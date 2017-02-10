@@ -257,7 +257,7 @@ Box.DialogVisual = function(scan) {
         rows: self.size.rows,
         cols: self.size.cols
       },
-      data: self.scan.boxables
+      data: self.scan.items
     });
     jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
     jQuery('#dialogDialog').dialog('open');
@@ -265,7 +265,7 @@ Box.DialogVisual = function(scan) {
 
   self.getBoxItem = function(row, col) {
     var pos = Box.utils.getPositionString(row, col);
-    var boxable = self.data[pos];
+    var boxables;
 
     if (jQuery.inArray(pos, self.scan.readErrorPositions) !== -1) {
       return new BoxItem({
@@ -277,13 +277,13 @@ Box.DialogVisual = function(scan) {
         unselectedImg: '/styles/images/tube_error.png'
       });
     }
-
-    if (typeof boxable !== 'undefined') {
+    boxables = self.data.filter(function(item) { return item.coordinates == pos; });
+    if (boxables.length > 0) {
       return new BoxItem({
         row: row,
         col: col,
         selected: self.selected,
-        title: boxable.alias,
+        title: boxables[0].alias,
         selectedImg: '/styles/images/tube_full_selected.png',
         unselectedImg: '/styles/images/tube_full.png',
         onClick: function() {}
@@ -318,21 +318,22 @@ Box.Visual = function() {
   //@Override
   self.getBoxItem = function(row, col) {
     var pos = Box.utils.getPositionString(row, col);
-    var boxable = self.data[pos];
-    if (typeof boxable !== 'undefined') {
+    var boxables;
+    boxables = self.data.filter(function(item) { return item.coordinates == pos; });
+    if (boxables.length > 0) {
       return new BoxItem({
         row: row,
         col: col,
         selected: self.selected,
-        title: boxable.alias,
+        title: boxables[0].alias,
         selectedImg: '/styles/images/tube_full_selected.png',
         unselectedImg: '/styles/images/tube_full.png',
         onClick: function() {
           jQuery('#selectedPosition').text(pos);
-          jQuery('#selectedName').text(boxable.name);
-          jQuery('#selectedAlias').html(Box.utils.hyperlinkifyBoxable(boxable.name, boxable.id, boxable.alias));
-          jQuery('#selectedName').html(Box.utils.hyperlinkifyBoxable(boxable.name, boxable.id, boxable.name));
-          jQuery('#selectedBarcode').val(boxable.identificationBarcode);
+          jQuery('#selectedName').text(boxables[0].name);
+          jQuery('#selectedAlias').html(Box.utils.hyperlinkifyBoxable(boxables[0].name, boxables[0].id, boxables[0].alias));
+          jQuery('#selectedName').html(Box.utils.hyperlinkifyBoxable(boxables[0].name, boxables[0].id, boxables[0].name));
+          jQuery('#selectedBarcode').val(boxables[0].identificationBarcode);
           jQuery('#selectedBarcode').select().focus();
           Box.ui.filterTableByColumn('#listingBoxablesTable', Box.utils.getPositionString(row, col), 0);
           jQuery('#removeSelected, #emptySelected').prop('disabled', false).removeClass('disabled');
@@ -382,7 +383,7 @@ Box.ScanDialog = function() {
 
     self.getNewPosition = function () {
       // Ignore all the magic numbers
-      var h = Box.boxJSON.size.rows*30 - 100;
+      var h = Box.boxJSON.rows*30 - 100;
       var w = Box.dialogWidth-400;
       return [Math.floor(Math.random() * h)+100, Math.floor(Math.random() * w)+100];
     };
@@ -580,7 +581,7 @@ Box.ScanDiff = function() {
     self.size = opts.size;
     self.data = opts.data;
 
-    var diff = Box.utils.getDiff(self.data, self.scan.boxables, self.size.rows, self.size.cols);
+    var diff = Box.utils.getDiff(self.data, self.scan.items, self.rows, self.cols);
     self.changed = diff.positions;
 
     jQuery('#dialogInfoAbove').html("<h1>Scan Success! </h1>"+
@@ -595,7 +596,7 @@ Box.ScanDiff = function() {
       position: [jQuery(window).width()/2 - Box.dialogWidth/2, 50],
       buttons: {
         "Save": function() {
-          Box.boxJSON.boxables = self.scan.boxables;
+          Box.boxJSON.items = self.scan.items;
           Box.saveContents();
           jQuery('#dialogDialog').dialog('close');
         },
@@ -610,10 +611,10 @@ Box.ScanDiff = function() {
     self.create({
       div: '#dialogVisual',
       size: {
-        rows: self.size.rows,
-        cols: self.size.cols
+        rows: self.rows,
+        cols: self.cols
       },
-      data: self.scan.boxables
+      data: self.scan.items
     });
     jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
     jQuery('#dialogDialog').dialog('open');
@@ -621,10 +622,11 @@ Box.ScanDiff = function() {
 
   self.getBoxItem = function(row, col) {
     var pos = Box.utils.getPositionString(row, col);
-    var boxable = self.data[pos];
+    var boxables;
     var sel, unsel;
 
-    if (typeof boxable !== 'undefined') {
+    boxables = self.data.filter(function(item) { return item.coordinates == pos; });
+    if (boxables.length > 0) {
       sel = jQuery.inArray(pos, self.changed) !== -1 ?
             '/styles/images/tube_full_selected_changed.png' :
             '/styles/images/tube_full_selected.png';
@@ -636,7 +638,7 @@ Box.ScanDiff = function() {
         row: row,
         col: col,
         selected: self.selected,
-        title: boxable.alias,
+        title: boxables[0].alias,
         selectedImg: sel,
         unselectedImg: unsel,
         onClick: function() {}
@@ -691,7 +693,7 @@ Box.PrepareScannerDialog = function() {
       buttons: {}
     });
     jQuery('#dialogDialog').dialog('open');
-    Box.scan.prepareScanner(Box.boxJSON.size.rows, Box.boxJSON.size.columns);
+    Box.scan.prepareScanner(Box.boxJSON.rows, Box.boxJSON.columns);
   };
 
   self.error = function() {
@@ -764,46 +766,31 @@ Box.utils = {
 
   // Return the position of a boxable item given its id in a box else return null
   findItemPos: function(name, boxables) {
-    for (var pos in boxables) {
-      if (boxables[pos].name == name) {
-        return pos;
-      }
-    }
-    return null;
+    var matches = boxables.filter(function(item) { return item.name == name; });
+    return matches.length == 1 ? mathces[0] : null;
   },
 
   // Return an array of changed positions as well as an HTML list representing the diff
   getDiff: function(oldBoxables, newBoxables) {
     var diff = [];
     var changed = [];
-
-    // Look for old items in the new
-    for (var oldpos in oldBoxables) {
-      if (oldBoxables.hasOwnProperty(oldpos)) {
-        var oldname = oldBoxables[oldpos].name;
-        var newpos = Box.utils.findItemPos(oldname, newBoxables);
-        if (newpos === null) {
-          diff.push('<li style="color:red;"><b>-</b> '+oldname+': removed from the box</li>');
-          changed.push(oldpos);
-        }  else {
-          diff.push('<li style="color:orange;"><b>!</b> '+oldname+': moved ('+oldpos+'->'+newpos+')</li>');
-          changed.push(oldpos);
-          changed.push(newpos);
-        }
+	oldBoxables.forEach(function(oldItem) {
+      var newItems = newBoxables.filter(function(item) { item.name == oldItem.name; });
+      if (newItems.length == 0) {
+        diff.push('<li style="color:red;"><b>-</b> '+oldItem.name+': removed from the box</li>');
+        changed.push(oldpos);
+      } else if (newItems[0].coordinates != oldItem.coordinates) {
+          diff.push('<li style="color:orange;"><b>!</b> '+oldItem.name+': moved ('+oldItem.coordinates+'->'+newItems[0].coordinates+')</li>');
+          changed.push(oldItem.coordinates);
+          changed.push(newItems[0].coordinates);
       }
-    }
-
-    // Look for new items
-    for (var pos in newBoxables) {
-      if (newBoxables.hasOwnProperty(pos)) {
-        var newname = newBoxables[pos].name;
-        oldpos = Box.utils.findItemPos(newname, oldBoxables);
-        if (oldpos === null) {
-          diff.push('<li style="color:green;"><b>+</b> '+newname+': added to the box at position '+pos+'</li>');
-          changed.push(pos);
-        }
+    });
+    newItems.forEach(function(newItem) {
+      if (oldBoxables.some(function(item) { item.name == newItem.name; })) {
+        diff.push('<li style="color:green;"><b>+</b> '+newItem.name+': added to the box at position '+newItem.coordinates+'</li>');
+        changed.push(pos);
       }
-    }
+    });
     return {'html': diff, 'positions': changed};
   }
 };

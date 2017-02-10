@@ -25,13 +25,12 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Collection;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.w3c.dom.Document;
-
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -42,10 +41,11 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Study extends SecurableByProfile, Submittable<Document>, Comparable, Deletable, Nameable {
+public interface Study extends SecurableByProfile, Comparable<Study>, Deletable, Nameable, ChangeLoggable, Aliasable {
 
   /** Field PREFIX */
   public static final String PREFIX = "STU";
@@ -111,6 +111,7 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
    * 
    * @return String alias.
    */
+  @Override
   public String getAlias();
 
   /**
@@ -122,26 +123,11 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
   public void setAlias(String alias);
 
   /**
-   * Returns the abstract of this Study object.
-   * 
-   * @return String abstract.
-   */
-  public String getAbstract();
-
-  /**
-   * Sets the abstract of this Study object.
-   * 
-   * @param abs
-   *          abs.
-   */
-  public void setAbstract(String abs);
-
-  /**
    * Returns the studyType of this Study object.
    * 
-   * @return String studyType.
+   * @return StudyType studyType.
    */
-  public String getStudyType();
+  public StudyType getStudyType();
 
   /**
    * Sets the studyType of this Study object.
@@ -149,7 +135,7 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
    * @param studyType
    *          studyType.
    */
-  public void setStudyType(String studyType);
+  public void setStudyType(StudyType studyType);
 
   /**
    * Registers an Experiment that will be undertaken as part of this Study

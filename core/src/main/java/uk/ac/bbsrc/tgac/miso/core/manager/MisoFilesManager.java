@@ -48,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.0.2
  */
 public class MisoFilesManager implements FilesManager {
-  protected static final Logger log = LoggerFactory.getLogger(MisoFilesManager.class);
+  private static final Logger log = LoggerFactory.getLogger(MisoFilesManager.class);
 
   private String fileStorageDirectory;
 
@@ -163,7 +163,7 @@ public class MisoFilesManager implements FilesManager {
       if (path.canRead()) {
         final File[] files = path.listFiles();
         if (files != null) {
-          final List<String> names = new ArrayList<String>();
+          final List<String> names = new ArrayList<>();
           for (final File f : Arrays.asList(files)) {
             names.add(f.getName());
           }

@@ -541,11 +541,6 @@
             </c:otherwise>
           </c:choose>
         </tr>
-          <%--
-          <tr>
-              <td>Paired: ${container.paired}</td>
-          </tr>
-          --%>
       </table>
       <div id='partitionErrorDiv' class="parsley-custom-error-message"></div>
       <div id="partitionDiv">
@@ -767,8 +762,7 @@
 
 <br/>
 </form:form>
-</div>
-<c:if test="${not empty run.changeLog}">
+<c:if test="${not empty run.changeLogs}">
   <br/>
   <h1>Changes</h1>
   <div style="clear:both">
@@ -781,7 +775,7 @@
       </tr>
       </thead>
       <tbody>
-      <c:forEach items="${run.changeLog}" var="change">
+      <c:forEach items="${run.changeLogs}" var="change">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td>${change.user.fullName} (${change.user.loginName})</td>
           <td><b>${change.summary}</b></td>
@@ -792,6 +786,7 @@
     </table>
   </div>
 </c:if>
+</div>
 </div>
 
 <%@ include file="adminsub.jsp" %>

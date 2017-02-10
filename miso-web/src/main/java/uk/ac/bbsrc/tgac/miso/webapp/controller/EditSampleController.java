@@ -40,7 +40,6 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,23 +63,21 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -98,10 +95,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
@@ -110,14 +110,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
@@ -132,7 +133,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ui.SampleOptionsController;
 @RequestMapping("/sample")
 @SessionAttributes("sample")
 public class EditSampleController {
-  protected static final Logger log = LoggerFactory.getLogger(EditSampleController.class);
+  private static final Logger log = LoggerFactory.getLogger(EditSampleController.class);
 
   private final ObjectMapper mapper = new ObjectMapper();
 
@@ -141,9 +142,6 @@ public class EditSampleController {
 
   @Autowired
   private RequestManager requestManager;
-
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -157,12 +155,14 @@ public class EditSampleController {
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
 
+  @Autowired
+  private ExperimentService experimentService;
+
+  @Autowired
+  private ChangeLogService changeLogService;
+
   public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
     this.sampleOptionsController = sampleOptionsController;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setRequestManager(RequestManager requestManager) {
@@ -203,40 +203,6 @@ public class EditSampleController {
   @ModelAttribute("sampleOptions")
   public String getSampleOptions(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     return mapper.writeValueAsString(sampleOptionsController.getSampleOptions(uriBuilder, response));
-  }
-
-  public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId)
-      throws IOException {
-    Project p = s.getProject();
-    EntityGroup<? extends Nameable, Sample> sgroup = (EntityGroup<? extends Nameable, Sample>) requestManager
-        .getEntityGroupById(entityGroupId);
-
-    Sample prevS = null;
-    Sample nextS = null;
-
-    if (p != null) {
-      if (!sgroup.getEntities().isEmpty()) {
-        Map<String, Sample> ret = new HashMap<>();
-        List<Sample> ss = new ArrayList<>(sgroup.getEntities());
-        Collections.sort(ss);
-        for (int i = 0; i < ss.size(); i++) {
-          if (ss.get(i).equals(s)) {
-            if (i != 0 && ss.get(i - 1) != null) {
-              prevS = ss.get(i - 1);
-            }
-
-            if (i != ss.size() - 1 && ss.get(i + 1) != null) {
-              nextS = ss.get(i + 1);
-            }
-            break;
-          }
-        }
-        ret.put("previousSample", prevS);
-        ret.put("nextSample", nextS);
-        return ret;
-      }
-    }
-    return Collections.emptyMap();
   }
 
   public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId)
@@ -297,9 +263,9 @@ public class EditSampleController {
   public Experiment populateExperiment(@RequestParam(value = "experimentId", required = false) Long experimentId) throws IOException {
     try {
       if (experimentId != null) {
-        return requestManager.getExperimentById(experimentId);
+        return experimentService.get(experimentId);
       } else {
-        return dataObjectFactory.getExperiment();
+        return new ExperimentImpl();
       }
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
@@ -361,7 +327,7 @@ public class EditSampleController {
 
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
-    return AbstractPool.CONCENTRATION_UNITS;
+    return PoolImpl.CONCENTRATION_UNITS;
   }
 
   @ModelAttribute("libraryQcTypesString")
@@ -699,12 +665,12 @@ public class EditSampleController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Sample sample = null;
       if (sampleId == AbstractSample.UNSAVED_ID) {
-        sample = detailedSample ? new DetailedSampleBuilder(user) : dataObjectFactory.getSample(user);
+        sample = detailedSample ? new DetailedSampleBuilder(user) : new SampleImpl(user);
         model.put("sampleCategory", "new");
         model.put("title", "New Sample");
 
         if (projectId != null) {
-          Project project = requestManager.lazyGetProjectById(projectId);
+          Project project = requestManager.getProjectById(projectId);
           if (project == null) throw new SecurityException("No such project.");
           model.addAttribute("project", project);
           sample.setProject(project);
@@ -730,7 +696,7 @@ public class EditSampleController {
         model.put("title", "Sample " + sampleId);
 
         if (projectId != null) {
-          Project project = requestManager.lazyGetProjectById(projectId);
+          Project project = requestManager.getProjectById(projectId);
           if (project == null) throw new SecurityException("No such project.");
           model.addAttribute("project", project);
           sample.setProject(project);
@@ -779,7 +745,7 @@ public class EditSampleController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Sample");
+    return changeLogService.listAll("Sample");
   }
 
   /**

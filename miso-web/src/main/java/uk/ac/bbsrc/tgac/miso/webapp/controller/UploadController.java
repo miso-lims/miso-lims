@@ -33,7 +33,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +45,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -61,8 +61,12 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService;
 
 @Controller
@@ -83,6 +87,14 @@ public class UploadController {
   private NamingScheme namingScheme;
   @Autowired
   private IndexService tagBarcodeService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private SampleService sampleService;
+  @Autowired
+  private SampleQcStore sampleQcStore;
+  @Autowired
+  private LibraryQcStore libraryQcStore;
 
   public void setTagBarcodeService(IndexService tagBarcodeService) {
     this.tagBarcodeService = tagBarcodeService;
@@ -110,6 +122,22 @@ public class UploadController {
 
   public void setLibraryNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  public void setSampleQcStore(SampleQcStore sampleQcStore) {
+    this.sampleQcStore = sampleQcStore;
+  }
+
+  public void setLibraryQcStore(LibraryQcStore libraryQcStore) {
+    this.libraryQcStore = libraryQcStore;
   }
 
   public void uploadFile(Class<?> type, String qualifier, MultipartFile fileItem) throws IOException {
@@ -181,7 +209,9 @@ public class UploadController {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, requestManager, namingScheme, tagBarcodeService);
+        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, sampleService, libraryService, sampleQcStore,
+            libraryQcStore,
+            namingScheme, tagBarcodeService);
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -208,7 +238,7 @@ public class UploadController {
         uploadFile(Sample.class, "forms", fileItem);
         File f = filesManager.getFile(Sample.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        jsonArray = FormUtils.preProcessSampleSheetImport(f, user, requestManager);
+        jsonArray = FormUtils.preProcessSampleSheetImport(f, user, sampleService);
       }
       response.setContentType("text/html");
       PrintWriter out = response.getWriter();
@@ -226,7 +256,7 @@ public class UploadController {
         uploadFile(Library.class, "forms", fileItem);
         File f = filesManager.getFile(Library.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        result = FormUtils.preProcessLibraryPoolSheetImport(f, user, requestManager);
+        result = FormUtils.preProcessLibraryPoolSheetImport(f, user, sampleService);
       }
 
       response.setContentType("text/html");
@@ -244,7 +274,7 @@ public class UploadController {
     String libraryId = request.getParameter("libraryId");
     if (libraryId == null) {
       throw new IOException("Cannot upload file - libraryId parameter missing or null");
-    } else if (requestManager.getLibraryById(Long.valueOf(libraryId)) == null) {
+    } else if (libraryService.get(Long.valueOf(libraryId)) == null) {
       throw new IOException("Cannot upload file - library does not exist");
     }
 
@@ -270,7 +300,7 @@ public class UploadController {
   @RequestMapping(value = "/dilution-to-pool", method = RequestMethod.POST)
   public void uploadLibraryList(MultipartHttpServletRequest request) throws IOException {
     try {
-      HashSet<String> librarySet = new HashSet<String>();
+      HashSet<String> librarySet = new HashSet<>();
       for (MultipartFile fileItem : getMultipartFiles(request)) {
         for (String s : new String(fileItem.getBytes()).split("\n")) {
           librarySet.add(s);
@@ -303,7 +333,7 @@ public class UploadController {
   }
 
   private List<MultipartFile> getMultipartFiles(MultipartHttpServletRequest request) {
-    List<MultipartFile> files = new ArrayList<MultipartFile>();
+    List<MultipartFile> files = new ArrayList<>();
     Map<String, MultipartFile> fMap = request.getFileMap();
     for (String fileName : fMap.keySet()) {
       MultipartFile fileItem = fMap.get(fileName);

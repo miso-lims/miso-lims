@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -26,10 +26,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.context;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import io.prometheus.client.hotspot.DefaultExports;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -47,39 +43,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor;
 import org.springframework.jndi.JndiObjectFactoryBean;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.factory.issuetracker.IssueTrackerFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.DelegatingNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.NamingSchemeResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
@@ -117,8 +94,6 @@ public class MisoAppListener implements ServletContextListener {
     MisoPropertyExporter exporter = (MisoPropertyExporter) context.getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
 
-    context.getServletContext().setAttribute("security.method", misoProperties.get("security.method"));
-
     log.info("Checking MISO storage paths...");
     String baseStoragePath = misoProperties.get("miso.baseDirectory");
     context.getServletContext().setAttribute("miso.baseDirectory", baseStoragePath);
@@ -138,115 +113,15 @@ public class MisoAppListener implements ServletContextListener {
 
     initializeNamingSchemes(context, misoProperties);
 
-    // set up printers
-    PrintManager<?, ?> printManager = (PrintManager<?, ?>) context.getBean("printManager");
-    Collection<PrintContext> pcs = printManager.getPrintContexts();
-    for (PrintContext<?> pc : pcs) {
-      log.info(pc.getName() + " : " + pc.getDescription());
-    }
-
-    try {
-      Collection<MisoPrintService> mpss = printManager.listAllPrintServices();
-      for (MisoPrintService<?, ?, ?> mps : mpss) {
-        log.info("Got print service: " + mps.toString());
-      }
-    } catch (Exception e) {
-      log.error("Could not list print services. This does not bode well for printing.", e);
-    }
-
-    // set up alerting
-    if ("true".equals(misoProperties.get("miso.alerting.enabled"))) {
-      // set up indexers and alerters
-      MisoRequestManager rm = new MisoRequestManager();
-      rm.setProjectStore((ProjectStore) context.getBean("projectStore"));
-      rm.setRunStore((RunStore) context.getBean("runStore"));
-      rm.setRunQcStore((RunQcStore) context.getBean("runQcStore"));
-      rm.setPoolStore((PoolStore) context.getBean("poolStore"));
-
-      SecurityManager sm = (com.eaglegenomics.simlims.core.manager.SecurityManager) context.getBean("securityManager");
-
-      RunAlertManager ram = (RunAlertManager) context.getBean("runAlertManager");
-      ram.setRequestManager(rm);
-      ram.setSecurityManager(sm);
-
-      ProjectAlertManager pam = (ProjectAlertManager) context.getBean("projectAlertManager");
-      pam.setRequestManager(rm);
-      pam.setSecurityManager(sm);
-
-      PoolAlertManager poam = (PoolAlertManager) context.getBean("poolAlertManager");
-      poam.setRequestManager(rm);
-      poam.setSecurityManager(sm);
-    }
-
-    if ("true".equals(misoProperties.get("miso.db.caching.precache.enabled"))) {
-      log.info("Precaching. This may take a while.");
-      try {
-        RequestManager rm = (RequestManager) context.getBean("requestManager");
-
-        User userdetails = new User("precacher", "none", true, true, true, true,
-            AuthorityUtils.createAuthorityList("ROLE_ADMIN,ROLE_INTERNAL"));
-        PreAuthenticatedAuthenticationToken newAuthentication = new PreAuthenticatedAuthenticationToken(userdetails,
-            userdetails.getPassword(), userdetails.getAuthorities());
-        newAuthentication.setAuthenticated(true);
-        newAuthentication.setDetails(userdetails);
-
-        try {
-          SecurityContext sc = SecurityContextHolder.getContextHolderStrategy().getContext();
-          sc.setAuthentication(newAuthentication);
-          SecurityContextHolder.getContextHolderStrategy().setContext(sc);
-        } catch (AuthenticationException a) {
-          log.error("security context init", a);
-        }
-
-        log.info("\\_ projects...");
-        log.info("" + rm.listAllProjects().size());
-        log.info("\\_ studies...");
-        log.info("" + rm.listAllStudies().size());
-        log.info("\\_ experiments...");
-        log.info("" + rm.listAllExperiments().size());
-        log.info("\\_ samples...");
-        log.info("" + rm.listAllSamples().size());
-        log.info("\\_ libraries...");
-        log.info("" + rm.listAllLibraries().size());
-        log.info("\\_ dilutions...");
-        log.info("" + rm.listAllLibraryDilutions().size());
-        log.info("" + rm.listAllEmPCRDilutions().size());
-        log.info("\\_ pools...");
-        log.info("" + rm.listAllPools().size());
-        log.info("\\_ sequencing containers...");
-        log.info("" + rm.listAllSequencerPartitionContainers().size());
-        log.info("\\_ runs...");
-        log.info("" + rm.listAllRuns().size());
-      } catch (IOException e) {
-        log.info("precache", e);
-      }
-    }
-
     if ("true".equals(misoProperties.get("miso.issuetracker.enabled"))) {
       String trackerType = misoProperties.get("miso.issuetracker.tracker");
       if (!isStringEmptyOrNull(trackerType)) {
-        try {
-          IssueTrackerManager manager = IssueTrackerFactory.newInstance().getTrackerManager(trackerType);
-          if (manager != null) {
-            for (String key : misoProperties.keySet()) {
-              if (key.startsWith("miso.issuetracker." + trackerType)) {
-                String prop = key.substring(key.lastIndexOf(".") + 1);
-                String methodName = "set" + LimsUtils.capitalise(prop); // prop.substring(0,1).toUpperCase() + prop.substring(1);
-                Method m = manager.getClass().getDeclaredMethod(methodName, String.class);
-                m.invoke(manager, misoProperties.get(key));
-              }
-            }
-            ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
-            context.getBeanFactory().registerSingleton("issueTrackerManager", manager);
-          } else {
-            log.error("No such issue tracker available with given type: " + trackerType);
-          }
-        } catch (NoSuchMethodException e) {
-          log.error("Unable to start the defined issuetracker " + trackerType, e);
-        } catch (InvocationTargetException e) {
-          log.error("Unable to start the defined issuetracker " + trackerType, e);
-        } catch (IllegalAccessException e) {
-          log.error("Unable to start the defined issuetracker " + trackerType, e);
+        IssueTrackerManager manager = IssueTrackerFactory.newInstance().getTrackerManager(trackerType);
+        if (manager != null) {
+          ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
+          context.getBeanFactory().registerSingleton("issueTrackerManager", manager);
+        } else {
+          log.error("No such issue tracker available with given type: " + trackerType);
         }
       }
     }
@@ -285,15 +160,15 @@ public class MisoAppListener implements ServletContextListener {
         .getBean("namingSchemeResolverService");
 
     String currentPropertyValue = null;
-    NamingScheme scheme = (NamingScheme) context.getBeanFactory().getBean("namingScheme");
-    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.scheme", misoProperties)) != null) {
-      scheme = resolver.getNamingScheme(currentPropertyValue);
-      if (scheme == null) throw new IllegalArgumentException("Failed to load naming scheme '" + currentPropertyValue + "'");
-      SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(scheme);
-      log.info("Replacing default namingScheme with " + scheme.getClass().getSimpleName());
-      ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("namingScheme");
-      context.getBeanFactory().registerSingleton("namingScheme", scheme);
+    DelegatingNamingScheme schemeHolder = (DelegatingNamingScheme) context.getBeanFactory().getBean("namingScheme");
+    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.scheme", misoProperties)) == null) {
+      throw new IllegalArgumentException("No naming scheme configured");
     }
+    NamingScheme scheme = resolver.getNamingScheme(currentPropertyValue);
+    if (scheme == null) throw new IllegalArgumentException("Failed to load naming scheme '" + currentPropertyValue + "'");
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(scheme);
+    log.info("Replacing default namingScheme with " + scheme.getClass().getSimpleName());
+    schemeHolder.setActualNamingScheme(scheme);
 
     if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.generator.nameable.name", misoProperties)) != null) {
       NameGenerator<Nameable> generator = resolver.getNameGenerator(currentPropertyValue);

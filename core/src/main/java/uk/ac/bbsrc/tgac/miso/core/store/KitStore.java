@@ -42,10 +42,6 @@ public interface KitStore extends Store<Kit> {
 
   Kit getKitByLotNumber(String lotNumber) throws IOException;
 
-  List<Kit> listByExperiment(long experimentId) throws IOException;
-
-  List<Kit> listByManufacturer(String manufacturerName) throws IOException;
-
   List<Kit> listKitsByType(KitType kitType) throws IOException;
 
   KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
@@ -63,4 +59,5 @@ public interface KitStore extends Store<Kit> {
    * @throws IOException
    */
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
+
 }

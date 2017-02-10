@@ -22,7 +22,7 @@ BEGIN
     UNION SELECT 'Analyte Stocks',COUNT(*) FROM SampleStock
     UNION SELECT 'Analyte Aliquots',COUNT(*) FROM SampleAliquot
     UNION SELECT 'Libraries',COUNT(*) FROM Library
-    UNION SELECT 'LibraryAdditionalInfo',COUNT(*) FROM LibraryAdditionalInfo
+    UNION SELECT 'DetailedLibrary',COUNT(*) FROM DetailedLibrary
     UNION SELECT 'LibraryChangeLogs',COUNT(*) FROM LibraryChangeLog
     UNION SELECT 'LibraryDilutions',COUNT(*) FROM LibraryDilution
     UNION SELECT 'Pool_Elements',COUNT(*) FROM Pool_Elements
@@ -50,7 +50,7 @@ BEGIN
     DELETE FROM Pool_Elements;
     DELETE FROM Pool;
     DELETE FROM LibraryDilution;
-    DELETE FROM LibraryAdditionalInfo;
+    DELETE FROM DetailedLibrary;
     DELETE FROM Library_Index;
     DELETE FROM LibraryChangeLog;
     DELETE FROM Library;

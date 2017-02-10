@@ -67,14 +67,14 @@ var Sample = Sample || {
     }
   },
 
-  removeSampleFromGroup: function(sampleId, sampleGroupId, successfunc) {
-    if (confirm("Are you sure you really want to remove SAM" + sampleId + " from Sample group "+sampleGroupId+"?")) {
+  removeSampleFromOverview: function(sampleId, overviewId, successfunc) {
+    if (confirm("Are you sure you really want to remove SAM" + sampleId + " from overview?")) {
       Fluxion.doAjax(
         'sampleControllerHelperService',
-        'removeSampleFromGroup',
+        'removeSampleFromOverview',
         {
           'sampleId': sampleId,
-          'sampleGroupId':sampleGroupId,
+          'overviewId':overviewId,
           'url': ajaxurl
         },
         {
@@ -590,7 +590,6 @@ Sample.barcode = {
       'printerControllerHelperService',
       'listAvailableServices',
       {
-        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Sample',
         'url': ajaxurl
       },
       {
@@ -612,7 +611,7 @@ Sample.barcode = {
                   'sampleControllerHelperService',
                   'printSampleBarcodes',
                   {
-                    'serviceName': jQuery('#serviceSelect').val(),
+                    'printerId': jQuery('#serviceSelect').val(),
                     'samples': samples,
                     'url': ajaxurl
                   },

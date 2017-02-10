@@ -59,7 +59,7 @@ import org.springframework.util.CollectionUtils;
  * @since 0.0.2
  */
 public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
-  protected static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
+  private static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
 
   private Map<String, String> resolvedProperties;
 
@@ -74,7 +74,6 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
       }
 
       // set a system property to the base directory so that other systems can be configured based on this path
-      // e.g. ehcache DiskStores
       System.setProperty("miso.baseDirectory", baseStoragePath);
 
       Map<String, String> propchecks = MisoWebUtils.checkCorePropertiesFiles(baseStoragePath);
@@ -104,14 +103,8 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
         }
       }
 
-      // override any config file security.method property with that from the system env
-      if (System.getenv("security.method") != null) {
-        misoProps.put("security.method", System.getenv("security.method"));
-        log.debug("Set security.method to " + misoProps.get("security.method"));
-      }
-
       super.processProperties(beanFactoryToProcess, misoProps);
-      resolvedProperties = new HashMap<String, String>();
+      resolvedProperties = new HashMap<>();
       for (Object key : misoProps.keySet()) {
         String keyStr = key.toString();
 

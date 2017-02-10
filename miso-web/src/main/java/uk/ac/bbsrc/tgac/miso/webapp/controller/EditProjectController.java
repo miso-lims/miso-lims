@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -61,7 +61,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -71,30 +70,30 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
 @RequestMapping("/project")
 @SessionAttributes("project")
 public class EditProjectController {
-  protected static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
+  private static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
   @Autowired
   private SecurityManager securityManager;
@@ -106,14 +105,16 @@ public class EditProjectController {
   private FilesManager filesManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
   private ReferenceGenomeService referenceGenomeService;
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
+  @Autowired
+  private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
+  @Autowired
+  private StudyService studyService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -127,6 +128,18 @@ public class EditProjectController {
     this.filesManager = filesManager;
   }
 
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
+  }
+
   @InitBinder
   public void initBinder(WebDataBinder binder) {
     CustomDateEditor cde = new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true);
@@ -135,7 +148,7 @@ public class EditProjectController {
 
   public Map<Integer, String> populateProjectFiles(Long projectId) throws IOException {
     if (projectId != AbstractProject.UNSAVED_ID) {
-      Project p = requestManager.lazyGetProjectById(projectId);
+      Project p = requestManager.getProjectById(projectId);
       if (p != null) {
         Map<Integer, String> fileMap = new HashMap<>();
         for (String s : filesManager.getFileNames(Project.class, projectId.toString())) {
@@ -169,7 +182,7 @@ public class EditProjectController {
 
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
-    return AbstractPool.CONCENTRATION_UNITS;
+    return PoolImpl.CONCENTRATION_UNITS;
   }
 
   @ModelAttribute("libraryDilutionUnits")
@@ -190,34 +203,26 @@ public class EditProjectController {
 
   public Collection<Run> populateProjectRuns(long projectId) throws IOException {
     List<Run> runs = new ArrayList<>(requestManager.listAllRunsByProjectId(projectId));
-    try {
-      Collections.sort(runs, new AliasComparator(Run.class));
+    Collections.sort(runs, new AliasComparator<>());
       for (Run r : runs) {
         RunImpl ri = (RunImpl) r;
         ri.setSequencerPartitionContainers(new ArrayList<>(
             requestManager.listSequencerPartitionContainersByRunId(r.getId())));
       }
       return runs;
-    } catch (NoSuchMethodException e) {
-      throw new IOException(e);
-    }
   }
 
   public Collection<Library> populateProjectLibraries(long projectId) throws IOException {
-    List<Library> libraries = new ArrayList<>(requestManager.listAllLibrariesByProjectId(projectId));
-    try {
-      Collections.sort(libraries, new AliasComparator(Library.class));
-      for (Library l : libraries) {
-        for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
-          try {
-            l.addQc(qc);
-          } catch (MalformedLibraryQcException e) {
-            throw new IOException(e);
-          }
+    List<Library> libraries = new ArrayList<>(libraryService.listByProjectId(projectId));
+    Collections.sort(libraries, new AliasComparator<>());
+    for (Library l : libraries) {
+      for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
+        try {
+          l.addQc(qc);
+        } catch (MalformedLibraryQcException e) {
+          throw new IOException(e);
         }
       }
-    } catch (NoSuchMethodException e) {
-      throw new IOException(e);
     }
 
     return libraries;
@@ -226,14 +231,14 @@ public class EditProjectController {
   public Collection<LibraryDilution> populateProjectLibraryDilutions(Collection<Library> projectLibraries) throws IOException {
     List<LibraryDilution> dilutions = new ArrayList<>();
     for (Library l : projectLibraries) {
-      dilutions.addAll(requestManager.listAllLibraryDilutionsByLibraryId(l.getId()));
+      dilutions.addAll(dilutionService.listByLibraryId(l.getId()));
     }
     Collections.sort(dilutions);
     return dilutions;
   }
 
   public Collection<LibraryDilution> populateProjectLibraryDilutions(long projectId) throws IOException {
-    List<LibraryDilution> dilutions = new ArrayList<>(requestManager.listAllLibraryDilutionsByProjectId(projectId));
+    List<LibraryDilution> dilutions = new ArrayList<>(dilutionService.listByProjectId(projectId));
     Collections.sort(dilutions);
     return dilutions;
   }
@@ -246,7 +251,7 @@ public class EditProjectController {
 
   public boolean existsAnyEmPcrLibrary(Collection<LibraryDilution> projectLibraryDilutions) throws IOException {
     for (LibraryDilution dil : projectLibraryDilutions) {
-      if (PlatformType.valueOf(dil.getLibrary().getPlatformName().toUpperCase()).usesEmPCR()) {
+      if (dil.getLibrary().getPlatformType().usesEmPCR()) {
         return true;
       }
     }
@@ -257,34 +262,13 @@ public class EditProjectController {
     return existsAnyEmPcrLibrary(populateProjectLibraryDilutions(projectId));
   }
 
-  public Collection<emPCR> populateProjectEmPCRs(long projectId) throws IOException {
-    List<emPCR> pcrs = new ArrayList<>(requestManager.listAllEmPCRsByProjectId(projectId));
-    Collections.sort(pcrs);
-    return pcrs;
-  }
-
-  public Collection<emPCRDilution> populateProjectEmPcrDilutions(Collection<emPCR> projectEmPCRs) throws IOException {
-    List<emPCRDilution> dilutions = new ArrayList<>();
-    for (emPCR e : projectEmPCRs) {
-      dilutions.addAll(requestManager.listAllEmPCRDilutionsByEmPcrId(e.getId()));
-    }
-    Collections.sort(dilutions);
-    return dilutions;
-  }
-
-  public Collection<emPCRDilution> populateProjectEmPcrDilutions(long projectId) throws IOException {
-    List<emPCRDilution> dilutions = new ArrayList<>(requestManager.listAllEmPCRDilutionsByProjectId(projectId));
-    Collections.sort(dilutions);
-    return dilutions;
-  }
-
   public Map<Long, Collection<Library>> populateLibraryGroupMap(Project project, Collection<Library> projectLibraries) throws IOException {
     Map<Long, Collection<Library>> libraryGroupMap = new HashMap<>();
 
     for (ProjectOverview po : project.getOverviews()) {
-      if (po.getSampleGroup() != null && !po.getSampleGroup().getEntities().isEmpty()) {
+      if (po.getSampleGroup() != null && !po.getSamples().isEmpty()) {
         Set<Library> libs = new HashSet<>();
-        for (Sample s : po.getSampleGroup().getEntities()) {
+        for (Sample s : po.getSamples()) {
           for (Library pl : projectLibraries) {
             if (pl.getSample().equals(s)) {
               libs.add(pl);
@@ -304,7 +288,7 @@ public class EditProjectController {
     try {
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
       Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(projectId);
+      Collection<Study> studies = studyService.listByProjectId(projectId);
 
       JSONObject runsJSON = new JSONObject();
       JSONObject studiesJSON = new JSONObject();
@@ -319,7 +303,7 @@ public class EditProjectController {
       }
 
       for (Study study : studies) {
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
+        Collection<Experiment> experiments = experimentService.listAllByStudyId(study.getId());
         if (experiments.size() == 0) {
           studiesJSON.put(study.getName(), "2");
         } else {
@@ -332,7 +316,7 @@ public class EditProjectController {
       }
 
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.listBySampleId(sample.getId());
         if (libraries.size() == 0) {
           if (sample.getQcPassed()) {
             samplesJSON.put(sample.getName(), "1");
@@ -342,7 +326,7 @@ public class EditProjectController {
         } else {
           JSONObject librariesJSON = new JSONObject();
           for (Library library : libraries) {
-            Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutionsByLibraryId(library.getId());
+            Collection<LibraryDilution> lds = dilutionService.listByLibraryId(library.getId());
             if (lds.size() > 0) {
               JSONObject dilutionsJSON = new JSONObject();
               for (LibraryDilution ld : lds) {
@@ -383,7 +367,7 @@ public class EditProjectController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Project project = null;
       if (projectId == AbstractProject.UNSAVED_ID) {
-        project = dataObjectFactory.getProject(user);
+        project = new ProjectImpl(user);
         model.put("title", "New Project");
       } else {
         project = requestManager.getProjectById(projectId);
@@ -396,10 +380,6 @@ public class EditProjectController {
         Collection<LibraryDilution> libraryDilutions = populateProjectLibraryDilutions(libraries);
         model.put("projectLibraryDilutions", libraryDilutions);
         model.put("existsAnyEmPcrLibrary", existsAnyEmPcrLibrary(libraryDilutions));
-
-        Collection<emPCR> emPcrs = populateProjectEmPCRs(projectId);
-        model.put("projectEmPcrs", emPcrs);
-        model.put("projectEmPcrDilutions", populateProjectEmPcrDilutions(emPcrs));
 
         model.put("projectPools", populateProjectPools(projectId));
 

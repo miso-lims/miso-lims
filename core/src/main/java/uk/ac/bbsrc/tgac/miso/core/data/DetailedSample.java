@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public interface DetailedSample extends Sample {
 

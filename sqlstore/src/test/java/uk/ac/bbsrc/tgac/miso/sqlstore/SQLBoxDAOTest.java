@@ -24,57 +24,32 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
-import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
-import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxDao;
 
 public class SQLBoxDAOTest extends AbstractDAOTest {
 
@@ -85,56 +60,17 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   @Spy
   private JdbcTemplate jdbcTemplate;
 
-  @Mock
-  private NamingScheme namingScheme;
-  @Mock
-  private SecurityStore securityDAO;
-  @Mock
-  private Store<SecurityProfile> securityProfileDAO;
-  @Mock
-  private SequencerReferenceStore sequencerReferenceDAO;
-  @Mock
-  private RunQcStore runQcDAO;
-  @Mock
-  private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
-  @Mock
-  private StatusStore statusDAO;
-  @Mock
-  private NoteStore noteDAO;
-  @Mock
-  private WatcherStore watcherDAO;
-  @Mock
-  private ChangeLogStore changeLogDAO;
-  @Mock
-  private SQLLibraryDAO LibraryDAO;
-  @Mock
-  private HibernateSampleDao sampleDao;
-  @Mock
-  private SQLPoolDAO poolDao;
+  @Autowired
+  private SessionFactory sessionFactory;
 
   @InjectMocks
-  private SQLBoxDAO dao;
-
-  // Auto-increment sequence doesn't roll back with transactions, so must be tracked
-  private static long nextAutoIncrementId = 3L;
+  private HibernateBoxDao dao;
 
   @Before
   public void setup() throws IOException, MisoNamingException {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
-
-    SecurityProfile securityProfile = new SecurityProfile();
-    when(securityProfileDAO.get(anyLong())).thenReturn(securityProfile);
-    User user = new UserImpl();
-    user.setUserId(1l);
-    when(securityDAO.getUserById(anyLong())).thenReturn(user);
-
-    when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
-
-    CacheManager cacheManager = mock(CacheManager.class);
-    Mockito.when(cacheManager.getCache(Matchers.anyString())).thenReturn(mock(Cache.class));
-    dao.setCacheManager(cacheManager);
+    dao.setSessionFactory(sessionFactory);
   }
 
   @Test
@@ -167,25 +103,11 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws Exception {
-    Box box = dao.lazyGet(2);
-    assertEquals("box2alias", box.getAlias());
-    assertEquals("box2", box.getName());
-    assertEquals(2, box.getId());
-    assertEquals("barcode2", box.getIdentificationBarcode());
-    assertEquals(4, box.getSize().getRows());
-    assertEquals("boxuse2", box.getUse().getAlias());
-  }
-
-  @Test
   public void testListAll() throws Exception {
     Collection<Box> boxes = dao.listAll();
-    assertTrue(boxes.size() == 2);
+    assertTrue(boxes.size() > 0);
 
-    Iterator<Box> iterator = boxes.iterator();
-
-    assertEquals(1, iterator.next().getId());
-    assertEquals(2, iterator.next().getId());
+    assertEquals(boxes.size(), dao.count());
   }
 
   @Test
@@ -226,41 +148,37 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testEmptyAllTubes() throws Exception {
-    when(poolDao.getByPositionId(1)).thenReturn(new PoolImpl(new UserImpl()));
-    when(poolDao.getByBarcode(null)).thenReturn(new PoolImpl(new UserImpl()));
     Box box = dao.get(1);
 
-    assertTrue("precondition failed", box.getBoxables().values().size() > 0);
+    assertTrue("precondition failed", box.getBoxables().size() > 0);
     dao.discardAllTubes(box);
-    assertTrue(box.getBoxables().values().size() == 0);
+    assertTrue(box.getBoxables().size() == 0);
 
   }
 
   @Test
   public void testEmptySingleTube() throws Exception {
-    when(poolDao.getByPositionId(1)).thenReturn(new PoolImpl(new UserImpl()));
-    when(poolDao.getByBarcode(null)).thenReturn(new PoolImpl(new UserImpl()));
 
     Box box = dao.get(1);
+    int count = box.getBoxables().size();
 
-    assertTrue("precondition failed", box.getBoxables().values().size() > 0);
+    assertTrue("precondition failed", box.getBoxables().size() > 0);
+    assertTrue(box.getBoxables().containsKey("B02"));
     dao.discardSingleTube(box, "B02");
-    assertTrue(box.getBoxables().values().size() == 0);
+    Box fetchedBox = dao.get(1);
+    assertEquals(count - 1, fetchedBox.getBoxables().size());
 
   }
 
   @Test
   public void testRemoveBoxableFromBox() throws Exception {
-    Pool pool = new PoolImpl(new UserImpl());
-    pool.setBoxPosition("1");
+    Box box = dao.get(1);
+    Boxable item = box.getBoxables().values().iterator().next();
+    assertNotNull(item);
 
-    dao.removeBoxableFromBox(pool);
-  }
-
-  private void mockAutoIncrement(long value) {
-    Map<String, Object> rs = new HashMap<>();
-    rs.put("Auto_increment", value);
-    Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
+    dao.removeBoxableFromBox(item);
+    Box again = dao.get(1);
+    assertFalse(again.getBoxables().containsValue(item));
   }
 
   @Test
@@ -282,10 +200,6 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     BoxUse boxuse = dao.getUseById(1);
     box.setUse(boxuse);
 
-    long autoIncrementId = nextAutoIncrementId;
-    mockAutoIncrement(autoIncrementId);
-
-    when(namingScheme.generateNameFor(box)).thenReturn("newbox");
     long boxId = dao.save(box);
 
     Box retrieved = dao.get(boxId);

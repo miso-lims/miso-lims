@@ -38,6 +38,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.1.6
  */
 public class SystemAlert extends DefaultAlert {
+  private static final long serialVersionUID = 1L;
+
   public SystemAlert() {
     super(getDummySystemUser());
   }

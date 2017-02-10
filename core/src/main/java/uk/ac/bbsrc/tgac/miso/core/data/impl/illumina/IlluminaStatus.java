@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl.illumina;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
@@ -50,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  * @since 0.0.2
  */
 public class IlluminaStatus extends StatusImpl {
-  protected static final Logger log = LoggerFactory.getLogger(IlluminaStatus.class);
+  private static final Logger log = LoggerFactory.getLogger(IlluminaStatus.class);
   String statusXml = null;
 
   public IlluminaStatus() {
@@ -90,6 +91,8 @@ public class IlluminaStatus extends StatusImpl {
     } catch (TransformerException e) {
       log.error("parse status XML", e);
     } catch (ParseException e) {
+      log.error("parse status XML", e);
+    } catch (UnsupportedEncodingException e) {
       log.error("parse status XML", e);
     }
   }

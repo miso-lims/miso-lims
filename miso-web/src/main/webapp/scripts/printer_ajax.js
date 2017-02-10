@@ -24,165 +24,52 @@
 var Print = Print || {};
 
 Print.ui = {
-  changePrinterServiceRow : function(printService) {
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'changePrinterServiceRow',
-      {
-        'serviceName':printService,
-        'url':ajaxurl
-      },
-      {'doOnSuccess':function(json) {
-        jQuery('#host-' + printService).html(json.hostname);
-        jQuery('#edit-' + printService).html(json.edit);
-        if(jQuery('#schema-' + printService).is(':empty')){
-          jQuery('#schema-' + printService).html(json.barcodableSchemas);
-        }else{
-          var selectedschema =  jQuery('#schema-' + printService).val();
-          jQuery('#schema-' + printService).html(json.barcodableSchemas);
-          jQuery('#schema-' + printService+' select').val(selectedschema);
+  changeBackend: function() {
+    var backend = parseInt(document.getElementById('backend').value);
+    jQuery('#backendConfiguration').html(
+      Print.backends.filter(function(b) { return b.id == backend; })[0].configurationKeys.map(function (k) {
+        return k + ": <input id='cfg" + k + "'/>";
+      }).join("<br/>"));
+  },
+
+  showAddPrinter: function() {
+    Print.ui.dialog = jQuery('#add-printer-dialog').dialog({
+        autoOpen: true,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+          "Save": function() {
+            var backend = parseInt(document.getElementById('backend').value);
+            var configuration = {};
+            Print.backends.filter(function(b) { return b.id == backend; })[0].configurationKeys.forEach(function (k) {
+             configuration[k] = document.getElementById('cfg' + k).value;
+            });
+
+            Print.service.addPrinter(
+              document.getElementById('addName').value,
+              document.getElementById('driver').value,
+              backend,
+              configuration);
+          },
+          "Cancel": function() {
+            Pool.orders.dialog.dialog( "close" );
+          }
         }
-      }
-    });
-  },
-
-  editPrinterService : function(serviceName) {
-    var schema='';
-    if(jQuery('#newschema-' + serviceName).length !== 0) {
-      schema =  jQuery('#newschema-' + serviceName+' option:selected').val();
-    }
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'editPrinterService',
-      {
-        'serviceName':serviceName,
-        'host':jQuery('#newhost-' + serviceName).val(),
-        'schema':schema,
-        'url':ajaxurl
-      },
-      {'doOnSuccess':Utils.page.pageReload
-      }
-    );
-  },
-
-  getPrinterFormEntities : function() {
-    var self = this;
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'getPrinterFormEntities',
-      {'url':ajaxurl},
-      {'doOnSuccess':self.processPrinterServiceRow}
-    );
-  },
-
-  processPrinterServiceRow : function(json) {
-    if (!jQuery('#printerTable').attr("addInProgress")) {
-      jQuery('#printerTable').attr("addInProgress", "true");
-      jQuery('#printerTable tr:first th:eq(4)').remove();
-      jQuery('#printerTable tr:first th:eq(3)').remove();
-
-      jQuery('#printerTable').find("tr").each(function() {
-        jQuery(this).find("td:eq(4)").remove();
-        jQuery(this).find("td:eq(3)").remove();
       });
-
-      jQuery('#printerTable tr:first').append("<th>Printable Entity</th><th>Available</th><th></th>");
-
-      jQuery('#printerTable')[0].insertRow(1);
-
-      var column1 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
-      column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
-      var column2 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
-      column2.innerHTML = "<i>Set in context fields</i>";
-      var column3 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
-      column3.innerHTML = "<select id='contexts' name='context' onchange='Print.ui.getContextFieldsForContext(this)'>" +json.contexts+ "</select><br/><div id='contextFields' name='contextFields'/>";
-      var column4 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
-      column4.innerHTML = "<select id='barcodableSchemas' name='printSchema'>" +json.barcodableSchemas+ "</select>";
-      var column5 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
-      column5.innerHTML = "<select id='barcodables' name='printServiceFor'>" +json.barcodables+ "</select>";
-      var column6 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
-      column6.innerHTML = "<div id='available'></div>";
-      var column7 = jQuery('#printerTable')[0].rows[1].insertCell(-1);
-      column7.id = "addTd";
-      column7.innerHTML = "Add";
-    }
-    else {
-      alert("Cannot add another printer service when one is already in progress.");
-    }
-  },
-
-  getContextFieldsForContext : function(contextSelect) {
-    var self = this;
-    var context = jQuery(contextSelect).val();
-    Fluxion.doAjax(
-            'printerControllerHelperService',
-            'getContextFields',
-    {'contextName':context, 'url':ajaxurl},
-    {'doOnSuccess':self.processContextChange}
-    );
-  },
-
-  processContextChange : function(json) {
-    jQuery('#contextFields').html("Context fields:<br/>");
-    var fields = json.contextFields;
-    for (var key in fields) {
-      if (fields.hasOwnProperty(key)) {
-        jQuery('#contextFields').append(key +": <input id='contextField-"+key+"' field='"+key+"' type='text' value='"+fields[key]+"'/><br/>");
-      }
-    }
-    jQuery('#contextField-host').keyup(function() { Print.service.validatePrinter(this); });
   }
 };
 
 Print.service = {
-  validatePrinter : function(t) {
-    jQuery('#available')[0].innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
-
-    if (t.value != t.lastValue) {
-      if (t.timer) {
-        clearTimeout(t.timer);
-      }
-
-      t.timer = setTimeout(function () {
-        Fluxion.doAjax(
-          'printerControllerHelperService',
-          'checkPrinterAvailability',
-          {'host':t.value, 'url':ajaxurl},
-          {"doOnSuccess": function(json) {
-            jQuery('#available')[0].innerHTML = json.html;
-            if (json.html == "OK") {
-              jQuery('#available')[0].setAttribute("style", "background-color:green");
-              jQuery('#addTd')[0].innerHTML = "<a href='javascript:void(0);' onclick='Print.service.addPrinterService();'/>Add</a>";
-            }
-            else {
-              jQuery('#available')[0].setAttribute("style", "background-color:red");
-            }
-          }
-        });
-      }, 200);
-      t.lastValue = t.value;
-    }
-  },
-
-  addPrinterService : function() {
-    jQuery('#printerTable').removeAttr("addInProgress");
-
-    var f = Utils.mappifyForm("addPrinterForm");
-    var cf = {};
-    jQuery('input[id*="contextField-"]').each(function() {
-      var field = jQuery(this).attr("field");
-      cf[field] = jQuery(this).val();
-    });
-
+  addPrinter: function(name, driver, backend, configuration) {
     Fluxion.doAjax(
       'printerControllerHelperService',
-      'addPrintService',
+      'addPrinter',
       {
-        'serviceName':f.serviceName,
-        'contextName':f.context,
-        'contextFields':cf,
-        'serviceFor':f.printServiceFor,
-        'schema':f.printSchema,
+        'name':name,
+        'driver':driver,
+        'backend':backend,
+        'configuration':configuration,
         'url':ajaxurl},
       {'doOnSuccess':Utils.page.pageReload,
        'doOnError':function(json) {
@@ -192,224 +79,28 @@ Print.service = {
     );
   },
 
-  disablePrintService : function(printerName) {
+  setPrinterState: function(printerId, state) {
     Fluxion.doAjax(
     'printerControllerHelperService',
-    'disablePrintService',
+    'setPrinterState',
     {
-      'printerName':printerName,
+      'printerId':printerId,
+      'state':state,
       'url':ajaxurl},
     {
       'doOnSuccess':Utils.page.pageReload
     });
   },
 
-  enablePrintService : function(printerName) {
+  deletePrinter: function(printerId) {
     Fluxion.doAjax(
     'printerControllerHelperService',
-    'enablePrintService',
+    'deletePrinter',
     {
-      'printerName':printerName,
+      'printerId':printerId,
       'url':ajaxurl},
     {
       'doOnSuccess':Utils.page.pageReload
     });
-  },
-
-  reprintJob : function(jobId) {
-    Fluxion.doAjax(
-    'printerControllerHelperService',
-    'reprintJob',
-    {
-      'jobId':jobId,
-      'url':ajaxurl},
-    {
-      'doOnSuccess': function(json) {
-        alert(json.response);
-      }
-    });
-  },
-
-  printCustomBarcodes: function () {
-    var samples = [];
-    for (var i = 0; i < arguments.length; i++) {
-      samples[i] = {'sampleId': arguments[i]};
-    }
-
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'serviceClass': 'net.sf.json.JSONObject',
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#printServiceSelectDialog')
-                  .html("<form>" +
-                        "<fieldset class='dialog'>" +
-                        "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                        json.services +
-                        "</select></fieldset></form>");
-
-          var barcodeitornot = 'no';
-          if (jQuery('#barcodeit').is(':checked')) {
-            barcodeitornot = 'yes';
-          }
-          jQuery('#printServiceSelectDialog').dialog({
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function () {
-                Fluxion.doAjax(
-                  'printerControllerHelperService',
-                  'printCustomBarcode',
-                  {
-                    'serviceName': jQuery('#serviceSelect').val(),
-                    'line1': jQuery('#customPrintLine1').val(),
-                    'line2': jQuery('#customPrintLine2').val(),
-                    'line3': jQuery('#customPrintLine3').val(),
-                    'barcodeit': barcodeitornot,
-                    'url': ajaxurl
-                  },
-                  {
-                    'doOnSuccess': function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function () {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        },
-        'doOnError': function (json) {
-          alert(json.error);
-        }
-      }
-    );
-  },
-
-  printCustom1DBarcodes: function () {
-    var samples = [];
-    for (var i = 0; i < arguments.length; i++) {
-      samples[i] = {'sampleId': arguments[i]};
-    }
-
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'serviceClass': 'net.sf.json.JSONObject',
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                  json.services +
-                  "</select></fieldset></form>");
-
-          jQuery('#printServiceSelectDialog').dialog({
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function () {
-                Fluxion.doAjax(
-                  'printerControllerHelperService',
-                  'printCustom1DBarcode',
-                  {
-                    'serviceName': jQuery('#serviceSelect').val(),
-                    'line1': jQuery('#custom1DPrintLine1').val(),
-                    'line2': jQuery('#custom1DPrintLine2').val(),
-                    'url': ajaxurl
-                  },
-                  {
-                    'doOnSuccess': function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function () {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        },
-        'doOnError': function (json) {
-          alert(json.error);
-        }
-      }
-    );
-  } ,
-
-  printCustom1DBarcodesBulk: function (codes) {
-
-    if (codes === "") {
-      alert("Please input at least one barcode...");
-    }
-    var samples = [];
-    for (var i = 0; i < arguments.length; i++) {
-      samples[i] = {'sampleId': arguments[i]};
-    }
-
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'serviceClass': 'net.sf.json.JSONObject',
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#printServiceSelectDialog')
-                  .html("<form>" +
-                        "<fieldset class='dialog'>" +
-                        "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                        json.services +
-                        "</select></fieldset></form>");
-
-          jQuery('#printServiceSelectDialog').dialog({
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function () {
-                Fluxion.doAjax(
-                  'printerControllerHelperService',
-                  'printCustom1DBarcodeBulk',
-                  {
-                    'serviceName': jQuery('#serviceSelect').val(),
-                    'barcodes': codes,
-                    'url': ajaxurl
-                  },
-                  {
-                    'doOnSuccess': function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function () {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        },
-        'doOnError': function (json) {
-          alert(json.error);
-        }
-      }
-    );
   }
 };

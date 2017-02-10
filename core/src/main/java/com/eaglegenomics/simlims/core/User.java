@@ -1,9 +1,14 @@
 package com.eaglegenomics.simlims.core;
 
-import org.springframework.security.core.GrantedAuthority;
-
 import java.io.Serializable;
 import java.util.Collection;
+
+import org.springframework.security.core.GrantedAuthority;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * com.eaglegenomics.simlims.core
@@ -13,7 +18,10 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface User extends Serializable, Comparable {
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties({ "roles", "password", "loginName", "groups", "admin", "internal", "external" })
+public interface User extends Serializable, Comparable<User> {
   boolean isActive();
 
   void setActive(boolean active);
@@ -36,8 +44,10 @@ public interface User extends Serializable, Comparable {
 
   String[] getRoles();
 
+  @JsonIgnore
   Collection<GrantedAuthority> getRolesAsAuthorities();
 
+  @JsonIgnore
   Collection<GrantedAuthority> getPermissionsAsAuthorities();
 
   boolean isAdmin();

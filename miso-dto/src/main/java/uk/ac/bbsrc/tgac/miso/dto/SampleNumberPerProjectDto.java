@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SampleNumberPerProjectDto {
 
   private Long id;

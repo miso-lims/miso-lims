@@ -26,12 +26,10 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -42,8 +40,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -154,6 +154,16 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   public void saveProjects(Collection<Project> projects) throws IOException {
     log.info("Migrating projects...");
+    StudyType other = null;
+    for (StudyType st : serviceManager.getStudyDao().listAllStudyTypes()) {
+      if (st.getName().equals("Other")) {
+        other = st;
+        break;
+      }
+    }
+    if (other == null) {
+      throw new IllegalStateException("Cannot find “other” study type.");
+    }
     for (Project project : projects) {
       project.setSecurityProfile(new SecurityProfile(migrationUser));
       valueTypeLookup.resolveAll(project);
@@ -163,7 +173,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         Study study = new StudyImpl();
         study.setAlias((project.getShortName() == null ? project.getAlias() : project.getShortName()) + " study");
         study.setDescription("");
-        study.setStudyType("Other");
+        study.setStudyType(other);
         study.setLastModifier(migrationUser);
         project.getStudies().add(study);
       }
@@ -217,7 +227,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     valueTypeLookup.resolveAll(sample);
 
     Collection<SampleQC> qcs = new TreeSet<>(sample.getSampleQCs());
-    Collection<Note> notes = new HashSet<>(sample.getNotes());
+    addSampleNoteDetails(sample);
 
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
@@ -247,7 +257,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       sample.setId(serviceManager.getSampleService().create(sample));
     }
     saveSampleQcs(sample, qcs);
-    saveSampleNotes(sample, notes);
+
     log.debug("Saved sample " + sample.getAlias());
   }
 
@@ -296,8 +306,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (changes == null || changes.isEmpty()) throw new IOException("Cannot save sample due to missing changelogs");
     serviceManager.getChangeLogDao().deleteAllById("sample", sample.getId());
     for (ChangeLog change : changes) {
-      change.setUser(migrationUser);
-      serviceManager.getChangeLogDao().create("sample", sample.getId(), change);
+      ChangeLog newChangeLog = sample.createChangeLog(change.getSummary(), change.getColumnsChanged(), migrationUser);
+      serviceManager.getChangeLogDao().create(newChangeLog);
     }
   }
 
@@ -316,12 +326,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
   }
 
-  private void saveSampleNotes(Sample sample, Collection<Note> notes) throws IOException {
+  private void addSampleNoteDetails(Sample sample) throws IOException {
     Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
-    for (Note note : notes) {
+    for (Note note : sample.getNotes()) {
       note.setCreationDate(date);
       note.setOwner(migrationUser);
-      note.setNoteId(serviceManager.getNoteDao().saveSampleNote(sample, note));
     }
   }
 
@@ -362,63 +371,57 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
 
   private void saveLibrary(Library library) throws IOException {
-      log.debug("Saving library " + library.getAlias());
-      if (isDetailedSample(library.getSample())) {
-        DetailedSample sample = (DetailedSample) library.getSample();
-        if (sample.getId() == AbstractSample.UNSAVED_ID && sample.getPreMigrationId() != null) {
-          library.setSample(serviceManager.getSampleDao().getByPreMigrationId(sample.getPreMigrationId()));
-          if (library.getSample() == null) {
-            throw new IOException("No Sample found with pre-migration ID " + sample.getPreMigrationId());
-          }
+    log.debug("Saving library " + library.getAlias());
+    if (isDetailedSample(library.getSample())) {
+      DetailedSample sample = (DetailedSample) library.getSample();
+      if (sample.getId() == AbstractSample.UNSAVED_ID && sample.getPreMigrationId() != null) {
+        library.setSample(serviceManager.getSampleDao().getByPreMigrationId(sample.getPreMigrationId()));
+        if (library.getSample() == null) {
+          throw new IOException("No Sample found with pre-migration ID " + sample.getPreMigrationId());
         }
       }
-      if (library.getSample() == null || library.getSample().getId() == AbstractSample.UNSAVED_ID) {
-        throw new IOException("Library does not have a parent sample set");
-      }
-      library.inheritPermissions(library.getSample().getProject());
-      valueTypeLookup.resolveAll(library);
-      library.setLastModifier(migrationUser);
-      library.setLastUpdated(timeStamp);
-      if (library.getLibraryAdditionalInfo() != null) {
-        library.getLibraryAdditionalInfo().setCreatedBy(migrationUser);
-        library.getLibraryAdditionalInfo().setCreationDate(timeStamp);
-        library.getLibraryAdditionalInfo().setUpdatedBy(migrationUser);
-        library.getLibraryAdditionalInfo().setLastUpdated(timeStamp);
-        // Check for duplicate alias
-        Collection<Library> dupes = serviceManager.getLibraryDao().listByAlias(library.getAlias());
-        if (!dupes.isEmpty()) {
-          for (Library dupe : dupes) {
-            dupe.getLibraryAdditionalInfo().setNonStandardAlias(true);
-            serviceManager.getLibraryDao().save(dupe);
-          }
-          library.getLibraryAdditionalInfo().setNonStandardAlias(true);
+    }
+    if (library.getSample() == null || library.getSample().getId() == AbstractSample.UNSAVED_ID) {
+      throw new IOException("Library does not have a parent sample set");
+    }
+    library.inheritPermissions(library.getSample().getProject());
+    valueTypeLookup.resolveAll(library);
+    library.setLastModifier(migrationUser);
+    if (isDetailedLibrary(library)) {
+
+      library.setCreationDate(timeStamp);
+      // Check for duplicate alias
+      Collection<Library> dupes = serviceManager.getLibraryDao().listByAlias(library.getAlias());
+      if (!dupes.isEmpty()) {
+        for (Library dupe : dupes) {
+          ((DetailedLibrary) dupe).setNonStandardAlias(true);
+          serviceManager.getLibraryDao().save(dupe);
         }
+        ((DetailedLibrary) library).setNonStandardAlias(true);
       }
-      if (replaceChangeLogs) {
-        Collection<ChangeLog> changes = library.getChangeLog();
-        copyTimestampsFromChangelog(library);
-        library.setId(serviceManager.getLibraryDao().save(library));
-        saveLibraryChangeLog(library, changes);
-      } else {
-        library.setId(serviceManager.getLibraryDao().save(library));
-      }
-      log.debug("Saved library " + library.getAlias());
+    }
+    if (replaceChangeLogs) {
+      Collection<ChangeLog> changes = library.getChangeLog();
+      copyTimestampsFromChangelog(library);
+      library.setId(serviceManager.getLibraryDao().save(library));
+      saveLibraryChangeLog(library, changes);
+    } else {
+      library.setId(serviceManager.getLibraryDao().save(library));
+    }
+    log.debug("Saved library " + library.getAlias());
   }
 
   private void copyTimestampsFromChangelog(Library library) {
     Date earliest = getEarliestChangeDate(library);
-    Date latest = getLatestChangeDate(library);
-    library.getLibraryAdditionalInfo().setCreationDate(earliest);
-    library.getLibraryAdditionalInfo().setLastUpdated(latest);
-    library.setLastUpdated(latest);
+    library.setCreationDate(earliest);
   }
 
   private void saveLibraryChangeLog(Library library, Collection<ChangeLog> changes) throws IOException {
     if (changes == null || changes.isEmpty()) throw new IOException("Cannot save library due to missing changelogs");
     serviceManager.getChangeLogDao().deleteAllById("library", library.getId());
     for (ChangeLog change : changes) {
-      change.setUser(migrationUser);
-      serviceManager.getChangeLogDao().create("library", library.getId(), change);
+      ChangeLog newChangeLog = library.createChangeLog(change.getSummary(), change.getColumnsChanged(), migrationUser);
+      serviceManager.getChangeLogDao().create(newChangeLog);
     }
   }
 
@@ -450,10 +453,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
 
     Collection<ChangeLog> ghostChangeLog = null;
-    if (ldi.getLibrary().getId() == AbstractDilution.UNSAVED_ID && ldi.getLibrary().getLibraryAdditionalInfo() != null
-        && ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId() != null) {
-      Long preMigrationId = ldi.getLibrary().getLibraryAdditionalInfo().getPreMigrationId();
+    if (ldi.getLibrary().getId() == LibraryDilution.UNSAVED_ID && ldi.getLibrary() instanceof DetailedLibrary
+        && ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId() != null) {
       ghostChangeLog = ldi.getLibrary().getChangeLog();
+      Long preMigrationId = ((DetailedLibrary) ldi.getLibrary()).getPreMigrationId();
       ldi.setLibrary(serviceManager.getLibraryDao().getByPreMigrationId(preMigrationId));
       if (ldi.getLibrary() == null) {
         throw new IOException("No Library found with pre-migration ID " + preMigrationId);
@@ -521,30 +524,27 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
     }
   }
-  
+
   public void savePools(final Collection<Pool> pools) throws IOException {
     log.info("Migrating pools...");
     for (Pool pool : pools) {
-      Collection<Note> notes = pool.getNotes();
       setPoolModifiedDetails(pool);
+      addPoolNoteDetails(pool);
       pool.setId(serviceManager.getPoolDao().save(pool));
-      savePoolNotes(pool, notes);
       log.debug("Saved pool " + pool.getAlias());
     }
     log.info(pools.size() + " pools migrated.");
   }
-  
+
   private void setPoolModifiedDetails(Pool pool) throws IOException {
-    if (pool.getId() == AbstractPool.UNSAVED_ID) pool.setCreationDate(timeStamp);
+    if (pool.getId() == PoolImpl.UNSAVED_ID) pool.setCreationDate(timeStamp);
     pool.setLastModifier(migrationUser);
-    pool.setLastUpdated(timeStamp);
   }
-  
-  private void savePoolNotes(Pool pool, Collection<Note> notes) throws IOException {
-    for (Note note : notes) {
+
+  private void addPoolNoteDetails(Pool pool) throws IOException {
+    for (Note note : pool.getNotes()) {
       note.setCreationDate(timeStamp);
       note.setOwner(migrationUser);
-      note.setNoteId(serviceManager.getNoteDao().savePoolNote(pool, note));
     }
   }
 
@@ -590,19 +590,20 @@ public class DefaultMigrationTarget implements MigrationTarget {
               if (!mergeRunPools) throw new IOException("A pool already exists for lane " + toPartition.getPartitionNumber());
               Pool toPool = toPartition.getPool();
               // Merge pools
-              Collection<Dilution> fromPoolables = fromPartition.getPool().getPoolableElements();
-              Collection<Dilution> toPoolables = toPool.getPoolableElements();
+              Collection<LibraryDilution> fromPoolables = fromPartition.getPool().getPoolableElements();
+              Collection<LibraryDilution> toPoolables = toPool.getPoolableElements();
               toPoolables.addAll(fromPoolables);
               setPoolModifiedDetails(toPool);
               serviceManager.getPoolDao().save(toPool);
-              savePoolNotes(toPool, fromPartition.getPool().getNotes());
+              addPoolNoteDetails(fromPartition.getPool());
               log.debug(String.format("Merged new pool %s with existing pool '%s' in run %d lane %d",
                   fromPartition.getPool().getAlias(), toPool.getAlias(), to.getId(), toPartition.getPartitionNumber()));
             } else {
               // Add new pool
               toPartition.setPool(fromPartition.getPool());
               setPoolModifiedDetails(fromPartition.getPool());
-              log.debug("added " + toPartition.getPool().getAlias() + " to run " + to.getId() + " lane " + toPartition.getPartitionNumber());
+              log.debug(
+                  "added " + toPartition.getPool().getAlias() + " to run " + to.getId() + " lane " + toPartition.getPartitionNumber());
             }
             break;
           }
@@ -643,8 +644,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (tolerateErrors) {
       log.error("Error during save", e);
       sessionFactory.getCurrentSession().clear();
-    }
-    else throw new IOException(e);
+    } else throw new IOException(e);
   }
 
 }

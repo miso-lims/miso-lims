@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
-import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
+import uk.ac.bbsrc.tgac.miso.core.store.ReferenceGenomeDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)

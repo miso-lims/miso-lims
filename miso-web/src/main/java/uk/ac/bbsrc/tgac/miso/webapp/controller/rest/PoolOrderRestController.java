@@ -3,16 +3,12 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +25,10 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
@@ -37,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
-import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
@@ -79,7 +78,7 @@ public class PoolOrderRestController extends RestController {
     for (HealthType health : LimsUtils.getUsedHealthTypes(completions)) {
       headings.add(health.getKey());
     }
-    node.put("headings", headings);
+    node.set("headings", headings);
     ArrayNode data = mapper.createArrayNode();
     if (!completions.isEmpty()) {
       for (Entry<SequencingParameters, PoolOrderCompletionGroup> entry : LimsUtils.groupCompletions(completions).values().iterator().next()
@@ -93,7 +92,7 @@ public class PoolOrderRestController extends RestController {
         data.add(completion);
       }
     }
-    node.put("completions", data);
+    node.set("completions", data);
 
     return node;
   }

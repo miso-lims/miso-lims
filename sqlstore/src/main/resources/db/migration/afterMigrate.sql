@@ -1,18 +1,7 @@
---StartNoTest
+-- StartNoTest
 DELIMITER //
 
 DROP FUNCTION IF EXISTS `nextval`//
-CREATE FUNCTION `nextval` (`seq_name` varchar(100))
-RETURNS bigint(20) NOT DETERMINISTIC
-BEGIN
-    DECLARE cur_val bigint(20);
-    SELECT sequence_cur_value INTO cur_val FROM sequence_data WHERE sequence_name = seq_name;
- 
-    IF cur_val IS NOT NULL THEN
-        UPDATE sequence_data SET sequence_cur_value = sequence_cur_value + 1 WHERE sequence_name = seq_name;
-    END IF;
-    RETURN cur_val;
-END//
 
 DROP TRIGGER IF EXISTS SampleChange//
 CREATE TRIGGER SampleChange BEFORE UPDATE ON Sample
@@ -232,9 +221,6 @@ FOR EACH ROW
   END//
 
 DROP TRIGGER IF EXISTS BeforeInsertSample//
-CREATE TRIGGER BeforeInsertSample BEFORE INSERT ON Sample
-  FOR EACH ROW
-  SET NEW.boxPositionId = nextval('box_position_seq')//
 
 DROP TRIGGER IF EXISTS SampleInsert//
 CREATE TRIGGER SampleInsert AFTER INSERT ON Sample
@@ -292,11 +278,33 @@ FOR EACH ROW
     '',
     NEW.lastModifier,
     'Run created.')//
+    
+DROP TRIGGER IF EXISTS StatusChange//
+CREATE TRIGGER StatusChange BEFORE UPDATE ON Status
+FOR EACH ROW
+  BEGIN
+    DECLARE log_message varchar(500) CHARACTER SET utf8;
+    DECLARE runId bigint(20);
+    SET log_message = CONCAT_WS(', ',
+      CASE WHEN NEW.health <> OLD.health THEN CONCAT('health: ', COALESCE(OLD.health, 'n/a'), ' → ', COALESCE(NEW.health, 'n/a')) END,
+      CASE WHEN (NEW.completionDate IS NULL) <> (OLD.completionDate IS NULL) OR NEW.completionDate <> OLD.completionDate THEN CONCAT('completion date: ', COALESCE(OLD.completionDate, 'n/a'), ' → ', COALESCE(NEW.completionDate, 'n/a')) END,
+      CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('start date: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END,
+      CASE WHEN NEW.runName <> OLD.runName THEN CONCAT('run name: ', COALESCE(OLD.runName, 'n/a'), ' → ', COALESCE(NEW.runName, 'n/a'), ' (this could be a problem -- inform your MISO administrators if you see this)') END);
+      SET runId = (SELECT runId FROM Run WHERE alias = NEW.runName OR status_statusId = NEW.statusId LIMIT 1);
+    IF runId IS NOT NULL AND log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
+        runId,
+        COALESCE(CONCAT_WS(',',
+          CASE WHEN NEW.health <> OLD.health THEN 'health' END,
+          CASE WHEN (NEW.completionDate IS NULL) <> (OLD.completionDate IS NULL) OR NEW.completionDate <> OLD.completionDate THEN 'completionDate' END,
+          CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN 'startDate' END,
+          CASE WHEN NEW.runName <> OLD.runName THEN 'runName' END), ''),
+        (SELECT lastModifier FROM Run WHERE alias = NEW.runName),
+        log_message);
+    END IF;
+  END//
 
 DROP TRIGGER IF EXISTS BeforeInsertPool//
-CREATE TRIGGER BeforeInsertPool BEFORE INSERT ON Pool
-  FOR EACH ROW
-  SET NEW.boxPositionId = nextval('box_position_seq')//
 
 DROP TRIGGER IF EXISTS PoolChange//
 CREATE TRIGGER PoolChange BEFORE UPDATE ON Pool
@@ -306,7 +314,6 @@ FOR EACH ROW
   SET log_message = CONCAT_WS(', ',
         CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
         CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', OLD.concentration, ' → ', NEW.concentration) END,
-        CASE WHEN (NEW.experiment_experimentId IS NULL) <> (OLD.experiment_experimentId IS NULL) OR NEW.experiment_experimentId <> OLD.experiment_experimentId THEN CONCAT('experiment: ', COALESCE((SELECT name FROM Experiment WHERE experimentId = OLD.experiment_experimentId), 'n/a'), ' → ', COALESCE((SELECT name FROM Experiment WHERE experimentId = NEW.experiment_experimentId), 'n/a')) END,
         CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('identification-barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
         CASE WHEN NEW.name <> OLD.name THEN CONCAT('name: ', OLD.name, ' → ', NEW.name) END,
         CASE WHEN NEW.platformType <> OLD.platformType THEN CONCAT('platform-type: ', OLD.platformType, ' → ', NEW.platformType) END,
@@ -318,7 +325,6 @@ FOR EACH ROW
       COALESCE(CONCAT_WS(',',
         CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN 'alias' END,
         CASE WHEN NEW.concentration <> OLD.concentration THEN 'concentration' END,
-        CASE WHEN (NEW.experiment_experimentId IS NULL) <> (OLD.experiment_experimentId IS NULL) OR NEW.experiment_experimentId <> OLD.experiment_experimentId THEN 'experiment_experimentId' END,
         CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN 'identificationBarcode' END,
         CASE WHEN NEW.name <> OLD.name THEN 'name' END,
         CASE WHEN NEW.platformType <> OLD.platformType THEN 'platformType' END,
@@ -440,7 +446,7 @@ FOR EACH ROW
         CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN CONCAT('location barcode: ', COALESCE(OLD.locationBarcode, 'n/a'), ' → ', COALESCE(NEW.locationBarcode, 'n/a')) END,
         CASE WHEN NEW.name <> OLD.name THEN CONCAT('name: ', OLD.name, ' → ', NEW.name) END,
         CASE WHEN NEW.paired <> OLD.paired THEN CONCAT('end: ', CASE WHEN OLD.paired THEN 'paired' ELSE 'singled' END, ' → ', CASE WHEN NEW.paired THEN 'paired' ELSE 'single' END) END,
-        CASE WHEN (NEW.platformName IS NULL) <> (OLD.platformName IS NULL) OR NEW.platformName <> OLD.platformName THEN CONCAT('platform: ', COALESCE(OLD.platformName, 'n/a'), ' → ', COALESCE(NEW.platformName, 'n/a')) END,
+        CASE WHEN (NEW.platformType IS NULL) <> (OLD.platformType IS NULL) OR NEW.platformType <> OLD.platformType THEN CONCAT('platform: ', COALESCE(OLD.platformType, 'n/a'), ' → ', COALESCE(NEW.platformType, 'n/a')) END,
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN CONCAT('QC passed: ', COALESCE(OLD.qcPassed, 'n/a'), ' → ', COALESCE(NEW.qcPassed, 'n/a')) END,
         CASE WHEN NEW.discarded <> OLD.discarded THEN CONCAT('discarded: ', OLD.discarded, ' → ', NEW.discarded) END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END);
@@ -459,7 +465,7 @@ FOR EACH ROW
         CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN 'locationBarcode' END,
         CASE WHEN NEW.name <> OLD.name THEN 'name' END,
         CASE WHEN NEW.paired <> OLD.paired THEN 'paired' END,
-        CASE WHEN (NEW.platformName IS NULL) <> (OLD.platformName IS NULL) OR NEW.platformName <> OLD.platformName THEN 'platformName' END,
+        CASE WHEN (NEW.platformType IS NULL) <> (OLD.platformType IS NULL) OR NEW.platformType <> OLD.platformType THEN 'platformType' END,
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN 'qcPassed' END,
         CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN 'sample_sampleId' END,
         CASE WHEN NEW.discarded <> OLD.discarded THEN 'discarded' END,
@@ -472,13 +478,15 @@ FOR EACH ROW
   END//
 
 DROP TRIGGER IF EXISTS LibraryAdditionalInfoChange//
-CREATE TRIGGER LibraryAdditionalInfoChange BEFORE UPDATE ON LibraryAdditionalInfo
+DROP TRIGGER IF EXISTS DetailedLibraryChange//
+CREATE TRIGGER DetailedLibraryChange BEFORE UPDATE ON DetailedLibrary
 FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
      CASE WHEN NEW.archived <> OLD.archived THEN CONCAT('archived: ', OLD.archived, ' → ', NEW.archived) END,
      CASE WHEN (NEW.kitDescriptorId IS NULL) <> (OLD.kitDescriptorId IS NULL) OR NEW.kitDescriptorId <> OLD.kitDescriptorId THEN CONCAT('kit: ', COALESCE((SELECT name FROM KitDescriptor WHERE kitDescriptorId = OLD.kitDescriptorId), 'n/a'), ' → ', COALESCE((SELECT name FROM KitDescriptor WHERE kitDescriptorId = NEW.kitDescriptorId), 'n/a')) END,
+     CASE WHEN NEW.libraryDesignCodeId <> OLD.libraryDesignCodeId THEN CONCAT('designCode: ', (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = OLD.libraryDesignCodeId), ' → ', (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = NEW.libraryDesignCodeId)) END,
      CASE WHEN (NEW.libraryDesign IS NULL) <> (OLD.libraryDesign IS NULL) OR NEW.libraryDesign <> OLD.libraryDesign THEN CONCAT('library design: ', COALESCE((SELECT name FROM LibraryDesign WHERE libraryDesignId = OLD.libraryDesign), 'n/a'), ' → ', COALESCE((SELECT name FROM LibraryDesign WHERE libraryDesignId = NEW.libraryDesign), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
@@ -527,9 +535,6 @@ FOR EACH ROW
     CONCAT('Library dilution ', NEW.name, ' created.'))//
 
 DROP TRIGGER IF EXISTS BeforeInsertLibrary//
-CREATE TRIGGER BeforeInsertLibrary BEFORE INSERT ON Library
-  FOR EACH ROW
-  SET NEW.boxPositionId = nextval('box_position_seq')//
 
 DROP TRIGGER IF EXISTS LibraryInsert//
 CREATE TRIGGER LibraryInsert AFTER INSERT ON Library
@@ -551,7 +556,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END,
         CASE WHEN NEW.name <> OLD.name THEN CONCAT('name: ', OLD.name, ' → ', NEW.name) END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN CONCAT('project: ', COALESCE((SELECT name FROM Project WHERE projectId = OLD.project_projectId), 'n/a'), ' → ', COALESCE((SELECT name FROM Project WHERE projectId = NEW.project_projectId), 'n/a')) END,
-        CASE WHEN NEW.studyType <> OLD.studyType THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyType), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyType), 'n/a')) END);
+        CASE WHEN NEW.studyTypeId <> OLD.studyTypeId THEN CONCAT('type: ', COALESCE((SELECT name FROM StudyType WHERE typeId = OLD.studyTypeId), 'n/a'), ' → ', COALESCE((SELECT name FROM StudyType WHERE typeId = NEW.studyTypeId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO StudyChangeLog(studyId, columnsChanged, userId, message) VALUES (
       NEW.studyId,
@@ -561,7 +566,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN 'description' END,
         CASE WHEN NEW.name <> OLD.name THEN 'name' END,
         CASE WHEN NEW.project_projectId <> OLD.project_projectId THEN 'project_projectId' END,
-        CASE WHEN NEW.studyType <> OLD.studyType THEN 'studyType' END), ''),
+        CASE WHEN NEW.studyTypeId <> OLD.studyTypeId THEN 'studyTypeId' END), ''),
       NEW.lastModifier,
       log_message
       );
@@ -610,6 +615,27 @@ FOR EACH ROW
     '',
     NEW.lastModifier,
     'Container created.')//
+
+DROP TRIGGER IF EXISTS PartitionChange//
+CREATE TRIGGER PartitionChange BEFORE UPDATE ON _Partition
+FOR EACH ROW
+  BEGIN
+    DECLARE log_message varchar(500) CHARACTER SET utf8;
+    SET log_message = CONCAT_WS(', ',
+    CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId THEN CONCAT('pool changed in partition ', OLD.partitionNumber, ': ', COALESCE((SELECT name FROM Pool WHERE poolId = OLD.pool_poolId), 'n/a'), ' → ', COALESCE((SELECT name FROM Pool WHERE poolId = NEW.pool_poolId), 'n/a')) END);
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message) VALUES (
+        (SELECT spcp.container_containerId FROM SequencerPartitionContainer_Partition spcp
+         WHERE spcp.partitions_partitionId = OLD.partitionId),
+         COALESCE(CONCAT_WS(', ',
+           CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId THEN 'pool' END), ''),
+         (SELECT spc.lastModifier FROM SequencerPartitionContainer spc
+           JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
+         WHERE spcp.partitions_partitionId = OLD.partitionId),
+         log_message
+      );
+    END IF;
+  END //
 
 DROP TRIGGER IF EXISTS BoxChange//
 CREATE TRIGGER BoxChange BEFORE UPDATE ON Box
@@ -793,7 +819,7 @@ CREATE PROCEDURE deleteLibrary(
 END//
 
 DELIMITER ;
---EndNoTest
+-- EndNoTest
 
 DROP VIEW IF EXISTS CompletedPartitions;
 CREATE OR REPLACE VIEW RunPartitionsByHealth AS
@@ -817,3 +843,19 @@ CREATE OR REPLACE VIEW OrderCompletion AS
 
 CREATE OR REPLACE VIEW SampleDerivedInfo AS
   SELECT sampleId, MAX(changeTime) as lastModified FROM SampleChangeLog GROUP BY sampleId;
+  
+CREATE OR REPLACE VIEW RunDerivedInfo AS
+  SELECT runId, MAX(changeTime) as lastModified FROM RunChangeLog GROUP BY runId;
+
+CREATE OR REPLACE VIEW ContainerDerivedInfo AS
+  SELECT containerId, MAX(changeTime) as lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId;
+
+CREATE OR REPLACE VIEW PoolDerivedInfo AS
+  SELECT poolId, MAX(changeTime) as lastModified FROM PoolChangeLog GROUP BY poolId;
+
+CREATE OR REPLACE VIEW LibraryDerivedInfo AS
+  SELECT libraryId, MAX(changeTime) AS lastModified FROM LibraryChangeLog GROUP BY libraryId;
+  
+CREATE OR REPLACE VIEW BoxDerivedInfo AS
+  SELECT boxId, MAX(changeTime) AS lastModified FROM BoxChangeLog GROUP BY boxId;
+

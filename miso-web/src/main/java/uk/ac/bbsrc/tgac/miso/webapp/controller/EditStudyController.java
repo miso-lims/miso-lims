@@ -43,18 +43,20 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
 @RequestMapping("/study")
@@ -69,11 +71,9 @@ public class EditStudyController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
+  private ChangeLogService changeLogService;
+  @Autowired
+  private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -96,34 +96,34 @@ public class EditStudyController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Study");
+    return changeLogService.listAll("Study");
   }
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getStudyColumnSizes();
+    return studyService.getColumnSizes();
   }
 
   @ModelAttribute("studyTypes")
-  public Collection<String> populateStudyTypes() throws IOException {
-    return requestManager.listAllStudyTypes();
+  public Collection<StudyType> populateStudyTypes() throws IOException {
+    return studyService.listTypes();
   }
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
-    return setupForm(AbstractStudy.UNSAVED_ID, projectId, model);
+    return setupForm(StudyImpl.UNSAVED_ID, projectId, model);
   }
 
   @RequestMapping(value = "/rest/{studyId}", method = RequestMethod.GET)
   public @ResponseBody Study jsonRest(@PathVariable Long studyId) throws IOException {
-    return requestManager.getStudyById(studyId);
+    return studyService.get(studyId);
   }
 
   @RequestMapping(value = "/{studyId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long studyId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Study study = requestManager.getStudyById(studyId);
+      Study study = studyService.get(studyId);
       Project project;
       if (study != null) {
         if (!study.userCanRead(user)) {
@@ -154,11 +154,11 @@ public class EditStudyController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Study study = null;
-      if (studyId == AbstractStudy.UNSAVED_ID) {
-        study = dataObjectFactory.getStudy(user);
+      if (studyId == StudyImpl.UNSAVED_ID) {
+        study = new StudyImpl(user);
         model.put("title", "New Study");
       } else {
-        study = requestManager.getStudyById(studyId);
+        study = studyService.get(studyId);
         model.put("title", "Study " + studyId);
       }
 
@@ -199,7 +199,7 @@ public class EditStudyController {
         throw new SecurityException("Permission denied.");
       }
       study.setLastModifier(user);
-      requestManager.saveStudy(study);
+      studyService.save(study);
       session.setComplete();
       model.clear();
       return "redirect:/miso/study/" + study.getId();

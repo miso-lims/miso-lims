@@ -39,6 +39,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -49,9 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -75,6 +76,9 @@ public class DownloadController {
   @Autowired
   private FilesManager filesManager;
 
+  @Autowired
+  private LibraryService libraryService;
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -85,6 +89,10 @@ public class DownloadController {
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   @RequestMapping(value = "/project/{id}/{hashcode}", method = RequestMethod.GET)
@@ -117,20 +125,14 @@ public class DownloadController {
   @RequestMapping(value = "/submission/{id}/{hashcode}", method = RequestMethod.GET)
   protected void downloadSubmissionFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
       throws Exception {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Submission submission = requestManager.getSubmissionById(id);
-    if (submission.userCanRead(user)) {
       lookupAndRetrieveFile(Submission.class, "SUB" + id, hashcode, response);
-    } else {
-      throw new SecurityException("Access denied");
-    }
   }
 
   @RequestMapping(value = "/libraryqc/{id}/{hashcode}", method = RequestMethod.GET)
   protected void downloadLibraryQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
       throws Exception {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Library library = requestManager.getLibraryById(id);
+    Library library = libraryService.get(id);
     if (library.userCanRead(user)) {
       lookupAndRetrieveFile(LibraryQC.class, id.toString(), hashcode, response);
     } else {

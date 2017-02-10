@@ -41,11 +41,12 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.integration.Message;
+import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -88,7 +89,7 @@ public class SolidNotificationMessageConsumerMechanism
     RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
     Assert.notNull(requestManager, "Cannot consume MISO notification messages without a RequestManager.");
     Map<String, List<String>> statuses = message.getPayload();
-    Set<Run> output = new HashSet<Run>();
+    Set<Run> output = new HashSet<>();
     for (String key : statuses.keySet()) {
       HealthType ht = HealthType.valueOf(key);
       JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
@@ -101,8 +102,8 @@ public class SolidNotificationMessageConsumerMechanism
   }
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
-    Map<String, Run> updatedRuns = new HashMap<String, Run>();
-    List<Run> runsToSave = new ArrayList<Run>();
+    Map<String, Run> updatedRuns = new HashMap<>();
+    List<Run> runsToSave = new ArrayList<>();
     // 2011-01-25 15:37:27.093
     DateFormat logDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     DateFormat simpleLogDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -265,7 +266,7 @@ public class SolidNotificationMessageConsumerMechanism
                       .listSequencerPartitionContainersByBarcode(run.getString("containerId"));
                   if (!pfs.isEmpty()) {
                     if (pfs.size() == 1) {
-                      SequencerPartitionContainer lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(pfs).get(0);
+                      SequencerPartitionContainer lf = new ArrayList<>(pfs).get(0);
                       if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                         r.setSecurityProfile(lf.getSecurityProfile());
                       }
@@ -318,8 +319,8 @@ public class SolidNotificationMessageConsumerMechanism
 
     try {
       if (runsToSave.size() > 0) {
-        int[] saved = requestManager.saveRuns(runsToSave);
-        log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
+        requestManager.saveRuns(runsToSave);
+        log.info("Batch saved " + runsToSave.size() + " runs");
       }
     } catch (IOException e) {
       log.error("Couldn't save run batch", e);

@@ -24,9 +24,12 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oauth="http://www.springframework.org/schema/security/oauth"
   xmlns:security="http://www.springframework.org/schema/security"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-                           http://www.springframework.org/schema/security/oauth http://www.springframework.org/schema/security/spring-security-oauth-1.0.xsd
-                           http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                      http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/security/oauth 
+                      http://www.springframework.org/schema/security/spring-security-oauth.xsd
+                      http://www.springframework.org/schema/security 
+                      http://www.springframework.org/schema/security/spring-security.xsd"
   default-autowire="byName">
 
   <bean id="securityManager" name="securityManager" class="uk.ac.bbsrc.tgac.miso.core.security.LDAPSecurityManager" />
@@ -43,13 +46,15 @@
   <security:http pattern="/images/**" security="none" />
   <!-- filters="none"/> -->
 
-  <!-- <security:http access-denied-page="/accessDenied.jsp" use-expressions="true"> -->
-  <security:http access-denied-page="/accessDenied.jsp" use-expressions="true" auto-config="false" entry-point-ref="loginUrlAuthenticationEntryPoint">
+  <security:http use-expressions="true" auto-config="false" entry-point-ref="loginUrlAuthenticationEntryPoint">
+
+    <security:access-denied-handler error-page="/accessDenied.jsp"/>
+    <security:csrf disabled="true" />
 
     <security:custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
     <security:custom-filter position="FORM_LOGIN_FILTER" ref="misoAuthFilter" />
 
-    <security:remember-me data-source-ref="dataSource" user-service-ref="ldapUserAuthService" />
+    <security:remember-me data-source-ref="dataSource" user-service-ref="ldapUserAuthService" remember-me-parameter="_spring_security_remember_me" />
 
     <security:intercept-url pattern="/login.jsp" access="permitAll" />
 
@@ -109,7 +114,7 @@
   <bean id="httpSessionSecurityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
 
   <bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-    <property name="loginFormUrl" value="/login.jsp" />
+    <constructor-arg value="/login.jsp" />
   </bean>
 
   <bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">
@@ -119,10 +124,18 @@
 
   <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 
-  <bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
-    <property name="maximumSessions" value="-1" />
-    <!--<property name="exceptionIfMaximumExceeded" value="false"/> -->
-    <constructor-arg name="sessionRegistry" ref="sessionRegistry" />
+    <bean id="sas" class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
+    <constructor-arg>
+      <list>
+        <bean class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
+          <constructor-arg ref="sessionRegistry"/>
+        </bean>
+        <bean class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy"/>
+        <bean class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
+          <constructor-arg ref="sessionRegistry"/>
+        </bean>
+      </list>
+    </constructor-arg>
   </bean>
 
   <bean id="misoAuthFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.MisoLdapAuthenticationFilter">

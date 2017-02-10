@@ -28,10 +28,10 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,34 +45,33 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
-
-import net.sf.ehcache.CacheManager;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
 
 public class SQLRunDAOTest extends AbstractDAOTest {
 
@@ -83,8 +82,9 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   @Spy
   private JdbcTemplate jdbcTemplate;
 
-  @Mock
-  private NamingScheme namingScheme;
+  @Autowired
+  private SessionFactory sessionFactory;
+
   @Mock
   private SecurityStore securityDAO;
   @Mock
@@ -96,31 +96,39 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   @Mock
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
   @Mock
-  private StatusStore statusDAO;
+  private HibernateChangeLogDao changeLogDAO;
   @Mock
-  private NoteStore noteDAO;
-  @Mock
-  private WatcherStore watcherDAO;
-  @Mock
-  private ChangeLogStore changeLogDAO;
+  private StatusStore statusDao;
 
   @InjectMocks
-  private SQLRunDAO dao;
+  private HibernateRunDao dao;
 
-  // Auto-increment sequence doesn't roll back with transactions, so must be tracked
-  private static long nextAutoIncrementId = 5L;
+  private final User emptyUser = new UserImpl();
+  private final SequencerReference emptySR = new SequencerReferenceImpl();
+  private final Status emptyStatus = new StatusImpl();
 
   @Before
-  public void setup() {
+  public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
+    dao.setSessionFactory(sessionFactory);
+    dao.setSecurityStore(securityDAO);
+    emptyUser.setUserId(1L);
+    when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
+    emptySR.setId(1L);
+    when(sequencerReferenceDAO.get(Matchers.anyLong())).thenReturn(emptySR);
+    emptyStatus.setHealth(HealthType.Unknown);
+    emptyStatus.setInstrumentName("srName");
+    emptyStatus.setRunName("runName");
+    emptyStatus.setLastUpdated(new Date());
+    emptyStatus.setStartDate(new Date());
+    when(statusDao.get(Matchers.anyLong())).thenReturn(emptyStatus);
   }
 
   @Test
-  public void testListAll() {
+  public void testListAll() throws IOException {
     List<Run> runs = dao.listAll();
-    assertEquals(4, runs.size());
+    assertTrue(runs.size() > 0);
   }
 
   @Test
@@ -132,46 +140,46 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   @Test
   public void testListAllWithBiggerLimit() throws IOException {
     List<Run> runs = dao.listAllWithLimit(50L);
-    assertEquals(4, runs.size());
+    assertTrue(runs.size() > 2);
   }
 
   @Test
   public void testListAllWithZeroLimit() throws IOException {
     List<Run> runs = dao.listAllWithLimit(0L);
-    assertEquals(0, runs.size());
+    assertTrue(runs.size() > 0);
   }
 
   @Test
   public void testListAllWithNegativeLimit() throws IOException {
     List<Run> runs = dao.listAllWithLimit(-1L);
-    assertEquals(4, runs.size());
+    assertTrue(runs.size() > 0);
   }
 
   @Test
   public void testRunCount() throws IOException {
-    assertEquals(4, dao.count());
+    assertEquals(dao.listAll().size(), dao.count());
   }
 
   @Test
-  public void testListBySearch1204() {
+  public void testListBySearch1204() throws IOException {
     List<Run> runs = dao.listBySearch("1204");
     assertEquals(2, runs.size());
   }
 
   @Test
-  public void testListBySearchH1179() {
+  public void testListBySearchH1179() throws IOException {
     List<Run> runs = dao.listBySearch("h1179");
     assertEquals(4, runs.size());
   }
 
   @Test
-  public void testListBySearchNone() {
+  public void testListBySearchNone() throws IOException {
     List<Run> runs = dao.listBySearch("pizza");
     assertEquals(0, runs.size());
   }
 
   @Test
-  public void testListBySearchEmpty() {
+  public void testListBySearchEmpty() throws IOException {
     List<Run> runs = dao.listBySearch("");
     assertEquals(4, runs.size());
   }
@@ -293,23 +301,6 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws IOException {
-    mockNonLazyThings();
-    Run run = dao.lazyGet(1L);
-    assertNotNull(run);
-    assertTrue(run.getSequencerPartitionContainers().isEmpty());
-    assertTrue(run.getRunQCs().isEmpty());
-    assertTrue(run.getNotes().isEmpty());
-  }
-
-  @Test
-  public void testLazyGetNone() throws IOException {
-    mockNonLazyThings();
-    Run run = dao.lazyGet(-9999L);
-    assertNull(run);
-  }
-
-  @Test
   public void testRemove() throws IOException, MisoNamingException {
     Run run = new RunImpl();
     String runName = "RUN111";
@@ -318,24 +309,19 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setDescription("Run Description");
     run.setPairedEnd(true);
     run.setPlatformType(PlatformType.ILLUMINA);
-    SequencerReference mockSR = Mockito.mock(SequencerReference.class);
-    when(mockSR.getId()).thenReturn(1L);
-    run.setSequencerReference(mockSR);
-    User mockUser = Mockito.mock(User.class);
-    when(mockUser.getUserId()).thenReturn(1L);
-    run.setLastModifier(mockUser);
-
-    mockAutoIncrement(nextAutoIncrementId);
-    when(namingScheme.generateNameFor(run)).thenReturn(runName);
-    when(namingScheme.validateName(Mockito.anyString())).thenReturn(ValidationResult.success());
+    run.setSequencerReference(emptySR);
+    run.setLastModifier(emptyUser);
+    run.setStatus(emptyStatus);
 
     long runId = dao.save(run);
     Run insertedRun = dao.get(runId);
     assertNotNull(insertedRun);
-    assertTrue(dao.remove(insertedRun));
-    Mockito.verify(changeLogDAO, Mockito.times(1)).deleteAllById("Run", run.getId());
-    assertNull(dao.get(insertedRun.getId()));
-    nextAutoIncrementId++;
+
+    runId = dao.save(insertedRun);
+
+    Run changedRun = dao.get(runId);
+    assertTrue(dao.remove(changedRun));
+    assertNull(dao.get(changedRun.getId()));
   }
 
   @Test
@@ -344,9 +330,9 @@ public class SQLRunDAOTest extends AbstractDAOTest {
 
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     run.setSecurityProfile(profile);
-    SequencerReference sequencer = Mockito.mock(SequencerReference.class);
+    SequencerReference sequencer = Mockito.mock(SequencerReferenceImpl.class);
     Mockito.when(sequencer.getId()).thenReturn(1L);
-    User user = Mockito.mock(User.class);
+    User user = Mockito.mock(UserImpl.class);
     Mockito.when(user.getUserId()).thenReturn(1L);
     run.setSequencerReference(sequencer);
     run.setFilePath("/far/far/away");
@@ -354,11 +340,9 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setLastModifier(user);
     run.setSequencingParameters(null);
 
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
-
     assertEquals(1L, dao.save(run));
     Run savedRun = dao.get(1L);
-    assertNotSame(run, savedRun);
+    assertSame(run, savedRun);
     assertEquals(run.getId(), savedRun.getId());
     assertEquals("/far/far/away", savedRun.getFilePath());
     assertEquals("AwesomeRun", savedRun.getName());
@@ -366,16 +350,11 @@ public class SQLRunDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws IOException, MisoNamingException {
-    assertNull(dao.get(nextAutoIncrementId));
     Run newRun = makeRun("TestRun");
-    mockAutoIncrement(nextAutoIncrementId);
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
+    Long savedId = dao.save(newRun);
 
-    assertEquals(nextAutoIncrementId, dao.save(newRun));
-
-    Run savedRun = dao.get(nextAutoIncrementId);
+    Run savedRun = dao.get(savedId);
     assertEquals(newRun.getAlias(), savedRun.getAlias());
-    nextAutoIncrementId++;
   }
 
   @Test
@@ -386,43 +365,31 @@ public class SQLRunDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveAll() throws MisoNamingException, IOException {
-    long autoIncrementId = nextAutoIncrementId;
     List<Run> runs = new ArrayList<>();
     Run run1 = makeRun("TestRun1");
     Run run2 = makeRun("TestRun2");
     runs.add(run1);
     runs.add(run2);
-    mockAutoIncrement(autoIncrementId);
-    Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
 
-    assertNull(dao.get(autoIncrementId));
-    assertNull(dao.get(autoIncrementId + 1L));
-
-    CacheManager cacheManager = Mockito.mock(CacheManager.class);
-    Mockito.when(cacheManager.getCache(Matchers.anyString())).thenReturn(null);
-    dao.setCacheManager(cacheManager);
-
+    assertNull(dao.getByAlias(run1.getAlias()));
+    assertNull(dao.getByAlias(run2.getAlias()));
     dao.saveAll(runs);
 
-    dao.setCacheManager(null);
-    Run savedRun1 = dao.get(autoIncrementId);
+    Run savedRun1 = dao.getByAlias(run1.getAlias());
     assertNotNull(savedRun1);
     assertEquals(run1.getAlias(), savedRun1.getAlias());
 
-    Run savedRun2 = dao.get(autoIncrementId + 1L);
+    Run savedRun2 = dao.getByAlias(run2.getAlias());
     assertNotNull(savedRun2);
     assertEquals(run2.getAlias(), savedRun2.getAlias());
-    nextAutoIncrementId += 2;
   }
 
   @Test
   public void testSaveAllNone() throws IOException {
-    mockAutoIncrement(5L);
-
+    int originalCount = dao.count();
     List<Run> runs = new ArrayList<>();
-    int[] ids = dao.saveAll(runs);
-    assertEquals(1, ids.length);
-    assertEquals(AbstractRun.UNSAVED_ID, Long.valueOf(ids[0]));
+    dao.saveAll(runs);
+    assertSame(originalCount, dao.count());
   }
 
   @Test
@@ -432,11 +399,12 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   }
 
   private Run makeRun(String alias) {
-    SecurityProfile profile = Mockito.mock(SecurityProfile.class);
-    SequencerReference sequencer = Mockito.mock(SequencerReference.class);
-    Mockito.when(sequencer.getId()).thenReturn(1L);
-    User user = Mockito.mock(User.class);
-    Mockito.when(user.getUserId()).thenReturn(1L);
+    SecurityProfile profile = new SecurityProfile();
+    profile.setProfileId(3L);
+    SequencerReference sequencer = emptySR;
+    User user = new UserImpl();
+    user.setUserId(1L);
+
     Run run = new RunImpl();
     run.setSecurityProfile(profile);
     run.setAlias(alias);
@@ -448,38 +416,27 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setPlatformType(PlatformType.ILLUMINA);
     run.setSequencerReference(sequencer);
     run.setLastModifier(user);
+    run.setStatus(emptyStatus);
     return run;
   }
 
-  private void mockAutoIncrement(long value) {
-    Map<String, Object> rs = new HashMap<>();
-    rs.put("Auto_increment", value);
-    Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
-  }
-
-  @SuppressWarnings("unchecked") // Safe (for mocks in a unit test)
   private void mockNonLazyThings() throws IOException {
-    User mockUser = Mockito.mock(User.class);
+    User mockUser = Mockito.mock(UserImpl.class);
     Mockito.when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(mockUser);
 
     List<SequencerPartitionContainer<SequencerPoolPartition>> mockContainers = new ArrayList<>();
-    mockContainers.add(Mockito.mock(SequencerPartitionContainer.class));
+    mockContainers.add(Mockito.mock(SequencerPartitionContainerImpl.class));
     Mockito.when(sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(Matchers.anyLong())).thenReturn(mockContainers);
 
     List<RunQC> mockQcs = new ArrayList<>();
-    mockQcs.add(Mockito.mock(RunQC.class));
+    mockQcs.add(Mockito.mock(RunQCImpl.class));
     Mockito.when(runQcDAO.listByRunId(Matchers.anyLong())).thenReturn(mockQcs);
-
-    List<Note> mockNotes = new ArrayList<>();
-    mockNotes.add(Mockito.mock(Note.class));
-    Mockito.when(noteDAO.listByRun(Matchers.anyLong())).thenReturn(mockNotes);
   }
 
   private void assertNonLazyThings(Run run) {
     assertNotNull(run);
     assertFalse(run.getSequencerPartitionContainers().isEmpty());
     assertFalse(run.getRunQCs().isEmpty());
-    assertFalse(run.getNotes().isEmpty());
   }
 
   @Test
@@ -540,5 +497,25 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     List<Run> runs = dao.listByOffsetAndNumResults(2, 2, "desc", "lastModified");
     assertEquals(2, runs.size());
     assertEquals(2, runs.get(0).getId());
+  }
+
+  @Test
+  public void testWatchers() throws Exception {
+    Run run = dao.get(1L);
+    assertNotNull(run);
+    assertEquals(0, run.getWatchers().size());
+
+    User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
+    assertNotNull(user);
+
+    dao.addWatcher(run, user);
+    assertEquals(1, run.getWatchers().size());
+    run = dao.get(1L);
+    assertEquals(1, run.getWatchers().size());
+
+    dao.removeWatcher(run, user);
+    assertEquals(0, run.getWatchers().size());
+    run = dao.get(1L);
+    assertEquals(0, run.getWatchers().size());
   }
 }

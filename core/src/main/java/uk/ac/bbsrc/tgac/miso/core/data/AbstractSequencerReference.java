@@ -25,10 +25,24 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 
 /**
  * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer
@@ -36,21 +50,35 @@ import org.slf4j.LoggerFactory;
  * @author Rob Davey
  * @since 0.0.2
  */
+@MappedSuperclass
 public abstract class AbstractSequencerReference implements SequencerReference {
-  protected static final Logger log = LoggerFactory.getLogger(AbstractSequencerReference.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractSequencerReference.class);
 
   public static final Long UNSAVED_ID = 0L;
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "referenceId")
   private long id = AbstractSequencerReference.UNSAVED_ID;
+
+  @Column(nullable = false)
   private String name;
+
+  @ManyToOne(targetEntity = PlatformImpl.class)
+  @JoinColumn(name = "platformId", nullable = false)
   private Platform platform;
-  private Boolean available;
-  private InetAddress ip;
+
+  private String ip;
+
   private String serialNumber;
   private Date dateCommissioned;
   private Date dateDecommissioned = null;
+
+  @OneToOne(targetEntity = SequencerReferenceImpl.class)
+  @JoinColumn(name = "upgradedSequencerReferenceId")
   private SequencerReference upgradedSequencerReference;
-  private SequencerReference preUpgradeSequencerReference;
+
+  @Transient
   private Date lastServicedDate;
 
   @Override
@@ -84,27 +112,22 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   }
 
   @Override
-  public void setAvailable(Boolean available) {
-    this.available = available;
+  public void setIpAddress(String ip) {
+    if (ip == null) {
+      this.ip = null;
+    } else {
+      try {
+        InetAddress inet = InetAddress.getByName(ip);
+        this.ip = (inet != null ? inet.getHostAddress() : null);
+      } catch (IOException e) {
+        log.error("Error getting InetAddress from given ip " + ip, e);
+        throw new IllegalArgumentException("Error getting InetAddress from given ip " + ip, e);
+      }
+    }
   }
 
   @Override
-  public Boolean getAvailable() {
-    return this.available;
-  }
-
-  @Override
-  public void checkAvailability(int timeout) throws IOException {
-    this.available = getIpAddress() == null ? false : getIpAddress().isReachable(timeout);
-  }
-
-  @Override
-  public void setIpAddress(InetAddress ip) {
-    this.ip = ip;
-  }
-
-  @Override
-  public InetAddress getIpAddress() {
+  public String getIpAddress() {
     return this.ip;
   }
 
@@ -149,18 +172,8 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   }
 
   @Override
-  public void setPreUpgradeSequencerReference(SequencerReference sequencer) {
-    this.preUpgradeSequencerReference = sequencer;
-  }
-
-  @Override
-  public SequencerReference getPreUpgradeSequencerReference() {
-    return preUpgradeSequencerReference;
-  }
-
-  @Override
-  public String getFQDN() {
-    return getIpAddress() == null ? null : getIpAddress().getCanonicalHostName();
+  public String getFQDN() throws UnknownHostException {
+    return getIpAddress() == null ? null : InetAddress.getByName(getIpAddress()).getCanonicalHostName();
   }
 
   @Override
@@ -170,12 +183,13 @@ public abstract class AbstractSequencerReference implements SequencerReference {
 
   @Override
   public String toString() {
-    return "AbstractSequencerReference [id=" + id + ", name=" + name
-        + ", platform=" + String.valueOf(platform.getId()) + ", available=" + available
-        + ", ip=" + String.valueOf(ip)
+    return "AbstractSequencerReference [id=" + id
+        + ", name=" + name
+        + ", platform=" + platform.getId()
+        + ", ip=" + ip
         + ", serialNumber=" + serialNumber
-        + ", dateCommissioned=" + String.valueOf(dateCommissioned)
-        + ", dateDecommissioned=" + String.valueOf(dateDecommissioned)
+        + ", dateCommissioned=" + dateCommissioned
+        + ", dateDecommissioned=" + dateDecommissioned
         + ", upgradedSequencerReference=" + (upgradedSequencerReference == null ? null : upgradedSequencerReference.getId()) + "]";
   }
   

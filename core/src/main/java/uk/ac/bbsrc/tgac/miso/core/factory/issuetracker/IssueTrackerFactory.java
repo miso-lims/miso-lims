@@ -45,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
  * @since 0.1.6
  */
 public class IssueTrackerFactory {
-  protected static final Logger log = LoggerFactory.getLogger(IssueTrackerFactory.class);
+  private static final Logger log = LoggerFactory.getLogger(IssueTrackerFactory.class);
   private Map<String, IssueTrackerManager> managerMap;
 
   public static IssueTrackerFactory newInstance() {
@@ -71,7 +71,7 @@ public class IssueTrackerFactory {
       ServiceLoader<IssueTrackerManager> consumerLoader = ServiceLoader.load(IssueTrackerManager.class);
       Iterator<IssueTrackerManager> consumerIterator = consumerLoader.iterator();
 
-      managerMap = new HashMap<String, IssueTrackerManager>();
+      managerMap = new HashMap<>();
       while (consumerIterator.hasNext()) {
         IssueTrackerManager p = consumerIterator.next();
 

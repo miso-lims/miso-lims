@@ -316,8 +316,8 @@
     <tr>
       <td class="h">Location:</td>
       <td>
-        <c:if test="${!empty sample.boxLocation}">${sample.boxLocation},</c:if>
-        <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.boxId}"/>'>${sample.boxAlias}, ${sample.boxPosition}</a></c:if>
+        <c:if test="${!empty sample.box.locationBarcode}">${sample.box.locationBarcode},</c:if>
+        <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.box.id}"/>'>${sample.box.alias}, ${sample.boxPosition}</a></c:if>
       </td>
     </tr>
   </table>

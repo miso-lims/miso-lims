@@ -4,49 +4,79 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxDerivedInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
+@MappedSuperclass
 public abstract class AbstractBox implements Box {
 
   public static final Long UNSAVED_ID = 0L;
 
+  @ManyToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
-  private long boxId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long boxId = UNSAVED_ID;
   private String name;
   private String alias;
   private String description;
   private String identificationBarcode;
   private String locationBarcode;
-  private User lastModifier;
-  private Date lastUpdated;
 
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
+  private User lastModifier;
+
+  @OneToOne
+  @PrimaryKeyJoinColumn
+  private BoxDerivedInfo derivedInfo;
+
+  @ManyToOne
+  @JoinColumn(name = "boxSizeId")
   private BoxSize size;
+  @ManyToOne
+  @JoinColumn(name = "boxUseId")
   private BoxUse use;
-  
+
+  @OneToMany(targetEntity = BoxChangeLog.class, mappedBy = "box")
   private final Collection<ChangeLog> changeLog;
 
   @CoverageIgnore
   public AbstractBox() {
-	  securityProfile = null;
-	  boxId = AbstractBox.UNSAVED_ID;
-	  changeLog = new ArrayList<ChangeLog>();
+    securityProfile = null;
+    boxId = AbstractBox.UNSAVED_ID;
+    changeLog = new ArrayList<>();
   }
-  
+
   @Override
   public User getLastModifier() {
     return lastModifier;
   }
-  
+
   @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
   }
-  
+
   @Override
   public long getId() {
     return boxId;
@@ -76,12 +106,12 @@ public abstract class AbstractBox implements Box {
   public void setAlias(String alias) {
     this.alias = alias;
   }
-  
+
   @Override
   public String getDescription() {
     return description;
   }
-  
+
   @Override
   public void setDescription(String description) {
     this.description = description;
@@ -122,8 +152,7 @@ public abstract class AbstractBox implements Box {
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
   }
@@ -159,19 +188,15 @@ public abstract class AbstractBox implements Box {
   public void setSize(BoxSize size) {
     this.size = size;
   }
-  
+
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
   }
-  
+
   @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
+  public Date getLastModified() {
+    return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
-  
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
+
 }

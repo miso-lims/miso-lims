@@ -44,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
  * @since 0.0.2
  */
 public class SequencerInterrogationUtils {
-  protected static final Logger log = LoggerFactory.getLogger(SequencerInterrogationUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(SequencerInterrogationUtils.class);
   /**
    * Sets up the socket connection to a given SequencerReference
    * 

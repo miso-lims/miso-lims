@@ -28,8 +28,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * Defines a DAO interface for storing Runs
@@ -37,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSchemeAware {
+public interface RunStore extends Store<Run>, Remover<Run> {
   /**
    * Gets the latest Run, by start date, that is associated with the given container
    *
@@ -74,16 +75,6 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
    * @throws IOException when
    */
   Run getByAlias(String alias) throws IOException;
-
-  /**
-   * List all Runs related to an Experiment given an Experiment ID
-   *
-   * @param experimentId of type long
-   * @return List<Run>
-   * @throws IOException when
-   */
-  @Deprecated
-  List<Run> listByExperimentId(long experimentId) throws IOException;
 
   /**
    * List all Runs using a Pool given a Pool ID
@@ -147,7 +138,7 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
    */
   Collection<Run> listAllWithLimit(long limit) throws IOException;
 
-  int[] saveAll(Collection<Run> runs) throws IOException;
+  void saveAll(Collection<Run> runs) throws IOException;
 
   /**
    * @return a map containing all column names and max lengths from the Run table
@@ -160,7 +151,12 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   public List<Run> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol)
       throws IOException;
 
-  public List<Run> listByOffsetAndNumResults(int ofset, int limit, String sortDir, String sortCol) throws IOException;
+  public List<Run> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException;
 
   public long countBySearch(String querystr) throws IOException;
+
+  public void addWatcher(Run run, User watcher);
+
+  public void removeWatcher(Run run, User watcher);
+
 }

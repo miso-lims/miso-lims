@@ -23,9 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.runstats.server;
 
+import static java.nio.file.Files.readAllBytes;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.integration.Message;
+import org.springframework.messaging.Message;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
 
@@ -72,7 +74,7 @@ public class StatisticsTransformer implements FileSetTransformer<String, Map<Str
           if (rm.matches()) {
             String fileName = f.getName();
             String runName = rm.group(1);
-            byte[] b = LimsUtils.inputStreamToByteArray(new FileInputStream(f));
+            byte[] b = readAllBytes(f.toPath());
 
             map.get("stats").put(runName + "-" + fileName, b);
           }

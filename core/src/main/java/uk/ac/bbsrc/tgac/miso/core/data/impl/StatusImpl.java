@@ -24,8 +24,10 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -48,8 +50,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
  * @since 0.0.2
  */
 @Entity
-@Table(name = "`Status`")
+@Table(name = "Status")
 public class StatusImpl implements Status, Serializable {
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
   @Id
@@ -57,12 +61,16 @@ public class StatusImpl implements Status, Serializable {
   private long statusId = StatusImpl.UNSAVED_ID;
 
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private HealthType health;
   private Date startDate;
   private Date completionDate;
+  @Column(nullable = false)
   private String instrumentName;
-  private String xml;
+  private byte[] xml;
+  @Column(nullable = false)
   private String runName;
+  @Column(nullable = false)
   private Date lastUpdated;
 
   /**
@@ -96,13 +104,17 @@ public class StatusImpl implements Status, Serializable {
   }
 
   @Override
-  public String getXml() {
-    return xml;
+  public String getXml() throws UnsupportedEncodingException {
+    if (xml != null && xml.length > 0) {
+      return new String(xml, "UTF-8");
+    } else {
+      return null;
+    }
   }
 
   @Override
-  public void setXml(String xml) {
-    this.xml = xml;
+  public void setXml(String xml) throws UnsupportedEncodingException {
+    this.xml = xml == null ? null : xml.getBytes("UTF-8");
   }
 
   @Override

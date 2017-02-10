@@ -37,7 +37,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
 
 @Controller
 public class ListKitDescriptorsController {
@@ -51,10 +51,10 @@ public class ListKitDescriptorsController {
   }
 
   @Autowired
-  private RequestManager requestManager;
+  private KitService kitService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setKitService(KitService kitService) {
+    this.kitService = kitService;
   }
 
   @ModelAttribute("title")
@@ -65,11 +65,11 @@ public class ListKitDescriptorsController {
   @RequestMapping("/kitdescriptors")
   public ModelAndView listKitDescriptors(ModelMap model) throws IOException {
     try {
-      model.addAttribute("sequencing", requestManager.listKitDescriptorsByType(KitType.SEQUENCING));
-      model.addAttribute("empcr", requestManager.listKitDescriptorsByType(KitType.EMPCR));
-      model.addAttribute("library", requestManager.listKitDescriptorsByType(KitType.LIBRARY));
-      model.addAttribute("clustering", requestManager.listKitDescriptorsByType(KitType.CLUSTERING));
-      model.addAttribute("multiplexing", requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING));
+      model.addAttribute("sequencing", kitService.listKitDescriptorsByType(KitType.SEQUENCING));
+      model.addAttribute("empcr", kitService.listKitDescriptorsByType(KitType.EMPCR));
+      model.addAttribute("library", kitService.listKitDescriptorsByType(KitType.LIBRARY));
+      model.addAttribute("clustering", kitService.listKitDescriptorsByType(KitType.CLUSTERING));
+      model.addAttribute("multiplexing", kitService.listKitDescriptorsByType(KitType.MULTIPLEXING));
 
       return new ModelAndView("/pages/listKitDescriptors.jsp", model);
     } catch (IOException ex) {

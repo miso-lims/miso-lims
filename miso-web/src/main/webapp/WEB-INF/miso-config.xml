@@ -23,16 +23,18 @@
 -->
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                      http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/tx 
+                      http://www.springframework.org/schema/tx/spring-tx.xsd
+                      http://www.springframework.org/schema/context 
+                      http://www.springframework.org/schema/context/spring-context.xsd"
   default-autowire="byName">
 
   <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
   </bean>
-
-  <bean id="dataObjectFactory" name="dataObjectFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory" />
-
-  <bean id="protocolManager" class="com.eaglegenomics.simlims.core.manager.LocalProtocolManager" />
 
   <bean id="requestManager" class="uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager">
     <constructor-arg index="0">
@@ -55,16 +57,11 @@
     <property name="fileUploadListener" ref="multipartUploadListener"/>
   </bean>
 
-  <bean id="fileDownloadController" class="uk.ac.bbsrc.tgac.miso.webapp.controller.DownloadController">
-    <property name="filesManager" ref="misoFileManager" />
-  </bean>
-
   <bean id="misoFileManager" class="uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager">
     <property name="fileStorageDirectory" value="${miso.fileStorageDirectory}" />
   </bean>
 
   <bean id="submissionManager" class="uk.ac.bbsrc.tgac.miso.core.manager.ERASubmissionManager">
-    <property name="submissionProperties" value="#{propertyConfigurer.getPropertiesAsProperties()}" />
     <property name="centreName" value="${submission.centreName}" />
     <property name="accountName" value="${submission.accountName}" />
     <property name="dropBox" value="${submission.dropBox}" />
@@ -77,7 +74,8 @@
 
   <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
 
-  <bean id="namingScheme" name="namingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultNamingScheme"/>
+  <!-- further naming scheme config happens in MisoAppListener -->
+  <bean id="namingScheme" name="namingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DelegatingNamingScheme"/>
 
   <bean id="filePathGeneratorResolverService" name="filePathGeneratorResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.submission.MisoFilePathGeneratorResolverService" />
 

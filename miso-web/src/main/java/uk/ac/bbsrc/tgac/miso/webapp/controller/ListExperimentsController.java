@@ -40,6 +40,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
  * com.eaglegenomics.miso.web
@@ -55,6 +56,8 @@ public class ListExperimentsController {
 
   @Autowired
   private SecurityManager securityManager;
+  @Autowired
+  private ExperimentService experimentService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -74,7 +77,7 @@ public class ListExperimentsController {
 
   @RequestMapping(value = "/experiments/rest/", method = RequestMethod.GET)
   public @ResponseBody Collection<Experiment> jsonRest() throws IOException {
-    return requestManager.listAllExperiments();
+    return experimentService.listAll();
   }
 
   @RequestMapping("/experiments")

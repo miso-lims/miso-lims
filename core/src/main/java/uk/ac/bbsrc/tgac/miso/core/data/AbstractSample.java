@@ -31,30 +31,39 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
@@ -62,7 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * Skeleton implementation of a Sample
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -77,28 +86,29 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private long sampleId = AbstractSample.UNSAVED_ID;
 
   @ManyToOne(targetEntity = ProjectImpl.class)
+  @JoinColumn(name = "project_projectId")
+  @JsonBackReference
   private Project project;
 
-  @Transient
-  private final Collection<Experiment> experiments = new HashSet<Experiment>();
-
-  @Transient
+  @OneToMany(targetEntity = LibraryImpl.class, mappedBy = "sample")
   @JsonManagedReference
-  private final Collection<Library> libraries = new HashSet<Library>();
+  private final Collection<Library> libraries = new HashSet<>();
 
-  @Transient
-  private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
+  @OneToMany(targetEntity = SampleQCImpl.class, mappedBy = "sample", cascade = CascadeType.ALL)
+  @JsonManagedReference
+  private Collection<SampleQC> sampleQCs = new TreeSet<>();
 
-  @Transient
-  private Collection<Note> notes = new HashSet<Note>();
+  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Sample_Note", joinColumns = {
+      @JoinColumn(name = "sample_sampleId") }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId") })
+  private Collection<Note> notes = new HashSet<>();
 
-  @Transient
+  @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
-  @Transient
-  public Document submissionDocument;
-
-  @Transient
+  @ManyToOne
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
 
   private String accession;
@@ -111,16 +121,27 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private Boolean qcPassed;
   private String identificationBarcode;
   private String locationBarcode;
-  private String alias;
-  private Long securityProfile_profileId;
 
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
+  @JsonBackReference
   private User lastModifier;
 
   @OneToOne(targetEntity = SampleDerivedInfo.class)
   @PrimaryKeyJoinColumn
   private SampleDerivedInfo derivedInfo;
+
+  @ManyToOne(targetEntity = BoxImpl.class)
+  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = sampleId AND bp.targetType LIKE 'Sample%')")
+  private Box box;
+
+  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = sampleId AND bp.targetType LIKE 'Sample%')")
+  private String position;
+
+  @Override
+  public String getBoxPosition() {
+    return position;
+  }
 
   @Override
   public User getLastModifier() {
@@ -163,6 +184,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
+  public Box getBox() {
+    return box;
+  }
+
+  @Override
   public String getName() {
     return name;
   }
@@ -200,16 +226,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setTaxonIdentifier(String taxonIdentifier) {
     this.taxonIdentifier = nullifyStringIfBlank(taxonIdentifier);
-  }
-
-  @Override
-  public String getAlias() {
-    return alias;
-  }
-
-  @Override
-  public void setAlias(String alias) {
-    this.alias = alias;
   }
 
   @Override
@@ -297,12 +313,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     this.qcPassed = qcPassed;
   }
 
-  /*
-   * public Document getSubmissionData() { return submissionDocument; }
-   * 
-   * public void accept(SubmittableVisitor v) { v.visit(this); }
-   */
-
   @Override
   public Collection<Note> getNotes() {
     return notes;
@@ -336,9 +346,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
-    if (securityProfile != null) {
-      this.securityProfile_profileId = securityProfile.getProfileId();
-    }
   }
 
   @Override
@@ -361,9 +368,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public abstract void buildSubmission();
-
-  @Override
   public abstract void buildReport();
 
   @Override
@@ -372,8 +376,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Sample s = (Sample) o;
+  public int compareTo(Sample s) {
     if (getId() != 0L && s.getId() != 0L) {
       if (getId() < s.getId()) return -1;
       if (getId() > s.getId()) return 1;
@@ -404,21 +407,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public Long getSecurityProfileId() {
-    return securityProfile_profileId;
-  }
-
-  @Override
-  public void setSecurityProfileId(Long securityProfileId) {
-    securityProfile_profileId = securityProfileId;
-  }
-
-  @Override
   public int hashCode() {
     return new HashCodeBuilder(7, 37)
         .appendSuper(super.hashCode())
         .append(accession)
-        .append(alias)
         .append(description)
         .append(identificationBarcode)
         .append(locationBarcode)
@@ -440,7 +432,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     return new EqualsBuilder()
         .appendSuper(super.equals(obj))
         .append(accession, other.accession)
-        .append(alias, other.alias)
         .append(description, other.description)
         .append(identificationBarcode, other.identificationBarcode)
         .append(locationBarcode, other.locationBarcode)

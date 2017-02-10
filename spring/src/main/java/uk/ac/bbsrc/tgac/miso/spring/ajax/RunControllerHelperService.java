@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -58,7 +58,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -67,19 +66,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioRun;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -97,15 +95,9 @@ public class RunControllerHelperService {
   @Autowired
   private RequestManager requestManager;
   @Autowired
-  private WatchManager watchManager;
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
-  @Autowired
   private MisoFilesManager misoFileManager;
-
-  public void setWatchManager(WatchManager watchManager) {
-    this.watchManager = watchManager;
-  }
+  @Autowired
+  private StudyService studyService;
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
@@ -132,7 +124,8 @@ public class RunControllerHelperService {
         if (newPt != null) {
           log.info("STORED: " + newRuntype + " :: " + storedPlatformType);
           if (!newRuntype.equals(storedPlatformType)) {
-            run = dataObjectFactory.getRunOfType(newPt, user);
+            run = new RunImpl(user);
+            run.setPlatformType(newPt);
             run.setId(storedRun.getId());
           } else {
             run = storedRun;
@@ -193,7 +186,8 @@ public class RunControllerHelperService {
       Map<String, Object> responseMap = new HashMap<>();
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-      Run run = dataObjectFactory.getRunOfType(pt, user);
+      Run run = new RunImpl(user);
+      run.setPlatformType(pt);
       run.setSequencerReference(sr);
 
       session.setAttribute("run_" + cId, run);
@@ -258,8 +252,6 @@ public class RunControllerHelperService {
         "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
     sb.append(
         "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
-    sb.append(
-        "<tr><td>Paired End:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
     sb.append("</table>");
     sb.append("<div id='partitionErrorDiv'> </div>");
     sb.append("<div id='partitionDiv'>");
@@ -268,7 +260,7 @@ public class RunControllerHelperService {
 
   public JSONObject changeIlluminaContainer(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
-    IlluminaRun run = (IlluminaRun) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     run.getSequencerPartitionContainers().clear();
     String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
     if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
@@ -283,7 +275,7 @@ public class RunControllerHelperService {
       b.append("</table>");
       b.append("</div>");
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       f.setPartitionLimit(1);
       f.initEmptyPartitions();
@@ -296,7 +288,7 @@ public class RunControllerHelperService {
       b.append("<input id='lane8' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
       b.append("<div id='containerdiv0'> </div>");
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     } else {
@@ -310,8 +302,6 @@ public class RunControllerHelperService {
             + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
         b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
             + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-        b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
-            + "].paired' name='sequencerPartitionContainers[" + i + "].paired' value='false'/></td></tr>");
         b.append("</table>");
         b.append("<div id='partitionErrorDiv'> </div>");
         b.append("<div id='partitionDiv'>");
@@ -322,7 +312,7 @@ public class RunControllerHelperService {
         b.append("</table>");
         b.append("</div>");
 
-        SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+        SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
         f.setPlatform(run.getSequencerReference().getPlatform());
         f.initEmptyPartitions();
         run.addSequencerPartitionContainer(f);
@@ -352,7 +342,7 @@ public class RunControllerHelperService {
     b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
 
-    IlluminaRun run = (IlluminaRun) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numLanes);
@@ -367,7 +357,7 @@ public class RunControllerHelperService {
   public JSONObject changeLS454Container(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
     int numContainers = json.getInt("numContainers");
-    LS454Run run = (LS454Run) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     run.getSequencerPartitionContainers().clear();
 
     for (int i = 0; i < numContainers; i++) {
@@ -378,8 +368,6 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
-          + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
@@ -388,7 +376,7 @@ public class RunControllerHelperService {
       b.append(generateChamberButtons("LS454", i, 1, 16));
       b.append("<br/></div>");
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
@@ -413,7 +401,7 @@ public class RunControllerHelperService {
     b.append("<th>" + PlatformType.LS454.getPartitionName() + " No.</th>");
     b.append("<th>Pool</th>");
 
-    LS454Run run = (LS454Run) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
@@ -439,8 +427,6 @@ public class RunControllerHelperService {
           + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
           + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired End:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
-          + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
@@ -458,7 +444,7 @@ public class RunControllerHelperService {
       }
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
-      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
@@ -488,7 +474,7 @@ public class RunControllerHelperService {
   public JSONObject changePacBioContainer(HttpSession session, JSONObject json) {
     int numContainers = json.getInt("numContainers");
     StringBuilder b = new StringBuilder();
-    PacBioRun run = (PacBioRun) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     run.getSequencerPartitionContainers().clear();
 
     for (int i = 0; i < numContainers; i++) {
@@ -512,7 +498,7 @@ public class RunControllerHelperService {
 
       b.append("<br/><div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
-      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
@@ -523,7 +509,7 @@ public class RunControllerHelperService {
     int numChambers = json.getInt("numChambers");
     int container = json.getInt("container");
 
-    PacBioRun run = (PacBioRun) session.getAttribute("run_" + json.getString("run_cId"));
+    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
@@ -537,20 +523,6 @@ public class RunControllerHelperService {
     b.append("</table>");
 
     return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  private String getPlatformSelect(Run run) throws IOException {
-    StringBuilder b = new StringBuilder();
-    Collection<Platform> platforms = requestManager.listAllPlatforms();
-    b.append("<select name='platform' id='platform' onchange='setContainerCount(this);'>");
-    for (Platform p : platforms) {
-      if (p.getPlatformType().equals(run.getPlatformType())) {
-        b.append("<option value='" + p.getId() + "' platform='" + p.getPlatformType().getKey() + "'");
-        b.append(">" + p.getPlatformType().getKey() + " - " + p.getInstrumentModel() + "</option>");
-      }
-    }
-    b.append("</select>");
-    return b.toString();
   }
 
   public JSONObject getRunQCUsers(HttpSession session, JSONObject json) {
@@ -646,7 +618,7 @@ public class RunControllerHelperService {
           }
         }
 
-        RunQC newQc = dataObjectFactory.getRunQC();
+        RunQC newQc = new RunQCImpl();
         newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
         newQc.setQcType(requestManager.getRunQcTypeById(json.getLong("qcType")));
@@ -795,7 +767,7 @@ public class RunControllerHelperService {
 
   public JSONObject generateIlluminaDemultiplexCSV(HttpSession session, JSONObject json) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    IlluminaRun r = (IlluminaRun) requestManager.getRunById(json.getLong("runId"));
+    Run r = requestManager.getRunById(json.getLong("runId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = requestManager.getSequencerPartitionContainerById(json.getLong("containerId"));
     if (r != null && f != null) {
       String casavaVersion = "1.8.2";
@@ -848,16 +820,8 @@ public class RunControllerHelperService {
 
     try {
       Run run = requestManager.getRunById(runId);
-      Note note = requestManager.getNoteById(noteId);
-      if (run.getNotes().contains(note)) {
-        run.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        run.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
-        requestManager.saveRun(run);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
-      }
+      requestManager.deleteRunNote(run, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("delete run note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
@@ -870,9 +834,7 @@ public class RunControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Run run = requestManager.getRunById(runId);
       if (!run.getWatchers().contains(user)) {
-        watchManager.watch(run, user);
-        run.setLastModifier(user);
-        requestManager.saveRun(run);
+        requestManager.addRunWatcher(run, user);
       }
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
@@ -887,9 +849,7 @@ public class RunControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Run run = requestManager.getRunById(runId);
       if (run.getWatchers().contains(user)) {
-        watchManager.unwatch(run, user);
-        run.setLastModifier(user);
-        requestManager.saveRun(run);
+        requestManager.removeRunWatcher(run, user);
       }
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
@@ -909,14 +869,17 @@ public class RunControllerHelperService {
       PlatformType pt = json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))
           ? PlatformType.get(json.getString("platform")) : r.getPlatformType();
 
-      Pool p = requestManager.getPoolByBarcode(barcode, pt);
+      Pool p = requestManager.getPoolByBarcode(barcode);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (p == null) {
-        p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)), pt);
+        p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)));
       }
       // if pool still can't be found, return error
       if (p == null) {
         return JSONUtils.SimpleJSONError("Cannot find a pool with barcode " + barcode);
+      }
+      if (p.getPlatformType() != pt) {
+        return JSONUtils.SimpleJSONError("Pool with that barcode is " + p.getPlatformType().getKey() + " and not " + pt.getKey());
       }
       List<SequencerPartitionContainer> fs = new ArrayList<SequencerPartitionContainer>(r.getSequencerPartitionContainers());
       if (!fs.isEmpty()) {
@@ -945,16 +908,9 @@ public class RunControllerHelperService {
 
       if (p.getExperiments().size() != 0) {
         // check if each poolable has been in a study for this pool already
-        Collection<Dilution> ds = p.getPoolableElements();
-        for (Dilution d : ds) {
-          Collection<Study> studies = requestManager.listAllStudiesByLibraryId(d.getLibrary().getId());
-          if (studies.isEmpty()) {
-            pooledProjects.add(d.getLibrary().getSample().getProject());
-          } else {
-            for (Study stu : studies) {
-              pooledProjects.add(stu.getProject());
-            }
-          }
+        Collection<LibraryDilution> ds = p.getPoolableElements();
+        for (LibraryDilution d : ds) {
+          pooledProjects.add(d.getLibrary().getSample().getProject());
         }
 
         for (Experiment poolExp : p.getExperiments()) {
@@ -964,7 +920,7 @@ public class RunControllerHelperService {
           }
         }
       } else {
-        for (Dilution d : p.getPoolableElements()) {
+        for (LibraryDilution d : p.getPoolableElements()) {
           pooledProjects.add(d.getLibrary().getSample().getProject());
         }
       }
@@ -973,7 +929,7 @@ public class RunControllerHelperService {
         sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
         sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
             + partition + "_" + project.getProjectId() + "'>");
-        Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
+        Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
           return JSONUtils.SimpleJSONError("No studies available on project " + project.getName()
               + ". At least one study must be available for each project associated with this Pool.");
@@ -1004,8 +960,8 @@ public class RunControllerHelperService {
           "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + LimsUtils.getDateAsString(p.getCreationDate()) + ")</b><br/>");
 
-      Collection<Dilution> ds = p.getPoolableElements();
-      for (Dilution d : ds) {
+      Collection<LibraryDilution> ds = p.getPoolableElements();
+      for (LibraryDilution d : ds) {
         b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
       }
 
@@ -1028,7 +984,7 @@ public class RunControllerHelperService {
           b.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
           b.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
               + partition + "_" + project.getProjectId() + "'>");
-          Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
+          Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
           if (studies.isEmpty()) {
             throw new Exception("No studies available on project " + project.getName()
                 + ". At least one study must be available for each project associated with this Pool. Double click to add a different pool");
@@ -1117,9 +1073,5 @@ public class RunControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 }

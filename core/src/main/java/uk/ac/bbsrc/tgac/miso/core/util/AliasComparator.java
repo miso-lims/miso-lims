@@ -25,7 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.lang.reflect.Method;
+import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util
@@ -36,59 +36,10 @@ import java.lang.reflect.Method;
  * @date 01/12/11
  * @since 0.1.3
  */
-public class AliasComparator extends AlphanumericComparator {
-  private Method method;
-  private boolean isAscending = true;
-  private boolean isNullsLast = true;
-  private static final Object[] EMPTY_OBJECT_ARRAY = new Object[] {};
-
-  public AliasComparator(Class c) throws NoSuchMethodException, IllegalArgumentException {
-    method = c.getMethod("getAlias");
-    Class returnClass = method.getReturnType();
-    if (returnClass.getName().equals("void")) {
-      String message = method.getName() + " has a void return type";
-      throw new IllegalArgumentException(message);
-    }
-  }
-
+public class AliasComparator<T extends Aliasable> extends AlphanumericComparator<T> {
   @Override
-  public int compare(Object object1, Object object2) {
-    String alias1 = null;
-    String alias2 = null;
-
-    try {
-      alias1 = (String) method.invoke(object1, EMPTY_OBJECT_ARRAY);
-      alias2 = (String) method.invoke(object2, EMPTY_OBJECT_ARRAY);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-
-    // Treat empty strings like nulls
-    if (isStringEmptyOrNull(alias1)) {
-      alias1 = null;
-    }
-
-    if (isStringEmptyOrNull(alias2)) {
-      alias2 = null;
-    }
-
-    // Handle sorting of null values
-    if (alias1 == null && alias2 == null) return 0;
-    if (alias1 == null) return isNullsLast ? 1 : -1;
-    if (alias2 == null) return isNullsLast ? -1 : 1;
-
-    // Compare objects
-    String c1;
-    String c2;
-
-    if (isAscending) {
-      c1 = alias1;
-      c2 = alias2;
-    } else {
-      c1 = alias2;
-      c2 = alias1;
-    }
-
-    return super.compare(c1, c2);
+  protected String getProperty(T object) {
+    String alias = object.getAlias();
+    return isStringEmptyOrNull(alias) ? null : alias;
   }
 }

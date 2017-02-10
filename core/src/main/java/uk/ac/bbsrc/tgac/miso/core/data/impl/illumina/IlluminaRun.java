@@ -58,7 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 @Entity
 @DiscriminatorValue("Illumina")
 public class IlluminaRun extends RunImpl {
-  protected static final Logger log = LoggerFactory.getLogger(IlluminaRun.class);
+  private static final Logger log = LoggerFactory.getLogger(IlluminaRun.class);
 
   public IlluminaRun() {
     setPlatformType(PlatformType.ILLUMINA);
@@ -116,15 +116,6 @@ public class IlluminaRun extends RunImpl {
     setPlatformType(PlatformType.ILLUMINA);
     setStatus(new StatusImpl());
     setSecurityProfile(new SecurityProfile(user));
-  }
-
-  @Override
-  public void buildSubmission() {
-    /*
-     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
-     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
-     * ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
-     */
   }
 
   @Override

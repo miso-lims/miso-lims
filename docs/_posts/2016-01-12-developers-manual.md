@@ -167,7 +167,7 @@ API access to any registered Issue trackers, e.g. JIRA, RT, Redmine, Mantis, is 
 
 Issue tracker managers allow integration with external issue trackers, removing the need to context switch between MISO and said tracker by a user. An example of this feature is in the Project page, where one or more issue IDs can be supplied which will import the issue details from the tracker's API. Currently the only default supported implementation is JIRA, as provided by the [JiraIssueManager](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/java/uk/ac/bbsrc/tgac/miso/webapp/service/integration/jira/JiraIssueManager.java) class.
 
-### Printers
+### Printers (Out of date. See Driver and Backend classes)
 
 API access to any printing devices, notably barcode printers, is made available through implementors of the [PrintManager](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/PrintManager.java) interface. This interface defines the contract whereby [MisoPrintService](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/MisoPrintService.java)s and [PrintJob](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/PrintJob.java)s can be stored and retrieved, as well as an abstraction of printing content to a print service. Like a lot of other MISO services, the [MisoPrintService](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/MisoPrintService.java) interface has the @Spi annotation, allowing any custom printing services to be automatically resolved at runtime by using the @ServiceProvider annotation on any concrete classes (see [Miso Service Providers](#DeveloperManual-MisoServiceProviders)).
 
@@ -545,13 +545,6 @@ If the CascadeType is set to PERSIST, we want to call the parent [Project](https
 
 In any CascadeType scenario, we want to make sure any [Note](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Note.java)s attached to this Sample are persisted. Finally, we want to evict this Sample from the cache that holds the list of all Samples, again to make sure stale information isn't presented to any users.
 
-### Cache eviction
-
-As is apparent in the previous parent/child mapping cascading examples, any relevant caches should be managed so that up-to-date information is available. When saving any objects, state may change, so stale objects need to be evicted from their caches. See the [Caching](#DeveloperManual-Caching) section below.
-
-## Caching
-
-Considering the default SQL layer supplied with MISO, SQL queries can be very slow, especially across multiple tables. As a result, we have implemented an [EhCache](http://ehcache.org/) layer that greatly improves read times from the underlying database by storing frequently used objects in memory, and less frequently used on disk, as per a standard [LRU policy](http://en.wikipedia.org/wiki/Cache_algorithms#Least_Recently_Used). A number of caches exist for the various domain model objects and are configured according to available memory and disk space (see [EhCache Configuration](#DeveloperManual-EhCacheConfiguration)). Furthermore, the [EhCache Annotations library](http://ehcache.org/documentation/2.4/user-guide/spring#spring-25---31-ehcache-annotations-for-spring) is used to simplify the configuration of the persistence and removal policy of objects themselves (see Persisting Objects and below).
 
 ### Persisting objects
 
@@ -587,7 +580,7 @@ public long save(Project project) throws IOException {
 
 ### Retrieving objects
 
-When retrieving objects from the data store, the ehcache-annotated **get()** and **listAll()** methods check the specified caches for collision on the supplied object. If the objects exists in the cache, the cached version is returned. If not, the method body executes:
+When retrieving objects from the data store, the **get()** and **listAll()** methods check the specified caches for collision on the supplied object. If the objects exists in the cache, the cached version is returned. If not, the method body executes:
 
 
 
@@ -718,9 +711,6 @@ public class ProjectMapper extends CacheAwareRowMapper<Project> {
         log.debug("Cache put for Project " + id);
       }
     }
-    catch(net.sf.ehcache.CacheException ce) {
-      ce.printStackTrace();
-    }
     catch(UnsupportedOperationException uoe) {
       uoe.printStackTrace();
     }
@@ -757,7 +747,6 @@ A great deal of MISO can be configured at the Spring XML level, making it easy f
 |[integration-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/integration-config.xml)|Configures elements in the integration layer, e.g. analysis server|[Integration configuration](#DeveloperManual-Integrationconfiguration)|
 |[print-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/print-config.xml)|Configures the printing subsystem, e.g. print context resolvers|[Printer configuration](#DeveloperManual-Printerconfiguration)|
 |[logging-config.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/logging-config.xml)|Configures the logging subsystem, e.g. request layer logging|[Logging configuration](#DeveloperManual-Loggingconfiguration)|
-|[ehcache.xml](https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/resources/ehcache.xml)|Configures the caching layer|[EhCache configuration](#DeveloperManual-EhCacheconfiguration)|
 
 
 ### Core webapp configuration
@@ -799,10 +788,6 @@ The print-config.xml controls available PrintManager beans and relevant print se
 ### <span><span><span><span>Logging configuration</span></span></span></span>
 
 <span><span><span><span>Overarching logging mechanisms and respective aspect triggers are configured here.</span></span></span></span>
-
-### EhCache configuration
-
-Caches, eviction policies and cache sizes are configured here. There shouldn't be any reason to amend the configuration here in terms of available caches, other than increasing/decreasing cache sizes in memory and disk according to your available JVM memory.
 
 ## Contexts
 

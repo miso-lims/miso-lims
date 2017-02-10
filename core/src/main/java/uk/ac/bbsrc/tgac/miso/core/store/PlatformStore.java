@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * Defines a DAO interface for storing Platforms
@@ -64,5 +65,5 @@ public interface PlatformStore extends Store<Platform> {
    * @throws IOException
    *           when
    */
-  List<String> listDistinctPlatformNames() throws IOException;
+  List<PlatformType> listDistinctPlatformNames() throws IOException;
 }

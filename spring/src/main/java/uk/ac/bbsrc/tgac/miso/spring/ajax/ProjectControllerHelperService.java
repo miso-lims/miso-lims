@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -32,14 +30,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,37 +43,32 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.EntityGroupImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
+import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -98,13 +88,17 @@ public class ProjectControllerHelperService {
   @Autowired
   private IssueTrackerManager issueTrackerManager;
   @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
+  private PrinterService printerService;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
-  private WatchManager watchManager;
-  @Autowired
   private NamingScheme namingScheme;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
+  @Autowired
+  private SampleService sampleService;
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
@@ -126,12 +120,20 @@ public class ProjectControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
-    this.printManager = printManager;
+  public void setPrinterService(PrinterService printerService) {
+    this.printerService = printerService;
   }
 
-  public void setWatchManager(WatchManager watchManager) {
-    this.watchManager = watchManager;
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   public JSONObject validateProjectShortName(HttpSession session, JSONObject json) {
@@ -208,15 +210,8 @@ public class ProjectControllerHelperService {
 
     try {
       final ProjectOverview po = requestManager.getProjectOverviewById(overviewId);
-      final Note note = requestManager.getNoteById(noteId);
-      if (po.getNotes().contains(note)) {
-        po.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        requestManager.saveProjectOverview(po);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Project Overview does not have note " + noteId + ". Cannot remove");
-      }
+      requestManager.deleteProjectOverviewNote(po, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
       log.error("delete project overview", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
@@ -439,7 +434,7 @@ public class ProjectControllerHelperService {
 
   private String checkLibraries(Long projectId) throws IOException {
     int pass = 0;
-    final Collection<Library> libs = requestManager.listAllLibrariesByProjectId(projectId);
+    final Collection<Library> libs = libraryService.listByProjectId(projectId);
     if (libs.size() > 0) {
       for (final Library l : libs) {
         if (l.getLibraryQCs().size() > 0) {
@@ -499,273 +494,33 @@ public class ProjectControllerHelperService {
   }
 
   public JSONObject printAllSampleBarcodes(HttpSession session, JSONObject json) {
-    final Long projectId = json.getLong("projectId");
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        final Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Sample.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-      }
-
-      final Queue<File> thingsToPrint = new LinkedList<>();
-      final Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
-      for (final Sample sample : samples) {
-        // autosave the barcode if none has been previously generated
-        if (isStringEmptyOrNull(sample.getIdentificationBarcode())) {
-          sample.setLastModifier(user);
-          requestManager.saveSample(sample);
-        }
-        final File f = mps.getLabelFor(sample);
-        if (f != null) thingsToPrint.add(f);
-      }
-      final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (final MisoPrintException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (final IOException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printAllBarcodes(printerService, json,
+        new SampleControllerHelperService.SampleBarcodeAssister(requestManager, sampleService));
   }
 
   public JSONObject printSelectedSampleBarcodes(HttpSession session, JSONObject json) {
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final JSONArray ss = JSONArray.fromObject(json.getString("samples"));
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        final Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Sample.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-      }
-
-      final Queue<File> thingsToPrint = new LinkedList<>();
-      for (final JSONObject p : (Iterable<JSONObject>) ss) {
-        final Long sampleId = p.getLong("sampleId");
-        final Sample sample = requestManager.getSampleById(sampleId);
-        if (isStringEmptyOrNull(sample.getIdentificationBarcode())) {
-          sample.setLastModifier(user);
-          requestManager.saveSample(sample);
-        }
-        final File f = mps.getLabelFor(sample);
-        if (f != null) thingsToPrint.add(f);
-      }
-      final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (final MisoPrintException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (final IOException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json,
+        new SampleControllerHelperService.SampleBarcodeAssister(requestManager, sampleService));
   }
 
   public JSONObject printAllLibraryBarcodes(HttpSession session, JSONObject json) {
-    final Long projectId = json.getLong("projectId");
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        final Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-      }
-
-      final Queue<File> thingsToPrint = new LinkedList<>();
-      final Collection<Library> libraries = requestManager.listAllLibrariesByProjectId(projectId);
-      for (final Library library : libraries) {
-        // autosave the barcode if none has been previously generated
-        if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
-          library.setLastModifier(user);
-          requestManager.saveLibrary(library);
-        }
-        final File f = mps.getLabelFor(library);
-        if (f != null) thingsToPrint.add(f);
-      }
-      final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (final MisoPrintException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (final IOException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printAllBarcodes(printerService, json,
+        new LibraryControllerHelperService.LibraryBarcodeAssister(libraryService));
   }
 
   public JSONObject printSelectedLibraryBarcodes(HttpSession session, JSONObject json) {
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final JSONArray ss = JSONArray.fromObject(json.getString("libraries"));
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        final Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-      }
-
-      final Queue<File> thingsToPrint = new LinkedList<>();
-      for (final JSONObject p : (Iterable<JSONObject>) ss) {
-        final Long libraryId = p.getLong("libraryId");
-        final Library library = requestManager.getLibraryById(libraryId);
-        // autosave the barcode if none has been previously generated
-        if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
-          library.setLastModifier(user);
-          requestManager.saveLibrary(library);
-        }
-        final File f = mps.getLabelFor(library);
-        if (f != null) thingsToPrint.add(f);
-      }
-      final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (final MisoPrintException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (final IOException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json,
+        new LibraryControllerHelperService.LibraryBarcodeAssister(libraryService));
   }
 
   public JSONObject printAllLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
-    final Long projectId = json.getLong("projectId");
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        final Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Dilution.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-      }
-
-      final Queue<File> thingsToPrint = new LinkedList<>();
-      final Collection<LibraryDilution> libraryDilutions = requestManager.listAllLibraryDilutionsByProjectId(projectId);
-      for (final LibraryDilution libraryDilution : libraryDilutions) {
-        // autosave the barcode if none has been previously generated
-        if (isStringEmptyOrNull(libraryDilution.getIdentificationBarcode())) {
-          requestManager.saveLibraryDilution(libraryDilution);
-        }
-        final File f = mps.getLabelFor(libraryDilution);
-        if (f != null) thingsToPrint.add(f);
-      }
-      final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (final MisoPrintException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (final IOException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printAllBarcodes(printerService, json,
+        new LibraryControllerHelperService.LibraryDilutionBarcodeAssister(dilutionService));
   }
 
   public JSONObject printSelectedLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
-    try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final JSONArray ss = JSONArray.fromObject(json.getString("dilutions"));
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        final Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Dilution.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-      }
-
-      final Queue<File> thingsToPrint = new LinkedList<>();
-      for (final JSONObject p : (Iterable<JSONObject>) ss) {
-        final Long dilutionId = p.getLong("dilutionId");
-        final LibraryDilution libraryDilution = requestManager.getLibraryDilutionById(dilutionId);
-        // autosave the barcode if none has been previously generated
-        if (isStringEmptyOrNull(libraryDilution.getIdentificationBarcode())) {
-          requestManager.saveLibraryDilution(libraryDilution);
-        }
-        final File f = mps.getLabelFor(libraryDilution);
-        if (f != null) thingsToPrint.add(f);
-      }
-      final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (final MisoPrintException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (final IOException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json,
+        new LibraryControllerHelperService.LibraryDilutionBarcodeAssister(dilutionService));
   }
 
   public JSONObject generateSampleDeliveryForm(HttpSession session, JSONObject json) {
@@ -779,7 +534,7 @@ public class ProjectControllerHelperService {
       try {
         final JSONArray a = JSONArray.fromObject(json.get("samples"));
         for (final JSONObject j : (Iterable<JSONObject>) a) {
-          samples.add(requestManager.getSampleById(j.getLong("sampleId")));
+          samples.add(sampleService.get(j.getLong("sampleId")));
         }
         final File f = misoFileManager.getNewFile(Project.class, projectId.toString(),
             "SampleInformationForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
@@ -887,12 +642,7 @@ public class ProjectControllerHelperService {
     try {
       final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
-      if (!overview.getWatchers().contains(user)) {
-        watchManager.watch(overview, user);
-        watchManager.watch(overview.getProject(), user);
-        requestManager.saveProjectOverview(overview);
-        requestManager.saveProject(overview.getProject());
-      }
+      requestManager.addProjectWatcher(overview.getProject(), user);
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
       log.error("watch overview", e);
@@ -905,13 +655,8 @@ public class ProjectControllerHelperService {
     try {
       final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+      requestManager.removeProjectWatcher(overview.getProject(), user);
       if (!overview.getProject().getSecurityProfile().getOwner().equals(user)) {
-        if (overview.getWatchers().contains(user)) {
-          watchManager.unwatch(overview, user);
-          watchManager.unwatch(overview.getProject(), user);
-          requestManager.saveProjectOverview(overview);
-          requestManager.saveProject(overview.getProject());
-        }
         return JSONUtils.SimpleJSONResponse("OK");
       } else {
         return JSONUtils.SimpleJSONError("Cannot unwatch an entity of which you are the owner.");
@@ -927,7 +672,6 @@ public class ProjectControllerHelperService {
     final StringBuilder sb = new StringBuilder();
     final JSONObject j = new JSONObject();
     try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
       sb.append("<ul class='bullets' style='margin-left: -30px;'>");
       for (final User theUser : overview.getWatchers()) {
@@ -972,17 +716,14 @@ public class ProjectControllerHelperService {
         final JSONArray a = JSONArray.fromObject(json.get("samples"));
         for (final JSONObject j : (Iterable<JSONObject>) a) {
           if (j.has("sampleId")) {
-            samples.add(requestManager.getSampleById(j.getLong("sampleId")));
+            samples.add(sampleService.get(j.getLong("sampleId")));
           } else {
             return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
           }
         }
       }
 
-      final EntityGroup<ProjectOverview, Sample> osg = new EntityGroupImpl<>();
-      osg.setEntities(samples);
-      osg.setParent(overview);
-      overview.setSampleGroup(osg);
+      overview.setSampleGroup(samples);
 
       requestManager.saveProjectOverview(overview);
       requestManager.saveProject(overview.getProject());
@@ -996,25 +737,20 @@ public class ProjectControllerHelperService {
 
   public JSONObject addSamplesToGroup(HttpSession session, JSONObject json) {
     final Long overviewId = json.getLong("overviewId");
-    final Long groupId = json.getLong("groupId");
     try {
       final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
-      final EntityGroup<ProjectOverview, Sample> osg = overview.getSampleGroup();
-
-      if (osg != null && groupId != null && osg.getId() == groupId.longValue()) {
-        if (json.has("samples")) {
-          final JSONArray a = JSONArray.fromObject(json.get("samples"));
-          for (final JSONObject j : (Iterable<JSONObject>) a) {
-            if (j.has("sampleId")) {
-              final Sample s = requestManager.getSampleById(j.getLong("sampleId"));
-              if (osg.getEntities().contains(s)) {
-                log.error("Sample group already contains " + s.getName());
-              } else {
-                osg.addEntity(s);
-              }
+      if (json.has("samples")) {
+        final JSONArray a = JSONArray.fromObject(json.get("samples"));
+        for (final JSONObject j : (Iterable<JSONObject>) a) {
+          if (j.has("sampleId")) {
+            final Sample s = requestManager.getSampleById(j.getLong("sampleId"));
+            if (overview.getSamples().contains(s)) {
+              log.error("Sample group already contains " + s.getName());
             } else {
-              return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
+              overview.getSamples().add(s);
             }
+          } else {
+            return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
           }
         }
       }

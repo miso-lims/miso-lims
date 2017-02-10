@@ -47,7 +47,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.Message;
+import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -459,8 +459,8 @@ public class IlluminaNotificationMessageConsumerMechanism
     }
     try {
       if (runsToSave.size() > 0) {
-        int[] saved = requestManager.saveRuns(runsToSave);
-        log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
+        requestManager.saveRuns(runsToSave);
+        log.info("Batch saved " + runsToSave.size() + " runs");
       }
     } catch (IOException e) {
       log.error("Couldn't save run batch", e);
@@ -479,7 +479,7 @@ public class IlluminaNotificationMessageConsumerMechanism
         for (SequencingParameters parameters : getParameterSet()) {
           log.debug("Checking run " + run.getString(IlluminaTransformer.JSON_RUN_NAME) + " against parameters " + parameters.getName());
 
-          if (parameters.getPlatformId() == r.getSequencerReference().getPlatform().getId() && parameters.matches(document)) {
+          if (parameters.getPlatform().getId() == r.getSequencerReference().getPlatform().getId() && parameters.matches(document)) {
             log.debug("Matched run " + run.getString(IlluminaTransformer.JSON_RUN_NAME) + " to parameters " + parameters.getName());
             r.setSequencingParameters(parameters);
             break;

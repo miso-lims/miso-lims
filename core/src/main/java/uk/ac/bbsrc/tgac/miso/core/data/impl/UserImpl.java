@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -33,16 +33,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -55,7 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  */
 @Entity
 @Table(name = "User")
-public class UserImpl implements User, Serializable, Comparable {
+public class UserImpl implements User, Serializable {
   protected static final Logger log = LoggerFactory.getLogger(UserImpl.class);
 
   private static final long serialVersionUID = 1L;
@@ -77,10 +81,13 @@ public class UserImpl implements User, Serializable, Comparable {
   private boolean admin = false;
   private boolean active = true;
 
-  @Transient
-  private Collection<Group> groups = new HashSet<Group>();
-  @Transient
-  private String[] roles = new String[0];
+  @ManyToMany(targetEntity = Group.class)
+  @JoinTable(name = "User_Group", inverseJoinColumns = { @JoinColumn(name = "groups_groupId") }, joinColumns = {
+      @JoinColumn(name = "users_userId") })
+  private Collection<Group> groups = new HashSet<>();
+
+  @Lob
+  private String roles = new String();
 
   @Override
   public boolean isActive() {
@@ -142,21 +149,22 @@ public class UserImpl implements User, Serializable, Comparable {
 
   @Override
   public String[] getRoles() {
-    return roles;
+    return roles.split(",");
   }
 
   @Override
+  @JsonIgnore
   public Collection<GrantedAuthority> getRolesAsAuthorities() {
-    List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
-    for (String s : roles) {
-      auths.add(new GrantedAuthorityImpl(s));
+    List<GrantedAuthority> auths = new ArrayList<>();
+    for (String s : getRoles()) {
+      auths.add(new SimpleGrantedAuthority(s));
     }
     return auths;
   }
 
   @Override
   public Collection<GrantedAuthority> getPermissionsAsAuthorities() {
-    List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
+    List<GrantedAuthority> auths = new ArrayList<>();
     if (isAdmin()) {
       auths.add(MisoAuthority.ROLE_ADMIN);
     }
@@ -224,7 +232,11 @@ public class UserImpl implements User, Serializable, Comparable {
 
   @Override
   public void setRoles(String[] roles) {
-    this.roles = roles;
+    StringBuilder roleString = new StringBuilder();
+    for (String role : roles) {
+      if (!LimsUtils.isStringEmptyOrNull(role)) roleString.append(role);
+    }
+    this.roles = roleString.toString();
   }
 
   /**
@@ -246,7 +258,7 @@ public class UserImpl implements User, Serializable, Comparable {
   @Override
   public int hashCode() {
     if (getId() != UserImpl.UNSAVED_ID) {
-      return (int) getId();
+      return ((Long) getId()).intValue();
     } else {
       int hashcode = 1;
       if (getLoginName() != null) hashcode = 37 * hashcode + getLoginName().hashCode();
@@ -273,8 +285,7 @@ public class UserImpl implements User, Serializable, Comparable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    User t = (User) o;
+  public int compareTo(User t) {
     if (getId() < t.getUserId()) return -1;
     if (getId() > t.getUserId()) return 1;
     return 0;

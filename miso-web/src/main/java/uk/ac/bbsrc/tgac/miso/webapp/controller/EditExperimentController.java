@@ -46,22 +46,24 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
 @RequestMapping("/experiment")
@@ -76,11 +78,13 @@ public class EditExperimentController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
+  private ExperimentService experimentService;
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
+  @Autowired
+  private ChangeLogService changeLogService;
+
+  @Autowired
+  private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -92,7 +96,7 @@ public class EditExperimentController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getExperimentColumnSizes();
+    return experimentService.getColumnSizes();
   }
 
   @ModelAttribute("platforms")
@@ -102,7 +106,7 @@ public class EditExperimentController {
 
   public Collection<? extends Pool> populateAvailablePools(User user, Experiment experiment) throws IOException {
     if (experiment.getPlatform() != null) {
-      List<Pool> pools = new ArrayList<Pool>();
+      List<Pool> pools = new ArrayList<>();
       for (Pool p : requestManager.listAllPoolsByPlatform(experiment.getPlatform().getPlatformType())) {
         if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
           pools.add(p);
@@ -116,24 +120,24 @@ public class EditExperimentController {
 
   @RequestMapping(value = "/new/{studyId}", method = RequestMethod.GET)
   public ModelAndView newAssignedExperiment(@PathVariable Long studyId, ModelMap model) throws IOException {
-    return setupForm(AbstractExperiment.UNSAVED_ID, studyId, model);
+    return setupForm(ExperimentImpl.UNSAVED_ID, studyId, model);
   }
 
   @RequestMapping(value = "/rest/{experimentId}", method = RequestMethod.GET)
   public @ResponseBody Experiment jsonRest(@PathVariable Long experimentId) throws IOException {
-    return requestManager.getExperimentById(experimentId);
+    return experimentService.get(experimentId);
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Experiment");
+    return changeLogService.listAll("Experiment");
   }
 
   @RequestMapping(value = "/{experimentId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Experiment experiment = requestManager.getExperimentById(experimentId);
+      Experiment experiment = experimentService.get(experimentId);
 
       if (experiment == null) {
         throw new SecurityException("No such Experiment");
@@ -168,11 +172,11 @@ public class EditExperimentController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Experiment experiment = null;
-      if (experimentId == AbstractExperiment.UNSAVED_ID) {
-        experiment = dataObjectFactory.getExperiment();
+      if (experimentId == ExperimentImpl.UNSAVED_ID) {
+        experiment = new ExperimentImpl();
         model.put("title", "New Experiment");
       } else {
-        experiment = requestManager.getExperimentById(experimentId);
+        experiment = experimentService.get(experimentId);
         model.put("title", "Experiment " + experimentId);
       }
 
@@ -185,7 +189,7 @@ public class EditExperimentController {
       }
 
       if (studyId != null) {
-        Study study = requestManager.getStudyById(studyId);
+        Study study = studyService.get(studyId);
         model.addAttribute("study", study);
         experiment.setStudy(study);
         if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
@@ -227,7 +231,7 @@ public class EditExperimentController {
         throw new SecurityException("Permission denied.");
       }
       experiment.setLastModifier(user);
-      requestManager.saveExperiment(experiment);
+      experimentService.save(experiment);
       session.setComplete();
       model.clear();
       return "redirect:/miso/experiment/" + experiment.getId();

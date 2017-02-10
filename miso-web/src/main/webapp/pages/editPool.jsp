@@ -195,8 +195,8 @@
   <tr>
     <td class="h">Location:</td>
     <td>
-      <c:if test="${!empty pool.boxLocation}">${pool.boxLocation},</c:if>
-      <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.boxId}"/>'>${pool.boxAlias}, ${pool.boxPosition}</a></c:if>
+      <c:if test="${!empty pool.box.locationBarcode}">${pool.box.locationBarcode},</c:if>
+      <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.box.id}"/>'>${pool.box.alias}, ${pool.boxPosition}</a></c:if>
     </td>
   </tr>
 </table>

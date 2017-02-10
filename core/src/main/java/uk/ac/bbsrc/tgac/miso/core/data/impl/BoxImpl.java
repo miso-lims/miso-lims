@@ -3,26 +3,60 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.MapKeyClass;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.AnyMetaDef;
+import org.hibernate.annotations.ManyToAny;
+import org.hibernate.annotations.MetaValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
+@Entity
+@Table(name = "Box")
 public class BoxImpl extends AbstractBox implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   protected static final Logger log = LoggerFactory.getLogger(BoxImpl.class);
 
   // The contents of the Box
-  private Map<String, Boxable> boxableItems = new HashMap<String, Boxable>();
+  @ManyToAny(metaColumn = @Column(name = "targetType"))
+  @MapKeyColumn(name = "position", unique = true)
+  @MapKeyClass(String.class)
+  @JoinTable(name = "BoxPosition", joinColumns = { @JoinColumn(name = "boxId") }, inverseJoinColumns = {
+      @JoinColumn(name = "targetId") })
+  @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
+      @MetaValue(targetEntity = LibraryImpl.class, value = "Library"),
+      @MetaValue(targetEntity = DetailedLibraryImpl.class, value = "LibraryDetailed"),
+      @MetaValue(targetEntity = PoolImpl.class, value = "Pool"),
+      @MetaValue(targetEntity = SampleImpl.class, value = "Sample"),
+      @MetaValue(targetEntity = SampleAliquotImpl.class, value = "SampleAliquot"),
+      @MetaValue(targetEntity = IdentityImpl.class, value = "SampleIdentity"),
+      @MetaValue(targetEntity = SampleStockImpl.class, value = "SampleStock"),
+      @MetaValue(targetEntity = SampleTissueImpl.class, value = "SampleTissue"),
+      @MetaValue(targetEntity = SampleTissueProcessingImpl.class, value = "SampleProcessing"),
+      @MetaValue(targetEntity = SampleCVSlideImpl.class, value = "SampleCV"),
+      @MetaValue(targetEntity = SampleLCMTubeImpl.class, value = "SampleLCM"),
+  })
+  private Map<String, Boxable> boxableItems = new HashMap<>();
 
   /*
    * Construct new Box with defaults, and an empty SecurityProfile
@@ -59,9 +93,7 @@ public class BoxImpl extends AbstractBox implements Serializable {
     if (!position.matches("[A-Z][0-9][0-9]")) throw new IllegalArgumentException("Position must match [A-Z][0-9][0-9]");
     if (BoxUtils.fromRowChar(position.charAt(0)) >= getSize().getRows()) throw new IndexOutOfBoundsException("Row letter too large!");
     int col = BoxUtils.tryParseInt(position.substring(1, 3));
-    if (col <= 0 || col > getSize().getColumns()) throw new IndexOutOfBoundsException("Column value too large!"); // columns are
-                                                                                                                  // zero-indexed in
-                                                                                                                  // database
+    if (col <= 0 || col > getSize().getColumns()) throw new IndexOutOfBoundsException("Column value too large!");
   }
   
   @Override
@@ -115,22 +147,12 @@ public class BoxImpl extends AbstractBox implements Serializable {
   @Override
   public void removeBoxable(String position) {
     validate(position);
-    removeBoxable(getBoxable(position));
-  }
-
-  @Override
-  public void removeBoxable(Boxable boxable) {
-    boxableItems.values().remove(boxable);
+    boxableItems.remove(position);
   }
 
   @Override
   public void removeAllBoxables() {
-    Iterator<Boxable> i = boxableItems.values().iterator();
-    while (i.hasNext()) {
-      Boxable box = i.next();
-      // box.setLocationBarcode(""); // TODO: GLT-219
-      i.remove();
-    }
+    boxableItems.clear();
   }
 
   @Override
@@ -157,5 +179,15 @@ public class BoxImpl extends AbstractBox implements Serializable {
     } catch (IOException ex) {
       return "";
     }
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    BoxChangeLog changeLog = new BoxChangeLog();
+    changeLog.setBox(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }

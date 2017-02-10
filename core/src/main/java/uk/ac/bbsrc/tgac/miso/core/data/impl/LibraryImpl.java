@@ -25,7 +25,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
 import org.slf4j.Logger;
@@ -35,7 +38,9 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -47,7 +52,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
  */
 @Entity
 @Table(name = "Library")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorValue("L")
 public class LibraryImpl extends AbstractLibrary implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   protected static final Logger log = LoggerFactory.getLogger(LibraryImpl.class);
 
   /**
@@ -74,5 +84,15 @@ public class LibraryImpl extends AbstractLibrary implements Serializable {
     } else {
       setSecurityProfile(new SecurityProfile(user));
     }
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    LibraryChangeLog changeLog = new LibraryChangeLog();
+    changeLog.setLibrary(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }

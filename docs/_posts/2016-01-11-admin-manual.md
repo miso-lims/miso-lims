@@ -173,10 +173,9 @@ The configuration files are:
 | `submission.properties`   | properties to set the submission environment.              |
 
 ## Security Environment
-MISO can use either LDAP or JDBC as an authentication mechanism. The mechanism
-is set in both `/storage/miso/security.properties` and the
-`$CATALINA_HOME/bin/setenv.sh` or `/etc/default/tomcat8` files and both must be
-the same.
+MISO can use either LDAP (`ldap`), Active Directory LDAP (`ad`), or JDBC
+(`jdbc`) as an authentication mechanism. This is set by the `-Dsecurity.method`
+noted in the previous section.
 
 If you are using JDBC (aka storing usernames and passwords in the database), set the 
 security method to `jdbc`.

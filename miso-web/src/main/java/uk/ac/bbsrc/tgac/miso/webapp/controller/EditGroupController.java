@@ -43,12 +43,11 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 @Controller
 @SessionAttributes("user")
@@ -57,19 +56,12 @@ public class EditGroupController {
 
   @Autowired
   private SecurityManager securityManager;
-
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
   
   @Autowired
   private RequestManager requestManager;
   
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -79,7 +71,7 @@ public class EditGroupController {
   @ModelAttribute("users")
   public Collection<User> populateUsers() throws IOException {
     try {
-      List<User> users = new ArrayList<User>(securityManager.listAllUsers());
+      List<User> users = new ArrayList<>(securityManager.listAllUsers());
       Collections.sort(users);
       return users;
     } catch (IOException ex) {
@@ -108,7 +100,7 @@ public class EditGroupController {
   @RequestMapping(value = "/admin/group/{groupId}", method = RequestMethod.GET)
   public ModelAndView adminSetupForm(@PathVariable Long groupId, ModelMap model) throws IOException {
     try {
-      model.put("group", groupId == Group.UNSAVED_ID ? dataObjectFactory.getGroup() : securityManager.getGroupById(groupId));
+      model.put("group", groupId == Group.UNSAVED_ID ? new Group() : securityManager.getGroupById(groupId));
       return new ModelAndView("/pages/editGroup.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

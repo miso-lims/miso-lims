@@ -8,15 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 
 public class DefaultLibraryAliasGenerator implements NameGenerator<Library> {
 
   @Autowired
-  private RequestManager requestManager;
+  private LibraryStore libraryStore;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setLibraryStore(LibraryStore libraryStore) {
+    this.libraryStore = libraryStore;
   }
 
   @Override
@@ -27,7 +27,7 @@ public class DefaultLibraryAliasGenerator implements NameGenerator<Library> {
 
       if (m.matches()) {
         try {
-          int numLibs = requestManager.listAllLibrariesBySampleId(library.getSample().getId()).size();
+          int numLibs = libraryStore.listBySampleId(library.getSample().getId()).size();
           String la = m.group(1) + "_" + "L" + m.group(2) + "-" + (numLibs + 1) + "_" + m.group(3);
           return la;
         } catch (IOException e) {

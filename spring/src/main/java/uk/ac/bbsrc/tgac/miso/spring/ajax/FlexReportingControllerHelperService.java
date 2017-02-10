@@ -69,6 +69,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -88,9 +91,19 @@ public class FlexReportingControllerHelperService {
   private RequestManager requestManager;
   @Autowired
   private JdbcTemplate interfaceTemplate;
+  @Autowired
+  private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private StudyService studyService;
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   public String flexHTMLTemplate(String content) {
@@ -283,7 +296,7 @@ public class FlexReportingControllerHelperService {
           }
 
         }
-        for (Library library : requestManager.listAllLibrariesByProjectId(project.getProjectId())) {
+        for (Library library : libraryService.listByProjectId(project.getProjectId())) {
           if (!librariesInRun.contains(library)) {
             Sample sample = library.getSample();
             jsonArray.add("['" + project.getName() + "','" + sample.getName() + "','" + library.getName() + "','NA','NA','NA']");
@@ -468,7 +481,7 @@ public class FlexReportingControllerHelperService {
                               JsonSanitizer.sanitize(
                                   "[\"" + sample.getAlias() + "\",\"" + sample.getDescription() + "\",\"" + sample.getSampleType() + "\",\""
                                       + libraryInRun.getName() + "\",\"" + dilution.getName() + "\",\"" + indexInfo.toString() + "\",\""
-                                      + libraryQc.getInsertSize().toString() + "\",\"" + run.getAlias() + "\",\""
+                                      + Integer.toString(libraryQc.getInsertSize()) + "\",\"" + run.getAlias() + "\",\""
                                       + spp.getPartitionNumber().toString() + "\"]"));
                         }
                       }
@@ -675,7 +688,7 @@ public class FlexReportingControllerHelperService {
     }
     return "['<input class=\"chkboxlibraries\" id=\"" + library.getId() + "\" type=\"checkbox\" name=\"libraryIds\" value=\""
         + library.getId() + "\" id=\"" + library.getId() + "\"/>','" + library.getName() + "','" + library.getAlias() + "','"
-        + library.getDescription() + "','" + library.getPlatformName() + "','" + library.getLibraryType().getDescription() + "','" + qc
+        + library.getDescription() + "','" + library.getPlatformType() + "','" + library.getLibraryType().getDescription() + "','" + qc
         + "']";
   }
 
@@ -693,13 +706,13 @@ public class FlexReportingControllerHelperService {
       Date startDate = df.parse(from);
       Date endDate = df.parse(to);
       if (!isStringEmptyOrNull(searchStr)) {
-        libraries = requestManager.listAllLibrariesBySearch(searchStr);
+        libraries = libraryService.listBySearch(searchStr);
       } else {
-        libraries = requestManager.getLibrariesByCreationDate(startDate, endDate);
+        libraries = libraryService.searchByCreationDate(startDate, endDate);
       }
 
       for (Library library : libraries) {
-        if ((platform.equals("all") || platform.equals(library.getPlatformName()))
+        if ((platform.equals("all") || platform.equals(library.getPlatformType()))
             && (qc.equals("all") || qc.equals(library.getQcPassed().toString()))) {
 
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to) && library.getCreationDate() != null) {
@@ -740,7 +753,7 @@ public class FlexReportingControllerHelperService {
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("name").equals("libraryIds")) {
-          Library l = requestManager.getLibraryById(j.getLong("value"));
+          Library l = libraryService.get(j.getLong("value"));
           if (l != null) {
             libraries.add(l);
 
@@ -748,9 +761,9 @@ public class FlexReportingControllerHelperService {
             count++;
             typeMap.put(l.getLibraryType().getDescription(), count);
 
-            int countPlatform = platformMap.containsKey(l.getPlatformName()) ? platformMap.get(l.getPlatformName()) : 0;
+            int countPlatform = platformMap.containsKey(l.getPlatformType()) ? platformMap.get(l.getPlatformType()) : 0;
             countPlatform++;
-            platformMap.put(l.getPlatformName(), countPlatform);
+            platformMap.put(l.getPlatformType().getKey(), countPlatform);
           }
         }
       }
@@ -771,7 +784,7 @@ public class FlexReportingControllerHelperService {
           Integer libqcpassed = 0;
           Integer libqcfailed = 0;
           for (Library l : libraries) {
-            if (l.getLibraryType().getDescription().equals(libraryType) && l.getPlatformName().equals(platform)) {
+            if (l.getLibraryType().getDescription().equals(libraryType) && l.getPlatformType().equals(platform)) {
               if (l.getQcPassed() != null) {
                 if (l.getQcPassed()) {
                   libqcpassed++;
@@ -820,7 +833,7 @@ public class FlexReportingControllerHelperService {
       row.add(library.getName());
       row.add(library.getAlias());
       row.add(library.getDescription() == null ? "" : library.getDescription());
-      row.add(library.getPlatformName());
+      row.add(library.getPlatformType().getKey());
       row.add(library.getLibraryType().getDescription());
       row.add(qc);
       jsonArray.add(row);
@@ -846,7 +859,7 @@ public class FlexReportingControllerHelperService {
 
       jsonArray.add(
           "['" + library.getSample().getProject().getName() + "','" + library.getName() + "','" + library.getAlias() + "','"
-              + library.getDescription() + "','" + library.getPlatformName() + "','" + library.getLibraryType().getDescription() + "','"
+              + library.getDescription() + "','" + library.getPlatformType() + "','" + library.getLibraryType().getDescription() + "','"
               + qc + "','" + LimsUtils.getDateAsString(library.getCreationDate()) + "','" + library.getSample().getName() + "','" + sampleQC
               + "','" + scientificName + "']");
     }
@@ -1071,7 +1084,7 @@ public class FlexReportingControllerHelperService {
       JSONArray projectChildrenArray = new JSONArray();
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
       Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
+      Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
 
       JSONObject runJSON = new JSONObject();
       JSONArray runsArray = new JSONArray();
@@ -1100,7 +1113,7 @@ public class FlexReportingControllerHelperService {
         JSONArray substudiesArray = new JSONArray();
         substudyJSON.put("name", study.getName());
         substudyJSON.put("description", study.getAlias());
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
+        Collection<Experiment> experiments = experimentService.listAllByStudyId(study.getId());
         if (experiments.size() > 0) {
           JSONObject experimentJSON = new JSONObject();
           JSONArray experimentsArray = new JSONArray();
@@ -1130,7 +1143,7 @@ public class FlexReportingControllerHelperService {
       sampleJSON.put("name", "Samples");
       sampleJSON.put("description", "");
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.listBySampleId(sample.getId());
         if (libraries.size() == 0) {
           if (sample.getQcPassed()) {
             samplesArray

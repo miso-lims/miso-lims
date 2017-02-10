@@ -1,7 +1,4 @@
 <aspectj>
-    <aspects>
-        <aspect name="uk.ac.bbsrc.tgac.miso.sqlstore.SqlProfiler"/>
-    </aspects>
     <!-- <weaver options="-verbose -showWeaveInfo "> -->
     <weaver>
       <include within="uk.ac.bbsrc.tgac.miso.sqlstore.*"/>

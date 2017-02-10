@@ -8,13 +8,13 @@ import java.util.Map;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -73,7 +73,7 @@ public class ValueTypeLookup {
   private Map<Long, LibraryStrategyType> libraryStrategiesById;
   private Map<String, LibraryStrategyType> libraryStrategiesByName;
   private Map<Long, LibraryType> libraryTypeById;
-  private Map<String, Map<String, LibraryType>> libraryTypeByPlatformAndDescription;
+  private Map<PlatformType, Map<String, LibraryType>> libraryTypeByPlatformAndDescription;
   private Map<Long, LibraryDesign> libraryDesignById;
   private Map<String, Map<String, LibraryDesign>> libraryDesignBySampleClassAliasAndName;
   private Map<Long, LibraryDesignCode> libraryDesignCodeById;
@@ -232,7 +232,7 @@ public class ValueTypeLookup {
 
   private void setLibraryTypes(Collection<LibraryType> libraryTypes) {
     Map<Long, LibraryType> mapById = new UniqueKeyHashMap<>();
-    Map<String, Map<String, LibraryType>> mapByPlatformAndDesc = new UniqueKeyHashMap<>();
+    Map<PlatformType, Map<String, LibraryType>> mapByPlatformAndDesc = new UniqueKeyHashMap<>();
     for (LibraryType lt : libraryTypes) {
       if (!mapByPlatformAndDesc.containsKey(lt.getPlatformType())) {
         mapByPlatformAndDesc.put(lt.getPlatformType(), new UniqueKeyHashMap<String, LibraryType>());
@@ -890,14 +890,14 @@ public class ValueTypeLookup {
         throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getQcType().getQcTypeId(), qc.getQcType().getName()));
       qc.setQcType(type);
     }
-    if (library.getLibraryAdditionalInfo() != null) {
-      LibraryAdditionalInfo lai = library.getLibraryAdditionalInfo();
+    if (LimsUtils.isDetailedLibrary(library)) {
+      DetailedLibrary lai = (DetailedLibrary) library;
 
-      if (lai.getPrepKit() != null) { // optional field
-        KitDescriptor kit = resolve(lai.getPrepKit());
+      if (lai.getKitDescriptor() != null) { // optional field
+        KitDescriptor kit = resolve(lai.getKitDescriptor());
         if (kit == null) throw new IOException(
-            String.format("KitDescriptor not found (id=%d or name=%s)", lai.getPrepKit().getId(), lai.getPrepKit().getName()));
-        lai.setPrepKit(kit);
+            String.format("KitDescriptor not found (id=%d or name=%s)", lai.getKitDescriptor().getId(), lai.getKitDescriptor().getName()));
+        lai.setKitDescriptor(kit);
       }
 
       if (lai.getLibraryDesign() != null) { // optional field

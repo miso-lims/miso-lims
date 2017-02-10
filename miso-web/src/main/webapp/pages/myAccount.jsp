@@ -46,22 +46,18 @@
               <a href="<c:url value='/miso/admin/configuration/database'/>">Database</a><br/>
               <a href="<c:url value='/miso/admin/configuration/security'/>">Security</a><br/>
               --%>
-            <a href="<c:url value='/miso/admin/configuration/printers'/>">Barcode Printers</a>
+            <a href="<c:url value='/miso/printers'/>">Barcode Printers</a>
           </div>
         </div>
 
-        <div class="portlet">
-          <div class="portlet-header">Cache Administration</div>
-          <div class="portlet-content">
-            <a href="javascript:void(0);" onclick="flushAllCaches();">Flush All Caches</a><br/>
-            <a href="javascript:void(0);" onclick="viewCacheStats();">Flush Cache...</a><br/>
-            <a href="javascript:void(0);" onclick="viewCacheStats();">View Cache Stats</a><br/>
-          <c:if test="${autoGenerateIdBarcodes}">
-            <a href="javascript:void(0);" onclick="regenAllBarcodes();">Regenerate All Barcodes</a><br/>
-          </c:if>
-            <a href="javascript:void(0);" onclick="reindexAlertManagers();">Reindex Alert Managers</a>
+        <c:if test="${autoGenerateIdBarcodes}">
+          <div class="portlet">
+            <div class="portlet-header">Barcode Administration</div>
+            <div class="portlet-content">
+              <a href="javascript:void(0);" onclick="regenAllBarcodes();">Regenerate All Barcodes</a><br/>
+            </div>
           </div>
-        </div>
+        </c:if>
       </sec:authorize>
 
       <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_SUBMITTER')">
@@ -148,74 +144,9 @@
     getSystemAlerts();
   });
 
-  function flushAllCaches() {
-    Fluxion.doAjax(
-      'cacheHelperService',
-      'flushAllCaches',
-      {'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery("body").append(json.html);
-        jQuery("#dialog").dialog("destroy");
-
-        jQuery("#dialog-message").dialog({
-          modal: true,
-          buttons: {
-            Ok: function () {
-              jQuery(this).dialog('close');
-            }
-          }
-        });
-      }
-      }
-    );
-  }
-
-  function flushCache(cacheName) {
-    Fluxion.doAjax(
-      'cacheHelperService',
-      'flushCache',
-      {'url': ajaxurl, 'cache': cacheName},
-      {'doOnSuccess': function (json) {
-        jQuery("body").append(json.html);
-        jQuery("#dialog").dialog("destroy");
-
-        jQuery("#dialog-message").dialog({
-          zIndex: 10000,
-          modal: true,
-          buttons: {
-            Ok: function () {
-              jQuery(this).dialog('close');
-            }
-          }
-        });
-      }
-      }
-    );
-  }
-
-  function viewCacheStats() {
-    Fluxion.doAjax(
-      'cacheHelperService',
-      'viewCacheStats',
-      {'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        var stats = "<b>Cache Stats:</b><br/><table class='list'><thead><tr><th>Name</th><th>Elements</th><th>Hits</th><th>Search Times</th><th>Flush</th></tr></thead><tbody>";
-        for (var key in json.caches) {
-          if (json.caches.hasOwnProperty(key)) {
-            var cache = json.caches[key];
-            stats += "<tr><td>" + cache.name + "</td><td>" + cache.size + "</td><td>" + cache.hits + "</td><td>" + cache.searchtimes + "</td><td><a href='#' onclick='flushCache(\"" + cache.name + "\");'>Flush</a></td></tr>";
-          }
-        }
-        stats += "</tbody></table>";
-        jQuery.colorbox({width: "80%", html: stats});
-      }
-      }
-    );
-  }
-
   function regenAllBarcodes() {
     Fluxion.doAjax(
-      'cacheHelperService',
+      'barcodeHelperService',
       'regenerateAllBarcodes',
       {'url': ajaxurl},
       {'doOnSuccess': function (json) {

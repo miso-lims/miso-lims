@@ -31,9 +31,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
-import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
-
-import java.io.Serializable;
 
 /**
  * Concrete implementation of a Project, inheriting from the simlims core Project
@@ -62,15 +59,6 @@ public class ProjectImpl extends AbstractProject implements Serializable {
    */
   public ProjectImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
-  }
-
-  @Override
-  public void buildSubmission() {
-    /*
-     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
-     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
-     * ERASubmissionFactory.generateProjectSubmissionXML(submissionDocument, this);
-     */
   }
 
   /**

@@ -50,10 +50,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 
 @Controller
 @RequestMapping("/container")
@@ -68,11 +69,7 @@ public class EditSequencerPartitionContainerController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
+  private ChangeLogService changeLogService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -84,7 +81,7 @@ public class EditSequencerPartitionContainerController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("SequencerPartitionContainer");
+    return changeLogService.listAll("SequencerPartitionContainer");
   }
 
   @ModelAttribute("platformTypes")
@@ -108,7 +105,7 @@ public class EditSequencerPartitionContainerController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       SequencerPartitionContainer<SequencerPoolPartition> container = null;
       if (containerId == AbstractSequencerPartitionContainer.UNSAVED_ID) {
-        container = dataObjectFactory.getSequencerPartitionContainer(user);
+        container = new SequencerPartitionContainerImpl(user);
         model.put("title", "New Container");
       } else {
         container = requestManager.getSequencerPartitionContainerById(containerId);

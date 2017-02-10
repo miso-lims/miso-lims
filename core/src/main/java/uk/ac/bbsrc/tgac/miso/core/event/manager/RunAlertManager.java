@@ -30,6 +30,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -40,7 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.manager
@@ -51,16 +52,18 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
  * @date 11/11/11
  * @since 0.1.3
  */
+@Service
 public class RunAlertManager {
-  protected static final Logger log = LoggerFactory.getLogger(RunAlertManager.class);
-  Map<Long, Run> runs = new HashMap<Long, Run>();
+  private static final Logger log = LoggerFactory.getLogger(RunAlertManager.class);
+  Map<Long, Run> runs = new HashMap<>();
 
-  private RequestManager misoRequestManager;
+  @Value("${miso.alerting.enabled}")
   private boolean enabled = true;
 
   @Autowired
   private SecurityManager securityManager;
 
+  @Autowired
   private MisoListener runListener;
 
   public MisoListener getRunListener() {
@@ -77,10 +80,6 @@ public class RunAlertManager {
 
   public void removeListeners(Run run) {
     run.removeListener(getRunListener());
-  }
-
-  public void setRequestManager(RequestManager misoRequestManager) {
-    this.misoRequestManager = misoRequestManager;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -129,17 +128,8 @@ public class RunAlertManager {
       log.warn("Alerting system disabled.");
     }
   }
-
-  public void update(Long runId) throws IOException {
-    update(misoRequestManager.getRunById(runId));
-  }
   
-  public void updateQcs(Long runQcId) throws IOException {
-    Run run = misoRequestManager.getRunQCById(runQcId).getRun();
-    update(run);
-  }
-
-  private void update(Run r) throws IOException {
+  public void update(Run r) throws IOException {
     if (enabled) {
       Run clone = runs.get(r.getId());
       if (clone == null) {
@@ -178,8 +168,7 @@ public class RunAlertManager {
     }
   }
 
-  public void addWatcher(Run run, Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
+  public void addWatcher(Run run, User user) throws IOException {
     if (user != null) {
       Run clone = runs.get(run.getId());
       if (clone == null) {
@@ -191,8 +180,7 @@ public class RunAlertManager {
     }
   }
 
-  public void removeWatcher(Run run, Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
+  public void removeWatcher(Run run, User user) throws IOException {
     if (user != null) {
       Run clone = runs.get(run.getId());
       if (clone == null) {
@@ -204,16 +192,15 @@ public class RunAlertManager {
     }
   }
 
-  public void updateGroupWatcher(Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
+  public void updateGroupWatcher(User user) throws IOException {
     if (user != null) {
       for (Run r : runs.values()) {
         if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("RunWatchers"))) {
-          addWatcher(r, userId);
+          addWatcher(r, user);
         } else {
           if (r.getSecurityProfile() != null && r.getSecurityProfile().getOwner() != null
               && !r.getSecurityProfile().getOwner().equals(user)) {
-            removeWatcher(r, userId);
+            removeWatcher(r, user);
           }
         }
       }

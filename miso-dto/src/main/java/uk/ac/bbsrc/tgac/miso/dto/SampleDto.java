@@ -2,11 +2,12 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
 
-import org.codehaus.jackson.annotate.JsonSubTypes;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.annotate.JsonTypeName;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -16,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = SampleAliquotDto.class, name = SampleAliquot.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleIdentityDto.class, name = Identity.CATEGORY_NAME),
@@ -97,7 +98,7 @@ public class SampleDto {
     return identificationBarcode;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
   }
@@ -106,7 +107,7 @@ public class SampleDto {
     return locationLabel;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setLocationLabel(String locationLabel) {
     this.locationLabel = locationLabel;
   }
@@ -131,7 +132,7 @@ public class SampleDto {
     return qcPassed;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
   }

@@ -2,28 +2,50 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+
+@MappedSuperclass
 public abstract class AbstractSequencerServiceRecord implements SequencerServiceRecord {
   
   public static final long UNSAVED_ID = 0L;
   
-  private long id = AbstractSequencerServiceRecord.UNSAVED_ID;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long recordId = AbstractSequencerServiceRecord.UNSAVED_ID;
+
+  @ManyToOne(targetEntity = SequencerReferenceImpl.class)
+  @JoinColumn(name = "sequencerReferenceId")
   private SequencerReference sequencerReference;
+
+  @Column(nullable = false)
   private String title;
   private String details;
+
+  @Column(name = "servicedBy", nullable = false)
   private String servicedByName;
   private String referenceNumber;
+
+  @Column(nullable = false)
   private Date serviceDate;
   private Date shutdownTime;
   private Date restoredTime;
 
   @Override
   public void setId(long id) {
-    this.id = id;
+    this.recordId = id;
   }
 
   @Override
   public long getId() {
-    return id;
+    return recordId;
   }
 
   @Override

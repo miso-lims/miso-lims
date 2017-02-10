@@ -61,11 +61,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
@@ -78,7 +81,9 @@ public class ContainerControllerHelperService {
   @Autowired
   private RequestManager requestManager;
   @Autowired
-  private DataObjectFactory dataObjectFactory;
+  private ExperimentService experimentService;
+  @Autowired
+  private StudyService studyService;
 
   public JSONObject getPlatformTypes(HttpSession session, JSONObject json) throws IOException {
     StringBuilder b = new StringBuilder();
@@ -195,8 +200,6 @@ public class ContainerControllerHelperService {
         "<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
     sb.append(
         "<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
-    sb.append(
-        "<tr><td>Paired End:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
     sb.append("</table>");
     sb.append("<div id='partitionErrorDiv'> </div>");
     sb.append("<div id='partitionDiv'>");
@@ -447,16 +450,9 @@ public class ContainerControllerHelperService {
 
       if (p.getExperiments().size() != 0) {
         // check if each poolable has been in a study for this pool already
-        Collection<Dilution> ds = p.getPoolableElements();
+        Collection<LibraryDilution> ds = p.getPoolableElements();
         for (Dilution d : ds) {
-          Collection<Study> studies = requestManager.listAllStudiesByLibraryId(d.getLibrary().getId());
-          if (studies.isEmpty()) {
-            pooledProjects.add(d.getLibrary().getSample().getProject());
-          } else {
-            for (Study stu : studies) {
-              pooledProjects.add(stu.getProject());
-            }
-          }
+          pooledProjects.add(d.getLibrary().getSample().getProject());
         }
 
         for (Experiment poolExp : p.getExperiments()) {
@@ -466,8 +462,8 @@ public class ContainerControllerHelperService {
           }
         }
       } else {
-        Collection<Dilution> ds = p.getPoolableElements();
-        for (Dilution d : ds) {
+        Collection<LibraryDilution> ds = p.getPoolableElements();
+        for (LibraryDilution d : ds) {
           pooledProjects.add(d.getLibrary().getSample().getProject());
         }
       }
@@ -476,7 +472,7 @@ public class ContainerControllerHelperService {
         sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
         sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
             + partition + "_" + project.getProjectId() + "'>");
-        Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
+        Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
           return JSONUtils.SimpleJSONError("No studies available on project " + project.getName()
               + ". At least one study must be available for each project associated with this Pool.");
@@ -511,9 +507,9 @@ public class ContainerControllerHelperService {
         b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
       }
 
-      Collection<Dilution> ds = p.getPoolableElements();
+      Collection<LibraryDilution> ds = p.getPoolableElements();
       Set<Project> pooledProjects = new HashSet<>();
-      for (Dilution d : ds) {
+      for (LibraryDilution d : ds) {
         pooledProjects.add(d.getLibrary().getSample().getProject());
         b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ") : "
             + d.getConcentration() + " " + d.getUnits() + "</span><br/>");
@@ -533,7 +529,7 @@ public class ContainerControllerHelperService {
           b.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
           b.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
               + partition + "_" + project.getProjectId() + "'>");
-          Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
+          Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
           if (studies.isEmpty()) {
             throw new Exception("No studies available on project " + project.getName()
                 + ". At least one study must be available for each project associated with this Pool.");
@@ -575,7 +571,7 @@ public class ContainerControllerHelperService {
       }
 
       Long studyId = json.getLong("studyId");
-      Study s = requestManager.getStudyById(studyId);
+      Study s = studyService.get(studyId);
       if (s == null) {
         throw new Exception("Could not retrieve study: " + studyId);
       }
@@ -588,7 +584,7 @@ public class ContainerControllerHelperService {
 
       StringBuilder sb = new StringBuilder();
 
-      Experiment e = dataObjectFactory.getExperiment();
+      Experiment e = new ExperimentImpl();
       e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType() + "_" + (s.getExperiments().size() + 1));
       e.setTitle(s.getProject().getName() + " " + platform.getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
       e.setDescription(s.getProject().getAlias());
@@ -599,7 +595,7 @@ public class ContainerControllerHelperService {
       try {
         e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         p.addExperiment(e);
-        requestManager.saveExperiment(e);
+        experimentService.save(e);
       } catch (MalformedExperimentException e1) {
         log.error("failed to save experiment", e1);
         return JSONUtils.SimpleJSONError("Failed to save experiment: " + e1.getMessage());
@@ -722,11 +718,11 @@ public class ContainerControllerHelperService {
       for (SequencerPartitionContainer<SequencerPoolPartition> spc : requestManager.listAllSequencerPartitionContainers()) {
         String run = "";
         String sequencer = "";
-        if (spc.getRun() != null) {
-          run = TableHelper.hyperLinkify("/miso/run/" + spc.getRun().getId(), spc.getRun().getAlias());
-          if (spc.getRun().getSequencerReference() != null) {
-            sequencer = TableHelper.hyperLinkify("/miso/sequencer/" + spc.getRun().getSequencerReference().getId(),
-                spc.getRun().getSequencerReference().getPlatform().getNameAndModel());
+        if (spc.getLastRun() != null) {
+          run = TableHelper.hyperLinkify("/miso/run/" + spc.getLastRun().getId(), spc.getLastRun().getAlias());
+          if (spc.getLastRun().getSequencerReference() != null) {
+            sequencer = TableHelper.hyperLinkify("/miso/sequencer/" + spc.getLastRun().getSequencerReference().getId(),
+                spc.getLastRun().getSequencerReference().getPlatform().getNameAndModel());
           }
         }
         String identificationBarcode = (isStringEmptyOrNull(spc.getIdentificationBarcode()) ? "Unknown Barcode"
@@ -783,13 +779,14 @@ public class ContainerControllerHelperService {
     try {
       if (json.has("containerId")) {
         Long containerId = json.getLong("containerId");
-        SequencerPartitionContainer container = requestManager.getSequencerPartitionContainerById(containerId);
+        SequencerPartitionContainer<?> container = requestManager.getSequencerPartitionContainerById(containerId);
 
-        if (container.getRun() != null && "Completed".equals(container.getRun().getStatus().getHealth().getKey())) {
-          return JSONUtils.SimpleJSONResponse("yes");
-        } else {
-          return JSONUtils.SimpleJSONResponse("no");
+        for (Run run : container.getRuns()) {
+          if (run != null && "Completed".equals(run.getStatus().getHealth().getKey())) {
+            return JSONUtils.SimpleJSONResponse("yes");
+          }
         }
+        return JSONUtils.SimpleJSONResponse("no");
 
       } else {
         return JSONUtils.SimpleJSONError("No Sequencing Container specified");
@@ -834,10 +831,6 @@ public class ContainerControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public JSONObject isSerialNumberUnique(HttpSession session, JSONObject json) {

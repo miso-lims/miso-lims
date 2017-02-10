@@ -951,7 +951,6 @@ Pool.barcode = {
       'printerControllerHelperService',
       'listAvailableServices',
       {
-        'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Pool',
         'url':ajaxurl
       },
       {
@@ -973,7 +972,7 @@ Pool.barcode = {
                 'poolControllerHelperService',
                 'printPoolBarcodes',
                 {
-                  'serviceName':jQuery('#serviceSelect').val(),
+                  'printerId':jQuery('#serviceSelect').val(),
                   'pools':pools,
                   'url':ajaxurl
                 },

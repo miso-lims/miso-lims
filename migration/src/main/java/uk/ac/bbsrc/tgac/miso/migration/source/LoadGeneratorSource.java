@@ -11,11 +11,10 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.springframework.format.datetime.DateFormatter;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -32,10 +31,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -132,7 +130,7 @@ public class LoadGeneratorSource implements MigrationSource {
    * Creates a LoadGeneratorSource using the configuration found in properties.
    * 
    * @param properties contains options which include numbers of objects to generate, foreign key IDs from the migration target, and other
-   * settings
+   *          settings
    * @throws IllegalArgumentException if any of the required properties are missing
    */
   public LoadGeneratorSource(MigrationProperties properties) {
@@ -339,15 +337,15 @@ public class LoadGeneratorSource implements MigrationSource {
     return this.libraries;
   }
 
-  private Library createLibrary(DetailedSample sample, int libraryNum) {
-    Library lib = new LibraryImpl();
+  private DetailedLibrary createLibrary(DetailedSample sample, int libraryNum) {
+    DetailedLibrary lib = new DetailedLibraryImpl();
 
     lib.setDescription("library");
     lib.setSample(sample);
     LibraryType lt = new LibraryType();
     lt.setId(libraryTypeId);
     lib.setLibraryType(lt);
-    lib.setPlatformName("Illumina");
+    lib.setPlatformType("Illumina");
     lib.setPaired(true);
     lib.setQcPassed(true);
 
@@ -358,11 +356,6 @@ public class LoadGeneratorSource implements MigrationSource {
     LibraryStrategyType strat = new LibraryStrategyType();
     strat.setId(libraryStrategyTypeId);
     lib.setLibraryStrategyType(strat);
-
-    LibraryAdditionalInfo lai = new LibraryAdditionalInfoImpl();
-    lai.setArchived(false);
-    lai.setLibrary(lib);
-    lib.setLibraryAdditionalInfo(lai);
 
     // faked alias generation to avoid necessity of target database data
     // Note: this will fail (OICR) validation if libraryCount > 999999
@@ -405,8 +398,12 @@ public class LoadGeneratorSource implements MigrationSource {
       log.info("Generating " + poolCount + " pools, each containing " + poolSize + " dilutions...");
       List<Pool> pools = new ArrayList<>();
       List<LibraryDilution> libraryDilutions = getLibraryDilutions();
+      if (libraryDilutions.size() < poolSize) {
+        throw new IllegalStateException(
+            "The pools need to have " + poolSize + " elements, but only " + libraryDilutions.size() + " dilutions are available.");
+      }
       for (int poolNum = 1, libNum = 0; poolNum <= poolCount; poolNum++) {
-        Set<Dilution> ldis = new HashSet<>();
+        Set<LibraryDilution> ldis = new HashSet<>();
         while (ldis.size() < poolSize) {
           ldis.add(libraryDilutions.get(libNum));
           libNum++;
@@ -420,7 +417,7 @@ public class LoadGeneratorSource implements MigrationSource {
     return this.pools;
   }
 
-  private Pool createPool(Set<Dilution> libraryDilutions, int poolNum) {
+  private Pool createPool(Set<LibraryDilution> libraryDilutions, int poolNum) {
     Pool p = new PoolImpl();
     p.setAlias("Test_Pool_" + poolNum);
     p.setPoolableElements(libraryDilutions);

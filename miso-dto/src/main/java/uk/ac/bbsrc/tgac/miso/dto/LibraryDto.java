@@ -2,10 +2,19 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = DetailedLibraryDto.class, name = "Detailed"),
+    @JsonSubTypes.Type(value = LibraryDto.class, name = "Plain") })
+@JsonTypeName(value = "Plain")
 public class LibraryDto {
 
   private String alias;
@@ -14,8 +23,7 @@ public class LibraryDto {
   private String description;
   private String identificationBarcode;
   private String lastModified;
-  private Long libraryId;
-  private LibraryAdditionalInfoDto libraryAdditionalInfo;
+  private Long id;
   private Long librarySelectionTypeId;
   private Long libraryStrategyTypeId;
   private Long libraryTypeId;
@@ -27,7 +35,7 @@ public class LibraryDto {
   private String parentSampleAlias;
   private Long parentSampleId;
   private Long parentSampleClassId;
-  private String platformName;
+  private String platformType;
   private Boolean qcPassed;
   private Long index1Id;
   private Long index2Id;
@@ -54,7 +62,7 @@ public class LibraryDto {
   }
 
   public Long getId() {
-    return libraryId;
+    return id;
   }
 
   public String getIdentificationBarcode() {
@@ -63,10 +71,6 @@ public class LibraryDto {
 
   public String getLastModified() {
     return lastModified;
-  }
-
-  public LibraryAdditionalInfoDto getLibraryAdditionalInfo() {
-    return libraryAdditionalInfo;
   }
 
   public Long getLibrarySelectionTypeId() {
@@ -109,8 +113,8 @@ public class LibraryDto {
     return parentSampleId;
   }
 
-  public String getPlatformName() {
-    return platformName;
+  public String getPlatformType() {
+    return platformType;
   }
 
   public Boolean getQcPassed() {
@@ -162,21 +166,17 @@ public class LibraryDto {
   }
 
   public void setId(Long libraryId) {
-    this.libraryId = libraryId;
+    this.id = libraryId;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
-  }
-
-  public void setLibraryAdditionalInfo(LibraryAdditionalInfoDto libraryAdditionalInfo) {
-    this.libraryAdditionalInfo = libraryAdditionalInfo;
   }
 
   public void setLibrarySelectionTypeId(Long librarySelectionTypeId) {
@@ -195,7 +195,7 @@ public class LibraryDto {
     this.libraryTypeId = libraryTypeId;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setLocationLabel(String locationLabel) {
     this.locationLabel = locationLabel;
   }
@@ -228,36 +228,36 @@ public class LibraryDto {
     this.parentSampleClassId = parentSampleClassId;
   }
 
-  public void setPlatformName(String platformName) {
-    this.platformName = platformName;
+  public void setPlatformType(String platformType) {
+    this.platformType = platformType;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setIndex1Id(Long index1Id) {
     this.index1Id = index1Id;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setIndex2Id(Long index2Id) {
     this.index2Id = index2Id;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setIndex1Label(String index1Label) {
     this.index1Label = index1Label;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setIndex2Label(String index2Label) {
     this.index2Label = index2Label;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setIndexFamilyName(String indexFamilyName) {
     this.indexFamilyName = indexFamilyName;
   }

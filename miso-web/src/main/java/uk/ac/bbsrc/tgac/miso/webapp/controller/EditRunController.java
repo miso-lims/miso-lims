@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -63,18 +63,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -91,19 +93,18 @@ public class EditRunController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
+  private RunAlertManager runAlertManager;
 
   @Autowired
-  private RunAlertManager runAlertManager;
+  private ChangeLogService changeLogService;
 
   private RunStatsManager runStatsManager;
 
   @Autowired
   private SequencingParametersService sequencingParametersService;
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
+  @Autowired
+  private ExperimentService experimentService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -211,12 +212,12 @@ public class EditRunController {
   }
 
   public Collection<Experiment> populateAvailableExperiments(User user) throws IOException {
-    return requestManager.listAllExperiments();
+    return experimentService.listAll();
   }
 
   public Collection<Experiment> populateAvailableExperiments(PlatformType platformType, User user) throws IOException {
     List<Experiment> exps = new ArrayList<>();
-    for (Experiment e : requestManager.listAllExperiments()) {
+    for (Experiment e : experimentService.listAll()) {
       if (e.getPlatform() != null && e.getPlatform().getPlatformType().equals(platformType)) {
         exps.add(e);
       }
@@ -239,7 +240,7 @@ public class EditRunController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Run");
+    return changeLogService.listAll("Run");
   }
 
   @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
@@ -248,7 +249,7 @@ public class EditRunController {
     Run run = null;
 
     if (runId == AbstractRun.UNSAVED_ID) {
-      run = dataObjectFactory.getRun(user);
+      run = new RunImpl(user);
     } else {
       run = requestManager.getRunById(runId);
     }
@@ -269,7 +270,7 @@ public class EditRunController {
       if (run == null) {
         throw new SecurityException("No such Run.");
       } else if (run.getId() == AbstractRun.UNSAVED_ID) {
-        run = dataObjectFactory.getRun(user);
+        run = new RunImpl(user);
         model.put("title", "New Run");
         model.put("availablePools", populateAvailablePools(user));
         model.put("multiplexed", false);
@@ -295,7 +296,7 @@ public class EditRunController {
         run.setStatus(new StatusImpl());
       } else {
         try {
-          InputStream in = StatsController.class
+          InputStream in = run.getPlatformType() == null ? null : StatsController.class
               .getResourceAsStream("/status/xsl/" + run.getPlatformType().getKey().toLowerCase() + "/statusXml.xsl");
           if (in != null && run.getStatus().getXml() != null) {
             String xsl = LimsUtils.inputStreamToString(in);

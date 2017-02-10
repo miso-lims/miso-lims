@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.integration.Message;
+import org.springframework.messaging.Message;
 
 import uk.ac.bbsrc.tgac.miso.notification.core.batch.JobLaunchRequest;
 import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;

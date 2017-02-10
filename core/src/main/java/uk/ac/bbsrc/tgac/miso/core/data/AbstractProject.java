@@ -23,39 +23,48 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.eaglegenomics.simlims.core.Request;
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressTypeUserType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -67,9 +76,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
  * @since 0.0.2
  */
 @MappedSuperclass
-@TypeDefs({ @TypeDef(name = "progressTypeUserType", typeClass = ProgressTypeUserType.class) })
 public abstract class AbstractProject implements Project {
-  protected static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
   private static final long serialVersionUID = 1L;
 
   /**
@@ -77,6 +85,7 @@ public abstract class AbstractProject implements Project {
    */
   public static final Long UNSAVED_ID = 0L;
 
+  @Column(updatable = false)
   private Date creationDate = new Date();
   private String description = "";
   private String name = "";
@@ -87,35 +96,48 @@ public abstract class AbstractProject implements Project {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long projectId = AbstractProject.UNSAVED_ID;
 
-  @Transient
-  private Collection<Request> requests = new HashSet<>();
-
-  @Transient
+  @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
+  @JsonManagedReference
   private Collection<Sample> samples = new HashSet<>();
-  @Transient
-  private Collection<Run> runs = new HashSet<>();
-  @Transient
+
+  @OneToMany(targetEntity = StudyImpl.class, fetch = FetchType.LAZY, mappedBy = "project")
+  @JsonManagedReference
   private Collection<Study> studies = new HashSet<>();
-  @Transient
+
+  @OneToMany(targetEntity = ProjectOverview.class, mappedBy = "project", cascade = CascadeType.ALL)
+  @JsonManagedReference
   private Collection<ProjectOverview> overviews = new HashSet<>();
-  @Transient
+
+  @ElementCollection
+  @CollectionTable(name = "Project_Issues", joinColumns = { @JoinColumn(name = "project_projectId") })
+  @Column(name = "issueKey")
   private Collection<String> issueKeys = new HashSet<>();
 
-  @Column
-  @Type(type = "progressTypeUserType")
+  @Enumerated(EnumType.STRING)
   private ProgressType progress;
 
-  @OneToOne(targetEntity = ReferenceGenomeImpl.class)
+  @ManyToOne(targetEntity = ReferenceGenomeImpl.class)
   @JoinColumn(name = "referenceGenomeId", referencedColumnName = "referenceGenomeId", nullable = false)
   private ReferenceGenome referenceGenome;
 
-  @Transient
+  @ManyToOne
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
+
   @Transient
   private final Set<MisoListener> listeners = new HashSet<>();
+
+  @Column(nullable = false)
   private Date lastUpdated;
+
+  @ManyToMany(targetEntity = UserImpl.class)
+  @JoinTable(name = "Project_Watcher", joinColumns = { @JoinColumn(name = "projectId") },
+      inverseJoinColumns = { @JoinColumn(name = "userId") })
+  private Set<User> watchUsers = new HashSet<>();
+
   @Transient
-  private Set<User> watchers = new HashSet<>();
+  // not Hibernate-managed
+  private Group watchGroup;
 
   @Override
   public Date getCreationDate() {
@@ -164,18 +186,8 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
-  public Collection<Request> getRequests() {
-    return requests;
-  }
-
-  @Override
   public Collection<Sample> getSamples() {
     return samples;
-  }
-
-  @Override
-  public Collection<Run> getRuns() {
-    return runs;
   }
 
   @Override
@@ -225,48 +237,21 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
-  public void setRequests(Collection<Request> requests) {
-    this.requests = requests;
-  }
-
-  @Override
   public void setSamples(Collection<Sample> samples) {
     this.samples = samples;
-    try {
-      Collections.sort(Arrays.asList(this.samples), new AliasComparator(Sample.class));
-    } catch (NoSuchMethodException e) {
-      log.error("set samples", e);
-    }
-  }
-
-  @Override
-  public void setRuns(Collection<Run> runs) {
-    this.runs = runs;
-    try {
-      Collections.sort(Arrays.asList(this.runs), new AliasComparator(Run.class));
-    } catch (NoSuchMethodException e) {
-      log.error("set runs", e);
-    }
+      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<Sample>());
   }
 
   @Override
   public void addSample(Sample sample) {
     this.samples.add(sample);
-    try {
-      Collections.sort(Arrays.asList(this.samples), new AliasComparator(Sample.class));
-    } catch (NoSuchMethodException e) {
-      log.error("set sample", e);
-    }
+      Collections.sort(Lists.newArrayList(this.samples), new AliasComparator<Sample>());
   }
 
   @Override
   public void setStudies(Collection<Study> studies) {
     this.studies = studies;
-    try {
-      Collections.sort(Arrays.asList(this.studies), new AliasComparator(Study.class));
-    } catch (NoSuchMethodException e) {
-      log.error("set studies", e);
-    }
+      Collections.sort(Lists.newArrayList(this.studies), new AliasComparator<Study>());
   }
 
   @Override
@@ -339,18 +324,6 @@ public abstract class AbstractProject implements Project {
     return securityProfile.userCanWrite(user);
   }
 
-  /**
-   * Only those users who can write to the project can create requests on it.
-   */
-  public Request createRequest(User owner) throws SecurityException {
-    if (!userCanWrite(owner)) {
-      throw new SecurityException();
-    }
-    Request request = new Request(this, owner);
-    getRequests().add(request);
-    return request;
-  }
-
   public void addStudy(Study s) {
     // do study validation
     s.setProject(this);
@@ -395,24 +368,39 @@ public abstract class AbstractProject implements Project {
     return listeners.remove(listener);
   }
 
-  @Override
-  public Set<User> getWatchers() {
-    return watchers;
+  public void setWatchUsers(Set<User> watchUsers) {
+    this.watchUsers = watchUsers;
+  }
+
+  public Set<User> getWatchUsers() {
+    return watchUsers;
   }
 
   @Override
-  public void setWatchers(Set<User> watchers) {
-    this.watchers = watchers;
+  public void setWatchGroup(Group watchGroup) {
+    this.watchGroup = watchGroup;
+  }
+
+  public Group getWatchGroup() {
+    return watchGroup;
+  }
+
+  @Override
+  public Set<User> getWatchers() {
+    Set<User> allWatchers = new HashSet<>();
+    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
+    if (watchUsers != null) allWatchers.addAll(watchUsers);
+    return allWatchers;
   }
 
   @Override
   public void addWatcher(User user) {
-    watchers.add(user);
+    watchUsers.add(user);
   }
 
   @Override
   public void removeWatcher(User user) {
-    watchers.remove(user);
+    watchUsers.remove(user);
   }
 
   @Override
@@ -421,13 +409,12 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Project s = (Project) o;
-    if (getId() != 0L && s.getId() != 0L) {
-      if (getId() < s.getId()) return -1;
-      if (getId() > s.getId()) return 1;
-    } else if (getAlias() != null && s.getAlias() != null) {
-      return getAlias().compareTo(s.getAlias());
+  public int compareTo(Project o) {
+    if (getId() != 0L && o.getId() != 0L) {
+      if (getId() < o.getId()) return -1;
+      if (getId() > o.getId()) return 1;
+    } else if (getAlias() != null && o.getAlias() != null) {
+      return getAlias().compareTo(o.getAlias());
     }
     return 0;
   }

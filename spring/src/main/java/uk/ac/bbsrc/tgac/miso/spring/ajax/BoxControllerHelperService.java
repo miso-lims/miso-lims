@@ -10,15 +10,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
@@ -27,32 +24,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 
 import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
-import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
+import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
 @Ajaxified
 public class BoxControllerHelperService {
@@ -60,24 +57,25 @@ public class BoxControllerHelperService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private SampleService sampleService;
 
   @Autowired
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
-  private BarcodeFactory barcodeFactory;
-
-  @Autowired
   private MisoFilesManager misoFileManager;
 
   @Autowired
-  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
+  private PrinterService printerService;
 
   @Autowired
   private BoxScanner boxScanner;
+
+  @Autowired
+  private SecurityManager securityManager;
 
   /**
    * Returns a JSONObject of HTML for making the /miso/boxes table
@@ -125,8 +123,8 @@ public class BoxControllerHelperService {
     Boxable sample;
     Boxable library;
     Boxable pool;
-    sample = requestManager.getSampleByBarcode(barcode);
-    library = requestManager.getLibraryByBarcode(barcode);
+    sample = sampleService.getByBarcode(barcode);
+    library = libraryService.getByBarcode(barcode);
     pool = requestManager.getPoolByIdBarcode(barcode);
     if ((sample == null ? 0 : 1) + (library == null ? 0 : 1) + (pool == null ? 0 : 1) > 1) {
       String errorMessage = "";
@@ -260,7 +258,6 @@ public class BoxControllerHelperService {
     }
 
     try {
-      box.setLastModifier(authorizationManager.getCurrentUser());
       requestManager.saveBox(box);
     } catch (IOException e) {
       log.debug("Error saving box", e);
@@ -365,7 +362,8 @@ public class BoxControllerHelperService {
         .SimpleJSONError(boxable.getName() + " (" + boxable.getAlias() + ") has been discarded, and can not be added to the box.");
 
     // if the selected item is already in the box, remove it here and add it to the correct position in next step
-    if (box.boxableExists(boxable)) box.removeBoxable(boxable);
+    if (boxable.getBox() != null && boxable.getBox().getId() == box.getId())
+      box.removeBoxable(boxable.getBoxPosition());
 
     // if an item already exists at this position, its location will be set to unknown.
     box.setBoxable(position, boxable);
@@ -377,7 +375,7 @@ public class BoxControllerHelperService {
       requestManager.saveBox(box);
 
       ObjectMapper mapper = new ObjectMapper();
-      response.put("boxJSON", mapper.writer().writeValueAsString(box));
+      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
       response.put("addedToBox", boxable.getName() + " was successfully added to position " + position);
     } catch (IOException e) {
       log.debug("Error updating one boxable item", e);
@@ -417,7 +415,7 @@ public class BoxControllerHelperService {
     String position = json.getString("position");
     if (!box.isValidPosition(position)) return JSONUtils.SimpleJSONError("Invalid position given!");
 
-    box.removeBoxable(box.getBoxable(position));
+    box.removeBoxable(position);
 
     try {
       box.setLastModifier(authorizationManager.getCurrentUser());
@@ -425,7 +423,7 @@ public class BoxControllerHelperService {
 
       Map<String, Object> response = new HashMap<>();
       ObjectMapper mapper = new ObjectMapper();
-      response.put("boxJSON", mapper.writer().writeValueAsString(box));
+      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
       return JSONUtils.JSONObjectResponse(response);
     } catch (IOException e) {
       log.debug("Error removing one boxable item", e);
@@ -476,7 +474,7 @@ public class BoxControllerHelperService {
           requestManager.discardSingleTube(box, position);
           box = requestManager.getBoxById(boxId);
           ObjectMapper mapper = new ObjectMapper();
-          response.put("boxJSON", mapper.writer().writeValueAsString(box));
+          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
         } catch (IOException e) {
           log.debug("Failed to discard single tube", e);
           return JSONUtils.SimpleJSONError("Failed to discard single tube: " + e.getMessage());
@@ -524,7 +522,7 @@ public class BoxControllerHelperService {
           requestManager.discardAllTubes(box); // box save is performed as part of this method
           box = requestManager.getBoxById(boxId);
           ObjectMapper mapper = new ObjectMapper();
-          response.put("boxJSON", mapper.writer().writeValueAsString(box));
+          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
           return response;
         } catch (IOException e) {
           log.debug("Error discarding box", e);
@@ -579,6 +577,7 @@ public class BoxControllerHelperService {
     File temploc = getBarcodeFileLocation(session);
     try {
       Box box = requestManager.getBoxById(boxId);
+      BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = null;
@@ -621,62 +620,33 @@ public class BoxControllerHelperService {
    * @return JSON message indicating success or error
    */
   public JSONObject printBoxBarcodes(HttpSession session, JSONObject json) {
-    try {
-      User user = authorizationManager.getCurrentUser();
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new BarcodePrintAssister<Box>() {
 
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
+      @Override
+      public Box fetch(long id) throws IOException {
+        return requestManager.getBoxById(id);
       }
 
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Box.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-          if (mps == null) {
-            return JSONUtils
-                .SimpleJSONError("Unable to resolve a print service for Boxes. A service seems to be recognised but cannot be resolved.");
-          }
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-        if (mps == null) {
-          return JSONUtils.SimpleJSONError("Unable to resolve a print service for Boxes with the name '" + serviceName + "'.");
-        }
+      @Override
+      public void store(Box item) throws IOException {
+        requestManager.saveBox(item);
       }
 
-      Queue<File> thingsToPrint = new LinkedList<>();
-      JSONArray ss = JSONArray.fromObject(json.getString("boxes"));
-      for (JSONObject s : (Iterable<JSONObject>) ss) {
-        try {
-          Long boxId = s.getLong("boxId");
-          Box box = requestManager.getBoxById(boxId);
-          // autosave the barcode if none has been previously generated
-          if (box.getIdentificationBarcode() == null || "".equals(box.getIdentificationBarcode())) {
-            box.setLastModifier(authorizationManager.getCurrentUser());
-            requestManager.saveBox(box);
-          }
-          File f = mps.getLabelFor(box);
-          if (f != null) thingsToPrint.add(f);
-        } catch (IOException e) {
-          log.debug("Failed to print barcodes", e);
-          return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
-        }
+      @Override
+      public String getGroupName() {
+        return "boxes";
       }
 
-      PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (MisoPrintException e) {
-      log.debug("Failed to print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (IOException e) {
-      log.debug("Failed to print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+      @Override
+      public String getIdName() {
+        return "boxId";
+      }
+
+      @Override
+      public Iterable<Box> fetchAll(long projectId) throws IOException {
+        throw new UnsupportedOperationException();
+      }
+    });
   }
 
   /**
@@ -883,7 +853,7 @@ public class BoxControllerHelperService {
         }
 
         ObjectMapper mapper = new ObjectMapper();
-        scanResults.put("boxJSON", mapper.writer().writeValueAsString(box));
+        scanResults.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
       } catch (IntegrationException e) {
         log.info(e.getMessage());
         return JSONUtils.SimpleJSONError("Error scanning box: " + e.getMessage());
@@ -938,23 +908,13 @@ public class BoxControllerHelperService {
   }
 
   @CoverageIgnore
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  @CoverageIgnore
-  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
-    this.barcodeFactory = barcodeFactory;
-  }
-
-  @CoverageIgnore
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
   }
 
   @CoverageIgnore
-  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
-    this.printManager = printManager;
+  public void setPrinterService(PrinterService printerService) {
+    this.printerService = printerService;
   }
 
   @CoverageIgnore
@@ -965,5 +925,13 @@ public class BoxControllerHelperService {
   @CoverageIgnore
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 }

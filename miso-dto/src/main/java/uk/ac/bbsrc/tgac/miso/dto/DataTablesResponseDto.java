@@ -2,7 +2,8 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 public class DataTablesResponseDto<T> {
   /**

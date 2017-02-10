@@ -11,6 +11,7 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -27,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
  * remaining data that Hibernate cannot access. Similarly, it then follows any necessary links on save. All the SqlStore-populated fields
  * are marked “transient” in the LibraryDesign class.
  */
+@Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateLibraryDesignDao implements LibraryDesignDao {
 
@@ -78,11 +80,11 @@ public class HibernateLibraryDesignDao implements LibraryDesignDao {
   }
 
   private LibraryDesign fetchSqlStore(LibraryDesign libraryDesign) throws IOException {
-    if (libraryDesign != null && libraryDesign.getHibernateLibrarySelectionTypeId() != null) {
-      libraryDesign.setLibrarySelectionType(libraryDao.getLibrarySelectionTypeById(libraryDesign.getHibernateLibrarySelectionTypeId()));
+    if (libraryDesign != null && libraryDesign.getLibrarySelectionType().getId() != null) {
+      libraryDesign.setLibrarySelectionType(libraryDao.getLibrarySelectionTypeById(libraryDesign.getLibrarySelectionType().getId()));
     }
-    if (libraryDesign != null && libraryDesign.getHibernateLibraryStrategyTypeId() != null) {
-      libraryDesign.setLibraryStrategyType(libraryDao.getLibraryStrategyTypeById(libraryDesign.getHibernateLibraryStrategyTypeId()));
+    if (libraryDesign != null && libraryDesign.getLibraryStrategyType().getId() != null) {
+      libraryDesign.setLibraryStrategyType(libraryDao.getLibraryStrategyTypeById(libraryDesign.getLibraryStrategyType().getId()));
     }
     return libraryDesign;
   }

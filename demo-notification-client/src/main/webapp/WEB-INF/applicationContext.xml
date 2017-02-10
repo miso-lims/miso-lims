@@ -25,8 +25,14 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:integration="http://www.springframework.org/schema/integration"
   xmlns:ip="http://www.springframework.org/schema/integration/ip" xmlns:task="http://www.springframework.org/schema/task"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-       http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip-2.0.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                      http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/integration 
+                      http://www.springframework.org/schema/integration/spring-integration.xsd 
+                      http://www.springframework.org/schema/integration/ip 
+                      http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd 
+                      http://www.springframework.org/schema/task 
+                      http://www.springframework.org/schema/task/spring-task.xsd"
   default-autowire="byName">
 
   <bean name="notificationConsumerService" class="uk.ac.bbsrc.tgac.miso.core.service.integration.MisoNotificationConsumerService" />

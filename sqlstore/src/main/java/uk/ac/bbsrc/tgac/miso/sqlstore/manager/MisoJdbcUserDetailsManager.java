@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
@@ -57,7 +57,7 @@ public class MisoJdbcUserDetailsManager extends JdbcUserDetailsManager {
           @Override
           public List<GrantedAuthority> extractData(ResultSet rs) throws SQLException {
             rs.next();
-            List<GrantedAuthority> roleList = new ArrayList<GrantedAuthority>();
+            List<GrantedAuthority> roleList = new ArrayList<>();
             Blob roleblob = rs.getBlob("authority");
             if (roleblob != null) {
               if (roleblob.length() > 0) {
@@ -66,7 +66,7 @@ public class MisoJdbcUserDetailsManager extends JdbcUserDetailsManager {
                 String[] roles = s1.split(",");
                 for (String role : roles) {
                   log.info("Found role " + role + " for " + rs.getString("username"));
-                  GrantedAuthorityImpl authority = new GrantedAuthorityImpl(role);
+                  SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
                   roleList.add(authority);
                 }
               } else {

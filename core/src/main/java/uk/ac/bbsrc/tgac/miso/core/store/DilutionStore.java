@@ -29,7 +29,6 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
@@ -111,41 +110,6 @@ public interface DilutionStore extends Store<Dilution>, Remover<Dilution>, Namin
   Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException;
 
   /**
-   * List all emPCRDilutions prepared for a given PlatformType
-   * 
-   * @param platformType
-   *          of type PlatformType
-   * @return Collection<emPCRDilution>
-   * @throws IOException
-   *           when
-   */
-  Collection<emPCRDilution> listAllEmPcrDilutionsByPlatform(PlatformType platformType) throws IOException;
-
-  /**
-   * List all emPCRDilutions related to a given Project
-   * 
-   * @param projectId
-   *          of type long
-   * @return Collection<emPCRDilution>
-   * @throws IOException
-   *           when
-   */
-  Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException;
-
-  /**
-   * List all emPCRDilutions that match a given search string
-   * 
-   * @param query
-   *          of type String
-   * @param platformType
-   *          of type PlatformType
-   * @return Collection<emPCRDilution>
-   * @throws IOException
-   *           when
-   */
-  Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException;
-
-  /**
    * List all emPCRDilutions prepared for a given PlatformType within a given Project
    * 
    * @param projectId
@@ -168,26 +132,6 @@ public interface DilutionStore extends Store<Dilution>, Remover<Dilution>, Namin
   Collection<LibraryDilution> listAllLibraryDilutions() throws IOException;
 
   /**
-   * List all emPCRDilutions
-   * 
-   * @return Collection<emPCRDilution>
-   * @throws IOException
-   *           when
-   */
-  Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException;
-
-  /**
-   * List all emPCRDilutions by a given parent EmPCR ID
-   * 
-   * @param pcrId
-   *          of type long
-   * @return Collection<emPCRDilution>
-   * @throws IOException
-   *           when
-   */
-  Collection<emPCRDilution> listAllByEmPCRId(long pcrId) throws IOException;
-
-  /**
    * List all LibraryDilutions in a given IlluminaPool
    * 
    * @param poolId
@@ -197,28 +141,6 @@ public interface DilutionStore extends Store<Dilution>, Remover<Dilution>, Namin
    *           when
    */
   Collection<LibraryDilution> listByIlluminaPoolId(long poolId) throws IOException;
-
-  /**
-   * List all LibraryDilutions in a given 454 Pool
-   * 
-   * @param poolId
-   *          of type long
-   * @return Collection<emPCRDilution>
-   * @throws IOException
-   *           when
-   */
-  Collection<emPCRDilution> listByLS454PoolId(long poolId) throws IOException;
-
-  /**
-   * List all LibraryDilutions in a given SolidPool
-   * 
-   * @param poolId
-   *          of type long
-   * @return Collection<emPCRDilution>
-   * @throws IOException
-   *           when
-   */
-  Collection<emPCRDilution> listBySolidPoolId(long poolId) throws IOException;
 
   /**
    * List all LibraryDilutions in a given EmPCRool
@@ -276,37 +198,4 @@ public interface DilutionStore extends Store<Dilution>, Remover<Dilution>, Namin
    *           when
    */
   long saveLibraryDilution(LibraryDilution dilution) throws IOException;
-
-  /**
-   * Get an emPCRDilution by ID
-   * 
-   * @param dilutionId
-   *          of type long
-   * @return emPCRDilution
-   * @throws IOException
-   *           when
-   */
-  emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException;
-
-  /**
-   * Get an emPCRDilution by ID barcode
-   * 
-   * @param barcode
-   *          of type String
-   * @return emPCRDilution
-   * @throws IOException
-   *           when
-   */
-  emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException;
-
-  /**
-   * Save an emPCRDilution
-   * 
-   * @param dilution
-   *          of type emPCRDilution
-   * @return long
-   * @throws IOException
-   *           when
-   */
-  long saveEmPCRDilution(emPCRDilution dilution) throws IOException;
 }

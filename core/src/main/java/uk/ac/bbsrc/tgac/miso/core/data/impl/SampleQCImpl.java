@@ -25,6 +25,9 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +45,10 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Entity
+@Table(name = "SampleQC")
 public class SampleQCImpl extends AbstractSampleQC implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(SampleQCImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(SampleQCImpl.class);
   /**
    * Construct a new SampleQCImpl
    */

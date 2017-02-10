@@ -2,8 +2,9 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class SampleAliquotDto extends SampleStockDto {
 

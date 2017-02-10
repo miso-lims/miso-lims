@@ -24,14 +24,20 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -40,17 +46,27 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
+@MappedSuperclass
 public abstract class AbstractPartition implements Partition {
   public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "partitionId")
   private long id = AbstractPartition.UNSAVED_ID;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
 
+  @Column(nullable = false)
   private Integer partitionNumber;
+
+  @ManyToOne(targetEntity = SequencerPartitionContainerImpl.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
+      @JoinColumn(name = "partitions_partitionId") }, inverseJoinColumns = {
+          @JoinColumn(name = "container_containerId") })
+  @JsonBackReference
   private SequencerPartitionContainer sequencerPartitionContainer = null;
 
   @Override
@@ -115,8 +131,6 @@ public abstract class AbstractPartition implements Partition {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
   }
-
-  public abstract void buildSubmission();
 
   /**
    * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.

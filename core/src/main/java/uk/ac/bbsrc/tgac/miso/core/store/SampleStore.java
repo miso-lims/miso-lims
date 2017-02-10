@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 
 /**
@@ -37,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample> {
+public interface SampleStore extends Store<Sample>, Remover<Sample> {
 
   /**
    * List all Samples that match a search criteria
@@ -75,17 +74,6 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample> 
   Collection<Sample> listByProjectId(long projectId) throws IOException;
 
   /**
-   * List all Samples related to an Experiment given an Experiment ID
-   * 
-   * @param experimentId
-   *          of type long
-   * @return Collection<Sample>
-   * @throws IOException
-   *           when
-   */
-  Collection<Sample> listByExperimentId(long experimentId) throws IOException;
-
-  /**
    * List all Samples by a given alias
    * 
    * @param alias
@@ -95,17 +83,6 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample> 
    *           when
    */
   Collection<Sample> listByAlias(String alias) throws IOException;
-
-  /**
-   * List all Samples that are part of a Submission given a Submission ID
-   * 
-   * @param submissionId
-   *          of type long
-   * @return Collection<Sample>
-   * @throws IOException
-   *           when
-   */
-  Collection<Sample> listBySubmissionId(long submissionId) throws IOException;
 
   /**
    * List all SampleTypes
@@ -135,17 +112,6 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample> 
   Collection<Sample> listAllByReceivedDate(long limit) throws IOException;
 
   /**
-   * List the Sample associated with the given positionId
-   * 
-   * @param positionId
-   *          of type long
-   * @return Boxable
-   * @throws IOException
-   *           when
-   */
-  Boxable getByPositionId(long positionId) throws IOException;
-
-  /**
    * List all Samples associated with identificationBarcodes from the given identificationBarcode list
    * 
    * @return Collection<Sample>
@@ -168,4 +134,5 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample> 
    *           when the objects cannot be retrieved
    */
   Collection<Sample> getByIdList(List<Long> idList) throws IOException;
+
 }

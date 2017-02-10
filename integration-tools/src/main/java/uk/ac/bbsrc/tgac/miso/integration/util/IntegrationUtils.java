@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * @since 0.1.3
  */
 public class IntegrationUtils {
-  protected static final Logger log = LoggerFactory.getLogger(IntegrationUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(IntegrationUtils.class);
   
     public static String makePostRequest(String host, int port, String query) throws IntegrationException {
     if (query == null || query.isEmpty()) {

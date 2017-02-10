@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
  * @since 0.0.2
  */
 public class ReportsUtils {
-  protected static final Logger log = LoggerFactory.getLogger(ReportsUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(ReportsUtils.class);
 
   public static String buildHTMLReport(List<? extends Reportable> reportables, String type, List<String> options)
       throws ReportingException {
@@ -96,7 +96,7 @@ public class ReportsUtils {
 
       if (reportables.size() == 1) {
         // Single Project report
-        List reportableslist = new ArrayList<Reportable>(reportables);
+        List reportableslist = new ArrayList<>(reportables);
         Reportable reportable = (Reportable) reportableslist.get(0);
         Project project = (Project) reportable;
         sb.append("<h1>Project Information</h1><br/><div class='report'>");
@@ -147,7 +147,7 @@ public class ReportsUtils {
       // Lists of Projects report
       else if (reportables.size() > 1) {
         sb.append("<h1>Projects Information</h1><br/><div class='report'>");
-        Map<String, Integer> map = new HashMap<String, Integer>();
+        Map<String, Integer> map = new HashMap<>();
         sb.append("<table class=\"list\">\n" + "    <thead>\n" + "    <tr>\n" + "        <th>Project Name</th>\n"
             + "        <th>Project Alias</th>\n" + "        <th>Project Description</th>\n" + "        <th>Progress</th>\n");
         if (incOverview) {
@@ -254,7 +254,7 @@ public class ReportsUtils {
 
       if (reportables.size() == 1) {
         // Single Sample report
-        List reportableslist = new ArrayList<Reportable>(reportables);
+        List reportableslist = new ArrayList<>(reportables);
         Reportable reportable = (Reportable) reportableslist.get(0);
         Sample sample = (Sample) reportable;
         sb.append("<h1>Sample Information</h1><br/><div class='report'>");
@@ -294,8 +294,8 @@ public class ReportsUtils {
       // Lists of Samples report
       else if (reportables.size() > 1) {
         sb.append("<h1>Samples Information</h1><br/><div class='report'>");
-        Map<String, Integer> typeMap = new HashMap<String, Integer>();
-        Map<String, Integer> qcMap = new HashMap<String, Integer>();
+        Map<String, Integer> typeMap = new HashMap<>();
+        Map<String, Integer> qcMap = new HashMap<>();
         sb.append("<table class=\"list\">\n" + "    <thead>\n" + "    <tr>\n" + "        <th>Sample Name</th>\n"
             + "        <th>Project Alias</th>\n" + "        <th>Sample Alias</th>\n" + "        <th>Sample Description</th>\n"
             + "        <th>Scientific Name</th>\n" + "        <th>Sample Type</th>\n" + "        <th>QC Passed</th>\n");
@@ -426,7 +426,7 @@ public class ReportsUtils {
 
       if (reportables.size() == 1) {
         // Single Run report
-        List reportableslist = new ArrayList<Reportable>(reportables);
+        List reportableslist = new ArrayList<>(reportables);
         Reportable reportable = (Reportable) reportableslist.get(0);
         Run run = (Run) reportable;
         sb.append("<h1>Run Information</h1><br/><div class='report'>");
@@ -453,8 +453,8 @@ public class ReportsUtils {
       // Lists of Runs report
       else if (reportables.size() > 1) {
         sb.append("<h1>Runs Information</h1><br/><div class='report'>");
-        Map<String, Integer> statusMap = new HashMap<String, Integer>();
-        Map<String, Integer> platformMap = new HashMap<String, Integer>();
+        Map<String, Integer> statusMap = new HashMap<>();
+        Map<String, Integer> platformMap = new HashMap<>();
         sb.append("<table class=\"list\">\n" + "    <thead>\n" + "    <tr>\n" + "        <th>Run Name</th>\n"
             + "        <th>Platform</th>\n" + "        <th>Sequencer</th>\n");
         if (incAlias) {

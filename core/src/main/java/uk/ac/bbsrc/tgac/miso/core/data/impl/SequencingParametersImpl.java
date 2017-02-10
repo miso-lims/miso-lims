@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -35,8 +36,6 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   private Long parametersId;
   @Column(nullable = false)
   private String name;
-  @Column(nullable = false)
-  private Long platformId;
   private String xpath;
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -51,7 +50,8 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   @Transient
   private XPathExpression expression;
 
-  @Transient
+  @ManyToOne(targetEntity = PlatformImpl.class)
+  @JoinColumn(name = "platformId")
   private Platform platform;
 
   @Override
@@ -87,11 +87,6 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   @Override
   public Platform getPlatform() {
     return platform;
-  }
-
-  @Override
-  public Long getPlatformId() {
-    return platformId;
   }
 
   @Override
@@ -143,9 +138,6 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   @Override
   public void setPlatform(Platform platform) {
     this.platform = platform;
-    if (platform != null) {
-      platformId = platform.getId();
-    }
   }
 
   @Override

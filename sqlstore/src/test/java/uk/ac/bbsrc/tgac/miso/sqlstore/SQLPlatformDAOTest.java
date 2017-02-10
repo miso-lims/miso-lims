@@ -22,23 +22,17 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
 
 public class SQLPlatformDAOTest extends AbstractDAOTest {
 
@@ -59,82 +53,80 @@ public class SQLPlatformDAOTest extends AbstractDAOTest {
   @Spy
   private JdbcTemplate jdbcTemplate;
 
-  @InjectMocks
-  private SQLPlatformDAO dao;
+  @Autowired
+  private SessionFactory sessionFactory;
 
-  // Auto-increment sequence doesn't roll back with transactions, so must be tracked
-  // There are 34 Platforms created during migrations, so this is the next id.
-  // This will have to be changed if new Platforms are added during migrations.
-  private static long nextAutoIncrementId = 35L;
+  @InjectMocks
+  private HibernatePlatformDao dao;
 
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
+    dao.setSessionFactory(sessionFactory);
   }
 
   @Test
-  public void testListAll() {
+  public void testListAll() throws IOException {
     List<Platform> platforms = dao.listAll();
-    assertEquals(3, platforms.size());
+    assertTrue(platforms.size() > 0);
   }
 
   @Test
   public void testPlatformCount() throws IOException {
-    assertEquals(3, dao.count());
+    assert (dao.count() == dao.listAll().size());
   }
 
   @Test
-  public void testListDistinctPlatformNames() {
-    List<String> distinctPlatformNames = dao.listDistinctPlatformNames();
-    assertEquals(2, distinctPlatformNames.size());
+  public void testListDistinctPlatformNames() throws IOException {
+    List<PlatformType> distinctPlatformNames = dao.listDistinctPlatformNames();
+    assertTrue(distinctPlatformNames.size() > 0);
   }
 
   @Test
-  public void testListbyName() {
+  public void testListbyName() throws IOException {
     List<Platform> platforms = dao.listByName("Illumina");
-    assertEquals(2, platforms.size());
+    assertTrue(platforms.size() > 0);
   }
 
   @Test
-  public void testListbyNameNone() {
+  public void testListbyNameNone() throws IOException {
     List<Platform> platforms = dao.listByName("Futurism");
     assertEquals(0, platforms.size());
   }
 
   @Test
-  public void testListByNameEmpty() {
+  public void testListByNameEmpty() throws IOException {
     List<Platform> platforms = dao.listByName("");
     assertEquals(0, platforms.size());
   }
 
   @Test
-  public void testListByNameNull() {
+  public void testListByNameNull() throws IOException {
     List<Platform> platforms = dao.listByName(null);
     assertEquals(0, platforms.size());
   }
 
   @Test
-  public void testGetByModel() {
+  public void testGetByModel() throws IOException {
     Platform platform = dao.getByModel("PacBio RS");
     assertNotNull(platform);
   }
 
   @Test
-  public void testGetByModelNone() {
+  public void testGetByModelNone() throws IOException {
     Platform platform = dao.getByModel("Coco Rocha");
     assertNull(platform);
   }
 
   @Test
-  public void testGetByModelEmpty() {
+  public void testGetByModelEmpty() throws IOException {
     Platform platform = dao.getByModel("");
     assertNull(platform);
   }
 
   @Test
-  public void testGetByModelNull() {
+  public void testGetByModelNull() throws IOException {
     Platform platform = dao.getByModel(null);
     assertNull(platform);
   }
@@ -152,44 +144,35 @@ public class SQLPlatformDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws IOException {
-    Platform platform = dao.lazyGet(16L);
-    assertNotNull(platform);
-  }
-
-  @Test
   public void testSaveEdit() throws IOException {
-    Platform platform = dao.get(16L);
+    Platform oldPlatform = dao.get(16L);
 
-    platform.setPlatformType(platform.getPlatformType());
-    platform.setInstrumentModel("Illumina HiSeq 2500");
-    platform.setDescription("4-channel flow cell");
-    platform.setNumContainers(1);
+    oldPlatform.setPlatformType(oldPlatform.getPlatformType());
+    oldPlatform.setInstrumentModel("Illumina HiSeq 2500");
+    oldPlatform.setDescription("4-channel flow cell");
+    oldPlatform.setNumContainers(1);
 
-    assertEquals(16L, dao.save(platform));
+    assertEquals(16L, dao.save(oldPlatform));
     Platform savedPlatform = dao.get(16L);
-    assertNotSame(platform, savedPlatform);
-    assertEquals(platform.getId(), savedPlatform.getId());
-    assertEquals("Illumina HiSeq 2500", savedPlatform.getInstrumentModel());
-    assertEquals("4-channel flow cell", savedPlatform.getDescription());
-    assertEquals("Illumina", savedPlatform.getPlatformType().getKey());
+    assertNotNull(savedPlatform);
+    assertEquals(oldPlatform.getId(), savedPlatform.getId());
+    assertEquals(oldPlatform.getInstrumentModel(), savedPlatform.getInstrumentModel());
+    assertEquals(oldPlatform.getDescription(), savedPlatform.getDescription());
+    assertEquals(oldPlatform.getPlatformType(), savedPlatform.getPlatformType());
   }
 
   @Test
   public void testSaveNew() throws IOException {
-    long autoIncrementId = nextAutoIncrementId;
     Platform newPlatform = makePlatform("PacBio", "Mystery container", 1);
-    mockAutoIncrement(autoIncrementId);
-    assertEquals(autoIncrementId, dao.save(newPlatform));
+    Long newId = dao.save(newPlatform);
+    assertNotNull(dao.get(newId));
 
-    Platform savedPlatform = dao.get(autoIncrementId);
-    assertEquals(newPlatform.getDescription(), savedPlatform.getDescription());
-    nextAutoIncrementId += 1;
+    assertEquals(newPlatform.getDescription(), dao.get(newId).getDescription());
   }
 
   @Test
   public void testSaveNull() throws IOException {
-    exception.expect(NullPointerException.class);
+    exception.expect(IllegalArgumentException.class);
     dao.save(null);
   }
 
@@ -200,11 +183,5 @@ public class SQLPlatformDAOTest extends AbstractDAOTest {
     platform.setInstrumentModel(instrumentModel);
     platform.setPlatformType(PlatformType.get("PacBio"));
     return platform;
-  }
-
-  private void mockAutoIncrement(long value) {
-    Map<String, Object> rs = new HashMap<>();
-    rs.put("auto_increment", value);
-    Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
   }
 }

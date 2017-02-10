@@ -58,7 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 @Entity
 @DiscriminatorValue("Solid")
 public class SolidRun extends RunImpl {
-  protected static final Logger log = LoggerFactory.getLogger(SolidRun.class);
+  private static final Logger log = LoggerFactory.getLogger(SolidRun.class);
 
   public SolidRun() {
     setPlatformType(PlatformType.SOLID);
@@ -129,15 +129,6 @@ public class SolidRun extends RunImpl {
     } catch (TransformerException e) {
       log.error("parse status XML", e);
     }
-  }
-
-  @Override
-  public void buildSubmission() {
-    /*
-     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
-     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
-     * ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
-     */
   }
 
   /**

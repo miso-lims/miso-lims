@@ -4,9 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -31,22 +30,20 @@ public class LibraryDesign {
   @Id
   private Long libraryDesignId;
 
-  @Column(name = "librarySelectionType")
-  private Long librarySelectionTypeId;
-  @Transient
+  @ManyToOne
+  @JoinColumn(name = "librarySelectionType")
   private LibrarySelectionType librarySelectionType;
 
-  @Column(name = "libraryStrategyType")
-  private Long libraryStrategyTypeId;
-  @Transient
+  @ManyToOne
+  @JoinColumn(name = "libraryStrategyType")
   private LibraryStrategyType libraryStrategyType;
-
   @Column(nullable = false)
   private String name;
-  @OneToOne(targetEntity = SampleClassImpl.class)
+  @ManyToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "sampleClassId", nullable = false)
   private SampleClass sampleClass;
-  @OneToOne(targetEntity = LibraryDesignCode.class)
+
+  @ManyToOne(targetEntity = LibraryDesignCode.class)
   @JoinColumn(name = "libraryDesignCodeId")
   private LibraryDesignCode libraryDesignCode;
 
@@ -80,32 +77,10 @@ public class LibraryDesign {
 
   public void setLibrarySelectionType(LibrarySelectionType librarySelectionType) {
     this.librarySelectionType = librarySelectionType;
-
-    // keep librarySelectionTypeId field consistent for Hibernate purposes
-    if (librarySelectionType == null) {
-      this.librarySelectionTypeId = null;
-    } else {
-      this.librarySelectionTypeId = librarySelectionType.getId();
-    }
   }
 
   public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType) {
     this.libraryStrategyType = libraryStrategyType;
-
-    // keep libraryStrategyTypeId field consistent for Hibernate purposes
-    if (libraryStrategyType == null) {
-      this.libraryStrategyTypeId = null;
-    } else {
-      this.libraryStrategyTypeId = libraryStrategyType.getId();
-    }
-  }
-
-  public Long getHibernateLibrarySelectionTypeId() {
-    return librarySelectionTypeId;
-  }
-
-  public Long getHibernateLibraryStrategyTypeId() {
-    return libraryStrategyTypeId;
   }
 
   public void setName(String name) {

@@ -28,7 +28,11 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.OneToMany;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +42,11 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -50,10 +56,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
  * @author Rob Davey
  * @since 0.1.0
  */
+@Entity
+@Table(name = "Run")
 public class RunImpl extends AbstractRun implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(RunImpl.class);
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @ManyToMany(targetEntity = SequencerPartitionContainerImpl.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
+      @JoinColumn(name = "Run_runId") }, inverseJoinColumns = {
+          @JoinColumn(name = "containers_containerId") })
   private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<SequencerPartitionContainer<SequencerPoolPartition>>(
       SequencerPartitionContainerImpl.class);
 
@@ -106,14 +117,20 @@ public class RunImpl extends AbstractRun implements Serializable {
     }
   }
 
-  @Override
-  public void buildSubmission() {
-  }
-
   /**
    * Method buildReport ...
    */
   @Override
   public void buildReport() {
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    RunChangeLog changeLog = new RunChangeLog();
+    changeLog.setRun(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }

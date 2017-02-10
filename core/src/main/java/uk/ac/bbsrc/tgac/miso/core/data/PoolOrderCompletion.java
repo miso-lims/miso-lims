@@ -10,8 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 
@@ -32,10 +32,10 @@ public class PoolOrderCompletion implements Serializable {
   @ManyToOne(targetEntity = SequencingParametersImpl.class)
   @JoinColumn(name = "parametersId", nullable = false)
   private SequencingParameters parameters;
-  @Transient
-  private Pool pool;
   @Id
-  private Long poolId;
+  @ManyToOne(targetEntity = PoolImpl.class)
+  @JoinColumn(name = "poolId")
+  private Pool pool;
 
   public HealthType getHealth() {
     return health;
@@ -51,10 +51,6 @@ public class PoolOrderCompletion implements Serializable {
 
   public Pool getPool() {
     return pool;
-  }
-
-  public Long getPoolId() {
-    return poolId;
   }
 
   public SequencingParameters getSequencingParameters() {

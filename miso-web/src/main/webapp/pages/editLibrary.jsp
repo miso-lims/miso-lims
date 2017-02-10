@@ -201,7 +201,7 @@
     </c:choose>
 
     <span id="aliasCounter" class="counter"></span>
-    <c:if test="${detailedSample && library.libraryAdditionalInfo.hasNonStandardAlias()}">
+    <c:if test="${detailedSample && library.hasNonStandardAlias()}">
       <ul class="parsley-errors-list filled" id="nonStandardAlias">
         <li class="parsley-custom-error-message">
         Double-check this alias -- it will be saved even if it is duplicated or does not follow the naming standard!
@@ -238,7 +238,7 @@
   </tr>
 </c:if>
 <c:choose>
-  <c:when test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
+  <c:when test="${!empty library.sample && detailedSample}">
     <input type="hidden" value="true" name="paired" id="paired"/>
   </c:when>
   <c:otherwise>
@@ -264,13 +264,13 @@
         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
       <td>Platform - Library Type:</td>
       <td>
-        <form:select id="platformNames" path="platformName" items="${platformNames}"
-                     onchange="Library.ui.changePlatformName(null);" class="validateable"/>
+        <form:select id="platformTypes" path="platformType" items="${platformTypes}"
+                     onchange="Library.ui.changePlatformType(null);" class="validateable"/>
         <form:select id="libraryTypes" path="libraryType"/>
       </td>
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          Library.ui.changePlatformName(<c:out value="${library.libraryType.id}" default="0"/>, function() {
+          Library.ui.changePlatformType(<c:out value="${library.libraryType.id}" default="0"/>, function() {
             <c:if test="${not empty library.libraryType}">jQuery('#libraryTypes').val('${library.libraryType.id}');</c:if>
             Library.setOriginalIndices();
           });
@@ -279,17 +279,17 @@
     </c:when>
     <c:otherwise>
       <td>Platform - Library Type</td>
-      <td>${library.platformName} - ${library.libraryType.description}</td>
+      <td>${library.platformType} - ${library.libraryType.description}</td>
     </c:otherwise>
   </c:choose>
 </tr>
 <tr>
-<c:if test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
+<c:if test="${!empty library.sample && detailedSample}">
   <tr>
     <td>Library Design:</td>
     <td>
-      <miso:select id="libraryDesignTypes" path="libraryAdditionalInfo.libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/>
-      &nbsp;&nbsp;&nbsp;Design Code: <miso:select id="libraryDesignCodes" path="libraryAdditionalInfo.libraryDesignCode" items="${libraryDesignCodes}" itemLabel="code" itemValue="id" defaultLabel="(None)" defaultValue="-1"/>
+      <miso:select id="libraryDesignTypes" path="libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/>
+      &nbsp;&nbsp;&nbsp;Design Code: <miso:select id="libraryDesignCodes" path="libraryDesignCode" items="${libraryDesignCodes}" itemLabel="code" itemValue="id" defaultLabel="(None)" defaultValue="-1"/>
     </td>
   </tr>
 </c:if>
@@ -385,8 +385,8 @@
 <tr>
   <td class="h">Location:</td>
   <td>
-    <c:if test="${!empty library.boxLocation}">${library.boxLocation},</c:if>
-    <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.boxId}"/>'>${library.boxAlias}, ${library.boxPosition}</a></c:if>
+    <c:if test="${!empty library.box.locationBarcode}">${ library.box.locationBarcode},</c:if>
+    <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.box.id}"/>'>${library.box.alias}, ${library.boxPosition}</a></c:if>
   </td>
 </tr>
 </table>
@@ -400,7 +400,7 @@
   <tr>
     <td>Library Kit:*</td>
     <td>
-      <miso:select id="libraryKit" path="libraryAdditionalInfo.prepKit" items="${prepKits}" itemLabel="name"
+      <miso:select id="libraryKit" path="kitDescriptor" items="${prepKits}" itemLabel="name"
           itemValue="id" defaultLabel="SELECT" defaultValue=""/>
     </td>
   </tr>
@@ -416,15 +416,13 @@
   </c:if>
   <tr>
     <td class="h">Archived:</td>
-    <td><form:checkbox id="archived" path="libraryAdditionalInfo.archived"/></td>
+    <td><form:checkbox id="archived" path="archived"/></td>
   </tr>
 </table>
-<script type="text/javascript">
- jQuery(document).ready(function () {
-   Hot.detailedSample = ${detailedSample};
- });
-</script>
 </c:if>
+<script type="text/javascript">
+  Hot.detailedSample = ${detailedSample};
+</script>
 
 <c:choose>
   <c:when
@@ -579,7 +577,7 @@
     </a>
 
     <div id="ldmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, ${libraryPrepKitId}, ${autoGenerateIdBarcodes}); return false;">
+      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, <c:out value="${library.kitDescriptor.id}" default="0"/>, ${autoGenerateIdBarcodes}); return false;">
         Add Library Dilution
       </a>
       <c:if test="${not empty library.libraryDilutions}">
@@ -603,6 +601,7 @@
         </c:if>
         <th>ID Barcode</th>
         <th align="center">Edit</th>
+        <th align="center">Pool</th>
       </tr>
       </thead>
       <tbody>
@@ -638,7 +637,7 @@
                         </a>
 
                         <div id="dil${dil.id}IdBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-                          <a href="javascript:void(0);" onclick="Library.barcode.printDilutionBarcode(${dil.id}, '${library.platformName}');">Print</a>
+                          <a href="javascript:void(0);" onclick="Library.barcode.printDilutionBarcode(${dil.id}, '${library.platformType}');">Print</a>
                         </div>
                       </li>
                     </ul>
@@ -670,10 +669,6 @@
               </a>
             </td>
             <td>
-              <c:if test="${library.platformName eq 'LS454' or library.platformName eq 'Solid'}">
-                <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.id});">Add emPCR</a> 
-                <br />           
-              </c:if>
               <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
             </td>
           </tr>
@@ -684,80 +679,6 @@
     <input type='hidden' id='dilLibraryId' name='id' value='${library.id}'/>
   </form>
 </span>
-
-<c:if test="${library.platformName ne 'Illumina'}">
-  <br/>
-  <h1>emPCR</h1>
-
-  <div id="addEmPcr"></div>
-  <form id='addEmPcrForm'>
-    <table class="list" id="emPcrTable">
-      <thead>
-      <tr>
-        <th>Library Dilution ID</th>
-        <th>PCRed By</th>
-        <th>PCR Date</th>
-        <th>Results (${emPCRUnits})</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:if test="${not empty emPCRs}">
-        <c:forEach items="${emPCRs}" var="empcr">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${empcr.libraryDilution.id}</td>
-            <td>${empcr.pcrCreator}</td>
-            <td><fmt:formatDate value="${empcr.creationDate}"/></td>
-            <td>${empcr.concentration} ${emPCRUnits}</td>
-            <td>
-              <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrDilutionRow(${empcr.id});">Add emPCR Dilution</a>
-            </td>
-          </tr>
-        </c:forEach>
-      </c:if>
-      </tbody>
-    </table>
-  </form>
-
-  <h1>emPCR Dilutions</h1>
-
-  <div id="addEmPcrDilution"></div>
-  <form id='addEmPcrDilutionForm'>
-    <table class="list" id="emPcrDilutionTable">
-      <thead>
-      <tr>
-        <th>emPCR ID</th>
-        <th>Done By</th>
-        <th>Date</th>
-        <th>Results (${emPCRDilutionUnits})</th>
-        <th>Construct Pool</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:if test="${not empty emPcrDilutions}">
-        <c:forEach items="${emPcrDilutions}" var="dil">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${dil.emPCR.id}</td>
-            <td>${dil.dilutionCreator}</td>
-            <td><fmt:formatDate value="${dil.creationDate}"/></td>
-            <td>${dil.concentration} ${emPCRDilutionUnits}</td>
-            <td>
-              <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
-            </td>
-          </tr>
-        </c:forEach>
-      </c:if>
-      </tbody>
-    </table>
-  </form>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery("#emPcrDilutionTable").tablesorter({
-        headers: {
-        }
-      });
-    });
-  </script>
-</c:if>
 
   <c:if test="${not empty libraryPools}">
     <br/>
@@ -1170,7 +1091,7 @@ function setEditables(datatable) {
     return value;
   },
   {
-    data: '{${platformNamesString}}',
+    data: '{${platformTypesString}}',
     type: 'select',
     onblur: 'submit',
     placeholder: '',

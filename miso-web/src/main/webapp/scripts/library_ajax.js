@@ -282,6 +282,8 @@ Library.dilution = {
       'dilutionCreator': f.libraryDilutionCreator,
       'dilutionDate': f.libraryDilutionDate,
       'results': f.libraryDilutionResults,
+      'autoGenerateIdBarcodes': autoGenerateIdBarcodes,
+      'detailedSample': Hot.detailedSample,
       'url': ajaxurl
     };
  	  if (Hot.detailedSample) {
@@ -577,7 +579,6 @@ Library.barcode = {
       'printerControllerHelperService',
       'listAvailableServices',
       {
-        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Library',
         'url': ajaxurl
       },
       {
@@ -599,7 +600,7 @@ Library.barcode = {
                   'libraryControllerHelperService',
                   'printLibraryBarcodes',
                   {
-                    'serviceName': jQuery('#serviceSelect').val(),
+                    'printerId': jQuery('#serviceSelect').val(),
                     'libraries': libraries,
                     'url': ajaxurl
                   },
@@ -654,7 +655,7 @@ Library.barcode = {
                   'libraryControllerHelperService',
                   'printLibraryDilutionBarcodes',
                   {
-                    'serviceName': jQuery('#serviceSelect').val(),
+                    'printerId': jQuery('#serviceSelect').val(),
                     'dilutions': dilutions,
                     'platform': platform,
                     'url': ajaxurl
@@ -722,9 +723,9 @@ Library.barcode = {
 };
 
 Library.ui = {
-  changePlatformName: function (originalLibraryTypeId, callback) {
+  changePlatformType: function (originalLibraryTypeId, callback) {
     var self = this;
-    var platform = jQuery('#platformNames').val();
+    var platform = jQuery('#platformTypes').val();
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'changePlatformName',
@@ -1282,7 +1283,7 @@ Library.ui = {
     if (designSelect == null || designSelect.value == -1) {
       selection.disabled = false;
       strategy.disabled = false;
-      code.disabled = false;
+      if (code) { code.disabled = false; }
       if (typeof callback == 'function') callback();
     } else {
       var matchedDesigns = Library.designs.filter(function (rule) { return rule.id == designSelect.value; });
@@ -1291,8 +1292,10 @@ Library.ui = {
         selection.disabled = true;
         strategy.value = matchedDesigns[0].libraryStrategyType.id;
         strategy.disabled = true;
-        code.value = matchedDesigns[0].libraryDesignCode.id;
-        code.disabled = true;
+        if (code) {
+          code.value = matchedDesigns[0].libraryDesignCode.id;
+          code.disabled = true;
+        }
       }
     }
   }

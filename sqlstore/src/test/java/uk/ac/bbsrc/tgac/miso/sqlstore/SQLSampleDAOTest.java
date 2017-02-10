@@ -9,11 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.persistence.CascadeType;
 
 import org.hibernate.SessionFactory;
 import org.junit.Before;
@@ -22,7 +18,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +26,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
@@ -44,12 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 
@@ -61,20 +49,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
 
   @Autowired
   private JdbcTemplate template;
-  @Mock
-  private SecurityStore securityDAO;
-  @Mock
-  private Store<SecurityProfile> securityProfileDAO;
-  @Mock
-  private ChangeLogStore changeLogDAO;
-  @Mock
-  private ProjectStore projectStore;
-  @Mock
-  private LibraryStore libraryStore;
-  @Mock
-  private SampleQcStore sampleQCStore;
-  @Mock
-  private NoteStore noteStore;
   @Mock
   private NamingScheme namingScheme;
 
@@ -89,7 +63,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     dao.setSessionFactory(sessionFactory);
     dao.setJdbcTemplate(template);
-    dao.setSecurityProfileDao(securityProfileDAO);
   }
 
   @Test
@@ -101,8 +74,11 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws Exception {
+    SecurityProfile profile = new SecurityProfile();
+    profile.setProfileId(1L);
 
     Sample sample = new SampleImpl();
+    sample.setSecurityProfile(profile);
     String sampleName = "latestSample32";
     sample.setName(sampleName);
     sample.setAlias("alias32LK");
@@ -112,18 +88,15 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     user.setUserId(1L);
     sample.setLastModifier(user);
 
-    mockAutoIncrement();
     when(namingScheme.generateNameFor(any(Sample.class))).thenReturn(sampleName);
     when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
     when(namingScheme.validateSampleAlias(anyString())).thenReturn(ValidationResult.success());
-    when(securityProfileDAO.save(any(SecurityProfile.class))).thenReturn(3L);
 
     int sizeBefore = dao.listAll().size();
     long id = dao.save(sample);
     Sample retrieved = dao.get(id);
     assertEquals("did not insert sample", sizeBefore + 1, dao.listAll().size());
     assertEquals("sample name does not match", sampleName, retrieved.getName());
-    assertEquals("Security profile does not match", 3L, (long) retrieved.getSecurityProfileId());
   }
 
   @Test
@@ -131,7 +104,8 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
 
     Sample sample = dao.get(8);
 
-    SecurityProfile profile = Mockito.mock(SecurityProfile.class);
+    SecurityProfile profile = new SecurityProfile();
+    profile.setProfileId(1L);
     sample.setSecurityProfile(profile);
 
     Project project = new ProjectImpl();
@@ -187,7 +161,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
 
   @Test
   public void testRemove() throws Exception {
-    dao.setCascadeType(CascadeType.ALL);
 
     Sample sample = dao.get(7);
 
@@ -373,19 +346,6 @@ public class SQLSampleDAOTest extends AbstractDAOTest {
     DetailedSample detailed = (DetailedSample) sample;
     assertNotNull(detailed.getParent());
     assertEquals(15L, detailed.getParent().getId());
-  }
-
-  private void mockAutoIncrement() throws IOException {
-    Collection<Sample> samples = dao.listAll();
-    long max = 0;
-    for (Sample sample : samples) {
-      if (sample.getId() > max) {
-        max = sample.getId();
-      }
-    }
-    max++;
-    Map<String, Object> rs = new HashMap<>();
-    rs.put("Auto_increment", max);
   }
 
   @Test

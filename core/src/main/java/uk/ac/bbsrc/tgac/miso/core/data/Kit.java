@@ -26,10 +26,10 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.util.Collection;
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 import com.eaglegenomics.simlims.core.Note;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
@@ -40,9 +40,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface Kit extends Comparable, Barcodable, Locatable {
+public interface Kit extends Comparable<Kit>, Barcodable, Locatable {
   public void setId(long id);
 
   /**

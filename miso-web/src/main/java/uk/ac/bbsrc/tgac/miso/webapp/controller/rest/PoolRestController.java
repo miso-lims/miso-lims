@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -57,10 +56,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 
 /**
  * A controller to handle all REST requests for Pools
@@ -76,8 +75,15 @@ public class PoolRestController extends RestController {
   @Autowired
   private RequestManager requestManager;
 
+  @Autowired
+  private LibraryDilutionService dilutionService;
+
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 
   @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces = "application/json")
@@ -87,7 +93,6 @@ public class PoolRestController extends RestController {
     if (p == null) {
       throw new RestException("No pool found with ID: " + poolId, Status.NOT_FOUND);
     }
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     return mapper.writeValueAsString(p);
   }
 
@@ -156,7 +161,7 @@ public class PoolRestController extends RestController {
 
   @RequestMapping(value = "/wizard/librarydilutions", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody JSONObject ldRest() throws IOException {
-    Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutions();
+    Collection<LibraryDilution> lds = dilutionService.list();
 
     List<String> types = new ArrayList<>(requestManager.listDistinctPlatformNames());
     Collections.sort(types);

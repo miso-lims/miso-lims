@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,34 +9,28 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import javax.persistence.CascadeType;
-
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.datetime.DateFormatter;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunQcDao;
 
 public class SQLRunQCDAOTest extends AbstractDAOTest {
 
@@ -46,31 +38,21 @@ public class SQLRunQCDAOTest extends AbstractDAOTest {
   public final ExpectedException exception = ExpectedException.none();
 
   @InjectMocks
-  private SQLRunQCDAO dao;
-
-  @Mock
-  private SQLRunDAO runDAO;
-  @Mock
-  private SQLSequencerPartitionContainerDAO sequencerPartitionContainerDAO;
+  private HibernateRunQcDao dao;
 
   @Autowired
-  @Spy
-  private JdbcTemplate jdbcTemplate;
-
+  SessionFactory sessionFactory;
 
   @Before
   public void setup() throws IOException, MisoNamingException {
     MockitoAnnotations.initMocks(this);
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setDataObjectFactory(new TgacDataObjectFactory());
-
+    dao.setSessionFactory(sessionFactory);
     SequencerPartitionContainer spp = new SequencerPartitionContainerImpl();
-    List<Partition> partitionList = new ArrayList();
+    List<Partition> partitionList = new ArrayList<>();
     Partition partition = new PartitionImpl();
     partition.setPartitionNumber(new Integer(3));
     partitionList.add(partition);
     spp.setPartitions(partitionList);
-    when(sequencerPartitionContainerDAO.lazyGet(anyLong())).thenReturn( spp);
   }
 
   @Test
@@ -105,15 +87,6 @@ public class SQLRunQCDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testLazyGet() throws Exception {
-    RunQC runQC = dao.lazyGet(3);
-    assertEquals(3, runQC.getId());
-    assertEquals("information3", runQC.getInformation());
-    assertEquals("username3", runQC.getQcCreator());
-    assertTrue(runQC.getDoNotProcess());
-  }
-
-  @Test
   public void testListByRunId() throws Exception {
     Collection<RunQC> runQCs = dao.listByRunId(2);
     RunQC runQC = runQCs.iterator().next();
@@ -140,15 +113,7 @@ public class SQLRunQCDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListPartitionSelectionsByRunQcId() throws Exception {
-    Collection<Partition> partitions = dao.listPartitionSelectionsByRunQcId(1);
-    assertEquals(1, partitions.size());
-    assertEquals(new Integer(3), partitions.iterator().next().getPartitionNumber());
-  }
-
-  @Test
   public void testRemove() throws Exception {
-    dao.setCascadeType(CascadeType.ALL);
     RunQC runQC = dao.get(3);
     boolean remove = dao.remove(runQC);
     assertTrue(remove);

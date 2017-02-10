@@ -33,12 +33,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -62,27 +61,29 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -100,13 +101,15 @@ public class PoolControllerHelperService {
   @Autowired
   private RequestManager requestManager;
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-  @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
-  private BarcodeFactory barcodeFactory;
+  private PrinterService printerService;
   @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
+  private ExperimentService experimentService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
+  @Autowired
+  private StudyService studyService;
 
   public JSONObject getPoolQcTypes(HttpSession session, JSONObject json) {
     try {
@@ -135,7 +138,7 @@ public class PoolControllerHelperService {
       if (json.has("poolId") && !isStringEmptyOrNull(json.getString("poolId"))) {
         Long poolId = Long.parseLong(json.getString("poolId"));
         Pool pool = requestManager.getPoolById(poolId);
-        PoolQC newQc = dataObjectFactory.getPoolQC();
+        PoolQC newQc = new PoolQCImpl();
         if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
           pool.setQcPassed(true);
         }
@@ -240,10 +243,10 @@ public class PoolControllerHelperService {
     StringBuilder sb = new StringBuilder();
     sb.append("<div id='dilslist' class='checklist' style='width: 100%;'>");
     for (String s : codes) {
-      Dilution ed = requestManager.getDilutionByBarcode(s);
+      Dilution ed = dilutionService.getByBarcode(s);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (ed == null) {
-        ed = requestManager.getDilutionByBarcode(new String(Base64.decodeBase64(s)));
+        ed = dilutionService.getByBarcode(new String(Base64.decodeBase64(s)));
       }
       if (ed != null) {
         sb.append("<span>");
@@ -321,6 +324,7 @@ public class PoolControllerHelperService {
     File temploc = getBarcodeFileLocation(session);
     try {
       Pool pool = requestManager.getPoolById(poolId);
+      BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
 
@@ -357,51 +361,33 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject printPoolBarcodes(HttpSession session, JSONObject json) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      JSONArray ss = JSONArray.fromObject(json.getString("pools"));
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new BarcodePrintAssister<Pool>() {
 
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
+      @Override
+      public Pool fetch(long id) throws IOException {
+        return requestManager.getPoolById(id);
       }
 
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Pool.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
+      @Override
+      public void store(Pool item) throws IOException {
+        requestManager.savePool(item);
       }
 
-      Queue<File> thingsToPrint = new LinkedList<>();
-      for (JSONObject p : (Iterable<JSONObject>) ss) {
-        try {
-          Long poolId = p.getLong("poolId");
-          Pool pool = requestManager.getPoolById(poolId);
-
-          File f = mps.getLabelFor(pool);
-          if (f != null) thingsToPrint.add(f);
-        } catch (IOException e) {
-          log.error("error printing pool barcode", e);
-          return JSONUtils.SimpleJSONError("Error printing pool barcode: " + e.getMessage());
-        }
+      @Override
+      public String getGroupName() {
+        return "pools";
       }
 
-      PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (MisoPrintException e) {
-      log.error("no printer of that name available", e);
-      return JSONUtils.SimpleJSONError("No printer of that name available: " + e.getMessage());
-    } catch (IOException e) {
-      log.error("cannot print barcodes", e);
-      return JSONUtils.SimpleJSONError("Cannot print barcodes: " + e.getMessage());
-    }
+      @Override
+      public String getIdName() {
+        return "poolId";
+      }
+
+      @Override
+      public Iterable<Pool> fetchAll(long projectId) throws IOException {
+        return Collections.emptyList();
+      }
+    });
   }
 
   public JSONObject changePoolIdBarcode(HttpSession session, JSONObject json) {
@@ -444,7 +430,7 @@ public class PoolControllerHelperService {
       if (searchStr.length() > 1) {
         String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
-        List<Experiment> experiments = new ArrayList<>(requestManager.listAllExperiments());
+        List<Experiment> experiments = new ArrayList<>(experimentService.listAll());
         int numMatches = 0;
         for (Experiment e : experiments) {
           if (e.getPlatform().getPlatformType().equals(PlatformType.valueOf(platformType))) {
@@ -483,7 +469,7 @@ public class PoolControllerHelperService {
       Pool p = requestManager.getPoolById(poolId);
 
       Long studyId = json.getLong("studyId");
-      Study s = requestManager.getStudyById(studyId);
+      Study s = studyService.get(studyId);
 
       if (json.has("runId") && json.get("runId") != null) {
         Long runId = json.getLong("runId");
@@ -491,7 +477,7 @@ public class PoolControllerHelperService {
         if (r != null) {
           StringBuilder sb = new StringBuilder();
 
-          Experiment e = dataObjectFactory.getExperiment();
+          Experiment e = new ExperimentImpl();
           e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType() + "_" + (s.getExperiments().size() + 1));
           e.setTitle(s.getProject().getName() + " " + r.getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
           e.setDescription(s.getProject().getAlias());
@@ -502,7 +488,7 @@ public class PoolControllerHelperService {
           try {
             p.addExperiment(e);
             e.setLastModifier(user);
-            requestManager.saveExperiment(e);
+            experimentService.save(e);
           } catch (MalformedExperimentException e1) {
             log.error("save experiment", e1);
           }
@@ -639,15 +625,8 @@ public class PoolControllerHelperService {
 
     try {
       Pool pool = requestManager.getPoolById(poolId);
-      Note note = requestManager.getNoteById(noteId);
-      if (pool.getNotes().contains(note)) {
-        pool.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        requestManager.savePool(pool);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Pool does not have note " + noteId + ". Cannot remove");
-      }
+      requestManager.deletePoolNote(pool, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("cannot remove note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
@@ -691,13 +670,11 @@ public class PoolControllerHelperService {
       if (!pool.userCanWrite(user)) {
         return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
       }
-      @SuppressWarnings("unchecked")
-      Dilution target = requestManager.getLibraryDilutionById(dilutionId);
+      LibraryDilution target = dilutionService.get(dilutionId);
       if (target == null) {
         return JSONUtils.SimpleJSONError("No such element.");
       }
       pool.getPoolableElements().add(target);
-      pool.setLastModified(new Date());
       pool.setLastModifier(user);
       requestManager.savePool(pool);
       return JSONUtils.SimpleJSONResponse("Pool modified.");
@@ -725,7 +702,6 @@ public class PoolControllerHelperService {
       }
       if (target != null) {
         pool.getPoolableElements().remove(target);
-        pool.setLastModified(new Date());
         pool.setLastModifier(user);
         requestManager.savePool(pool);
       }
@@ -744,19 +720,19 @@ public class PoolControllerHelperService {
     this.requestManager = requestManager;
   }
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
-    this.barcodeFactory = barcodeFactory;
-  }
-
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
-    this.printManager = printManager;
+  public void setPrinterService(PrinterService printerService) {
+    this.printerService = printerService;
+  }
+
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 }

@@ -29,7 +29,6 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * Defines a DAO interface for storing Dilutions
@@ -37,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<LibraryDilution>, NamingSchemeAware {
+public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<LibraryDilution> {
   /**
    * List all LibraryDilutions by a given parent library ID
    *
@@ -97,32 +96,6 @@ public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<Li
    *           when
    */
   Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
-
-  /**
-   * Get a Dilution by ID barcode, given a PlatformType
-   *
-   * @param barcode
-   *          of type String
-   * @param platformType
-   *          of type PlatformType
-   * @return Dilution
-   * @throws IOException
-   *           when
-   */
-  LibraryDilution getLibraryDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException;
-
-  /**
-   * Get a Dilution by ID, given a PlatformType
-   *
-   * @param dilutionId
-   *          of type long
-   * @param platformType
-   *          of type PlatformType
-   * @return Dilution
-   * @throws IOException
-   *           when
-   */
-  LibraryDilution getLibraryDilutionByIdAndPlatform(long dilutionId, PlatformType platformType) throws IOException;
 
   /**
    * Get a LibraryDilution by ID barcode

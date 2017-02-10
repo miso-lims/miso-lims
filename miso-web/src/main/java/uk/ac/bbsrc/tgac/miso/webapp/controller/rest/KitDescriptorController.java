@@ -7,13 +7,9 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response.Status;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,20 +19,27 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
 
 @Controller
 @RequestMapping("/rest")
 public class KitDescriptorController extends RestController {
   
   @Autowired
-  private RequestManager requestManager;
+  private KitService kitService;
   
   @Autowired
   private SecurityManager securityManager;
+
+  public void setKitService(KitService kitService) {
+    this.kitService = kitService;
+  }
 
   private static KitDescriptorDto writeUrls(KitDescriptorDto kitDescriptorDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
@@ -48,7 +51,7 @@ public class KitDescriptorController extends RestController {
   @RequestMapping(value = "/kitdescriptor/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public KitDescriptorDto getKitDescriptor(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) throws IOException {
-    KitDescriptor kd = requestManager.getKitDescriptorById(id);
+    KitDescriptor kd = kitService.getKitDescriptorById(id);
     if (kd == null) {
       throw new RestException("No kit descriptor found with ID: " + id, Status.NOT_FOUND);
     } else {
@@ -61,7 +64,7 @@ public class KitDescriptorController extends RestController {
   @RequestMapping(value = "/kitdescriptors", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<KitDescriptorDto> getKitDescriptors(UriComponentsBuilder uriBuilder) throws IOException {
-    Collection<KitDescriptor> kitDescriptors = requestManager.listAllKitDescriptors();
+    Collection<KitDescriptor> kitDescriptors = kitService.listKitDescriptors();
     Set<KitDescriptorDto> dtos = Dtos.asKitDescriptorDtos(kitDescriptors);
     for (KitDescriptorDto dto : dtos) {
       writeUrls(dto, uriBuilder);
@@ -77,7 +80,7 @@ public class KitDescriptorController extends RestController {
     KitDescriptor kd = Dtos.to(kitDescriptorDto);
     kd.setId(KitDescriptor.UNSAVED_ID);
     kd.setLastModifier(user);
-    requestManager.saveKitDescriptor(kd);
+    kitService.saveKitDescriptor(kd);
   }
   
   @RequestMapping(value = "/kitdescriptor/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
@@ -87,7 +90,7 @@ public class KitDescriptorController extends RestController {
       UriComponentsBuilder uriBuilder) throws IOException {
     KitDescriptor kd = Dtos.to(kitDescriptorDto);
     kd.setId(id);
-    requestManager.saveKitDescriptor(kd);
+    kitService.saveKitDescriptor(kd);
   }
 
 }

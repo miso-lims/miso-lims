@@ -28,10 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +42,13 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
 
 @Controller
 @RequestMapping("/kitdescriptor")
@@ -59,17 +57,14 @@ public class EditKitDescriptorController {
   protected static final Logger log = LoggerFactory.getLogger(EditKitDescriptorController.class);
 
   @Autowired
-  private RequestManager requestManager;
-
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+  private KitService kitService;
   
   @Autowired
   private SecurityManager securityManager;
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getKitDescriptorColumnSizes();
+    return kitService.getKitDescriptorColumnSizes();
   }
 
   @ModelAttribute("kitTypes")
@@ -82,12 +77,8 @@ public class EditKitDescriptorController {
     return Arrays.asList(PlatformType.values());
   }
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setKitService(KitService kitService) {
+    this.kitService = kitService;
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -104,12 +95,11 @@ public class EditKitDescriptorController {
         kitDescriptor = new KitDescriptor();
         model.put("title", "New Kit Descriptor");
       } else {
-        kitDescriptor = requestManager.getKitDescriptorById(kitDescriptorId);
+        kitDescriptor = kitService.getKitDescriptorById(kitDescriptorId);
+        if (kitDescriptor == null) {
+          throw new SecurityException("No such Kit Descriptor");
+        }
         model.put("title", kitDescriptor.getName());
-      }
-
-      if (kitDescriptor == null) {
-        throw new SecurityException("No such Kit Descriptor");
       }
 
       model.put("formObj", kitDescriptor);
@@ -129,7 +119,7 @@ public class EditKitDescriptorController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       kitDescriptor.setLastModifier(user);
-      requestManager.saveKitDescriptor(kitDescriptor);
+      kitService.saveKitDescriptor(kitDescriptor);
       session.setComplete();
       model.clear();
       return "redirect:/miso/kitdescriptor/" + kitDescriptor.getId();

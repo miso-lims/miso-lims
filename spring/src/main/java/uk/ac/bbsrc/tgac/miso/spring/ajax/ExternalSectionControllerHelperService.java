@@ -35,8 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -60,13 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public class ExternalSectionControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(DashboardHelperService.class);
   @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
-  @Autowired
   private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -83,7 +75,7 @@ public class ExternalSectionControllerHelperService {
         }
       }
 
-      if (projectCollection == null) {
+      if (projectCollection.isEmpty()) {
         b.append("You have no project.");
       } else {
         List<Project> projects = new ArrayList<>(projectCollection);
@@ -108,7 +100,6 @@ public class ExternalSectionControllerHelperService {
     try {
       Long projectId = json.getLong("projectId");
       StringBuilder projectSb = new StringBuilder();
-      StringBuilder runSb = new StringBuilder();
       StringBuilder sampleQcSb = new StringBuilder();
       Project project = requestManager.getProjectById(projectId);
       projectSb.append("<div class='report'>");
@@ -224,7 +215,7 @@ public class ExternalSectionControllerHelperService {
       for (Sample sample : requestManager.listAllSamplesByProjectId(projectId)) {
         String sampleQubit = "not available";
         if (requestManager.listAllSampleQCsBySampleId(sample.getId()).size() > 0) {
-          ArrayList<SampleQC> sampleQcList = new ArrayList(requestManager.listAllSampleQCsBySampleId(sample.getId()));
+          ArrayList<SampleQC> sampleQcList = new ArrayList<>(requestManager.listAllSampleQCsBySampleId(sample.getId()));
           SampleQC lastQc = sampleQcList.get(sampleQcList.size() - 1);
           sampleQubit = (lastQc.getResults() != null ? lastQc.getResults().toString() + " ng/µl" : "not available");
         }

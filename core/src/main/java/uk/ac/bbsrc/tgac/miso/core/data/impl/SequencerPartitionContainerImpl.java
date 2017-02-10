@@ -26,15 +26,26 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AutoPopulatingList;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -46,11 +57,19 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @date 14-May-2012
  * @since 0.1.6
  */
+@Entity
+@Table(name = "SequencerPartitionContainer")
 public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionContainer<SequencerPoolPartition> implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(SequencerPartitionContainerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(SequencerPartitionContainerImpl.class);
 
+  @OneToMany(targetEntity = PartitionImpl.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
+      @JoinColumn(name = "container_containerId", updatable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "partitions_partitionId", updatable = false) })
+  @JsonIgnore
   private List<SequencerPoolPartition> partitions = new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class);
 
+  @Transient
   private int partitionLimit = 8;
 
   /**
@@ -138,5 +157,15 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
       sb.append("!!!!! NULL PARTITIONS !!!!!");
     }
     return sb.toString();
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    SequencerPartitionContainerChangeLog changeLog = new SequencerPartitionContainerChangeLog();
+    changeLog.setSequencerPartitionContainer(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }

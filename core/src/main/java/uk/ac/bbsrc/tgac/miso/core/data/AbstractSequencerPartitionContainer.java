@@ -32,11 +32,23 @@ import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerDerivedInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -45,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.1.6
  */
+@MappedSuperclass
 public abstract class AbstractSequencerPartitionContainer<T extends Partition> implements SequencerPartitionContainer<T> {
   public static final Long UNSAVED_ID = 0L;
 
@@ -55,18 +68,33 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   // identificationBarcode is displayed as "serial number" to the user
   private String identificationBarcode;
   private String locationBarcode;
-  private Boolean paired = false;
-  private String name;
-  private Run run = null;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @ManyToMany(targetEntity = RunImpl.class)
+  @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
+      @JoinColumn(name = "containers_containerId") }, inverseJoinColumns = {
+          @JoinColumn(name = "Run_runId") })
+  private Collection<Run> runs = null;
+
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
+
+  @ManyToOne(targetEntity = PlatformImpl.class)
+  @JoinColumn(name = "platform")
   private Platform platform;
+
   private String validationBarcode;
 
-  private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  @OneToMany(targetEntity = SequencerPartitionContainerChangeLog.class, mappedBy = "sequencerPartitionContainer")
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
+  
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier")
   private User lastModifier;
-  private Date lastModified;
+
+  @OneToOne(targetEntity = ContainerDerivedInfo.class)
+  @PrimaryKeyJoinColumn
+  private ContainerDerivedInfo derivedInfo;
 
   @Override
   public User getLastModifier() {
@@ -80,12 +108,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   @Override
   public Date getLastModified() {
-    return lastModified;
-  }
-
-  @Override
-  public void setLastModified(Date lastModified) {
-    this.lastModified = lastModified;
+    return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
   @Override
@@ -124,16 +147,6 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   }
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
   public String getLabelText() {
     return getPlatform().getPlatformType().name() + " " + getValidationBarcode();
   }
@@ -153,12 +166,12 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     this.validationBarcode = validationBarcode;
   }
 
-  public Boolean getPaired() {
-    return paired;
-  }
-
-  public void setPaired(Boolean paired) {
-    this.paired = paired;
+  /**
+   * Containers don't have names, but they implement an interface which requires this method.
+   */
+  @Override
+  public String getName() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -171,13 +184,42 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   public abstract T getPartitionAt(int partitionNumber);
 
   @Override
-  public Run getRun() {
-    return run;
+  public Collection<Run> getRuns() {
+    return runs;
+  }
+
+  @Override
+  public void setRuns(Collection<Run> runs) {
+    this.runs = runs;
+  }
+
+  @Override
+  public Run getLastRun() {
+    Run lastRun = null;
+    for (Run thisRun : getRuns()) {
+      if (lastRun == null) {
+        lastRun = thisRun;
+      } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() == null) {
+        if (thisRun.getLastUpdated().after(lastRun.getLastUpdated())) lastRun = thisRun;
+      } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() != null) {
+        lastRun = thisRun;
+      } else if (lastRun.getStatus().getStartDate() != null && thisRun.getStatus().getStartDate() == null) {
+        continue;
+      } else if (thisRun.getStatus().getStartDate().after(lastRun.getStatus().getStartDate())) {
+        lastRun = thisRun;
+      }
+    }
+    return lastRun;
   }
 
   @Override
   public void setRun(Run run) {
-    this.run = run;
+    if (run != null && runs.size() > 1) {
+      throw new IllegalArgumentException("Cannot set single run on a container with multiple runs already linked!");
+    } else {
+      runs = new ArrayList<>();
+      if (run != null) runs.add(run);
+    }
   }
 
   @Override
@@ -224,7 +266,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     if (obj == null) return false;
     if (obj == this) return true;
     if (!(obj instanceof SequencerPartitionContainer)) return false;
-    SequencerPartitionContainer them = (SequencerPartitionContainer) obj;
+    SequencerPartitionContainer<?> them = (SequencerPartitionContainer<?>) obj;
     // If not saved, then compare resolved actual objects. Otherwise just compare IDs.
     if (getId() == AbstractSequencerPartitionContainer.UNSAVED_ID || them.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
       return getIdentificationBarcode().equals(them.getIdentificationBarcode());
@@ -256,8 +298,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   }
 
   @Override
-  public int compareTo(Object o) {
-    SequencerPartitionContainer t = (SequencerPartitionContainer) o;
+  public int compareTo(SequencerPartitionContainer<?> t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

@@ -149,7 +149,6 @@
                 <th>Name</th>
                 <th>Platform</th>
                 <th>Hostname</th>
-                <th>Available</th>
                 <th>View Stats</th>
                 <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <th class="fit">Edit</th>
@@ -166,38 +165,27 @@
                     <td>${ref.platform.nameAndModel}</td>
                     <td>${ref.FQDN}</td>
                     <c:choose>
-                      <c:when test="${ref.available}">
-                        <td style="background-color:green"></td>
-                        <c:choose>
-                          <c:when test="${ref.platform.platformType.key eq 'Illumina'}">
-                            <td><a href="<c:url value="/miso/stats/illumina/${ref.id}"/>">View</a></td>
-                          </c:when>
-                          <c:when test="${ref.platform.platformType.key eq 'LS454'}">
-                            <td><a href="<c:url value="/miso/stats/ls454/${ref.id}"/>">View</a></td>
-                          </c:when>
-                          <c:when test="${ref.platform.platformType.key eq 'Solid'}">
-                            <td><a href="<c:url value="/miso/stats/solid/${ref.id}"/>">View</a> (<a
-                                    href="http://${ref.FQDN}${path}">SETS</a>)
-                            </td>
-                          </c:when>
-                          <c:when test="${ref.platform.platformType.key eq 'PacBio'}">
-                            <td><a href="<c:url value="/miso/stats/pacbio/${ref.id}"/>">View</a></td>
-                          </c:when>
-                          <c:otherwise>
-                            <td><a href="http://${ref.FQDN}${path}">View</a></td>
-                          </c:otherwise>
-                        </c:choose>
-                      </c:when>
-                      <c:otherwise>
-                        <td style="background-color:red"></td>
-                        <td><i>Unavailable</i></td>
-                      </c:otherwise>
+                    <c:when test="${ref.platform.platformType.key eq 'Illumina'}">
+                      <td><a href="<c:url value="/miso/stats/illumina/${ref.id}"/>">View</a></td>
+                    </c:when>
+                    <c:when test="${ref.platform.platformType.key eq 'LS454'}">
+                      <td><a href="<c:url value="/miso/stats/ls454/${ref.id}"/>">View</a></td>
+                    </c:when>
+                    <c:when test="${ref.platform.platformType.key eq 'Solid'}">
+                      <td><a href="<c:url value="/miso/stats/solid/${ref.id}"/>">View</a> (<a href="http://${ref.FQDN}${path} }">SETS</a>)</td>
+                    </c:when>
+                    <c:when test="${ref.platform.platformType.key eq 'PacBio'}">
+                      <td><a href="<c:url value="/miso/stats/pacbio/${ref.id}"/>">View</a></td>
+                    </c:when>
+                    <c:otherwise>
+                      <td><a href="http://${ref.FQDN}${path}">View</a></td>
+                    </c:otherwise>
                     </c:choose>
                     <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                       <td class="misoicon"
                           onclick="window.location.href='<c:url value="/miso/stats/sequencer/${ref.id}"/>'"><span
                               class="ui-icon ui-icon-pencil"/></td>
-                      <td class="misoicon" onclick="Sequencer.ui.deleteSequencerReference(${ref.id}, pageReload);"><span
+                      <td class="misoicon" onclick="Sequencer.ui.deleteSequencerReference(${ref.id}, Utils.page.pageReload);"><span
                               class="ui-icon ui-icon-trash"/></td>
                     </c:if>
                   </tr>
