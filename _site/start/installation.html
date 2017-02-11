@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : Installing MISO</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/styles/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/styles/main.css">
+    </head>
+    <body>
+<a href="https://github.com/TGAC/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+
+
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/"><img src="/miso-lims/images/MISO.png"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+<span class="badge" style="position: relative;left:20px;bottom:20px;background:#8DBDD8;">Original</span>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/">Home</a></li>-->
+    <a href="/miso-lims/about">About</a>
+    <hr>
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Getting Started</li>
+            
+            <li data-order="1"><a href="/miso-lims/start/installation.html">Installing MISO</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/start/getting-started.html">Getting Started</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Manuals</li>
+            
+            <li data-order="1"><a href="/miso-lims/manuals/developers-manual.html">Developer's Manual</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/manuals/admin-manual.html">Administrator's Manual</a></li>
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+<hr>
+<a href="https://twitter.com/misolims" class="twitter-follow-button" data-show-count="false">Follow @misolims</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>Installing MISO
+        
+    </h2>
+</div>
+
+<h2 id="docker">Docker</h2>
+
+<p>The simplest way to get MISO up and running quickly is to use <a href="https://www.docker.com/">Docker</a>. Images of the most recent MISO releases are available on Docker Hub in <a href="https://hub.docker.com/r/misolims/miso-lims/">misolims/miso-lims</a>. The Docker container is intended as a demonstration and not a permanent installation.</p>
+
+<p>To use it:</p>
+
+<ol>
+  <li><a href="https://www.docker.com/products/docker">Install Docker 1.9.1+</a></li>
+  <li><code class="highlighter-rouge">docker pull misolims/miso-lims</code></li>
+  <li><code class="highlighter-rouge">docker run -p 8090:8080 -d -t misolims/miso-lims</code></li>
+</ol>
+
+<p>Navigate to <a href="http://localhost:8090">http://localhost:8090</a> to login to miso with the credentials <strong>admin/admin</strong>.</p>
+
+<h2 id="virtual-box">Virtual Box</h2>
+
+<p>An older version of MISO is available in our our virtual machine image with everything preinstalled. A VirtualBox instance is available with a self-contained MISO installation and MySQL database server, fully configured and can be used out-of-the-box.</p>
+
+<p>To use it:</p>
+
+<h1 id="download-virtualbox-software-from-httpswwwvirtualboxorg">Download VirtualBox software from: https://www.virtualbox.org/</h1>
+<p># Download the MISO OVA: https://repos.tgac.ac.uk/miso/latest/MISO_Image.ova
+# Import this OVA file into VirtualBox via File → Import Appliance. You may have to select Bridged Adaptor instead of NAT in the network settings.
+# Start the instance. Starting the appliance will result in an Ubuntu virtual machine complete with all MISO’s prerequisites pre-installed. The login for the virtual image is miso / misoadmin.
+# Start MISO server by using ./misoStart.sh and then open the browser and go http://localhost:8080/
+# Log in to MISO using admin / admin. Only some simple configuration for certain elements is required, such as Sequencer References, Printers and any additional users and groups.</p>
+
+<h2 id="installing-from-source">Installing from source</h2>
+
+<p>To run your own MISO instance in the long term, you will need to maintain your own fork of the MISO codebase with your configuration changes. For each release, you will need to merge the main changes into your local repository and then deploy a new version.</p>
+
+<p>For deployment, you will need a mySQL database server, a server to scan the sequencer output directories (the notification server), and a Tomcat application server. These can be on the same machine. It is advisable to have a separate build environment.</p>
+
+<p>At each upgrade, there are two steps: migrating the database and deploying a new application. Each version of the application contains all the migrations needed to upgrade any old database to match the current version. However, there is no rollback procedure, so a full database backup should be taken before migration.</p>
+
+<p>Installation and configuration details can be found in the <a href="/miso-lims/adm/admin-manual">MISO admin guide</a>.</p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script src="/miso-lims/styles/navigation.js"></script>
+        
+    </body>
+</html>

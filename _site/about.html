@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : About MISO</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/styles/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/styles/main.css">
+    </head>
+    <body>
+<a href="https://github.com/TGAC/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+
+
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/"><img src="/miso-lims/images/MISO.png"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+<span class="badge" style="position: relative;left:20px;bottom:20px;background:#8DBDD8;">Original</span>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/">Home</a></li>-->
+    <a href="/miso-lims/about">About</a>
+    <hr>
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Getting Started</li>
+            
+            <li data-order="1"><a href="/miso-lims/start/installation.html">Installing MISO</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/start/getting-started.html">Getting Started</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Manuals</li>
+            
+            <li data-order="1"><a href="/miso-lims/manuals/developers-manual.html">Developer's Manual</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/manuals/admin-manual.html">Administrator's Manual</a></li>
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+<hr>
+<a href="https://twitter.com/misolims" class="twitter-follow-button" data-show-count="false">Follow @misolims</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>About MISO
+        
+    </h2>
+</div>
+
+<p><a href="https://github.com/TGAC/miso-lims">MISO</a> (<u>M</u>anaging <u>I</u>nformation for <u>S</u>equencing <u>O</u>perations) is the Lab Information Management System developed at <a href="http://www.earlham.ac.uk/">Earlham</a>. MISO is heavily modelled upon the submission schemas specified by the <a href="http://www.ebi.ac.uk/ena/">SRA</a> and is therefore able to automatically generate and deploy the required XML and data files.</p>
+
+<h3 id="history">History</h3>
+
+<p>MISO has been developed by the <a href="http://www.earlham.ac.uk/davey-group">Davey group</a> at Earlham Institute since February 2010. The first version of MISO was released internally to Earlham staff on 19th Sept 2011. The first beta community release of MISO was 0.1.6, released May 31st, 2012. Since then, a small dedicated software team has provided the fixes and patches needed to support the institute. For more information, see the <a href="http://www.earlham.ac.uk/miso/">MISO website at Earlham</a>.</p>
+
+<p>In 2015, the <a href="http://labs.oicr.on.ca/genome-sequence-informatics/">Genome Sequence Informatics</a> team at OICR chose MISO as their new LIMS system. OICR did not want to fork MISO entirely, so together the team at Earlham and OICR worked out a development plan to better support multiple institutes with the same code base.</p>
+
+<p>Presently, MISO has four full-time developers between the two institutions. All active work is visible on Github and undergoes thorough code reviews and testing before being integrated into the mainline branches. Releases are pushed weekly to Github.</p>
+
+<h2 id="overview-of-features">Overview of Features</h2>
+
+<p>Both flavours:</p>
+
+<ul>
+  <li><strong>Track Sample and Library preparation</strong> - support for multiple technicians and many different workflows for sample and library preparation, customizable for your needs.</li>
+  <li><strong>Order sequencing lanes/cells</strong> - Control how much sequencing is required and automatically record how much is completed for a sample</li>
+  <li><strong>Monitor sequencing runs</strong> - output and provide notifications and metrics for different sequencing platforms, including Illumina, PacBio, 454, Solid and ONT</li>
+  <li><strong>Multiple user role support</strong> – user-centric access control to designated areas Laboratory tracking – project description, sample receipt, library preparation, run construction, and barcoding</li>
+  <li><strong>Lab instrument support</strong> – extensions available to use barcode printers, plate scanners and hand scanners directly in the MISO interface</li>
+  <li><strong>Reporting</strong> – personalised and filtered accurate statistics from library preparation and sequencing processes and including graphical visualisations</li>
+  <li><strong>Project tracking</strong> – through “traffic light” indicators and statistics graphs and plots, MISO can easily show the status of each project and run statistics</li>
+  <li><strong>SRA Submission</strong> – automated packaging of sequencing data and metadata, deployment of these data to remote public repositories (i.e. EBI SRA)</li>
+  <li><strong>Mature, open and extendable</strong> - in production use for several years, fully open and available, with strong support from major institutions, and a dedicated development team</li>
+</ul>
+
+<p>Original flavour (Earlham Institute):</p>
+
+<ul>
+  <li><strong>Bioinformatics pipelines</strong> – monitoring and reporting of analytical processes, interacting directly with the computing cluster</li>
+  <li><strong>Autogenerated tracking barcodes</strong> - print barcodes directly from MISO using your Brady printer to affix to lab equipment</li>
+  <li><strong>Spreadsheet-based sample receipt</strong></li>
+</ul>
+
+<p>OICR flavour (Ontario Institute for Cancer Research):</p>
+
+<ul>
+  <li><strong>Sample Hierarchy</strong> - enter tissues, stocks, aliquots and other types of samples and enforce their relationships with each other</li>
+  <li><strong>Detailed Samples</strong> - More attributes for Samples and Libraries to describe tissue types and origins, disease status, sample identifiers from other system (e.g. BioBank IDs), library design.</li>
+</ul>
+
+<p>Coupled with the open-source ethos of community development, MISO can make for a cost-effective, highly modifiable and robust system that can benefit both the public knowledge repositories and sequencing centres of all sizes.</p>
+
+<h2 id="community">Community</h2>
+
+<p>MISO is <a href="https://github.com/TGAC/miso-lims">open-source and freely available</a> for usage and modification according to the GNU Public Licence V3 (GPL3)</p>
+
+<p>Ask questions or report bugs on the <a href="https://github.com/TGAC/miso-lims/issues">Github tracker</a></p>
+
+<p>Join the developer discussion (and occasional meme) at http://miso-lims.slack.com</p>
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script src="/miso-lims/styles/navigation.js"></script>
+        
+    </body>
+</html>

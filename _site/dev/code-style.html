@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : Code Style</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/styles/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/styles/main.css">
+    </head>
+    <body>
+<a href="https://github.com/TGAC/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+
+
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/"><img src="/miso-lims/images/MISO.png"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+<span class="badge" style="position: relative;left:20px;bottom:20px;background:#8DBDD8;">Original</span>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/">Home</a></li>-->
+    <a href="/miso-lims/">Home</a>
+    <hr>
+    <a href="/miso-lims/manuals/developers-manual"><b>Developer's Manual</b></a>
+        
+
+        
+            
+                <li class="nav-header"></li>
+            
+            <li data-order=""><a href="/miso-lims/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/rest-api.html">REST API</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/kit-tracking.html">Kit Tracking</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order="2"><a href="/miso-lims/dev/code-style.html">Code Style</a></li>
+        
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <h2 id="java-coding-convention">Java Coding Convention</h2>
+
+<p>The MISO Java coding convention is based on the <a href="http://www.oracle.com/technetwork/java/codeconvtoc-136057.html">Oracle/Sun Java Coding Conventions</a> with the following modification:</p>
+
+<ul>
+  <li>Line indents are 2 spaces.</li>
+  <li>Line width is 140 characters.</li>
+</ul>
+
+<h2 id="xml-coding-convention">XML Coding Convention</h2>
+
+<ul>
+  <li>Line indents are 2 spaces.</li>
+  <li>Line width is 140 characters.</li>
+  <li>When formatting comments, lines are not joined. This preserves the formatting of multi-line comments making them more readable.</li>
+</ul>
+
+<h2 id="automatic-code-formatting">Automatic Code Formatting</h2>
+
+<p>Most IDEs have the ability to automatically format code on save. In addition to formatting the code to the above conventions MISO also specifies these automatic formatting rules:</p>
+
+<ul>
+  <li>Organize imports. (Remove unused. Provide full names. Sort imports.)</li>
+  <li>Add missing @Override annotations.</li>
+  <li>Add missing @Deprecated annotations.</li>
+  <li>Remove unnecessary casts.</li>
+</ul>
+
+<h2 id="ide-code-style-configuration">IDE Code Style Configuration</h2>
+
+<p>Use IDE automatic formatting features to configure code according to the MISO convention and to apply additional formatting rules.</p>
+
+<h3 id="eclipse">Eclipse</h3>
+
+<p>A set of Eclipse code formatting rules is available to automatically format code when using Eclipse. Follow the guide named <a href="/display/MISO/Eclipse+Code+Formatting">Eclipse Code Formatting</a> to setup the MISO coding standards.</p>
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script src="/miso-lims/styles/navigation.js"></script>
+
+        
+    </body>
+</html>
