@@ -1,7 +1,8 @@
 ---
-layout: page
+layout: developers
 title: "Code Style"
 category: dev
+order: 2
 date: 2016-01-12 13:40:35
 ---
 

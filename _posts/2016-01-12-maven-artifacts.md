@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: developers
 title: "Maven artifacts"
 category: dev
 date: 2016-01-12 13:47:32

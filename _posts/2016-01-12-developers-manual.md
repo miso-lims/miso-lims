@@ -1,13 +1,14 @@
 ---
-layout: page
+layout: developers
 title: "Developer's Manual"
-category: dev
+category: manuals
+order: 1
 date: 2016-01-12 13:38:53
 ---
 
 ![](/plugins/servlet/confluence/placeholder/macro?definition=e3RvYzpvdXRsaW5lPXRydWV9&locale=en_GB&version=2)
 
-# Introduction
+# Developer's Manual
 
 This is the "Really Big Index" of all MISO's major development areas. Some things may be missing here - if so, please [contact us](http://tracker.tgac.ac.uk).
 

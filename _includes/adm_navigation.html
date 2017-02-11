@@ -1,0 +1,14 @@
+<ul class="nav nav-list">
+    <!--<li><a href="{{ site.baseurl }}/">Home</a></li>-->
+    <a href="{{ site.baseurl }}/">Home</a>
+    <hr>
+    <a href="{{ site.baseurl }}/manuals/admin-manual"><b>Admin's Manual</b></a>
+        {% assign attr = 'adm' %}
+
+        {% for page in site.categories[attr] %}
+            {% if forloop.first %}
+                <li class="nav-header">{{ label }}</li>
+            {% endif %}
+            <li data-order="{{ page.order }}"><a href="{{ site.baseurl }}{{ page.url }}">{{ page.title }}</a></li>
+        {% endfor %}
+</ul>
