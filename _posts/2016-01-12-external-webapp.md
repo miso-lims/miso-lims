@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: admins
 title: "Configuring the external webapp"
 category: adm
 date: 2016-01-12 13:51:46

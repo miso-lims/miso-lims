@@ -1,7 +1,8 @@
 ---
-layout: page
+layout: developers
 title: "Eclipse Code Formatting"
 category: dev
+order: 2
 date: 2016-01-12 13:41:39
 ---
 

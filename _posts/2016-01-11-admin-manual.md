@@ -1,17 +1,17 @@
 ---
-layout: page
+layout: admins
 title: "Administrator's Manual"
-category: adm
+category: manuals
 date: 2016-01-11 13:51:46
 ---
 
 
-# Running a MISO Instance
+## Running a MISO Instance
 MISO requires some configuration directly in the source code. While we plan to
 change this over time, running an instance of MISO will require building and
 deploying a fork of the code base with customisations.
 
-# Prerequisites
+## Prerequisites
 For each service, which may be put on the same machine, the following tools are
 required:
 
@@ -39,12 +39,12 @@ Development Machine(s):
 * Eclipse
 * A merge tool such as Meld
 
-# Creating a Fork
+## Creating a Fork
 Use the GitHub interface or a private instance to create a forked repository.
 
 Proceed to set up a build environment.
 
-# Setting Up the Build Environment
+## Setting Up the Build Environment
 One or more machines should be set up to build MISO. A typical Linux system will
 work.
 
@@ -63,7 +63,7 @@ Locally, create a checkout:
     git clone you@server:your-miso.git
     git remote add tgac git@github.com:TGAC/miso-lims.git
 
-# Setting Up the Database Server
+## Setting Up the Database Server
 The database server needs to have [MySQL 5](https://www.mysql.com/). The tool
 [Flyway](https://flywaydb.org/) must also be present to migrate the database as
 the application is developed, but it can be installed on a different server so
@@ -90,7 +90,7 @@ need to add a grant privilege to the MISO database from your remote machine:
 
 Download the Flyway command line tool and install it.
 
-# Setting Up the Application Server
+## Setting Up the Application Server
 The application server needs [Tomcat 8](https://tomcat.apache.org/download-80.cgi).
 
 Create a file called `ROOT.xml` in the following directory
@@ -172,7 +172,7 @@ The configuration files are:
 | `security.properties`     | properties to set the security environment (see below).    |
 | `submission.properties`   | properties to set the submission environment.              |
 
-## Security Environment
+### Security Environment
 MISO can use either LDAP or JDBC as an authentication mechanism. The mechanism
 is set in both `/storage/miso/security.properties` and the
 `$CATALINA_HOME/bin/setenv.sh` or `/etc/default/tomcat8` files and both must be
@@ -215,7 +215,7 @@ prefix.
 If using JDBC, once running, you should change the passwords of the `admin` and
 `notification` accounts.
 
-## Naming Schemes
+### Naming Schemes
 MISO Naming Schemes are used to validate and generate entity String fields. They are
 used for all `name` fields, and some `alias` fields. You may configure a base naming
 scheme, and customize it by switching validators and generators in `miso.properties`.
@@ -237,44 +237,44 @@ default configurations:
 If the naming scheme you’ve selected has configurable components, you may configure them
 as follows.
 
-### `miso.naming.generator.nameable.name`
+#### `miso.naming.generator.nameable.name`
 
 | Option    | Example     |
 | default   | SAM1        |
 | classname | SampleImpl1 |
 
-### `miso.naming.generator.sample.alias`
+#### `miso.naming.generator.sample.alias`
 
 | Option  | Example               | Note                             |
 | oicr    | PROJ_0001_Ad_P_nn_1-1 | for use with DetailedSample only |
 
-### `miso.naming.generator.library.alias`
+#### `miso.naming.generator.library.alias`
 
 | Option  | Example                  | Note                                                                                                     |
 | default | XX_LYY-1                 | XX and YY taken from sample alias - depends on sample alias passing default validator with default regex |
 | oicr    | PROJ_0001_Ad_P_PE_300_WG | for use with DetailedSample only. depends on sample alias passing oicr validator                         |
 
-### `miso.naming.validator.nameable.name`
+#### `miso.naming.validator.nameable.name`
 
 | Option   | Detail                                       | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
 | default  | Matches 'default' generator, or custom regex | no         | no               | yes          | yes                |
 | allowany | Only checks that the name is not null        | yes        | yes              | no           | no                 |
 
-### `miso.naming.validator.sample.alias`
+#### `miso.naming.validator.sample.alias`
 
 | Option   | Detail                                         | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
 | default  | Default regex: `([A-z0-9]+)_S([A-z0-9]+)_(.*)` | no         | no               | yes          | no                 |
 | allowany | Only checks that the alias is not null         | yes        | yes              | no           | no                 |
 | oicr     | Matches 'oicr' generator                       | no         | no               | no           | no                 |
 
-### `miso.naming.validator.library.alias`
+#### `miso.naming.validator.library.alias`
 
 | Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
 | default  | Matches 'default' generator            | no         | no               | yes          | no                 |
 | allowany | Only checks that the alias is not null | yes        | yes              | no           | no                 |
 | oicr     | Matches 'oicr' generator               | no         | no               | no           | no                 |
 
-### `miso.naming.validator.project.shortName`
+#### `miso.naming.validator.project.shortName`
 
 | Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
 | allowany | Optional field, no format specified    | yes        | yes              | no           | no                 |
@@ -309,7 +309,7 @@ Java package. To create a new naming scheme option, create a new class in this p
 Extending the functionality to validate and/or generate additional fields is possible, but will
 require modifications at the Service layer as well.
 
-# Setting Up the Notification Server
+## Setting Up the Notification Server
 The notification server is a Java daemon that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
 without it, sequencer runs must be added manually. Configuration for
@@ -336,7 +336,7 @@ The service should start up. You can inspect `stdout` in
 `/srv/notification-server/notification/notification.log` file, and `stderr` by
 `sudo journalctl -f -u miso-notification`.
 
-# Building the Applicaton
+## Building the Applicaton
 Building the application is done by:
 
     mvn clean package -P external
@@ -346,7 +346,7 @@ There will be two important build artefacts:
 * `miso-web/target/ROOT.war`
 * `notification-server/target/notification-server-*.one-jar.jar`
 
-# Releasing and Upgrading
+## Releasing and Upgrading
 
 To install or upgrade, perform the following steps:
 
@@ -360,7 +360,7 @@ To install or upgrade, perform the following steps:
 1. Copy the `notification-server-*.one-jar.jar` to `/srv/notification-server/notification-server.jar`.
 1. Restart the notification server.
 
-## Migrating the database
+### Migrating the database
 Updating the database (or setting it up initially) will apply patches to the database using Flyway using the `ROOT.war`.
 
     cd ${FLYWAY}
@@ -370,7 +370,7 @@ Updating the database (or setting it up initially) will apply patches to the dat
 
 
 
-# Building the Docker image
+## Building the Docker image
 
 Pull the tag or snapshot that you want to build and package it:
 

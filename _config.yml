@@ -1,6 +1,8 @@
 # Site title and subtitle. This is used in _includes/header.html
 title: 'MISO'
 subtitle: 'An open-source LIMS for NGS sequencing centres'
+miso_flavour: 'Original'
+miso_colour: '#8DBDD8'
 
 # if you wish to integrate disqus on pages set your shortname here
 disqus_shortname: ''
@@ -20,11 +22,12 @@ codeurl: 'https://github.com/TGAC/miso-lims'
 # Default categories (in order) to appear in the navigation
 sections: [
     ['start', 'Getting Started'],
-    ['usr', 'User Guides'],
-    ['adm', 'Admin Guides'],
-    ['dev', 'Developer Guides'],
-    ['ref', 'Reference'],
-    ['post', 'Posts']
+    ['manuals', 'Manuals']
+#    ['usr', 'User Guides'],
+#    ['adm', 'Admin Guides'],
+#    ['dev', 'Developer Guides'],
+#    ['ref', 'Reference'],
+#    ['post', 'Posts']
 ]
 
 # Keep as an empty string if served up at the root. If served up at a specific

@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: developers
 title: "Kit Tracking"
 category: dev
 date: 2016-01-12 13:42:52
