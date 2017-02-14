@@ -79,7 +79,7 @@ ALTER TABLE SequencerReference ADD COLUMN ip VARCHAR(50) NOT NULL DEFAULT 'local
 -- H2 doesn't have INET_NTOA function
 -- StartNoTest
 UPDATE SequencerReference SET ip = INET_NTOA(ipAddress);
---EndNoTest
+-- EndNoTest
 ALTER TABLE SequencerReference DROP COLUMN available;
 ALTER TABLE SequencerReference DROP COLUMN ipAddress;
 ALTER TABLE SequencerReference ADD CONSTRAINT upgraded_SR_UK UNIQUE (upgradedSequencerReferenceId);
@@ -124,7 +124,7 @@ UPDATE RunQC_Partition rqp SET partition_partitionId = (
   AND p.partitionNumber = rqp.partitionNumber
 );
 ALTER TABLE RunQC_Partition CHANGE COLUMN partition_partitionId partition_partitionId BIGINT(20) NOT NULL;
---EndNoTest
+-- EndNoTest
 ALTER TABLE RunQC_Partition DROP PRIMARY KEY;
 ALTER TABLE RunQC_Partition ADD PRIMARY KEY(`runQc_runQcId`, `partition_partitionId`);
 ALTER TABLE RunQC_Partition ADD CONSTRAINT RunQCPartition_Partition_FK FOREIGN KEY (partition_partitionId) REFERENCES `_Partition` (partitionId);
@@ -521,6 +521,7 @@ ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_lastModifier_user 
 ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_library FOREIGN KEY (library_libraryId) REFERENCES Library (libraryId);
 ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_targetedSequencing FOREIGN KEY (targetedSequencingId) REFERENCES TargetedSequencing (targetedSequencingId);
 
+DROP TRIGGER IF EXISTS LibraryAdditionalInfoChange;
 ALTER TABLE LibraryAdditionalInfo RENAME TO DetailedLibrary;
 ALTER TABLE DetailedLibrary DROP FOREIGN KEY `libraryAdditionalInfo_createUser_fkey`;
 ALTER TABLE DetailedLibrary DROP COLUMN createdBy;
