@@ -24,12 +24,12 @@ An older version of MISO is available in our our virtual machine image with ever
 
 To use it:
 
-# Download VirtualBox software from: https://www.virtualbox.org/
-# Download the MISO OVA: https://repos.tgac.ac.uk/miso/latest/MISO_Image.ova
-# Import this OVA file into VirtualBox via File → Import Appliance. You may have to select Bridged Adaptor instead of NAT in the network settings.
-# Start the instance. Starting the appliance will result in an Ubuntu virtual machine complete with all MISO’s prerequisites pre-installed. The login for the virtual image is miso / misoadmin.
-# Start MISO server by using ./misoStart.sh and then open the browser and go http://localhost:8080/
-# Log in to MISO using admin / admin. Only some simple configuration for certain elements is required, such as Sequencer References, Printers and any additional users and groups.
+1. Download VirtualBox software from: https://www.virtualbox.org/
+1. Download the MISO OVA: https://repos.tgac.ac.uk/miso/latest/MISO_Image.ova
+1. Import this OVA file into VirtualBox via File → Import Appliance. You may have to select Bridged Adaptor instead of NAT in the network settings.
+1. Start the instance. Starting the appliance will result in an Ubuntu virtual machine complete with all MISO’s prerequisites pre-installed. The login for the virtual image is miso / misoadmin.
+1. Start MISO server by using ./misoStart.sh and then open the browser and go http://localhost:8080/
+1. Log in to MISO using admin / admin. Only some simple configuration for certain elements is required, such as Sequencer References, Printers and any additional users and groups.
 
 ## Installing from source
 
