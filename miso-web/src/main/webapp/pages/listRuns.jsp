@@ -43,6 +43,9 @@
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {
+        Run.platformTypes = [
+         <c:forEach item="${uk.ac.bbsrc.tgac.miso.core.data.type.PlatformTypes.values()}" var="pt">{ name : "${pt.name()}", key : "${pt.key}" },</c:forEach>
+        ];
         Run.ui.createListingRunsTable();
       });
     </script>

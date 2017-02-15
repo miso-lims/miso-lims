@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -56,19 +56,16 @@ import org.xml.sax.SAXException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersCollection;
@@ -129,14 +126,12 @@ public class IlluminaNotificationMessageConsumerMechanism
       String runName = run.getString(IlluminaTransformer.JSON_RUN_NAME);
       sb.append("Processing " + runName);
       log.debug("Processing " + runName);
-      Status is = new IlluminaStatus();
-      is.setRunName(runName);
-      Run r = null;
+      IlluminaRun r = null;
 
       Matcher m = p.matcher(runName);
       if (m.matches()) {
         try {
-          r = requestManager.getRunByAlias(runName);
+          r = (IlluminaRun) requestManager.getRunByAlias(runName);
         } catch (IOException ioe) {
           log.warn(
               "Cannot find run by the alias " + runName
@@ -151,19 +146,22 @@ public class IlluminaNotificationMessageConsumerMechanism
             if (!run.has(IlluminaTransformer.JSON_STATUS)) {
               // probably MiSeq
               r = new IlluminaRun();
-              r.setPlatformRunId(Integer.parseInt(m.group(2)));
               r.setAlias(runName);
               r.setFilePath(runName);
               r.setDescription(m.group(3));
               r.setPairedEnd(false);
-              is.setHealth(ht);
-              r.setStatus(is);
+              r.setHealth(ht);
             } else {
               String xml = run.getString(IlluminaTransformer.JSON_STATUS);
-              is = new IlluminaStatus(xml);
-              r = new IlluminaRun(xml);
-              is.setHealth(ht);
-              r.getStatus().setHealth(ht);
+              r = IlluminaRun.createRunFromXml(xml, t -> {
+                try {
+                  return requestManager.getSequencerReferenceByName(t);
+                } catch (IOException e) {
+                  log.warn("Cannot find sequencer: " + t, e);
+                  return null;
+                }
+              });
+              r.setHealth(ht);
             }
 
             if (run.has(IlluminaTransformer.JSON_FULL_PATH)) {
@@ -171,26 +169,21 @@ public class IlluminaNotificationMessageConsumerMechanism
             }
 
             if (run.has(IlluminaTransformer.JSON_NUM_CYCLES)) {
-              r.setCycles(Integer.parseInt(run.getString(IlluminaTransformer.JSON_NUM_CYCLES)));
+              r.setNumCycles(Integer.parseInt(run.getString(IlluminaTransformer.JSON_NUM_CYCLES)));
             }
 
             SequencerReference sr = null;
             if (run.has(IlluminaTransformer.JSON_SEQUENCER_NAME)) {
               sr = requestManager.getSequencerReferenceByName(run.getString(IlluminaTransformer.JSON_SEQUENCER_NAME));
-              r.getStatus().setInstrumentName(run.getString(IlluminaTransformer.JSON_SEQUENCER_NAME));
               r.setSequencerReference(sr);
             }
             if (r.getSequencerReference() == null) {
               sr = requestManager.getSequencerReferenceByName(m.group(1));
               r.setSequencerReference(sr);
             }
-            if (r.getSequencerReference() == null) {
-              sr = requestManager.getSequencerReferenceByName(r.getStatus().getInstrumentName());
-              r.setSequencerReference(sr);
-            }
 
             if (r.getSequencerReference() == null) {
-              log.error("Cannot save " + is.getRunName() + ": no sequencer reference available.");
+              log.error("Cannot save " + runName + ": no sequencer reference available.");
             } else {
               log.debug("Setting sequencer reference: " + sr.getName());
 
@@ -199,7 +192,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                   if (!isStringEmptyOrNull(run.getString(IlluminaTransformer.JSON_START_DATE))
                       && !"null".equals(run.getString(IlluminaTransformer.JSON_START_DATE))) {
                     log.debug("Updating start date:" + run.getString(IlluminaTransformer.JSON_START_DATE));
-                    r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString(IlluminaTransformer.JSON_START_DATE)));
+                    r.setStartDate(illuminaRunFolderDateFormat.parse(run.getString(IlluminaTransformer.JSON_START_DATE)));
                   }
                 } catch (ParseException e) {
                   log.error("run JSON", e);
@@ -211,7 +204,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                   if (!"null".equals(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE))
                       && !isStringEmptyOrNull(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE))) {
                     log.debug("Updating completion date:" + run.getString(IlluminaTransformer.JSON_COMPLETE_DATE));
-                    r.getStatus().setCompletionDate(logDateFormat.parse(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)));
+                    r.setCompletionDate(logDateFormat.parse(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)));
                   }
                 } catch (ParseException e) {
                   log.error("run JSON", e);
@@ -225,51 +218,30 @@ public class IlluminaNotificationMessageConsumerMechanism
 
             // always overwrite any previous alias with the correct run alias
             r.setAlias(runName);
-            r.setPlatformType(PlatformType.ILLUMINA);
 
             // update description if empty
             if (isStringEmptyOrNull(r.getDescription())) {
               r.setDescription(m.group(3));
             }
 
-            if (r.getStatus() != null) {
-              if (!r.getStatus().getHealth().equals(HealthType.Failed) && !r.getStatus().getHealth().equals(HealthType.Completed)) {
-                r.getStatus().setHealth(ht);
+            if (!r.getHealth().equals(HealthType.Failed) && !r.getHealth().equals(HealthType.Completed)) {
+              r.setHealth(ht);
               }
 
-              if (run.has(IlluminaTransformer.JSON_STATUS)) {
-                r.getStatus().setXml(run.getString(IlluminaTransformer.JSON_STATUS));
-              } else {
-                log.debug("No new status XML information coming through from notification system...");
-              }
-            } else {
-              if (run.has(IlluminaTransformer.JSON_STATUS)) {
-                is.setXml(run.getString(IlluminaTransformer.JSON_STATUS));
-              }
-
-              is.setHealth(ht);
-              r.setStatus(is);
-            }
-
-            log.debug(runName + " New status: " + r.getStatus().getHealth().toString() + " -> " + ht.toString());
+            log.debug(runName + " New status: " + r.getHealth().toString() + " -> " + ht.toString());
 
             if (run.has(IlluminaTransformer.JSON_NUM_CYCLES)) {
-              r.setCycles(Integer.parseInt(run.getString(IlluminaTransformer.JSON_NUM_CYCLES)));
+              r.setNumCycles(Integer.parseInt(run.getString(IlluminaTransformer.JSON_NUM_CYCLES)));
             }
 
             if (r.getSequencerReference() == null) {
               SequencerReference sr = null;
               if (run.has(IlluminaTransformer.JSON_SEQUENCER_NAME)) {
                 sr = requestManager.getSequencerReferenceByName(run.getString(IlluminaTransformer.JSON_SEQUENCER_NAME));
-                r.getStatus().setInstrumentName(run.getString(IlluminaTransformer.JSON_SEQUENCER_NAME));
                 r.setSequencerReference(sr);
               }
               if (r.getSequencerReference() == null) {
                 sr = requestManager.getSequencerReferenceByName(m.group(1));
-                r.setSequencerReference(sr);
-              }
-              if (r.getSequencerReference() == null) {
-                sr = requestManager.getSequencerReferenceByName(r.getStatus().getInstrumentName());
                 r.setSequencerReference(sr);
               }
             }
@@ -279,7 +251,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                 if (!"null".equals(run.getString(IlluminaTransformer.JSON_START_DATE))
                     && !isStringEmptyOrNull(run.getString(IlluminaTransformer.JSON_START_DATE))) {
                   log.debug("Updating start date:" + run.getString(IlluminaTransformer.JSON_START_DATE));
-                  r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString(IlluminaTransformer.JSON_START_DATE)));
+                  r.setStartDate(illuminaRunFolderDateFormat.parse(run.getString(IlluminaTransformer.JSON_START_DATE)));
                 }
               } catch (ParseException e) {
                 log.error(runName, e);
@@ -291,19 +263,19 @@ public class IlluminaNotificationMessageConsumerMechanism
                   && !isStringEmptyOrNull(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE))) {
                 log.debug("Updating completion date:" + run.getString(IlluminaTransformer.JSON_COMPLETE_DATE));
                 try {
-                  r.getStatus().setCompletionDate(logDateFormat.parse(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)));
+                  r.setCompletionDate(logDateFormat.parse(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)));
                 } catch (ParseException e) {
                   log.error(runName, e);
                   try {
-                    r.getStatus().setCompletionDate(anotherLogDateFormat.parse(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)));
+                    r.setCompletionDate(anotherLogDateFormat.parse(run.getString(IlluminaTransformer.JSON_COMPLETE_DATE)));
                   } catch (ParseException e1) {
                     log.error(runName, e1);
                   }
                 }
               } else {
-                if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)
-                    && !r.getStatus().getHealth().equals(HealthType.Stopped)) {
-                  r.getStatus().setCompletionDate(null);
+                if (!r.getHealth().equals(HealthType.Completed) && !r.getHealth().equals(HealthType.Failed)
+                    && !r.getHealth().equals(HealthType.Stopped)) {
+                  r.setCompletionDate(null);
                 }
               }
             }
@@ -450,8 +422,7 @@ public class IlluminaNotificationMessageConsumerMechanism
             runsToSave.add(r);
           }
         } else {
-          log.warn("\\_ Run not saved. Saving status: " + is.getRunName());
-          requestManager.saveStatus(is);
+          log.warn("\\_ Run not saved. Saving status: " + runName);
         }
       } catch (IOException ioe) {
         log.error("Couldn't process run", ioe);

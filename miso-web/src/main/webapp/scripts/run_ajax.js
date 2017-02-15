@@ -317,25 +317,6 @@ Run.ui = {
     s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].locationBarcode' name='sequencerPartitionContainers[" + fc + "].locationBarcode' value='" + s.html() + "'/>");
   },
 
-  changePlatformType: function (form, runId) {
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'changePlatformType',
-      {
-        'platformtype': form.value,
-        'run_cId': jQuery('input[name=run_cId]').val(),
-        'runId': runId,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#sequencerReferenceSelect').html(json.sequencers);
-          Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
-        }
-      }
-    );
-  },
-
   populateRunOptions: function (form, runId) {
     if (form.value !== 0) {
       Fluxion.doAjax(
@@ -441,7 +422,9 @@ Run.ui = {
       }
     })).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/run/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Run</button>");
+    jQuery("#toolbar").append("<a onmouseover='mopen(\"addrunmenu\")' onmouseout='mclosetime()'>Add Run</a><div id='addrunmenu' onmouseover='mcancelclosetime()' onmouseout='mclosetime()' style='visibility: hidden;'>" +
+      Run.platformTypes.map(function (x) { return "<a href=\"/miso/run/new/" + x.name + "\">Add " + x.key + "</a>"; }).join("<br/>") +
+      "</div>");
   },
 
   changeIlluminaLane: function (t, container) {

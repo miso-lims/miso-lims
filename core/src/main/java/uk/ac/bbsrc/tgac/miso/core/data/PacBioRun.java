@@ -21,46 +21,56 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.data.impl.ls454;
+package uk.ac.bbsrc.tgac.miso.core.data;
 
-import javax.persistence.DiscriminatorValue;
+import java.util.Date;
+
 import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-
-/**
- * uk.ac.bbsrc.tgac.miso.core.data.impl.ls454
- * <p/>
- * TODO Info
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
 @Entity
-@DiscriminatorValue("LS454")
-public class LS454Run extends RunImpl {
+@Table(name = "RunPacBio")
+public class PacBioRun extends Run {
+  private long movieDuration;
 
-  public LS454Run() {
-    setPlatformType(PlatformType.LS454);
-    setStatus(new StatusImpl());
+  private String wellName;
+
+  @Temporal(TemporalType.DATE)
+  private Date creationDate;
+
+  public PacBioRun(User user) {
+    super(user);
   }
 
-  public LS454Run(User user) {
-    setPlatformType(PlatformType.LS454);
-    setStatus(new StatusImpl());
-    setSecurityProfile(new SecurityProfile(user));
+  public PacBioRun() {
+    super();
   }
 
-  /**
-   * Method buildReport ...
-   */
-  @Override
-  public void buildReport() {
+  public long getMovieDuration() {
+    return movieDuration;
+  }
 
+  public String getWellName() {
+    return wellName;
+  }
+
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  public void setMovieDuration(long movieDuration) {
+    this.movieDuration = movieDuration;
+  }
+
+  public void setWellName(String wellName) {
+    this.wellName = wellName;
+  }
+
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
   }
 }

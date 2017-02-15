@@ -71,7 +71,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -497,13 +496,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       @Override
       public SequencerReference resolveById(long id) throws Exception {
         return requestManager.getSequencerReferenceById(id);
-      }
-    }.register(binder);
-
-    new BindingConverterById<Status>(Status.class) {
-      @Override
-      public Status resolveById(long id) throws Exception {
-        return requestManager.getStatusById(id);
       }
     }.register(binder);
 

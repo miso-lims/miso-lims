@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
@@ -61,10 +62,10 @@ public class RunD3CalendarController {
       JSONArray runsArray = new JSONArray();
       for (Run r : runs) {
         runsArray.add(JSONObject.fromObject(
-            "{'ID':'" + r.getId() + "','Name':'" + r.getName() + "','Start':'" + (r.getStatus() != null ? r.getStatus().getStartDate() : "")
-                + "','Stop':'" + (r.getStatus() != null ? r.getStatus().getCompletionDate() : "") + "','Instrument':'"
+            "{'ID':'" + r.getId() + "','Name':'" + r.getName() + "','Start':'" + (r.getStartDate())
+                + "','Stop':'" + (r.getCompletionDate()) + "','Instrument':'"
                 + r.getSequencerReference().getId() + "','InstrumentName':'" + r.getSequencerReference().getPlatform().getInstrumentModel()
-                + "','Health':'" + (r.getStatus() != null && r.getStatus().getHealth() != null ? r.getStatus().getHealth().getKey() : "")
+                + "','Health':'" + (r.getHealth() != null ? r.getHealth().getKey() : "")
                 + "','Description':'" + r.getDescription() + "'}"));
       }
       return runsArray;

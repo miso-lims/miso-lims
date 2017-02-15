@@ -24,15 +24,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +50,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -63,22 +59,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/run")
@@ -143,7 +134,7 @@ public class EditRunController {
   }
 
   public Boolean isMultiplexed(Run run) throws IOException {
-    if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
+    if (run != null && run.getId() != Run.UNSAVED_ID) {
       for (SequencerPartitionContainer<SequencerPoolPartition> f : run.getSequencerPartitionContainers()) {
         for (SequencerPoolPartition p : f.getPartitions()) {
           if (p.getPool() != null && p.getPool().getPoolableElements().size() > 1) {
@@ -179,7 +170,7 @@ public class EditRunController {
   }
 
   public Boolean hasOperationsQcPassed(Run run) throws IOException {
-    if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
+    if (run != null && run.getId() != Run.UNSAVED_ID) {
       for (RunQC qc : run.getRunQCs()) {
         if ("SeqOps QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
           return true;
@@ -190,7 +181,7 @@ public class EditRunController {
   }
 
   public Boolean hasInformaticsQcPassed(Run run) throws IOException {
-    if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
+    if (run != null && run.getId() != Run.UNSAVED_ID) {
       for (RunQC qc : run.getRunQCs()) {
         if ("SeqInfo QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
           return true;
@@ -226,11 +217,12 @@ public class EditRunController {
     return exps;
   }
 
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
-  public ModelAndView newUnassignedRun(ModelMap model) throws IOException {
+  @RequestMapping(value = "/new/{platformType}", method = RequestMethod.GET)
+  public ModelAndView newUnassignedRun(@PathVariable PlatformType platformType, ModelMap model) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     // clear any existing run in the model
     model.addAttribute("run", null);
-    return setupForm(AbstractRun.UNSAVED_ID, model);
+    return setupForm(platformType.createRun(user), platformType, model);
   }
 
   @RequestMapping(value = "/rest/{runId}", method = RequestMethod.GET)
@@ -245,32 +237,24 @@ public class EditRunController {
 
   @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Run run = null;
+    Run run = requestManager.getRunById(runId);
 
-    if (runId == AbstractRun.UNSAVED_ID) {
-      run = new RunImpl(user);
-    } else {
-      run = requestManager.getRunById(runId);
-    }
-
-    return setupForm(run, model);
+    return setupForm(run, run.getSequencerReference().getPlatform().getPlatformType(), model);
   }
 
   @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable String runAlias, ModelMap model) throws IOException {
     Run run = requestManager.getRunByAlias(runAlias);
-    return setupForm(run, model);
+    return setupForm(run, run.getSequencerReference().getPlatform().getPlatformType(), model);
   }
 
-  public ModelAndView setupForm(Run run, ModelMap model) throws IOException {
+  public ModelAndView setupForm(Run run, PlatformType platformType, ModelMap model) throws IOException {
+    model.put("platformType", platformType);
+
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-      if (run == null) {
-        throw new SecurityException("No such Run.");
-      } else if (run.getId() == AbstractRun.UNSAVED_ID) {
-        run = new RunImpl(user);
+      if (run.getId() == Run.UNSAVED_ID) {
         model.put("title", "New Run");
         model.put("availablePools", populateAvailablePools(user));
         model.put("multiplexed", false);
@@ -292,27 +276,12 @@ public class EditRunController {
         throw new SecurityException("Permission denied.");
       }
 
-      if (run.getStatus() == null) {
-        run.setStatus(new StatusImpl());
+      model.put("sequencerReferences", requestManager.listSequencerReferencesByPlatformType(platformType));
+      if (run.getSequencerReference() != null) {
+        model.put("sequencingParameters",
+            sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getId()));
       } else {
-        try {
-          InputStream in = run.getPlatformType() == null ? null : StatsController.class
-              .getResourceAsStream("/status/xsl/" + run.getPlatformType().getKey().toLowerCase() + "/statusXml.xsl");
-          if (in != null && run.getStatus().getXml() != null) {
-            String xsl = LimsUtils.inputStreamToString(in);
-            model.put("statusXml", (SubmissionUtils.xslTransform(run.getStatus().getXml(), xsl)));
-          }
-        } catch (TransformerException e) {
-          model.put("error",
-              MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + run.getAlias(), e.getMessage()));
-          log.error("transform XML status", e);
-        }
-        if (run.getSequencerReference() != null) {
-          model.put("sequencingParameters",
-              sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getId()));
-        } else {
-          model.put("sequencingParameters", Collections.emptyList());
-        }
+        model.put("sequencingParameters", Collections.emptyList());
       }
 
       model.put("formObj", run);

@@ -54,7 +54,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -266,7 +265,7 @@ public class EditIlluminaPoolController {
 
   @RequestMapping(value = "/import", method = RequestMethod.POST)
   public String importLibraryDilutionsToPool(HttpServletRequest request, ModelMap model) throws IOException {
-    IlluminaPool p = (IlluminaPool) model.get("pool");
+    Pool p = (Pool) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
       LibraryDilution ld = dilutionService.getByBarcode(s);

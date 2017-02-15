@@ -49,6 +49,7 @@
         <thead>
         <tr>
           <th>Run Name</th>
+          <th>Alias</th>
           <th>Instrument Name</th>
           <th>Health</th>
           <th>Start Date</th>
@@ -57,15 +58,16 @@
         </tr>
         </thead>
         <tbody>
-        <c:forEach items="${stats}" var="stat">
+        <c:forEach items="${runs}" var="run">
           <tr>
-            <td>${stat.runName}</td>
-            <td>${stat.instrumentName}</td>
-            <td>${stat.health.key}</td>
-            <td>${stat.startDate}</td>
-            <td><fmt:formatDate value="${stat.lastUpdated}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+            <td>${run.name}</td>
+            <td>${run.alias}</td>
+            <td>${run.sequencerReference.name}</td>
+            <td>${run.health.key}</td>
+            <td>${run.startDate}</td>
+            <td><fmt:formatDate value="${run.lastUpdated}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
             <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/stats/${fn:toLowerCase(platformtype)}/${referenceId}/${stat.runName}"/>'">
+                onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
               <span class="ui-icon ui-icon-pencil"/></td>
           </tr>
         </c:forEach>

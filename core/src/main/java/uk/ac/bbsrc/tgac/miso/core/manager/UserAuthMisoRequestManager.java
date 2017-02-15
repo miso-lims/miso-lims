@@ -61,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -377,13 +376,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (readCheck(o.getSample())) return o;
     else throw new AuthorizationIOException(
         "User " + getCurrentUsername() + " cannot read parent Sample " + o.getSample().getId() + " for SampleQC " + sampleQcId);
-  }
-
-  @Override
-  public Status getStatusByRunName(String runName) throws IOException {
-    Run o = backingManager.getRunByAlias(runName);
-    if (readCheck(o)) return backingManager.getStatusByRunName(runName);
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Run " + o.getId() + " for Status");
   }
 
   @Override
@@ -953,15 +945,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveStatus(Status status) throws IOException {
-    if (getCurrentUser().isInternal()) {
-      return backingManager.saveStatus(status);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Status");
-    }
-  }
-
-  @Override
   public long saveSequencerReference(SequencerReference sequencerReference) throws IOException {
     if (getCurrentUser().isAdmin()) {
       return backingManager.saveSequencerReference(sequencerReference);
@@ -982,11 +965,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Platform getPlatformById(long platformId) throws IOException {
     return backingManager.getPlatformById(platformId);
-  }
-
-  @Override
-  public Status getStatusById(long statusId) throws IOException {
-    return backingManager.getStatusById(statusId);
   }
 
   @Override
@@ -1168,16 +1146,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Collection<QcType> listAllRunQcTypes() throws IOException {
     return backingManager.listAllRunQcTypes();
-  }
-
-  @Override
-  public Collection<Status> listAllStatus() throws IOException {
-    return backingManager.listAllStatus();
-  }
-
-  @Override
-  public Collection<Status> listAllStatusBySequencerName(String sequencerName) throws IOException {
-    return backingManager.listAllStatusBySequencerName(sequencerName);
   }
 
   @Override

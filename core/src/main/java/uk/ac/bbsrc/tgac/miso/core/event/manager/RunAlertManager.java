@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -38,7 +38,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
@@ -96,15 +95,8 @@ public class RunAlertManager {
         Run clone = partialCopy(run);
         if (clone != null) {
           applyListeners(clone);
-          if (runs.containsKey(run.getId())) {
-            if (clone.getStatus() != null) {
-              log.debug("Not replacing Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
-            }
-          } else {
+          if (!runs.containsKey(run.getId())) {
             runs.put(run.getId(), clone);
-            if (clone.getStatus() != null) {
-              log.debug("Queued Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
-            }
           }
         }
       }
@@ -128,7 +120,7 @@ public class RunAlertManager {
       log.warn("Alerting system disabled.");
     }
   }
-  
+
   public void update(Run r) throws IOException {
     if (enabled) {
       Run clone = runs.get(r.getId());
@@ -141,9 +133,9 @@ public class RunAlertManager {
         push(r);
       } else {
         log.debug("Update: got clone of " + clone.getId());
-        if (r.getStatus() != null) {
-          clone.setStatus(r.getStatus());
-        }
+        clone.setHealth(r.getHealth());
+        clone.setCompletionDate(r.getCompletionDate());
+        clone.setStartDate(r.getStartDate());
 
         // run QC added
         if (r.getRunQCs().size() > clone.getRunQCs().size()) {
@@ -206,19 +198,19 @@ public class RunAlertManager {
       }
     }
   }
-  
+
   /**
-   * Creates a minimal copy of the run to be used for change tracking in the alerting system. Only relevant 
+   * Creates a minimal copy of the run to be used for change tracking in the alerting system. Only relevant
    * fields are copied
    * 
    * @param run the run to copy
    * @return the copy
    */
   private Run partialCopy(Run run) {
-    Run clone = new RunImpl();
+    Run clone = new Run();
     clone.setId(run.getId());
     clone.setAlias(run.getAlias());
-    clone.setStatus(run.getStatus());
+    clone.setHealth(run.getHealth());
     for (RunQC qc : run.getRunQCs()) {
       try {
         clone.addQc(partialCopy(qc));
@@ -231,7 +223,7 @@ public class RunAlertManager {
     }
     return clone;
   }
-  
+
   /**
    * Creates a minimal copy of the RunQC to be used for change tracking in the alerting system. Only relevant
    * fields are copied

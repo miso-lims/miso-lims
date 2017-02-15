@@ -21,9 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
@@ -51,7 +49,7 @@ public class HibernateRunDao implements RunStore {
   @Override
   public long save(Run run) throws IOException {
     long id;
-    if (run.getId() == AbstractRun.UNSAVED_ID) {
+    if (run.getId() == Run.UNSAVED_ID) {
       currentSession().save(run);
     } else {
       currentSession().update(run);
@@ -62,7 +60,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public Run get(long id) throws IOException {
-    Run run = (Run) currentSession().get(RunImpl.class, id);
+    Run run = (Run) currentSession().get(Run.class, id);
     return withWatcherGroup(run);
   }
 
@@ -85,7 +83,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
 
@@ -94,7 +92,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
   }
 
@@ -117,7 +115,7 @@ public class HibernateRunDao implements RunStore {
     // show up
     currentSession().flush();
 
-    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
+    Criteria criteria = currentSession().createCriteria(Run.class, "r");
     criteria.createAlias("r.containers", "spc").createAlias("r.status", "status");
     criteria.add(Restrictions.eq("spc.id", containerId));
     criteria.addOrder(Order.desc("status.startDate"));
@@ -131,7 +129,7 @@ public class HibernateRunDao implements RunStore {
     // show up
     currentSession().flush();
 
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.createAlias("containers", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
     criteria.addOrder(Order.desc("id"));
@@ -141,7 +139,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listBySearch(String query) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(DbUtils.searchRestrictions(query, "name", "alias", "description"));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
@@ -150,14 +148,14 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public Run getByAlias(String alias) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(Restrictions.eq("alias", alias));
     return withWatcherGroup((Run) criteria.uniqueResult());
   }
 
   @Override
   public List<Run> listByPoolId(long poolId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.createAlias("containers", "spc").createAlias("spc.partitions", "partition");
     criteria.createAlias("partition.pool", "pool");
     criteria.add(Restrictions.eq("pool.id", poolId));
@@ -172,7 +170,7 @@ public class HibernateRunDao implements RunStore {
     // show up
     currentSession().flush();
 
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.createAlias("containers", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
     @SuppressWarnings("unchecked")
@@ -182,7 +180,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listByProjectId(long projectId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
+    Criteria criteria = currentSession().createCriteria(Run.class, "r");
     criteria.createAlias("r.containers", "container").createAlias("container.partitions", "partition");
     criteria.createAlias("partition.pool", "pool").createAlias("pool.pooledElements", "dilution");
     criteria.createAlias("dilution.library", "library").createAlias("library.sample", "sample");
@@ -196,7 +194,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listByPlatformId(long platformId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
+    Criteria criteria = currentSession().createCriteria(Run.class, "r");
     criteria.createAlias("r.sequencerReference", "sr");
     criteria.add(Restrictions.eq("sr.platform.id", platformId));
     @SuppressWarnings("unchecked")
@@ -206,7 +204,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listByStatus(String health) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
+    Criteria criteria = currentSession().createCriteria(Run.class, "r");
     criteria.createAlias("r.status", "status");
     criteria.add(Restrictions.eq("status.health", HealthType.get(health)));
     @SuppressWarnings("unchecked")
@@ -216,7 +214,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listBySequencerId(long sequencerReferenceId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(Restrictions.eq("sequencerReference.id", sequencerReferenceId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
@@ -225,7 +223,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listAllWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.addOrder(Order.desc("id"));
     criteria.setMaxResults((int) limit);
     @SuppressWarnings("unchecked")
@@ -249,7 +247,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public long countRuns() throws IOException {
-    long c = (Long) currentSession().createCriteria(RunImpl.class).setProjection(Projections.rowCount()).uniqueResult();
+    long c = (Long) currentSession().createCriteria(Run.class).setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
   }
 
@@ -259,7 +257,7 @@ public class HibernateRunDao implements RunStore {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     if ("lastUpdated".equals(sortCol)) sortCol = "status.lastUpdated";
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     if (querystr != null) {
       criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
     }
@@ -280,7 +278,7 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public long countBySearch(String querystr) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
     long c = (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;

@@ -36,10 +36,8 @@ import org.springframework.messaging.Message;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
@@ -80,17 +78,13 @@ public class DemoIlluminaConsumerMechanism implements NotificationMessageConsume
       String runName = run.getString("runName");
       sb.append("Processing " + runName);
       log.debug("Processing " + runName);
-      Status is = new IlluminaStatus();
-      is.setRunName(runName);
 
       Run r = new IlluminaRun();
-      r.setPlatformRunId(0);
       r.setAlias(runName);
       r.setFilePath(runName);
       r.setDescription("Test Run Import");
       r.setPairedEnd(false);
-      is.setHealth(ht);
-      r.setStatus(is);
+      r.setHealth(ht);
 
       updatedRuns.put(r.getAlias(), r);
       sb.append("...done\n");

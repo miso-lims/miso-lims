@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -71,7 +72,7 @@ public class ExternalRestController extends RestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "projects", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "projects", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String jsonRest() throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<Project> lp = requestManager.listAllProjects();
@@ -99,7 +100,7 @@ public class ExternalRestController extends RestController {
     return "{" + sb.toString() + "}";
   }
 
-  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String jsonRestProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     StringBuilder sb = new StringBuilder();
 
@@ -185,7 +186,7 @@ public class ExternalRestController extends RestController {
       int ri = 0;
       for (Run run : runs) {
         ri++;
-        if (!run.getStatus().getHealth().getKey().equals("Failed")) {
+        if (run.getHealth() != HealthType.Failed) {
           ArrayList<String> runSamples = new ArrayList<>();
           Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
               .listSequencerPartitionContainersByRunId(run.getId());
@@ -213,15 +214,16 @@ public class ExternalRestController extends RestController {
           sb.append("'name':'" + run.getName() + "'");
           sb.append(",");
           sb.append("'status':'"
-              + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "'");
+              + (run.getHealth() != null ? run.getHealth().getKey() : "") + "'");
           sb.append(",");
           sb.append("'startDate':'"
-              + (run.getStatus() != null && run.getStatus().getStartDate() != null ? run.getStatus().getStartDate().toString() : "") + "'");
+              + (run.getStartDate() != null ? run.getStartDate().toString() : "") + "'");
           sb.append(",");
-          sb.append("'completionDate':'" + (run.getStatus() != null && run.getStatus().getCompletionDate() != null
-              ? run.getStatus().getCompletionDate().toString() : "") + "'");
+          sb.append("'completionDate':'" + (run.getCompletionDate() != null
+              ? run.getCompletionDate().toString() : "") + "'");
           sb.append(",");
-          sb.append("'platformType':'" + (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "'");
+          sb.append("'platformType':'" + (run.getSequencerReference().getPlatform().getPlatformType() != null
+              ? run.getSequencerReference().getPlatform().getPlatformType().getKey() : "") + "'");
           sb.append(",");
           sb.append("'samples':[");
           if (runSamples.size() > 0) {
@@ -247,5 +249,5 @@ public class ExternalRestController extends RestController {
 
     return "{" + sb.toString() + "}";
   }
-  
+
 }
