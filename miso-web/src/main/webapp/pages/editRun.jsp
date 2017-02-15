@@ -30,10 +30,7 @@
 --%>
 <%@ include file="../header.jsp" %>
 
-<c:choose>
-  <c:when test="${not empty run.status}"><div id="maincontent" class="${run.status.health.key}"></c:when>
-  <c:otherwise><div id="maincontent"></c:otherwise>
-</c:choose>
+<div id="maincontent" class="${run.health.key}">
 <div id="contentcolumn">
 <form:form id="run-form" data-parsley-validate="" action="/miso/run" method="POST" modelAttribute="run" autocomplete="off">
 
@@ -98,31 +95,22 @@
       <td class="h">Accession:</td>
       <td><a href="http://www.ebi.ac.uk/ena/data/view/${run.accession}" target="_blank">${run.accession}</a>
       </td>
-        <%--<td><a href="void(0);" onclick="popup('help/runAccession.html');">Help</a></td>--%>
     </tr>
   </c:if>
   <tr>
-    <c:choose>
-      <c:when test="${run.id == 0}">
-        <td>Platform:*</td>
-        <td>
-          <div id="platformButtons">
-          <c:choose>
-            <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:radiobuttons
-                id="platformTypes" path="platformType" items="${platformTypes}"
-                onchange="Run.ui.changePlatformType(this);"
-                disabled="disabled"/></c:when>
-            <c:otherwise><form:radiobuttons id="platformTypes" path="platformType" items="${platformTypes}"
-                                            onchange="Run.ui.changePlatformType(this);"/></c:otherwise>
-          </c:choose>
-        </div>
-        </td>
-      </c:when>
-      <c:otherwise>
-        <td>Platform</td>
-        <td>${run.platformType.key}</td>
-      </c:otherwise>
-    </c:choose>
+    <td>Platform:</td>
+    <td>${platformType.key}</td>
+  </tr>
+  <tr>
+    <td>Sequencer:</td>
+    <td>
+      <c:choose>
+        <c:when test="${run.id == 0}">
+          <miso:select id="sequencerReference" path="sequencerReference" items="${sequencerReferences}" itemLabel="name" itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+        </c:when>
+        <c:otherwise>${run.sequencerReference.name} - ${run.sequencerReference.platform.instrumentModel}</c:otherwise>
+      </c:choose>
+    </td>
   </tr>
   <c:if test="${run.id != 0}">
     <tr>
@@ -137,20 +125,6 @@
         <div class="parsley-required"></div>
       </div>
     </td>
-  </tr>
-  <tr>
-    <c:choose>
-      <c:when test="${run.id == 0}">
-        <td>Sequencer:</td>
-        <td id="sequencerReferenceSelect">
-          <i>Please choose a platform above...</i>
-        </td>
-      </c:when>
-      <c:otherwise>
-        <td>Sequencer:*</td>
-        <td>${run.sequencerReference.name} - ${run.sequencerReference.platform.instrumentModel}</td>
-      </c:otherwise>
-    </c:choose>
   </tr>
   <tr>
     <td></td>
@@ -169,25 +143,23 @@
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
     </td>
-      <%--<td><a href="void(0);" onclick="popup('help/runName.html');">Help</a></td>--%>
   </tr>
   <tr>
     <td class="h">Alias:*</td>
     <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span>
     </td>
-      <%--<td><a href="void(0);" onclick="popup('help/runAlias.html');">Help</a></td>--%>
   </tr>
   <tr>
     <td>Description:</td>
     <td>
       <c:choose>
-        <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:input
-            path="description" disabled="disabled" class="validateable"/></c:when>
+        <c:when test="${run.health.key ne 'Unknown'}">
+           <form:input path="description" disabled="disabled" class="validateable"/>
+        </c:when>
         <c:otherwise><form:input path="description" class="validateable"/></c:otherwise>
       </c:choose>
       <span id="descriptioncounter" class="counter"></span>
     </td>
-      <%--<td><a href="void(0);" onclick="popup('help/runDescription.html');">Help</a></td>--%>
   </tr>
   <tr>
     <td>Run Path:*</td>
@@ -198,13 +170,13 @@
       </c:choose>
     </td>
   </tr>
-  <c:if test="${run.id != 0 && run.platformType.key == 'PacBio' && pacBioDashboardUrl != null}">
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.PacBioRun') && pacBioDashboardUrl != null}">
   <tr>
     <td>PacBio Dashboard:</td>
     <td><span id="pbDashLink"></span></td>
     <script type="text/javascript">
     jQuery(document).ready(function() {
-      Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.status.startDate}', '${run.sequencerReference.name}');
+      Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.startDate}', '${run.sequencerReference.name}');
     });
     </script>
   </tr>
@@ -213,7 +185,7 @@
     <td>Paired End:</td>
     <td>
       <c:choose>
-        <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:checkbox
+        <c:when test="${run.health.key ne 'Unknown'}"><form:checkbox
             value="${run.pairedEnd}" path="pairedEnd" disabled="disabled"/></c:when>
         <c:otherwise><form:checkbox value="${run.pairedEnd}" path="pairedEnd"/></c:otherwise>
       </c:choose>
@@ -223,7 +195,7 @@
   <tr>
     <td valign="top">Status:</td>
     <td>
-      <form:radiobuttons id="status.health" path="status.health" items="${healthTypes}"
+      <form:radiobuttons id="health" path="health" items="${healthTypes}"
                          onchange="Run.checkForCompletionDate();"/><br/>
       <table class="list" id="runStatusTable">
         <thead>
@@ -235,32 +207,26 @@
         </thead>
         <tbody>
         <tr>
-          <td><fmt:formatDate pattern="dd/MM/yyyy" value="${run.status.startDate}"/></td>
+          <td><fmt:formatDate pattern="dd/MM/yyyy" value="${run.startDate}"/></td>
           <c:choose>
-            <c:when test="${(run.status.health.key eq 'Completed' and empty run.status.completionDate)
-                    or run.status.health.key eq 'Failed'
-                    or run.status.health.key eq 'Stopped'}">
-              <td><form:input path="status.completionDate"/></td>
+            <c:when test="${(run.health.isDone() and empty run.completionDate)}">
+              <td><form:input path="completionDate"/></td>
               <script type="text/javascript">
-                Utils.ui.addDatePicker("status\\.completionDate");
+                Utils.ui.addDatePicker("completionDate");
               </script>
             </c:when>
             <c:otherwise>
               <td id="completionDate">
-                <fmt:formatDate pattern="dd/MM/yyyy" value="${run.status.completionDate}"/>
+                <fmt:formatDate pattern="dd/MM/yyyy" value="${run.completionDate}"/>
               </td>
             </c:otherwise>
           </c:choose>
           <td>
-            <fmt:formatDate value="${run.status.lastUpdated}" dateStyle="long" pattern="dd/MM/yyyy HH:mm:ss"/>
+            <fmt:formatDate value="${run.lastUpdated}" dateStyle="long" pattern="dd/MM/yyyy HH:mm:ss"/>
           </td>
         </tr>
         </tbody>
       </table>
-
-      <c:if test="${not empty run.status.xml}">
-        ${statusXml}
-      </c:if>
     </td>
   </tr>
 
@@ -286,7 +252,7 @@
     </div>
   </c:if>
 
-  <c:if test="${run.status.health.key ne 'Failed' and run.status.health.key ne 'Stopped' and metrixEnabled and run.platformType.key eq 'Illumina'}">
+  <c:if test="${not empty run.metrics}">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>
@@ -297,7 +263,7 @@
   </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      Stats.getInterOpMetrics('${run.alias}', '${run.platformType.key}');
+      Stats.getInterOpMetrics('${run.alias}', '${run.metrics}');
     });
   </script>
   </c:if>
@@ -346,7 +312,7 @@
   <br/>
 </c:if>
 
-<c:if test="${not empty run.status and run.status.health.key eq 'Completed'}">
+<c:if test="${run.health.key eq 'Completed'}">
   <h1>Run QC</h1>
   <ul class="sddm">
     <li>
@@ -427,17 +393,17 @@
 <div id="runPartitions">
 <c:choose>
 <c:when test="${empty run.sequencerPartitionContainers}">
-  <if test="${not empty run.sequencerReference}">
+  <c:if test="${not empty run.sequencerReference}">
     Container:
      <c:forEach var="platformContainerCount" begin="1"
                 end="${run.sequencerReference.platform.numContainers}" step="1"
                 varStatus="platformContainer">
        <input id='container${platformContainerCount}select' name='containerselect'
-              onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
+              onchange="Run.container.changeContainer(this.value, '${platformType.key}', ${run.sequencerReference.id});"
               type='radio'
               value='${platformContainerCount}'/>${platformContainerCount}
      </c:forEach>
-   </if>
+   </c:if>
   <br/>
 
   <div id='containerdiv' class="note ui-corner-all"></div>
@@ -445,7 +411,7 @@
 <c:otherwise>
   <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="containerCount">
     <div class="note ui-corner-all">
-      <h2>${run.platformType.containerName} ${containerCount.count}</h2>
+      <h2>${platformType.containerName} ${containerCount.count}</h2>
       <c:if test="${not empty container.identificationBarcode}">
         <ul class="sddm">
           <li>
@@ -456,7 +422,7 @@
             <div class="run" id="containermenu"
                  onmouseover="mcancelclosetime()"
                  onmouseout="mclosetime()">
-              <c:if test="${run.platformType.key eq 'Illumina'}">
+              <c:if test="${platformType.key eq 'Illumina'}">
                 <a href="javascript:void(0);"
                    onclick="Run.container.generateCasava17DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
                   CSV (pre-1.8)</a>
@@ -544,11 +510,11 @@
       </table>
       <div id='partitionErrorDiv' class="parsley-custom-error-message"></div>
       <div id="partitionDiv">
-        <i class="italicInfo">Click in a ${run.platformType.partitionName} box to beep/type in barcodes, or double click a
-          pool on the right to sequentially add pools to the ${run.platformType.containerName}</i>
+        <i class="italicInfo">Click in a ${platformType.partitionName} box to beep/type in barcodes, or double click a
+          pool on the right to sequentially add pools to the ${platformType.containerName}</i>
         <table class="in">
           <tr>
-	          <th>${run.platformType.partitionName} No.</th>
+	          <th>${platformType.partitionName} No.</th>
 	          <th>Pool</th>
 	          <c:if test="${statsAvailable}">
 	            <th>Stats</th>
@@ -561,7 +527,6 @@
                 <c:choose>
                   <c:when test="${not empty partition.pool}">
                     <div class="dashboard">
-                        <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(run.platformType.key)}/${partition.pool.id}"/>'> --%>
                       <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
                           ${partition.pool.name}
                         (${partition.pool.creationDate})
@@ -623,30 +588,15 @@
 </td>
 <td width="50%" valign="top">
   <h2>Available Pools</h2>
-  <c:choose>
-    <c:when test="${not empty run.platformType}">
       <input id="showOnlyReady" type="checkbox" checked="true"
-             onclick="Run.pool.toggleReadyToRunCheck(this, '${run.platformType.key}');"/>Only Ready to Run pools?
+             onclick="Run.pool.toggleReadyToRunCheck(this, '${platformType.key}');"/>Only Ready to Run pools?
       <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
         <input type="text" size="8" id="searchPools" name="searchPools"/></div>
       <script type="text/javascript">
         Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
-          Run.pool.poolSearch(jQuery('#searchPools').val(), '${run.platformType.key}');
+          Run.pool.poolSearch(jQuery('#searchPools').val(), '${platformType.key}');
         }, 300, 2);
       </script>
-    </c:when>
-    <c:otherwise>
-      <input id="showOnlyReady" type="checkbox" checked="true"
-             onclick="Run.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformType]:checked').val());"/>Only Ready to Run pools?
-      <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
-        <input type="text" size="8" id="searchPools" name="searchPools"/></div>
-      <script type="text/javascript">
-        Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
-          Run.pool.poolSearch(jQuery('#searchPools').val(), jQuery('input[name=platformType]:checked').val());
-        }, 300, 2);
-      </script>
-    </c:otherwise>
-  </c:choose>
   <div id='poolList' class="elementList ui-corner-all" style="height:500px">
   </div>
 </td>
@@ -689,17 +639,10 @@
       countDirection: 'down'
     });
 
-    <c:choose>
-    <c:when test="${not empty run.platformType}">
-      Run.pool.poolSearch("", '${run.platformType.key}');
-      <c:if test="${run.id != 0 and metrixEnabled}">
-        Stats.checkRunProgress('${run.alias}', '${run.platformType.key}');
-      </c:if>
-    </c:when>
-    <c:otherwise>
-      Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
-    </c:otherwise>
-    </c:choose>
+     Run.pool.poolSearch("", '${platformType.key}');
+     <c:if test="${run.id != 0 and metrixEnabled}">
+       Stats.checkRunProgress('${run.alias}', '${platformType.key}');
+     </c:if>
 
     <c:if test="${statsAvailable}">
       Stats.getRunStats(${run.id});

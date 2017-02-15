@@ -36,6 +36,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -161,13 +162,13 @@ public class StatsControllerHelperService {
     String runAlias = json.getString("runAlias");
     try {
       Run run = requestManager.getRunByAlias(runAlias);
-      if (run != null && run.getStatus() != null && run.getStatus().getHealth().equals(HealthType.Unknown)) {
+      if (run != null && run.getHealth() == HealthType.Unknown) {
         String platformType = json.getString("platformType").toLowerCase();
         JSONObject response = notificationQueryService.getRunProgress(runAlias, platformType);
         if (response.has("progress")) {
-          String progress = response.getString("progress");
-          if (!run.getStatus().getHealth().equals(HealthType.valueOf(progress))) {
-            run.getStatus().setHealth(HealthType.valueOf(progress));
+          HealthType progress = HealthType.valueOf(response.getString("progress"));
+          if (run.getHealth() != progress) {
+            run.setHealth(progress);
             requestManager.saveRun(run);
             return response;
           }

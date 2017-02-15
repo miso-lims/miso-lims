@@ -54,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 public class RunFailedResponderService extends AbstractResponderService<RunEvent> {
   protected static final Logger log = LoggerFactory.getLogger(RunFailedResponderService.class);
 
-  private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
+  private Set<AlerterService> alerterServices = new HashSet<>();
 
   public RunFailedResponderService() {
   }
@@ -72,8 +72,7 @@ public class RunFailedResponderService extends AbstractResponderService<RunEvent
   @Override
   public boolean respondsTo(RunEvent event) {
     Run r = event.getEventObject();
-    if (event.getEventType().equals(MisoEventType.RUN_FAILED) && r.getStatus() != null
-        && r.getStatus().getHealth().equals(HealthType.Failed)) {
+    if (event.getEventType().equals(MisoEventType.RUN_FAILED) && r.getHealth().equals(HealthType.Failed)) {
       log.info("Run " + r.getAlias() + ": " + event.getEventMessage());
       return true;
     }

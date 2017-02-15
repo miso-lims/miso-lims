@@ -367,7 +367,7 @@ public class ReportingControllerHelperService {
               b.append("</td>");
               b.append("<td> " + run.getAlias());
               b.append("</td>");
-              b.append("<td> " + run.getStatus().getHealth().getKey());
+              b.append("<td> " + run.getHealth().getKey());
               b.append("</td>");
               b.append("</tr>");
               numMatches++;
@@ -390,7 +390,7 @@ public class ReportingControllerHelperService {
           b.append("</td>");
           b.append("<td> " + run.getAlias());
           b.append("</td>");
-          b.append("<td> " + run.getStatus().getHealth().getKey());
+          b.append("<td> " + run.getHealth().getKey());
           b.append("</td>");
           b.append("</tr>");
         }

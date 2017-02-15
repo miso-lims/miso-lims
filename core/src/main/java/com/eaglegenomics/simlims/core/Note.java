@@ -27,7 +27,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
@@ -72,7 +71,7 @@ public class Note implements Serializable, Comparable<Note> {
   @JsonBackReference
   private final Collection<Pool> pools = new HashSet<>();
 
-  @ManyToMany(targetEntity = RunImpl.class)
+  @ManyToMany(targetEntity = Run.class)
   @JoinTable(name = "Run_Note", inverseJoinColumns = {
       @JoinColumn(name = "run_runId") }, joinColumns = {
           @JoinColumn(name = "notes_noteId") })

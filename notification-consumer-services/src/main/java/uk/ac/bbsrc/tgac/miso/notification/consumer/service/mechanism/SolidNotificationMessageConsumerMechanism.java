@@ -51,12 +51,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
@@ -118,9 +114,15 @@ public class SolidNotificationMessageConsumerMechanism
 
       if (run.has("status")) {
         String xml = run.getString("status");
-        Status is = new SolidStatus(xml);
+        Run is = Run.createFromSolidXml(xml, t -> {
+          try {
+            return requestManager.getSequencerReferenceByName(t);
+          } catch (IOException e) {
+            log.warn("No sequencer: " + t, e);
+          }
+          return null;
+        });
         is.setHealth(ht);
-        is.setRunName(runName);
 
         Run r = null;
         Matcher m = p.matcher(runName);
@@ -136,9 +138,8 @@ public class SolidNotificationMessageConsumerMechanism
         try {
           if (attemptRunPopulation) {
             if (r == null) {
-              log.debug("Saving new run and status: " + is.getRunName());
-              r = new SolidRun(xml);
-              r.getStatus().setHealth(ht);
+              log.debug("Saving new run and status: " + runName);
+              r = is;
               if (run.has("fullPath")) {
                 r.setFilePath(run.getString("fullPath"));
               }
@@ -146,16 +147,10 @@ public class SolidNotificationMessageConsumerMechanism
               SequencerReference sr = null;
               if (run.has("sequencerName")) {
                 sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
-                r.getStatus().setInstrumentName(run.getString("sequencerName"));
                 r.setSequencerReference(sr);
               }
               if (r.getSequencerReference() == null) {
                 sr = requestManager.getSequencerReferenceByName(m.group(1));
-                r.getStatus().setInstrumentName(m.group(1));
-                r.setSequencerReference(sr);
-              }
-              if (r.getSequencerReference() == null) {
-                sr = requestManager.getSequencerReferenceByName(r.getStatus().getInstrumentName());
                 r.setSequencerReference(sr);
               }
 
@@ -166,9 +161,9 @@ public class SolidNotificationMessageConsumerMechanism
 
                     Matcher m2 = simpleDateRegex.matcher(run.getString("startDate"));
                     if (m2.matches()) {
-                      r.getStatus().setStartDate(simpleLogDateFormat.parse(run.getString("startDate")));
+                      r.setStartDate(simpleLogDateFormat.parse(run.getString("startDate")));
                     } else {
-                      r.getStatus().setStartDate(logDateFormat.parse(run.getString("startDate")));
+                      r.setStartDate(logDateFormat.parse(run.getString("startDate")));
                     }
                   } catch (ParseException e) {
                     log.error("process run JSON start date", e);
@@ -179,9 +174,9 @@ public class SolidNotificationMessageConsumerMechanism
                   try {
                     if (run.get("completionDate") != null && !run.getString("completionDate").equals("null")) {
                       log.debug("Updating completion date:" + run.getString("completionDate"));
-                      r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
+                      r.setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
                     } else {
-                      r.getStatus().setCompletionDate(null);
+                      r.setCompletionDate(null);
                     }
                   } catch (ParseException e) {
                     log.error("process run JSON completion date", e);
@@ -189,25 +184,18 @@ public class SolidNotificationMessageConsumerMechanism
                 }
               }
             } else {
-              log.debug("Updating existing run and status: " + is.getRunName());
+              log.debug("Updating existing run and status: " + runName);
 
               r.setAlias(runName);
-              r.setPlatformType(PlatformType.SOLID);
 
               if (r.getSequencerReference() == null) {
                 SequencerReference sr = null;
                 if (run.has("sequencerName")) {
                   sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
-                  r.getStatus().setInstrumentName(run.getString("sequencerName"));
                   r.setSequencerReference(sr);
                 }
                 if (r.getSequencerReference() == null) {
                   sr = requestManager.getSequencerReferenceByName(m.group(1));
-                  r.getStatus().setInstrumentName(m.group(1));
-                  r.setSequencerReference(sr);
-                }
-                if (r.getSequencerReference() == null) {
-                  sr = requestManager.getSequencerReferenceByName(r.getStatus().getInstrumentName());
                   r.setSequencerReference(sr);
                 }
               }
@@ -218,9 +206,9 @@ public class SolidNotificationMessageConsumerMechanism
 
                     Matcher m2 = simpleDateRegex.matcher(run.getString("startDate"));
                     if (m2.matches()) {
-                      r.getStatus().setStartDate(simpleLogDateFormat.parse(run.getString("startDate")));
+                      r.setStartDate(simpleLogDateFormat.parse(run.getString("startDate")));
                     } else {
-                      r.getStatus().setStartDate(logDateFormat.parse(run.getString("startDate")));
+                      r.setStartDate(logDateFormat.parse(run.getString("startDate")));
                     }
                   } catch (ParseException e) {
                     log.error("process run JSON start date", e);
@@ -231,9 +219,9 @@ public class SolidNotificationMessageConsumerMechanism
                   try {
                     if (run.get("completionDate") != null && !run.getString("completionDate").equals("null")) {
                       log.debug("Updating completion date:" + run.getString("completionDate"));
-                      r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
+                      r.setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
                     } else {
-                      r.getStatus().setCompletionDate(null);
+                      r.setCompletionDate(null);
                     }
                   } catch (ParseException e) {
                     log.error("process run JSON completion date", e);
@@ -248,18 +236,11 @@ public class SolidNotificationMessageConsumerMechanism
                     r.setFilePath(run.getString("fullPath"));
                   }
                 }
-
-                // update status if run isn't completed or failed
-                if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)) {
-                  log.debug("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> "
-                      + is.getHealth().getKey() + ")");
-                  r.setStatus(is);
-                }
               }
             }
 
             if (r.getSequencerReference() != null) {
-              List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((SolidRun) r).getSequencerPartitionContainers();
+              List<SequencerPartitionContainer<SequencerPoolPartition>> fs = r.getSequencerPartitionContainers();
               if (fs.isEmpty()) {
                 if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
                   Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager

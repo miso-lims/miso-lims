@@ -64,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -782,7 +783,7 @@ public class ContainerControllerHelperService {
         SequencerPartitionContainer<?> container = requestManager.getSequencerPartitionContainerById(containerId);
 
         for (Run run : container.getRuns()) {
-          if (run != null && "Completed".equals(run.getStatus().getHealth().getKey())) {
+          if (run != null && run.getHealth() == HealthType.Completed) {
             return JSONUtils.SimpleJSONResponse("yes");
           }
         }

@@ -570,8 +570,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private void updateRun(Run from, Run to) throws IOException {
     log.debug("Updating run " + to.getId());
-    to.getStatus().setCompletionDate(to.getStatus().getCompletionDate());
-    to.getStatus().setHealth(to.getStatus().getHealth());
+    to.setCompletionDate(to.getCompletionDate());
+    to.setHealth(to.getHealth());
     if (to.getSequencerPartitionContainers().size() != 1) {
       throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",
           to.getAlias(), to.getSequencerPartitionContainers().size()));

@@ -30,7 +30,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
+
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 
 /**
  * Enum representing the different platform types available
@@ -39,11 +44,21 @@ import com.google.common.collect.Lists;
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina", false, "Flow Cell", "Lane", "ILLUMINA"), //
+  ILLUMINA("Illumina", false, "Flow Cell", "Lane", "ILLUMINA") {
+    @Override
+    public Run createRun(User user) {
+      return new IlluminaRun(user);
+    }
+  }, //
   LS454("LS454", true, "Plate", "Lane", "LS454"), //
   SOLID("Solid", true, "Slide", "Lane", "ABI_SOLID"), //
   IONTORRENT("IonTorrent", false, "Chip", "Chip", null), //
-  PACBIO("PacBio", false, "SMRT Cell", "SMRT Cell", null), //
+  PACBIO("PacBio", false, "SMRT Cell", "SMRT Cell", null) {
+    @Override
+    public Run createRun(User user) {
+      return new PacBioRun(user);
+    }
+  }, //
   OXFORDNANOPORE("OxfordNanopore", false, "Flow Cell", "Flow Cell", null);
 
   /**
@@ -133,5 +148,9 @@ public enum PlatformType {
 
   public String getSraName() {
     return sraName;
+  }
+
+  public Run createRun(User user) {
+    return new Run(user);
   }
 }

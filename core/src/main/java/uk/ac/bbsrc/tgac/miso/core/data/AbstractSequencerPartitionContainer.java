@@ -46,7 +46,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -69,7 +68,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   private String identificationBarcode;
   private String locationBarcode;
 
-  @ManyToMany(targetEntity = RunImpl.class)
+  @ManyToMany(targetEntity = Run.class)
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
       @JoinColumn(name = "containers_containerId") }, inverseJoinColumns = {
           @JoinColumn(name = "Run_runId") })
@@ -199,13 +198,13 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     for (Run thisRun : getRuns()) {
       if (lastRun == null) {
         lastRun = thisRun;
-      } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() == null) {
+      } else if (lastRun.getStartDate() == null && thisRun.getStartDate() == null) {
         if (thisRun.getLastUpdated().after(lastRun.getLastUpdated())) lastRun = thisRun;
-      } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() != null) {
+      } else if (lastRun.getStartDate() == null && thisRun.getStartDate() != null) {
         lastRun = thisRun;
-      } else if (lastRun.getStatus().getStartDate() != null && thisRun.getStatus().getStartDate() == null) {
+      } else if (lastRun.getStartDate() != null && thisRun.getStartDate() == null) {
         continue;
-      } else if (thisRun.getStatus().getStartDate().after(lastRun.getStatus().getStartDate())) {
+      } else if (thisRun.getStartDate().after(lastRun.getStartDate())) {
         lastRun = thisRun;
       }
     }

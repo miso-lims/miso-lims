@@ -75,7 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
@@ -205,8 +205,7 @@ public class EditProjectController {
     List<Run> runs = new ArrayList<>(requestManager.listAllRunsByProjectId(projectId));
     Collections.sort(runs, new AliasComparator<>());
       for (Run r : runs) {
-        RunImpl ri = (RunImpl) r;
-        ri.setSequencerPartitionContainers(new ArrayList<>(
+      r.setSequencerPartitionContainers(new ArrayList<>(
             requestManager.listSequencerPartitionContainersByRunId(r.getId())));
       }
       return runs;
@@ -295,7 +294,7 @@ public class EditProjectController {
       JSONObject samplesJSON = new JSONObject();
 
       for (Run run : runs) {
-        if (run.getStatus() != null && run.getStatus().getHealth() != null && run.getStatus().getHealth().getKey().equals("Completed")) {
+        if (run.getHealth() == HealthType.Completed) {
           runsJSON.put(run.getName(), "1");
         } else {
           runsJSON.put(run.getName(), "0");

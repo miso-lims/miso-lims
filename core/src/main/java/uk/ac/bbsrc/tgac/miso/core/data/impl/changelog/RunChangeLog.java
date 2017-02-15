@@ -11,7 +11,6 @@ import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 
 @Entity
 @Table(name = "RunChangeLog")
@@ -21,7 +20,7 @@ public class RunChangeLog extends AbstractChangeLog {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long runChangeLogId;
 
-  @ManyToOne(fetch = FetchType.LAZY, targetEntity = RunImpl.class)
+  @ManyToOne(fetch = FetchType.LAZY, targetEntity = Run.class)
   @JoinColumn(name = "runId", nullable = false, updatable = false)
   private Run run;
 

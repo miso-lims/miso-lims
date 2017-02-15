@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -239,7 +240,7 @@ public class ExternalSectionControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Run run : requestManager.listAllRunsByProjectId(projectId)) {
-        if (!run.getStatus().getHealth().getKey().equals("Failed")) {
+        if (run.getHealth() != HealthType.Failed) {
 
           StringBuilder sb = new StringBuilder();
           Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
@@ -268,13 +269,15 @@ public class ExternalSectionControllerHelperService {
             sb.append("</ul>");
           }
           jsonArray.add("['" + run.getName() + "','"
-              + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','"
-              + (run.getStatus() != null && run.getStatus().getStartDate() != null
-                  ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "")
+              + (run.getHealth() != null ? run.getHealth().getKey() : "") + "','"
+              + (run.getStartDate() != null
+                  ? LimsUtils.getDateAsString(run.getStartDate()) : "")
               + "','"
-              + (run.getStatus() != null && run.getStatus().getCompletionDate() != null
-                  ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : "")
-              + "','" + (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "','" + sb.toString() + "']");
+              + (run.getCompletionDate() != null
+                  ? LimsUtils.getDateAsString(run.getCompletionDate()) : "")
+              + "','" + (run.getSequencerReference().getPlatform().getPlatformType() != null
+                  ? run.getSequencerReference().getPlatform().getPlatformType().getKey() : "")
+              + "','" + sb.toString() + "']");
 
         }
       }

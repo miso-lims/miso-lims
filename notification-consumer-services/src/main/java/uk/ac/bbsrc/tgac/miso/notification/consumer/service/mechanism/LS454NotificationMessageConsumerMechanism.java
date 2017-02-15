@@ -54,16 +54,13 @@ import org.w3c.dom.Element;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Status;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
@@ -138,16 +135,12 @@ public class LS454NotificationMessageConsumerMechanism
         }
 
         if (!runLog.startsWith("ERROR")) {
-          Status is = new LS454Status(runLog);
-          is.setHealth(ht);
-          is.setRunName(runName);
 
-          Run r = null;
+          LS454Run r = null;
           Matcher m = p.matcher(runName);
           if (m.matches()) {
             try {
-              is.setInstrumentName(m.group(2));
-              r = requestManager.getRunByAlias(runName);
+              r = (LS454Run) requestManager.getRunByAlias(runName);
             } catch (IOException ioe) {
               log.warn(
                   "Cannot find run by this alias. This usually means the run hasn't been previously imported. If attemptRunPopulation is false, processing will not take place for this run!");
@@ -157,7 +150,7 @@ public class LS454NotificationMessageConsumerMechanism
           try {
             if (attemptRunPopulation) {
               if (r == null) {
-                log.debug("\\_ Saving new run and status: " + is.getRunName());
+                log.debug("\\_ Saving new run and status: " + runName);
                 r = new LS454Run();
                 r.setAlias(run.getString("runName"));
                 r.setDescription(m.group(3));
@@ -168,9 +161,6 @@ public class LS454NotificationMessageConsumerMechanism
                   r.setFilePath(run.getString("fullPath"));
                 }
 
-                is.setInstrumentName(m.group(2));
-                r.setStatus(is);
-
                 SequencerReference sr = null;
                 if (run.has("sequencerName")) {
                   sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
@@ -178,13 +168,10 @@ public class LS454NotificationMessageConsumerMechanism
                 if (sr == null) {
                   sr = requestManager.getSequencerReferenceByName(m.group(2));
                 }
-                if (sr == null) {
-                  sr = requestManager.getSequencerReferenceByName(r.getStatus().getInstrumentName());
-                }
 
                 if (run.has("completionDate")) {
                   try {
-                    is.setCompletionDate(gsLogDateFormat.parse(run.getString("completionDate")));
+                    r.setCompletionDate(gsLogDateFormat.parse(run.getString("completionDate")));
                   } catch (ParseException e) {
                     log.error("Cannot parse " + runName + " completion date", e);
                   }
@@ -194,29 +181,22 @@ public class LS454NotificationMessageConsumerMechanism
                   r.setSequencerReference(sr);
                   runsToSave.add(r);
                 } else {
-                  log.error("\\_ Cannot save " + is.getRunName() + ": no sequencer reference available.");
+                  log.error("\\_ Cannot save " + runName + ": no sequencer reference available.");
                 }
               } else {
-                log.debug("\\_ Updating existing run and status: " + is.getRunName());
+                log.debug("\\_ Updating existing run and status: " + runName);
 
                 r.setAlias(runName);
 
-                r.setPlatformType(PlatformType.LS454);
                 r.setDescription(m.group(3));
                 // TODO check this properly
                 r.setPairedEnd(false);
 
-                if (r.getStatus() != null && run.has("status")) {
-                  if (!r.getStatus().getHealth().equals(HealthType.Failed) && !r.getStatus().getHealth().equals(HealthType.Completed)) {
-                    r.getStatus().setHealth(ht);
-                  }
-                } else {
-                  if (run.has("status")) {
-                    r.setStatus(is);
+                if (run.has("status")) {
+                  if (!r.getHealth().equals(HealthType.Failed) && !r.getHealth().equals(HealthType.Completed)) {
+                    r.setHealth(ht);
                   }
                 }
-
-                r.getStatus().setInstrumentName(m.group(2));
 
                 if (r.getSequencerReference() == null) {
                   SequencerReference sr = null;
@@ -226,9 +206,6 @@ public class LS454NotificationMessageConsumerMechanism
                   if (sr == null) {
                     sr = requestManager.getSequencerReferenceByName(m.group(2));
                   }
-                  if (sr == null) {
-                    sr = requestManager.getSequencerReferenceByName(r.getStatus().getInstrumentName());
-                  }
 
                   if (sr != null) {
                     r.setSequencerReference(sr);
@@ -237,7 +214,7 @@ public class LS454NotificationMessageConsumerMechanism
 
                 if (run.has("completionDate")) {
                   try {
-                    r.getStatus().setCompletionDate(gsLogDateFormat.parse(run.getString("completionDate")));
+                    r.setCompletionDate(gsLogDateFormat.parse(run.getString("completionDate")));
                   } catch (ParseException e) {
                     log.error("run JSON", e);
                   }
@@ -249,13 +226,6 @@ public class LS454NotificationMessageConsumerMechanism
                     log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
                     r.setFilePath(run.getString("fullPath"));
                   }
-                }
-
-                // update status if run isn't completed or failed
-                if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)) {
-                  log.debug("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> "
-                      + is.getHealth().getKey() + ")");
-                  r.setStatus(is);
                 }
               }
 
@@ -274,12 +244,11 @@ public class LS454NotificationMessageConsumerMechanism
 
                     String startDateStr = runInfo.getElementsByTagName("date").item(0).getTextContent();
                     Date startDate = startDateFormat.parse(startDateStr);
-                    if (!startDate.equals(r.getStatus().getStartDate())) {
-                      r.getStatus().setStartDate(startDate);
-                      requestManager.saveStatus(r.getStatus());
+                    if (!startDate.equals(r.getStartDate())) {
+                      r.setStartDate(startDate);
                     }
 
-                    List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((LS454Run) r).getSequencerPartitionContainers();
+                    List<SequencerPartitionContainer<SequencerPoolPartition>> fs = r.getSequencerPartitionContainers();
 
                     Element ptp = (Element) paramsDoc.getElementsByTagName("ptp").item(0);
                     String ptpId = ptp.getElementsByTagName("id").item(0).getTextContent();
@@ -322,9 +291,8 @@ public class LS454NotificationMessageConsumerMechanism
                     String startDateStr = m.group(1);
                     DateFormat df = new SimpleDateFormat("yyyy'_'MM'_'dd'_'HH'_'mm'_'ss");
                     Date startDate = df.parse(startDateStr);
-                    if (!startDate.equals(r.getStatus().getStartDate())) {
-                      r.getStatus().setStartDate(startDate);
-                      requestManager.saveStatus(r.getStatus());
+                    if (!startDate.equals(r.getStartDate())) {
+                      r.setStartDate(startDate);
                     }
                   } catch (ParseException e) {
                     log.error("run JSON", e);

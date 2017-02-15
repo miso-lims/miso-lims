@@ -284,7 +284,7 @@ public class FlexReportingControllerHelperService {
                                 JsonSanitizer.sanitize(
                                     "[\"" + project.getName() + "\",\"" + libraryInRun.getSample().getName() + "\",\""
                                         + libraryInRun.getName() + "\",\"" + spp.getPool().getName() + "\",\"" + run.getName() + "\",\""
-                                        + run.getStatus().getHealth().getKey() + "\"]"));
+                                        + run.getHealth().getKey() + "\"]"));
                           }
                         }
                       }
@@ -333,12 +333,12 @@ public class FlexReportingControllerHelperService {
         for (Run run : runs) {
 
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
-            if (run.getStatus() != null && run.getStatus().getCompletionDate() != null) {
+            if (run.getCompletionDate() != null) {
 
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
               Date startDate = df.parse(from);
               Date endDate = df.parse(to);
-              Date runDate = run.getStatus().getCompletionDate();
+              Date runDate = run.getCompletionDate();
 
               if ((runDate.after(startDate) && runDate.before(endDate)) || runDate.equals(startDate) || runDate.equals(endDate)) {
                 projectBool = true;
@@ -373,7 +373,7 @@ public class FlexReportingControllerHelperService {
           sb.append(
               "<input class=\"runsinproject" + project.getProjectId() + "\" id=\"" + run.getName()
                   + "\" type=\"checkbox\" name=\"runIds\" value=\"" + run.getId() + "\" />");
-          sb.append(run.getName() + " - " + run.getStatus().getHealth().getKey() + " - " + run.getAlias());
+          sb.append(run.getName() + " - " + run.getHealth().getKey() + " - " + run.getAlias());
           Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
               .listSequencerPartitionContainersByRunId(run.getId());
           if (spcs.size() > 0) {
@@ -886,8 +886,10 @@ public class FlexReportingControllerHelperService {
   public String runFormRowBuilder(Run run) {
     return "['<input class=\"chkboxruns\" id=\"" + run.getId() + "\" type=\"checkbox\" name=\"runIds\" value=\"" + run.getId() + "\" id=\""
         + run.getId() + "\"/>','" + run.getName() + "','" + run.getAlias() + "','"
-        + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','"
-        + (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "']";
+        + (run.getHealth() != null ? run.getHealth().getKey() : "") + "','"
+        + (run.getSequencerReference().getPlatform().getPlatformType() != null
+            ? run.getSequencerReference().getPlatform().getPlatformType().getKey() : "")
+        + "']";
   }
 
   public JSONObject searchRunsByCreationDateandString(HttpSession session, JSONObject json) {
@@ -909,17 +911,17 @@ public class FlexReportingControllerHelperService {
       }
 
       for (Run run : runs) {
-        if ((platform.equals("all") || platform.equals(run.getPlatformType().getKey()))
-            && (status.equals("all") || (run.getStatus() != null && run.getStatus().getHealth() != null
-                ? status.equals(run.getStatus().getHealth().getKey()) : true))) {
+        if ((platform.equals("all") || platform.equals(run.getSequencerReference().getPlatform().getPlatformType().getKey()))
+            && (status.equals("all") || (run.getHealth() != null
+                ? status.equals(run.getHealth().getKey()) : true))) {
 
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
-            if (run.getStatus() != null && run.getStatus().getCompletionDate() != null) {
+            if (run.getCompletionDate() != null) {
 
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
               Date startDate = df.parse(from);
               Date endDate = df.parse(to);
-              Date receivedDate = run.getStatus().getCompletionDate();
+              Date receivedDate = run.getCompletionDate();
 
               if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate)
                   || receivedDate.equals(endDate)) {
@@ -927,12 +929,12 @@ public class FlexReportingControllerHelperService {
               }
             }
           } else if (!isStringEmptyOrNull(runStartedFrom) && !isStringEmptyOrNull(runStartedTo)) {
-            if (run.getStatus() != null && run.getStatus().getStartDate() != null) {
+            if (run.getStartDate() != null) {
 
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
               Date startDate = df.parse(runStartedFrom);
               Date endDate = df.parse(runStartedTo);
-              Date startedDate = run.getStatus().getStartDate();
+              Date startedDate = run.getStartDate();
 
               if ((startedDate.after(startDate) && startedDate.before(endDate)) || startedDate.equals(startDate)
                   || startedDate.equals(endDate)) {
@@ -970,16 +972,17 @@ public class FlexReportingControllerHelperService {
           if (run != null) {
             runs.add(run);
 
-            int count = platformTypeMap.containsKey(run.getPlatformType().getKey()) ? platformTypeMap.get(run.getPlatformType().getKey())
+            int count = platformTypeMap.containsKey(run.getSequencerReference().getPlatform().getPlatformType().getKey())
+                ? platformTypeMap.get(run.getSequencerReference().getPlatform().getPlatformType().getKey())
                 : 0;
             count++;
-            platformTypeMap.put(run.getPlatformType().getKey(), count);
+            platformTypeMap.put(run.getSequencerReference().getPlatform().getPlatformType().getKey(), count);
 
-            if (run.getStatus() != null && run.getStatus().getHealth() != null) {
-              int countQC = statusMap.containsKey(run.getStatus().getHealth().getKey())
-                  ? statusMap.get(run.getStatus().getHealth().getKey()) : 0;
+            if (run.getHealth() != null) {
+              int countQC = statusMap.containsKey(run.getHealth().getKey())
+                  ? statusMap.get(run.getHealth().getKey()) : 0;
               countQC++;
-              statusMap.put(run.getStatus().getHealth().getKey(), countQC);
+              statusMap.put(run.getHealth().getKey(), countQC);
             }
           }
         }
@@ -1019,8 +1022,8 @@ public class FlexReportingControllerHelperService {
       jsonArray.add(
           JsonSanitizer.sanitize(
               "[\"" + (run.getName().replace("+", "-")) + "\",\"" + (run.getAlias().replace("+", "-")) + "\",\""
-                  + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "\",\""
-                  + run.getPlatformType().getKey() + "\"]"));
+                  + (run.getHealth() != null ? run.getHealth().getKey() : "") + "\",\""
+                  + run.getSequencerReference().getPlatform().getPlatformType().getKey() + "\"]"));
     }
     return jsonArray;
   }
@@ -1052,11 +1055,11 @@ public class FlexReportingControllerHelperService {
                         jsonArray.add(
                             JsonSanitizer.sanitize(
                                 "[\"" + run.getName() + "\",\"" + (run.getAlias().replace("+", "-")) + "\",\""
-                                    + (run.getStatus() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "\",\""
+                                    + ( LimsUtils.getDateAsString(run.getStartDate()) + "\",\""
                                     + pool.getName() + "\",\"" + spp.getPartitionNumber() + "\",\""
                                     + dilution.getLibrary().getSample().getProject().getName() + "\",\""
                                     + projectMap.get(dilution.getLibrary().getSample().getProject().getName()) + "\",\""
-                                    + spp.getPool().getPoolableElements().size() + "\"]"));
+                                        + spp.getPool().getPoolableElements().size() + "\"]")));
                         projectMapDisplayed.put(dilution.getLibrary().getSample().getProject().getName(), 1);
                       }
                     }
@@ -1092,7 +1095,7 @@ public class FlexReportingControllerHelperService {
       runJSON.put("name", "Runs");
       runJSON.put("description", "");
       for (Run run : runs) {
-        if (run.getStatus() != null && run.getStatus().getHealth() != null && run.getStatus().getHealth().getKey().equals("Completed")) {
+        if (run.getHealth() == HealthType.Completed) {
           runsArray.add(JSONObject.fromObject("{'name': '" + run.getName() + "','description':'" + run.getAlias() + "','color': '1'}"));
         } else {
           runsArray.add(JSONObject.fromObject("{'name': '" + run.getName() + "','description':'" + run.getAlias() + "','color': '0'}"));
