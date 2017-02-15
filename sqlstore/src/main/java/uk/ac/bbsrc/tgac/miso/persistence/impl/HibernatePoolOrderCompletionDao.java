@@ -30,7 +30,7 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao {
   @Override
   public Collection<PoolOrderCompletion> getForPool(Long poolId) throws HibernateException, IOException {
     Criteria criteria = currentSession().createCriteria(PoolOrderCompletion.class);
-    criteria.add(Restrictions.eq("pool.id", poolId));
+    criteria.add(Restrictions.eq("id.pool.id", poolId));
     @SuppressWarnings("unchecked")
     List<PoolOrderCompletion> result = criteria.list();
     return result;

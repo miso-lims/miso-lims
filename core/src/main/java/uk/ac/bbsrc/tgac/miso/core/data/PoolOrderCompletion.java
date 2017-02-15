@@ -3,10 +3,11 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -24,28 +25,58 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 @Entity
 @Table(name = "OrderCompletion")
 public class PoolOrderCompletion implements Serializable {
+  @Embeddable
+  public static class PoolOrderCompletionId implements Serializable {
+    private static final long serialVersionUID = -2890725144995338712L;
+    @Enumerated(EnumType.STRING)
+    HealthType health;
+    @ManyToOne(targetEntity = SequencingParametersImpl.class)
+    @JoinColumn(name = "parametersId", nullable = false)
+    SequencingParameters parameters;
+    @ManyToOne(targetEntity = PoolImpl.class)
+    @JoinColumn(name = "poolId")
+    Pool pool;
+
+    public PoolOrderCompletionId() {
+    }
+
+    public HealthType getHealth() {
+      return health;
+    }
+
+    public SequencingParameters getParameters() {
+      return parameters;
+    }
+
+    public Pool getPool() {
+      return pool;
+    }
+
+    public void setHealth(HealthType health) {
+      this.health = health;
+    }
+
+    public void setParameters(SequencingParameters parameters) {
+      this.parameters = parameters;
+    }
+
+    public void setPool(Pool pool) {
+      this.pool = pool;
+    }
+
+  }
+
   private static final long serialVersionUID = 1L;
 
-  @Enumerated(EnumType.STRING)
-  private HealthType health;
-
+  @EmbeddedId
+  private final PoolOrderCompletionId id = new PoolOrderCompletionId();
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
   private int num_partitions;
 
-  @Id
-  @ManyToOne(targetEntity = SequencingParametersImpl.class)
-  @JoinColumn(name = "parametersId", nullable = false)
-  private SequencingParameters parameters;
-
-  @Id
-  @ManyToOne(targetEntity = PoolImpl.class)
-  @JoinColumn(name = "poolId")
-  private Pool pool;
-
   public HealthType getHealth() {
-    return health;
+    return id.health;
   }
 
   public Date getLastUpdated() {
