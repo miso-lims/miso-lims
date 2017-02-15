@@ -1,3 +1,5 @@
+-- hibernatize_everything
+
 DROP TABLE Project_Study;
 UPDATE Project SET progress = UPPER(progress);
 ALTER TABLE Project ADD CONSTRAINT project_alias_UK UNIQUE (alias);
@@ -542,3 +544,5 @@ ALTER TABLE Box ADD CONSTRAINT fk_box_boxUse FOREIGN KEY (boxUseId) REFERENCES B
 ALTER TABLE Box ADD CONSTRAINT fk_box_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
 
 DROP TABLE Study_Experiment;
+
+
