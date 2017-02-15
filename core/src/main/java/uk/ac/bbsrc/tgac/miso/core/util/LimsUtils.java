@@ -604,7 +604,7 @@ public class LimsUtils {
       if (poolGroups.containsKey(completion.getPool())) {
         parametersGroup = poolGroups.get(completion.getPool());
       } else {
-        parametersGroup = new HashMap<>();
+        parametersGroup = new TreeMap<>();
         poolGroups.put(completion.getPool(), parametersGroup);
       }
       PoolOrderCompletionGroup groupedCompletions;
