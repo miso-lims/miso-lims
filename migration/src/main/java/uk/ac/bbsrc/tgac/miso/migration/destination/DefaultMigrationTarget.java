@@ -155,7 +155,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveProjects(Collection<Project> projects) throws IOException {
     log.info("Migrating projects...");
     StudyType other = null;
-    for (StudyType st : serviceManager.getStudyDao().listAllStudyTypes()) {
+    for (StudyType st : serviceManager.getStudyService().listTypes()) {
       if (st.getName().equals("Other")) {
         other = st;
         break;
@@ -177,11 +177,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
         study.setLastModifier(migrationUser);
         project.getStudies().add(study);
       }
-      project.setId(serviceManager.getProjectDao().save(project));
+      project.setId(serviceManager.getRequestManager().saveProject(project));
       for (Study study : project.getStudies()) {
         study.setProject(project);
         study.inheritPermissions(project);
-        study.setId(serviceManager.getStudyDao().save(study));
+        study.setId(serviceManager.getStudyService().save(study));
       }
       log.debug("Saved project " + project.getAlias());
     }
@@ -248,6 +248,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
       if (isIdentitySample(detailed)) updateSampleNumberPerProject(detailed);
     }
+    addSampleQcs(sample, qcs);
     if (replaceChangeLogs) {
       Collection<ChangeLog> changes = new ArrayList<>(sample.getChangeLog());
       sample.setId(serviceManager.getSampleService().create(sample));
@@ -256,7 +257,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
     } else {
       sample.setId(serviceManager.getSampleService().create(sample));
     }
-    saveSampleQcs(sample, qcs);
 
     log.debug("Saved sample " + sample.getAlias());
   }
@@ -311,7 +311,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
   }
 
-  private void saveSampleQcs(Sample sample, Collection<SampleQC> qcs) throws IOException {
+  private void addSampleQcs(Sample sample, Collection<SampleQC> qcs) throws IOException {
     Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
     for (SampleQC qc : qcs) {
       try {
@@ -322,7 +322,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
       qc.setQcCreator(migrationUser.getFullName());
       qc.setQcDate(date);
-      qc.setId(serviceManager.getSampleQcDao().save(qc));
     }
   }
 
@@ -391,11 +390,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
       library.setCreationDate(timeStamp);
       // Check for duplicate alias
-      Collection<Library> dupes = serviceManager.getLibraryDao().listByAlias(library.getAlias());
+      Collection<Library> dupes = serviceManager.getLibraryService().listByAlias(library.getAlias());
       if (!dupes.isEmpty()) {
         for (Library dupe : dupes) {
           ((DetailedLibrary) dupe).setNonStandardAlias(true);
-          serviceManager.getLibraryDao().save(dupe);
+          serviceManager.getLibraryService().update(dupe);
         }
         ((DetailedLibrary) library).setNonStandardAlias(true);
       }
@@ -403,10 +402,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (replaceChangeLogs) {
       Collection<ChangeLog> changes = library.getChangeLog();
       copyTimestampsFromChangelog(library);
-      library.setId(serviceManager.getLibraryDao().save(library));
+      library.setId(serviceManager.getLibraryService().create(library));
       saveLibraryChangeLog(library, changes);
     } else {
-      library.setId(serviceManager.getLibraryDao().save(library));
+      library.setId(serviceManager.getLibraryService().create(library));
     }
     log.debug("Saved library " + library.getAlias());
   }
@@ -463,7 +462,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
     }
     valueTypeLookup.resolveAll(ldi);
-    ldi.setId(serviceManager.getDilutionDao().save(ldi));
+    ldi.setId(serviceManager.getDilutionService().create(ldi));
     fixDilutionChangeLog(ldi, ghostChangeLog);
     log.debug("Saved library dilution " + friendlyName);
   }
@@ -530,7 +529,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     for (Pool pool : pools) {
       setPoolModifiedDetails(pool);
       addPoolNoteDetails(pool);
-      pool.setId(serviceManager.getPoolDao().save(pool));
+      pool.setId(serviceManager.getRequestManager().savePool(pool));
       log.debug("Saved pool " + pool.getAlias());
     }
     log.info(pools.size() + " pools migrated.");
@@ -594,7 +593,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
               Collection<LibraryDilution> toPoolables = toPool.getPoolableElements();
               toPoolables.addAll(fromPoolables);
               setPoolModifiedDetails(toPool);
-              serviceManager.getPoolDao().save(toPool);
+              serviceManager.getRequestManager().savePool(toPool);
               addPoolNoteDetails(fromPartition.getPool());
               log.debug(String.format("Merged new pool %s with existing pool '%s' in run %d lane %d",
                   fromPartition.getPool().getAlias(), toPool.getAlias(), to.getId(), toPartition.getPartitionNumber()));

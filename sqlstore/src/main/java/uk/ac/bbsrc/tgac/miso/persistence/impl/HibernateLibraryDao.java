@@ -427,4 +427,7 @@ public class HibernateLibraryDao implements LibraryStore {
     this.boxDao = boxDao;
   }
 
+  public void setDetailedSampleEnabled(boolean detailedSampleEnabled) {
+    this.detailedSampleEnabled = detailedSampleEnabled;
+  }
 }

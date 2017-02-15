@@ -189,9 +189,31 @@ public class MisoRequestManager implements RequestManager {
   private RunAlertManager runAlertManager;
   @Autowired
   private ProjectAlertManager projectAlertManager;
+  @Autowired
+  private SecurityManager securityManager;
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
+  }
+
+  public void setSecurityProfileStore(SecurityProfileStore securityProfileStore) {
+    this.securityProfileStore = securityProfileStore;
+  }
+
+  public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
+    this.poolAlertManager = poolAlertManager;
+  }
+
+  public void setProjectAlertManager(ProjectAlertManager projectAlertManager) {
+    this.projectAlertManager = projectAlertManager;
+  }
+
+  public void setRunAlertManager(RunAlertManager runAlertManager) {
+    this.runAlertManager = runAlertManager;
   }
 
   public void setBoxStore(BoxStore boxStore) {
@@ -230,6 +252,10 @@ public class MisoRequestManager implements RequestManager {
     this.projectStore = projectStore;
   }
 
+  public void setReferenceGenomeStore(ReferenceGenomeDao referenceGenomeStore) {
+    this.referenceGenomeDao = referenceGenomeStore;
+  }
+
   public void setRunStore(RunStore runStore) {
     this.runStore = runStore;
   }
@@ -264,6 +290,10 @@ public class MisoRequestManager implements RequestManager {
 
   public void setSubmissionStore(SubmissionStore submissionStore) {
     this.submissionStore = submissionStore;
+  }
+
+  public void setTargetedSequencingStore(TargetedSequencingStore targetedSequencingStore) {
+    this.targetedSequencingStore = targetedSequencingStore;
   }
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
@@ -1156,9 +1186,6 @@ public class MisoRequestManager implements RequestManager {
     }
     return original;
   }
-
-  @Autowired
-  private SecurityManager securityManager;
 
   public User getCurrentUser() throws IOException {
     Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();

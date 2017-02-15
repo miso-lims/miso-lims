@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.migration.destination;
 import java.io.IOException;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -12,6 +13,10 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.migration.util.OicrMigrationNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
@@ -52,12 +57,14 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultStudyService;
 
 /**
  * This class is used to simplify creation and wiring of MISO services. Some of the config is currently hardcoded - mainly naming schemes
@@ -99,9 +106,15 @@ public class MisoServiceManager {
   private DefaultSampleService sampleService;
   private DefaultLabService labService;
   private DefaultLibraryService libraryService;
+  private DefaultLibraryDilutionService dilutionService;
   private DefaultSampleNumberPerProjectService sampleNumberPerProjectService;
   private DefaultSampleValidRelationshipService sampleValidRelationshipService;
   private DefaultReferenceGenomeService referenceGenomeService;
+  private DefaultStudyService studyService;
+
+  private PoolAlertManager poolAlertManager;
+  private ProjectAlertManager projectAlertManager;
+  private RunAlertManager runAlertManager;
 
   private HibernateSampleClassDao sampleClassDao;
   private HibernateSampleDao sampleDao;
@@ -120,6 +133,8 @@ public class MisoServiceManager {
   private HibernateIndexDao indexDao;
   private HibernateSequencingParametersDao sequencingParametersDao;
   private HibernateReferenceGenomeDao referenceGenomeDao;
+
+  private MisoRequestManager requestManager;
 
   /**
    * Constructs a new MisoServiceManager with no services initialized
@@ -147,6 +162,7 @@ public class MisoServiceManager {
     m.setDefaultBoxDao();
     m.setDefaultChangeLogDao();
     m.setDefaultDilutionDao();
+    m.setDefaultDilutionService();
     m.setDefaultExperimentDao();
     m.setDefaultInstituteDao();
     m.setDefaultKitDao();
@@ -180,6 +196,7 @@ public class MisoServiceManager {
     m.setDefaultSequencerReferenceDao();
     m.setDefaultStatusDao();
     m.setDefaultStudyDao();
+    m.setDefaultStudyService();
     m.setDefaultSubprojectDao();
     m.setDefaultTargetedSequencingDao();
     m.setDefaultTissueMaterialDao();
@@ -190,11 +207,39 @@ public class MisoServiceManager {
     m.setDefaultIndexDao();
     m.setDefaultSequencingParametersDao();
 
-    User migrationUser = m.getsecurityStore().getUserByLoginName(username);
+    // sigh
+    m.setDefaultRequestManager();
+
+    m.setDefaultPoolAlertManager();
+    m.setDefaultProjectAlertManager();
+    m.setDefaultRunAlertManager();
+
+    User migrationUser = m.getUserByLoginNameInTransaction(m.getSecurityStore(), username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
     m.setUpSecurityContext(migrationUser);
     m.setAuthorizationManagerWithUser(migrationUser);
     return m;
+  }
+
+  /**
+   * Hibernate needs this to be wrapped in a transaction
+   * 
+   * @param securityStore
+   * @return User
+   * @throws IOException
+   */
+  public User getUserByLoginNameInTransaction(HibernateSecurityDao securityStore, String username) throws IOException {
+
+    Transaction tx = sessionFactory.getCurrentSession().beginTransaction();
+    User user;
+    try {
+      user = securityStore.getUserByLoginName(username);
+      tx.commit();
+    } catch (Exception e) {
+      if (tx.isActive()) tx.rollback();
+      throw e;
+    }
+    return user;
   }
 
   /**
@@ -238,9 +283,37 @@ public class MisoServiceManager {
     if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setAuthorizationManager(authorizationManager);
     if (sampleValidRelationshipService != null) sampleValidRelationshipService.setAuthorizationManager(authorizationManager);
     if (referenceGenomeService != null) referenceGenomeService.setAuthorizationManager(authorizationManager);
+    if (studyService != null) studyService.setAuthorizationManager(authorizationManager);
+    if (dilutionService != null) dilutionService.setAuthorizationManager(authorizationManager);
   }
 
-  public HibernateSecurityDao getsecurityStore() {
+  public MisoRequestManager getRequestManager() {
+    return requestManager;
+  }
+
+  public void setRequestManager(MisoRequestManager requestManager) {
+    this.requestManager = requestManager;
+  }
+
+  public void setDefaultRequestManager() {
+    MisoRequestManager rm = new MisoRequestManager();
+    // Set stores for entities which need names generated before creation and can't be saved via services.
+    rm.setProjectStore(projectDao);
+    rm.setPoolStore(poolDao);
+    rm.setSampleQcStore(sampleQcDao);
+    rm.setNamingScheme(namingScheme);
+    rm.setSecurityStore(securityStore);
+    rm.setSecurityProfileStore(securityProfileDao);
+    rm.setPoolAlertManager(poolAlertManager);
+    rm.setProjectAlertManager(projectAlertManager);
+    rm.setRunAlertManager(runAlertManager);
+    rm.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
+    rm.setSecurityStore(securityStore);
+    rm.setSecurityManager(securityManager);
+    setRequestManager(rm);
+  }
+
+  public HibernateSecurityDao getSecurityStore() {
     return securityStore;
   }
 
@@ -252,12 +325,16 @@ public class MisoServiceManager {
   public void setDefaultSecurityStore() {
     HibernateSecurityDao store = new HibernateSecurityDao();
     store.setJdbcTemplate(jdbcTemplate);
+    store.setSessionFactory(sessionFactory);
     setSecurityStore(store);
   }
 
   private void updateSecurityStoreDependencies() {
     if (securityManager != null) securityManager.setSecurityStore(securityStore);
     if (poolDao != null) poolDao.setSecurityStore(securityStore);
+    if (requestManager != null) requestManager.setSecurityStore(securityStore);
+    if (projectDao != null) projectDao.setSecurityStore(securityStore);
+    if (runDao != null) runDao.setSecurityStore(securityStore);
   }
 
   public HibernateSecurityProfileDao getSecurityProfileDao() {
@@ -276,6 +353,7 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityProfileDaoDependencies() {
+    if (requestManager != null) requestManager.setSecurityProfileStore(securityProfileDao);
   }
 
   public LocalSecurityManager getSecurityManager() {
@@ -294,6 +372,10 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityManagerDependencies() {
+    if (poolAlertManager != null) poolAlertManager.setSecurityManager(securityManager);
+    if (projectAlertManager != null) projectAlertManager.setSecurityManager(securityManager);
+    if (runAlertManager != null) runAlertManager.setSecurityManager(securityManager);
+    if (requestManager != null) requestManager.setSecurityManager(securityManager);
   }
 
   public HibernateProjectDao getProjectDao() {
@@ -308,11 +390,15 @@ public class MisoServiceManager {
   public void setDefaultProjectDao() {
     HibernateProjectDao dao = new HibernateProjectDao();
     dao.setJdbcTemplate(jdbcTemplate);
+    dao.setSessionFactory(sessionFactory);
+    dao.setSecurityStore(securityStore);
+    dao.setProjectAlertManager(projectAlertManager);
     setProjectDao(dao);
   }
 
   private void updateProjectDaoDependencies() {
     if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setProjectStore(projectDao);
+    if (requestManager != null) requestManager.setProjectStore(projectDao);
   }
 
   public HibernateSampleClassDao getSampleClassDao() {
@@ -400,11 +486,13 @@ public class MisoServiceManager {
   public void setDefaultSampleDao() {
     HibernateSampleDao dao = new HibernateSampleDao();
     dao.setSessionFactory(sessionFactory);
+    dao.setJdbcTemplate(jdbcTemplate);
     setSampleDao(dao);
   }
 
   private void updateSampleDaoDependencies() {
     if (sampleService != null) sampleService.setSampleDao(sampleDao);
+    if (libraryService != null) libraryService.setSampleDao(sampleDao);
   }
 
   public HibernateChangeLogDao getChangeLogDao() {
@@ -436,10 +524,12 @@ public class MisoServiceManager {
 
   public void setDefaultSampleQcDao() {
     HibernateSampleQcDao dao = new HibernateSampleQcDao();
+    dao.setSessionFactory(sessionFactory);
     setSampleQcDao(dao);
   }
 
   private void updateSampleQcDaoDependencies() {
+    if (requestManager != null) requestManager.setSampleQcStore(sampleQcDao);
   }
 
   public HibernateLibraryDao getLibraryDao() {
@@ -455,11 +545,14 @@ public class MisoServiceManager {
     HibernateLibraryDao dao = new HibernateLibraryDao();
     dao.setSessionFactory(sessionFactory);
     dao.setBoxDao(boxDao);
+    dao.setDetailedSampleEnabled(true);
     setLibraryDao(dao);
   }
 
   private void updateLibraryDaoDependencies() {
     if (libraryDesignDao != null) libraryDesignDao.setLibraryDao(libraryDao);
+    if (libraryService != null) libraryService.setLibraryDao(libraryDao);
+    if (dilutionService != null) dilutionService.setLibraryDao(libraryDao);
   }
 
   public DefaultLibraryService getLibraryService() {
@@ -524,6 +617,30 @@ public class MisoServiceManager {
   }
 
   private void updateDilutionDaoDependencies() {
+    if (dilutionService != null) dilutionService.setDilutionDao(dilutionDao);
+  }
+
+  public DefaultLibraryDilutionService getDilutionService() {
+    return dilutionService;
+  }
+
+  public void setDilutionService(DefaultLibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
+    updateDilutionServiceDependencies();
+  }
+
+  public void setDefaultDilutionService() {
+    DefaultLibraryDilutionService svc = new DefaultLibraryDilutionService();
+    svc.setDilutionDao(dilutionDao);
+    svc.setAuthorizationManager(authorizationManager);
+    svc.setNamingScheme(getNamingScheme());
+    svc.setLibraryDao(libraryDao);
+    svc.setTargetedSequencingDao(targetedSequencingDao);
+    svc.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
+    setDilutionService(svc);
+  }
+
+  private void updateDilutionServiceDependencies() {
   }
 
   public HibernateTargetedSequencingDao getTargetedSequencingDao() {
@@ -542,6 +659,7 @@ public class MisoServiceManager {
   }
 
   private void updateTargetedSequencingDaoDependencies() {
+    if (dilutionService != null) dilutionService.setTargetedSequencingDao(targetedSequencingDao);
   }
 
   public HibernatePoolDao getPoolDao() {
@@ -562,6 +680,7 @@ public class MisoServiceManager {
   }
 
   private void updatePoolDaoDependencies() {
+    if (requestManager != null) requestManager.setPoolStore(poolDao);
   }
 
   public HibernateExperimentDao getExperimentDao() {
@@ -620,6 +739,7 @@ public class MisoServiceManager {
   }
 
   private void updatePlatformDaoDependencies() {
+    if (requestManager != null) requestManager.setPlatformStore(platformDao);
   }
 
   public HibernateStudyDao getStudyDao() {
@@ -654,6 +774,7 @@ public class MisoServiceManager {
     HibernateRunDao dao = new HibernateRunDao();
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
+    dao.setSecurityStore(securityStore);
     setRunDao(dao);
   }
 
@@ -694,7 +815,6 @@ public class MisoServiceManager {
   }
 
   private void updateSequencerPartitionContainerDaoDependencies() {
- 
   }
 
   public HibernateStatusDao getStatusDao() {
@@ -989,6 +1109,27 @@ public class MisoServiceManager {
     if (sampleService != null) sampleService.setSampleValidRelationshipService(sampleValidRelationshipService);
   }
 
+  public DefaultStudyService getStudyService() {
+    return studyService;
+  }
+
+  public void setStudyService(DefaultStudyService studyService) {
+    this.studyService = studyService;
+    updateStudyServiceDependencies();
+  }
+
+  public void setDefaultStudyService() {
+    DefaultStudyService svc = new DefaultStudyService();
+    svc.setAuthorizationManager(authorizationManager);
+    svc.setProjectStore(projectDao);
+    svc.setStudyStore(studyDao);
+    svc.setNamingScheme(namingScheme);
+    setStudyService(svc);
+  }
+
+  private void updateStudyServiceDependencies() {
+  }
+
   public DefaultReferenceGenomeService getReferenceGenomeService() {
     return referenceGenomeService;
   }
@@ -1116,6 +1257,63 @@ public class MisoServiceManager {
   }
 
   private void updateSequencingParametersDaoDependencies() {
+  }
+
+  public PoolAlertManager getPoolAlertManager() {
+    return poolAlertManager;
+  }
+
+  public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
+    this.poolAlertManager = poolAlertManager;
+    updatePoolAlertManagerDependencies();
+  }
+
+  public void setDefaultPoolAlertManager() {
+    PoolAlertManager pam = new PoolAlertManager();
+    pam.setSecurityManager(securityManager);
+    setPoolAlertManager(pam);
+  }
+
+  public void updatePoolAlertManagerDependencies() {
+    if (requestManager != null) requestManager.setPoolAlertManager(poolAlertManager);
+  }
+
+  public ProjectAlertManager getProjectAlertManager() {
+    return projectAlertManager;
+  }
+
+  public void setProjectAlertManager(ProjectAlertManager projectAlertManager) {
+    this.projectAlertManager = projectAlertManager;
+    updateProjectAlertManagerDependencies();
+  }
+
+  public void setDefaultProjectAlertManager() {
+    ProjectAlertManager pam = new ProjectAlertManager();
+    pam.setSecurityManager(securityManager);
+    setProjectAlertManager(pam);
+  }
+
+  public void updateProjectAlertManagerDependencies() {
+    if (projectDao != null) projectDao.setProjectAlertManager(projectAlertManager);
+  }
+
+  public RunAlertManager getRunAlertManager() {
+    return runAlertManager;
+  }
+
+  public void setRunAlertManager(RunAlertManager runAlertManager) {
+    this.runAlertManager = runAlertManager;
+    updateRunAlertManagerDependencies();
+  }
+
+  public void setDefaultRunAlertManager() {
+    RunAlertManager ram = new RunAlertManager();
+    ram.setSecurityManager(securityManager);
+    setRunAlertManager(ram);
+  }
+
+  public void updateRunAlertManagerDependencies() {
+    if (requestManager != null) requestManager.setRunAlertManager(runAlertManager);
   }
 
 }
