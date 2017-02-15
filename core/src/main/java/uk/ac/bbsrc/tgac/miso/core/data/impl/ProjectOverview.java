@@ -299,11 +299,6 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
     return numProposedSamples;
   }
 
-  @Deprecated
-  public Long getOverviewId() {
-    return overviewId;
-  }
-
   public boolean getPrimaryAnalysisCompleted() {
     return primaryAnalysisCompleted;
   }
@@ -461,11 +456,6 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
     this.numProposedSamples = numProposedSamples;
   }
 
-  @Deprecated
-  public void setOverviewId(Long overviewId) {
-    this.overviewId = overviewId;
-  }
-
   public void setPrimaryAnalysisCompleted(boolean primaryAnalysisCompleted) {
     if (this.primaryAnalysisCompleted != primaryAnalysisCompleted && primaryAnalysisCompleted) {
       this.primaryAnalysisCompleted = primaryAnalysisCompleted;
@@ -485,11 +475,6 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   public void setSampleGroup(Set<Sample> sampleGroup) {
     this.sampleGroup = sampleGroup;
-  }
-
-  @Deprecated
-  public void setSamples(Set<Sample> samples) {
-    sampleGroup = samples;
   }
 
   public void setStartDate(Date startDate) {
