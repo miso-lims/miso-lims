@@ -175,7 +175,7 @@ public class ProjectAlertManager {
         clone.setProgress(p.getProgress());
 
         for (ProjectOverview po : p.getOverviews()) {
-          ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
+          ProjectOverview cloneOverview = clone.getOverviewById(po.getId());
           if (cloneOverview != null) {
             cloneOverview.setAllSampleQcPassed(po.getAllSampleQcPassed());
             cloneOverview.setLibraryPreparationComplete(po.getLibraryPreparationComplete());
@@ -196,9 +196,9 @@ public class ProjectAlertManager {
 
   public void addWatcher(ProjectOverview overview, User user) throws IOException {
     for (Project clone : projects.values()) {
-      ProjectOverview cloneOverview = clone.getOverviewById(overview.getOverviewId());
+      ProjectOverview cloneOverview = clone.getOverviewById(overview.getId());
       if (cloneOverview != null) {
-        log.debug("Added watcher " + user.getUserId() + " to overview " + overview.getOverviewId());
+        log.debug("Added watcher " + user.getUserId() + " to overview " + overview.getId());
         cloneOverview.addWatcher(user);
         clone.addWatcher(user);
         break;
@@ -208,9 +208,9 @@ public class ProjectAlertManager {
 
   public void removeWatcher(ProjectOverview overview, User user) throws IOException {
     for (Project clone : projects.values()) {
-      ProjectOverview cloneOverview = clone.getOverviewById(overview.getOverviewId());
+      ProjectOverview cloneOverview = clone.getOverviewById(overview.getId());
       if (cloneOverview != null) {
-        log.debug("Removed watcher " + user.getUserId() + " from overview " + overview.getOverviewId());
+        log.debug("Removed watcher " + user.getUserId() + " from overview " + overview.getId());
         cloneOverview.removeWatcher(user);
         clone.removeWatcher(user);
         break;
@@ -225,7 +225,7 @@ public class ProjectAlertManager {
       if (clone == null) {
         project.addWatcher(user);
         for (ProjectOverview po : project.getOverviews()) {
-          ProjectOverview pOverview = project.getOverviewById(po.getOverviewId());
+          ProjectOverview pOverview = project.getOverviewById(po.getId());
           if (pOverview != null) {
             pOverview.addWatcher(user);
           }
@@ -235,7 +235,7 @@ public class ProjectAlertManager {
       } else {
         clone.addWatcher(user);
         for (ProjectOverview po : clone.getOverviews()) {
-          ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
+          ProjectOverview cloneOverview = clone.getOverviewById(po.getId());
           if (cloneOverview != null) {
             cloneOverview.addWatcher(user);
           }
@@ -249,7 +249,7 @@ public class ProjectAlertManager {
     if (clone == null) {
       project.removeWatcher(user);
       for (ProjectOverview po : project.getOverviews()) {
-        ProjectOverview pOverview = project.getOverviewById(po.getOverviewId());
+        ProjectOverview pOverview = project.getOverviewById(po.getId());
         if (pOverview != null) {
           pOverview.removeWatcher(user);
         }
@@ -259,7 +259,7 @@ public class ProjectAlertManager {
     } else {
       clone.removeWatcher(user);
       for (ProjectOverview po : clone.getOverviews()) {
-        ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
+        ProjectOverview cloneOverview = clone.getOverviewById(po.getId());
         if (cloneOverview != null) {
           cloneOverview.removeWatcher(user);
         }
