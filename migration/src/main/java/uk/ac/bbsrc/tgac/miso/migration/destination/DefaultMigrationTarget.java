@@ -553,7 +553,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
       Run run = serviceManager.getRunDao().getByAlias(newRun.getAlias());
       if (run == null) {
         run = newRun;
-        run.getStatus().setLastUpdated(new Date());
+
+        // slated for demolition
+        run.getStatus().setLastUpdated(timeStamp);
       } else {
         updateRun(newRun, run);
       }
@@ -574,7 +576,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     to.getStatus().setHealth(to.getStatus().getHealth());
 
     // slated for demolition
-    to.getStatus().setLastUpdated(new Date());
+    to.getStatus().setLastUpdated(timeStamp);
 
     if (to.getSequencerPartitionContainers().size() != 1) {
       throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",
