@@ -300,6 +300,7 @@ public class MisoServiceManager {
     // Set stores for entities which need names generated before creation and can't be saved via services.
     rm.setProjectStore(projectDao);
     rm.setPoolStore(poolDao);
+    rm.setRunStore(runDao);
     rm.setSampleQcStore(sampleQcDao);
     rm.setNamingScheme(namingScheme);
     rm.setSecurityStore(securityStore);
@@ -779,6 +780,7 @@ public class MisoServiceManager {
   }
 
   private void updateRunDaoDependencies() {
+    if (requestManager != null) requestManager.setRunStore(runDao);
   }
 
   public HibernateRunQcDao getRunQcDao() {
