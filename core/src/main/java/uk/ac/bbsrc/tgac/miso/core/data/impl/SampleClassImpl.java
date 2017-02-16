@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -41,6 +43,7 @@ public class SampleClassImpl implements SampleClass {
   private User createdBy;
 
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
 
   @OneToOne(targetEntity = UserImpl.class)
@@ -48,6 +51,7 @@ public class SampleClassImpl implements SampleClass {
   private User updatedBy;
 
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
   private Boolean dnaseTreatable;

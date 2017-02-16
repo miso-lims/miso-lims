@@ -38,7 +38,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -75,6 +76,7 @@ public class LibraryDilution implements Dilution, Serializable {
   @Column(nullable = false)
   private String name;
   @Column(nullable = false)
+  @Temporal(TemporalType.DATE)
   private Date creationDate;
   @Column(nullable = false)
   private Double concentration;
@@ -103,8 +105,8 @@ public class LibraryDilution implements Dilution, Serializable {
   @JoinColumn(name = "lastModifier")
   private User lastModifier;
 
-  @Transient
-  private Date lastModified;
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastUpdated;
 
   private String identificationBarcode;
   private Long preMigrationId;
@@ -152,16 +154,16 @@ public class LibraryDilution implements Dilution, Serializable {
     return lastModifier;
   }
 
-  public void setLastModifier(User lastModifier) {
-    this.lastModifier = lastModifier;
+  public void setLastModifier(User lastUpdated) {
+    this.lastModifier = lastUpdated;
   }
 
-  public Date getLastModified() {
-    return lastModified;
+  public Date getLastUpdated() {
+    return lastUpdated;
   }
 
-  public void setLastModified(Date lastModified) {
-    this.lastModified = lastModified;
+  public void setLastUpdated(Date lastUpdated) {
+    this.lastUpdated = lastUpdated;
   }
 
   @Override

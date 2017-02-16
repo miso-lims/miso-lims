@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 
@@ -34,8 +36,13 @@ public abstract class AbstractSequencerServiceRecord implements SequencerService
   private String referenceNumber;
 
   @Column(nullable = false)
+  @Temporal(TemporalType.DATE)
   private Date serviceDate;
+
+  @Temporal(TemporalType.TIMESTAMP)
   private Date shutdownTime;
+
+  @Temporal(TemporalType.TIMESTAMP)
   private Date restoredTime;
 
   @Override

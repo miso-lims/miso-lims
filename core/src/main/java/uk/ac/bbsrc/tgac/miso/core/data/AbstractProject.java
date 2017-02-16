@@ -45,6 +45,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.BooleanUtils;
@@ -86,6 +88,7 @@ public abstract class AbstractProject implements Project {
   public static final Long UNSAVED_ID = 0L;
 
   @Column(updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate = new Date();
   private String description = "";
   private String name = "";
@@ -128,6 +131,7 @@ public abstract class AbstractProject implements Project {
   private final Set<MisoListener> listeners = new HashSet<>();
 
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
   @ManyToMany(targetEntity = UserImpl.class)

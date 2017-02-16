@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
@@ -26,12 +28,17 @@ public class PoolOrderCompletion implements Serializable {
 
   @Enumerated(EnumType.STRING)
   private HealthType health;
+
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
+
   private int num_partitions;
+
   @Id
   @ManyToOne(targetEntity = SequencingParametersImpl.class)
   @JoinColumn(name = "parametersId", nullable = false)
   private SequencingParameters parameters;
+
   @Id
   @ManyToOne(targetEntity = PoolImpl.class)
   @JoinColumn(name = "poolId")

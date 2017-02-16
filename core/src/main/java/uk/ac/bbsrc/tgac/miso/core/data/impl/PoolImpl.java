@@ -51,6 +51,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -115,6 +117,8 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   @Column(length = CONCENTRATION_LENGTH)
   private Double concentration;
+
+  @Temporal(TemporalType.DATE)
   private Date creationDate;
   @OneToOne(targetEntity = PoolDerivedInfo.class)
   @PrimaryKeyJoinColumn

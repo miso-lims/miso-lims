@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -43,6 +45,7 @@ public class TargetedSequencing {
   private User createdBy;
 
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -50,6 +53,7 @@ public class TargetedSequencing {
   private User updatedBy;
 
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
   public Long getId() {

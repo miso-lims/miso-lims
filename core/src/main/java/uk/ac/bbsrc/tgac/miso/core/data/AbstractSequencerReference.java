@@ -36,6 +36,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.slf4j.Logger;
@@ -71,7 +73,9 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   private String ip;
 
   private String serialNumber;
+  @Temporal(TemporalType.DATE)
   private Date dateCommissioned;
+  @Temporal(TemporalType.DATE)
   private Date dateDecommissioned = null;
 
   @OneToOne(targetEntity = SequencerReferenceImpl.class)

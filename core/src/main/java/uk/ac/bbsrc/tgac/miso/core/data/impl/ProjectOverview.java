@@ -43,6 +43,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -109,10 +111,15 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   private boolean primaryAnalysisCompleted;
   @Column(nullable = false)
   private String principalInvestigator;
+
   @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
+  @Temporal(TemporalType.DATE)
   private Date startDate;
+
+  @Temporal(TemporalType.DATE)
   private Date endDate;
   private Integer numProposedSamples;
   private boolean allSampleQcPassed;

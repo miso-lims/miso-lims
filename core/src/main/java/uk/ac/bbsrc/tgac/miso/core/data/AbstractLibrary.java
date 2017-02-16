@@ -47,6 +47,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -102,6 +104,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private String accession;
 
   @Column(nullable = false)
+  @Temporal(TemporalType.DATE)
   private Date creationDate = new Date();
 
   private String identificationBarcode;

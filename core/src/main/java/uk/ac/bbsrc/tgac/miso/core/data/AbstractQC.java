@@ -31,6 +31,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
@@ -54,6 +56,8 @@ public abstract class AbstractQC implements QC {
   @ManyToOne(targetEntity = QcType.class)
   @JoinColumn(name = "qcMethod")
   private QcType qcType;
+
+  @Temporal(TemporalType.DATE)
   private Date qcDate = new Date();
 
   @Override

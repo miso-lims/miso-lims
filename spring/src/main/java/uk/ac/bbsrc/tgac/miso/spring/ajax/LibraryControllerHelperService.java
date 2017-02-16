@@ -716,7 +716,7 @@ public class LibraryControllerHelperService {
         Library library = libraryService.get(libraryId);
         LibraryDilution newDilution = new LibraryDilution();
         newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
-        newDilution.setLastModified(newDilution.getCreationDate());
+        newDilution.setLastUpdated(newDilution.getCreationDate());
         newDilution.setConcentration(Double.parseDouble(json.getString("results")));
         if (json.has("targetedSequencing")) {
           Long libraryDilutionTargetedSequencingId = Long.parseLong(json.getString("targetedSequencing"));

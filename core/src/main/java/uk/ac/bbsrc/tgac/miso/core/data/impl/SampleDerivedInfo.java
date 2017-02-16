@@ -5,9 +5,10 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.Subselect;
 import org.hibernate.annotations.Synchronize;
 
 @Entity
@@ -18,6 +19,8 @@ public class SampleDerivedInfo {
 
   @Id
   private Long sampleId;
+
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
 
   public Long getId() {

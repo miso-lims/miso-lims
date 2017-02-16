@@ -443,12 +443,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     log.debug("Saving library dilution " + friendlyName);
     if (replaceChangeLogs) {
-      if (ldi.getCreationDate() == null || ldi.getLastModified() == null) {
+      if (ldi.getCreationDate() == null || ldi.getLastUpdated() == null) {
         throw new IOException("Cannot save dilution due to missing timestamps");
       }
     } else {
       ldi.setCreationDate(timeStamp);
-      ldi.setLastModified(timeStamp);
+      ldi.setLastUpdated(timeStamp);
     }
 
     Collection<ChangeLog> ghostChangeLog = null;
