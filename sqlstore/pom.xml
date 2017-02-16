@@ -219,6 +219,10 @@
           <driver>com.mysql.jdbc.Driver</driver>
           <url>jdbc:mysql://localhost:3306/lims?characterEncoding=UTF-8</url>
           <outOfOrder>true</outOfOrder>
+          <locations>
+            <location>classpath:db.migration</location>
+            <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
+          </locations>
         </configuration>
       </plugin>
     </plugins>
