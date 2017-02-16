@@ -94,9 +94,6 @@
   <bean id="sequencerReferenceControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.SequencerReferenceControllerHelperService">
   </bean>
 
-  <bean id="reportingControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ReportingControllerHelperService">
-  </bean>
-
   <bean id="flexReportingControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.FlexReportingControllerHelperService">
   </bean>
 
