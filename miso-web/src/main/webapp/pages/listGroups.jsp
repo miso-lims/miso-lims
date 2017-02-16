@@ -27,8 +27,8 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>
-      <div id="totalCount">
-      </div>
+      <span id="totalCount">
+      </span>
     </h1>
     <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
     </form>

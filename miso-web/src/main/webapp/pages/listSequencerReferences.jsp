@@ -45,7 +45,7 @@
       <div id="tab">
         <div id="tab-1"></div>
         <div id="tab-2"></div>
-        <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingSequencersTable"></table>      
+        <table class="display no-border" id="listingSequencersTable"></table>      
       </div>
     </div>
     

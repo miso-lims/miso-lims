@@ -16,7 +16,7 @@
     <div id="contentcolumn">
 
         <h1>
-            Library & Pool Sheet Import
+            Library &amp; Pool Sheet Import
         </h1>
 
         <div id="librarypoolsheetformdiv" class="simplebox ui-corner-all">
@@ -42,11 +42,6 @@
         <div id="librarypoolsheet_statusdiv"></div>
     </div>
 </div>
-<script type="text/javascript">
-    jQuery(document).ready(function () {
-
-    });
-</script>
 <%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>

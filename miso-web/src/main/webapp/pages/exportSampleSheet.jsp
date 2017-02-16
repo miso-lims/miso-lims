@@ -66,16 +66,16 @@
 <br/>
 
 <div id="exportButtons" style="display:none;">
-    <table width="900">
+    <table style="width:900;">
         <tr>
-            <td width="50%">
+            <td class="half-width">
                 <button class="button ui-state-default ui-corner-all" id="exportSampleForm"
                         onclick="ImportExport.exportSampleForm();">Export Sample Sheet
                 </button>
             </td>
-            <td width="50%">
+            <td class="half-width">
                 <button class="button ui-state-default ui-corner-all" id="exportLibraryPoolForm"
-                        onclick="ImportExport.exportLibraryPoolForm();">Export Library & Pool Sheet
+                        onclick="ImportExport.exportLibraryPoolForm();">Export Library &amp; Pool Sheet
                 </button>
             </td>
         </tr>
@@ -868,10 +868,10 @@
 <div id="librarySelectionHolder" style="display: none;">
     <br/>
     <br/>
-    <table width="900">
+    <table style="width:900;">
         <tr>
-            <td width="50%"></td>
-            <td width="50%">
+            <td class="half-width"></td>
+            <td class="half-width">
                 <table style="border:1px solid grey;" class="ui-corner-all">
                     <tr>
                         <td style="background-color:yellow;"></td>

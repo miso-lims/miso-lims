@@ -26,8 +26,8 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>
-      <div id="totalCount">
-      </div>
+      <span id="totalCount">
+      </span>
     </h1>
     <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
     </form>
@@ -59,24 +59,10 @@
           <td class="fit">
               ${submission.submissionDate}
           </td>
-          <c:choose>
-          <c:when test="${submission.verified}">
-          <td class="fit yes_green">
-            </c:when>
-            <c:otherwise>
-          <td class="fit no_red">
-            </c:otherwise>
-            </c:choose>
+          <td class="${submission.verified ? 'fit yes_green' : 'fit no_red'}">
               ${submission.verified}
           </td>
-          <c:choose>
-          <c:when test="${submission.completed}">
-          <td class="fit yes_green">
-            </c:when>
-            <c:otherwise>
-          <td class="fit no_red">
-            </c:otherwise>
-            </c:choose>
+          <td class="${submission.completed ? 'fit yes_green' : 'fit no_red'}">
               ${submission.completed}
           </td>
         </tr>

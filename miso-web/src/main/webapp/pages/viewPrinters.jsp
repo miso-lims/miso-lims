@@ -71,10 +71,9 @@
              </td>
            </sec:authorize>
            <sec:authorize access="hasRole('ROLE_ADMIN')">
-             <td id='edit-${service.name}' class="misoicon"/>
+             <td id='edit-${service.name}' class="misoicon">
              <a href='javascript:void(0);'
-                onclick="if (confirm('Delete printer ${printer.name}?')) { Print.service.deletePrinter(${printer.id}); } return false;"><span
-                 class="ui-icon ui-icon-circle-close"/></a>
+                onclick="if (confirm('Delete printer ${printer.name}?')) { Print.service.deletePrinter(${printer.id}); } return false;"><span class="ui-icon ui-icon-circle-close"></span></a>
              </td>
            </sec:authorize>
          </tr>

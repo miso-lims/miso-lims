@@ -45,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 
 /**
@@ -101,7 +100,7 @@ public class UserAuthMisoRequestManagerTest {
   @Mock
   private SequencerPoolPartition sequencerPoolParition;
   @Mock
-  private SequencerPartitionContainer sequencerPartitionContainer;
+  private SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer;
   @Mock
   private Submission submission;
   @Mock
@@ -665,7 +664,6 @@ public class UserAuthMisoRequestManagerTest {
   public void testGetLibraryQCByIdThrows() throws IOException {
     long qcId = 1L;
     long libraryId = 2;
-    PlatformType platformType = PlatformType.ILLUMINA;
     when(backingManager.getLibraryQCById(qcId)).thenReturn(libraryQC);
     when(libraryQC.userCanRead(any(User.class))).thenReturn(false);
     when(libraryQC.getLibrary()).thenReturn(library);
@@ -1052,7 +1050,7 @@ public class UserAuthMisoRequestManagerTest {
    */
   @Test
   public void testListAllProjects() throws IOException {
-    Set projects = new HashSet();
+    Set<Project> projects = new HashSet<>();
     projects.add(project1);
     projects.add(project2);
     projects.add(project3);
@@ -1070,7 +1068,7 @@ public class UserAuthMisoRequestManagerTest {
    */
   @Test
   public void testListAllProjectsOneUnreadable() throws IOException {
-    Set projects = new HashSet();
+    Set<Project> projects = new HashSet<>();
     projects.add(project1);
     projects.add(project2);
     projects.add(project3);
@@ -1079,7 +1077,7 @@ public class UserAuthMisoRequestManagerTest {
     when(project2.userCanRead(any(User.class))).thenReturn(false);
     when(project3.userCanRead(any(User.class))).thenReturn(true);
 
-    Set filtered = new HashSet();
+    Set<Project> filtered = new HashSet<>();
     filtered.add(project1);
     filtered.add(project3);
 

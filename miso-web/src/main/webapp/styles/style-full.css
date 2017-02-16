@@ -1922,3 +1922,16 @@ button.disabled {
 .wide-padding {
   padding: 2px 15px;
 }
+
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  width: 50%;
+}
+
+.no-border {
+  border: 0;
+}

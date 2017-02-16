@@ -830,7 +830,7 @@
 </c:if>
 
 <c:if test="${sample.id != 0}">
-  <a name="sampleqc"></a>
+  <a id="sampleqc"></a>
 
   <h1>
     <span id="qcsTotalCount"></span>
@@ -889,7 +889,7 @@
       </form>
     </div>
   <br/>
-  <a name="library"></a>
+  <a id="library"></a>
 
   <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
 

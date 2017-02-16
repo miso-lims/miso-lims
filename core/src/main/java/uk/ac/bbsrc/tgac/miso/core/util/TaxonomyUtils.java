@@ -35,7 +35,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class TaxonomyUtils {
   public static String checkScientificNameAtNCBI(String scientificName) {
     try {
       String query = ncbiEntrezUtilsURL + "db=taxonomy&term=" + URLEncoder.encode(scientificName, "UTF-8");
-      final HttpClient httpclient = new DefaultHttpClient();
+      final HttpClient httpclient = HttpClientBuilder.create().build();
       HttpGet httpget = new HttpGet(query);
       try {
         HttpResponse response = httpclient.execute(httpget);

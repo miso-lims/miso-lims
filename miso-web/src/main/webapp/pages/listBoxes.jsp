@@ -25,7 +25,7 @@
       </ul>
 
       <div id="tab">
-        <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingBoxesTable">
+        <table class="display no-border" id="listingBoxesTable">
         </table>
         <script type="text/javascript">
 jQuery(document).ready(function () {

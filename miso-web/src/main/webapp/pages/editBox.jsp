@@ -322,9 +322,7 @@
 
 <div id='dialogDialog' title='Scan' hidden='true'>
   <div id='dialogInfoAbove'></div>
-  <center>
-  <div id="dialogVisual"></div>
-  </center>
+  <div id="dialogVisual" style="text-align:center;"></div>
   <div id="dialogInfoBelow"></div>
 </div>
 </div>

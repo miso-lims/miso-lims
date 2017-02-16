@@ -35,7 +35,7 @@
   </span>
 </h1>
 
-<table cellpadding="0" cellspacing="0" border="0" class="display" id="listingProjectsTable">
+<table class="display no-border" id="listingProjectsTable">
 </table>
 </div>
 

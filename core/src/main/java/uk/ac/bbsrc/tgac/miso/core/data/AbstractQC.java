@@ -139,8 +139,7 @@ public abstract class AbstractQC implements QC {
   }
 
   @Override
-  public int compareTo(Object o) {
-    QC t = (QC) o;
+  public int compareTo(QC t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 
 @Entity
 @Table(name = "LibraryDesign")
-public class LibraryDesign {
+public class LibraryDesign implements Serializable {
   public static boolean validate(Library library, Iterable<LibraryDesign> rules) {
     // Return true if the ruleset is empty.
     boolean first = true;
@@ -26,6 +28,8 @@ public class LibraryDesign {
     }
     return first;
   }
+
+  private static final long serialVersionUID = 1L;
 
   @Id
   private Long libraryDesignId;
