@@ -46,6 +46,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -215,5 +217,13 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     Map<String, Integer> boxColumnSizes = dao.getBoxColumnSizes();
 
     assertTrue(10 == boxColumnSizes.size());
+  }
+
+  @Test
+  public void testAnyMetaDef() throws Exception {
+    Box box = dao.get(1L);
+    box.getBoxables();
+    assertTrue(box.getBoxable("A01") instanceof Identity);
+    assertTrue(box.getBoxable("B02") instanceof SampleTissue);
   }
 }
