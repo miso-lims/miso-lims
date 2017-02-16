@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -53,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 @Entity
 @Table(name = "Library")
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorValue("L")
 public class LibraryImpl extends AbstractLibrary implements Serializable {
 
   private static final long serialVersionUID = 1L;

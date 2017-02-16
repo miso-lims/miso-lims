@@ -459,38 +459,42 @@ WHERE studyChangeLogId IN (
         );
 ALTER TABLE StudyChangeLog ADD FOREIGN KEY (studyId) REFERENCES Study(studyId);
 
-ALTER TABLE BoxPosition ADD COLUMN targetId bigint(20) NOT NULL;
-ALTER TABLE BoxPosition ADD COLUMN targetType varchar(50) NOT NULL;
-ALTER TABLE BoxPosition ADD COLUMN position varchar(3) NOT NULL;
--- StartNoTest
-ALTER TABLE BoxPosition CHANGE COLUMN targetId targetId bigint(20);
-ALTER TABLE BoxPosition CHANGE COLUMN targetType targetType varchar(1);
-ALTER TABLE BoxPosition CHANGE COLUMN position position varchar(3);
-UPDATE BoxPosition SET
-  position = CONCAT(CHAR(65 + `column`), LPAD(row + 1, 2, '0')),
-  targetType = (
-    SELECT 'S' FROM Sample WHERE Sample.boxPositionId = BoxPosition.boxPositionId UNION
-    SELECT 'L' FROM Library WHERE Library.boxPositionId = BoxPosition.boxPositionId UNION
-    SELECT 'P' FROM Pool WHERE Pool.boxPositionId = BoxPosition.boxPositionId),
-  targetId = (
+CREATE TABLE BoxContents (
+  boxId bigint(20) NOT NULL,
+  targetId bigint(20) NOT NULL,
+  targetType varchar(50) NOT NULL,
+  position varchar(3) NOT NULL,
+  CONSTRAINT boxcontents_box_boxId FOREIGN KEY (boxId) REFERENCES Box(boxId),
+  CONSTRAINT box_postion_pk PRIMARY KEY(boxId, targetId, targetType),
+  CONSTRAINT box_unique_item UNIQUE (targetId, targetType),
+  CONSTRAINT box_single_occupancy UNIQUE (boxId, position)
+) ENGINE=InnoDB;
+
+
+INSERT INTO BoxContents(boxId, position, targetType, targetId) SELECT
+  boxId,
+  CONCAT(CHAR(65 + `column`), LPAD(row + 1, 2, '0')),
+  (SELECT CONCAT('Sample',
+      CASE
+        WHEN EXISTS(SELECT * FROM SampleAliquot WHERE SampleAliquot.sampleId = Sample.sampleId) THEN 'Aliquot'
+        WHEN EXISTS(SELECT * FROM Identity WHERE Identity.sampleId = Sample.sampleId) THEN 'Identity'
+        WHEN EXISTS(SELECT * FROM SampleStock WHERE SampleStock.sampleId = Sample.sampleId) THEN 'Stock'
+        WHEN EXISTS(SELECT * FROM SampleTissue WHERE SampleTissue.sampleId = Sample.sampleId) THEN 'Tissue'
+        WHEN EXISTS(SELECT * FROM SampleCVSlide WHERE SampleCVSlide.sampleId = Sample.sampleId) THEN 'CV'
+        WHEN EXISTS(SELECT * FROM SampleLCMTube WHERE SampleLCMTube.sampleId = Sample.sampleId) THEN 'LCM'
+        WHEN EXISTS(SELECT * FROM SampleTissueProcessing WHERE SampleTissueProcessing.sampleId = Sample.sampleId) THEN 'Processing'
+        ELSE ''
+      END) FROM Sample WHERE Sample.boxPositionId = BoxPosition.boxPositionId UNION
+    SELECT CONCAT('Library', CASE WHEN EXISTS(SELECT * FROM LibraryAdditionalInfo WHERE LibraryAdditionalInfo.libraryId = Library.libraryId) THEN 'Detailed' ELSE '' END) FROM Library WHERE Library.boxPositionId = BoxPosition.boxPositionId UNION
+    SELECT 'Pool' FROM Pool WHERE Pool.boxPositionId = BoxPosition.boxPositionId),
+  (
     SELECT sampleId FROM Sample WHERE Sample.boxPositionId = BoxPosition.boxPositionId UNION
     SELECT libraryId FROM Library WHERE Library.boxPositionId = BoxPosition.boxPositionId UNION
-    SELECT poolId FROM Pool WHERE Pool.boxPositionId = BoxPosition.boxPositionId);
--- EndNoTest
+    SELECT poolId FROM Pool WHERE Pool.boxPositionId = BoxPosition.boxPositionId)
+FROM BoxPosition;
 
-ALTER TABLE BoxPosition CHANGE COLUMN targetId targetId bigint(20) NOT NULL;
-ALTER TABLE BoxPosition CHANGE COLUMN targetType targetType varchar(1) NOT NULL;
-ALTER TABLE BoxPosition CHANGE COLUMN position position varchar(3) NOT NULL;
-ALTER TABLE BoxPosition DROP PRIMARY KEY;
-ALTER TABLE BoxPosition ADD CONSTRAINT box_postion_pk PRIMARY KEY(boxId, targetId, targetType);
-ALTER TABLE BoxPosition ADD CONSTRAINT box_unique_item UNIQUE (targetId, targetType);
-ALTER TABLE BoxPosition ADD CONSTRAINT box_single_occupancy UNIQUE (boxId, position);
--- StartNoTest
-ALTER TABLE BoxPosition DROP INDEX boxId;
-ALTER TABLE BoxPosition DROP COLUMN `row`;
-ALTER TABLE BoxPosition DROP COLUMN `column`;
-ALTER TABLE BoxPosition DROP COLUMN `boxPositionId`;
--- EndNoTest
+DROP TABLE BoxPosition;
+ALTER TABLE BoxContents RENAME TO BoxPosition;
 ALTER TABLE Sample DROP COLUMN `boxPositionId`;
 ALTER TABLE Library DROP COLUMN `boxPositionId`;
 ALTER TABLE Pool DROP COLUMN `boxPositionId`;

@@ -476,8 +476,9 @@ VALUES
 DELETE FROM BoxPosition;
 INSERT INTO `BoxPosition` (`boxId`, `position`, `targetType`, `targetId`)
 VALUES
-('1', 'B02', 'Sample', 1),
-('2', 'A02', 'Sample', 2);
+(1, 'B02', 'SampleTissue', 16),
+(1, 'A01', 'SampleIdentity', 15),
+(2, 'A02', 'Sample', 2);
 
 DELETE FROM Submission;
 INSERT INTO `Submission` (`submissionId`, `creationDate`, `submittedDate`, `verified`, `description`, `name`, `title`, `accession`, `alias`, `completed`)

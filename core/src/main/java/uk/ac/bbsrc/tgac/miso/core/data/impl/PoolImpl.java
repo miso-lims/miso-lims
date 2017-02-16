@@ -36,7 +36,6 @@ import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -96,7 +95,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @Entity
 @Table(name = "Pool")
-@DiscriminatorValue("P")
 public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   private static final int CONCENTRATION_LENGTH = 17;
   public static final String CONCENTRATION_UNITS = "nM";
