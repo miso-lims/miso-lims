@@ -49,7 +49,7 @@
 <c:forEach items="${platformTypes}" var="pt" varStatus="c">
   <div id="tab-${c.count}">
     <h1>
-      <div id="${pt}totalCount">${pt} Pools</div>
+      <span id="${pt}totalCount">${pt} Pools</span>
     </h1>
 
     <form id="filter-form${c.count}">Filter:

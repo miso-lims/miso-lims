@@ -139,8 +139,8 @@
 
 <c:if test="${pool.id != 0}">
   <h1>
-    <div id="qcsTotalCount">
-    </div>
+    <span id="qcsTotalCount">
+    </span>
   </h1>
   <ul class="sddm">
     <li><a
@@ -156,7 +156,7 @@
       </div>
     </li>
   </ul>
-  <span style="clear:both">
+  <div style="clear:both">
     <div id="addPoolQC"></div>
     <div id='addQcForm'>
       <table class="list" id="poolQcTable">
@@ -203,7 +203,7 @@
         jQuery('#qcsTotalCount').html(jQuery('#poolQcTable>tbody>tr:visible').length.toString() + " QCs");
       });
     </script>
-  </span>
+  </div>
 </c:if>
 
 <h1>Experiments</h1>
@@ -254,7 +254,7 @@
       <c:forEach items="${pool.poolableElements}" var="dil">
         <div onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'"
              class="dashboard">
-          <span style="float:left">
+          <div style="float:left">
           <input type="hidden" id="dilutions${dil.id}" value="${dil.name}" name="dilutions"/>
           <b>Dilution:</b> ${dil.name}<br/>
           <b>Library:</b> <a href="<c:url value="/miso/library/${dil.library.id}"/>">${dil.library.alias}
@@ -263,33 +263,34 @@
               href="<c:url value="/miso/sample/${dil.library.sample.id}"/>">${dil.library.sample.alias}
             (${dil.library.sample.name})</a><br/>
           <c:choose>
-            <c:when test="${fn:length(pool.poolableElements) > 1}">
-              <c:choose>
-                <c:when test="${not empty dil.library.indices}">
-                  <b>Indices:</b></br>
-            <c:forEach items="${dil.library.indices}" varStatus="status" var="indexmap">
-              ${status.count}: ${indexmap.value.name} (${indexmap.value.sequence})
-              <c:if test="${status.count lt fn:length(dil.library.indices)}">
-                <br/>
-              </c:if>
-            </c:forEach>
-          </span>
-          <span class="counter">
-            <img src="<c:url value='/styles/images/status/green.png'/>" border='0'>
-          </span>
+          <c:when test="${fn:length(pool.poolableElements) > 1}">
+            <c:choose>
+              <c:when test="${not empty dil.library.indices}">
+                <b>Indices:</b><br/>
+                <c:forEach items="${dil.library.indices}" varStatus="status" var="indexmap">
+                  ${status.count}: ${indexmap.value.name} (${indexmap.value.sequence})
+                  <c:if test="${status.count lt fn:length(dil.library.indices)}">
+                    <br/>
+                  </c:if>
+                </c:forEach>
+                </div>
+                <span class="counter">
+                  <img src="<c:url value='/styles/images/status/green.png'/>" border='0'>
+                </span>
+              </c:when>
+              <c:otherwise>
+                <b>Index:</b>
+                <a href="<c:url value="/miso/library/${dil.library.id}"/>">Choose index</a>
+                </div>
+                <span class="counter">
+                  <img src="<c:url value='/styles/images/status/red.png'/>" border='0'>
+                </span>
+                </div>
+              </c:otherwise>
+            </c:choose>
           </c:when>
           <c:otherwise>
-            <b>Index:</b>
-            <a href="<c:url value="/miso/library/${dil.library.id}"/>">Choose index</a>
-            </span>
-            <span class="counter">
-              <img src="<c:url value='/styles/images/status/red.png'/>" border='0'>
-            </span>
-          </c:otherwise>
-          </c:choose>
-          </c:when>
-          <c:otherwise>
-            </span>
+            </div>
           </c:otherwise>
           </c:choose>
           <span onclick='Utils.ui.confirmRemove(jQuery(this).parent());'

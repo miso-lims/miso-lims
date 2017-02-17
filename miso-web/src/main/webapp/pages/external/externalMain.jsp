@@ -35,13 +35,13 @@
             <p>Please select a project to view.</p>
         </div>
         <div id="externalSampleStatusWrapper">
-            <table cellpadding="0" cellspacing="0" border="0" class="display" id="externalSampleStatus">
+            <table class="display no-border" id="externalSampleStatus">
             </table>
         </div>
         <div id="externalSampleQcStatus">
         </div>
         <div id="externalRunStatusWrapper">
-            <table cellpadding="0" cellspacing="0" border="0" class="display" id="externalRunStatus">
+            <table class="display no-border" id="externalRunStatus">
             </table>
         </div>
     </div>

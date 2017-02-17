@@ -103,7 +103,7 @@
 
 </head>
 <body>
-<table border="0" width="100%">
+<table class="full-width no-border">
     <tr>
         <td class="headertable" align="left" onclick="window.location.href='<c:url value='/miso/external/'/>'">
             <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo"

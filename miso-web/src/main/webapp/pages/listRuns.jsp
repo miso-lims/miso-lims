@@ -36,11 +36,12 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>
-      <div id="totalCount">Runs
-      </div>
+      <span id="totalCount">Runs
+      </span>
     </h1>
-    <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingRunsTable">
+    <table class="display no-border" id="listingRunsTable">
     </table>
+    
     <script type="text/javascript">
       jQuery(document).ready(function () {
         Run.ui.createListingRunsTable();
@@ -48,7 +49,6 @@
     </script>
   </div>
 </div>
-</script>
 <%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>

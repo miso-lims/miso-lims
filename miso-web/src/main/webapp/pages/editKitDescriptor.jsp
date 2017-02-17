@@ -107,7 +107,7 @@
     <c:if test="${not empty kitDescriptor.changeLog}">
       <br/>
       <h1>Changes</h1>
-      <span style="clear:both">
+      <div style="clear:both">
         <table class="list" id="changelog_table">
           <thead>
           <tr>
@@ -126,7 +126,7 @@
           </c:forEach>
           </tbody>
         </table>
-      </span>
+      </div>
     </c:if>
   </div>
 </div>

@@ -42,7 +42,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "QCType")
-public class QcType implements Comparable, Serializable {
+public class QcType implements Comparable<QcType>, Serializable {
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
   /** Field libraryTypeId */
@@ -177,8 +179,7 @@ public class QcType implements Comparable, Serializable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    QcType t = (QcType) o;
+  public int compareTo(QcType t) {
     int name = getName().compareTo(t.getName());
     if (name != 0) return name;
 

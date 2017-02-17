@@ -45,8 +45,8 @@
 
 <div id="tab-1">
   <h1>
-    <div id="SequencingtotalCount">
-    </div>
+    <span id="SequencingtotalCount">
+    </span>
   </h1>
   <a href="<c:url value="/miso/kitdescriptor/new"/>" class="add">Create Kit Descriptor</a>
 
@@ -108,8 +108,8 @@
 
 <div id="tab-3">
   <h1>
-    <div id="LibrarytotalCount">
-    </div>
+    <span id="LibrarytotalCount">
+    </span>
   </h1>
   <a href="<c:url value="/miso/kitdescriptor/new"/>" class="add">Create Kit Descriptor</a>
 
@@ -172,8 +172,8 @@
 
 <div id="tab-4">
   <h1>
-    <div id="ClusteringtotalCount">
-    </div>
+    <span id="ClusteringtotalCount">
+    </span>
   </h1>
   <a href="<c:url value="/miso/kitdescriptor/new"/>" class="add">Create Kit Descriptor</a>
 
@@ -235,8 +235,8 @@
 
 <div id="tab-5">
   <h1>
-    <div id="MultiplexingtotalCount">
-    </div>
+    <span id="MultiplexingtotalCount">
+    </span>
   </h1>
   <a href="<c:url value="/miso/kitdescriptor/new"/>" class="add">Create Kit Descriptor</a>
 

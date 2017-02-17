@@ -66,7 +66,7 @@
             <td><fmt:formatDate value="${stat.lastUpdated}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/stats/${fn:toLowerCase(platformtype)}/${referenceId}/${stat.runName}"/>'">
-              <span class="ui-icon ui-icon-pencil"/></td>
+              <span class="ui-icon ui-icon-pencil"></span></td>
           </tr>
         </c:forEach>
         </tbody>
@@ -182,11 +182,12 @@
                     </c:otherwise>
                     </c:choose>
                     <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                      <td class="misoicon"
-                          onclick="window.location.href='<c:url value="/miso/stats/sequencer/${ref.id}"/>'"><span
-                              class="ui-icon ui-icon-pencil"/></td>
-                      <td class="misoicon" onclick="Sequencer.ui.deleteSequencerReference(${ref.id}, Utils.page.pageReload);"><span
-                              class="ui-icon ui-icon-trash"/></td>
+                      <td class="misoicon" onclick="window.location.href='<c:url value="/miso/stats/sequencer/${ref.id}"/>'">
+                        <span class="ui-icon ui-icon-pencil"></span>
+                      </td>
+                      <td class="misoicon" onclick="Sequencer.ui.deleteSequencerReference(${ref.id}, Utils.page.pageReload);">
+                        <span class="ui-icon ui-icon-trash"></span>
+                      </td>
                     </c:if>
                   </tr>
                 </c:forEach>

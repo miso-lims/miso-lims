@@ -39,8 +39,8 @@
 <div id="contentcolumn">
 <form:form id="project-form" data-parsley-validate="" action="/miso/project" method="POST" commandName="project" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="project"/>
-<h1><c:choose><c:when
-    test="${project.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
+<h1>
+<c:choose><c:when test="${project.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
   Project
   <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="Project.validateProject();">
     Save
@@ -293,100 +293,72 @@
 
 <ol id="progress">
   <li class="sample-qc-step">
-    <c:choose>
-    <c:when test="${overview.allSampleQcPassed and overview.libraryPreparationComplete}">
-    <div class="left mid-progress-done">
-    </c:when>
-    <c:when test="${overview.allSampleQcPassed}">
-    <div class="left-progress-done">
-    </c:when>
-    <c:otherwise>
-    <div class="left">
-    </c:otherwise>
-    </c:choose>
-    <span>Sample QCs</span>
-    <form:checkbox value="${overview.allSampleQcPassed}"
-                   path="overviews[${ov.count-1}].allSampleQcPassed"/>
+    <c:if test="${overview.allSampleQcPassed}">
+      <c:set value="left-progress-done" var="cssSamQcClass"></c:set>
+    </c:if>
+    <c:if test="${overview.allSampleQcPassed and overview.libraryPreparationComplete}">
+      <c:set value="mid-progress-done" var="cssSamQcClass"></c:set>
+    </c:if>
+    <div class="${cssSamQcClass}">
+      <span>Sample QCs</span>
+      <form:checkbox value="${overview.allSampleQcPassed}" path="overviews[${ov.count-1}].allSampleQcPassed"/>
     </div>
   </li>
 
   <li class="lib-prep-step">
-    <c:choose>
-      <c:when test="${overview.libraryPreparationComplete and overview.allLibrariesQcPassed}">
-        <div class="mid-progress-done">
-      </c:when>
-      <c:when test="${overview.libraryPreparationComplete}">
-        <div class="left-progress-done">
-      </c:when>
-      <c:otherwise>
-      <div>
-      </c:otherwise>
-    </c:choose>
+    <c:if test="${overview.libraryPreparationComplete}">
+      <c:set value="left-progress-done" var="cssLibClass"></c:set>
+    </c:if>
+    <c:if test="${overview.libraryPreparationComplete and overview.allLibrariesQcPassed}">
+      <c:set value="mid-progress-done" var="cssLibClass"></c:set>
+    </c:if>
+    <div class="${cssLibClass}">
       <span>Libraries prepared</span>
       <form:checkbox value="${overview.libraryPreparationComplete}" path="overviews[${ov.count-1}].libraryPreparationComplete"/>
     </div>
   </li>
 
   <li class="lib-qc-step">
-    <c:choose>
-      <c:when test="${overview.allLibrariesQcPassed and overview.allPoolsConstructed}">
-        <div class="mid-progress-done">
-      </c:when>
-      <c:when test="${overview.allLibrariesQcPassed}">
-        <div class="left-progress-done">
-      </c:when>
-      <c:otherwise>
-        <div>
-      </c:otherwise>
-    </c:choose>
+    <c:if test="${overview.allLibrariesQcPassed}">
+      <c:set value="left-progress-done" var="cssLibQcClass"></c:set>
+    </c:if>
+    <c:if test="${overview.allLibrariesQcPassed and overview.allPoolsConstructed}">
+      <c:set value="mid-progress-done" var="cssLibQcClass"></c:set>
+    </c:if>
+    <div class="${cssLibQcClass}">
       <span>Library QCs</span>
       <form:checkbox value="${overview.allLibrariesQcPassed}" path="overviews[${ov.count-1}].allLibrariesQcPassed"/>
     </div>
   </li>
 
   <li class="pools-step">
-    <c:choose>
-      <c:when test="${overview.allPoolsConstructed and overview.allRunsCompleted}">
-        <div class="mid-progress-done">
-      </c:when>
-      <c:when test="${overview.allPoolsConstructed}">
-        <div class="left-progress-done">
-      </c:when>
-      <c:otherwise>
-        <div>
-      </c:otherwise>
-    </c:choose>
+    <c:if test="${overview.allPoolsConstructed}">
+      <c:set value="left-progress-done" var="cssPoolsClass"></c:set>
+    </c:if>
+    <c:if test="${overview.allPoolsConstructed and overview.allRunsCompleted}">
+      <c:set value="mid-progress-done" var="cssPoolsClass"></c:set>
+    </c:if>
+    <div class="${cssPoolsClass}">
       <span>Pools Constructed</span>
       <form:checkbox value="${overview.allPoolsConstructed}" path="overviews[${ov.count-1}].allPoolsConstructed"/>
-      </div>
+    </div>
   </li>
 
   <li class="runs-step">
-    <c:choose>
-      <c:when test="${overview.allRunsCompleted and overview.primaryAnalysisCompleted}">
-        <div class="mid-progress-done">
-      </c:when>
-      <c:when test="${overview.allRunsCompleted}">
-        <div class="left-progress-done">
-      </c:when>
-      <c:otherwise>
-        <div>
-      </c:otherwise>
-    </c:choose>
+    <c:if test="${overview.allRunsCompleted}">
+      <c:set value="left-progress-done" var="cssRunsClass"></c:set>
+    </c:if>
+    <c:if test="${overview.allRunsCompleted and overview.primaryAnalysisCompleted}">
+      <c:set value="mid-progress-done" var="cssRunsClass"></c:set>
+    </c:if>
+    <div class="${cssRunsClass}">
       <span>Runs Completed</span>
       <form:checkbox value="${overview.allRunsCompleted}" path="overviews[${ov.count-1}].allRunsCompleted"/>
     </div>
   </li>
 
   <li class="primary-analysis-step">
-    <c:choose>
-      <c:when test="${overview.primaryAnalysisCompleted}">
-        <div class="right mid-progress-done">
-      </c:when>
-      <c:otherwise>
-        <div class="right">
-      </c:otherwise>
-    </c:choose>
+    <div class="right ${overview.primaryAnalysisCompleted ? 'mid-progress-done' : ''}">
       <span>Primary Analysis</span>
       <form:checkbox value="${overview.primaryAnalysisCompleted}" path="overviews[${ov.count-1}].primaryAnalysisCompleted"/>
     </div>
@@ -416,7 +388,7 @@
       </div>
     </li>
   </ul>
-  <span style="clear:both">
+  <div style="clear:both">
     <table class="list" id="overview_samplegroup_table_${overview.id}">
       <thead>
       <tr>
@@ -432,13 +404,13 @@
           <td><b><a href="<c:url value='/miso/sample/${sample.id}'/>">${sample.name}</a></b></td>
           <td><a href="<c:url value='/miso/sample/${sample.id}'/>">${sample.alias}</a></td>
           <td class="misoicon" onclick="Sample.removeSampleFromOverview(${sample.id}, ${overview.id}, Utils.page.pageReload);">
-            <span class="ui-icon ui-icon-trash"/>
+            <span class="ui-icon ui-icon-trash"></span>
           </td>
         </tr>
       </c:forEach>
       </tbody>
     </table>
-  </span>
+  </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
       jQuery('#overview_samplegroup_table_'+${overview.sampleGroup.id}).dataTable({
@@ -546,7 +518,7 @@
           <tr>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
               <td class="misoicon" onclick="Project.ui.deleteFile(${project.id}, ${file.key});">
-                <span class="ui-icon ui-icon-trash" />
+                <span class="ui-icon ui-icon-trash"></span>
               </td>
             </sec:authorize>
           </tr>
@@ -554,9 +526,9 @@
     </div>
     <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
 
-      <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
+      <span onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
           ${file.value}
-      </div>
+      </span>
     </a>
     </c:forEach>
   </div>
@@ -582,7 +554,7 @@
       </div>
     </li>
   </ul>
-  <span style="clear:both">
+  <div style="clear:both">
     <table class="list" id="study_table">
       <thead>
       <tr>
@@ -602,7 +574,7 @@
 
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Study.deleteStudy(${study.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
+              <span class="ui-icon ui-icon-trash"></span>
             </td>
           </sec:authorize>
         </tr>
@@ -630,7 +602,7 @@
         });
       });
     </script>
-  </span>
+  </div>
 </div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_arrowclick'), 'samplesdiv');">
@@ -677,7 +649,7 @@
         </li>
       </ul>
 
-      <span style="clear:both">
+      <div style="clear:both">
         <div id="deliveryformdiv" class="simplebox" style="display:none;">
           <table class="in">
             <tr>
@@ -753,7 +725,7 @@
               <td>${sample.id}</td>
               <sec:authorize access="hasRole('ROLE_ADMIN')">
                 <td class="misoicon" onclick="Sample.deleteSample(${sample.id}, Utils.page.pageReload);">
-                  <span class="ui-icon ui-icon-trash"/>
+                  <span class="ui-icon ui-icon-trash"></span>
                 </td>
               </sec:authorize>
             </tr>
@@ -800,7 +772,7 @@
             });
           });
         </script>
-      </span>
+      </div>
     </div>
 
     <div id="samtab-2">
@@ -833,7 +805,7 @@
               </li>
             </ul>
 
-            <span style="clear:both">
+            <div style="clear:both">
               <table class="list" id="overview_samplegroup_table_${overview.id}">
                 <thead>
                 <tr>
@@ -861,7 +833,7 @@
                     <td>${sample.id}</td>
                     <sec:authorize access="hasRole('ROLE_ADMIN')">
                       <td class="misoicon" onclick="Sample.deleteSample(${sample.id}, Utils.page.pageReload);">
-                        <span class="ui-icon ui-icon-trash"/>
+                        <span class="ui-icon ui-icon-trash"></span>
                       </td>
                     </sec:authorize>
                   </tr>
@@ -908,7 +880,7 @@
                   });
                 });
               </script>
-            </span>
+            </div>
           </div>
         </c:if>
       </c:forEach>
@@ -936,7 +908,7 @@
     </ul>
 
     <div id="libtab-1">
-      <a name="library"></a>
+      <a id="library"></a>
 
       <h1>${fn:length(projectLibraries)} Libraries</h1>
       <ul class="sddm">
@@ -959,7 +931,7 @@
         </li>
       </ul>
 
-      <span style="clear:both">
+      <div style="clear:both">
         <table class="list" id="library_table">
           <thead>
           <tr>
@@ -996,7 +968,7 @@
               <td>${library.qcPassed}</td>
               <sec:authorize access="hasRole('ROLE_ADMIN')">
                 <td class="misoicon" onclick="Library.deleteLibrary(${library.id}, Utils.page.pageReload);">
-                  <span class="ui-icon ui-icon-trash"/>
+                  <span class="ui-icon ui-icon-trash"></span>
                 </td>
               </sec:authorize>
             </tr>
@@ -1031,7 +1003,7 @@
             });
           });
         </script>
-      </span>
+      </div>
     </div>
     <div id="libtab-2">
       <c:forEach items="${project.overviews}" var="overview" varStatus="ov">
@@ -1096,7 +1068,7 @@
                   <td>${grouplib.qcPassed}</td>
                   <sec:authorize access="hasRole('ROLE_ADMIN')">
                     <td class="misoicon" onclick="Library.deleteLibrary(${grouplib.id}, Utils.page.pageReload);">
-                      <span class="ui-icon ui-icon-trash"/>
+                      <span class="ui-icon ui-icon-trash"></span>
                     </td>
                   </sec:authorize>
                 </tr>
@@ -1150,7 +1122,7 @@
   <div id="librarydils_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="librarydilsdiv" style="display:none;">
-  <a name="librarydil"></a>
+  <a id="librarydil"></a>
 
   <h1>${fn:length(projectLibraryDilutions)} Library Dilutions</h1>
   <ul class="sddm">
@@ -1167,8 +1139,8 @@
       </div>
     </li>
   </ul>
-  <span style="clear:both">
-    <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="librarydils_table">
+  <div style="clear:both">
+    <table class="list no-border full-width" id="librarydils_table">
       <thead>
       <tr>
         <th>Dilution Name</th>
@@ -1195,7 +1167,7 @@
           <td>${dil.concentration}</td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Library.dilution.deleteLibraryDilution(${dil.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
+              <span class="ui-icon ui-icon-trash"></span>
             </td>
           </sec:authorize>
         </tr>
@@ -1228,7 +1200,7 @@
         });
       });
     </script>
-  </span>
+  </div>
 </div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_arrowclick'), 'poolsdiv');">
@@ -1236,7 +1208,7 @@
   <div id="pools_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="poolsdiv" style="display:none;">
-  <a name="pool"></a>
+  <a id="pool"></a>
 
   <h1>${fn:length(projectPools)} Pools</h1>
   <ul class="sddm">
@@ -1252,8 +1224,8 @@
       </div>
     </li>
   </ul>
-  <span style="clear:both">
-    <table class="list" id="pools_table">
+  <div style="clear:both">
+    <table class="list no-border full-width" id="pools_table">
       <thead>
       <tr>
         <th>Pool Name</th>
@@ -1276,7 +1248,7 @@
           <td>${pool.concentration}</td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
+              <span class="ui-icon ui-icon-trash"></span>
             </td>
           </sec:authorize>
         </tr>
@@ -1308,7 +1280,7 @@
         });
       });
     </script>
-  </span>
+  </div>
 </div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runsdiv');">
@@ -1318,7 +1290,7 @@
 <div id="runsdiv" style="display:none;">
   <h1>${fn:length(projectRuns)} Runs</h1>
 
-  <table class="list" id="run_table">
+  <table class="list no-border full-width" id="run_table">
     <thead>
     <tr>
       <th>Run Name</th>
@@ -1360,7 +1332,7 @@
         </td>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
-            <span class="ui-icon ui-icon-trash"/>
+            <span class="ui-icon ui-icon-trash"></span>
           </td>
         </sec:authorize>
       </tr>
