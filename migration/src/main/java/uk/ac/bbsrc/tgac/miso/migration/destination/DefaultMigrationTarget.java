@@ -553,6 +553,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
       Run run = serviceManager.getRunDao().getByAlias(newRun.getAlias());
       if (run == null) {
         run = newRun;
+
+        // slated for demolition
+        run.getStatus().setLastUpdated(timeStamp);
       } else {
         updateRun(newRun, run);
       }
@@ -561,7 +564,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         container.setId(serviceManager.getSequencerPartitionContainerDao().save(container));
       }
       run.setLastModifier(migrationUser);
-      run.setId(serviceManager.getRunDao().save(run));
+      run.setId(serviceManager.getRequestManager().saveRun(run));
       log.debug("Saved run " + run.getAlias());
     }
     log.info(runs.size() + " runs migrated.");
@@ -571,6 +574,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Updating run " + to.getId());
     to.getStatus().setCompletionDate(to.getStatus().getCompletionDate());
     to.getStatus().setHealth(to.getStatus().getHealth());
+
+    // slated for demolition
+    to.getStatus().setLastUpdated(timeStamp);
+
     if (to.getSequencerPartitionContainers().size() != 1) {
       throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",
           to.getAlias(), to.getSequencerPartitionContainers().size()));

@@ -1089,7 +1089,7 @@ public class MisoRequestManager implements RequestManager {
         try {
           String name = namingScheme.generateNameFor(run);
           run.setName(name);
-          run.getStatus().setRunName(run.getName());
+          run.getStatus().setRunName(run.getAlias());
 
           validateNameOrThrow(run, namingScheme);
           return runStore.save(run);
