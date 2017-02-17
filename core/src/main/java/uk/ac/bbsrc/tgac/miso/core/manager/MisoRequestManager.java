@@ -300,6 +300,10 @@ public class MisoRequestManager implements RequestManager {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
   }
 
+  public void setLibraryDilutionStore(LibraryDilutionStore libraryDilutionStore) {
+    this.libraryDilutionStore = libraryDilutionStore;
+  }
+
   @Override
   public Collection<Project> listAllProjects() throws IOException {
     if (projectStore != null) {
@@ -1071,6 +1075,7 @@ public class MisoRequestManager implements RequestManager {
   public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
     ProjectOverview managed = projectStore.getProjectOverviewById(overview.getId());
     note.setCreationDate(new Date());
+    note.setOwner(getCurrentUser());
     managed.getNotes().add(note);
     projectStore.saveOverview(managed);
   }
@@ -1166,6 +1171,7 @@ public class MisoRequestManager implements RequestManager {
   public void saveRunNote(Run run, Note note) throws IOException {
     Run managed = runStore.get(run.getId());
     note.setCreationDate(new Date());
+    note.setOwner(getCurrentUser());
     managed.addNote(note);
     runStore.save(managed);
   }
@@ -1289,6 +1295,7 @@ public class MisoRequestManager implements RequestManager {
   public void savePoolNote(Pool pool, Note note) throws IOException {
     Pool managed = poolStore.get(pool.getId());
     note.setCreationDate(new Date());
+    note.setOwner(getCurrentUser());
     managed.addNote(note);
     poolStore.save(managed);
   }
@@ -1488,11 +1495,6 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public Pool getPoolByBarcode(String barcode) throws IOException {
-    return getPoolByBarcode(barcode);
-  }
-
-  @Override
-  public Pool getPoolByIdBarcode(String barcode) throws IOException {
     if (poolStore != null) {
       return poolStore.getByBarcode(barcode);
     } else {

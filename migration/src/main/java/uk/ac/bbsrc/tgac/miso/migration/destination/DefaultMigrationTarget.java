@@ -25,6 +25,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -147,7 +148,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     for (Run run : runs) {
       valueTypeLookup.resolveAll(run);
     }
-    if (mergeRunPools) holdExistingPartialPools(runs, pools);
+    if (mergeRunPools) mergeExistingPartialPools(runs, pools);
     savePools(pools);
     saveRuns(runs);
   }
@@ -379,6 +380,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
     library.inheritPermissions(library.getSample().getProject());
     valueTypeLookup.resolveAll(library);
     library.setLastModifier(migrationUser);
+    for (Note note : library.getNotes()) {
+      note.setCreationDate(timeStamp);
+      note.setOwner(migrationUser);
+    }
     if (isDetailedLibrary(library)) {
 
       library.setCreationDate(timeStamp);
@@ -478,51 +483,105 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
 
   /**
-   * Examines existing runs with existing pools to see if a pool has already been partially migrated.
-   * If an existing pool is found on the same run and lane as a pool in the migration, the migrating
-   * pool is removed from the pools collection to avoid saving it as a new pool. It will be merged
-   * with the existing Pool when the run is saved.
+   * Examines existing pools to see if any migrating pools have already been partially migrated. If so,
+   * the migrating pool is merged with the existing pool, and removed from the pools collection to avoid
+   * saving it as a new pool
+   * 
    * 
    * @param runs all of the Runs being migrated
+   * @param pools all of the Pools being migrated. Any Pools that are merged in this method will be removed
+   *          from the collection
    * @throws IOException
    */
-  private void holdExistingPartialPools(final Collection<Run> runs, final Collection<Pool> pools) throws IOException {
+  private void mergeExistingPartialPools(final Collection<Run> runs, final Collection<Pool> pools) throws IOException {
     for (Run newRun : runs) {
       if (newRun.getSequencerPartitionContainers().size() != 1) {
         throw new IOException(String.format("Migrating run %s has unexpected number of sequencerPartitionContainers (%d)",
             newRun.getAlias(), newRun.getSequencerPartitionContainers().size()));
       }
       Run existingRun = serviceManager.getRunDao().getByAlias(newRun.getAlias());
-      if (existingRun != null) {
-        if (existingRun.getSequencerPartitionContainers().size() != 1) {
-          throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",
-              existingRun.getAlias(), existingRun.getSequencerPartitionContainers().size()));
-        }
-        SequencerPartitionContainer<SequencerPoolPartition> existingLanes = existingRun.getSequencerPartitionContainers().get(0);
-        for (SequencerPoolPartition newLane : newRun.getSequencerPartitionContainers().get(0).getPartitions()) {
+      if (existingRun != null && existingRun.getSequencerPartitionContainers().size() != 1) {
+        throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",
+            existingRun.getAlias(), existingRun.getSequencerPartitionContainers().size()));
+      }
+      for (SequencerPoolPartition newLane : newRun.getSequencerPartitionContainers().get(0).getPartitions()) {
+        if (newLane.getPool() != null) {
           Pool existingPool = null;
-          for (SequencerPoolPartition existingLane : existingLanes.getPartitions()) {
-            if (existingLane.getPartitionNumber() == newLane.getPartitionNumber()) {
-              existingPool = existingLane.getPool();
+          if (existingRun != null) {
+            // Find existing pool on same lane
+            SequencerPartitionContainer<SequencerPoolPartition> existingLanes = existingRun.getSequencerPartitionContainers().get(0);
+            for (SequencerPoolPartition existingLane : existingLanes.getPartitions()) {
+              if (existingLane.getPartitionNumber() == newLane.getPartitionNumber()) {
+                existingPool = existingLane.getPool();
+              }
             }
           }
-          if (newLane.getPool() != null && existingPool != null) {
-            log.debug(String.format("Holding pool %s from run %s lane %d to merge with existing pool",
+          if (existingPool == null) {
+            // find existing pool from different run/lane
+            existingPool = findExistingPool(newLane.getPool());
+          }
+          if (existingPool != null) {
+            log.debug(String.format("Merging pool %s from run %s lane %d with existing pool",
                 newLane.getPool().getAlias(),
                 newRun.getAlias(),
                 newLane.getPartitionNumber()));
+            mergePools(newLane.getPool(), existingPool);
             pools.remove(newLane.getPool());
+            newLane.setPool(existingPool);
           }
         }
       }
     }
   }
 
+  private Pool findExistingPool(Pool pool) throws IOException {
+    if (pool.getIdentificationBarcode() != null) {
+      Pool poolByBarcode = serviceManager.getRequestManager().getPoolByBarcode(pool.getIdentificationBarcode());
+      if (poolByBarcode != null) {
+        if (poolByBarcode.getAlias().equals(pool.getAlias())) {
+          return poolByBarcode;
+        } else {
+          throw new IllegalStateException(String.format(
+              "Trying to migrate pool %s with barcode %s, but there exists a pool %s with barcode %s",
+              pool.getAlias(), pool.getIdentificationBarcode(),
+              poolByBarcode.getAlias(), poolByBarcode.getIdentificationBarcode()));
+        }
+      }
+    }
+    Collection<Pool> matches = serviceManager.getRequestManager().listAllPoolsBySearch(pool.getAlias());
+
+    // filter by alias
+    List<Pool> aliasMatches = Lists.newArrayList();
+    for (Pool match : matches) {
+      if (match.getAlias().equals(pool.getAlias())) {
+        aliasMatches.add(match);
+      }
+    }
+    if (aliasMatches.isEmpty()) return null;
+    else if (aliasMatches.size() == 1) return aliasMatches.get(0);
+
+    // filter by description
+    if (pool.getDescription() != null) {
+      List<Pool> descriptionMatches = Lists.newArrayList();
+      for (Pool match : aliasMatches) {
+        if (pool.getDescription().equals(match.getDescription())) {
+          descriptionMatches.add(match);
+        }
+      }
+      if (descriptionMatches.size() == 1) return descriptionMatches.get(0);
+      else throw new IllegalStateException(String.format("Found %d existing pools matching alias %s (and description)",
+          descriptionMatches.size(), pool.getAlias()));
+    } else {
+      throw new IllegalStateException(String.format("Found %d existing pools matching alias %s",
+          aliasMatches.size(), pool.getAlias()));
+    }
+
+  }
+
   public void savePools(final Collection<Pool> pools) throws IOException {
     log.info("Migrating pools...");
     for (Pool pool : pools) {
       setPoolModifiedDetails(pool);
-      addPoolNoteDetails(pool);
       pool.setId(serviceManager.getRequestManager().savePool(pool));
       log.debug("Saved pool " + pool.getAlias());
     }
@@ -532,12 +591,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private void setPoolModifiedDetails(Pool pool) throws IOException {
     if (pool.getId() == PoolImpl.UNSAVED_ID) pool.setCreationDate(timeStamp);
     pool.setLastModifier(migrationUser);
-  }
-
-  private void addPoolNoteDetails(Pool pool) throws IOException {
     for (Note note : pool.getNotes()) {
-      note.setCreationDate(timeStamp);
-      note.setOwner(migrationUser);
+      if (note.getNoteId() == Note.UNSAVED_ID) {
+        note.setCreationDate(timeStamp);
+        note.setOwner(migrationUser);
+      }
     }
   }
 
@@ -566,8 +624,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private void updateRun(Run from, Run to) throws IOException {
     log.debug("Updating run " + to.getId());
-    to.getStatus().setCompletionDate(to.getStatus().getCompletionDate());
-    to.getStatus().setHealth(to.getStatus().getHealth());
+    to.getStatus().setCompletionDate(from.getStatus().getCompletionDate());
+    to.getStatus().setHealth(from.getStatus().getHealth());
 
     // slated for demolition
     to.getStatus().setLastUpdated(timeStamp);
@@ -584,20 +642,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
     SequencerPartitionContainer<SequencerPoolPartition> toFlowcell = to.getSequencerPartitionContainers().get(0);
     for (SequencerPoolPartition fromPartition : fromFlowcell.getPartitions()) {
       if (fromPartition.getPool() != null) {
+        boolean saved = false;
         for (SequencerPoolPartition toPartition : toFlowcell.getPartitions()) {
           if (toPartition.getPartitionNumber().equals(fromPartition.getPartitionNumber())) {
             if (toPartition.getPool() != null) {
               if (!mergeRunPools) throw new IOException("A pool already exists for lane " + toPartition.getPartitionNumber());
-              Pool toPool = toPartition.getPool();
-              // Merge pools
-              Collection<LibraryDilution> fromPoolables = fromPartition.getPool().getPoolableElements();
-              Collection<LibraryDilution> toPoolables = toPool.getPoolableElements();
-              toPoolables.addAll(fromPoolables);
-              setPoolModifiedDetails(toPool);
-              serviceManager.getRequestManager().savePool(toPool);
-              addPoolNoteDetails(fromPartition.getPool());
-              log.debug(String.format("Merged new pool %s with existing pool '%s' in run %d lane %d",
-                  fromPartition.getPool().getAlias(), toPool.getAlias(), to.getId(), toPartition.getPartitionNumber()));
             } else {
               // Add new pool
               toPartition.setPool(fromPartition.getPool());
@@ -605,11 +654,34 @@ public class DefaultMigrationTarget implements MigrationTarget {
               log.debug(
                   "added " + toPartition.getPool().getAlias() + " to run " + to.getId() + " lane " + toPartition.getPartitionNumber());
             }
+            saved = true;
             break;
           }
         }
+        if (!saved) throw new IndexOutOfBoundsException(String.format("Partition %d not found in run %s",
+            fromPartition.getPartitionNumber(), to.getAlias()));
       }
     }
+  }
+
+  /**
+   * Merges pool data from source into target
+   * 
+   * @param source
+   * @param target
+   * @throws IOException
+   * @throws IllegalStateException if there are conflicting description or barcodes
+   */
+  private void mergePools(Pool fromPool, Pool toPool) throws IOException {
+    Collection<LibraryDilution> fromPoolables = fromPool.getPoolableElements();
+    Collection<LibraryDilution> toPoolables = toPool.getPoolableElements();
+    toPoolables.addAll(fromPoolables);
+    setPoolModifiedDetails(toPool);
+    serviceManager.getRequestManager().savePool(toPool);
+    for (Note note : fromPool.getNotes()) {
+      serviceManager.getRequestManager().savePoolNote(toPool, note);
+    }
+    log.debug(String.format("Merged new pool %s with existing pool '%s'", fromPool.getAlias(), toPool.getAlias()));
   }
 
   /**

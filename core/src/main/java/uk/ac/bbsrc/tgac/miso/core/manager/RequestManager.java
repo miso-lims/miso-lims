@@ -104,8 +104,6 @@ public interface RequestManager {
 
   public Pool getPoolByBarcode(String barcode) throws IOException;
 
-  public Pool getPoolByIdBarcode(String barcode) throws IOException;
-
   public PoolQC getPoolQCById(long poolQcId) throws IOException;
 
   public LibraryQC getLibraryQCById(long qcId) throws IOException;

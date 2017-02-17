@@ -541,39 +541,6 @@ public class UserAuthMisoRequestManagerTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByIdBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetPoolByIdBarcode() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getPoolByIdBarcode(barcode)).thenReturn(pool);
-    when(pool.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(pool, userAuthMisoRequestManager.getPoolByIdBarcode(barcode));
-
-    verify(backingManager).getPoolByIdBarcode(barcode);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByIdBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetPoolByIdBarcodeThrows() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getPoolByIdBarcode(barcode)).thenReturn(pool);
-    when(pool.userCanRead(any(User.class))).thenReturn(false);
-    Long poolId = 1L;
-    when(pool.getId()).thenReturn(poolId);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Pool " + poolId);
-
-    userAuthMisoRequestManager.getPoolByIdBarcode(barcode);
-
-    verify(backingManager).getPoolByIdBarcode(barcode);
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByBarcode(java.lang.String)} .
    */
   @Test
