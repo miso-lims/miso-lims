@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -35,6 +37,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -215,4 +218,17 @@ public abstract class AbstractSequencerReference implements SequencerReference {
     return lastServicedDate;
   }
   
+  @OneToMany(targetEntity = Run.class, mappedBy = "sequencerReference")
+  private Set<Run> runs = new HashSet<>();
+
+  @Override
+  public Set<Run> getRuns() {
+    return runs;
+  }
+
+  @Override
+  public void setRuns(Set<Run> runs) {
+    this.runs = runs;
+  }
+
 }

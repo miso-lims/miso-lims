@@ -436,7 +436,7 @@
         { "sTitle" : "End Date", "mData" : "endDate" },
         { "sTitle" : "Type", "mData" : "platformType" },
         { "sTitle" : "Parameters", "mData" : "parameters.name" },
-        { "sTitle" : "Last Modified", "mData" : "lastUpdated" }
+        { "sTitle" : "Last Modified", "mData" : "lastModified" }
       ],
       "iDisplayLength": 50,
       "bJQueryUI": true,

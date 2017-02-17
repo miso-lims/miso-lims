@@ -56,7 +56,6 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -65,7 +64,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -111,21 +109,20 @@ public class RunControllerHelperService {
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Long runId = AbstractRun.UNSAVED_ID;
+      Long runId = Run.UNSAVED_ID;
 
       if (json.has("runId") && !isStringEmptyOrNull(json.getString("runId"))) {
         // edit existing run
         Map<String, Object> responseMap = new HashMap<>();
         runId = Long.parseLong(json.getString("runId"));
         Run storedRun = requestManager.getRunById(runId);
-        String storedPlatformType = storedRun.getPlatformType().getKey();
+        String storedPlatformType = storedRun.getSequencerReference().getPlatform().getPlatformType().getKey();
 
         PlatformType newPt = PlatformType.get(newRuntype);
         if (newPt != null) {
           log.info("STORED: " + newRuntype + " :: " + storedPlatformType);
           if (!newRuntype.equals(storedPlatformType)) {
-            run = new RunImpl(user);
-            run.setPlatformType(newPt);
+            run = new Run(user);
             run.setId(storedRun.getId());
           } else {
             run = storedRun;
@@ -181,12 +178,11 @@ public class RunControllerHelperService {
     String cId = json.getString("run_cId");
     try {
       SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
-      PlatformType pt = sr.getPlatform().getPlatformType();
       Map<String, Object> responseMap = new HashMap<>();
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-      Run run = new RunImpl(user);
-      run.setPlatformType(pt);
+      Run run = new Run(user);
+
       run.setSequencerReference(sr);
 
       session.setAttribute("run_" + cId, run);
@@ -257,7 +253,7 @@ public class RunControllerHelperService {
         Long runId = Long.parseLong(json.getString("runId"));
         Run r = requestManager.getRunById(runId);
 
-        for (SequencerPartitionContainer f : ((RunImpl) r).getSequencerPartitionContainers()) {
+        for (SequencerPartitionContainer f : r.getSequencerPartitionContainers()) {
           sb.append("<table class='containerSummary'><tr>");
           for (Partition p : f.getPartitions()) {
             sb.append("<td onclick='Run.qc.toggleProcessPartition(this);' runId='" + r.getId() + "' containerId='" + f.getId()
@@ -327,7 +323,8 @@ public class RunControllerHelperService {
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
           sb.append("<td>");
 
-          for (SequencerPartitionContainer f : ((RunImpl) run).getSequencerPartitionContainers()) {
+          for (SequencerPartitionContainer f : run.getSequencerPartitionContainers()) {
+
             sb.append("<table class='containerSummary'><tr>");
             for (Partition p : f.getPartitions()) {
               if (processSelections.contains(run.getId() + "_" + f.getId() + "_" + p.getPartitionNumber())) {
@@ -487,11 +484,11 @@ public class RunControllerHelperService {
     int container = json.getInt("container");
     int partition = json.getInt("partition");
 
-    RunImpl r = (RunImpl) session.getAttribute("run_" + json.getString("run_cId"));
+    Run r = (Run) session.getAttribute("run_" + json.getString("run_cId"));
 
     try {
       PlatformType pt = json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))
-          ? PlatformType.get(json.getString("platform")) : r.getPlatformType();
+          ? PlatformType.get(json.getString("platform")) : r.getSequencerReference().getPlatform().getPlatformType();
 
       Pool p = poolService.getPoolByBarcode(barcode);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
@@ -669,12 +666,13 @@ public class RunControllerHelperService {
         JSONArray inner = new JSONArray();
         inner.add(TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getAlias()));
-        inner.add((run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : ""));
-        inner.add((run.getStatus() != null && run.getStatus().getStartDate() != null
-            ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : ""));
-        inner.add((run.getStatus() != null && run.getStatus().getCompletionDate() != null
-            ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : ""));
-        inner.add((run.getPlatformType() != null ? run.getPlatformType().getKey() : ""));
+        inner.add((run.getHealth() != null ? run.getHealth().getKey() : ""));
+        inner.add((run.getStartDate() != null
+            ? LimsUtils.getDateAsString(run.getStartDate()) : ""));
+        inner.add((run.getCompletionDate() != null
+            ? LimsUtils.getDateAsString(run.getCompletionDate()) : ""));
+        inner.add((run.getSequencerReference().getPlatform().getPlatformType() != null
+            ? run.getSequencerReference().getPlatform().getPlatformType().getKey() : ""));
 
         jsonArray.add(inner);
       }

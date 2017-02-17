@@ -39,7 +39,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
@@ -98,13 +97,14 @@ public class RunAlertManager {
         if (clone != null) {
           applyListeners(clone);
           if (runs.containsKey(run.getId())) {
-            if (clone.getStatus() != null) {
-              log.debug("Not replacing Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
+            if (clone.getHealth() != null) {
+              log.debug("Not replacing Run " + clone.getId() + ": " + clone.getHealth().name());
             }
-          } else {
+          }
+          if (!runs.containsKey(run.getId())) {
             runs.put(run.getId(), clone);
-            if (clone.getStatus() != null) {
-              log.debug("Queued Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
+            if (clone.getHealth() != null) {
+              log.debug("Queued Run " + clone.getId() + ": " + clone.getHealth().name());
             }
           }
         }
@@ -142,9 +142,10 @@ public class RunAlertManager {
         push(r);
       } else {
         log.debug("Update: got clone of " + clone.getId());
-        if (r.getStatus() != null) {
-          clone.setStatus(r.getStatus());
-        }
+        clone.setHealth(r.getHealth());
+        clone.setCompletionDate(r.getCompletionDate());
+        clone.setStartDate(r.getStartDate());
+
 
         // run QC added
         if (r.getRunQCs().size() > clone.getRunQCs().size()) {
@@ -216,10 +217,10 @@ public class RunAlertManager {
    * @return the copy
    */
   private Run partialCopy(Run run) {
-    Run clone = new RunImpl();
+    Run clone = new Run();
     clone.setId(run.getId());
     clone.setAlias(run.getAlias());
-    clone.setStatus(run.getStatus());
+    clone.setHealth(run.getHealth());
     for (RunQC qc : run.getRunQCs()) {
       try {
         clone.addQc(partialCopy(qc));

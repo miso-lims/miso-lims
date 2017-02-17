@@ -43,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -175,7 +176,7 @@ public class ProjectTreeControllerHelperService {
 
       JSONObject miso = new JSONObject();
       for (Run run : runs) {
-        if (run.getStatus() != null && run.getStatus().getHealth() != null && run.getStatus().getHealth().getKey().equals("Completed")) {
+        if (run.getHealth() == HealthType.Completed) {
           runsArray.add(JSONObject
               .fromObject("{'name': '" + run.getName() + "','description':'" + run.getAlias() + "','show':'\"RUN \"','color': '1'}"));
         } else {

@@ -334,7 +334,7 @@
           <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
             <td><b><a href='<c:url value="/miso/run/${run.id}"/>'>${run.name}</a></b></td>
             <td><a href='<c:url value="/miso/run/${run.id}"/>'>${run.alias}</a></td>
-            <td>${run.status.health}</td>
+            <td>${run.health}</td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
               <span class="ui-icon ui-icon-trash"></span>

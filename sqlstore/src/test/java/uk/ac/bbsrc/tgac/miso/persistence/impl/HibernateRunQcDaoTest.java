@@ -22,15 +22,14 @@ import org.springframework.format.datetime.DateFormatter;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunQcDao;
 
 public class HibernateRunQcDaoTest extends AbstractDAOTest {
 
@@ -63,7 +62,7 @@ public class HibernateRunQcDaoTest extends AbstractDAOTest {
     runQC.setDoNotProcess(true);
     runQC.setInformation("information");
     runQC.setQcDate(new Date());
-    runQC.setRun(new RunImpl());
+    runQC.setRun(new Run());
     runQC.setQcType(new QcType());
     runQC.setPartitionSelections(new ArrayList<Partition>());
     long saveId = dao.save(runQC);

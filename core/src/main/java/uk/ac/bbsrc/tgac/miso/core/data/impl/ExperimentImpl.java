@@ -109,7 +109,7 @@ public class ExperimentImpl implements Experiment {
   private Pool pool;
 
   // defines the parent run which processes this experiment
-  @ManyToOne(targetEntity = RunImpl.class)
+  @ManyToOne(targetEntity = Run.class)
   @JoinTable(name = "Experiment_Run", joinColumns = { @JoinColumn(name = "runs_runId") }, inverseJoinColumns = {
       @JoinColumn(name = "Experiment_experimentId") })
   private Run run;

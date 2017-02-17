@@ -497,9 +497,8 @@ public class ERASubmissionManager implements SubmissionManager {
 
       xml.setAttribute("alias", "L00" + entry.getValue().getPartitionNumber() + ":" + entry.getKey().getName() + ":" + r.getAlias());
       xml.setAttribute("run_center", submissionProperties.getProperty("submission.centreName"));
-      if (r.getStatus() != null && r.getStatus().getHealth().equals(HealthType.Completed)) {
-
-        xml.setAttribute("run_date", DF_TIMESTAMP.format(r.getStatus().getCompletionDate()));
+      if (r.getHealth() == HealthType.Completed) {
+        xml.setAttribute("run_date", DF_TIMESTAMP.format(r.getCompletionDate()));
       }
       xml.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
 
