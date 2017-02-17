@@ -40,14 +40,18 @@ DROP PROCEDURE IF EXISTS clearData//
 CREATE PROCEDURE clearData ()
 BEGIN
     
+    DELETE FROM SequencerPartitionContainerChangeLog;
     DELETE FROM Run_SequencerPartitionContainer;
     DELETE FROM SequencerPartitionContainer_Partition;
     DELETE FROM SequencerPartitionContainer;
     DELETE FROM _Partition;
-    DELETE FROM Status;
+    DELETE FROM RunChangeLog;
     DELETE FROM Run;
+    DELETE FROM ExperimentChangeLog;
+    DELETE FROM Experiment;
     DELETE FROM PoolOrder;
-    DELETE FROM Pool_Elements;
+    DELETE FROM Pool_Dilution;
+    DELETE FROM PoolChangeLog;
     DELETE FROM Pool;
     DELETE FROM LibraryDilution;
     DELETE FROM DetailedLibrary;
@@ -68,8 +72,8 @@ BEGIN
     DELETE FROM Sample;
     DELETE FROM SampleNumberPerProject;
     DELETE FROM Subproject;
+    DELETE FROM StudyChangeLog;
     DELETE FROM Study;
-    DELETE FROM Project_ProjectOverview;
     DELETE FROM ProjectOverview_Note;
     DELETE FROM ProjectOverview;
     DELETE FROM Project;

@@ -307,6 +307,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     serviceManager.getChangeLogDao().deleteAllById("sample", sample.getId());
     for (ChangeLog change : changes) {
       ChangeLog newChangeLog = sample.createChangeLog(change.getSummary(), change.getColumnsChanged(), migrationUser);
+      newChangeLog.setTime(change.getTime());
       serviceManager.getChangeLogDao().create(newChangeLog);
     }
   }
@@ -336,14 +337,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private static Date getLatestChangeDate(Sample sample) {
     Date latest = null;
     for (ChangeLog change : sample.getChangeLog()) {
-      if (latest == null || change.getTime().after(latest)) latest = change.getTime();
-    }
-    return latest;
-  }
-
-  private static Date getLatestChangeDate(Library library) {
-    Date latest = null;
-    for (ChangeLog change : library.getChangeLog()) {
       if (latest == null || change.getTime().after(latest)) latest = change.getTime();
     }
     return latest;
@@ -420,6 +413,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     serviceManager.getChangeLogDao().deleteAllById("library", library.getId());
     for (ChangeLog change : changes) {
       ChangeLog newChangeLog = library.createChangeLog(change.getSummary(), change.getColumnsChanged(), migrationUser);
+      newChangeLog.setTime(change.getTime());
       serviceManager.getChangeLogDao().create(newChangeLog);
     }
   }
