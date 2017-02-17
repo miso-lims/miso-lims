@@ -160,7 +160,7 @@
   <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
     <property name="dataSource" ref="dataSource"/>
     <property name="sqlMigrationSuffix" value=".test.sql"/>
-    <property name="locations" value="db/test_migration"/>
+    <property name="locations" value="classpath:uk.ac.bbsrc.tgac.miso.db.migration,db/test_migration"/>
   </bean>
   
 </beans>

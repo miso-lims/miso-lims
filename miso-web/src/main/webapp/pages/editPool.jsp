@@ -502,7 +502,7 @@
           { "sTitle" : "Start Date", "mData" : "startDate" },
           { "sTitle" : "End Date", "mData" : "endDate" },
           { "sTitle" : "Type", "mData" : "platformType" },
-          { "sTitle" : "Last Modified", "mData" : "lastUpdated" }
+          { "sTitle" : "Last Modified", "mData" : "lastModified" }
         ],
         "iDisplayLength": 50,
         "bJQueryUI": true,

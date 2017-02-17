@@ -35,7 +35,7 @@ import com.eaglegenomics.simlims.core.User;
 @Entity
 @Table(name = "RunPacBio")
 public class PacBioRun extends Run {
-  private long movieDuration;
+  private Long movieDuration;
 
   private String wellName;
 
@@ -50,7 +50,7 @@ public class PacBioRun extends Run {
     super();
   }
 
-  public long getMovieDuration() {
+  public Long getMovieDuration() {
     return movieDuration;
   }
 
@@ -62,7 +62,7 @@ public class PacBioRun extends Run {
     return creationDate;
   }
 
-  public void setMovieDuration(long movieDuration) {
+  public void setMovieDuration(Long movieDuration) {
     this.movieDuration = movieDuration;
   }
 

@@ -57,11 +57,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -1021,6 +1024,7 @@ public class MisoRequestManager implements RequestManager {
   public long saveRun(Run run) throws IOException {
     if (runStore != null) {
 
+      run.setLastModifier(getCurrentUser());
       if (run.getId() == Run.UNSAVED_ID) {
 
         run.setName(generateTemporaryName());
@@ -1055,6 +1059,25 @@ public class MisoRequestManager implements RequestManager {
         }
         managed.setNotes(run.getNotes());
         managed.setSequencingParameters(run.getSequencingParameters());
+        if (managed instanceof IlluminaRun) {
+          IlluminaRun managedIllumina = (IlluminaRun) managed;
+          IlluminaRun runIllumina = (IlluminaRun) run;
+          managedIllumina.setCallCycle(runIllumina.getCallCycle());
+          managedIllumina.setImgCycle(runIllumina.getImgCycle());
+          managedIllumina.setNumCycles(runIllumina.getNumCycles());
+          managedIllumina.setScoreCycle(runIllumina.getScoreCycle());
+        } else if (managed instanceof PacBioRun) {
+          PacBioRun managedPacBio = (PacBioRun) managed;
+          PacBioRun runPacBio = (PacBioRun) run;
+          managedPacBio.setCreationDate(runPacBio.getCreationDate());
+          managedPacBio.setMovieDuration(runPacBio.getMovieDuration());
+          managedPacBio.setWellName(runPacBio.getWellName());
+        } else if (managed instanceof LS454Run) {
+          LS454Run managedLS454 = (LS454Run) managed;
+          LS454Run runLS454 = (LS454Run) run;
+          managedLS454.setCycles(runLS454.getCycles());
+        }
+
         runStore.save(managed);
         if (runAlertManager != null) runAlertManager.update(managed);
         return run.getId();

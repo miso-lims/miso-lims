@@ -116,9 +116,9 @@ public class HibernateRunDao implements RunStore {
     currentSession().flush();
 
     Criteria criteria = currentSession().createCriteria(Run.class, "r");
-    criteria.createAlias("r.containers", "spc").createAlias("r.status", "status");
+    criteria.createAlias("r.containers", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
-    criteria.addOrder(Order.desc("status.startDate"));
+    criteria.addOrder(Order.desc("startDate"));
     criteria.setMaxResults(1);
     return withWatcherGroup((Run) criteria.uniqueResult());
   }
@@ -205,8 +205,7 @@ public class HibernateRunDao implements RunStore {
   @Override
   public List<Run> listByStatus(String health) throws IOException {
     Criteria criteria = currentSession().createCriteria(Run.class, "r");
-    criteria.createAlias("r.status", "status");
-    criteria.add(Restrictions.eq("status.health", HealthType.get(health)));
+    criteria.add(Restrictions.eq("health", HealthType.get(health)));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
@@ -256,13 +255,11 @@ public class HibernateRunDao implements RunStore {
       throws IOException {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    if ("lastUpdated".equals(sortCol)) sortCol = "status.lastUpdated";
     Criteria criteria = currentSession().createCriteria(Run.class);
     if (querystr != null) {
       criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
     }
     criteria.createAlias("derivedInfo", "derivedInfo");
-    criteria.createAlias("status", "status");
     criteria.setFirstResult(offset);
     criteria.setMaxResults(limit);
     criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));

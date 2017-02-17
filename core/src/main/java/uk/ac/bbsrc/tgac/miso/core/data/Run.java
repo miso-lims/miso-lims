@@ -223,10 +223,6 @@ public class Run
   @Column(nullable = false)
   private Boolean pairedEnd;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private PlatformType platformType;
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long runId = UNSAVED_ID;

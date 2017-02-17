@@ -1086,7 +1086,7 @@
               </c:if>
             </c:forEach>
           </td>
-          <td>${run.status.health}</td>
+          <td>${run.health.key}</td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
               <span class="ui-icon ui-icon-trash"></span>

@@ -217,8 +217,9 @@ public class EditRunController {
     return exps;
   }
 
-  @RequestMapping(value = "/new/{platformType}", method = RequestMethod.GET)
-  public ModelAndView newUnassignedRun(@PathVariable PlatformType platformType, ModelMap model) throws IOException {
+  @RequestMapping(value = "/new/{platformTypeName}", method = RequestMethod.GET)
+  public ModelAndView newUnassignedRun(@PathVariable String platformTypeName, ModelMap model) throws IOException {
+    PlatformType platformType = PlatformType.valueOf(platformTypeName);
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     // clear any existing run in the model
     model.addAttribute("run", null);

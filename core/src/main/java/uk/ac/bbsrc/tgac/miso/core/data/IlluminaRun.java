@@ -109,40 +109,40 @@ public class IlluminaRun extends Run {
     return null;
   }
 
-  private int callCycle;
-  private int imgCycle;
-  private int numCycles;
-  private int scoreCycle;
+  private Integer callCycle;
+  private Integer imgCycle;
+  private Integer numCycles;
+  private Integer scoreCycle;
 
-  public int getCallCycle() {
+  public Integer getCallCycle() {
     return callCycle;
   }
 
-  public int getImgCycle() {
+  public Integer getImgCycle() {
     return imgCycle;
   }
 
-  public int getNumCycles() {
+  public Integer getNumCycles() {
     return numCycles;
   }
 
-  public int getScoreCycle() {
+  public Integer getScoreCycle() {
     return scoreCycle;
   }
 
-  public void setCallCycle(int callCycle) {
+  public void setCallCycle(Integer callCycle) {
     this.callCycle = callCycle;
   }
 
-  public void setImgCycle(int imgCycle) {
+  public void setImgCycle(Integer imgCycle) {
     this.imgCycle = imgCycle;
   }
 
-  public void setNumCycles(int numCycles) {
+  public void setNumCycles(Integer numCycles) {
     this.numCycles = numCycles;
   }
 
-  public void setScoreCycle(int scoreCycle) {
+  public void setScoreCycle(Integer scoreCycle) {
     this.scoreCycle = scoreCycle;
   }
 }

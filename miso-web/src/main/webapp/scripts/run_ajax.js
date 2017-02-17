@@ -56,6 +56,34 @@ var Run = Run || {
     jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
+    jQuery('#wellName').attr('class', 'form-control');
+    jQuery('#wellName').attr('data-parsley-maxlength', '255');
+    jQuery('#wellName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    jQuery('#movieDuration').attr('class', 'form-control');
+    jQuery('#movieDuration').attr('data-parsley-maxlength', '10');
+    jQuery('#movieDuration').attr('data-parsley-type', 'number');
+
+    jQuery('#numCycles').attr('class', 'form-control');
+    jQuery('#numCycles').attr('data-parsley-maxlength', '10');
+    jQuery('#numCycles').attr('data-parsley-type', 'number');
+
+    jQuery('#callCycle').attr('class', 'form-control');
+    jQuery('#callCycle').attr('data-parsley-maxlength', '10');
+    jQuery('#callCycle').attr('data-parsley-type', 'number');
+
+    jQuery('#imgCycle').attr('class', 'form-control');
+    jQuery('#imgCycle').attr('data-parsley-maxlength', '10');
+    jQuery('#imgCycle').attr('data-parsley-type', 'number');
+
+    jQuery('#scoreCycles').attr('class', 'form-control');
+    jQuery('#scoreCycles').attr('data-parsley-maxlength', '10');
+    jQuery('#scoreCycles').attr('data-parsley-type', 'number');
+
+    jQuery('#cycles').attr('class', 'form-control');
+    jQuery('#cycles').attr('data-parsley-maxlength', '10');
+    jQuery('#cycles').attr('data-parsley-type', 'number');
+
     // Radio button validation: ensure a platform is selected
     jQuery('#platformType').attr('class', 'form-control');
     jQuery('#platformTypes1').attr('required', 'true');
@@ -391,8 +419,8 @@ Run.ui = {
           "iSortPriority": 0
         },
         {
-          "sTitle": "Last Updated",
-          "mData": "lastUpdated",
+          "sTitle": "Last Modified",
+          "mData": "lastModified",
           "iSortPriority": 2,
           "bVisible": (Sample.detailedSample ? "true" : "false")
         }
@@ -422,9 +450,6 @@ Run.ui = {
       }
     })).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("#toolbar").append("<a onmouseover='mopen(\"addrunmenu\")' onmouseout='mclosetime()'>Add Run</a><div id='addrunmenu' onmouseover='mcancelclosetime()' onmouseout='mclosetime()' style='visibility: hidden;'>" +
-      Run.platformTypes.map(function (x) { return "<a href=\"/miso/run/new/" + x.name + "\">Add " + x.key + "</a>"; }).join("<br/>") +
-      "</div>");
   },
 
   changeIlluminaLane: function (t, container) {

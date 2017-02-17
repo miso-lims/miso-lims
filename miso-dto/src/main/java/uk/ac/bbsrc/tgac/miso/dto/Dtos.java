@@ -1227,7 +1227,7 @@ public class Dtos {
       dto.setStatus("");
     }
     if (from.getLastUpdated() != null) {
-      dto.setLastUpdated(getDateAsString(from.getLastUpdated()));
+      dto.setLastModified(getDateAsString(from.getLastUpdated()));
     }
     if (from.getSequencerReference() != null) {
       dto.setPlatformType(from.getSequencerReference().getPlatform().getPlatformType().getKey());

@@ -170,16 +170,54 @@
       </c:choose>
     </td>
   </tr>
-  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.PacBioRun') && pacBioDashboardUrl != null}">
-  <tr>
-    <td>PacBio Dashboard:</td>
-    <td><span id="pbDashLink"></span></td>
-    <script type="text/javascript">
-    jQuery(document).ready(function() {
-      Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.startDate}', '${run.sequencerReference.name}');
-    });
-    </script>
-  </tr>
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.PacBioRun')}">
+    <c:if test="${pacBioDashboardUrl != null}">
+      <tr>
+        <td>PacBio Dashboard:</td>
+        <td><span id="pbDashLink"></span></td>
+        <script type="text/javascript">
+          jQuery(document).ready(function() {
+            Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.startDate}', '${run.sequencerReference.name}');
+          });
+        </script>
+      </tr>
+    </c:if>
+    <tr>
+      <td>Movie Duration:</td>
+      <td><form:input path="movieDuration" class="validateable"/></td>
+    </tr>
+    <tr>
+      <td>Well:</td>
+      <td><form:input path="wellName" class="validateable"/></td>
+    </tr>
+    <tr>
+      <td>Creation Date:</td>
+      <td>${run.creationDate}</td>
+    </tr>
+  </c:if>
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
+    <tr>
+      <td>Number of Cycles:</td>
+      <td><form:input path="numCycles" class="validateable"/></td>
+    </tr>
+    <tr>
+      <td>Called Cycles:</td>
+      <td><form:input path="callCycle" class="validateable"/></td>
+    </tr>
+    <tr>
+      <td>Imaged Cycles:</td>
+      <td><form:input path="imgCycle" class="validateable"/></td>
+    </tr>
+    <tr>
+      <td>Scored Cycles:</td>
+      <td><form:input path="scoreCycle" class="validateable"/></td>
+    </tr>
+  </c:if>
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.LS454Run')}">
+    <tr>
+      <td>Cycles:</td>
+      <td><form:input path="cycles" class="validateable"/></td>
+    </tr>
   </c:if>
   <tr>
     <td>Paired End:</td>

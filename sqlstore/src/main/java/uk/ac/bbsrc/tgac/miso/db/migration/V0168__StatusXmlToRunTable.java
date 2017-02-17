@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,9 +17,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 import org.xml.sax.InputSource;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * Migration to remove a xml file from the MySql database. The useful values from the xml file are copied to fields in the database.
@@ -39,7 +38,7 @@ public class V0168__StatusXmlToRunTable implements JdbcMigration {
   }
 
   private Map<String, String> getStatusXml(Connection connection) throws SQLException {
-    Map<String, String> result = Maps.newHashMap();
+    Map<String, String> result = new HashMap<>();
     PreparedStatement getStatusXml = connection.prepareStatement("SELECT s.runName, s.xml FROM Status AS s WHERE s.xml IS NOT NULL");
     ResultSet rs = getStatusXml.executeQuery();
     while (rs.next()) {
@@ -51,7 +50,7 @@ public class V0168__StatusXmlToRunTable implements JdbcMigration {
   }
 
   private void addStatusColumnsToRun(Connection connection) throws SQLException {
-    List<String> newColumnSql = Lists.newArrayList();
+    List<String> newColumnSql = new ArrayList<>();
     newColumnSql.add("ALTER TABLE Run ADD COLUMN numCycles int(11) DEFAULT NULL;");
     newColumnSql.add("ALTER TABLE Run ADD COLUMN imgCycle int(11) DEFAULT NULL;");
     newColumnSql.add("ALTER TABLE Run ADD COLUMN scoreCycle int(11) DEFAULT NULL;");

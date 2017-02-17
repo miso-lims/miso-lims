@@ -35,17 +35,23 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>
-      <div id="totalCount">Runs
-      </div>
-    </h1>
+    <h1>Runs</h1>
+    <ul class="sddm">
+      <li>
+        <a onmouseover="mopen('addrunmenu')" onmouseout="mclosetime()">Add Run
+          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+        </a>
+        <div id="addrunmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()" style="visibility: hidden;">
+          <c:forEach items="${platformTypes}" var="pt">
+            <a href="/miso/run/new/${pt.name()}">Add ${pt.key}</a>
+          </c:forEach>
+        </div>
+       </li>
+    </ul>
     <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingRunsTable">
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {
-        Run.platformTypes = [
-         <c:forEach item="${uk.ac.bbsrc.tgac.miso.core.data.type.PlatformTypes.values()}" var="pt">{ name : "${pt.name()}", key : "${pt.key}" },</c:forEach>
-        ];
         Run.ui.createListingRunsTable();
       });
     </script>
