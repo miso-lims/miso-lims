@@ -20,8 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -49,7 +49,7 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   }
 
   @Override
-  public long save(SequencerPartitionContainer<SequencerPoolPartition> spc) throws IOException {
+  public long save(SequencerPartitionContainer spc) throws IOException {
     long id;
     if (spc.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
       id = (Long) currentSession().save(spc);
@@ -62,15 +62,15 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
 
   @SuppressWarnings("unchecked")
   @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> get(long id) throws IOException {
-    return (SequencerPartitionContainer<SequencerPoolPartition>) currentSession().get(SequencerPartitionContainerImpl.class, id);
+  public SequencerPartitionContainer get(long id) throws IOException {
+    return (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, id);
   }
 
   @Override
-  public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAll() throws IOException {
+  public Collection<SequencerPartitionContainer> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
     @SuppressWarnings("unchecked")
-    List<SequencerPartitionContainer<SequencerPoolPartition>> results = criteria.list();
+    List<SequencerPartitionContainer> results = criteria.list();
     return results;
   }
 
@@ -82,12 +82,12 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   }
 
   @Override
-  public boolean remove(SequencerPartitionContainer<SequencerPoolPartition> spc) throws IOException {
+  public boolean remove(SequencerPartitionContainer spc) throws IOException {
     if (spc.isDeletable()) {
       Long spcId = spc.getId();
       currentSession().delete(spc);
 
-      SequencerPartitionContainer<SequencerPoolPartition> testIfExists = get(spcId);
+      SequencerPartitionContainer testIfExists = get(spcId);
       return testIfExists == null;
     } else {
       return false;
@@ -95,7 +95,7 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   }
 
   @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerByPartitionId(long partitionId)
+  public SequencerPartitionContainer getSequencerPartitionContainerByPartitionId(long partitionId)
       throws IOException {
     // flush here because if Hibernate has not persisted recent changes to container-partition relationships, unexpected associations may
     // show up
@@ -105,13 +105,13 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
     criteria.createAlias("spc.partitions", "ps");
     criteria.add(Restrictions.eq("ps.id", partitionId));
     @SuppressWarnings("unchecked")
-    SequencerPartitionContainer<SequencerPoolPartition> record = (SequencerPartitionContainer<SequencerPoolPartition>) criteria
+    SequencerPartitionContainer record = (SequencerPartitionContainer) criteria
         .uniqueResult();
     return record;
   }
 
   @Override
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainersByRunId(long runId)
+  public List<SequencerPartitionContainer> listAllSequencerPartitionContainersByRunId(long runId)
       throws IOException {
     // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
     // show up
@@ -121,22 +121,22 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
     criteria.createAlias("runs", "run");
     criteria.add(Restrictions.eq("run.id", runId));
     @SuppressWarnings("unchecked")
-    List<SequencerPartitionContainer<SequencerPoolPartition>> records = criteria.list();
+    List<SequencerPartitionContainer> records = criteria.list();
     return records;
   }
 
   @Override
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByBarcode(String barcode)
+  public List<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode)
       throws IOException {
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
     criteria.add(Restrictions.eq("identificationBarcode", barcode));
     @SuppressWarnings("unchecked")
-    List<SequencerPartitionContainer<SequencerPoolPartition>> records = criteria.list();
+    List<SequencerPartitionContainer> records = criteria.list();
     return records;
   }
 
   @Override
-  public Collection<? extends SequencerPoolPartition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException {
+  public Collection<Partition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException {
     // flush here because if Hibernate has not persisted recent changes to container-partition relationships, unexpected associations may
     // show up
     currentSession().flush();
@@ -144,7 +144,7 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
     Criteria criteria = currentSession().createCriteria(PartitionImpl.class);
     criteria.add(Restrictions.eq("sequencerPartitionContainer.id", sequencerPartitionContainerId));
     @SuppressWarnings("unchecked")
-    List<? extends SequencerPoolPartition> records = criteria.list();
+    List<Partition> records = criteria.list();
     return records;
   }
 
@@ -160,7 +160,7 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   }
 
   @Override
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> listBySearchOffsetAndNumResults(int offset, int limit, String querystr,
+  public List<SequencerPartitionContainer> listBySearchOffsetAndNumResults(int offset, int limit, String querystr,
       String sortDir, String sortCol) throws IOException {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
@@ -183,12 +183,12 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
     query.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
     query.createAlias("derivedInfo", "derivedInfo");
     @SuppressWarnings("unchecked")
-    List<SequencerPartitionContainer<SequencerPoolPartition>> records = query.list();
+    List<SequencerPartitionContainer> records = query.list();
     return records;
   }
 
   @Override
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> listByOffsetAndNumResults(int offset, int limit, String sortDir,
+  public List<SequencerPartitionContainer> listByOffsetAndNumResults(int offset, int limit, String sortDir,
       String sortCol) throws IOException {
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
     if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
@@ -200,13 +200,13 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
     criteria.setMaxResults(limit);
     criteria.addOrder("asc".equalsIgnoreCase(sortDir.toLowerCase()) ? Order.asc(sortCol) : Order.desc(sortCol));
     @SuppressWarnings("unchecked")
-    List<SequencerPartitionContainer<SequencerPoolPartition>> records = criteria.list();
+    List<SequencerPartitionContainer> records = criteria.list();
     return records;
   }
 
   @Override
-  public SequencerPoolPartition getPartitionById(long partitionId) {
-    return (SequencerPoolPartition) currentSession().get(PartitionImpl.class, partitionId);
+  public Partition getPartitionById(long partitionId) {
+    return (Partition) currentSession().get(PartitionImpl.class, partitionId);
   }
 
   public SessionFactory getSessionFactory() {

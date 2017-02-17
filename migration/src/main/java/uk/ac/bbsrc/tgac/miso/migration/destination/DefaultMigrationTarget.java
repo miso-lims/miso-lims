@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -39,7 +40,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
@@ -504,13 +504,13 @@ public class DefaultMigrationTarget implements MigrationTarget {
         throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",
             existingRun.getAlias(), existingRun.getSequencerPartitionContainers().size()));
       }
-      for (SequencerPoolPartition newLane : newRun.getSequencerPartitionContainers().get(0).getPartitions()) {
+      for (Partition newLane : newRun.getSequencerPartitionContainers().get(0).getPartitions()) {
         if (newLane.getPool() != null) {
           Pool existingPool = null;
           if (existingRun != null) {
             // Find existing pool on same lane
-            SequencerPartitionContainer<SequencerPoolPartition> existingLanes = existingRun.getSequencerPartitionContainers().get(0);
-            for (SequencerPoolPartition existingLane : existingLanes.getPartitions()) {
+            SequencerPartitionContainer existingLanes = existingRun.getSequencerPartitionContainers().get(0);
+            for (Partition existingLane : existingLanes.getPartitions()) {
               if (existingLane.getPartitionNumber() == newLane.getPartitionNumber()) {
                 existingPool = existingLane.getPool();
               }
@@ -611,7 +611,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       } else {
         updateRun(newRun, run);
       }
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
         container.setLastModifier(migrationUser);
         container.setId(serviceManager.getSequencerPartitionContainerDao().save(container));
       }
@@ -638,12 +638,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
       throw new IOException(String.format("Migrating run %s has unexpected number of sequencerPartitionContainers (%d)",
           from.getAlias(), from.getSequencerPartitionContainers().size()));
     }
-    SequencerPartitionContainer<SequencerPoolPartition> fromFlowcell = from.getSequencerPartitionContainers().get(0);
-    SequencerPartitionContainer<SequencerPoolPartition> toFlowcell = to.getSequencerPartitionContainers().get(0);
-    for (SequencerPoolPartition fromPartition : fromFlowcell.getPartitions()) {
+    SequencerPartitionContainer fromFlowcell = from.getSequencerPartitionContainers().get(0);
+    SequencerPartitionContainer toFlowcell = to.getSequencerPartitionContainers().get(0);
+    for (Partition fromPartition : fromFlowcell.getPartitions()) {
       if (fromPartition.getPool() != null) {
         boolean saved = false;
-        for (SequencerPoolPartition toPartition : toFlowcell.getPartitions()) {
+        for (Partition toPartition : toFlowcell.getPartitions()) {
           if (toPartition.getPartitionNumber().equals(fromPartition.getPartitionNumber())) {
             if (toPartition.getPool() != null) {
               if (!mergeRunPools) throw new IOException("A pool already exists for lane " + toPartition.getPartitionNumber());

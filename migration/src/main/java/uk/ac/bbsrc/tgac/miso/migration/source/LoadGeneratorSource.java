@@ -15,6 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -26,7 +27,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -468,7 +468,7 @@ public class LoadGeneratorSource implements MigrationSource {
     sequencer.setId(runSequencerId);
     run.setSequencerReference(sequencer);
 
-    SequencerPartitionContainer<SequencerPoolPartition> container = new SequencerPartitionContainerImpl();
+    SequencerPartitionContainer container = new SequencerPartitionContainerImpl();
     container.setIdentificationBarcode(runBarcode);
     Platform platform = new PlatformImpl();
     platform.setId(runPlatformId);
@@ -481,9 +481,9 @@ public class LoadGeneratorSource implements MigrationSource {
     status.setInstrumentName(RUN_INSTRUMENT_NAME);
     run.setStatus(status);
 
-    List<SequencerPoolPartition> partitions = new ArrayList<>();
+    List<Partition> partitions = new ArrayList<>();
     for (int i = 0; i < pools.size(); i++) {
-      SequencerPoolPartition partition = new PartitionImpl();
+      Partition partition = new PartitionImpl();
       partition.setPartitionNumber(i);
       partition.setPool(pools.get(i));
       partition.setSequencerPartitionContainer(container);
@@ -492,7 +492,7 @@ public class LoadGeneratorSource implements MigrationSource {
 
     container.setPartitions(partitions);
 
-    List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new ArrayList<>();
+    List<SequencerPartitionContainer> containers = new ArrayList<>();
     containers.add(container);
     run.setSequencerPartitionContainers(containers);
     return run;

@@ -11,7 +11,6 @@ import org.junit.Test;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
@@ -52,7 +51,7 @@ public class LoadGeneratorSourceTest {
     Run r = data.getRuns().iterator().next();
     assertNotNull(r.getSequencerPartitionContainers());
     assertEquals(1, r.getSequencerPartitionContainers().size());
-    SequencerPartitionContainer<SequencerPoolPartition> spc = r.getSequencerPartitionContainers().get(0);
+    SequencerPartitionContainer spc = r.getSequencerPartitionContainers().get(0);
     assertNotNull(spc.getPartitions());
     assertEquals(8, spc.getPartitions().size());
   }

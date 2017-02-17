@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -40,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -98,9 +98,9 @@ public class UserAuthMisoRequestManagerTest {
   @Mock
   private Study study;
   @Mock
-  private SequencerPoolPartition sequencerPoolParition;
+  private Partition sequencerPoolParition;
   @Mock
-  private SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer;
+  private SequencerPartitionContainer sequencerPartitionContainer;
   @Mock
   private Submission submission;
   @Mock
@@ -482,12 +482,12 @@ public class UserAuthMisoRequestManagerTest {
   @Test
   public void testGetSequencerPoolPartitionById() throws IOException {
     long inputId = 1L;
-    when(backingManager.getSequencerPoolPartitionById(inputId)).thenReturn(sequencerPoolParition);
+    when(backingManager.getPartitionById(inputId)).thenReturn(sequencerPoolParition);
     when(sequencerPoolParition.userCanRead(any(User.class))).thenReturn(true);
 
-    assertEquals(sequencerPoolParition, userAuthMisoRequestManager.getSequencerPoolPartitionById(inputId));
+    assertEquals(sequencerPoolParition, userAuthMisoRequestManager.getPartitionById(inputId));
 
-    verify(backingManager).getSequencerPoolPartitionById(inputId);
+    verify(backingManager).getPartitionById(inputId);
   }
 
   /**
@@ -496,15 +496,15 @@ public class UserAuthMisoRequestManagerTest {
   @Test
   public void testGetSequencerPoolPartitionByIdThrows() throws IOException {
     long inputId = 1L;
-    when(backingManager.getSequencerPoolPartitionById(inputId)).thenReturn(sequencerPoolParition);
+    when(backingManager.getPartitionById(inputId)).thenReturn(sequencerPoolParition);
     when(sequencerPoolParition.userCanRead(any(User.class))).thenReturn(false);
 
     thrown.expect(IOException.class);
     thrown.expectMessage("User null cannot read Partition " + inputId);
 
-    userAuthMisoRequestManager.getSequencerPoolPartitionById(inputId);
+    userAuthMisoRequestManager.getPartitionById(inputId);
 
-    verify(backingManager).getSequencerPoolPartitionById(inputId);
+    verify(backingManager).getPartitionById(inputId);
   }
 
   /**

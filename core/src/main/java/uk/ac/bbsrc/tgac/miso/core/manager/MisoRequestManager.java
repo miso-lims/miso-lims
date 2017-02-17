@@ -52,7 +52,6 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -63,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -73,7 +73,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
@@ -82,6 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -636,7 +636,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByRunId(long runId)
+  public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByRunId(long runId)
       throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return sequencerPartitionContainerStore.listAllSequencerPartitionContainersByRunId(runId);
@@ -646,7 +646,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByBarcode(String barcode)
+  public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode)
       throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return sequencerPartitionContainerStore.listSequencerPartitionContainersByBarcode(barcode);
@@ -656,7 +656,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainers() throws IOException {
+  public Collection<SequencerPartitionContainer> listAllSequencerPartitionContainers() throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return sequencerPartitionContainerStore.listAll();
     } else {
@@ -894,7 +894,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException {
+  public void deleteContainer(SequencerPartitionContainer container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       if (!sequencerPartitionContainerStore.remove(container)) {
         throw new IOException("Unable to delete container.");
@@ -1301,12 +1301,12 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException {
+  public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
-      if (container.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
+      if (container.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
         return sequencerPartitionContainerStore.save(container);
       } else {
-        SequencerPartitionContainer<SequencerPoolPartition> managed = getSequencerPartitionContainerById(container.getId());
+        SequencerPartitionContainer managed = getSequencerPartitionContainerById(container.getId());
         managed.setIdentificationBarcode(container.getIdentificationBarcode());
         managed.setLocationBarcode(container.getLocationBarcode());
         managed.setValidationBarcode(container.getValidationBarcode());
@@ -1318,10 +1318,10 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  private void updatePartitionPools(SequencerPartitionContainer<SequencerPoolPartition> source,
-      SequencerPartitionContainer<SequencerPoolPartition> managed) throws IOException {
-    for (SequencerPoolPartition sourcePartition : source.getPartitions()) {
-      for (SequencerPoolPartition managedPartition : source.getPartitions()) {
+  private void updatePartitionPools(SequencerPartitionContainer source,
+      SequencerPartitionContainer managed) throws IOException {
+    for (Partition sourcePartition : source.getPartitions()) {
+      for (Partition managedPartition : source.getPartitions()) {
         if (sourcePartition.getId() == managedPartition.getId()) {
           Pool sourcePool = sourcePartition.getPool();
           Pool managedPool = managedPartition.getPool();
@@ -1503,7 +1503,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException {
+  public Partition getPartitionById(long partitionId) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return sequencerPartitionContainerStore.getPartitionById(partitionId);
     } else {
@@ -1512,7 +1512,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerById(long containerId) throws IOException {
+  public SequencerPartitionContainer getSequencerPartitionContainerById(long containerId) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return sequencerPartitionContainerStore.get(containerId);
     } else {
@@ -2113,7 +2113,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageSizeSearch(int offset, int limit, String querystr,
+  public List<SequencerPartitionContainer> getContainersByPageSizeSearch(int offset, int limit, String querystr,
       String sortDir, String sortCol) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return sequencerPartitionContainerStore.listBySearchOffsetAndNumResults(offset, limit, querystr, sortDir, sortCol);
@@ -2123,7 +2123,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageAndSize(int offset, int limit, String sortDir,
+  public List<SequencerPartitionContainer> getContainersByPageAndSize(int offset, int limit, String sortDir,
       String sortCol) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return sequencerPartitionContainerStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol);

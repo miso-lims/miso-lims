@@ -49,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -1253,7 +1252,7 @@ public class Dtos {
     return dtoList;
   }
 
-  public static ContainerDto asDto(SequencerPartitionContainer<SequencerPoolPartition> from) {
+  public static ContainerDto asDto(SequencerPartitionContainer from) {
     ContainerDto dto = new ContainerDto();
     dto.setId(from.getId());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
@@ -1269,9 +1268,9 @@ public class Dtos {
     return dto;
   }
 
-  public static List<ContainerDto> asContainerDtos(Collection<SequencerPartitionContainer<SequencerPoolPartition>> containerSubset) {
+  public static List<ContainerDto> asContainerDtos(Collection<SequencerPartitionContainer> containerSubset) {
     List<ContainerDto> dtoList = new ArrayList<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> container : containerSubset) {
+    for (SequencerPartitionContainer container : containerSubset) {
       dtoList.add(asDto(container));
     }
     return dtoList;

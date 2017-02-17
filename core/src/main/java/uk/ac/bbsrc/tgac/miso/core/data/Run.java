@@ -74,11 +74,11 @@ public interface Run
    */
   public void setSequencerReference(SequencerReference sequencerReference);
 
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers();
+  public List<SequencerPartitionContainer> getSequencerPartitionContainers();
 
-  public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers);
+  public void setSequencerPartitionContainers(List<SequencerPartitionContainer> containers);
 
-  public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer);
+  public void addSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer);
 
   /**
    * Returns the platformType of this Run object.

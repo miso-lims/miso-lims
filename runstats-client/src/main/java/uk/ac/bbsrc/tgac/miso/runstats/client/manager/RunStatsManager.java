@@ -41,10 +41,10 @@ import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.tgac.statsdb.exception.ConsumerException;
 import uk.ac.tgac.statsdb.run.ReportTable;
@@ -128,12 +128,12 @@ public class RunStatsManager {
 
     if (!run.getSequencerPartitionContainers().isEmpty()) {
       JSONObject containers = new JSONObject();
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
         JSONObject f = new JSONObject();
         f.put("idBarcode", container.getIdentificationBarcode());
 
         JSONArray partitions = new JSONArray();
-        for (SequencerPoolPartition part : container.getPartitions()) {
+        for (Partition part : container.getPartitions()) {
           JSONObject partition = new JSONObject();
 
           map.put(RunProperty.lane, Integer.toString(part.getPartitionNumber()));
@@ -205,8 +205,8 @@ public class RunStatsManager {
     // clear any previous barcode query
     map.remove(RunProperty.barcode);
     if (!run.getSequencerPartitionContainers().isEmpty()) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
-        SequencerPoolPartition part = container.getPartitionAt(laneNumber);
+      for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
+        Partition part = container.getPartitionAt(laneNumber);
         if (part.getPartitionNumber() == laneNumber) {
           if (part.getPool() != null) {
             Pool pool = part.getPool();

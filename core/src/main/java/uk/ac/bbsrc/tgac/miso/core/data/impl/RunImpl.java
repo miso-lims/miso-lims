@@ -45,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 
 /**
@@ -65,7 +64,7 @@ public class RunImpl extends AbstractRun implements Serializable {
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
       @JoinColumn(name = "Run_runId") }, inverseJoinColumns = {
           @JoinColumn(name = "containers_containerId") })
-  private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<>(
+  private List<SequencerPartitionContainer> containers = new AutoPopulatingList<>(
       SequencerPartitionContainerImpl.class);
 
   /**
@@ -94,18 +93,18 @@ public class RunImpl extends AbstractRun implements Serializable {
   }
 
   @Override
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers() {
+  public List<SequencerPartitionContainer> getSequencerPartitionContainers() {
     if (this.containers != null) Collections.sort(this.containers);
     return containers;
   }
 
   @Override
-  public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers) {
+  public void setSequencerPartitionContainers(List<SequencerPartitionContainer> containers) {
     this.containers = containers;
   }
 
   @Override
-  public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> f) {
+  public void addSequencerPartitionContainer(SequencerPartitionContainer f) {
     f.setSecurityProfile(getSecurityProfile());
     if (f.getId() == 0L && f.getIdentificationBarcode() == null) {
       // can't validate it so add it anyway. this will only usually be the case for new run population.

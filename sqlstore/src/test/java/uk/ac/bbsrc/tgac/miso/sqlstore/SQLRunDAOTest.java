@@ -52,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
@@ -424,7 +423,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     User mockUser = Mockito.mock(UserImpl.class);
     Mockito.when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(mockUser);
 
-    List<SequencerPartitionContainer<SequencerPoolPartition>> mockContainers = new ArrayList<>();
+    List<SequencerPartitionContainer> mockContainers = new ArrayList<>();
     mockContainers.add(Mockito.mock(SequencerPartitionContainerImpl.class));
     Mockito.when(sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(Matchers.anyLong())).thenReturn(mockContainers);
 

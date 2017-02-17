@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -43,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
-public interface Partition extends SecurableByProfile, Identifiable, Comparable {
+public interface Partition extends SecurableByProfile, Identifiable, Comparable<Partition>, Deletable {
   /**
    * Returns the sequencerPartitionContainer of this Partition object.
    * 
@@ -81,4 +82,20 @@ public interface Partition extends SecurableByProfile, Identifiable, Comparable 
    *          partitionNumber.
    */
   void setPartitionNumber(Integer partitionNumber);
+
+  /**
+   * Returns the pool of this SequencerPoolPartition object.
+   * 
+   * @return Pool pool.
+   */
+  @JsonManagedReference(value = "pool")
+  public Pool getPool();
+
+  /**
+   * Sets the pool of this SequencerPoolPartition object.
+   * 
+   * @param pool
+   *          pool.
+   */
+  public void setPool(Pool pool);
 }

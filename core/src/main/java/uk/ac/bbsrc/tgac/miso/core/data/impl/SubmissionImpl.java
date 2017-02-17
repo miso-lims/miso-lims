@@ -45,8 +45,8 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -81,7 +81,7 @@ public class SubmissionImpl implements Submission, Serializable {
       @JoinColumn(name = "partition_partitionId") })
   @MapKeyJoinColumn(name = "dilution_dilutionId")
   @MapKeyClass(LibraryDilution.class)
-  private Map<Dilution, SequencerPoolPartition> dilutions;
+  private Map<Dilution, Partition> dilutions;
 
   @ManyToMany(targetEntity = ExperimentImpl.class)
   @JoinTable(name = "Submission_Experiment", joinColumns = {
@@ -141,7 +141,7 @@ public class SubmissionImpl implements Submission, Serializable {
   }
 
   @Override
-  public Map<Dilution, SequencerPoolPartition> getDilutions() {
+  public Map<Dilution, Partition> getDilutions() {
     return dilutions;
   }
 
@@ -221,7 +221,7 @@ public class SubmissionImpl implements Submission, Serializable {
   }
 
   @Override
-  public void setDilutions(Map<Dilution, SequencerPoolPartition> dilutions) {
+  public void setDilutions(Map<Dilution, Partition> dilutions) {
     this.dilutions = dilutions;
   }
 

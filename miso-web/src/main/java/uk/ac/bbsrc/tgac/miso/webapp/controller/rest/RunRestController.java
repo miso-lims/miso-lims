@@ -53,7 +53,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -113,7 +112,7 @@ public class RunRestController extends RestController {
     if (r == null) {
       throw new RestException("No run found with alias: " + runAlias, Status.NOT_FOUND);
     }
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> conts = r.getSequencerPartitionContainers();
+    Collection<SequencerPartitionContainer> conts = r.getSequencerPartitionContainers();
     if (conts.isEmpty() || conts.size() != 1) {
       throw new RestException("Expected 1 sequencing container for run " + runAlias + ", but found " + (conts == null ? 0 : conts.size()));
     }

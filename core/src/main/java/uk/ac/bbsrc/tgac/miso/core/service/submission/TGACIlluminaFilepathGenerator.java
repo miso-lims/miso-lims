@@ -41,8 +41,8 @@ import net.sourceforge.fluxion.spi.ServiceProvider;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 
@@ -67,7 +67,7 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
   }
 
   @Override
-  public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution l) throws SubmissionException {
+  public Set<File> generateFilePath(Partition partition, Dilution l) throws SubmissionException {
     Pool pool = partition.getPool();
     if (pool != null) {
       if (pool.getExperiments() != null) {
@@ -102,7 +102,7 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
   }
 
   @Override
-  public Set<File> generateFilePaths(SequencerPoolPartition partition) throws SubmissionException {
+  public Set<File> generateFilePaths(Partition partition) throws SubmissionException {
     Set<File> filePaths = new HashSet<>();
     if ((partition.getSequencerPartitionContainer().getLastRun().getFilePath()) == null) {
       throw new SubmissionException("No valid run filepath!");

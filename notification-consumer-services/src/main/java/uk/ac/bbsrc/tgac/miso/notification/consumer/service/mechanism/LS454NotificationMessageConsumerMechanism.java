@@ -56,7 +56,6 @@ import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -279,7 +278,7 @@ public class LS454NotificationMessageConsumerMechanism
                       requestManager.saveStatus(r.getStatus());
                     }
 
-                    List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((LS454Run) r).getSequencerPartitionContainers();
+                    List<SequencerPartitionContainer> fs = ((LS454Run) r).getSequencerPartitionContainers();
 
                     Element ptp = (Element) paramsDoc.getElementsByTagName("ptp").item(0);
                     String ptpId = ptp.getElementsByTagName("id").item(0).getTextContent();

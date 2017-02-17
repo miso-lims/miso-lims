@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -48,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
@@ -83,7 +83,7 @@ public interface RequestManager {
 
   public void savePoolNote(Pool pool, Note note) throws IOException;
 
-  public long saveSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException;
+  public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException;
 
   public long saveStatus(Status status) throws IOException;
 
@@ -96,9 +96,9 @@ public interface RequestManager {
   public long saveBox(Box box) throws IOException;
 
   // GETS
-  public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException;
+  public Partition getPartitionById(long partitionId) throws IOException;
 
-  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerById(long containerId) throws IOException;
+  public SequencerPartitionContainer getSequencerPartitionContainerById(long containerId) throws IOException;
 
   public Pool getPoolById(long poolId) throws IOException;
 
@@ -202,13 +202,13 @@ public interface RequestManager {
 
   public Collection<RunQC> listAllRunQCsByRunId(long runId) throws IOException;
 
-  public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByRunId(long runId)
+  public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByRunId(long runId)
       throws IOException;
 
-  public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByBarcode(String barcode)
+  public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode)
       throws IOException;
 
-  public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainers() throws IOException;
+  public Collection<SequencerPartitionContainer> listAllSequencerPartitionContainers() throws IOException;
 
   public Collection<Sample> listAllSamples() throws IOException;
 
@@ -331,7 +331,7 @@ public interface RequestManager {
 
   public void deletePool(Pool pool) throws IOException;
 
-  public void deleteContainer(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException;
+  public void deleteContainer(SequencerPartitionContainer container) throws IOException;
 
   public void deleteRunNote(Run run, Long noteId) throws IOException;
 
@@ -387,10 +387,10 @@ public interface RequestManager {
 
   public Long countContainers() throws IOException;
 
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageSizeSearch(int offset, int limit, String querystr,
+  public List<SequencerPartitionContainer> getContainersByPageSizeSearch(int offset, int limit, String querystr,
       String sortDir, String sortCol) throws IOException;
 
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageAndSize(int offset, int limit, String sortDir,
+  public List<SequencerPartitionContainer> getContainersByPageAndSize(int offset, int limit, String sortDir,
       String sortCol) throws IOException;
 
   public Long countContainersBySearch(String querystr) throws IOException;

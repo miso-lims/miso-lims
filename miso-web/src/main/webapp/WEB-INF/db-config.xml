@@ -49,7 +49,6 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractPartition</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractQC</value>
@@ -57,7 +56,6 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractRunQC</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.BoxSize</value>
