@@ -17,7 +17,7 @@ required:
 
 All:
 
-* JDK 7
+* JDK 8
 
 Application Server:
 
@@ -50,7 +50,7 @@ work.
 
 You will need:
 
-* JDK 7.0
+* JDK 8.0
 * [Maven 3.0.5](http://maven.apache.org/download.html) or later
 * Git
 
