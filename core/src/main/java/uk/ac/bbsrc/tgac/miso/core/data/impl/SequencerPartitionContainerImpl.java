@@ -82,7 +82,9 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long containerId = SequencerPartitionContainerImpl.UNSAVED_ID;
 
-  // identificationBarcode is displayed as "serial number" to the user
+  /**
+   * identificationBarcode is displayed as "serial number" to the user
+   */
   private String identificationBarcode;
   private String locationBarcode;
 

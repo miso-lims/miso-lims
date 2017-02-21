@@ -192,6 +192,7 @@ public class IntegrationUtils {
     while (-1 != (n = bis.read(buffer))) {
       out.write(buffer, 0, n);
     }
+    bis.close();
     return out.toByteArray();
   }
 }

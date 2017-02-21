@@ -347,12 +347,12 @@ public class EditRunController {
       for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
         if (container != null) {
           container.setLastModifier(user);
+          for (Partition partition : container.getPartitions()) {
+            if (partition.getPool() != null) partition.getPool().setLastModifier(user);
+          }
         }
       }
       run.setLastModifier(user);
-      for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
-        container.setLastModifier(user);
-      }
       requestManager.saveRun(run);
       session.setComplete();
       model.clear();

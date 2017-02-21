@@ -1124,6 +1124,12 @@ public class MisoRequestManager implements RequestManager {
             }
           }
         }
+        managed.getSequencerPartitionContainers().clear();
+        for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
+          SequencerPartitionContainer managedContainer = getSequencerPartitionContainerById(container.getId());
+          updatePartitionPools(container, managedContainer);
+          managed.addSequencerPartitionContainer(managedContainer);
+        }
         managed.setNotes(run.getNotes());
         managed.setSequencingParameters(run.getSequencingParameters());
         runStore.save(managed);
@@ -1321,7 +1327,10 @@ public class MisoRequestManager implements RequestManager {
   private void updatePartitionPools(SequencerPartitionContainer source,
       SequencerPartitionContainer managed) throws IOException {
     for (Partition sourcePartition : source.getPartitions()) {
-      for (Partition managedPartition : source.getPartitions()) {
+      for (Partition managedPartition : managed.getPartitions()) {
+        if (sourcePartition == null || managedPartition == null) {
+          throw new IOException("Partition from " + (sourcePartition == null ? "client" : "database") + " is null.");
+        }
         if (sourcePartition.getId() == managedPartition.getId()) {
           Pool sourcePool = sourcePartition.getPool();
           Pool managedPool = managedPartition.getPool();
@@ -1333,6 +1342,7 @@ public class MisoRequestManager implements RequestManager {
           } else if (sourcePool.getId() != managedPool.getId()) {
             managedPartition.setPool(getPoolById(sourcePool.getId()));
           }
+          continue;
         }
       }
     }

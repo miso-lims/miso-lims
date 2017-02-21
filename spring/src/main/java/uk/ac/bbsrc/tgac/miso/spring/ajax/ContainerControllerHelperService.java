@@ -470,7 +470,8 @@ public class ContainerControllerHelperService {
       sb.append("<div style='float:left; clear:both'>");
       for (Project project : pooledProjects) {
         sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-        sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
+        sb.append((isStringEmptyOrNull(project.getShortName()) ? project.getAlias() : project.getShortName()));
+        sb.append(": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
             + partition + "_" + project.getProjectId() + "'>");
         Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
@@ -478,7 +479,8 @@ public class ContainerControllerHelperService {
               + ". At least one study must be available for each project associated with this Pool.");
         } else {
           for (Study s : studies) {
-            sb.append("<option value='" + s.getId() + "'>" + s.getName() + " - " + s.getStudyType() + "</option>");
+            sb.append("<option value='" + s.getId() + "'>" + s.getName() + " - " + s.getAlias() + " (" + s.getStudyType().getName()
+                + ")</option>");
           }
         }
         sb.append("</select>");

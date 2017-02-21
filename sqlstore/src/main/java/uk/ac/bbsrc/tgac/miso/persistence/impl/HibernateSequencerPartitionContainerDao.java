@@ -60,7 +60,6 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
     return id;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public SequencerPartitionContainer get(long id) throws IOException {
     return (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, id);
@@ -104,7 +103,6 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class, "spc");
     criteria.createAlias("spc.partitions", "ps");
     criteria.add(Restrictions.eq("ps.id", partitionId));
-    @SuppressWarnings("unchecked")
     SequencerPartitionContainer record = (SequencerPartitionContainer) criteria
         .uniqueResult();
     return record;
