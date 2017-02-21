@@ -2,6 +2,7 @@
 
 Changes:
 
+ * _Java 8 is now required for compilation_
  * Replace SQLStore layer with Hibernate DAOs
  * Removed emPCR and emPCRDilution
  * Changed out TGAC brand logo for Earlham Institute
