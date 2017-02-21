@@ -291,7 +291,6 @@ public class LS454NotificationMessageConsumerMechanism
                           f.setPlatform(r.getSequencerReference().getPlatform());
                         }
                         f.setPartitionLimit(numPartitions);
-                        f.initEmptyPartitions();
                         f.setIdentificationBarcode(ptpId);
 
                         log.debug("\\_ Created new SequencerPartitionContainer with " + f.getPartitions().size() + " partitions");

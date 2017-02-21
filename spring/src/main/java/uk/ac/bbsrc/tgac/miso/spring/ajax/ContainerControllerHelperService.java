@@ -231,7 +231,6 @@ public class ContainerControllerHelperService {
             .getAttribute("container_" + json.getString("container_cId"));
         lf.setPlatform(sr.getPlatform());
         lf.setPartitionLimit(1);
-        lf.initEmptyPartitions();
       } else if ("Illumina HiSeq 2500".equals(sr.getPlatform().getInstrumentModel())) {
         SequencerPartitionContainer lf = (SequencerPartitionContainer) session
             .getAttribute("container_" + json.getString("container_cId"));
@@ -259,7 +258,6 @@ public class ContainerControllerHelperService {
             .getAttribute("container_" + json.getString("container_cId"));
         lf.setPlatform(sr.getPlatform());
         lf.setPartitionLimit(8);
-        lf.initEmptyPartitions();
       }
       b.append("<div id='containerdiv0'> </div>");
       b.append("</div>");
@@ -321,7 +319,6 @@ public class ContainerControllerHelperService {
         SequencerPartitionContainer lf = (SequencerPartitionContainer) session
             .getAttribute("container_" + json.getString("container_cId"));
         lf.setPartitionLimit(6);
-        lf.initEmptyPartitions();
         session.setAttribute("container_" + json.getString("container_cId"), lf);
       } else {
         b.append("Number of " + PlatformType.SOLID.getPartitionName() + "s:");
@@ -396,7 +393,6 @@ public class ContainerControllerHelperService {
     SequencerPartitionContainer lf = (SequencerPartitionContainer) session
         .getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numPartitions);
-    lf.initEmptyPartitions();
     session.setAttribute("container_" + json.getString("container_cId"), lf);
 
     for (int i = 0; i < numPartitions; i++) {

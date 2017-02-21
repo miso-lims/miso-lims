@@ -483,7 +483,8 @@ public class UserAuthMisoRequestManagerTest {
   public void testGetSequencerPoolPartitionById() throws IOException {
     long inputId = 1L;
     when(backingManager.getPartitionById(inputId)).thenReturn(sequencerPoolParition);
-    when(sequencerPoolParition.userCanRead(any(User.class))).thenReturn(true);
+    when(sequencerPoolParition.getSequencerPartitionContainer()).thenReturn(sequencerPartitionContainer);
+    when(sequencerPartitionContainer.userCanRead(any(User.class))).thenReturn(true);
 
     assertEquals(sequencerPoolParition, userAuthMisoRequestManager.getPartitionById(inputId));
 
@@ -497,7 +498,8 @@ public class UserAuthMisoRequestManagerTest {
   public void testGetSequencerPoolPartitionByIdThrows() throws IOException {
     long inputId = 1L;
     when(backingManager.getPartitionById(inputId)).thenReturn(sequencerPoolParition);
-    when(sequencerPoolParition.userCanRead(any(User.class))).thenReturn(false);
+    when(sequencerPoolParition.getSequencerPartitionContainer()).thenReturn(sequencerPartitionContainer);
+    when(sequencerPartitionContainer.userCanRead(any(User.class))).thenReturn(false);
 
     thrown.expect(IOException.class);
     thrown.expectMessage("User null cannot read Partition " + inputId);

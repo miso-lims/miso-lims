@@ -33,7 +33,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -107,11 +106,6 @@ public interface SequencerPartitionContainer
   void setPartitionLimit(int partitionLimit);
 
   /**
-   * Initialise this container with empty {@link PartitionImpl} objects up to the specified partition limit
-   */
-  void initEmptyPartitions();
-
-  /**
    * Returns the platform of this Container object.
    * 
    * @return Platform platform.
@@ -138,11 +132,6 @@ public interface SequencerPartitionContainer
    * @param validationBarcode
    */
   public void setValidationBarcode(String validationBarcode);
-
-  /**
-   * Add new partition
-   */
-  public void addNewPartition();
 
   public User getLastModifier();
 

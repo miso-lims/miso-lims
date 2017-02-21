@@ -430,8 +430,8 @@ VALUES ( 1, 'username1', '2016-01-26', 1, 'information1', 1),
 ( 3, 'username3', '2015-03-26', 3, 'information3', 1);
 
 DELETE FROM `_Partition`;
-INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`, `securityProfile_profileId`)
-VALUES (1,1,1,1);
+INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`)
+VALUES (1,1,1);
 
 DELETE FROM `SequencerPartitionContainer`;
 INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `platform`, `validationBarcode`, `lastModifier`) 

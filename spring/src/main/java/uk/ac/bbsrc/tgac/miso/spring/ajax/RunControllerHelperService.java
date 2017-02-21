@@ -277,7 +277,6 @@ public class RunControllerHelperService {
       SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       f.setPartitionLimit(1);
-      f.initEmptyPartitions();
       run.addSequencerPartitionContainer(f);
     } else if ("Illumina HiSeq 2500".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
       b.append("<h2>" + PlatformType.ILLUMINA.getContainerName() + " 1</h2>");
@@ -313,7 +312,6 @@ public class RunControllerHelperService {
 
         SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
         f.setPlatform(run.getSequencerReference().getPlatform());
-        f.initEmptyPartitions();
         run.addSequencerPartitionContainer(f);
       }
     }
@@ -345,7 +343,6 @@ public class RunControllerHelperService {
     SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numLanes);
-    f.initEmptyPartitions();
 
     b.append(generateRows(container, 0, (numLanes - 1)));
     b.append("</table>");
@@ -404,7 +401,6 @@ public class RunControllerHelperService {
     SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
-    f.initEmptyPartitions();
 
     b.append(generateRows(container, 0, (numChambers - 1)));
     b.append("</table>");
@@ -458,7 +454,6 @@ public class RunControllerHelperService {
     SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
-    f.initEmptyPartitions();
 
     StringBuilder b = new StringBuilder();
     b.append("<table class='in'>");
@@ -512,7 +507,6 @@ public class RunControllerHelperService {
     SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
-    f.initEmptyPartitions();
 
     StringBuilder b = new StringBuilder();
     b.append("<table class='in'>");

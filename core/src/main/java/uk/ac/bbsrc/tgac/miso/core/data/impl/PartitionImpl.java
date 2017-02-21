@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -36,8 +35,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -47,7 +44,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -73,10 +69,6 @@ public class PartitionImpl implements Partition, Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "partitionId")
   private long id = PartitionImpl.UNSAVED_ID;
-
-  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile = null;
 
   @Column(nullable = false)
   private Integer partitionNumber;
@@ -127,37 +119,8 @@ public class PartitionImpl implements Partition, Serializable {
   }
 
   @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
-  @Override
   public boolean isDeletable() {
     return getId() != UNSAVED_ID;
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
-  }
-
-  @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
   }
 
   @Override

@@ -56,13 +56,11 @@ import org.xml.sax.SAXException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaStatus;
@@ -365,7 +363,6 @@ public class IlluminaNotificationMessageConsumerMechanism
                     }
                   }
 
-                  f.initEmptyPartitions();
                   f.setIdentificationBarcode(run.getString("containerId"));
                   r.addSequencerPartitionContainer(f);
                 }
@@ -386,7 +383,6 @@ public class IlluminaNotificationMessageConsumerMechanism
                     f.setPartitionLimit(1);
                   }
                 }
-                f.initEmptyPartitions();
               } else {
                 if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                   if (f.getPartitions().size() != 1) {
@@ -405,34 +401,6 @@ public class IlluminaNotificationMessageConsumerMechanism
                     log.warn(
                         f.getName() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
                             + ") doesn't match usual number of GA/HiSeq partitions (8)");
-                    log.warn("Attempting fix...");
-                    Map<Integer, Partition> parts = new HashMap<>();
-                    Partition notNullPart = f.getPartitions().get(0);
-                    long notNullPartID = notNullPart.getId();
-                    int notNullPartNum = notNullPart.getPartitionNumber();
-
-                    for (int i = 1; i < 9; i++) {
-                      parts.put(i, null);
-                    }
-
-                    for (Partition p : f.getPartitions()) {
-                      parts.put(p.getPartitionNumber(), p);
-                    }
-
-                    for (Integer num : parts.keySet()) {
-                      if (parts.get(num) == null) {
-                        long newId = (notNullPartID - notNullPartNum) + num;
-                        log.info("Inserting partition at " + num + " with ID " + newId);
-                        Partition p = new PartitionImpl();
-                        p.setSequencerPartitionContainer(f);
-                        p.setId(newId);
-                        p.setPartitionNumber(num);
-                        p.setSecurityProfile(f.getSecurityProfile());
-                        ((SequencerPartitionContainerImpl) f).addPartition(p);
-                      }
-                    }
-
-                    log.info(f.getName() + ":: partitions now (" + f.getPartitions().size() + ")");
                   }
                 }
               }

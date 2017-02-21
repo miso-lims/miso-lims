@@ -278,7 +278,6 @@ public class SolidNotificationMessageConsumerMechanism
                     log.debug("No containers linked to run " + r.getId() + ": creating...");
                     SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
                     f.setSecurityProfile(r.getSecurityProfile());
-                    f.initEmptyPartitions();
                     f.setIdentificationBarcode(run.getString("containerNum"));
                     if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                       f.setPlatform(r.getSequencerReference().getPlatform());
