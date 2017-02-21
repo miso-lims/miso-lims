@@ -74,14 +74,14 @@ public class PartitionImpl implements Partition, Serializable {
   @Column(name = "partitionId")
   private long id = PartitionImpl.UNSAVED_ID;
 
-  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
 
   @Column(nullable = false)
   private Integer partitionNumber;
 
-  @ManyToOne(targetEntity = SequencerPartitionContainerImpl.class, cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = SequencerPartitionContainerImpl.class)
   @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
       @JoinColumn(name = "partitions_partitionId") }, inverseJoinColumns = {
           @JoinColumn(name = "container_containerId") })
