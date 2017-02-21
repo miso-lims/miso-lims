@@ -88,15 +88,15 @@ public class PoolOrderCompletion implements Serializable {
   }
 
   public Pool getPool() {
-    return pool;
+    return id.pool;
   }
 
   public SequencingParameters getSequencingParameters() {
-    return parameters;
+    return id.parameters;
   }
 
   public void setHealth(HealthType health) {
-    this.health = health;
+    this.id.health = health;
   }
 
   public void setLastUpdated(Date lastUpdated) {
@@ -104,6 +104,6 @@ public class PoolOrderCompletion implements Serializable {
   }
 
   public void setPool(Pool pool) {
-    this.pool = pool;
+    this.id.pool = pool;
   }
 }
