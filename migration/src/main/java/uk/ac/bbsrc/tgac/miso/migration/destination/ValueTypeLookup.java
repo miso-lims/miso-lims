@@ -780,24 +780,28 @@ public class ValueTypeLookup {
       if (LimsUtils.isTissueSample(detailed)) {
         SampleTissue tissue = (SampleTissue) detailed;
 
-        TissueOrigin to = resolve(tissue.getTissueOrigin());
-        if (to == null) throw new IOException(String.format(
-            "TissueOrigin not found: id=%d, alias=%s, description=%s",
-            tissue.getTissueOrigin().getId(),
-            tissue.getTissueOrigin().getAlias(),
-            tissue.getTissueOrigin().getDescription()));
-        tissue.setTissueOrigin(to);
-
-        TissueType tt = resolve(tissue.getTissueType());
-        if (tt == null) {
-          if (tissue.getTissueType() != null) {
-            throw new IOException(
-                String.format("TissueType not found: id=%d, alias=%s", tissue.getTissueType().getId(), tissue.getTissueType().getAlias()));
-          } else {
-            throw new IOException("Sample " + tissue.getAlias() + " is missing a tissueType");
-          }
+        if (tissue.getTissueOrigin() != null) {
+          TissueOrigin to = resolve(tissue.getTissueOrigin());
+          if (to == null) throw new IOException(String.format(
+              "TissueOrigin not found: id=%d, alias=%s, description=%s",
+              tissue.getTissueOrigin().getId(),
+              tissue.getTissueOrigin().getAlias(),
+              tissue.getTissueOrigin().getDescription()));
+          tissue.setTissueOrigin(to);
         }
-        tissue.setTissueType(tt);
+
+        if (tissue.getTissueType() != null) {
+          TissueType tt = resolve(tissue.getTissueType());
+          if (tt == null) {
+            if (tissue.getTissueType() != null) {
+              throw new IOException(
+                  String.format("TissueType not found: id=%d, alias=%s", tissue.getTissueType().getId(), tissue.getTissueType().getAlias()));
+            } else {
+              throw new IOException("Sample " + tissue.getAlias() + " is missing a tissueType");
+            }
+          }
+          tissue.setTissueType(tt);
+        }
 
         if (tissue.getLab() != null) { // optional field
           Lab lab = resolve(tissue.getLab());

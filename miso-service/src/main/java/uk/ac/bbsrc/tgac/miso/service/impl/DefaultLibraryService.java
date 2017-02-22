@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -416,6 +417,9 @@ public class DefaultLibraryService implements LibraryService {
       if (managedIndex != null) managedIndices.add(managedIndex);
     }
     library.setIndices(managedIndices);
+    if (library.getSecurityProfile() != null && library.getSecurityProfile().getProfileId() != SecurityProfile.UNSAVED_ID) {
+      library.setSecurityProfile(securityManager.getSecurityProfileById(library.getSecurityProfile().getProfileId()));
+    }
     if (isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;
       if (lai.getKitDescriptor() != null) {

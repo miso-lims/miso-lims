@@ -125,7 +125,7 @@ public class BoxControllerHelperService {
     Boxable pool;
     sample = sampleService.getByBarcode(barcode);
     library = libraryService.getByBarcode(barcode);
-    pool = requestManager.getPoolByIdBarcode(barcode);
+    pool = requestManager.getPoolByBarcode(barcode);
     if ((sample == null ? 0 : 1) + (library == null ? 0 : 1) + (pool == null ? 0 : 1) > 1) {
       String errorMessage = "";
       if (sample != null && library != null)

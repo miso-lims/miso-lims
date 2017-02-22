@@ -311,6 +311,7 @@ public class MisoServiceManager {
     rm.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
     rm.setSecurityStore(securityStore);
     rm.setSecurityManager(securityManager);
+    rm.setLibraryDilutionStore(dilutionDao);
     setRequestManager(rm);
   }
 
@@ -377,6 +378,7 @@ public class MisoServiceManager {
     if (projectAlertManager != null) projectAlertManager.setSecurityManager(securityManager);
     if (runAlertManager != null) runAlertManager.setSecurityManager(securityManager);
     if (requestManager != null) requestManager.setSecurityManager(securityManager);
+    if (libraryService != null) libraryService.setSecurityManager(securityManager);
   }
 
   public HibernateProjectDao getProjectDao() {
@@ -577,6 +579,7 @@ public class MisoServiceManager {
     svc.setIndexDao(indexDao);
     svc.setKitDao(kitDao);
     svc.setSampleDao(sampleDao);
+    svc.setSecurityManager(securityManager);
     setLibraryService(svc);
   }
 
@@ -619,6 +622,7 @@ public class MisoServiceManager {
 
   private void updateDilutionDaoDependencies() {
     if (dilutionService != null) dilutionService.setDilutionDao(dilutionDao);
+    if (requestManager != null) requestManager.setLibraryDilutionStore(dilutionDao);
   }
 
   public DefaultLibraryDilutionService getDilutionService() {
