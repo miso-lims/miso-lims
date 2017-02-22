@@ -53,7 +53,7 @@ public abstract class AbstractQC implements QC {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long qcId = AbstractQC.UNSAVED_ID;
 
-  private String qcUserName;
+  private String qcCreator;
 
   @ManyToOne(targetEntity = QcType.class)
   @JoinColumn(name = "qcMethod")
@@ -74,12 +74,12 @@ public abstract class AbstractQC implements QC {
 
   @Override
   public String getQcCreator() {
-    return qcUserName;
+    return qcCreator;
   }
 
   @Override
-  public void setQcCreator(String qcUserName) {
-    this.qcUserName = qcUserName;
+  public void setQcCreator(String qcCreator) {
+    this.qcCreator = qcCreator;
   }
 
   @Override

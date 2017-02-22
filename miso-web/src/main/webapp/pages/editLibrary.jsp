@@ -340,6 +340,22 @@
   <td>Indices:</td>
   <td id="indicesDiv">
   </td>
+  <script type="text/javascript">
+    Library = Library || {};
+    Library.indexFamilies = ${indexFamiliesJSON};
+    Library.setOriginalIndices = function() {
+      Library.lastIndexPosition = 0;
+      jQuery('#indicesDiv').empty();
+      document.getElementById('indexFamily').value = '${library.getCurrentFamily().id}';
+      <c:forEach items="${library.indices}" var="index">
+        <c:if test="${index.id != 0}">
+          Library.ui.createIndexBox(${index.id});
+        </c:if>
+      </c:forEach>
+      Library.ui.createIndexNextBox();
+    };
+    Library.setOriginalIndices();
+  </script>
 </tr>
 
 <tr bgcolor="yellow">
@@ -374,22 +390,6 @@
   </td>
 </tr>
 </table>
-<script type="text/javascript">
-    Library = Library || {};
-    Library.indexFamilies = ${indexFamiliesJSON};
-    Library.setOriginalIndices = function() {
-      Library.lastIndexPosition = 0;
-      jQuery('#indicesDiv').empty();
-      document.getElementById('indexFamily').value = '${library.getCurrentFamily().id}';
-      <c:forEach items="${library.indices}" var="index">
-        <c:if test="${index.id != 0}">
-          Library.ui.createIndexBox(${index.id});
-        </c:if>
-      </c:forEach>
-      Library.ui.createIndexNextBox();
-    };
-    Library.setOriginalIndices();
-  </script>
 <%@ include file="volumeControl.jspf" %>
 
 <c:if test="${detailedSample}">
@@ -476,7 +476,7 @@
                 <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <span style="color:#000000"><a href='#' onclick="Library.ui.deleteLibraryNote('${library.id}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span></a></span>
+                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
                 </c:if>
               </span>
           </div>
@@ -490,8 +490,8 @@
 <br/>
 <c:if test="${library.id != 0}">
 <h1>
-  <span id="qcsTotalCount">
-  </span>
+  <div id="qcsTotalCount">
+  </div>
 </h1>
 <ul class="sddm">
   <li>
@@ -504,7 +504,7 @@
     </div>
   </li>
 </ul>
-<div style="clear:both">
+<span style="clear:both">
   <div id="addLibraryQC"></div>
   <form id='addQcForm'>
     <table class="list" id="libraryQcTable">
@@ -514,7 +514,6 @@
         <th>QC Date</th>
         <th>Method</th>
         <th>Results</th>
-        <th>Insert Size</th>
         <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
           <th align="center">Edit</th>
@@ -531,10 +530,9 @@
 
             <fmt:formatNumber var="resultsRounded"
               value="${qc.results}"
-              maxFractionDigits="2" />
+              maxFractionDigits="${qc.qcType.precisionAfterDecimal}" />
 
             <td id="result${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
-            <td id="insert${qc.id}">${qc.insertSize} bp</td>
             <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
               <td id="edit${qc.id}" align="center">
@@ -550,7 +548,7 @@
     </table>
     <input type='hidden' id='qcLibraryId' name='id' value='${library.id}'/>
   </form>
-</div>
+</span>
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
@@ -567,8 +565,8 @@
 </script>
 
 <h1>
-  <span id="ldsTotalCount">
-  </span>
+  <div id="ldsTotalCount">
+  </div>
 </h1>
 <ul class="sddm">
   <li>
@@ -586,7 +584,7 @@
     </div>
   </li>
 </ul>
-<div style="clear:both">
+<span style="clear:both">
   <div id="addLibraryDilution"></div>
   <form id='addDilutionForm'>
     <table class="list" id="libraryDilutionTable">
@@ -678,7 +676,7 @@
     </table>
     <input type='hidden' id='dilLibraryId' name='id' value='${library.id}'/>
   </form>
-</div>
+</span>
 
   <c:if test="${not empty libraryPools}">
     <br/>
@@ -695,7 +693,7 @@
       </li>
     </ul>
 
-    <div style="clear:both">
+    <span style="clear:both">
       <table class="list" id="pools_table">
         <thead>
         <tr>
@@ -719,7 +717,7 @@
             <td>${pool.concentration}</td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
               <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);">
-                <span class="ui-icon ui-icon-trash"></span>
+                <span class="ui-icon ui-icon-trash"/>
               </td>
             </sec:authorize>
           </tr>
@@ -747,7 +745,7 @@
           });
         });
       </script>
-    </div>
+    </span>
   </c:if>
 
   <c:if test="${not empty libraryRuns}">
@@ -803,7 +801,7 @@
           <td>${run.status.health}</td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"></span>
+              <span class="ui-icon ui-icon-trash"/>
             </td>
           </sec:authorize>
         </tr>
@@ -835,26 +833,26 @@
   <c:if test="${not empty library.changeLog}">
     <br/>
     <h1>Changes</h1>
-    <div style="clear:both">
-      <table class="list" id="changelog_table">
-        <thead>
-        <tr>
-        <th>Editor</th>
-        <th>Summary</th>
-        <th>Time</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${library.changeLog}" var="change">
-        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${change.user.fullName} (${change.user.loginName})</td>
-          <td><b>${change.summary}</b></td>
-          <td>${change.time}</td>
-        </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-    </div>
+    <span style="clear:both">
+    <table class="list" id="changelog_table">
+      <thead>
+      <tr>
+      <th>Editor</th>
+      <th>Summary</th>
+      <th>Time</th>
+      </tr>
+      </thead>
+      <tbody>
+      <c:forEach items="${library.changeLog}" var="change">
+      <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+        <td>${change.user.fullName} (${change.user.loginName})</td>
+        <td><b>${change.summary}</b></td>
+        <td>${change.time}</td>
+      </tr>
+      </c:forEach>
+      </tbody>
+    </table>
+    </span>
   </c:if>
 </c:if>
 
@@ -900,27 +898,39 @@
   <table id="cinput" class="display">
     <thead>
     <tr>
-      <th style="width: 5%">Select <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+      <th style="width: 5%">Select <span sel="none" header="select" class="ui-icon ui-icon-arrowstop-1-s"
+                                         style="float:right"
                                          onclick="DatatableUtils.toggleSelectAll('#cinput', this);"></span></th>
       <th style="width: 10%">Sample</th>
-      <th style="width: 10%">Description <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+      <th style="width: 10%">Description <span header="description" class="ui-icon ui-icon-arrowstop-1-s"
+                                               style="float:right"
                                                onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 5%">Paired <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+      <th style="width: 5%">Paired <span header="paired" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                          onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Platform <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+      <th style="width: 10%">Platform <span header="platform" class="ui-icon ui-icon-arrowstop-1-s"
+                                            style="float:right"
                                             onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Type <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+      <th style="width: 10%">Type <span header="libraryType" class="ui-icon ui-icon-arrowstop-1-s"
+                                        style="float:right"
                                         onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Selection <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+      <th style="width: 10%">Selection <span header="selectionType" class="ui-icon ui-icon-arrowstop-1-s"
+                                             style="float:right"
                                              onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Strategy <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+      <th style="width: 10%">Strategy <span header="strategyType" class="ui-icon ui-icon-arrowstop-1-s"
+                                            style="float:right"
                                             onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Index Family <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                                               onclick="Library.ui.fillDownIndexFamilySelects('#cinput', this);"></span></th>
-      <th style="width: 10%">Indices <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                                           onclick="Library.ui.fillDownIndexSelects('#cinput', this);"></span></th>
-      <th style="width: 10%">Location <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                                            onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
+      <th style="width: 10%">Index Family <span header="indexFamily" class="ui-icon ui-icon-arrowstop-1-s"
+                                               style="float:right"
+                                               onclick="Library.ui.fillDownIndexFamilySelects('#cinput', this);"></span>
+      </th>
+      <th style="width: 10%">Indices <span header="indices" class="ui-icon ui-icon-arrowstop-1-s"
+                                                style="float:right"
+                                                onclick="Library.ui.fillDownIndexSelects('#cinput', this);"></span>
+      </th>
+      <th style="width: 10%">Location <span header="locationBarcode" class="ui-icon ui-icon-arrowstop-1-s"
+                                                    style="float:right"
+                                                    onclick="DatatableUtils.fillDown('#cinput', this);"></span>
+      </th>
     </tr>
     </thead>
     <tbody>

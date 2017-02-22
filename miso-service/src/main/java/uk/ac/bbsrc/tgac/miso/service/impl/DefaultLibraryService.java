@@ -41,8 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -363,15 +361,13 @@ public class DefaultLibraryService implements LibraryService {
     Library managed = libraryDao.get(library.getId());
     authorizationManager.throwIfNotWritable(managed);
     qc.setQcCreator(authorizationManager.getCurrentUsername());
-    try {
-      qc.setLibrary(managed);
-      managed.addQc(qc);
-    } catch (MalformedLibraryException e) {
-      throw new IOException("Malformed Library " + managed.getName() + " in the database...", e);
-    } catch (MalformedLibraryQcException e) {
-      throw new IOException("Malformed Library QC");
+
+    // update concentration if QC is of relevant type
+    if ("QuBit".equals(qc.getQcType().getName())) {
+      managed.setInitialConcentration(qc.getResults());
     }
-    libraryDao.save(managed);
+    libraryQcDao.save(qc);
+    libraryDao.save(library);
   }
 
   @Override

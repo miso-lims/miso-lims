@@ -10,6 +10,8 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 public interface SampleService {
 
@@ -46,4 +48,10 @@ public interface SampleService {
   public void deleteNote(Sample sample, Long noteId) throws IOException;
 
   Sample getByBarcode(String barcode) throws IOException;
+
+  void addQc(Sample sample, SampleQC qc) throws IOException;
+
+  public void deleteQc(Sample sample, Long qcId) throws IOException;
+
+  Collection<QcType> listSampleQcTypes() throws IOException;
 }

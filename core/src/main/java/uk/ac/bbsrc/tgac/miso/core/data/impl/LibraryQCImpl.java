@@ -40,7 +40,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 
 
 /**
@@ -83,11 +82,7 @@ public class LibraryQCImpl extends AbstractQC implements LibraryQC, Serializable
    */
   public LibraryQCImpl(Library library, User user) {
     if (library.userCanRead(user)) {
-      try {
-        setLibrary(library);
-      } catch (MalformedLibraryException e) {
-        log.error("construct", e);
-      }
+      setLibrary(library);
     }
   }
 
@@ -97,7 +92,7 @@ public class LibraryQCImpl extends AbstractQC implements LibraryQC, Serializable
   }
 
   @Override
-  public void setLibrary(Library library) throws MalformedLibraryException {
+  public void setLibrary(Library library) {
     this.library = library;
   }
 

@@ -380,6 +380,7 @@ public class MisoServiceManager {
     if (runAlertManager != null) runAlertManager.setSecurityManager(securityManager);
     if (requestManager != null) requestManager.setSecurityManager(securityManager);
     if (libraryService != null) libraryService.setSecurityManager(securityManager);
+    if (sampleService != null) sampleService.setSecurityManager(securityManager);
   }
 
   public HibernateProjectDao getProjectDao() {
@@ -472,6 +473,8 @@ public class MisoServiceManager {
     svc.setTissueTypeDao(tissueTypeDao);
     svc.setSampleDao(sampleDao);
     svc.setLabService(labService);
+    svc.setSampleQcDao(sampleQcDao);
+    svc.setSecurityManager(securityManager);
     setSampleService(svc);
   }
 
@@ -536,6 +539,7 @@ public class MisoServiceManager {
 
   private void updateSampleQcDaoDependencies() {
     if (requestManager != null) requestManager.setSampleQcStore(sampleQcDao);
+    if (sampleService != null) sampleService.setSampleQcDao(sampleQcDao);
   }
 
   public HibernateLibraryDao getLibraryDao() {

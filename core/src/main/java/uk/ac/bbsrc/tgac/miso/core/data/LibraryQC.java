@@ -28,8 +28,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-
 /**
  * A QC that is specifically carried out on a given {@link Library}
  * 
@@ -53,10 +51,8 @@ public interface LibraryQC extends QC {
    * 
    * @param library
    *          library.
-   * @throws MalformedLibraryException
-   *           when the Library being set is not valid
    */
-  public void setLibrary(Library library) throws MalformedLibraryException;
+  public void setLibrary(Library library);
 
   /**
    * Returns the insertSize (in base pairs) of this LibraryQC object.

@@ -55,7 +55,7 @@ public class QcType implements Comparable<QcType>, Serializable {
   /** Refers to the entity to which this QcType can be applied (e.g. Sample, Pool, Run) */
   private String qcTarget;
   private String units;
-  private Integer precision;
+  private Integer precisionAfterDecimal;
   private boolean archived;
 
   /**
@@ -158,19 +158,19 @@ public class QcType implements Comparable<QcType>, Serializable {
    * A precision of zero represents an Integer.
    * A precision of -1 represents a boolean. A QC performed with a boolean precision QcType should have a result of either 1 or 0.
    * 
-   * @return Integer precision
+   * @return Integer precisionAfterDecimal
    */
-  public Integer getPrecision() {
-    return precision;
+  public Integer getPrecisionAfterDecimal() {
+    return precisionAfterDecimal;
   }
 
   /**
    * Sets the precision of this QcType object.
    * 
-   * @param precision
+   * @param precisionAfterDecimal
    */
-  public void setPrecision(Integer precision) {
-    this.precision = precision;
+  public void setPrecisionAfterDecimal(Integer precisionAfterDecimal) {
+    this.precisionAfterDecimal = precisionAfterDecimal;
   }
 
   /**

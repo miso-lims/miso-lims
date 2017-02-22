@@ -77,7 +77,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
@@ -217,11 +216,7 @@ public class EditProjectController {
     Collections.sort(libraries, new AliasComparator<>());
     for (Library l : libraries) {
       for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
-        try {
-          l.addQc(qc);
-        } catch (MalformedLibraryQcException e) {
-          throw new IOException(e);
-        }
+        l.addQc(qc);
       }
     }
 

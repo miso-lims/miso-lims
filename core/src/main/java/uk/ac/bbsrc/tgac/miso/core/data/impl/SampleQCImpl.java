@@ -39,7 +39,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -81,11 +80,7 @@ public class SampleQCImpl extends AbstractQC implements SampleQC, Serializable {
    */
   public SampleQCImpl(Sample sample, User user) {
     if (sample.userCanRead(user)) {
-      try {
-        setSample(sample);
-      } catch (MalformedSampleException e) {
-        log.error("constructor", e);
-      }
+      setSample(sample);
     }
   }
 
@@ -95,7 +90,7 @@ public class SampleQCImpl extends AbstractQC implements SampleQC, Serializable {
   }
 
   @Override
-  public void setSample(Sample sample) throws MalformedSampleException {
+  public void setSample(Sample sample) {
     this.sample = sample;
   }
 

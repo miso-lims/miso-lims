@@ -47,7 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
 
@@ -316,12 +315,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private void addSampleQcs(Sample sample, Collection<SampleQC> qcs) throws IOException {
     Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
     for (SampleQC qc : qcs) {
-      try {
-        qc.setSample(sample);
-      } catch (MalformedSampleException e) {
-        // Never actually gets thrown
-        throw new RuntimeException(e);
-      }
+      qc.setSample(sample);
       qc.setQcCreator(migrationUser.getFullName());
       qc.setQcDate(date);
     }

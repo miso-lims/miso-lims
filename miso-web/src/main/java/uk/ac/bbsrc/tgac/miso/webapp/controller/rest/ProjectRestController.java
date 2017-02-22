@@ -53,8 +53,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -126,11 +124,7 @@ public class ProjectRestController extends RestController {
 
       if (s.getSampleQCs().isEmpty()) {
         for (SampleQC qc : requestManager.listAllSampleQCsBySampleId(s.getId())) {
-          try {
-            s.addQc(qc);
-          } catch (MalformedSampleQcException e) {
-            log.error("get project by id", e);
-          }
+          s.addQc(qc);
         }
       }
     }
@@ -150,11 +144,7 @@ public class ProjectRestController extends RestController {
       }
 
       for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
-        try {
-          l.addQc(qc);
-        } catch (MalformedLibraryQcException e) {
-          log.error("get project libraries", e);
-        }
+        l.addQc(qc);
       }
     }
 
