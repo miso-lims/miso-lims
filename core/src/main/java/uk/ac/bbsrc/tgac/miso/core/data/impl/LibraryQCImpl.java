@@ -25,16 +25,21 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 
 
@@ -46,8 +51,22 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
  */
 @Entity
 @Table(name = "LibraryQC")
-public class LibraryQCImpl extends AbstractLibraryQC implements Serializable {
+public class LibraryQCImpl extends AbstractQC implements LibraryQC, Serializable {
+
+  private static final long serialVersionUID = 1L;
   private static final Logger log = LoggerFactory.getLogger(LibraryQCImpl.class);
+  public static final String UNITS = "nM";
+
+  private Double results;
+
+  @Column(nullable = false)
+  private Integer insertSize;
+
+  @ManyToOne(targetEntity = LibraryImpl.class)
+  @JoinColumn(name = "library_libraryId")
+  @JsonBackReference
+  private Library library;
+
   /**
    * Construct a new LibraryQC
    */
@@ -69,17 +88,68 @@ public class LibraryQCImpl extends AbstractLibraryQC implements Serializable {
       } catch (MalformedLibraryException e) {
         log.error("construct", e);
       }
-    } else {
     }
   }
 
   @Override
-  public boolean userCanRead(User user) {
-    return true;
+  public Library getLibrary() {
+    return library;
   }
 
   @Override
-  public boolean userCanWrite(User user) {
-    return true;
+  public void setLibrary(Library library) throws MalformedLibraryException {
+    this.library = library;
+  }
+
+  @Override
+  public Double getResults() {
+    return results;
+  }
+
+  @Override
+  public void setResults(Double results) {
+    this.results = results;
+  }
+
+  @Override
+  public Integer getInsertSize() {
+    return insertSize;
+  }
+
+  @Override
+  public void setInsertSize(Integer insertSize) {
+    this.insertSize = insertSize;
+  }
+
+  /**
+   * Equivalency is based on getQcId() if set, otherwise on name
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof LibraryQC)) return false;
+    LibraryQC them = (LibraryQC) obj;
+    // If not saved, then compare resolved actual objects. Otherwise
+    // just compare IDs.
+    if (this.getId() == AbstractQC.UNSAVED_ID || them.getId() == AbstractQC.UNSAVED_ID) {
+      return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate())
+          && this.getQcType().equals(them.getQcType()) && this.getResults().equals(them.getResults());
+    } else {
+      return this.getId() == them.getId();
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    if (getId() != AbstractQC.UNSAVED_ID) {
+      return (int) getId();
+    } else {
+      int hashcode = getQcCreator().hashCode();
+      hashcode = 37 * hashcode + getQcDate().hashCode();
+      hashcode = 37 * hashcode + getQcType().hashCode();
+      hashcode = 37 * hashcode + getResults().hashCode();
+      return hashcode;
+    }
   }
 }

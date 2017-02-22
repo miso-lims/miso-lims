@@ -70,7 +70,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -104,6 +103,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
@@ -318,7 +318,7 @@ public class EditSampleController {
 
   @ModelAttribute("sampleQCUnits")
   public String sampleQCUnits() throws IOException {
-    return AbstractSampleQC.UNITS;
+    return SampleQCImpl.UNITS;
   }
 
   @ModelAttribute("libraryDilutionUnits")

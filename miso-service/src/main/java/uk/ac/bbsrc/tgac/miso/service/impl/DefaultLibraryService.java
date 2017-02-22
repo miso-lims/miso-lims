@@ -27,7 +27,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -36,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -376,7 +376,7 @@ public class DefaultLibraryService implements LibraryService {
 
   @Override
   public void deleteQc(Library library, Long qcId) throws IOException {
-    if (qcId == null || qcId.equals(AbstractLibraryQC.UNSAVED_ID)) {
+    if (qcId == null || qcId.equals(LibraryQCImpl.UNSAVED_ID)) {
       throw new IllegalArgumentException("Cannot delete an unsaved Library QC");
     }
     Library managed = libraryDao.get(library.getId());

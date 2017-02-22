@@ -26,15 +26,19 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 
 /**
@@ -47,8 +51,19 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
  */
 @Entity
 @Table(name = "SampleQC")
-public class SampleQCImpl extends AbstractSampleQC implements Serializable {
+public class SampleQCImpl extends AbstractQC implements SampleQC, Serializable {
+
+  private static final long serialVersionUID = 1L;
   private static final Logger log = LoggerFactory.getLogger(SampleQCImpl.class);
+  public static final String UNITS = "ng/&#181;l";
+
+  private Double results;
+
+  @ManyToOne(targetEntity = SampleImpl.class)
+  @JoinColumn(name = "sample_sampleId")
+  @JsonBackReference
+  private Sample sample;
+
   /**
    * Construct a new SampleQCImpl
    */
@@ -71,17 +86,58 @@ public class SampleQCImpl extends AbstractSampleQC implements Serializable {
       } catch (MalformedSampleException e) {
         log.error("constructor", e);
       }
-    } else {
     }
   }
 
   @Override
-  public boolean userCanRead(User user) {
-    return true;
+  public Sample getSample() {
+    return sample;
   }
 
   @Override
-  public boolean userCanWrite(User user) {
-    return true;
+  public void setSample(Sample sample) throws MalformedSampleException {
+    this.sample = sample;
+  }
+
+  @Override
+  public Double getResults() {
+    return results;
+  }
+
+  @Override
+  public void setResults(Double results) {
+    this.results = results;
+  }
+
+  /**
+   * Equivalency is based on getRunId() if set, otherwise on name
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof SampleQC)) return false;
+    SampleQC them = (SampleQC) obj;
+    // If not saved, then compare resolved actual objects. Otherwise
+    // just compare IDs.
+    if (this.getId() == AbstractQC.UNSAVED_ID || them.getId() == AbstractQC.UNSAVED_ID) {
+      return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate())
+          && this.getQcType().equals(them.getQcType()) && this.getResults().equals(them.getResults());
+    } else {
+      return this.getId() == them.getId();
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    if (getId() != AbstractQC.UNSAVED_ID) {
+      return (int) getId();
+    } else {
+      int hashcode = getQcCreator().hashCode();
+      hashcode = 37 * hashcode + getQcDate().hashCode();
+      hashcode = 37 * hashcode + getQcType().hashCode();
+      hashcode = 37 * hashcode + getResults().hashCode();
+      return hashcode;
+    }
   }
 }

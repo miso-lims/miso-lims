@@ -71,7 +71,6 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -84,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -346,7 +346,7 @@ public class EditLibraryController {
 
   @ModelAttribute("libraryQCUnits")
   public String libraryQCUnits() {
-    return AbstractLibraryQC.UNITS;
+    return LibraryQCImpl.UNITS;
   }
 
   @ModelAttribute("libraryDilutionUnits")

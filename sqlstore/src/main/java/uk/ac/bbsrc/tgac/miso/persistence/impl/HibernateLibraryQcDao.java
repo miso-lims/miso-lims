@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -37,7 +36,7 @@ public class HibernateLibraryQcDao implements LibraryQcStore {
   @Override
   public long save(LibraryQC libraryQc) throws IOException {
     long id;
-    if (libraryQc.getId() == AbstractLibraryQC.UNSAVED_ID) {
+    if (libraryQc.getId() == LibraryQCImpl.UNSAVED_ID) {
       id = (long) currentSession().save(libraryQc);
     } else {
       currentSession().update(libraryQc);

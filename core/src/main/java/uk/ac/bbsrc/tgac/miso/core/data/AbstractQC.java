@@ -34,6 +34,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 /**
@@ -103,6 +105,16 @@ public abstract class AbstractQC implements QC {
   @Override
   public boolean isDeletable() {
     return getId() != AbstractQC.UNSAVED_ID;
+  }
+
+  @Override
+  public boolean userCanRead(User user) {
+    return true;
+  }
+
+  @Override
+  public boolean userCanWrite(User user) {
+    return true;
   }
 
   /**

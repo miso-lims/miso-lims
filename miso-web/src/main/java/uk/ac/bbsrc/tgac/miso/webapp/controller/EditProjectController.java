@@ -62,7 +62,6 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -76,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
@@ -177,7 +177,7 @@ public class EditProjectController {
 
   @ModelAttribute("sampleQCUnits")
   public String sampleQCUnits() throws IOException {
-    return AbstractSampleQC.UNITS;
+    return SampleQCImpl.UNITS;
   }
 
   @ModelAttribute("poolConcentrationUnits")
