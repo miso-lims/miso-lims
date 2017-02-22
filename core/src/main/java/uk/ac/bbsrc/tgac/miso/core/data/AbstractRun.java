@@ -187,13 +187,13 @@ public abstract class AbstractRun implements Run {
   }
 
   @Override
-  public abstract List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers();
+  public abstract List<SequencerPartitionContainer> getSequencerPartitionContainers();
 
   @Override
-  public abstract void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers);
+  public abstract void setSequencerPartitionContainers(List<SequencerPartitionContainer> containers);
 
   @Override
-  public abstract void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer);
+  public abstract void addSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer);
 
   @Override
   public PlatformType getPlatformType() {

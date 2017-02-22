@@ -57,12 +57,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -266,13 +266,13 @@ public class FlexReportingControllerHelperService {
       for (Project project : projects) {
         Set<Library> librariesInRun = new HashSet<>();
         for (Run run : requestManager.listAllRunsByProjectId(project.getProjectId())) {
-          Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
+          Collection<SequencerPartitionContainer> spcs = requestManager
               .listSequencerPartitionContainersByRunId(run.getId());
           if (spcs.size() > 0) {
-            for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+            for (SequencerPartitionContainer spc : spcs) {
 
               if (spc.getPartitions().size() > 0) {
-                for (SequencerPoolPartition spp : spc.getPartitions()) {
+                for (Partition spp : spc.getPartitions()) {
                   if (spp.getPool() != null) {
                     if (spp.getPool().getPoolableElements().size() > 0) {
                       for (Dilution dilution : spp.getPool().getPoolableElements()) {
@@ -374,14 +374,14 @@ public class FlexReportingControllerHelperService {
               "<input class=\"runsinproject" + project.getProjectId() + "\" id=\"" + run.getName()
                   + "\" type=\"checkbox\" name=\"runIds\" value=\"" + run.getId() + "\" />");
           sb.append(run.getName() + " - " + run.getStatus().getHealth().getKey() + " - " + run.getAlias());
-          Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
+          Collection<SequencerPartitionContainer> spcs = requestManager
               .listSequencerPartitionContainersByRunId(run.getId());
           if (spcs.size() > 0) {
             sb.append("<ul>");
-            for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+            for (SequencerPartitionContainer spc : spcs) {
 
               if (spc.getPartitions().size() > 0) {
-                for (SequencerPoolPartition spp : spc.getPartitions()) {
+                for (Partition spp : spc.getPartitions()) {
                   if (spp.getPool() != null) {
                     if (spp.getPool().getExperiments().size() > 0) {
                       for (Experiment experiment : spp.getPool().getExperiments()) {
@@ -450,13 +450,13 @@ public class FlexReportingControllerHelperService {
 
       Set<Library> librariesInRun = new HashSet<>();
       for (Run run : runs) {
-        Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
+        Collection<SequencerPartitionContainer> spcs = requestManager
             .listSequencerPartitionContainersByRunId(run.getId());
         if (spcs.size() > 0) {
-          for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+          for (SequencerPartitionContainer spc : spcs) {
 
             if (spc.getPartitions().size() > 0) {
-              for (SequencerPoolPartition spp : spc.getPartitions()) {
+              for (Partition spp : spc.getPartitions()) {
                 if (spp.getPool() != null) {
                   if (spp.getPool().getPoolableElements().size() > 0) {
                     for (Dilution dilution : spp.getPool().getPoolableElements()) {
@@ -1029,13 +1029,13 @@ public class FlexReportingControllerHelperService {
     JSONArray jsonArray = new JSONArray();
     try {
       for (Run run : runs) {
-        Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
+        Collection<SequencerPartitionContainer> spcs = requestManager
             .listSequencerPartitionContainersByRunId(run.getId());
         if (spcs.size() > 0) {
-          for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+          for (SequencerPartitionContainer spc : spcs) {
 
             if (spc.getPartitions().size() > 0) {
-              for (SequencerPoolPartition spp : spc.getPartitions()) {
+              for (Partition spp : spc.getPartitions()) {
                 if (spp.getPool() != null) {
                   Pool pool = spp.getPool();
                   if (spp.getPool().getPoolableElements().size() > 0) {

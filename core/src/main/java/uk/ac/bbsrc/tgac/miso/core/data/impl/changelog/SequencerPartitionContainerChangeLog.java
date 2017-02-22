@@ -12,7 +12,6 @@ import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 
@@ -28,7 +27,7 @@ public class SequencerPartitionContainerChangeLog extends AbstractChangeLog {
 
   @ManyToOne(fetch = FetchType.LAZY, targetEntity = SequencerPartitionContainerImpl.class)
   @JoinColumn(name = "containerId", nullable = false, updatable = false)
-  private SequencerPartitionContainer<Partition> sequencerPartitionContainer;
+  private SequencerPartitionContainer sequencerPartitionContainer;
 
   @Override
   public Long getId() {

@@ -79,9 +79,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -481,10 +481,10 @@ public class ERASubmissionManager implements SubmissionManager {
 
   private static final DateFormat DF_TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-  private final class DilutionXmlSubfile extends XmlSubmissionFromSet<Entry<Dilution, SequencerPoolPartition>> {
+  private final class DilutionXmlSubfile extends XmlSubmissionFromSet<Entry<Dilution, Partition>> {
 
     @Override
-    protected Set<Entry<Dilution, SequencerPoolPartition>> items(Submission submission) {
+    protected Set<Entry<Dilution, Partition>> items(Submission submission) {
       return submission.getDilutions().entrySet();
     }
 
@@ -499,7 +499,7 @@ public class ERASubmissionManager implements SubmissionManager {
     }
 
     @Override
-    protected void populate(Element xml, Entry<Dilution, SequencerPoolPartition> entry) {
+    protected void populate(Element xml, Entry<Dilution, Partition> entry) {
       Run r = entry.getValue().getSequencerPartitionContainer().getLastRun();
 
       xml.setAttribute("alias", "L00" + entry.getValue().getPartitionNumber() + ":" + entry.getKey().getName() + ":" + r.getAlias());
@@ -757,7 +757,7 @@ public class ERASubmissionManager implements SubmissionManager {
     FilePathGenerator FPG = new TGACIlluminaFilepathGenerator();
 
     for (Object o : s.getDilutions().values()) {
-      SequencerPoolPartition l = (SequencerPoolPartition) o;
+      Partition l = (Partition) o;
       try {
         dataFiles = FPG.generateFilePaths(l);
       } catch (SubmissionException submissionException) {

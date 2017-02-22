@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -68,7 +69,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
@@ -407,11 +407,11 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     }.register(binder);
 
-    new BindingConverterById<SequencerPoolPartition>(SequencerPoolPartition.class) {
+    new BindingConverterById<Partition>(Partition.class) {
 
       @Override
-      public SequencerPoolPartition resolveById(long id) throws Exception {
-        return requestManager.getSequencerPoolPartitionById(id);
+      public Partition resolveById(long id) throws Exception {
+        return requestManager.getPartitionById(id);
       }
 
     }.register(binder, List.class, "partitions");

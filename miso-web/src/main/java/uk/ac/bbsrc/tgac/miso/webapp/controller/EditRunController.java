@@ -62,7 +62,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -144,8 +143,8 @@ public class EditRunController {
 
   public Boolean isMultiplexed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> f : run.getSequencerPartitionContainers()) {
-        for (SequencerPoolPartition p : f.getPartitions()) {
+      for (SequencerPartitionContainer f : run.getSequencerPartitionContainers()) {
+        for (Partition p : f.getPartitions()) {
           if (p.getPool() != null && p.getPool().getPoolableElements().size() > 1) {
             return true;
           }
@@ -348,12 +347,12 @@ public class EditRunController {
       for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
         if (container != null) {
           container.setLastModifier(user);
+          for (Partition partition : container.getPartitions()) {
+            if (partition.getPool() != null) partition.getPool().setLastModifier(user);
+          }
         }
       }
       run.setLastModifier(user);
-      for (SequencerPartitionContainer<? extends Partition> container : run.getSequencerPartitionContainers()) {
-        container.setLastModifier(user);
-      }
       requestManager.saveRun(run);
       session.setComplete();
       model.clear();

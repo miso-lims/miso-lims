@@ -507,6 +507,7 @@ public class LimsUtils {
         }
       }
 
+      fis.close();
       int offset = (int) i + 1;
 
       if (offset >= bb.limit()) throw new NoSuchElementException();

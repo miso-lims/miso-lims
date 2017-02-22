@@ -52,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
@@ -122,7 +121,7 @@ public class AnalysisController {
 
       map.put("instrument-id", run.getSequencerReference().getName());
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = ((RunImpl) run).getSequencerPartitionContainers().get(0);
+      SequencerPartitionContainer f = ((RunImpl) run).getSequencerPartitionContainers().get(0);
       String laneValue = "8";
       String naType = "dna";
       String indexValue = "6";

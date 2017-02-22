@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
@@ -29,7 +30,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -950,10 +950,10 @@ public class ValueTypeLookup {
       run.setPlatformType(platformType);
     }
     if (run.getSequencerPartitionContainers() != null) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> flowcell : run.getSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer flowcell : run.getSequencerPartitionContainers()) {
         if (flowcell.getPlatform() == null) flowcell.setPlatform(platform);
         if (flowcell.getPartitions() != null) {
-          for (SequencerPoolPartition lane : flowcell.getPartitions()) {
+          for (Partition lane : flowcell.getPartitions()) {
             if (lane.getPool() != null && lane.getPool().getPlatformType() == null) {
               lane.getPool().setPlatformType(platformType);
             }

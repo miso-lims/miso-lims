@@ -180,6 +180,7 @@ public class DownloadController {
       }
       responseStream.flush();
       responseStream.close();
+      fis.close();
     } else {
       throw new IOException("Cannot open file. Please check that it exists and is readable.");
     }

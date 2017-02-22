@@ -25,10 +25,10 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util
@@ -40,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
  * @since 0.1.6
  */
 public class RunProcessingUtils {
-  public static String buildIlluminaDemultiplexCSV(Run r, SequencerPartitionContainer<SequencerPoolPartition> f, String casavaVersion,
+  public static String buildIlluminaDemultiplexCSV(Run r, SequencerPartitionContainer f, String casavaVersion,
       String userName) {
     boolean newCasava = false;
 
@@ -58,7 +58,7 @@ public class RunProcessingUtils {
       sb.append("\n");
     }
 
-    for (SequencerPoolPartition l : f.getPartitions()) {
+    for (Partition l : f.getPartitions()) {
       int count = 0;
       Pool p = l.getPool();
       if (p != null) {

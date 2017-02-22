@@ -41,12 +41,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -187,13 +187,13 @@ public class ExternalRestController extends RestController {
         ri++;
         if (!run.getStatus().getHealth().getKey().equals("Failed")) {
           ArrayList<String> runSamples = new ArrayList<>();
-          Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
+          Collection<SequencerPartitionContainer> spcs = requestManager
               .listSequencerPartitionContainersByRunId(run.getId());
           if (spcs.size() > 0) {
-            for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+            for (SequencerPartitionContainer spc : spcs) {
 
               if (spc.getPartitions().size() > 0) {
-                for (SequencerPoolPartition spp : spc.getPartitions()) {
+                for (Partition spp : spc.getPartitions()) {
                   if (spp.getPool() != null) {
                     if (spp.getPool().getPoolableElements().size() > 0) {
                       for (Dilution dilution : spp.getPool().getPoolableElements()) {

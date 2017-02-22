@@ -63,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -275,7 +274,7 @@ public class RunControllerHelperService {
       b.append("</table>");
       b.append("</div>");
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
+      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       f.setPartitionLimit(1);
       f.initEmptyPartitions();
@@ -288,7 +287,7 @@ public class RunControllerHelperService {
       b.append("<input id='lane8' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
       b.append("<div id='containerdiv0'> </div>");
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
+      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     } else {
@@ -312,7 +311,7 @@ public class RunControllerHelperService {
         b.append("</table>");
         b.append("</div>");
 
-        SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
+        SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
         f.setPlatform(run.getSequencerReference().getPlatform());
         f.initEmptyPartitions();
         run.addSequencerPartitionContainer(f);
@@ -343,7 +342,7 @@ public class RunControllerHelperService {
     b.append("<th>Pool</th>");
 
     Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
-    SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
+    SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numLanes);
     f.initEmptyPartitions();
@@ -376,7 +375,7 @@ public class RunControllerHelperService {
       b.append(generateChamberButtons("LS454", i, 1, 16));
       b.append("<br/></div>");
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
+      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
@@ -402,7 +401,7 @@ public class RunControllerHelperService {
     b.append("<th>Pool</th>");
 
     Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
-    SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
+    SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
     f.initEmptyPartitions();
@@ -444,7 +443,7 @@ public class RunControllerHelperService {
       }
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
-      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
+      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
@@ -456,7 +455,7 @@ public class RunControllerHelperService {
     int container = json.getInt("container");
 
     SolidRun run = (SolidRun) session.getAttribute("run_" + json.getString("run_cId"));
-    SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
+    SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
     f.initEmptyPartitions();
@@ -498,7 +497,7 @@ public class RunControllerHelperService {
 
       b.append("<br/><div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
-      SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
+      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
@@ -510,7 +509,7 @@ public class RunControllerHelperService {
     int container = json.getInt("container");
 
     Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
-    SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
+    SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
     f.initEmptyPartitions();
@@ -568,7 +567,7 @@ public class RunControllerHelperService {
         Long runId = Long.parseLong(json.getString("runId"));
         Run r = requestManager.getRunById(runId);
 
-        for (SequencerPartitionContainer<SequencerPoolPartition> f : ((RunImpl) r).getSequencerPartitionContainers()) {
+        for (SequencerPartitionContainer f : ((RunImpl) r).getSequencerPartitionContainers()) {
           sb.append("<table class='containerSummary'><tr>");
           for (Partition p : f.getPartitions()) {
             sb.append("<td onclick='Run.qc.toggleProcessPartition(this);' runId='" + r.getId() + "' containerId='" + f.getId()
@@ -609,7 +608,7 @@ public class RunControllerHelperService {
 
           long containerId = Long.parseLong(id.split("_")[1]);
           long partitionNumber = Long.parseLong(id.split("_")[2]);
-          SequencerPartitionContainer<SequencerPoolPartition> f = requestManager.getSequencerPartitionContainerById(containerId);
+          SequencerPartitionContainer f = requestManager.getSequencerPartitionContainerById(containerId);
           for (Partition p : f.getPartitions()) {
             if (p.getPartitionNumber() == partitionNumber) {
               p.setSequencerPartitionContainer(f);
@@ -638,7 +637,7 @@ public class RunControllerHelperService {
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
           sb.append("<td>");
 
-          for (SequencerPartitionContainer<SequencerPoolPartition> f : ((RunImpl) run).getSequencerPartitionContainers()) {
+          for (SequencerPartitionContainer f : ((RunImpl) run).getSequencerPartitionContainers()) {
             sb.append("<table class='containerSummary'><tr>");
             for (Partition p : f.getPartitions()) {
               if (processSelections.contains(run.getId() + "_" + f.getId() + "_" + p.getPartitionNumber())) {
@@ -689,19 +688,19 @@ public class RunControllerHelperService {
       try {
         String barcode = json.getString("barcode");
         long containerNum = json.getLong("containerNum");
-        Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = requestManager
+        Collection<SequencerPartitionContainer> fs = requestManager
             .listSequencerPartitionContainersByBarcode(barcode);
         if (!fs.isEmpty()) {
           JSONObject confirm = new JSONObject();
           StringBuilder sb = new StringBuilder();
           if (fs.size() == 1) {
             // replace container div
-            SequencerPartitionContainer<SequencerPoolPartition> f = new ArrayList<>(fs)
+            SequencerPartitionContainer f = new ArrayList<>(fs)
                 .get(0);
             sb.append("<table class='in'>");
             sb.append("<th>Partition No.</th>");
             sb.append("<th>Pool</th>");
-            for (SequencerPoolPartition p : f.getPartitions()) {
+            for (Partition p : f.getPartitions()) {
               sb.append("<tr>");
               sb.append("<td>" + p.getPartitionNumber() + "</td>");
               sb.append("<td width='90%'>");
@@ -768,7 +767,7 @@ public class RunControllerHelperService {
   public JSONObject generateIlluminaDemultiplexCSV(HttpSession session, JSONObject json) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Run r = requestManager.getRunById(json.getLong("runId"));
-    SequencerPartitionContainer<SequencerPoolPartition> f = requestManager.getSequencerPartitionContainerById(json.getLong("containerId"));
+    SequencerPartitionContainer f = requestManager.getSequencerPartitionContainerById(json.getLong("containerId"));
     if (r != null && f != null) {
       String casavaVersion = "1.8.2";
       if (json.has("casavaVersion") && !isStringEmptyOrNull(json.getString("casavaVersion"))) {
@@ -881,7 +880,7 @@ public class RunControllerHelperService {
       if (p.getPlatformType() != pt) {
         return JSONUtils.SimpleJSONError("Pool with that barcode is " + p.getPlatformType().getKey() + " and not " + pt.getKey());
       }
-      List<SequencerPartitionContainer> fs = new ArrayList<SequencerPartitionContainer>(r.getSequencerPartitionContainers());
+      List<SequencerPartitionContainer> fs = new ArrayList<>(r.getSequencerPartitionContainers());
       if (!fs.isEmpty()) {
         SequencerPartitionContainer f = fs.get(container);
         if (f.getPlatform().getPlatformType().equals(p.getPlatformType())) {
@@ -927,7 +926,8 @@ public class RunControllerHelperService {
       sb.append("<div style='float:left; clear:both'>");
       for (Project project : pooledProjects) {
         sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-        sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
+        sb.append((isStringEmptyOrNull(project.getShortName()) ? project.getAlias() : project.getShortName()));
+        sb.append(": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
             + partition + "_" + project.getProjectId() + "'>");
         Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
@@ -935,7 +935,8 @@ public class RunControllerHelperService {
               + ". At least one study must be available for each project associated with this Pool.");
         } else {
           for (Study s : studies) {
-            sb.append("<option value='" + s.getId() + "'>" + s.getName() + " - " + s.getStudyType() + "</option>");
+            sb.append("<option value='" + s.getId() + "'>" + s.getName() + " - " + s.getAlias() + " (" + s.getStudyType().getName()
+                + ")</option>");
           }
         }
         sb.append("</select>");

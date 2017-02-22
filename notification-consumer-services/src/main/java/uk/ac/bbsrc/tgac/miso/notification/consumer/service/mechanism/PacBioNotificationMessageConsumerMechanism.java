@@ -51,7 +51,6 @@ import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
@@ -250,14 +249,14 @@ public class PacBioNotificationMessageConsumerMechanism
               }
 
               if (r.getSequencerReference() != null) {
-                List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((PacBioRun) r).getSequencerPartitionContainers();
+                List<SequencerPartitionContainer> fs = ((PacBioRun) r).getSequencerPartitionContainers();
                 if (fs.isEmpty()) {
                   if (run.has("plateId") && !isStringEmptyOrNull(run.getString("plateId"))) {
-                    Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager
+                    Collection<SequencerPartitionContainer> pfs = requestManager
                         .listSequencerPartitionContainersByBarcode(run.getString("plateId"));
                     if (!pfs.isEmpty()) {
                       if (pfs.size() == 1) {
-                        SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<>(
+                        SequencerPartitionContainer lf = new ArrayList<>(
                             pfs).get(0);
                         if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                           r.setSecurityProfile(lf.getSecurityProfile());

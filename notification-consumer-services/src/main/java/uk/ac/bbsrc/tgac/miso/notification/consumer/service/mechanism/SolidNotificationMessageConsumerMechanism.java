@@ -49,7 +49,6 @@ import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -259,10 +258,10 @@ public class SolidNotificationMessageConsumerMechanism
             }
 
             if (r.getSequencerReference() != null) {
-              List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((SolidRun) r).getSequencerPartitionContainers();
+              List<SequencerPartitionContainer> fs = ((SolidRun) r).getSequencerPartitionContainers();
               if (fs.isEmpty()) {
                 if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
-                  Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager
+                  Collection<SequencerPartitionContainer> pfs = requestManager
                       .listSequencerPartitionContainersByBarcode(run.getString("containerId"));
                   if (!pfs.isEmpty()) {
                     if (pfs.size() == 1) {

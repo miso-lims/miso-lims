@@ -44,12 +44,11 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
@@ -96,15 +95,15 @@ public class EditSequencerPartitionContainerController {
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws IOException {
-    return setupForm(AbstractSequencerPartitionContainer.UNSAVED_ID, model);
+    return setupForm(SequencerPartitionContainerImpl.UNSAVED_ID, model);
   }
 
   @RequestMapping(value = "/{containerId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long containerId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      SequencerPartitionContainer<SequencerPoolPartition> container = null;
-      if (containerId == AbstractSequencerPartitionContainer.UNSAVED_ID) {
+      SequencerPartitionContainer container = null;
+      if (containerId == SequencerPartitionContainerImpl.UNSAVED_ID) {
         container = new SequencerPartitionContainerImpl(user);
         model.put("title", "New Container");
       } else {
@@ -125,7 +124,7 @@ public class EditSequencerPartitionContainerController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer<SequencerPoolPartition> container, ModelMap model, SessionStatus session)
+  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer container, ModelMap model, SessionStatus session)
       throws IOException, MalformedRunException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -133,7 +132,7 @@ public class EditSequencerPartitionContainerController {
         throw new SecurityException("Permission denied.");
       }
 
-      for (SequencerPoolPartition partition : container.getPartitions()) {
+      for (Partition partition : container.getPartitions()) {
         if (partition.getPool() != null) {
           Pool pool = partition.getPool();
           pool.setLastModifier(user);

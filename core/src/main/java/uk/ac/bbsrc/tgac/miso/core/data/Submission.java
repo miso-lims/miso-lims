@@ -97,7 +97,7 @@ public interface Submission extends Nameable, Comparable<Submission> {
 
   void setExperiments(Set<Experiment> experiments);
 
-  Map<Dilution, SequencerPoolPartition> getDilutions();
+  Map<Dilution, Partition> getDilutions();
 
-  void setDilutions(Map<Dilution, SequencerPoolPartition> dilutions);
+  void setDilutions(Map<Dilution, Partition> dilutions);
 }

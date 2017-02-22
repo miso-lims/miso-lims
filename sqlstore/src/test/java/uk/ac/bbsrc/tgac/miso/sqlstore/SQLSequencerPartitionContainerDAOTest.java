@@ -48,7 +48,6 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -83,7 +82,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListAll() throws IOException {
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listAll();
+    Collection<SequencerPartitionContainer> spcs = dao.listAll();
     assertEquals(4, spcs.size());
   }
 
@@ -94,55 +93,55 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListByBarcodeC075RACXX() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listSequencerPartitionContainersByBarcode("C075RACXX");
+    List<SequencerPartitionContainer> spcs = dao.listSequencerPartitionContainersByBarcode("C075RACXX");
     assertEquals(1, spcs.size());
   }
 
   @Test
   public void testListByBarcodeNone() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listSequencerPartitionContainersByBarcode("A0AAAAAXX");
+    List<SequencerPartitionContainer> spcs = dao.listSequencerPartitionContainersByBarcode("A0AAAAAXX");
     assertEquals(0, spcs.size());
   }
 
   @Test
   public void testListByBarcodeEmpty() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listSequencerPartitionContainersByBarcode("A0AAAAAXX");
+    List<SequencerPartitionContainer> spcs = dao.listSequencerPartitionContainersByBarcode("A0AAAAAXX");
     assertEquals(0, spcs.size());
   }
 
   @Test
   public void testListByRunId() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listAllSequencerPartitionContainersByRunId(1L);
+    List<SequencerPartitionContainer> spcs = dao.listAllSequencerPartitionContainersByRunId(1L);
     assertEquals(1, spcs.size());
   }
 
   @Test
   public void testListByRunIdNone() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listAllSequencerPartitionContainersByRunId(9999L);
+    List<SequencerPartitionContainer> spcs = dao.listAllSequencerPartitionContainersByRunId(9999L);
     assertEquals(0, spcs.size());
   }
 
   @Test
   public void testGetByPartitionId() throws IOException {
-    SequencerPartitionContainer<SequencerPoolPartition> spc = dao.getSequencerPartitionContainerByPartitionId(1L);
+    SequencerPartitionContainer spc = dao.getSequencerPartitionContainerByPartitionId(1L);
     assertNotNull(spc);
   }
 
   @Test
   public void testGetByPartitionIdNone() throws IOException {
-    SequencerPartitionContainer<SequencerPoolPartition> spc = dao.getSequencerPartitionContainerByPartitionId(9999L);
+    SequencerPartitionContainer spc = dao.getSequencerPartitionContainerByPartitionId(9999L);
     assertNull(spc);
   }
 
   @Test
   public void testGet() throws IOException {
-    SequencerPartitionContainer<SequencerPoolPartition> spc = dao.get(1L);
+    SequencerPartitionContainer spc = dao.get(1L);
     assertNonLazyThings(spc);
   }
 
   @Test
   public void testSaveEdit() throws IOException {
-    SequencerPartitionContainer<SequencerPoolPartition> spc = dao.get(4L);
+    SequencerPartitionContainer spc = dao.get(4L);
 
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     spc.setSecurityProfile(profile);
@@ -157,7 +156,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     spc.setRun(run);
 
     assertEquals(4L, dao.save(spc));
-    SequencerPartitionContainer<SequencerPoolPartition> savedSPC = dao.get(4L);
+    SequencerPartitionContainer savedSPC = dao.get(4L);
     assertEquals(spc.getId(), savedSPC.getId());
     assertEquals("ABCDEFXX", savedSPC.getIdentificationBarcode());
   }
@@ -170,25 +169,25 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws IOException {
-    SequencerPartitionContainer<SequencerPoolPartition> newSPC = makeSPC("ABCDEFXX");
+    SequencerPartitionContainer newSPC = makeSPC("ABCDEFXX");
 
     Long newId = dao.save(newSPC);
     assertNotNull(newId);
 
-    SequencerPartitionContainer<SequencerPoolPartition> savedSPC = dao.get(newId);
+    SequencerPartitionContainer savedSPC = dao.get(newId);
     assertEquals(newSPC.getIdentificationBarcode(), savedSPC.getIdentificationBarcode());
   }
 
   @Test
   public void testRemove() throws IOException {
-    SequencerPartitionContainer<SequencerPoolPartition> spc = new SequencerPartitionContainerImpl();
+    SequencerPartitionContainer spc = new SequencerPartitionContainerImpl();
     String spcIDBC = "ABCDEFXX";
     spc.setIdentificationBarcode(spcIDBC);
     spc.setPlatform(Mockito.mock(PlatformImpl.class));
     spc.setLastModifier(emptyUser);
 
     long spcId = dao.save(spc);
-    SequencerPartitionContainer<SequencerPoolPartition> insertedSpc = dao.get(spcId);
+    SequencerPartitionContainer insertedSpc = dao.get(spcId);
     assertNotNull(insertedSpc);
     assertTrue(dao.remove(spc));
     assertNull(dao.get(insertedSpc.getId()));
@@ -197,10 +196,10 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
   @Test
   public void testRemoveContainerFromRun() throws IOException {
     Long runId = 1L;
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcByRunId = dao.listAllSequencerPartitionContainersByRunId(runId);
+    List<SequencerPartitionContainer> spcByRunId = dao.listAllSequencerPartitionContainersByRunId(runId);
     assertEquals(1, spcByRunId.size());
 
-    SequencerPartitionContainer<SequencerPoolPartition> fetchedSPC = spcByRunId.iterator().next();
+    SequencerPartitionContainer fetchedSPC = spcByRunId.iterator().next();
     Run removeTarget = null;
     for (Run run : fetchedSPC.getRuns()) {
       if (run.getId() == runId) removeTarget = run;
@@ -216,15 +215,15 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
   public void testRemoveContainerFromUnassociatedRun() throws IOException {
     assertEquals(1, dao.listAllSequencerPartitionContainersByRunId(1L).size());
 
-    SequencerPartitionContainer<SequencerPoolPartition> spc = dao.get(2L);
+    SequencerPartitionContainer spc = dao.get(2L);
     spc.setRun(null);
     dao.save(spc);
     assertEquals(1, dao.listAllSequencerPartitionContainersByRunId(1L).size());
   }
 
-  private SequencerPartitionContainer<SequencerPoolPartition> makeSPC(String identificationBarcode) throws IOException {
+  private SequencerPartitionContainer makeSPC(String identificationBarcode) throws IOException {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
-    SequencerPartitionContainer<SequencerPoolPartition> pc = new SequencerPartitionContainerImpl();
+    SequencerPartitionContainer pc = new SequencerPartitionContainerImpl();
     pc.setSecurityProfile(profile);
     pc.setIdentificationBarcode(identificationBarcode);
     pc.setLocationBarcode("location");
@@ -235,14 +234,14 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     return pc;
   }
 
-  private void assertNonLazyThings(SequencerPartitionContainer<SequencerPoolPartition> spc) {
+  private void assertNonLazyThings(SequencerPartitionContainer spc) {
     assertNotNull(spc);
     assertFalse(spc.getPartitions().isEmpty());
   }
 
   @Test
   public void testListWithLimitAndOffset() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listByOffsetAndNumResults(1, 2, "asc", "id");
+    List<SequencerPartitionContainer> spcs = dao.listByOffsetAndNumResults(1, 2, "asc", "id");
     assertEquals(2, spcs.size());
     assertEquals(2, spcs.get(0).getId());
   }
@@ -264,27 +263,27 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListBySearchWithLimit() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listBySearchOffsetAndNumResults(2, 2, "C0", "asc", "id");
+    List<SequencerPartitionContainer> spcs = dao.listBySearchOffsetAndNumResults(2, 2, "C0", "asc", "id");
     assertEquals(1, spcs.size());
     assertEquals(4L, spcs.get(0).getId());
   }
 
   @Test
   public void testListByEmptySearchWithLimit() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listBySearchOffsetAndNumResults(0, 3, "", "asc", "id");
+    List<SequencerPartitionContainer> spcs = dao.listBySearchOffsetAndNumResults(0, 3, "", "asc", "id");
     assertEquals(3L, spcs.size());
   }
 
   @Test
   public void testListByBadSearchWithLimit() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao
+    List<SequencerPartitionContainer> spcs = dao
         .listBySearchOffsetAndNumResults(0, 2, "; DROP TABLE SequencerPartitionContainer;", "asc", "id");
     assertEquals(0L, spcs.size());
   }
 
   @Test
   public void testListByOffsetBadSortDir() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listByOffsetAndNumResults(1, 3, "BARK", "id");
+    List<SequencerPartitionContainer> spcs = dao.listByOffsetAndNumResults(1, 3, "BARK", "id");
     assertEquals(3, spcs.size());
   }
 
@@ -296,7 +295,7 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListOffsetThreeWithThreeSamplesPerPageOrderLastMod() throws IOException {
-    List<SequencerPartitionContainer<SequencerPoolPartition>> spcs = dao.listByOffsetAndNumResults(2, 2, "desc", "lastModified");
+    List<SequencerPartitionContainer> spcs = dao.listByOffsetAndNumResults(2, 2, "desc", "lastModified");
     assertEquals(2, spcs.size());
     assertEquals(2, spcs.get(0).getId());
   }

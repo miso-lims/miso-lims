@@ -56,11 +56,11 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -130,7 +130,7 @@ public class SubmissionControllerHelperService {
 
         // sets the title, alias and description based on form contents
         JSONArray form = JSONArray.fromObject(json.get("form"));
-        Set<SequencerPoolPartition> newPartitions = new HashSet<>();
+        Set<Partition> newPartitions = new HashSet<>();
 
         for (JSONObject j : (Iterable<JSONObject>) form) {
           if (j.getString("name").equals("title")) {
@@ -147,7 +147,7 @@ public class SubmissionControllerHelperService {
             Long dilutionId = Long.parseLong(j.getString("name").replaceAll("\\D+", ""));
             Long partitionId = Long.parseLong(j.getString("value").replaceAll("\\D+", ""));
             Dilution dilution = dilutionService.get(dilutionId);
-            SequencerPoolPartition partition = requestManager.getSequencerPoolPartitionById(partitionId);
+            Partition partition = requestManager.getPartitionById(partitionId);
             newSubmission.getDilutions().put(dilution, partition);
           }
         }
@@ -418,16 +418,16 @@ public class SubmissionControllerHelperService {
             sb.append("<ul>");
 
             // creates HTML list of sequencing containers for each run
-            Collection<SequencerPartitionContainer<SequencerPoolPartition>> partitionContainers = requestManager
+            Collection<SequencerPartitionContainer> partitionContainers = requestManager
                 .listSequencerPartitionContainersByRunId(r.getId());
-            for (SequencerPartitionContainer<SequencerPoolPartition> partitionContainer : partitionContainers) {
+            for (SequencerPartitionContainer partitionContainer : partitionContainers) {
               sb.append("<li>");
               sb.append("<b>" + partitionContainer.getIdentificationBarcode() + "</b> : " + partitionContainer.getId());
               sb.append("<ul>");
 
               // creates HTML list of partitions for each sequencing container
-              Collection<SequencerPoolPartition> partitions = partitionContainer.getPartitions();
-              for (SequencerPoolPartition part : partitions) {
+              Collection<Partition> partitions = partitionContainer.getPartitions();
+              for (Partition part : partitions) {
 
                 // Checks whether the partition was involved in the project.
                 boolean partitionInvolved = false;

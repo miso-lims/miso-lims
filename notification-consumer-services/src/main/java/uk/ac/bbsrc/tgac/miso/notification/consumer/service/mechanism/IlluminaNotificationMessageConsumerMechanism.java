@@ -59,7 +59,6 @@ import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
@@ -320,14 +319,14 @@ public class IlluminaNotificationMessageConsumerMechanism
 
           if (r.getSequencerReference() != null) {
             processRunParams(run, r);
-            Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = r.getSequencerPartitionContainers();
+            Collection<SequencerPartitionContainer> fs = r.getSequencerPartitionContainers();
             if (fs.isEmpty()) {
               if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
-                Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager
+                Collection<SequencerPartitionContainer> pfs = requestManager
                     .listSequencerPartitionContainersByBarcode(run.getString("containerId"));
                 if (!pfs.isEmpty()) {
                   if (pfs.size() == 1) {
-                    SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<>(
+                    SequencerPartitionContainer lf = new ArrayList<>(
                         pfs).get(0);
                     if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                       r.setSecurityProfile(lf.getSecurityProfile());
@@ -352,7 +351,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                             + ":: More than one sequencing container has this barcode. Cannot automatically link to a pre-existing barcode.");
                   }
                 } else {
-                  SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
+                  SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
                   f.setSecurityProfile(r.getSecurityProfile());
                   if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                     f.setPlatform(r.getSequencerReference().getPlatform());
@@ -372,7 +371,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                 }
               }
             } else {
-              SequencerPartitionContainer<SequencerPoolPartition> f = fs.iterator().next();
+              SequencerPartitionContainer f = fs.iterator().next();
               f.setSecurityProfile(r.getSecurityProfile());
               if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                 f.setPlatform(r.getSequencerReference().getPlatform());
@@ -424,7 +423,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                       if (parts.get(num) == null) {
                         long newId = (notNullPartID - notNullPartNum) + num;
                         log.info("Inserting partition at " + num + " with ID " + newId);
-                        SequencerPoolPartition p = new PartitionImpl();
+                        Partition p = new PartitionImpl();
                         p.setSequencerPartitionContainer(f);
                         p.setId(newId);
                         p.setPartitionNumber(num);

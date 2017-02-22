@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -58,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
@@ -261,8 +261,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
 
   // gets
   @Override
-  public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException {
-    SequencerPoolPartition o = backingManager.getSequencerPoolPartitionById(partitionId);
+  public Partition getPartitionById(long partitionId) throws IOException {
+    Partition o = backingManager.getPartitionById(partitionId);
     if (readCheck(o)) return o;
     else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Partition " + partitionId);
   }
@@ -298,7 +298,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerById(long containerId) throws IOException {
+  public SequencerPartitionContainer getSequencerPartitionContainerById(long containerId) throws IOException {
     SequencerPartitionContainer o = backingManager.getSequencerPartitionContainerById(containerId);
     if (readCheck(o))
       return o;
@@ -573,11 +573,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByRunId(long runId)
+  public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByRunId(long runId)
       throws IOException {
     User user = getCurrentUser();
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new HashSet<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> container : backingManager.listSequencerPartitionContainersByRunId(runId)) {
+    Collection<SequencerPartitionContainer> accessibles = new HashSet<>();
+    for (SequencerPartitionContainer container : backingManager.listSequencerPartitionContainersByRunId(runId)) {
       if (container.userCanRead(user)) {
         accessibles.add(container);
       }
@@ -586,12 +586,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByBarcode(String barcode)
+  public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode)
       throws IOException {
     User user = getCurrentUser();
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new HashSet<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> container : backingManager
-        .listSequencerPartitionContainersByBarcode(barcode)) {
+    Collection<SequencerPartitionContainer> accessibles = new HashSet<>();
+    for (SequencerPartitionContainer container : backingManager.listSequencerPartitionContainersByBarcode(barcode)) {
       if (container.userCanRead(user)) {
         accessibles.add(container);
       }
@@ -792,10 +791,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainers() throws IOException {
+  public Collection<SequencerPartitionContainer> listAllSequencerPartitionContainers() throws IOException {
     User user = getCurrentUser();
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new HashSet<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> container : backingManager.listAllSequencerPartitionContainers()) {
+    Collection<SequencerPartitionContainer> accessibles = new HashSet<>();
+    for (SequencerPartitionContainer container : backingManager.listAllSequencerPartitionContainers()) {
       if (container.userCanRead(user)) {
         accessibles.add(container);
       }
@@ -924,9 +923,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
         throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
       } else {
         run.setLastModifier(user);
-        List<SequencerPartitionContainer<SequencerPoolPartition>> containers = run.getSequencerPartitionContainers();
+        List<SequencerPartitionContainer> containers = run.getSequencerPartitionContainers();
         if (run.getSequencerPartitionContainers() != null) {
-          for (SequencerPartitionContainer<SequencerPoolPartition> container : containers) {
+          for (SequencerPartitionContainer container : containers) {
             container.setLastModifier(user);
           }
         }
@@ -1400,11 +1399,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageSizeSearch(int offset, int limit, String querystr,
+  public List<SequencerPartitionContainer> getContainersByPageSizeSearch(int offset, int limit, String querystr,
       String sortDir, String sortCol) throws IOException {
     User user = getCurrentUser();
-    List<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new ArrayList<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager.getContainersByPageSizeSearch(offset, limit, querystr,
+    List<SequencerPartitionContainer> accessibles = new ArrayList<>();
+    for (SequencerPartitionContainer spc : backingManager.getContainersByPageSizeSearch(offset, limit, querystr,
         sortDir, sortCol)) {
       if (spc.userCanRead(user)) {
         accessibles.add(spc);
@@ -1414,11 +1413,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getContainersByPageAndSize(int offset, int limit, String sortDir,
+  public List<SequencerPartitionContainer> getContainersByPageAndSize(int offset, int limit, String sortDir,
       String sortCol) throws IOException {
     User user = getCurrentUser();
-    List<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new ArrayList<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> spc : backingManager.getContainersByPageAndSize(offset, limit, sortDir,
+    List<SequencerPartitionContainer> accessibles = new ArrayList<>();
+    for (SequencerPartitionContainer spc : backingManager.getContainersByPageAndSize(offset, limit, sortDir,
         sortCol)) {
       if (spc.userCanRead(user)) {
         accessibles.add(spc);
