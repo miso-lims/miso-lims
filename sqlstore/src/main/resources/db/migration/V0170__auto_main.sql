@@ -1,5 +1,35 @@
 -- hibernatize_everything
 
+DROP TABLE IF EXISTS `State_Key`;
+DROP TABLE IF EXISTS `State_Value`;
+
+-- Kill orphaned objects
+DELETE FROM LibraryDilution WHERE library_libraryId NOT IN (SELECT libraryId FROM Library);
+
+-- Remove dead foreign keys
+UPDATE Run SET status_statusId = NULL WHERE status_statusId NOT IN (SELECT statusId FROM Status);
+UPDATE _Partition SET pool_poolId = NULL WHERE pool_poolId NOT IN (SELECT poolId FROM Pool);
+
+-- Remove dangling references in bridge tables
+DELETE FROM Pool_Elements WHERE elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution' AND elementId NOT IN (SELECT dilutionId FROM LibraryDilution);
+DELETE FROM Pool_Elements WHERE pool_poolId NOT IN (SELECT poolId FROM Pool);
+DELETE FROM Pool_Experiment WHERE pool_poolId NOT IN (SELECT poolId FROM Pool);
+DELETE FROM Project_ProjectOverview WHERE project_projectId NOT IN (SELECT projectId FROM Project);
+DELETE FROM RunQC_Partition WHERE runQc_runQcId NOT IN (SELECT qcId FROM RunQC);
+DELETE FROM RunQC_Partition WHERE NOT EXISTS (
+  SELECT p.partitionId FROM `_Partition` p
+  JOIN SequencerPartitionContainer_Partition spcp ON spcp.partitions_partitionId = p.partitionId
+  WHERE spcp.container_containerId = RunQC_Partition.containers_containerId
+  AND p.partitionNumber = RunQC_Partition.partitionNumber);
+DELETE FROM Run_Note WHERE notes_noteId NOT IN (SELECT noteId FROM Note);
+DELETE FROM Run_SequencerPartitionContainer WHERE containers_containerId NOT IN (SELECT containerId FROM SequencerPartitionContainer);
+DELETE FROM Run_SequencerPartitionContainer WHERE run_runId NOT IN (SELECT runId FROM Run);
+DELETE FROM Sample_Note WHERE sample_sampleId NOT IN (SELECT sampleId FROM Sample);
+DELETE FROM SequencerPartitionContainer_Partition WHERE container_containerId NOT IN (SELECT containerId FROM SequencerPartitionContainer);
+DELETE FROM SequencerPartitionContainer_Partition WHERE partitions_partitionId NOT IN (SELECT partitionId  FROM _Partition);
+
+-- Changes for Hibernate
+
 DROP TABLE Project_Study;
 UPDATE Project SET progress = UPPER(progress);
 ALTER TABLE Project ADD CONSTRAINT project_alias_UK UNIQUE (alias);
