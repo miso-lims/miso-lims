@@ -206,8 +206,6 @@ public class EditLibraryController {
     this.runService = runService;
   }
 
-  @Value("${miso.notification.interop.enabled}")
-  private Boolean metrixEnabled;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
@@ -218,11 +216,6 @@ public class EditLibraryController {
   private Boolean showDescription;
   @Value("${miso.display.library.bulk.volume}")
   private Boolean showVolume;
-
-  @ModelAttribute("metrixEnabled")
-  public Boolean isMetrixEnabled() {
-    return metrixEnabled;
-  }
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {

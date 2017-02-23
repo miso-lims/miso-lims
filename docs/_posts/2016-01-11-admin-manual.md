@@ -141,9 +141,6 @@ samples, libraries) are valid. If you do not want to use one of the supplied
 ones (TGAC's standard, OICR's standard, or no checks), you will have to write
 one or more specific to your organisation. See Naming Schemes below for more
 information.
-* If using a notification server, change `miso.notification.interop.enabled`
-to `true` and change the host and port for your notification server
- (see Setting Up the Notification Server below).
 * If using a bulk barcode scanner (only VisionMate is supported at present), 
 set `miso.boxscanner.enabled` to `true` and change the host and port for your
 VisionMate server.
