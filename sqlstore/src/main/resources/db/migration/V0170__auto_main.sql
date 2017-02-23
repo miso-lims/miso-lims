@@ -264,11 +264,9 @@ DROP TABLE PrintService;
 DROP TABLE PrintJob;
 
 
-ALTER TABLE BoxChangeLog ADD boxChangeLogId bigint(20) AUTO_INCREMENT
--- StartNoTest
- PRIMARY KEY FIRST
--- EndNoTest
-;
+ALTER TABLE BoxChangeLog ADD boxChangeLogId bigint(20) AUTO_INCREMENT BEFORE boxId;
+ALTER TABLE BoxChangeLog ADD PRIMARY KEY (boxChangeLogId);
+
 ALTER TABLE BoxChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE BoxChangeLog MODIFY message LONGTEXT;
 ALTER TABLE BoxChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -289,11 +287,9 @@ WHERE boxChangeLogId IN (
         );
 ALTER TABLE BoxChangeLog ADD FOREIGN KEY (boxId) REFERENCES Box(boxId);
 
-ALTER TABLE ExperimentChangeLog ADD experimentChangeLogId bigint(20) AUTO_INCREMENT
--- StartNoTest
- PRIMARY KEY FIRST
--- EndNoTest
-;
+ALTER TABLE ExperimentChangeLog ADD experimentChangeLogId bigint(20) AUTO_INCREMENT BEFORE experimentId;
+ALTER TABLE ExperimentChangeLog ADD PRIMARY KEY (experimentChangeLogId);
+
 ALTER TABLE ExperimentChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE ExperimentChangeLog MODIFY message LONGTEXT;
 ALTER TABLE ExperimentChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -314,11 +310,9 @@ WHERE experimentChangeLogId IN (
         );
 ALTER TABLE ExperimentChangeLog ADD FOREIGN KEY (experimentId) REFERENCES Experiment(experimentId);
 
-ALTER TABLE KitDescriptorChangeLog ADD kitDescriptorChangeLogId bigint(20) AUTO_INCREMENT
--- StartNoTest
- PRIMARY KEY FIRST
--- EndNoTest
-;
+ALTER TABLE KitDescriptorChangeLog ADD kitDescriptorChangeLogId bigint(20) AUTO_INCREMENT BEFORE kitDescriptorId;
+ALTER TABLE KitDescriptorChangeLog ADD PRIMARY KEY (kitDescriptorChangeLogId);
+
 ALTER TABLE KitDescriptorChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE KitDescriptorChangeLog MODIFY message LONGTEXT;
 ALTER TABLE KitDescriptorChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -339,11 +333,9 @@ WHERE kitDescriptorChangeLogId IN (
         );
 ALTER TABLE KitDescriptorChangeLog ADD FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor(kitDescriptorId);
 
-ALTER TABLE LibraryChangeLog ADD libraryChangeLogId bigint(20) AUTO_INCREMENT
--- StartNoTest
- PRIMARY KEY FIRST
--- EndNoTest
-;
+ALTER TABLE LibraryChangeLog ADD libraryChangeLogId bigint(20) AUTO_INCREMENT BEFORE libraryId;
+ALTER TABLE LibraryChangeLog ADD PRIMARY KEY (libraryChangeLogId);
+
 ALTER TABLE LibraryChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE LibraryChangeLog MODIFY message LONGTEXT;
 ALTER TABLE LibraryChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -364,11 +356,9 @@ WHERE libraryChangeLogId IN (
         );
 ALTER TABLE LibraryChangeLog ADD FOREIGN KEY (libraryId) REFERENCES Library(libraryId);
 
-ALTER TABLE PoolChangeLog ADD poolChangeLogId bigint(20) AUTO_INCREMENT
--- StartNoTest
- PRIMARY KEY FIRST
--- EndNoTest
-;
+ALTER TABLE PoolChangeLog ADD poolChangeLogId bigint(20) AUTO_INCREMENT BEFORE poolId;
+ALTER TABLE PoolChangeLog ADD PRIMARY KEY (poolChangeLogId);
+
 ALTER TABLE PoolChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE PoolChangeLog MODIFY message LONGTEXT;
 ALTER TABLE PoolChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -389,11 +379,9 @@ WHERE poolChangeLogId IN (
         );
 ALTER TABLE PoolChangeLog ADD FOREIGN KEY (poolId) REFERENCES Pool(poolId);
 
-ALTER TABLE RunChangeLog ADD runChangeLogId bigint(20) AUTO_INCREMENT
--- StartNoTest
- PRIMARY KEY FIRST
--- EndNoTest
-;
+ALTER TABLE RunChangeLog ADD runChangeLogId bigint(20) AUTO_INCREMENT BEFORE runId;
+ALTER TABLE RunChangeLog ADD PRIMARY KEY (runChangeLogId);
+
 ALTER TABLE RunChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE RunChangeLog MODIFY message LONGTEXT;
 ALTER TABLE RunChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -414,11 +402,9 @@ WHERE runChangeLogId IN (
         );
 ALTER TABLE RunChangeLog ADD FOREIGN KEY (runId) REFERENCES Run(runId);
 
-ALTER TABLE SampleChangeLog ADD sampleChangeLogId bigint(20) AUTO_INCREMENT
--- StartNoTest
- PRIMARY KEY FIRST
--- EndNoTest
-;
+ALTER TABLE SampleChangeLog ADD sampleChangeLogId bigint(20) AUTO_INCREMENT BEFORE sampleId;
+ALTER TABLE SampleChangeLog ADD PRIMARY KEY (sampleChangeLogId);
+
 ALTER TABLE SampleChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE SampleChangeLog MODIFY message LONGTEXT;
 ALTER TABLE SampleChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -439,11 +425,9 @@ WHERE sampleChangeLogId IN (
         );
 ALTER TABLE SampleChangeLog ADD FOREIGN KEY (sampleId) REFERENCES Sample(sampleId);
 
-ALTER TABLE SequencerPartitionContainerChangeLog ADD sequencerPartitionContainerChangeLogId bigint(20) AUTO_INCREMENT
--- StartNoTest
- PRIMARY KEY FIRST
--- EndNoTest
-;
+ALTER TABLE SequencerPartitionContainerChangeLog ADD sequencerPartitionContainerChangeLogId bigint(20) AUTO_INCREMENT BEFORE containerId;
+ALTER TABLE SequencerPartitionContainerChangeLog ADD PRIMARY KEY (sequencerPartitionContainerChangeLogId);
+
 ALTER TABLE SequencerPartitionContainerChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE SequencerPartitionContainerChangeLog MODIFY message LONGTEXT;
 ALTER TABLE SequencerPartitionContainerChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
@@ -464,11 +448,9 @@ WHERE sequencerPartitionContainerChangeLogId IN (
         );
 ALTER TABLE SequencerPartitionContainerChangeLog ADD FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer(containerId);
 
-ALTER TABLE StudyChangeLog ADD studyChangeLogId bigint(20) AUTO_INCREMENT
--- StartNoTest
- PRIMARY KEY FIRST
--- EndNoTest
-;
+ALTER TABLE StudyChangeLog ADD studyChangeLogId bigint(20) AUTO_INCREMENT BEFORE studyId;
+ALTER TABLE StudyChangeLog ADD PRIMARY KEY (studyChangeLogId);
+
 ALTER TABLE StudyChangeLog MODIFY columnsChanged VARCHAR(500);
 ALTER TABLE StudyChangeLog MODIFY message LONGTEXT;
 ALTER TABLE StudyChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
