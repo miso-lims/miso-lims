@@ -29,8 +29,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
 /**
  * A Partition represents a compartment on a {@link SequencerPartitionContainer} on a sequencing platform, e.g. a lane on Illumina, a
  * chamber on 454, or a SMRT cell on a PacBio.
@@ -44,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
-public interface Partition extends SecurableByProfile, Identifiable, Comparable<Partition>, Deletable {
+public interface Partition extends Identifiable, Comparable<Partition>, Deletable {
   /**
    * Returns the sequencerPartitionContainer of this Partition object.
    * 

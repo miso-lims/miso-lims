@@ -108,7 +108,6 @@ public class PacBioNotificationMessageConsumerMechanism
     Map<String, Run> updatedRuns = new HashMap<>();
     List<Run> runsToSave = new ArrayList<>();
 
-    DateFormat gsLogDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     for (JSONObject run : (Iterable<JSONObject>) runs) {
@@ -266,11 +265,7 @@ public class PacBioNotificationMessageConsumerMechanism
                         }
                         JSONArray cells = run.getJSONArray("cells");
                         if (cells.size() > lf.getPartitions().size()) {
-                          int numNewcells = cells.size() - lf.getPartitions().size();
                           lf.setPartitionLimit(cells.size());
-                          for (int i = 0; i < numNewcells; i++) {
-                            lf.addNewPartition();
-                          }
                         }
 
                         ((RunImpl) r).addSequencerPartitionContainer(lf);
@@ -284,7 +279,6 @@ public class PacBioNotificationMessageConsumerMechanism
                         JSONArray cells = run.getJSONArray("cells");
                         SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
                         f.setPartitionLimit(cells.size());
-                        f.initEmptyPartitions();
                         if (run.has("plateId") && !isStringEmptyOrNull(run.getString("plateId"))) {
                           f.setIdentificationBarcode(run.getString("plateId"));
                         }
@@ -313,11 +307,7 @@ public class PacBioNotificationMessageConsumerMechanism
                   }
                   JSONArray cells = run.getJSONArray("cells");
                   if (cells.size() > f.getPartitions().size()) {
-                    int numNewcells = cells.size() - f.getPartitions().size();
                     f.setPartitionLimit(cells.size());
-                    for (int i = 0; i < numNewcells; i++) {
-                      f.addNewPartition();
-                    }
                   }
                 }
 

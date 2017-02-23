@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -40,13 +42,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.AutoPopulatingList;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -76,7 +74,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
 
-  private static final Logger log = LoggerFactory.getLogger(SequencerPartitionContainerImpl.class);
+  public static final int DEFAULT_PARTITION_LIMIT = 8;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -91,10 +89,10 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @ManyToMany(targetEntity = RunImpl.class)
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
       @JoinColumn(name = "containers_containerId") }, inverseJoinColumns = {
-          @JoinColumn(name = "Run_runId") })
+      @JoinColumn(name = "Run_runId") })
   private Collection<Run> runs = null;
 
-  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
@@ -115,21 +113,17 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @PrimaryKeyJoinColumn
   private ContainerDerivedInfo derivedInfo;
 
-  @OneToMany(targetEntity = PartitionImpl.class, cascade = CascadeType.ALL)
-  @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
-      @JoinColumn(name = "container_containerId", updatable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "partitions_partitionId", updatable = false) })
+  @OneToMany(targetEntity = PartitionImpl.class, mappedBy = "sequencerPartitionContainer", cascade = CascadeType.ALL)
+  @OrderBy("partitionNumber")
   @JsonIgnore
-  private List<Partition> partitions = new AutoPopulatingList<>(PartitionImpl.class);
-
-  @Transient
-  private int partitionLimit = 8;
+  private List<Partition> partitions = new ArrayList<>();
 
   /**
    * Construct a new SequencerPartitionContainer with a default empty SecurityProfile
    */
   public SequencerPartitionContainerImpl() {
     setSecurityProfile(new SecurityProfile());
+    setPartitionLimit(DEFAULT_PARTITION_LIMIT);
   }
 
   /**
@@ -305,6 +299,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @Override
   public void setPartitions(List<Partition> partitions) {
     this.partitions = partitions;
+    Collections.sort(partitions, partitionNumberComparator);
   }
 
   @Override
@@ -314,42 +309,12 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @Override
   public void setPartitionLimit(int partitionLimit) {
-    this.partitionLimit = partitionLimit;
-  }
-
-  @Override
-  public void initEmptyPartitions() {
     getPartitions().clear();
     for (int i = 0; i < partitionLimit; i++) {
-      addNewPartition();
-    }
-  }
-
-  @Override
-  public void addNewPartition() {
-    if (getPartitions().size() < partitionLimit) {
       PartitionImpl partition = new PartitionImpl();
       partition.setSequencerPartitionContainer(this);
-      partition.setPartitionNumber(getPartitions().size() + 1);
-      partition.setSecurityProfile(getSecurityProfile());
+      partition.setPartitionNumber(i + 1);
       getPartitions().add(partition);
-    } else {
-      log.warn("This sequencing container is limited to " + partitionLimit + " lanes");
-    }
-  }
-
-  public void addPartition(Partition partition) {
-    if (getPartitions().size() < partitionLimit) {
-      if (!getPartitions().contains(partition)) {
-        if (partition.getSequencerPartitionContainer() == null) partition.setSequencerPartitionContainer(this);
-        if (partition.getPartitionNumber() == null) partition.setPartitionNumber(getPartitions().size() + 1);
-        if (partition.getSecurityProfile() == null) partition.setSecurityProfile(getSecurityProfile());
-        getPartitions().add(partition);
-      } else {
-        log.warn("This sequencing container already contains that lane");
-      }
-    } else {
-      log.warn("This sequencing container is limited to " + partitionLimit + " lanes");
     }
   }
 
@@ -405,4 +370,13 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     changeLog.setUser(user);
     return changeLog;
   }
+
+  private static final Comparator<Partition> partitionNumberComparator = new Comparator<Partition>() {
+
+    @Override
+    public int compare(Partition o1, Partition o2) {
+      return o1.getPartitionNumber().compareTo(o2.getPartitionNumber());
+    }
+
+  };
 }

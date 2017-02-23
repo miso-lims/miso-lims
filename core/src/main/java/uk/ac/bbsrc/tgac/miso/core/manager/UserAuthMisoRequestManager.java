@@ -263,7 +263,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Partition getPartitionById(long partitionId) throws IOException {
     Partition o = backingManager.getPartitionById(partitionId);
-    if (readCheck(o)) return o;
+    if (readCheck(o.getSequencerPartitionContainer())) return o;
     else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Partition " + partitionId);
   }
 
