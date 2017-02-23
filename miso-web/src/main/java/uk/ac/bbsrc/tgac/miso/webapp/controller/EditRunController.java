@@ -131,14 +131,6 @@ public class EditRunController {
     return false;
   }
 
-  @Value("${miso.notification.interop.enabled}")
-  private Boolean metrixEnabled;
-
-  @ModelAttribute("metrixEnabled")
-  public Boolean isMetrixEnabled() {
-    return metrixEnabled;
-  }
-
   @Value("${miso.pacbio.dashboard.connected}")
   private Boolean isPacBioDashboardConnected;
 

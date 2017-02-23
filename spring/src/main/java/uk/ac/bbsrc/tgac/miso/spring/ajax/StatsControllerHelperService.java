@@ -123,29 +123,6 @@ public class StatsControllerHelperService {
     }
   }
 
-  public JSONObject getInterOpMetrics(HttpSession session, JSONObject json) {
-    String runAlias = json.getString("runAlias");
-    String platformType = json.getString("platformType").toLowerCase();
-    try {
-      return notificationQueryService.getInterOpMetrics(runAlias, platformType);
-    } catch (IntegrationException e) {
-      log.error("Failed to retrieve InterOp metrics", e);
-      return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
-    }
-  }
-
-  public JSONObject getInterOpMetricsForLane(HttpSession session, JSONObject json) {
-    String runAlias = json.getString("runAlias");
-    String platformType = json.getString("platformType").toLowerCase();
-    int laneNum = json.getInt("lane");
-    try {
-      return notificationQueryService.getInterOpMetricsForLane(runAlias, platformType, laneNum);
-    } catch (IntegrationException e) {
-      log.error("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
-    }
-  }
-
   public JSONObject updateRunProgress(HttpSession session, JSONObject json) {
     String runAlias = json.getString("runAlias");
     try {

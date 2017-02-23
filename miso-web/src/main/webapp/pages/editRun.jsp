@@ -314,18 +314,17 @@
     </div>
   </c:if>
 
-  <c:if test="${run.health.key ne 'Stopped' and metrixEnabled and miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
+  <c:if test="${run.id != 0}">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>
   <div id="metrix">
-    <h1>InterOp Metrics</h1>
-
-    <div id="metrixdiv"></div>
+    <h1>Metrics</h1>
+    <div id="metricsdiv"></div>
   </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      Stats.getInterOpMetrics('${run.alias}', 'Illumina');
+      RunGraph.renderMetrics(<c:out value="${run.metrics}" default="[]"/>);
     });
   </script>
   </c:if>

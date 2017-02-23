@@ -162,26 +162,6 @@ public class NotificationRequestManager {
     return "";
   }
 
-  public String queryInterOpMetrics(JSONObject request) throws IllegalStateException, IllegalArgumentException {
-    File folder = lookupRunAliasPath(request);
-    if (folder != null) {
-      JSONArray runs = parseIlluminaInterOpFolder(folder);
-      if (!runs.isEmpty()) {
-        JSONObject run = runs.getJSONObject(0);
-        if (run.has("error")) {
-          return run.getString("error");
-        }
-
-        if (run.has("metrix")) {
-          return run.getString("metrix");
-        }
-      }
-    } else {
-      return "{\"error\":\"Cannot find run folder " + request.getString("run").replaceAll("('|\")", "\\\\$1") + "\"}";
-    }
-    return "";
-  }
-
   private File lookupRunAliasPath(JSONObject request) {
     if (context != null && dataPaths != null) {
       String platformType = request.getString("platform").toLowerCase();
