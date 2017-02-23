@@ -133,18 +133,17 @@ public class DefaultLibraryService implements LibraryService {
       library.inheritPermissions(sampleDao.get(library.getSample().getId()));
     }
     authorizationManager.throwIfNotWritable(library);
-    
+    validateParentOrThrow(library);
+
     // pre-save field generation
     library.setName(generateTemporaryName());
-    if (isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias()) {
-      // do not validate alias
-    } else if (isStringEmptyOrNull(library.getAlias()) && namingScheme.hasLibraryAliasGenerator()) {
+    if (isStringEmptyOrNull(library.getAlias()) && namingScheme.hasLibraryAliasGenerator()) {
       try {
         library.setAlias(namingScheme.generateLibraryAlias(library));
       } catch (MisoNamingException e) {
         throw new IOException("Error generating alias for library", e);
       }
-    } else {
+    } else if (!isDetailedLibrary(library) || !((DetailedLibrary) library).hasNonStandardAlias()) {
       validateAliasOrThrow(library);
     }
     return save(library).getId();
@@ -590,6 +589,21 @@ public class DefaultLibraryService implements LibraryService {
         // an existing DIFFERENT library already has this alias
         throw new IllegalArgumentException("NEW: A library with this alias already exists in the database");
       }
+    }
+  }
+
+  private void validateParentOrThrow(Library library) {
+    if (!isDetailedLibrary(library)) return;
+
+    if (!isAliquotSample(library.getSample())) {
+      String sc = null;
+      if (isDetailedSample(library.getSample())) {
+        DetailedSample sample = (DetailedSample) library.getSample();
+        sc = sample.getSampleClass() == null ? "not set" : sample.getSampleClass().getAlias();
+      } else {
+        sc = "Plain Sample";
+      }
+      throw new IllegalArgumentException(String.format("Sample Class '%s' is not a valid parent for Libraries. Must be an aliquot", sc));
     }
   }
 
