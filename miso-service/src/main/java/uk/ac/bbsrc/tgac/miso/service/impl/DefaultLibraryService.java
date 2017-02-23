@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -32,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -42,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
@@ -79,6 +84,8 @@ public class DefaultLibraryService implements LibraryService {
   private SampleDao sampleDao;
   @Autowired
   private KitStore kitDescriptorDao;
+  @Autowired
+  private ChangeLogStore changeLogDao;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -389,6 +396,55 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   /**
+   * Turns indices into strings for easier comparison and changelog message concatentation.
+   * 
+   * @param indices
+   * @return
+   */
+  private Set<String> stringifyIndices(List<Index> indices) {
+    Set<String> original = new HashSet<>();
+    for (Index index : indices) {
+      if (index != null) {
+        original.add(index.getFamily().getName() + " - " + index.getLabel());
+      }
+    }
+    return original;
+  }
+
+  /**
+   * Create a changelog if the indices have changed.
+   * 
+   * @param originalIndices
+   * @param updatedIndices
+   * @param target
+   * @throws IOException
+   */
+  private void makeChangeLogForIndices(List<Index> originalIndices, List<Index> updatedIndices, Library target) throws IOException {
+    
+    Set<String> original = stringifyIndices(originalIndices);
+    Set<String> updated = stringifyIndices(updatedIndices);
+    Set<String> added = new TreeSet<>(updated);
+    added.removeAll(originalIndices);
+    Set<String> removed = new TreeSet<>(original);
+    removed.removeAll(updatedIndices);
+
+    if (!added.isEmpty() || !removed.isEmpty()) {
+      StringBuilder message = new StringBuilder();
+      message.append("Indices");
+      LimsUtils.appendSet(message, removed, "removed");
+      LimsUtils.appendSet(message, added, (removed.isEmpty() ? "" : "; ") + "added");
+
+      LibraryChangeLog changeLog = new LibraryChangeLog();
+      changeLog.setLibrary(target);
+      changeLog.setColumnsChanged("indices");
+      changeLog.setSummary(message.toString());
+      changeLog.setTime(new Date());
+      changeLog.setUser(authorizationManager.getCurrentUser());
+      changeLogDao.create(changeLog);
+    }
+  }
+
+  /**
    * Loads persisted objects into library fields. Should be called before saving libraries. Loads all member objects <b>except</b>
    * <ul>
    * <li>creator/lastModifier User objects</li>
@@ -480,7 +536,10 @@ public class DefaultLibraryService implements LibraryService {
     target.setLibrarySelectionType(source.getLibrarySelectionType());
     target.setLibraryStrategyType(source.getLibraryStrategyType());
     target.setQcPassed(source.getQcPassed());
+
+    makeChangeLogForIndices(target.getIndices(), source.getIndices(), target);
     target.setIndices(source.getIndices());
+
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
       DetailedLibrary dTarget = (DetailedLibrary) target;
@@ -572,6 +631,10 @@ public class DefaultLibraryService implements LibraryService {
 
   public void setKitDao(KitStore kitDescriptorDao) {
     this.kitDescriptorDao = kitDescriptorDao;
+  }
+
+  public void setChangeLogDao(ChangeLogStore changeLogDao) {
+    this.changeLogDao = changeLogDao;
   }
 
   public void setAutoGenerateIdBarcodes(Boolean autoGenerateIdBarcodes) {

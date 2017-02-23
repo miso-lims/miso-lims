@@ -312,6 +312,7 @@ public class MisoServiceManager {
     rm.setSecurityStore(securityStore);
     rm.setSecurityManager(securityManager);
     rm.setLibraryDilutionStore(dilutionDao);
+    rm.setChangeLogStore(changeLogDao);
     setRequestManager(rm);
   }
 
@@ -514,6 +515,8 @@ public class MisoServiceManager {
   }
 
   private void updateChangeLogDaoDependencies() {
+    if (libraryService != null) libraryService.setChangeLogDao(changeLogDao);
+    if (requestManager != null) requestManager.setChangeLogStore(changeLogDao);
   }
 
   public HibernateSampleQcDao getSampleQcDao() {
@@ -580,6 +583,7 @@ public class MisoServiceManager {
     svc.setKitDao(kitDao);
     svc.setSampleDao(sampleDao);
     svc.setSecurityManager(securityManager);
+    svc.setChangeLogDao(changeLogDao);
     setLibraryService(svc);
   }
 
