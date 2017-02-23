@@ -882,6 +882,7 @@ public class DetailedSampleBuilder
     sample.setGroupId(groupId);
     sample.setGroupDescription(groupDescription);
     sample.setSynthetic(isSynthetic);
+    sample.setConcentration(concentration);
     sample.setNonStandardAlias(nonStandardAlias);
     sample.setSiblingNumber(siblingNumber);
     sample.setPreMigrationId(preMigrationId);
@@ -902,7 +903,6 @@ public class DetailedSampleBuilder
   private SampleStock buildStock() {
     SampleStock stock = new SampleStockImpl();
     stock.setStrStatus(strStatus);
-    stock.setConcentration(concentration);
     stock.setDNAseTreated(dnaseTreated);
     stock.setQCs(sampleQCs);
     return stock;

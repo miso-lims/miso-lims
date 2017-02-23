@@ -62,7 +62,8 @@ FOR EACH ROW
      CASE WHEN (NEW.detailedQcStatusId IS NULL) <> (OLD.detailedQcStatusId IS NULL) OR NEW.detailedQcStatusId <> OLD.detailedQcStatusId THEN CONCAT('QC Status: ', COALESCE((SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = OLD.detailedQcStatusId), 'n/a'), ' → ', COALESCE((SELECT description FROM DetailedQcStatus WHERE detailedQcStatusId = NEW.detailedQcStatusId), 'n/a')) END,
      CASE WHEN (NEW.detailedQcStatusNote IS NULL) <> (OLD.detailedQcStatusNote IS NULL) OR NEW.detailedQcStatusNote <> OLD.detailedQcStatusNote THEN CONCAT('QC Status Note: ', COALESCE(OLD.detailedQcStatusNote, 'n/a'), ' → ', COALESCE(NEW.detailedQcStatusNote, 'n/a')) END,
      CASE WHEN NEW.sampleClassId <> OLD.sampleClassId THEN CONCAT('class: ', (SELECT alias FROM SampleClass WHERE sampleClassId = OLD.sampleClassId), ' → ', (SELECT alias FROM SampleClass WHERE sampleClassId = NEW.sampleClassId)) END,
-     CASE WHEN (NEW.siblingNumber IS NULL) <> (OLD.siblingNumber IS NULL) OR NEW.siblingNumber <> OLD.siblingNumber THEN CONCAT('sibling: ', COALESCE(OLD.siblingNumber, 'n/a'), ' → ', COALESCE(NEW.siblingNumber, 'n/a')) END,
+     CASE WHEN (NEW.siblingNumber IS NULL) <> (OLD.siblingNumber IS NULL) OR NEW.siblingNumber <> OLD.siblingNumber THEN CONCAT('sibling: ', COALESCE(OLD.siblingNumber, 'n/a'), ' → ', COALESCE(NEW.siblingNumber, 'n/a')) END,CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(OLD.concentration, 'n/a'), ' → ', COALESCE(NEW.concentration, 'n/a')) END,
+     CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(OLD.concentration, 'n/a'), ' → ', COALESCE(NEW.concentration, 'n/a')) END, 
      CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN CONCAT('subproject: ', COALESCE((SELECT alias FROM Subproject WHERE subprojectId = OLD.subprojectId), 'n/a'), ' → ', COALESCE((SELECT alias FROM Subproject WHERE subprojectId = NEW.subprojectId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
@@ -76,6 +77,7 @@ FOR EACH ROW
         CASE WHEN (NEW.detailedQcStatusNote IS NULL) <> (OLD.detailedQcStatusNote IS NULL) OR NEW.detailedQcStatusNote <> OLD.detailedQcStatusNote THEN 'detailedQcStatusNote' END,
         CASE WHEN NEW.sampleClassId <> OLD.sampleClassId THEN 'sampleClassId' END,
         CASE WHEN (NEW.siblingNumber IS NULL) <> (OLD.siblingNumber IS NULL) OR NEW.siblingNumber <> OLD.siblingNumber THEN 'siblingNumber' END,
+        CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN 'concentration' END,
         CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN 'subprojectId' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
@@ -151,13 +153,11 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
-    CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(OLD.concentration, 'n/a'), ' → ', COALESCE(NEW.concentration, 'n/a')) END,
     CASE WHEN NEW.strStatus <> OLD.strStatus THEN CONCAT('STR status: ', OLD.strStatus, ' → ', NEW.strStatus) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
-         CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN 'concentration' END,
          CASE WHEN NEW.strStatus <> OLD.strStatus THEN 'strStatus' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),

@@ -107,4 +107,8 @@ public interface DetailedSample extends Sample {
 
   void setIdentityId(Long identityId);
 
+  Double getConcentration();
+
+  void setConcentration(Double concentration);
+
 }

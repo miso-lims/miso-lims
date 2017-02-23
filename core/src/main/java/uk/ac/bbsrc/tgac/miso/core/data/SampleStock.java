@@ -9,10 +9,6 @@ public interface SampleStock extends DetailedSample {
 
   public static String CATEGORY_NAME = "Stock";
 
-  Double getConcentration();
-
-  void setConcentration(Double concentration);
-
   /**
    * @return the short tandem repeat QC status for this SampleAnalyte
    */

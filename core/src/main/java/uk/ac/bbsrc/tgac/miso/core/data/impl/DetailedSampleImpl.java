@@ -56,6 +56,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   private String groupId;
   private String groupDescription;
   private boolean isSynthetic = false;
+  private Double concentration;
 
   @Column(nullable = false)
   private boolean nonStandardAlias = false;
@@ -165,6 +166,16 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
     if (isSynthetic != null) {
       this.isSynthetic = isSynthetic;
     }
+  }
+
+  @Override
+  public Double getConcentration() {
+    return concentration;
+  }
+
+  @Override
+  public void setConcentration(Double concentration) {
+    this.concentration = concentration;
   }
 
   @Override
