@@ -152,11 +152,13 @@ public class DefaultLibraryService implements LibraryService {
   @Override
   public void update(Library library) throws IOException {
     Library updatedLibrary = get(library.getId());
+    List<Index> originalIndices = new ArrayList<>(updatedLibrary.getIndices());
     authorizationManager.throwIfNotWritable(updatedLibrary);
     applyChanges(updatedLibrary, library);
     validateAliasOrThrow(updatedLibrary);
     setChangeDetails(updatedLibrary);
     loadChildEntities(updatedLibrary);
+    makeChangeLogForIndices(originalIndices, updatedLibrary.getIndices(), updatedLibrary);
     save(updatedLibrary);
   }
 
@@ -402,7 +404,7 @@ public class DefaultLibraryService implements LibraryService {
   private Set<String> stringifyIndices(List<Index> indices) {
     Set<String> original = new HashSet<>();
     for (Index index : indices) {
-      if (index != null) {
+      if (index != null && index.getId() != Index.UNSAVED_ID) {
         original.add(index.getFamily().getName() + " - " + index.getLabel());
       }
     }
@@ -535,7 +537,6 @@ public class DefaultLibraryService implements LibraryService {
     target.setLibraryStrategyType(source.getLibraryStrategyType());
     target.setQcPassed(source.getQcPassed());
 
-    makeChangeLogForIndices(target.getIndices(), source.getIndices(), target);
     target.setIndices(source.getIndices());
 
     if (isDetailedLibrary(target)) {
