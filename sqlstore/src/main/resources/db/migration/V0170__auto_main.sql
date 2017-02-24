@@ -264,212 +264,212 @@ DROP TABLE PrintService;
 DROP TABLE PrintJob;
 
 
-ALTER TABLE BoxChangeLog ADD boxChangeLogId bigint(20) AUTO_INCREMENT BEFORE boxId;
-ALTER TABLE BoxChangeLog ADD PRIMARY KEY (boxChangeLogId);
+CREATE TABLE NewBoxChangeLog (
+  boxChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  boxId bigint(20) NOT NULL,
+  columnsChanged varchar(500) NOT NULL,
+  userId bigint(20) NOT NULL,
+  message longtext NOT NULL,
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_boxChangeLog_box FOREIGN KEY (boxId) REFERENCES Box(boxId),
+  CONSTRAINT fk_boxChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
+) Engine=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE BoxChangeLog MODIFY columnsChanged VARCHAR(500);
-ALTER TABLE BoxChangeLog MODIFY message LONGTEXT;
-ALTER TABLE BoxChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
--- Remove orphaned log entries.
-DELETE
-FROM BoxChangeLog
-WHERE boxChangeLogId IN (
-        SELECT *
-        FROM (
-            SELECT BoxChangeLog.boxChangeLogId
-            FROM BoxChangeLog
-            WHERE NOT EXISTS (
-                    SELECT *
-                    FROM Box
-                    WHERE Box.boxId = BoxChangeLog.boxId
-                    )
-            ) AS t
-        );
-ALTER TABLE BoxChangeLog ADD FOREIGN KEY (boxId) REFERENCES Box(boxId);
+-- StartNoTest
+INSERT INTO NewBoxChangeLog(boxId, columnsChanged, userId, message, changeTime)
+SELECT boxId, columnsChanged, userId, message, changeTime FROM BoxChangeLog
+WHERE EXISTS (
+    SELECT * FROM Box WHERE Box.boxId = BoxChangeLog.boxId
+);
+-- EndNoTest
 
-ALTER TABLE ExperimentChangeLog ADD experimentChangeLogId bigint(20) AUTO_INCREMENT BEFORE experimentId;
-ALTER TABLE ExperimentChangeLog ADD PRIMARY KEY (experimentChangeLogId);
+DROP TABLE BoxChangeLog;
+ALTER TABLE NewBoxChangeLog RENAME TO BoxChangeLog;
 
-ALTER TABLE ExperimentChangeLog MODIFY columnsChanged VARCHAR(500);
-ALTER TABLE ExperimentChangeLog MODIFY message LONGTEXT;
-ALTER TABLE ExperimentChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
--- Remove orphaned log entries.
-DELETE
-FROM ExperimentChangeLog
-WHERE experimentChangeLogId IN (
-        SELECT *
-        FROM (
-            SELECT ExperimentChangeLog.experimentChangeLogId
-            FROM ExperimentChangeLog
-            WHERE NOT EXISTS (
-                    SELECT *
-                    FROM Experiment
-                    WHERE Experiment.experimentId = ExperimentChangeLog.experimentId
-                    )
-            ) AS t
-        );
-ALTER TABLE ExperimentChangeLog ADD FOREIGN KEY (experimentId) REFERENCES Experiment(experimentId);
 
-ALTER TABLE KitDescriptorChangeLog ADD kitDescriptorChangeLogId bigint(20) AUTO_INCREMENT BEFORE kitDescriptorId;
-ALTER TABLE KitDescriptorChangeLog ADD PRIMARY KEY (kitDescriptorChangeLogId);
+CREATE TABLE NewExperimentChangeLog (
+  experimentChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  experimentId bigint(20) NOT NULL,
+  columnsChanged varchar(500) NOT NULL,
+  userId bigint(20) NOT NULL,
+  message longtext NOT NULL,
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_experimentChangeLog_experiment FOREIGN KEY (experimentId) REFERENCES Experiment(experimentId),
+  CONSTRAINT fk_experimentChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
+) Engine=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE KitDescriptorChangeLog MODIFY columnsChanged VARCHAR(500);
-ALTER TABLE KitDescriptorChangeLog MODIFY message LONGTEXT;
-ALTER TABLE KitDescriptorChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
--- Remove orphaned log entries.
-DELETE
-FROM KitDescriptorChangeLog
-WHERE kitDescriptorChangeLogId IN (
-        SELECT *
-        FROM (
-            SELECT KitDescriptorChangeLog.kitDescriptorChangeLogId
-            FROM KitDescriptorChangeLog
-            WHERE NOT EXISTS (
-                    SELECT *
-                    FROM KitDescriptor
-                    WHERE KitDescriptor.kitDescriptorId = KitDescriptorChangeLog.kitDescriptorId
-                    )
-            ) AS t
-        );
-ALTER TABLE KitDescriptorChangeLog ADD FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor(kitDescriptorId);
+-- StartNoTest
+INSERT INTO NewExperimentChangeLog(experimentId, columnsChanged, userId, message, changeTime)
+SELECT experimentId, columnsChanged, userId, message, changeTime FROM ExperimentChangeLog
+WHERE EXISTS (
+    SELECT * FROM Experiment WHERE Experiment.experimentId = ExperimentChangeLog.experimentId
+);
+-- EndNoTest
 
-ALTER TABLE LibraryChangeLog ADD libraryChangeLogId bigint(20) AUTO_INCREMENT BEFORE libraryId;
-ALTER TABLE LibraryChangeLog ADD PRIMARY KEY (libraryChangeLogId);
+DROP TABLE ExperimentChangeLog;
+ALTER TABLE NewExperimentChangeLog RENAME TO ExperimentChangeLog;
 
-ALTER TABLE LibraryChangeLog MODIFY columnsChanged VARCHAR(500);
-ALTER TABLE LibraryChangeLog MODIFY message LONGTEXT;
-ALTER TABLE LibraryChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
--- Remove orphaned log entries.
-DELETE
-FROM LibraryChangeLog
-WHERE libraryChangeLogId IN (
-        SELECT *
-        FROM (
-            SELECT LibraryChangeLog.libraryChangeLogId
-            FROM LibraryChangeLog
-            WHERE NOT EXISTS (
-                    SELECT *
-                    FROM Library
-                    WHERE Library.libraryId = LibraryChangeLog.libraryId
-                    )
-            ) AS t
-        );
-ALTER TABLE LibraryChangeLog ADD FOREIGN KEY (libraryId) REFERENCES Library(libraryId);
 
-ALTER TABLE PoolChangeLog ADD poolChangeLogId bigint(20) AUTO_INCREMENT BEFORE poolId;
-ALTER TABLE PoolChangeLog ADD PRIMARY KEY (poolChangeLogId);
+CREATE TABLE NewKitDescriptorChangeLog (
+  kitDescriptorChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  kitDescriptorId bigint(20) NOT NULL,
+  columnsChanged varchar(500) NOT NULL,
+  userId bigint(20) NOT NULL,
+  message longtext NOT NULL,
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_kitDescriptorChangeLog_kitDescriptor FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor(kitDescriptorId),
+  CONSTRAINT fk_kitDescriptorChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
+) Engine=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE PoolChangeLog MODIFY columnsChanged VARCHAR(500);
-ALTER TABLE PoolChangeLog MODIFY message LONGTEXT;
-ALTER TABLE PoolChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
--- Remove orphaned log entries.
-DELETE
-FROM PoolChangeLog
-WHERE poolChangeLogId IN (
-        SELECT *
-        FROM (
-            SELECT PoolChangeLog.poolChangeLogId
-            FROM PoolChangeLog
-            WHERE NOT EXISTS (
-                    SELECT *
-                    FROM Pool
-                    WHERE Pool.poolId = PoolChangeLog.poolId
-                    )
-            ) AS t
-        );
-ALTER TABLE PoolChangeLog ADD FOREIGN KEY (poolId) REFERENCES Pool(poolId);
+-- StartNoTest
+INSERT INTO NewKitDescriptorChangeLog(kitDescriptorId, columnsChanged, userId, message, changeTime)
+SELECT kitDescriptorId, columnsChanged, userId, message, changeTime FROM KitDescriptorChangeLog
+WHERE EXISTS (
+    SELECT * FROM KitDescriptor WHERE KitDescriptor.kitDescriptorId = KitDescriptorChangeLog.kitDescriptorId
+);
+-- EndNoTest
 
-ALTER TABLE RunChangeLog ADD runChangeLogId bigint(20) AUTO_INCREMENT BEFORE runId;
-ALTER TABLE RunChangeLog ADD PRIMARY KEY (runChangeLogId);
+DROP TABLE KitDescriptorChangeLog;
+ALTER TABLE NewKitDescriptorChangeLog RENAME TO KitDescriptorChangeLog;
 
-ALTER TABLE RunChangeLog MODIFY columnsChanged VARCHAR(500);
-ALTER TABLE RunChangeLog MODIFY message LONGTEXT;
-ALTER TABLE RunChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
--- Remove orphaned log entries.
-DELETE
-FROM RunChangeLog
-WHERE runChangeLogId IN (
-        SELECT *
-        FROM (
-            SELECT RunChangeLog.runChangeLogId
-            FROM RunChangeLog
-            WHERE NOT EXISTS (
-                    SELECT *
-                    FROM Run
-                    WHERE Run.runId = RunChangeLog.runId
-                    )
-            ) AS t
-        );
-ALTER TABLE RunChangeLog ADD FOREIGN KEY (runId) REFERENCES Run(runId);
 
-ALTER TABLE SampleChangeLog ADD sampleChangeLogId bigint(20) AUTO_INCREMENT BEFORE sampleId;
-ALTER TABLE SampleChangeLog ADD PRIMARY KEY (sampleChangeLogId);
+CREATE TABLE NewLibraryChangeLog (
+  libraryChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  libraryId bigint(20) NOT NULL,
+  columnsChanged varchar(500) NOT NULL,
+  userId bigint(20) NOT NULL,
+  message longtext NOT NULL,
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_libraryChangeLog_library FOREIGN KEY (libraryId) REFERENCES Library(libraryId),
+  CONSTRAINT fk_libraryChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
+) Engine=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE SampleChangeLog MODIFY columnsChanged VARCHAR(500);
-ALTER TABLE SampleChangeLog MODIFY message LONGTEXT;
-ALTER TABLE SampleChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
--- Remove orphaned log entries.
-DELETE
-FROM SampleChangeLog
-WHERE sampleChangeLogId IN (
-        SELECT *
-        FROM (
-            SELECT SampleChangeLog.sampleChangeLogId
-            FROM SampleChangeLog
-            WHERE NOT EXISTS (
-                    SELECT *
-                    FROM Sample
-                    WHERE Sample.sampleId = SampleChangeLog.sampleId
-                    )
-            ) AS t
-        );
-ALTER TABLE SampleChangeLog ADD FOREIGN KEY (sampleId) REFERENCES Sample(sampleId);
+-- StartNoTest
+INSERT INTO NewLibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime)
+SELECT libraryId, columnsChanged, userId, message, changeTime FROM LibraryChangeLog
+WHERE EXISTS (
+    SELECT * FROM Library WHERE Library.libraryId = LibraryChangeLog.libraryId
+);
+-- EndNoTest
 
-ALTER TABLE SequencerPartitionContainerChangeLog ADD sequencerPartitionContainerChangeLogId bigint(20) AUTO_INCREMENT BEFORE containerId;
-ALTER TABLE SequencerPartitionContainerChangeLog ADD PRIMARY KEY (sequencerPartitionContainerChangeLogId);
+DROP TABLE LibraryChangeLog;
+ALTER TABLE NewLibraryChangeLog RENAME TO LibraryChangeLog;
 
-ALTER TABLE SequencerPartitionContainerChangeLog MODIFY columnsChanged VARCHAR(500);
-ALTER TABLE SequencerPartitionContainerChangeLog MODIFY message LONGTEXT;
-ALTER TABLE SequencerPartitionContainerChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
--- Remove orphaned log entries.
-DELETE
-FROM SequencerPartitionContainerChangeLog
-WHERE sequencerPartitionContainerChangeLogId IN (
-        SELECT *
-        FROM (
-            SELECT SequencerPartitionContainerChangeLog.sequencerPartitionContainerChangeLogId
-            FROM SequencerPartitionContainerChangeLog
-            WHERE NOT EXISTS (
-                    SELECT *
-                    FROM SequencerPartitionContainer
-                    WHERE SequencerPartitionContainer.containerId = SequencerPartitionContainerChangeLog.containerId
-                    )
-            ) AS t
-        );
-ALTER TABLE SequencerPartitionContainerChangeLog ADD FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer(containerId);
 
-ALTER TABLE StudyChangeLog ADD studyChangeLogId bigint(20) AUTO_INCREMENT BEFORE studyId;
-ALTER TABLE StudyChangeLog ADD PRIMARY KEY (studyChangeLogId);
+CREATE TABLE NewPoolChangeLog (
+  poolChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  poolId bigint(20) NOT NULL,
+  columnsChanged varchar(500) NOT NULL,
+  userId bigint(20) NOT NULL,
+  message longtext NOT NULL,
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_poolChangeLog_pool FOREIGN KEY (poolId) REFERENCES Pool(poolId),
+  CONSTRAINT fk_poolChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
+) Engine=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE StudyChangeLog MODIFY columnsChanged VARCHAR(500);
-ALTER TABLE StudyChangeLog MODIFY message LONGTEXT;
-ALTER TABLE StudyChangeLog ADD FOREIGN KEY (userId) REFERENCES User(userId);
--- Remove orphaned log entries.
-DELETE
-FROM StudyChangeLog
-WHERE studyChangeLogId IN (
-        SELECT *
-        FROM (
-            SELECT StudyChangeLog.studyChangeLogId
-            FROM StudyChangeLog
-            WHERE NOT EXISTS (
-                    SELECT *
-                    FROM Study
-                    WHERE Study.studyId = StudyChangeLog.studyId
-                    )
-            ) AS t
-        );
-ALTER TABLE StudyChangeLog ADD FOREIGN KEY (studyId) REFERENCES Study(studyId);
+-- StartNoTest
+INSERT INTO NewPoolChangeLog(poolId, columnsChanged, userId, message, changeTime)
+SELECT poolId, columnsChanged, userId, message, changeTime FROM PoolChangeLog
+WHERE EXISTS (
+    SELECT * FROM Pool WHERE Pool.poolId = PoolChangeLog.poolId
+);
+-- EndNoTest
+
+DROP TABLE PoolChangeLog;
+ALTER TABLE NewPoolChangeLog RENAME TO PoolChangeLog;
+
+
+CREATE TABLE NewRunChangeLog (
+  runChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  runId bigint(20) NOT NULL,
+  columnsChanged varchar(500) NOT NULL,
+  userId bigint(20) NOT NULL,
+  message longtext NOT NULL,
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_runChangeLog_run FOREIGN KEY (runId) REFERENCES Run(runId),
+  CONSTRAINT fk_runChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
+) Engine=InnoDB DEFAULT CHARSET=utf8;
+
+-- StartNoTest
+INSERT INTO NewRunChangeLog(runId, columnsChanged, userId, message, changeTime)
+SELECT runId, columnsChanged, userId, message, changeTime FROM RunChangeLog
+WHERE EXISTS (
+    SELECT * FROM Run WHERE Run.runId = RunChangeLog.runId
+);
+-- EndNoTest
+
+DROP TABLE RunChangeLog;
+ALTER TABLE NewRunChangeLog RENAME TO RunChangeLog;
+
+
+CREATE TABLE NewSampleChangeLog (
+  sampleChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  sampleId bigint(20) NOT NULL,
+  columnsChanged varchar(500) NOT NULL,
+  userId bigint(20) NOT NULL,
+  message longtext NOT NULL,
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_sampleChangeLog_sample FOREIGN KEY (sampleId) REFERENCES Sample(sampleId),
+  CONSTRAINT fk_sampleChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
+) Engine=InnoDB DEFAULT CHARSET=utf8;
+
+-- StartNoTest
+INSERT INTO NewSampleChangeLog(sampleId, columnsChanged, userId, message, changeTime)
+SELECT sampleId, columnsChanged, userId, message, changeTime FROM SampleChangeLog
+WHERE EXISTS (
+    SELECT * FROM Sample WHERE Sample.sampleId = SampleChangeLog.sampleId
+);
+-- EndNoTest
+
+DROP TABLE SampleChangeLog;
+ALTER TABLE NewSampleChangeLog RENAME TO SampleChangeLog;
+
+
+CREATE TABLE NewSequencerPartitionContainerChangeLog (
+  containerChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  containerId bigint(20) NOT NULL,
+  columnsChanged varchar(500) NOT NULL,
+  userId bigint(20) NOT NULL,
+  message longtext NOT NULL,
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_containerChangeLog_box FOREIGN KEY (containerId) REFERENCES SequencerPartitionContainer(containerId),
+  CONSTRAINT fk_containerChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
+) Engine=InnoDB DEFAULT CHARSET=utf8;
+
+-- StartNoTest
+INSERT INTO NewSequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message, changeTime)
+SELECT containerId, columnsChanged, userId, message, changeTime FROM SequencerPartitionContainerChangeLog
+WHERE EXISTS (
+    SELECT * FROM SequencerPartitionContainer WHERE SequencerPartitionContainer.containerId = SequencerPartitionContainerChangeLog.containerId
+);
+-- EndNoTest
+
+DROP TABLE SequencerPartitionContainerChangeLog;
+ALTER TABLE NewSequencerPartitionContainerChangeLog RENAME TO SequencerPartitionContainerChangeLog;
+
+
+CREATE TABLE NewStudyChangeLog (
+  studyChangeLogId bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  studyId bigint(20) NOT NULL,
+  columnsChanged varchar(500) NOT NULL,
+  userId bigint(20) NOT NULL,
+  message longtext NOT NULL,
+  changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_studyChangeLog_study FOREIGN KEY (studyId) REFERENCES Study(studyId),
+  CONSTRAINT fk_studyChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
+) Engine=InnoDB DEFAULT CHARSET=utf8;
+
+-- StartNoTest
+INSERT INTO NewStudyChangeLog(studyId, columnsChanged, userId, message, changeTime)
+SELECT studyId, columnsChanged, userId, message, changeTime FROM StudyChangeLog
+WHERE EXISTS (
+    SELECT * FROM Study WHERE Study.studyId = StudyChangeLog.studyId
+);
+-- EndNoTest
+
+DROP TABLE StudyChangeLog;
+ALTER TABLE NewStudyChangeLog RENAME TO StudyChangeLog;
+
 
 CREATE TABLE BoxContents (
   boxId bigint(20) NOT NULL,
