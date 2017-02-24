@@ -41,17 +41,16 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.messaging.Message;
+import org.springframework.util.Assert;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.integration.Message;
-import org.springframework.util.Assert;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
@@ -93,7 +92,7 @@ public class PacBioNotificationMessageConsumerMechanism
     RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
     Assert.notNull(requestManager, "Cannot consume MISO notification messages without a RequestManager.");
     Map<String, List<String>> statuses = message.getPayload();
-    Set<Run> output = new HashSet<Run>();
+    Set<Run> output = new HashSet<>();
     for (String key : statuses.keySet()) {
       HealthType ht = HealthType.valueOf(key);
       JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
@@ -106,10 +105,9 @@ public class PacBioNotificationMessageConsumerMechanism
   }
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
-    Map<String, Run> updatedRuns = new HashMap<String, Run>();
-    List<Run> runsToSave = new ArrayList<Run>();
+    Map<String, Run> updatedRuns = new HashMap<>();
+    List<Run> runsToSave = new ArrayList<>();
 
-    DateFormat gsLogDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     for (JSONObject run : (Iterable<JSONObject>) runs) {
@@ -250,14 +248,14 @@ public class PacBioNotificationMessageConsumerMechanism
               }
 
               if (r.getSequencerReference() != null) {
-                List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((PacBioRun) r).getSequencerPartitionContainers();
+                List<SequencerPartitionContainer> fs = ((PacBioRun) r).getSequencerPartitionContainers();
                 if (fs.isEmpty()) {
                   if (run.has("plateId") && !isStringEmptyOrNull(run.getString("plateId"))) {
-                    Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager
+                    Collection<SequencerPartitionContainer> pfs = requestManager
                         .listSequencerPartitionContainersByBarcode(run.getString("plateId"));
                     if (!pfs.isEmpty()) {
                       if (pfs.size() == 1) {
-                        SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
+                        SequencerPartitionContainer lf = new ArrayList<>(
                             pfs).get(0);
                         if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                           r.setSecurityProfile(lf.getSecurityProfile());
@@ -267,11 +265,7 @@ public class PacBioNotificationMessageConsumerMechanism
                         }
                         JSONArray cells = run.getJSONArray("cells");
                         if (cells.size() > lf.getPartitions().size()) {
-                          int numNewcells = cells.size() - lf.getPartitions().size();
                           lf.setPartitionLimit(cells.size());
-                          for (int i = 0; i < numNewcells; i++) {
-                            lf.addNewPartition();
-                          }
                         }
 
                         ((RunImpl) r).addSequencerPartitionContainer(lf);
@@ -285,7 +279,6 @@ public class PacBioNotificationMessageConsumerMechanism
                         JSONArray cells = run.getJSONArray("cells");
                         SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
                         f.setPartitionLimit(cells.size());
-                        f.initEmptyPartitions();
                         if (run.has("plateId") && !isStringEmptyOrNull(run.getString("plateId"))) {
                           f.setIdentificationBarcode(run.getString("plateId"));
                         }
@@ -297,10 +290,9 @@ public class PacBioNotificationMessageConsumerMechanism
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
                         ((RunImpl) r).addSequencerPartitionContainer(f);
-
-                          }
-                        }
                       }
+                    }
+                  }
                 } else {
                   SequencerPartitionContainer f = fs.iterator().next();
                   f.setSecurityProfile(r.getSecurityProfile());
@@ -315,11 +307,7 @@ public class PacBioNotificationMessageConsumerMechanism
                   }
                   JSONArray cells = run.getJSONArray("cells");
                   if (cells.size() > f.getPartitions().size()) {
-                    int numNewcells = cells.size() - f.getPartitions().size();
                     f.setPartitionLimit(cells.size());
-                    for (int i = 0; i < numNewcells; i++) {
-                      f.addNewPartition();
-                    }
                   }
                 }
 
@@ -341,8 +329,8 @@ public class PacBioNotificationMessageConsumerMechanism
 
     try {
       if (runsToSave.size() > 0) {
-        int[] saved = requestManager.saveRuns(runsToSave);
-        log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
+        requestManager.saveRuns(runsToSave);
+        log.info("Batch saved " + runsToSave.size() + " runs");
       }
     } catch (IOException e) {
       log.error("Couldn't save run batch", e);

@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +24,17 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 
 @Controller
 @RequestMapping("/box")
@@ -47,14 +49,10 @@ public class EditBoxController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
+  private ChangeLogService changeLogService;
 
   @Autowired
   private BoxScanner boxScanner;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -78,7 +76,7 @@ public class EditBoxController {
   }
 
   public List<String> boxSizesAsRowsByColumns() throws IOException {
-    List<String> sizes = new ArrayList<String>();
+    List<String> sizes = new ArrayList<>();
     for (BoxSize boxSize : requestManager.listAllBoxSizes()) {
       sizes.add("\"" + boxSize.getRowsByColumns() + "\"" + ":" + "\"" + boxSize.getRowsByColumns() + "\"");
     }
@@ -97,7 +95,7 @@ public class EditBoxController {
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Box");
+    return changeLogService.listAll("Box");
   }
 
   @RequestMapping(value = "/{boxId}", method = RequestMethod.GET)
@@ -107,15 +105,14 @@ public class EditBoxController {
       Box box = null;
 
       if (boxId == AbstractBox.UNSAVED_ID) {
-        box = dataObjectFactory.getBox(user);
+        box = new BoxImpl(user);
         model.put("title", "New Box");
       } else {
         box = requestManager.getBoxById(boxId);
+        if (box == null) {
+          throw new SecurityException("No such Box");
+        }
         model.put("title", box.getAlias());
-      }
-
-      if (box == null) {
-        throw new SecurityException("No such Box");
       }
       if (!box.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
@@ -135,7 +132,7 @@ public class EditBoxController {
 
       // add JSON
       ObjectMapper mapper = new ObjectMapper();
-      model.put("boxJSON", mapper.writer().writeValueAsString(box));
+      model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(box)));
 
       return new ModelAndView("/pages/editBox.jsp", model);
     } catch (IOException ex) {

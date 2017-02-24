@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
-import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
+import uk.ac.bbsrc.tgac.miso.core.store.ReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 

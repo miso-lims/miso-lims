@@ -3,10 +3,11 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.net.URI;
 import java.util.Set;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class PoolDto {
 
   private Long id;
@@ -96,7 +97,7 @@ public class PoolDto {
     this.creationDate = creationDate;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setDescription(String description) {
     this.description = description;
   }
@@ -105,12 +106,12 @@ public class PoolDto {
     this.id = id;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setLocationLabel(String locationLabel) {
     this.locationLabel = locationLabel;
   }

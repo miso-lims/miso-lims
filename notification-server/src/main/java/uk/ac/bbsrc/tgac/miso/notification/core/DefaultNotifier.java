@@ -41,8 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.http.HttpMethod;
-import org.springframework.integration.Message;
-import org.springframework.integration.channel.ChannelInterceptor;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.interceptor.WireTap;
 import org.springframework.integration.endpoint.SourcePollingChannelAdapter;
@@ -55,9 +53,12 @@ import org.springframework.integration.ip.tcp.TcpOutboundGateway;
 import org.springframework.integration.ip.tcp.connection.TcpNetClientConnectionFactory;
 import org.springframework.integration.splitter.MethodInvokingSplitter;
 import org.springframework.integration.support.channel.BeanFactoryChannelResolver;
-import org.springframework.integration.support.channel.ChannelResolver;
-import org.springframework.integration.transformer.HeaderEnricher;
 import org.springframework.integration.transformer.MessageTransformingHandler;
+import org.springframework.integration.transformer.support.HeaderValueMessageProcessor;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.core.DestinationResolver;
+import org.springframework.messaging.support.ChannelInterceptor;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.pacbio.PacBioServiceWrapper;
@@ -84,7 +85,7 @@ public class DefaultNotifier {
     log.info("Starting notification system...");
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/notification.xml");
 
-    ChannelResolver channelResolver = new BeanFactoryChannelResolver(context);
+    DestinationResolver<MessageChannel> channelResolver = new BeanFactoryChannelResolver(context);
     NotificationUtils notificationUtils = new NotificationUtils();
 
     File propsPath = new File(".", "notification.properties");
@@ -94,7 +95,7 @@ public class DefaultNotifier {
 
       CompositeFileListFilter statusFilter = (CompositeFileListFilter) context.getBean("statusFilter");
 
-      Map<String, Set<File>> allDataPaths = new HashMap<String, Set<File>>();
+      Map<String, Set<File>> allDataPaths = new HashMap<>();
 
       for (String platformType : PlatformType.getKeys()) {
         platformType = platformType.toLowerCase();
@@ -106,7 +107,7 @@ public class DefaultNotifier {
         if (props.containsKey(platformType + ".dataPaths")) {
           log.debug("Resolving " + platformType + ".dataPaths ...");
           String dataPaths = props.getProperty(platformType + ".dataPaths");
-          Set<File> paths = new HashSet<File>();
+          Set<File> paths = new HashSet<>();
           for (String path : dataPaths.split(",")) {
             File f = new File(path);
             if (f.exists() && f.canRead() && f.isDirectory()) {
@@ -166,17 +167,17 @@ public class DefaultNotifier {
           spca.setTrigger(trigger);
 
           spca.setSource(mfqms);
-          spca.setOutputChannel(channelResolver.resolveChannelName(platformType + "StatusFileInputChannel"));
+          spca.setOutputChannel(channelResolver.resolveDestination(platformType + "StatusFileInputChannel"));
           spca.setAutoStartup(false);
           spca.afterPropertiesSet();
 
-          DirectChannel outputChannel = (DirectChannel) channelResolver.resolveChannelName(platformType + "StatusChannel");
+          DirectChannel outputChannel = (DirectChannel) channelResolver.resolveDestination(platformType + "StatusChannel");
           outputChannel.setBeanName(platformType + "StatusChannel");
           outputChannel.setBeanFactory(context.getBeanFactory());
 
           if (props.containsKey("wiretap.enabled") && "true".equals(props.get("wiretap.enabled"))) {
             // set up wire tap
-            DirectChannel wireTapChannel = (DirectChannel) channelResolver.resolveChannelName("wireTapChannel");
+            DirectChannel wireTapChannel = (DirectChannel) channelResolver.resolveDestination("wireTapChannel");
             wireTapChannel.setBeanName("wireTapChannel");
             wireTapChannel.setBeanFactory(context.getBeanFactory());
 
@@ -188,16 +189,16 @@ public class DefaultNotifier {
             wireTapLogger.afterPropertiesSet();
             wireTapChannel.subscribe(wireTapLogger);
 
-            List<ChannelInterceptor> ints = new ArrayList<ChannelInterceptor>();
+            List<ChannelInterceptor> ints = new ArrayList<>();
             WireTap wt = new WireTap(wireTapChannel);
             ints.add(wt);
             outputChannel.setInterceptors(ints);
           }
 
-          DirectChannel signChannel = (DirectChannel) channelResolver.resolveChannelName(platformType + "MessageSignerChannel");
+          DirectChannel signChannel = (DirectChannel) channelResolver.resolveDestination(platformType + "MessageSignerChannel");
           signChannel.setBeanFactory(context.getBeanFactory());
 
-          DirectChannel splitterChannel = (DirectChannel) channelResolver.resolveChannelName(platformType + "SplitterChannel");
+          DirectChannel splitterChannel = (DirectChannel) channelResolver.resolveDestination(platformType + "SplitterChannel");
           splitterChannel.setBeanFactory(context.getBeanFactory());
 
           if (props.containsKey(platformType + ".http.statusEndpointURIs")) {
@@ -213,10 +214,10 @@ public class DefaultNotifier {
               splitterChannel.subscribe(mis);
 
               // sign messages and inject url into message headers via HeaderEnricher
-              Map<String, SignedHeaderValueMessageProcessor<String>> urlHeaderToSign = new HashMap<String, SignedHeaderValueMessageProcessor<String>>();
+              Map<String, SignedHeaderValueMessageProcessor<String>> urlHeaderToSign = new HashMap<>();
               URI su = URI.create(uri);
-              urlHeaderToSign.put("x-url", new SignedHeaderValueMessageProcessor<String>(su.getPath()));
-              urlHeaderToSign.put("x-user", new SignedHeaderValueMessageProcessor<String>("notification"));
+              urlHeaderToSign.put("x-url", new SignedHeaderValueMessageProcessor<>(su.getPath()));
+              urlHeaderToSign.put("x-user", new SignedHeaderValueMessageProcessor<>("notification"));
               NotificationMessageEnricher signer = new NotificationMessageEnricher(urlHeaderToSign);
               signer.setMessageProcessor(new MethodInvokingMessageProcessor(notificationUtils, "signMessageHeaders"));
 
@@ -296,7 +297,7 @@ public class DefaultNotifier {
     }
   }
 
-  static class SignedHeaderValueMessageProcessor<T> implements HeaderEnricher.HeaderValueMessageProcessor<T> {
+  static class SignedHeaderValueMessageProcessor<T> implements HeaderValueMessageProcessor<T> {
     private volatile Boolean overwrite = null;
     private final T value;
 

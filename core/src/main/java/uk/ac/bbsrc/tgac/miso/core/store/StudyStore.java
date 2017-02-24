@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
+ * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -25,10 +25,11 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 
 /**
  * Defines a DAO interface for storing Studies
@@ -36,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since version
  */
-public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, NamingSchemeAware {
+public interface StudyStore extends Store<Study>, Remover<Study> {
   /**
    * List all Studies that match a search criteria
    * 
@@ -48,16 +49,6 @@ public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, Na
    */
   Collection<Study> listBySearch(String query) throws IOException;
 
-  /**
-   * Get a Study related to an Experiment given an Experiment ID
-   * 
-   * @param experimentId
-   *          of type long
-   * @return Study
-   * @throws IOException
-   *           when
-   */
-  Study getByExperimentId(long experimentId) throws IOException;
 
   /**
    * List all Studies that are carried out as part of a parent Project given a Project ID
@@ -71,35 +62,13 @@ public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, Na
   Collection<Study> listByProjectId(long projectId) throws IOException;
 
   /**
-   * List all Studys that are part of a Submission given a Submission ID
-   * 
-   * @param submissionId
-   *          of type long
-   * @return Collection<Study>
-   * @throws IOException
-   *           when
-   */
-  Collection<Study> listBySubmissionId(long submissionId) throws IOException;
-
-  /**
-   * List all Studies that are carried out as part of a related Library given a Library ID
-   * 
-   * @param libraryId
-   *          of type long
-   * @return Collection<Study>
-   * @throws IOException
-   *           when
-   */
-  Collection<Study> listByLibraryId(long libraryId) throws IOException;
-
-  /**
    * List all StudyTypes
    * 
    * @return Collection<String>
    * @throws IOException
    *           when
    */
-  Collection<String> listAllStudyTypes() throws IOException;
+  List<StudyType> listAllStudyTypes() throws IOException;
 
   /**
    * List all persisted objects
@@ -115,4 +84,6 @@ public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, Na
    * @throws IOException
    */
   public Map<String, Integer> getStudyColumnSizes() throws IOException;
+
+  public StudyType getType(long id);
 }

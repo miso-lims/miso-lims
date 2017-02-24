@@ -46,6 +46,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
 import net.sourceforge.fluxion.spi.ServiceProvider;
+
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
@@ -72,7 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  */
 @ServiceProvider
 public class LS454SequencerInterrogationStrategy implements SequencerInterrogationStrategy {
-  protected static final Logger log = LoggerFactory.getLogger(LS454SequencerInterrogationStrategy.class);
+  private static final Logger log = LoggerFactory.getLogger(LS454SequencerInterrogationStrategy.class);
 
   private static final MisoPerlDaemonQuery statusQuery = new MisoPerlDaemonQuery("454", "status");
   private static final MisoPerlDaemonQuery completeRunsQuery = new MisoPerlDaemonQuery("454", "complete");
@@ -85,7 +86,7 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
 
   @Override
   public List<Status> listAllStatus(SequencerReference sr) throws InterrogationException {
-    List<Status> s = new ArrayList<Status>();
+    List<Status> s = new ArrayList<>();
     JSONObject response = JSONObject.fromObject(doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), statusQuery).parseResult());
     if (response != null && response.has("response")) {
       JSONArray a = response.getJSONArray("response");
@@ -137,7 +138,7 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
   public List<String> listRunsByHealthType(SequencerReference sr, HealthType healthType) throws InterrogationException {
     String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(),
         new MisoPerlDaemonQuery("454", healthType.getKey().toLowerCase())).parseResult();
-    List<String> s = new ArrayList<String>();
+    List<String> s = new ArrayList<>();
     if (response != null) {
       String[] ss = response.split(",");
       for (String sss : ss) {
@@ -156,7 +157,7 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
   @Override
   public List<String> listAllCompleteRuns(SequencerReference sr) throws InterrogationException {
     String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), completeRunsQuery).parseResult();
-    List<String> s = new ArrayList<String>();
+    List<String> s = new ArrayList<>();
     if (response != null) {
       String[] ss = response.split(",");
       for (String sss : ss) {
@@ -175,7 +176,7 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
   @Override
   public List<String> listAllIncompleteRuns(SequencerReference sr) throws InterrogationException {
     String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), incompleteRunsQuery).parseResult();
-    List<String> s = new ArrayList<String>();
+    List<String> s = new ArrayList<>();
     if (response != null) {
       String[] ss = response.split(",");
       for (String sss : ss) {

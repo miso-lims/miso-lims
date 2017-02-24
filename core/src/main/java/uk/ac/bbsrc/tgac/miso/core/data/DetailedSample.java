@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public interface DetailedSample extends Sample {
 
@@ -106,5 +106,9 @@ public interface DetailedSample extends Sample {
   Long getIdentityId();
 
   void setIdentityId(Long identityId);
+
+  Double getConcentration();
+
+  void setConcentration(Double concentration);
 
 }

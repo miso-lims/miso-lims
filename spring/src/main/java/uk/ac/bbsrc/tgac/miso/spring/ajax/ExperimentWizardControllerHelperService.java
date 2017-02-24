@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -49,10 +49,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * Created by IntelliJ IDEA. User: bianx Date: 19-Apr-2011 Time: 12:04:04 To change this template use File | Settings | File Templates.
@@ -64,6 +67,10 @@ public class ExperimentWizardControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private StudyService studyService;
+  @Autowired
+  private ExperimentService experimentService;
 
   public JSONObject loadExperimentPlatform(HttpSession session, JSONObject json) {
 
@@ -83,8 +90,8 @@ public class ExperimentWizardControllerHelperService {
 
     StringBuilder b = new StringBuilder();
     try {
-      for (String st : requestManager.listAllStudyTypes()) {
-        b.append("<option value=\"" + st + "\">" + st + "</option>");
+      for (StudyType st : studyService.listTypes()) {
+        b.append("<option value=\"" + st.getId() + "\">" + st.getName() + "</option>");
       }
     } catch (IOException e) {
       log.debug("Failed to change ReportType", e);
@@ -94,25 +101,25 @@ public class ExperimentWizardControllerHelperService {
   }
 
   public JSONObject addStudyExperiment(HttpSession session, JSONObject json) {
-    String studyType = null;
+    StudyType studyType = null;
     Long projectId = null;
     String studyId = null;
-    List<Long> ids = new ArrayList();
-
-    JSONArray a = JSONArray.fromObject(json.get("form"));
-    for (JSONObject j : (Iterable<JSONObject>) a) {
-
-      if (j.getString("name").equals("projectId")) {
-        projectId = Long.parseLong(j.getString("value"));
-      }
-      if (j.getString("name").equals("expids")) {
-        ids.add(Long.parseLong(j.getString("value")));
-      } else if (j.getString("name").equals("studyType")) {
-        studyType = j.getString("value");
-      }
-    }
+    List<Long> ids = new ArrayList<>();
 
     try {
+      JSONArray a = JSONArray.fromObject(json.get("form"));
+      for (JSONObject j : (Iterable<JSONObject>) a) {
+
+        if (j.getString("name").equals("projectId")) {
+          projectId = Long.parseLong(j.getString("value"));
+        }
+        if (j.getString("name").equals("expids")) {
+          ids.add(Long.parseLong(j.getString("value")));
+        } else if (j.getString("name").equals("studyType")) {
+          studyType = studyService.getType(j.getLong("value"));
+        }
+      }
+
       Project p = requestManager.getProjectById(projectId);
       Study s = new StudyImpl();
       s.setProject(p);
@@ -121,7 +128,7 @@ public class ExperimentWizardControllerHelperService {
       s.setSecurityProfile(p.getSecurityProfile());
       s.setStudyType(studyType);
       s.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
-      requestManager.saveStudy(s);
+      studyService.save(s);
 
       studyId = String.valueOf(s.getId());
 
@@ -157,7 +164,7 @@ public class ExperimentWizardControllerHelperService {
           e.setPool(requestManager.getPoolByBarcode(poolBarcode));
         }
         e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
-        requestManager.saveExperiment(e);
+        experimentService.save(e);
 
       }
     } catch (IOException e) {

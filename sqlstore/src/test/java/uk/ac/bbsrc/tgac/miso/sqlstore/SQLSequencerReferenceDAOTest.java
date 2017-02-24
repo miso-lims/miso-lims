@@ -7,11 +7,13 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.Collection;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,8 +23,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 
 public class SQLSequencerReferenceDAOTest extends AbstractDAOTest {
 
@@ -32,22 +34,21 @@ public class SQLSequencerReferenceDAOTest extends AbstractDAOTest {
   @Autowired
   private JdbcTemplate template;
 
-  private final DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
+  @Mock
+  private HibernatePlatformDao platformDAO;
 
-  private SQLPlatformDAO platformDAO;
+  @Autowired
+  private SessionFactory sessionFactory;
 
   @InjectMocks
-  private SQLSequencerReferenceDAO dao;
+  private HibernateSequencerReferenceDao dao;
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    platformDAO = new SQLPlatformDAO();
-    platformDAO.setDataObjectFactory(dataObjectFactory);
-    platformDAO.setJdbcTemplate(template);
     dao.setJdbcTemplate(template);
-    dao.setPlatformDAO(platformDAO);
-    dao.setDataObjectFactory(dataObjectFactory);
+    dao.setSessionFactory(sessionFactory);
+    dao.setJdbcTemplate(template);
   }
 
   @Test
@@ -59,21 +60,19 @@ public class SQLSequencerReferenceDAOTest extends AbstractDAOTest {
   @Test
   public void testSaveNew() throws Exception {
     String serialNumber = "F00";
-    Platform platform = platformDAO.get(16);
+    Platform platform = dao.get(1L).getPlatform();
     InetAddress address = Inet4Address.getLoopbackAddress();
-    SequencerReference seqref = new SequencerReferenceImpl("foo", address, platform);
-    seqref.setAvailable(true);
+    SequencerReference seqref = new SequencerReferenceImpl("foo", address.getHostAddress(), platform);
     seqref.setSerialNumber(serialNumber);
 
     int sizeBefore = dao.listAll().size();
     long id = dao.save(seqref);
     SequencerReference retrieved = dao.get(id);
     assertEquals("did not insert sequencer refence", sizeBefore + 1, dao.listAll().size());
-    assertEquals("sequencer reference name does not match", retrieved.getName(), "foo");
-    assertEquals("sequencer reference address does not match", retrieved.getIpAddress(), address);
-    assertTrue("sequencer reference availability does not match", retrieved.getAvailable());
-    assertEquals("sequencer reference date decommissioned does not match", retrieved.getDateDecommissioned(), null);
-    assertEquals("sequencer reference platform does not match", retrieved.getPlatform().getId(), platform.getId());
+    assertEquals("sequencer reference name does not match", "foo", retrieved.getName());
+    assertEquals("sequencer reference address does not match", address.getHostAddress(), retrieved.getIpAddress());
+    assertEquals("sequencer reference date decommissioned does not match", null, retrieved.getDateDecommissioned());
+    assertEquals("sequencer reference platform does not match", platform.getId(), retrieved.getPlatform().getId());
 
     assertTrue(dao.remove(retrieved));
     assertNull(dao.get(id));
@@ -102,8 +101,7 @@ public class SQLSequencerReferenceDAOTest extends AbstractDAOTest {
   public void testGet() throws Exception {
     SequencerReference seqref = dao.get(1);
     assertNotNull(seqref);
-    assertEquals("seqref name does not match", "h1179", seqref.getName());
-    assertTrue("seqref availablity does not match", seqref.getAvailable());
+    assertEquals("seqref name does not match", "SN7001179", seqref.getName());
     assertNull("seqref date commissioned is not null", seqref.getDateCommissioned());
     assertNull("seqref date decommissioned is not null", seqref.getDateDecommissioned());
   }

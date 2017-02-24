@@ -1,7 +1,6 @@
 package com.eaglegenomics.simlims.core;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -21,8 +20,6 @@ public interface Project extends Securable, Serializable {
 
   Long getProjectId();
 
-  Collection<Request> getRequests();
-
   void setCreationDate(Date date);
 
   void setDescription(String description);
@@ -30,6 +27,4 @@ public interface Project extends Securable, Serializable {
   void setName(String name);
 
   void setProjectId(Long projectId);
-
-  void setRequests(Collection<Request> requests);
 }

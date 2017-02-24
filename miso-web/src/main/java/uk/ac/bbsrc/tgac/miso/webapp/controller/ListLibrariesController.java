@@ -23,21 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import java.io.IOException;
-import java.util.Collection;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 /**
  * Controller for listing libraries
@@ -49,22 +40,9 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 public class ListLibrariesController {
   protected static final Logger log = LoggerFactory.getLogger(ListLibrariesController.class);
 
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
   @ModelAttribute("title")
   public String title() {
     return "Libraries";
-  }
-
-  @Deprecated
-  @RequestMapping(value = "/libraries/rest/", method = RequestMethod.GET)
-  public @ResponseBody Collection<Library> jsonRest() throws IOException {
-    return requestManager.listAllLibraries();
   }
 
   @RequestMapping("/libraries")

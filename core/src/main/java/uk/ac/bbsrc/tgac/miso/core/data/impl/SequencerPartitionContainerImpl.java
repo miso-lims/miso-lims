@@ -24,18 +24,39 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.AutoPopulatingList;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -46,18 +67,63 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @date 14-May-2012
  * @since 0.1.6
  */
-public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionContainer<SequencerPoolPartition> implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(SequencerPartitionContainerImpl.class);
+@Entity
+@Table(name = "SequencerPartitionContainer")
+public class SequencerPartitionContainerImpl implements SequencerPartitionContainer, Serializable {
 
-  private List<SequencerPoolPartition> partitions = new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class);
+  private static final long serialVersionUID = 1L;
+  public static final Long UNSAVED_ID = 0L;
 
-  private int partitionLimit = 8;
+  public static final int DEFAULT_PARTITION_LIMIT = 8;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long containerId = SequencerPartitionContainerImpl.UNSAVED_ID;
+
+  /**
+   * identificationBarcode is displayed as "serial number" to the user
+   */
+  private String identificationBarcode;
+  private String locationBarcode;
+
+  @ManyToMany(targetEntity = RunImpl.class)
+  @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
+      @JoinColumn(name = "containers_containerId") }, inverseJoinColumns = {
+      @JoinColumn(name = "Run_runId") })
+  private Collection<Run> runs = null;
+
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
+  private SecurityProfile securityProfile;
+
+  @ManyToOne(targetEntity = PlatformImpl.class)
+  @JoinColumn(name = "platform")
+  private Platform platform;
+
+  private String validationBarcode;
+
+  @OneToMany(targetEntity = SequencerPartitionContainerChangeLog.class, mappedBy = "sequencerPartitionContainer")
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier")
+  private User lastModifier;
+
+  @OneToOne(targetEntity = ContainerDerivedInfo.class)
+  @PrimaryKeyJoinColumn
+  private ContainerDerivedInfo derivedInfo;
+
+  @OneToMany(targetEntity = PartitionImpl.class, mappedBy = "sequencerPartitionContainer", cascade = CascadeType.ALL)
+  @OrderBy("partitionNumber")
+  @JsonIgnore
+  private List<Partition> partitions = new ArrayList<>();
 
   /**
    * Construct a new SequencerPartitionContainer with a default empty SecurityProfile
    */
   public SequencerPartitionContainerImpl() {
     setSecurityProfile(new SecurityProfile());
+    setPartitionLimit(DEFAULT_PARTITION_LIMIT);
   }
 
   /**
@@ -70,73 +136,247 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
   }
 
   @Override
-  public List<SequencerPoolPartition> getPartitions() {
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return (derivedInfo == null ? null : derivedInfo.getLastModified());
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
+
+  @Override
+  public long getId() {
+    return containerId;
+  }
+
+  @Override
+  public void setId(long id) {
+    this.containerId = id;
+  }
+
+  @Override
+  public String getIdentificationBarcode() {
+    return identificationBarcode;
+  }
+
+  @Override
+  public void setIdentificationBarcode(String identificationBarcode) {
+    this.identificationBarcode = identificationBarcode;
+  }
+
+  @Override
+  public String getLocationBarcode() {
+    return locationBarcode;
+  }
+
+  @Override
+  public void setLocationBarcode(String locationBarcode) {
+    this.locationBarcode = locationBarcode;
+  }
+
+  @Override
+  public String getLabelText() {
+    return getPlatform().getPlatformType().name() + " " + getValidationBarcode();
+  }
+
+  @Override
+  public boolean isDeletable() {
+    return getId() != SequencerPartitionContainerImpl.UNSAVED_ID;
+  }
+
+  @Override
+  public String getValidationBarcode() {
+    return validationBarcode;
+  }
+
+  @Override
+  public void setValidationBarcode(String validationBarcode) {
+    this.validationBarcode = validationBarcode;
+  }
+
+  /**
+   * Containers don't have names, but they implement an interface which requires this method.
+   */
+  @Override
+  public String getName() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Collection<Run> getRuns() {
+    return runs;
+  }
+
+  @Override
+  public void setRuns(Collection<Run> runs) {
+    this.runs = runs;
+  }
+
+  @Override
+  public Run getLastRun() {
+    Run lastRun = null;
+    for (Run thisRun : getRuns()) {
+      if (lastRun == null) {
+        lastRun = thisRun;
+      } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() == null) {
+        if (thisRun.getLastUpdated().after(lastRun.getLastUpdated())) lastRun = thisRun;
+      } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() != null) {
+        lastRun = thisRun;
+      } else if (lastRun.getStatus().getStartDate() != null && thisRun.getStatus().getStartDate() == null) {
+        continue;
+      } else if (thisRun.getStatus().getStartDate().after(lastRun.getStatus().getStartDate())) {
+        lastRun = thisRun;
+      }
+    }
+    return lastRun;
+  }
+
+  @Override
+  public void setRun(Run run) {
+    if (run != null && runs.size() > 1) {
+      throw new IllegalArgumentException("Cannot set single run on a container with multiple runs already linked!");
+    } else {
+      runs = new ArrayList<>();
+      if (run != null) runs.add(run);
+    }
+  }
+
+  @Override
+  public Platform getPlatform() {
+    return platform;
+  }
+
+  @Override
+  public void setPlatform(Platform platform) {
+    this.platform = platform;
+  }
+
+  @Override
+  public boolean userCanRead(User user) {
+    return securityProfile.userCanRead(user);
+  }
+
+  @Override
+  public boolean userCanWrite(User user) {
+    return securityProfile.userCanWrite(user);
+  }
+
+  @Override
+  public void setSecurityProfile(SecurityProfile securityProfile) {
+    this.securityProfile = securityProfile;
+  }
+
+  @Override
+  public SecurityProfile getSecurityProfile() {
+    return securityProfile;
+  }
+
+  @Override
+  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
+    if (parent.getSecurityProfile().getOwner() != null) {
+      setSecurityProfile(parent.getSecurityProfile());
+    } else {
+      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
+    }
+  }
+
+  @Override
+  public List<Partition> getPartitions() {
     return partitions;
   }
 
   @Override
-  public void setPartitions(List<SequencerPoolPartition> partitions) {
+  public void setPartitions(List<Partition> partitions) {
     this.partitions = partitions;
+    Collections.sort(partitions, partitionNumberComparator);
   }
 
   @Override
-  public SequencerPoolPartition getPartitionAt(int partitionNumber) throws IndexOutOfBoundsException {
+  public Partition getPartitionAt(int partitionNumber) throws IndexOutOfBoundsException {
     return partitions.get(partitionNumber - 1);
   }
 
   @Override
   public void setPartitionLimit(int partitionLimit) {
-    this.partitionLimit = partitionLimit;
-  }
-
-  @Override
-  public void initEmptyPartitions() {
     getPartitions().clear();
     for (int i = 0; i < partitionLimit; i++) {
-      addNewPartition();
+      PartitionImpl partition = new PartitionImpl();
+      partition.setSequencerPartitionContainer(this);
+      partition.setPartitionNumber(i + 1);
+      getPartitions().add(partition);
     }
   }
 
   @Override
-  public void addNewPartition() {
-    if (getPartitions().size() < partitionLimit) {
-      PartitionImpl partition = new PartitionImpl();
-      partition.setSequencerPartitionContainer(this);
-      partition.setPartitionNumber(getPartitions().size() + 1);
-      partition.setSecurityProfile(getSecurityProfile());
-      getPartitions().add(partition);
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof SequencerPartitionContainer)) return false;
+    SequencerPartitionContainer them = (SequencerPartitionContainer) obj;
+    // If not saved, then compare resolved actual objects. Otherwise just compare IDs.
+    if (getId() == SequencerPartitionContainerImpl.UNSAVED_ID || them.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
+      return getIdentificationBarcode().equals(them.getIdentificationBarcode());
     } else {
-      log.warn("This sequencing container is limited to " + partitionLimit + " lanes");
+      return getId() == them.getId();
     }
   }
 
-  public void addPartition(SequencerPoolPartition partition) {
-    if (getPartitions().size() < partitionLimit) {
-      if (!getPartitions().contains(partition)) {
-        if (partition.getSequencerPartitionContainer() == null) partition.setSequencerPartitionContainer(this);
-        if (partition.getPartitionNumber() == null) partition.setPartitionNumber(getPartitions().size() + 1);
-        if (partition.getSecurityProfile() == null) partition.setSecurityProfile(getSecurityProfile());
-        getPartitions().add(partition);
-      } else {
-        log.warn("This sequencing container already contains that lane");
-      }
+  @Override
+  public int hashCode() {
+    if (getId() != SequencerPartitionContainerImpl.UNSAVED_ID) {
+      return (int) getId();
     } else {
-      log.warn("This sequencing container is limited to " + partitionLimit + " lanes");
+      int hashcode = -1;
+      if (getIdentificationBarcode() != null) hashcode = 37 * hashcode + getIdentificationBarcode().hashCode();
+      return hashcode;
     }
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(super.toString());
-    if (getPartitions() != null) {
-      sb.append(" : [");
-      sb.append(LimsUtils.join(getPartitions(), ","));
-      sb.append("]");
-    } else {
-      sb.append(" : ");
-      sb.append("!!!!! NULL PARTITIONS !!!!!");
-    }
+    sb.append(getId());
+    sb.append(" : ");
+    sb.append(getIdentificationBarcode());
+    sb.append(" : ");
+    sb.append(getLocationBarcode());
     return sb.toString();
   }
+
+  @Override
+  public int compareTo(SequencerPartitionContainer t) {
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
+    return 0;
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    SequencerPartitionContainerChangeLog changeLog = new SequencerPartitionContainerChangeLog();
+    changeLog.setSequencerPartitionContainer(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
+  }
+
+  private static final Comparator<Partition> partitionNumberComparator = new Comparator<Partition>() {
+
+    @Override
+    public int compare(Partition o1, Partition o2) {
+      return o1.getPartitionNumber().compareTo(o2.getPartitionNumber());
+    }
+
+  };
 }

@@ -26,10 +26,11 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.util.Collection;
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.w3c.dom.Document;
+import com.eaglegenomics.simlims.core.Group;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
@@ -45,11 +46,12 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 // @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Project extends com.eaglegenomics.simlims.core.Project, Comparable, SecurableByProfile, Submittable<Document>, Reportable,
+public interface Project extends com.eaglegenomics.simlims.core.Project, Comparable<Project>, SecurableByProfile, Reportable<Project>,
     Deletable, Watchable, Nameable, Alertable {
   /** Field PREFIX */
   public static final String PREFIX = "PRO";
@@ -104,13 +106,6 @@ public interface Project extends com.eaglegenomics.simlims.core.Project, Compara
   Collection<Sample> getSamples();
 
   /**
-   * Returns the registered samples of this Project object.
-   * 
-   * @return Collection<Run> runs.
-   */
-  Collection<Run> getRuns();
-
-  /**
    * Returns the registered studies of this Project object.
    * 
    * @return Collection<Study> studies.
@@ -140,14 +135,6 @@ public interface Project extends com.eaglegenomics.simlims.core.Project, Compara
    *          samples.
    */
   void setSamples(Collection<Sample> samples);
-
-  /**
-   * Registers a collection of samples to this Project object.
-   * 
-   * @param runs
-   *          runs.
-   */
-  void setRuns(Collection<Run> runs);
 
   /**
    * Register that a Sample has been recieved in relation to this Project
@@ -203,4 +190,6 @@ public interface Project extends com.eaglegenomics.simlims.core.Project, Compara
   public ReferenceGenome getReferenceGenome();
 
   public void setReferenceGenome(ReferenceGenome referenceGenome);
+
+  public void setWatchGroup(Group group);
 }

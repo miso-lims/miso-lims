@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 
@@ -8,10 +8,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 public interface SampleStock extends DetailedSample {
 
   public static String CATEGORY_NAME = "Stock";
-
-  Double getConcentration();
-
-  void setConcentration(Double concentration);
 
   /**
    * @return the short tandem repeat QC status for this SampleAnalyte

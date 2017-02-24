@@ -32,34 +32,48 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Transient;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonManagedReference;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
@@ -75,77 +89,104 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 @MappedSuperclass
 public abstract class AbstractLibrary extends AbstractBoxable implements Library {
 
-  protected static final Logger log = LoggerFactory.getLogger(AbstractLibrary.class);
-  public static final Long UNSAVED_ID = 0L;
+  private static final Logger log = LoggerFactory.getLogger(AbstractLibrary.class);
+
   public static final String UNITS = "nM";
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long libraryId = AbstractLibrary.UNSAVED_ID;
 
+  @Column(nullable = false)
   private String name;
+
   private String description;
   private String accession;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.DATE)
   private Date creationDate = new Date();
+
   private String identificationBarcode;
   private String locationBarcode;
-  private String platformName;
-  private String alias;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "platformType", nullable = false)
+  private PlatformType platformType;
+
   private Boolean qcPassed;
-  private boolean lowQuality;
 
-  @Transient
-  private List<Index> indices = new ArrayList<>();
+  @Column(nullable = false)
+  private boolean lowQuality = false;
 
-  private Boolean paired;
-
-  @Transient
-  private final Collection<LibraryQC> libraryQCs = new TreeSet<LibraryQC>();
-
-  @Transient
-  private final Collection<LibraryDilution> libraryDilutions = new HashSet<LibraryDilution>();
-
-  @Transient
-  private SecurityProfile securityProfile;
-
-  @Transient
-  @JsonBackReference
-  private Sample sample;
-
-  @Transient
-  private LibraryType libraryType;
-
-  @Transient
-  private LibrarySelectionType librarySelectionType;
-
-  @Transient
-  private LibraryStrategyType libraryStrategyType;
+  @Column(nullable = false)
+  private boolean paired;
 
   @Column(name = "concentration")
   private Double initialConcentration;
 
-  @Transient
-  private Integer libraryQuant;
+  @ManyToMany(targetEntity = Index.class)
+  @JoinTable(name = "Library_Index", joinColumns = {
+      @JoinColumn(name = "library_libraryId", nullable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "index_indexId", nullable = false) })
+  private List<Index> indices = new ArrayList<>();
+
+  @OneToMany(targetEntity = LibraryQCImpl.class, mappedBy = "library", cascade = CascadeType.ALL)
+  @JsonManagedReference
+  private final Collection<LibraryQC> libraryQCs = new TreeSet<>();
+
+  @OneToMany(targetEntity = LibraryDilution.class, mappedBy = "library", cascade = CascadeType.ALL)
+  @JsonManagedReference
+  private final Collection<LibraryDilution> libraryDilutions = new HashSet<>();
+
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "securityProfile_profileId")
+  private SecurityProfile securityProfile;
+
+  @ManyToOne(targetEntity = SampleImpl.class)
+  @JoinColumn(name = "sample_sampleId")
+  @JsonBackReference
+  private Sample sample;
+
+  @ManyToOne
+  @JoinColumn(name = "libraryType")
+  private LibraryType libraryType;
+
+  @ManyToOne
+  @JoinColumn(name = "librarySelectionType")
+  private LibrarySelectionType librarySelectionType;
+
+  @ManyToOne
+  @JoinColumn(name = "libraryStrategyType")
+  private LibraryStrategyType libraryStrategyType;
 
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
-  private Date lastModified;
+  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Library_Note", joinColumns = {
+      @JoinColumn(name = "library_libraryId") }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId") })
+  private Collection<Note> notes = new HashSet<>();
 
-  @Transient
-  private Collection<Note> notes = new HashSet<Note>();
+  @OneToMany(targetEntity = LibraryChangeLog.class, mappedBy = "library")
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
-  @Transient
-  private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  @OneToOne
+  @PrimaryKeyJoinColumn
+  private LibraryDerivedInfo derivedInfo;
 
-  @Transient
-  private Date lastUpdated;
+  @ManyToOne(targetEntity = BoxImpl.class)
+  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")
+  private Box box;
+  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")
+  private String position;
 
-  @OneToOne(targetEntity = LibraryAdditionalInfoImpl.class, mappedBy = "library")
-  @Cascade({ CascadeType.ALL })
-  @JsonManagedReference
-  private LibraryAdditionalInfo libraryAdditionalInfo;
+  @Override
+  public String getBoxPosition() {
+    return position;
+  }
 
   @Override
   public long getId() {
@@ -185,6 +226,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setAccession(String accession) {
     this.accession = accession;
+  }
+
+  @Override
+  public Box getBox() {
+    return box;
   }
 
   @Override
@@ -334,13 +380,18 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public String getPlatformName() {
-    return platformName;
+  public PlatformType getPlatformType() {
+    return platformType;
   }
 
   @Override
-  public void setPlatformName(String platformName) {
-    this.platformName = nullifyStringIfBlank(platformName);
+  public void setPlatformType(PlatformType platformType) {
+    this.platformType = platformType;
+  }
+
+  @Override
+  public void setPlatformType(String platformName) {
+    this.platformType = PlatformType.get(platformName);
   }
 
   @Override
@@ -351,16 +402,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setInitialConcentration(Double initialConcentration) {
     this.initialConcentration = initialConcentration;
-  }
-
-  @Override
-  public Integer getLibraryQuant() {
-    return libraryQuant;
-  }
-
-  @Override
-  public void setLibraryQuant(Integer libraryQuant) {
-    this.libraryQuant = libraryQuant;
   }
 
   @Override
@@ -379,18 +420,18 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public void addNote(Note note) {
+    this.notes.add(note);
+  }
+
+  @Override
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
   }
 
   @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
+  public Date getLastModified() {
+    return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
   @Override
@@ -401,16 +442,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public boolean isLowQuality() {
     return lowQuality;
-  }
-
-  @Override
-  public LibraryAdditionalInfo getLibraryAdditionalInfo() {
-    return libraryAdditionalInfo;
-  }
-
-  @Override
-  public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo) {
-    this.libraryAdditionalInfo = libraryAdditionalInfo;
   }
 
   @CoverageIgnore
@@ -452,8 +483,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @CoverageIgnore
   @Override
-  public int compareTo(Object o) {
-    final Library l = (Library) o;
+  public int compareTo(Library l) {
     if (getId() != 0L && l.getId() != 0L) {
       if (getId() < l.getId()) return -1;
       if (getId() > l.getId()) return 1;
@@ -486,15 +516,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     this.lastModifier = lastModifier;
   }
 
-  @Override
-  public Date getLastModified() {
-    return lastModified;
-  }
-
-  @Override
-  public void setLastModified(Date lastModified) {
-    this.lastModified = lastModified;
-  }
 
   @Override
   public Collection<ChangeLog> getChangeLog() {
@@ -530,20 +551,18 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return new HashCodeBuilder(3, 33)
         .appendSuper(super.hashCode())
         .append(accession)
-        .append(alias)
+        .append(getAlias())
         .append(description)
         .append(identificationBarcode)
         .append(indices)
         .append(initialConcentration)
-        .append(libraryAdditionalInfo)
-        .append(libraryQuant)
         .append(librarySelectionType)
         .append(libraryStrategyType)
         .append(libraryType)
         .append(locationBarcode)
         .append(lowQuality)
         .append(paired)
-        .append(platformName)
+        .append(platformType)
         .append(qcPassed)
         .toHashCode();
   }
@@ -557,20 +576,18 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return new EqualsBuilder()
         .appendSuper(super.equals(obj))
         .append(accession, other.accession)
-        .append(alias, other.alias)
+        .append(getAlias(), other.getAlias())
         .append(description, other.description)
         .append(identificationBarcode, other.identificationBarcode)
         .append(indices, other.indices)
         .append(initialConcentration, other.initialConcentration)
-        .append(libraryAdditionalInfo, other.libraryAdditionalInfo)
-        .append(libraryQuant, other.libraryQuant)
         .append(librarySelectionType, other.librarySelectionType)
         .append(libraryStrategyType, other.libraryStrategyType)
         .append(libraryType, other.libraryType)
         .append(locationBarcode, other.locationBarcode)
         .append(lowQuality, other.lowQuality)
         .append(paired, other.paired)
-        .append(platformName, other.platformName)
+        .append(platformType, other.platformType)
         .append(qcPassed, other.qcPassed)
         .isEquals();
   }

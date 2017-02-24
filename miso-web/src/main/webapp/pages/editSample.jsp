@@ -316,8 +316,8 @@
     <tr>
       <td class="h">Location:</td>
       <td>
-        <c:if test="${!empty sample.boxLocation}">${sample.boxLocation},</c:if>
-        <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.boxId}"/>'>${sample.boxAlias}, ${sample.boxPosition}</a></c:if>
+        <c:if test="${!empty sample.box.locationBarcode}">${sample.box.locationBarcode},</c:if>
+        <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.box.id}"/>'>${sample.box.alias}, ${sample.boxPosition}</a></c:if>
       </td>
     </tr>
   </table>
@@ -400,6 +400,10 @@
             </c:choose>
           </tr>
         </c:if>
+        <tr>
+          <td class="h">Concentration (nM):</td>
+          <td><form:input id="concentration" path="concentration"/></td>
+        </tr>
         <tr>
           <td class="h">Sample Class:*</td>
           <td>
@@ -611,10 +615,6 @@
                   </c:forEach>
                 </form:select>
               </td>
-            </tr>
-            <tr>
-              <td class="h">Concentration (nM):</td>
-              <td><form:input id="concentration" path="concentration"/></td>
             </tr>
             <c:if test="${sample.sampleClass.DNAseTreatable}">
               <tr>
@@ -830,7 +830,7 @@
 </c:if>
 
 <c:if test="${sample.id != 0}">
-  <a name="sampleqc"></a>
+  <a id="sampleqc"></a>
 
   <h1>
     <span id="qcsTotalCount"></span>
@@ -889,7 +889,7 @@
       </form>
     </div>
   <br/>
-  <a name="library"></a>
+  <a id="library"></a>
 
   <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
 

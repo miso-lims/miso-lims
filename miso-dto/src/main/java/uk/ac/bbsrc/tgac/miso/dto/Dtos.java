@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
@@ -30,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -49,19 +49,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
@@ -79,11 +78,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
@@ -278,6 +281,9 @@ public class Dtos {
     if (from.isSynthetic() != null) {
       dto.setSynthetic(from.isSynthetic());
     }
+    if (from.getConcentration() != null) {
+      dto.setConcentration(from.getConcentration());
+    }
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     if (from.getDetailedQcStatus() != null) {
       dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
@@ -327,6 +333,9 @@ public class Dtos {
     }
     if (from.getSynthetic() != null) {
       to.setSynthetic(from.getSynthetic());
+    }
+    if (from.getConcentration() != null) {
+      to.setConcentration(from.getConcentration());
     }
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
@@ -470,7 +479,6 @@ public class Dtos {
 
   private static SampleStockDto asStockSampleDto(SampleStock from) {
     SampleStockDto dto = new SampleStockDto();
-    dto.setConcentration(from.getConcentration());
     dto.setStrStatus(from.getStrStatus().getLabel());
     dto.setDnaseTreated(from.getDNAseTreated());
     return dto;
@@ -478,7 +486,6 @@ public class Dtos {
 
   private static SampleStock toStockSample(SampleStockDto from) {
     SampleStock to = new SampleStockImpl();
-    to.setConcentration(from.getConcentration());
     if (from.getStrStatus() != null) {
       to.setStrStatus(from.getStrStatus());
     }
@@ -860,39 +867,28 @@ public class Dtos {
     return to;
   }
 
-  public static LibraryAdditionalInfoDto asDto(LibraryAdditionalInfo from) {
-    LibraryAdditionalInfoDto dto = new LibraryAdditionalInfoDto();
-    dto.setLibraryId(from.getLibraryId());
-    if (from.getPrepKit() != null) {
-      dto.setPrepKit(asDto(from.getPrepKit()));
+  private static DetailedLibraryDto asDetailedLibraryDto(DetailedLibrary from) {
+    DetailedLibraryDto dto = new DetailedLibraryDto();
+    if (from.getKitDescriptor() != null) {
+      dto.setKitDescriptorId(from.getKitDescriptor().getId());
     }
-    dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
-    dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
-    dto.setArchived(from.getArchived());
     if (from.getLibraryDesign() != null) {
       dto.setLibraryDesignId(from.getLibraryDesign().getId());
     }
     dto.setLibraryDesignCodeId(from.getLibraryDesignCode().getId());
+    dto.setPreMigrationId(from.getPreMigrationId());
+    dto.setArchived(from.getArchived());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     return dto;
   }
 
-  public static Set<LibraryAdditionalInfoDto> asLibraryAdditionalInfoDtos(Collection<LibraryAdditionalInfo> from) {
-    Set<LibraryAdditionalInfoDto> dtoSet = Sets.newHashSet();
-    for (LibraryAdditionalInfo l : from) {
-      dtoSet.add(asDto(l));
-    }
-    return dtoSet;
-  }
-
-  public static LibraryAdditionalInfo to(LibraryAdditionalInfoDto from) {
+  public static DetailedLibrary toDetailedLibrary(DetailedLibraryDto from) {
     if (from == null) return null;
-    LibraryAdditionalInfo to = new LibraryAdditionalInfoImpl();
-    to.setLibraryId(from.getLibraryId());
-    if (from.getPrepKit() != null) {
-      to.setPrepKit(to(from.getPrepKit()));
+    DetailedLibrary to = new DetailedLibraryImpl();
+    if (from.getKitDescriptorId() != null) {
+      KitDescriptor kitDescriptor = new KitDescriptor();
+      kitDescriptor.setId(from.getKitDescriptorId());
+      to.setKitDescriptor(kitDescriptor);
     }
     if (from.getLibraryDesignId() != null) {
       LibraryDesign design = new LibraryDesign();
@@ -902,7 +898,8 @@ public class Dtos {
     LibraryDesignCode ldCode = new LibraryDesignCode();
     ldCode.setId(from.getLibraryDesignCodeId());
     to.setLibraryDesignCode(ldCode);
-    to.setArchived(from.getArchived());
+
+    if (from.getArchived() != null) to.setArchived(from.getArchived());
     to.setNonStandardAlias(from.getNonStandardAlias());
     return to;
   }
@@ -938,7 +935,7 @@ public class Dtos {
     SequencingParametersDto dto = new SequencingParametersDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
-    dto.setPlatformId(from.getPlatformId());
+    dto.setPlatformId(from.getPlatform().getId());
     return dto;
   }
 
@@ -957,8 +954,13 @@ public class Dtos {
     return dtoList;
   }
 
-  public static LibraryDto asDto(Library from, LibraryAdditionalInfo infoFrom) {
-    LibraryDto dto = new LibraryDto();
+  public static LibraryDto asDto(Library from) {
+    LibraryDto dto = null;
+    if (isDetailedLibrary(from)) {
+      dto = asDetailedLibraryDto((DetailedLibrary) from);
+    } else {
+      dto = new LibraryDto();
+    }
     dto.setAlias(from.getAlias());
     dto.setName(from.getName());
     dto.setParentSampleId(from.getSample().getId());
@@ -983,8 +985,8 @@ public class Dtos {
     dto.setQcPassed(from.getQcPassed());
     dto.setLowQuality(from.isLowQuality());
     dto.setPaired(from.getPaired());
-    if (from.getPlatformName() != null) {
-      dto.setPlatformName(from.getPlatformName());
+    if (from.getPlatformType() != null) {
+      dto.setPlatformType(from.getPlatformType().getKey());
     }
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
@@ -999,9 +1001,6 @@ public class Dtos {
       }
     }
     dto.setVolume(from.getVolume());
-    if (infoFrom != null) {
-      dto.setLibraryAdditionalInfo(asDto(infoFrom));
-    }
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
@@ -1012,21 +1011,19 @@ public class Dtos {
   public static List<LibraryDto> asLibraryDtos(Collection<Library> from) {
     List<LibraryDto> dtoSet = new ArrayList<>();
     for (Library lib : from) {
-      dtoSet.add(asDto(lib, lib.getLibraryAdditionalInfo()));
+      dtoSet.add(asDto(lib));
     }
     return dtoSet;
   }
 
   public static Library to(LibraryDto from) {
-    Library target = new LibraryImpl();
-    return to(from, target);
-  }
-
-  /**
-   * Overwrites all modifiable fields. Intended to be used with a freshly-loaded database object or newly-created impl so save and update
-   * are similar.
-   */
-  public static Library to(LibraryDto from, Library to) {
+    Library to = null;
+    if (from instanceof DetailedLibraryDto) {
+      to = toDetailedLibrary((DetailedLibraryDto) from);
+    } else {
+      to = new LibraryImpl();
+    }
+    to.setId(from.getId());
     to.setAlias(from.getAlias());
     to.setName(from.getName());
     to.setDescription(from.getDescription());
@@ -1034,7 +1031,27 @@ public class Dtos {
     to.setInitialConcentration(from.getConcentration());
     to.setLowQuality(from.getLowQuality());
     to.setPaired(from.getPaired());
-    to.setPlatformName(from.getPlatformName());
+    to.setPlatformType(PlatformType.get(from.getPlatformType()));
+    if (from.getParentSampleId() != null) {
+      to.setSample(new SampleImpl());
+      to.getSample().setId(from.getParentSampleId());
+    }
+    if (from.getLibrarySelectionTypeId() != null) {
+      LibrarySelectionType sel = new LibrarySelectionType();
+      sel.setId(from.getLibrarySelectionTypeId());
+      to.setLibrarySelectionType(sel);
+    }
+    if (from.getLibraryStrategyTypeId() != null) {
+      LibraryStrategyType strat = new LibraryStrategyType();
+      strat.setId(from.getLibraryStrategyTypeId());
+      to.setLibraryStrategyType(strat);
+    }
+    if (from.getLibraryTypeId() != null) {
+      LibraryType type = new LibraryType();
+      type.setId(from.getLibraryTypeId());
+      if (from.getLibraryTypeAlias() != null) type.setDescription(from.getLibraryTypeAlias());
+      to.setLibraryType(type);
+    }
     to.setQcPassed(from.getQcPassed());
     if (from.getIndex1Id() != null) {
       List<Index> indices = new ArrayList<>();
@@ -1059,13 +1076,19 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    dto.setUseId(from.getUse().getId());
-    dto.setUseAlias(from.getUse().getAlias());
-    dto.setSizeId(from.getSize().getId());
-    dto.setRows(from.getSize().getRows());
-    dto.setCols(from.getSize().getColumns());
-    dto.setScannable(from.getSize().getScannable());
-    dto.setItems(asBoxablesDtos(from.getBoxables()));
+    if (from.getUse() != null) {
+      dto.setUseId(from.getUse().getId());
+      dto.setUseAlias(from.getUse().getAlias());
+    }
+    if (from.getSize() != null) {
+      dto.setSizeId(from.getSize().getId());
+      dto.setRows(from.getSize().getRows());
+      dto.setCols(from.getSize().getColumns());
+      dto.setScannable(from.getSize().getScannable());
+    }
+    if (from.getBoxables() != null) {
+      dto.setItems(asBoxablesDtos(from.getBoxables()));
+    }
     return dto;
   }
 
@@ -1081,8 +1104,11 @@ public class Dtos {
     BoxableDto dto = new BoxableDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
-    dto.setBoxAlias(from.getBoxAlias());
-    dto.setBoxPosition(BoxUtils.makeLocationLabel(from));
+    if (from.getBox() != null) {
+      dto.setBoxAlias(from.getBox().getAlias());
+      dto.setBoxPosition(BoxUtils.makeLocationLabel(from));
+      dto.setCoordinates(from.getBoxPosition());
+    }
     dto.setDiscarded(from.isDiscarded());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setName(from.getName());
@@ -1150,6 +1176,11 @@ public class Dtos {
       to.setCreationDate(df.parse(from.getCreationDate()));
     } catch (ParseException e) {
       // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
+    }
+    if (from.getTargetedSequencingId() != null) {
+      TargetedSequencing ts = new TargetedSequencing();
+      ts.setId(from.getTargetedSequencingId());
+      to.setTargetedSequencing(ts);
     }
     return to;
   }
@@ -1228,14 +1259,15 @@ public class Dtos {
     return dtoList;
   }
 
-  public static ContainerDto asDto(SequencerPartitionContainer<SequencerPoolPartition> from) {
+  public static ContainerDto asDto(SequencerPartitionContainer from) {
     ContainerDto dto = new ContainerDto();
     dto.setId(from.getId());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setPlatform(from.getPlatform().getPlatformType().getKey());
-    if (from.getRun() != null) {
-      dto.setLastRunAlias(from.getRun().getAlias());
-      dto.setLastRunId(from.getRun().getId());
+    Run lastRun = from.getLastRun();
+    if (lastRun != null) {
+      dto.setLastRunAlias(lastRun.getAlias());
+      dto.setLastRunId(lastRun.getId());
     }
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
@@ -1243,9 +1275,9 @@ public class Dtos {
     return dto;
   }
 
-  public static List<ContainerDto> asContainerDtos(Collection<SequencerPartitionContainer<SequencerPoolPartition>> containerSubset) {
+  public static List<ContainerDto> asContainerDtos(Collection<SequencerPartitionContainer> containerSubset) {
     List<ContainerDto> dtoList = new ArrayList<>();
-    for (SequencerPartitionContainer<SequencerPoolPartition> container : containerSubset) {
+    for (SequencerPartitionContainer container : containerSubset) {
       dtoList.add(asDto(container));
     }
     return dtoList;

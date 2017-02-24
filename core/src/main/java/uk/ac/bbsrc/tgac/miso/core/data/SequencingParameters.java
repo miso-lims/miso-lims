@@ -22,11 +22,6 @@ public interface SequencingParameters extends Comparable<SequencingParameters> {
 
   public Platform getPlatform();
 
-  /**
-   * Gets the platform ID. This exists due to platforms not being in Hibernate.
-   */
-  public Long getPlatformId();
-
   public User getUpdatedBy();
 
   String getXPath();

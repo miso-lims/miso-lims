@@ -1,3 +1,40 @@
+# 0.2.50
+
+Changes:
+
+ * Fix dilution and library bulk saving (#722)
+ * Fix pools not loading in boxes
+ * Fix Library QC save (#720)
+ * GLT-1530 move concentration to DetailedSample (#718)
+ * GLT-1502 make changelog for changing indices (#712)
+ * GLT-1184: fix partition numbers and ordering (#714)
+ * GLT-1526 add pools to lanes (#711)
+ * Fix bug causing pool order completions to be incorrect
+ * Update release notes and docs to use Java 8 (#710)
+
+Bad:
+ * Some samples display stacktrace org.hibernate.exception.SQLGrammarException
+
+# 0.2.49
+
+Changes:
+
+ * _Java 8 is now required for compilation_
+ * Replace SQLStore layer with Hibernate DAOs
+ * Removed emPCR and emPCRDilution
+ * Changed out TGAC brand logo for Earlham Institute
+ * Fix user saving, password handling, and logout
+ * Upgrade to Spring 4.3.6
+ * fixed and improved stability of naming scheme config (requires miso.properties change to include a naming scheme at all times)
+ * Fix run changelog layout
+ * add trigger for dilution changes creating a library changelog
+ * allow users to delete barcodes
+ * fix notification consumer config; log and return error status if undefined
+ * Create procedures to delete sample and library
+ * stored procedures to add value-type data if missing
+ * hide Experiments section when creating a new pool
+ * updated naming scheme docs
+
 # 0.2.48
 
 Changes:

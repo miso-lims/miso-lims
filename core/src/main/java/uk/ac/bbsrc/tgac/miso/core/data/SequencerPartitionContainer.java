@@ -27,13 +27,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Lane;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -43,47 +42,53 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @date 14/05/12
  * @since 0.1.6
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "run" })
-public interface SequencerPartitionContainer<T extends Partition> extends SecurableByProfile, Deletable, Comparable, Barcodable, Locatable {
+public interface SequencerPartitionContainer
+    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer>, Barcodable, Locatable, ChangeLoggable
+{
+
   public void setId(long id);
 
   /**
-   * Sets the name of this Container object.
+   * Returns the runs of this Container object.
    * 
-   * @param name name.
+   * @return Collection<Run> run.
    */
-  public void setName(String name);
+  Collection<Run> getRuns();
 
   /**
-   * Returns the run of this Container object.
+   * Sets the runs of this Container object.
    * 
-   * @return Run run.
+   * @param runs The runs of which this Container is a part.
+   * 
    */
-  Run getRun();
+  void setRuns(Collection<Run> runs);
 
   /**
-   * Sets the run of this Container object.
+   * Returns the {@link Run} with
+   * a) the latest start date (of the runs which have a known status), or
+   * b) the last modified date
    * 
-   * @param run The run of which this Container is a part.
-   * 
+   * @return Run run
    */
-  void setRun(Run run);
+  Run getLastRun();
 
   /**
    * Get the list of {@link Partition} objects comprising this container
    * 
    * @return List<Partition> partitions
    */
-  List<T> getPartitions();
+  List<Partition> getPartitions();
 
   /**
    * Set the list of {@link Partition} objects comprising this container
    * 
    * @param partitions List<Partition>
    */
-  void setPartitions(List<T> partitions);
+  void setPartitions(List<Partition> partitions);
 
   /**
    * Get a {@link Partition} at a given relative partition number index (base-1)
@@ -91,7 +96,7 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
    * @param partitionNumber
    * @return the {@link Partition} at the given index
    */
-  T getPartitionAt(int partitionNumber);
+  Partition getPartitionAt(int partitionNumber);
 
   /**
    * Set the number of partitions that this container can hold
@@ -99,11 +104,6 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
    * @param partitionLimit
    */
   void setPartitionLimit(int partitionLimit);
-
-  /**
-   * Initialise this container with empty {@link Lane} objects of type T up to the specified partition limit
-   */
-  void initEmptyPartitions();
 
   /**
    * Returns the platform of this Container object.
@@ -133,13 +133,6 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
    */
   public void setValidationBarcode(String validationBarcode);
 
-  /**
-   * Add new partition
-   * 
-   * 
-   */
-  public void addNewPartition();
-
   public User getLastModifier();
 
   public void setLastModifier(User lastModifier);
@@ -148,6 +141,6 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
 
   public Date getLastModified();
 
-  public void setLastModified(Date lastModified);
+  void setRun(Run run);
 
 }

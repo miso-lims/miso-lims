@@ -49,6 +49,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -63,6 +64,12 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.AlertService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -80,6 +87,16 @@ public class DashboardHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private AlertService alertService;
+  @Autowired
+  private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
+  @Autowired
+  private StudyService studyService;
 
   public JSONObject checkUser(HttpSession session, JSONObject json) {
     String username = json.getString("username");
@@ -184,9 +201,9 @@ public class DashboardHelperService {
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
 
-        pools = new ArrayList<Pool>(requestManager.listAllPoolsBySearch(searchStr));
+        pools = new ArrayList<>(requestManager.listAllPoolsBySearch(searchStr));
       } else {
-        pools = new ArrayList<Pool>(requestManager.listAllPoolsWithLimit(50));
+        pools = new ArrayList<>(requestManager.listAllPoolsWithLimit(50));
       }
 
       if (pools.size() > 0) {
@@ -217,9 +234,9 @@ public class DashboardHelperService {
       List<Study> studies;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        studies = new ArrayList<Study>(requestManager.listAllStudiesBySearch(searchStr));
+        studies = new ArrayList<>(studyService.listBySearch(searchStr));
       } else {
-        studies = new ArrayList<Study>(requestManager.listAllStudiesWithLimit(50));
+        studies = new ArrayList<>(studyService.listWithLimit(50));
       }
 
       if (studies.size() > 0) {
@@ -248,9 +265,9 @@ public class DashboardHelperService {
       List<Experiment> experiments;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsBySearch(searchStr));
+        experiments = new ArrayList<>(experimentService.listAllBySearch(searchStr));
       } else {
-        experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsWithLimit(50));
+        experiments = new ArrayList<>(experimentService.listAllWithLimit(50));
       }
 
       if (experiments.size() > 0) {
@@ -279,9 +296,9 @@ public class DashboardHelperService {
       List<Run> runs;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        runs = new ArrayList<Run>(requestManager.listAllRunsBySearch(searchStr));
+        runs = new ArrayList<>(requestManager.listAllRunsBySearch(searchStr));
       } else {
-        runs = new ArrayList<Run>(requestManager.listAllRunsWithLimit(50));
+        runs = new ArrayList<>(requestManager.listAllRunsWithLimit(50));
       }
 
       if (runs.size() > 0) {
@@ -310,9 +327,9 @@ public class DashboardHelperService {
       List<LibraryDilution> libraryDilutions;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        libraryDilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsBySearchOnly(searchStr));
+        libraryDilutions = new ArrayList<>(dilutionService.listBySearch(searchStr));
       } else {
-        libraryDilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsWithLimit(50));
+        libraryDilutions = new ArrayList<>(dilutionService.listWithLimit(50));
       }
 
       if (libraryDilutions.size() > 0) {
@@ -345,13 +362,13 @@ public class DashboardHelperService {
       List<Library> libraries;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(searchStr));
+        libraries = new ArrayList<>(libraryService.listBySearch(searchStr));
         if (libraries.isEmpty()) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(new String(Base64.decodeBase64(searchStr))));
+          libraries = new ArrayList<>(libraryService.listBySearch(new String(Base64.decodeBase64(searchStr))));
         }
       } else {
-        libraries = new ArrayList<Library>(requestManager.listAllLibrariesWithLimit(50));
+        libraries = new ArrayList<>(libraryService.listWithLimit(50));
       }
 
       if (libraries.size() > 0) {
@@ -412,7 +429,7 @@ public class DashboardHelperService {
     JSONObject response = new JSONObject();
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!requestManager.listUnreadAlertsByUserId(user.getUserId()).isEmpty()) {
+      if (!alertService.listUnreadByUserId(user.getUserId()).isEmpty()) {
         response.put("newAlerts", true);
       }
     } catch (IOException e) {
@@ -429,9 +446,9 @@ public class DashboardHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       List<Alert> alerts;
       if (json.has("showReadAlerts") && json.getBoolean("showReadAlerts")) {
-        alerts = new ArrayList<>(requestManager.listAlertsByUserId(user.getUserId()));
+        alerts = new ArrayList<>(alertService.listByUserId(user.getUserId()));
       } else {
-        alerts = new ArrayList<>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
+        alerts = new ArrayList<>(alertService.listUnreadByUserId(user.getUserId()));
       }
       Collections.sort(alerts);
       for (Alert a : alerts) {
@@ -465,7 +482,7 @@ public class DashboardHelperService {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (user.isAdmin()) {
-        List<Alert> alerts = new ArrayList<Alert>(requestManager.listAlertsByUserId(0L, limit));
+        List<Alert> alerts = new ArrayList<>(alertService.listByUserId(0L, limit));
         Collections.sort(alerts);
         Collections.reverse(alerts);
         for (Alert a : alerts) {
@@ -494,12 +511,11 @@ public class DashboardHelperService {
   public JSONObject setAlertAsRead(HttpSession session, JSONObject json) {
     Long alertId = json.getLong("alertId");
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Alert a = requestManager.getAlertById(alertId);
-      if (a.getAlertUser().equals(user)) {
+      Alert a = alertService.get(alertId);
+      try {
         a.setAlertRead(true);
-        requestManager.saveAlert(a);
-      } else {
+        alertService.save(a);
+      } catch (AuthorizationException e) {
         return JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
       }
     } catch (IOException e) {
@@ -513,12 +529,12 @@ public class DashboardHelperService {
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      List<Alert> alerts = new ArrayList<Alert>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
+      List<Alert> alerts = new ArrayList<>(alertService.listUnreadByUserId(user.getUserId()));
       for (Alert a : alerts) {
-        if (a.getAlertUser().equals(user)) {
+        try {
           a.setAlertRead(true);
-          requestManager.saveAlert(a);
-        } else {
+          alertService.save(a);
+        } catch (AuthorizationException e) {
           return JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
         }
       }
@@ -565,5 +581,17 @@ public class DashboardHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 }

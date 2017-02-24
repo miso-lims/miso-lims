@@ -17,6 +17,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -24,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -37,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -68,7 +71,6 @@ public class DetailedSampleBuilder
   private String identificationBarcode;
   private String locationBarcode;
   private String alias;
-  private Long securityProfile_profileId;
   private User lastModifier;
   private Double volume;
   private boolean discarded = false;
@@ -131,7 +133,6 @@ public class DetailedSampleBuilder
   public DetailedSampleBuilder(User user) {
     if (user != null) {
       securityProfile = new SecurityProfile(user);
-      securityProfile_profileId = getSecurityProfile().getProfileId();
     }
   }
 
@@ -317,16 +318,6 @@ public class DetailedSampleBuilder
   @Override
   public void setAlias(String alias) {
     this.alias = alias;
-  }
-
-  @Override
-  public Long getSecurityProfileId() {
-    return securityProfile_profileId;
-  }
-
-  @Override
-  public void setSecurityProfileId(Long securityProfileId) {
-    this.securityProfile_profileId = securityProfileId;
   }
 
   @Override
@@ -657,17 +648,12 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public void buildSubmission() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
   public void buildReport() throws ReportingException {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override
-  public int compareTo(Object o) {
+  public int compareTo(Sample s) {
     return 0;
   }
 
@@ -676,24 +662,10 @@ public class DetailedSampleBuilder
     return false;
   }
 
-  @Override
-  public void setBoxId(Long boxId) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
 
   @Override
-  public Long getBoxId() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
-  public void setBoxAlias(String alias) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
-  public String getBoxAlias() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
+  public Box getBox() {
+    return null;
   }
 
   @Override
@@ -717,33 +689,8 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public Long getBoxPositionId() {
-    return null;
-  }
-
-  @Override
-  public void setBoxPositionId(Long id) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
   public String getBoxPosition() {
     return null;
-  }
-
-  @Override
-  public void setBoxPosition(String id) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
-  }
-
-  @Override
-  public String getBoxLocation() {
-    return null;
-  }
-
-  @Override
-  public void setBoxLocation(String boxLocation) {
-    throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override
@@ -909,7 +856,6 @@ public class DetailedSampleBuilder
 
     sample.setId(sampleId);
     sample.setProject(project);
-    sample.setSecurityProfileId(securityProfile_profileId);
     sample.setSecurityProfile(securityProfile);
     sample.setAccession(accession);
     sample.setName(name);
@@ -936,6 +882,7 @@ public class DetailedSampleBuilder
     sample.setGroupId(groupId);
     sample.setGroupDescription(groupDescription);
     sample.setSynthetic(isSynthetic);
+    sample.setConcentration(concentration);
     sample.setNonStandardAlias(nonStandardAlias);
     sample.setSiblingNumber(siblingNumber);
     sample.setPreMigrationId(preMigrationId);
@@ -956,7 +903,6 @@ public class DetailedSampleBuilder
   private SampleStock buildStock() {
     SampleStock stock = new SampleStockImpl();
     stock.setStrStatus(strStatus);
-    stock.setConcentration(concentration);
     stock.setDNAseTreated(dnaseTreated);
     stock.setQCs(sampleQCs);
     return stock;
@@ -974,6 +920,16 @@ public class DetailedSampleBuilder
     tissue.setTissueMaterial(tissueMaterial);
     tissue.setRegion(region);
     return tissue;
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    SampleChangeLog changeLog = new SampleChangeLog();
+    changeLog.setSample(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 
 }

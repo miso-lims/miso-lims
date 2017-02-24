@@ -26,7 +26,7 @@
 <div id="maincontent">
 <div id="contentcolumn">
 <h1>
-  <div id="title">Reports</div>
+  <span id="title">Reports</span>
 </h1>
 <div id="reportTable">
   <br/>

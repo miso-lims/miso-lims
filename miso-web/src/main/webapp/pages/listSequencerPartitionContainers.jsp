@@ -30,10 +30,10 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>
-      <div id="totalCount">Sequencing Containers</div>
+      <span id="totalCount">Sequencing Containers</span>
     </h1>
 
-    <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingContainersTable">
+    <table class="display no-border" id="listingContainersTable">
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {

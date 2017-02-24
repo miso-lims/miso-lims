@@ -46,16 +46,16 @@ import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.integration.Message;
+import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -98,7 +98,7 @@ public class LS454NotificationMessageConsumerMechanism
     RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
     Assert.notNull(requestManager, "Cannot consume MISO notification messages without a RequestManager.");
     Map<String, List<String>> statuses = message.getPayload();
-    Set<Run> output = new HashSet<Run>();
+    Set<Run> output = new HashSet<>();
     for (String key : statuses.keySet()) {
       HealthType ht = HealthType.valueOf(key);
       JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
@@ -111,8 +111,8 @@ public class LS454NotificationMessageConsumerMechanism
   }
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
-    Map<String, Run> updatedRuns = new HashMap<String, Run>();
-    List<Run> runsToSave = new ArrayList<Run>();
+    Map<String, Run> updatedRuns = new HashMap<>();
+    List<Run> runsToSave = new ArrayList<>();
 
     DateFormat gsLogDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -278,7 +278,7 @@ public class LS454NotificationMessageConsumerMechanism
                       requestManager.saveStatus(r.getStatus());
                     }
 
-                    List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((LS454Run) r).getSequencerPartitionContainers();
+                    List<SequencerPartitionContainer> fs = ((LS454Run) r).getSequencerPartitionContainers();
 
                     Element ptp = (Element) paramsDoc.getElementsByTagName("ptp").item(0);
                     String ptpId = ptp.getElementsByTagName("id").item(0).getTextContent();
@@ -291,7 +291,6 @@ public class LS454NotificationMessageConsumerMechanism
                           f.setPlatform(r.getSequencerReference().getPlatform());
                         }
                         f.setPartitionLimit(numPartitions);
-                        f.initEmptyPartitions();
                         f.setIdentificationBarcode(ptpId);
 
                         log.debug("\\_ Created new SequencerPartitionContainer with " + f.getPartitions().size() + " partitions");
@@ -345,8 +344,8 @@ public class LS454NotificationMessageConsumerMechanism
 
     try {
       if (runsToSave.size() > 0) {
-        int[] saved = requestManager.saveRuns(runsToSave);
-        log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
+        requestManager.saveRuns(runsToSave);
+        log.info("Batch saved " + runsToSave.size() + " runs");
       }
     } catch (IOException e) {
       log.error("Couldn't save run batch", e);

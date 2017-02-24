@@ -51,10 +51,10 @@ import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
  * @since 0.1.6
  */
 public abstract class AbstractResponderService<T extends Event<?>> implements ResponderService<T> {
-  protected static final Logger log = LoggerFactory.getLogger(AbstractResponderService.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractResponderService.class);
 
   private boolean saveSystemAlert = true;
-  private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
+  private Set<AlerterService> alerterServices = new HashSet<>();
 
   public void setSaveSystemAlert(boolean saveSystemAlert) {
     this.saveSystemAlert = saveSystemAlert;

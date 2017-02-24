@@ -25,9 +25,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Provides model access to the underlying MISO LibraryStrategyType lookup table. These types should match the SRA submission schema for
@@ -38,17 +41,23 @@ import javax.persistence.Id;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class LibraryStrategyType implements Comparable, Serializable {
+@Entity
+@Table(name = "LibraryStrategyType")
+public class LibraryStrategyType implements Comparable<LibraryStrategyType>, Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryStrategyTypeId */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long libraryStrategyTypeId = LibraryStrategyType.UNSAVED_ID;
-  /** Field name */
+
+  @Column(nullable = false, unique = true)
   private String name;
-  /** Field description */
+
+  @Column(nullable = false)
   private String description;
 
   /**
@@ -132,9 +141,7 @@ public class LibraryStrategyType implements Comparable, Serializable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    LibraryStrategyType t = (LibraryStrategyType) o;
-
+  public int compareTo(LibraryStrategyType t) {
     int name = getName().compareTo(t.getName());
     if (name != 0) return name;
 

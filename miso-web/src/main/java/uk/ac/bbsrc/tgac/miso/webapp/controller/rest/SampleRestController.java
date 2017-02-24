@@ -27,7 +27,6 @@ import java.io.IOException;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,15 +37,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
-
-import com.eaglegenomics.simlims.core.User;
 
 /**
  * A controller to handle all REST requests for Samples
@@ -71,9 +65,6 @@ public class SampleRestController extends RestController {
   @RequestMapping(value = "{sampleId}", method = RequestMethod.GET, produces="application/json")
   public @ResponseBody String getSampleById(@PathVariable Long sampleId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     Sample s = requestManager.getSampleById(sampleId);
     if (s == null) {
       throw new RestException("No sample found with ID: " + sampleId, Status.NOT_FOUND);

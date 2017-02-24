@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -39,9 +39,12 @@ import com.google.common.collect.Lists;
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina", false, "Flow Cell", "Lane"), LS454("LS454", true, "Plate", "Lane"), SOLID("Solid", true, "Slide", "Lane"),
-  IONTORRENT("IonTorrent", false, "Chip", "Chip"), PACBIO("PacBio", false, "SMRT Cell", "SMRT Cell"),
-  OXFORDNANOPORE("OxfordNanopore",false, "Flow Cell", "Flow Cell");
+  ILLUMINA("Illumina", false, "Flow Cell", "Lane", "ILLUMINA"), //
+  LS454("LS454", true, "Plate", "Lane", "LS454"), //
+  SOLID("Solid", true, "Slide", "Lane", "ABI_SOLID"), //
+  IONTORRENT("IonTorrent", false, "Chip", "Chip", null), //
+  PACBIO("PacBio", false, "SMRT Cell", "SMRT Cell", null), //
+  OXFORDNANOPORE("OxfordNanopore", false, "Flow Cell", "Flow Cell", null);
 
   /**
    * Field key
@@ -50,6 +53,7 @@ public enum PlatformType {
   private final boolean usesEmPCR;
   private final String containerName;
   private final String partitionName;
+  private final String sraName;
   /**
    * Field lookup
    */
@@ -66,11 +70,12 @@ public enum PlatformType {
    * @param key
    *          of type String
    */
-  PlatformType(String key, boolean usesEmPCR, String containerName, String partitionName) {
+  PlatformType(String key, boolean usesEmPCR, String containerName, String partitionName, String sraName) {
     this.key = key;
     this.usesEmPCR = usesEmPCR;
     this.containerName = containerName;
     this.partitionName = partitionName;
+    this.sraName = sraName;
   }
 
   /**
@@ -117,12 +122,16 @@ public enum PlatformType {
   public boolean usesEmPCR() {
     return usesEmPCR;
   }
-  
+
   public String getContainerName() {
     return containerName;
   }
-  
+
   public String getPartitionName() {
     return partitionName;
+  }
+
+  public String getSraName() {
+    return sraName;
   }
 }

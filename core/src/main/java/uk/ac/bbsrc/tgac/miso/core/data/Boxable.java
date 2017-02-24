@@ -2,9 +2,9 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonSubTypes;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -21,31 +21,33 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 
 public interface Boxable extends Nameable, Barcodable {
   /**
-   * Set the BoxId of this Boxable item
-   * 
-   * @param Box
-   *          box to add
-   */
-
-  public void setBoxId(Long boxId);
-
-  /**
-   * Return the current BoxId of this Boxable item
-   * 
-   * @return Box current box
-   */
-  public Long getBoxId();
-
-  public void setBoxAlias(String alias);
-
-  public String getBoxAlias();
-
-  /**
    * Returns the alias of this Sample object.
    *
    * @return String alias.
    */
   public String getAlias();
+
+  public Box getBox();
+
+  public String getBoxPosition();
+
+  public Date getLastModified();
+
+  public String getLocationBarcode();
+
+  /**
+   * Returns the volume of the Implementor
+   * 
+   * @return volume
+   */
+  public Double getVolume();
+
+  /**
+   * Returns whether or not the Implementor has been emptied
+   * 
+   * @return emptied
+   */
+  public boolean isDiscarded();
 
   /**
    * Sets the alias of this Sample object.
@@ -64,41 +66,11 @@ public interface Boxable extends Nameable, Barcodable {
   public void setDiscarded(boolean emptied);
 
   /**
-   * Returns whether or not the Implementor has been emptied
-   * 
-   * @return emptied
-   */
-  public boolean isDiscarded();
-
-  /**
-   * Returns the volume of the Implementor
-   * 
-   * @return volume
-   */
-  public Double getVolume();
-
-  /**
    * Sets the volume of the Implementor
    * 
    * @param double
    *          volume
    */
   public void setVolume(Double volume);
-
-  public Long getBoxPositionId();
-
-  public void setBoxPositionId(Long id);
-
-  public String getBoxPosition();
-
-  public void setBoxPosition(String id);
-
-  public String getBoxLocation();
-
-  public void setBoxLocation(String boxLocation);
-
-  public Date getLastModified();
-
-  public String getLocationBarcode();
 
 }

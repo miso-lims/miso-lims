@@ -42,15 +42,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
 @RequestMapping("/experimentwizard")
@@ -65,11 +67,11 @@ public class ExperimentWizardController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
+  private ExperimentService experimentService;
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
+  @Autowired
+  private StudyService studyService;
+
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -80,13 +82,13 @@ public class ExperimentWizardController {
   }
 
   @ModelAttribute("studyTypes")
-  public Collection<String> populateStudyTypes() throws IOException {
-    return requestManager.listAllStudyTypes();
+  public Collection<StudyType> populateStudyTypes() throws IOException {
+    return studyService.listTypes();
   }
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getExperimentColumnSizes();
+    return experimentService.getColumnSizes();
   }
 
   @ModelAttribute("platforms")
@@ -97,7 +99,7 @@ public class ExperimentWizardController {
   public Collection<? extends Pool> populateAvailablePools(Experiment experiment) throws IOException {
     if (experiment.getPlatform() != null) {
       PlatformType platformType = experiment.getPlatform().getPlatformType();
-      ArrayList<Pool> pools = new ArrayList<Pool>();
+      ArrayList<Pool> pools = new ArrayList<>();
       for (Pool p : requestManager.listAllPoolsByPlatform(platformType)) {
         if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
           pools.add(p);
@@ -121,8 +123,8 @@ public class ExperimentWizardController {
         a.append("<option value=\"" + platform.getId() + "\">" + platform.getNameAndModel() + "</option>");
       }
 
-      for (String st : requestManager.listAllStudyTypes()) {
-        b.append("<option value=\"" + st + "\">" + st + "</option>");
+      for (StudyType st : studyService.listTypes()) {
+        b.append("<option value=\"" + st.getId() + "\">" + st.getName() + "</option>");
       }
 
       model.put("projectId", projectId);

@@ -41,8 +41,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
@@ -84,7 +84,7 @@ public class ListPoolsController {
 
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
-    return AbstractPool.CONCENTRATION_UNITS;
+    return PoolImpl.CONCENTRATION_UNITS;
   }
 
   @ModelAttribute("title")

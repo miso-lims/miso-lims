@@ -39,7 +39,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.AlertService;
 
 @Controller
 public class ListAlertsController {
@@ -53,17 +53,17 @@ public class ListAlertsController {
   }
 
   @Autowired
-  private RequestManager requestManager;
+  private AlertService alertService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setAlertService(AlertService alertService) {
+    this.alertService = alertService;
   }
 
   @RequestMapping("/alerts")
   public ModelAndView listAlerts(ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Collection<Alert> alerts = requestManager.listUnreadAlertsByUserId(user.getUserId());
+      Collection<Alert> alerts = alertService.listUnreadByUserId(user.getUserId());
       model.addAttribute("alerts", alerts);
       return new ModelAndView("/pages/listAlerts.jsp", model);
     } catch (IOException ex) {

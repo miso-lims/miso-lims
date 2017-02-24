@@ -102,13 +102,11 @@
       <tr>
         <td class="h">Alias:</td>
         <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
-          <%--<td><a href="void(0);" onclick="popup('help/studyAlias.html');">Help</a></td>--%>
       </tr>
       <tr>
         <td>Description:</td>
         <td><form:input path="description" class="validateable"/><span id="descriptioncounter" class="counter"></span>
         </td>
-          <%--<td><a href="void(0);" onclick="popup('help/studyDescription.html');">Help</a></td>--%>
       </tr>
       <c:if test="${not empty study.accession}">
         <tr>
@@ -116,12 +114,11 @@
           <td><a href="http://www.ebi.ac.uk/ena/data/view/${study.accession}"
                  target="_blank">${study.accession}</a>
           </td>
-            <%--<td><a href="void(0);" onclick="popup('help/studyAccession.html');">Help</a></td>--%>
         </tr>
       </c:if>
       <tr>
         <td>Study Type:</td>
-        <td><form:select items="${studyTypes}" path="studyType"/></td>
+        <td><miso:select id="studyType" path="studyType" items="${studyTypes}" itemLabel="name" itemValue="id" /></td>
       </tr>
       <c:choose>
         <c:when test="${!empty project and study.securityProfile.profileId eq project.securityProfile.profileId}">
@@ -152,8 +149,8 @@
       <c:choose>
         <c:when test="${study.id != 0}">
           <h1>
-            <div id="totalCount">
-            </div>
+            <span id="totalCount">
+            </span>
           </h1>
           <ul class="sddm">
             <li>
@@ -169,7 +166,7 @@
               </div>
             </li>
           </ul>
-          <span style="clear:both">
+          <div style="clear:both">
             <table class="list" id="table">
               <thead>
               <tr>
@@ -191,7 +188,7 @@
               </c:forEach>
               </tbody>
             </table>
-          </span>
+          </div>
           <script type="text/javascript">
             jQuery(document).ready(function () {
               jQuery("#table").tablesorter({
@@ -215,7 +212,7 @@
     <c:if test="${not empty study.changeLog}">
       <br/>
       <h1>Changes</h1>
-      <span style="clear:both">
+      <div style="clear:both">
         <table class="list" id="changelog_table">
           <thead>
           <tr>
@@ -234,7 +231,7 @@
           </c:forEach>
           </tbody>
         </table>
-      </span>
+      </div>
     </c:if>
   </div>
 </div>

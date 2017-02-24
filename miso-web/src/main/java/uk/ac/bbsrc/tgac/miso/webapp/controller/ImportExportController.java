@@ -6,8 +6,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-
 /**
  * Created with IntelliJ IDEA. User: bianx Date: 04/12/2013 Time: 13:39 To change this template use File | Settings | File Templates.
  */
@@ -19,12 +17,6 @@ public class ImportExportController {
 
   @Autowired
   private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
 
   public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
     this.securityManager = securityManager;

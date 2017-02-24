@@ -31,10 +31,11 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.integration.Message;
+import org.springframework.messaging.Message;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
@@ -58,7 +59,7 @@ public class DemoIlluminaConsumerMechanism implements NotificationMessageConsume
   @Override
   public Set<Run> consume(Message<Map<String, List<String>>> message) throws InterrogationException {
     Map<String, List<String>> statuses = message.getPayload();
-    Set<Run> output = new HashSet<Run>();
+    Set<Run> output = new HashSet<>();
     for (String key : statuses.keySet()) {
       HealthType ht = HealthType.valueOf(key);
       JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
@@ -71,7 +72,7 @@ public class DemoIlluminaConsumerMechanism implements NotificationMessageConsume
   }
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs) {
-    Map<String, Run> updatedRuns = new HashMap<String, Run>();
+    Map<String, Run> updatedRuns = new HashMap<>();
 
     StringBuilder sb = new StringBuilder();
 

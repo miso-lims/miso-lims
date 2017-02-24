@@ -46,7 +46,7 @@
       <c:forEach items="${platformTypes}" var="pt" varStatus="c">
         <div id="tab-${c.count}">
           <h1>
-            <div id="${pt}totalCount">${pt} Pools</div>
+            <span id="${pt}totalCount">${pt} Pools</span>
           </h1>
           <ul class="sddm">
             <li>
@@ -65,7 +65,7 @@
               </div>
             </li>
           </ul>
-          <table cellpadding="0" cellspacing="0" border="0" class="display" id="listing${pt}PoolsTable"></table>
+          <table class="display no-border" id="listing${pt}PoolsTable"></table>
           <script type="text/javascript">
             jQuery(document).ready(function () {
               Pool.ui.createListingPoolsTable('${pt}', '${poolConcentrationUnits}');

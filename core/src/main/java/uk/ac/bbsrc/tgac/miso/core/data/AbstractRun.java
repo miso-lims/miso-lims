@@ -32,28 +32,39 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Entity;
+import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunDerivedInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -67,10 +78,9 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@Entity
-@Table(name = "`Run`")
+@MappedSuperclass
 public abstract class AbstractRun implements Run {
-  protected static final Logger log = LoggerFactory.getLogger(AbstractRun.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractRun.class);
 
   public static final Long UNSAVED_ID = 0L;
 
@@ -78,41 +88,65 @@ public abstract class AbstractRun implements Run {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long runId = AbstractRun.UNSAVED_ID;
 
-  @Transient
-  public Document submissionDocument;
-
-  @OneToOne(cascade = CascadeType.ALL)
-  private SecurityProfile securityProfile;
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "securityProfile_profileId")
+  private SecurityProfile securityProfile = new SecurityProfile();
 
   private String name;
+  @Column(nullable = false)
   private String alias;
   private String description;
   private String accession;
   private Integer platformRunId;
+
+  @Column(nullable = false)
   private Boolean pairedEnd;
   private Integer cycles;
   private String filePath;
 
-  private Date lastUpdated;
+  @OneToOne(targetEntity = StatusImpl.class, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "status_statusId")
+  private Status status = new StatusImpl();
 
-  @OneToOne(targetEntity = StatusImpl.class, cascade = CascadeType.ALL)
-  private Status status;
-
+  @OneToMany(targetEntity = RunQCImpl.class, mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
   private Collection<RunQC> runQCs = new TreeSet<>();
 
+  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Run_Note", joinColumns = {
+      @JoinColumn(name = "run_runId") }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
 
-  @Transient
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private PlatformType platformType;
+
+  @ManyToOne(targetEntity = SequencerReferenceImpl.class)
+  @JoinColumn(name = "sequencerReference_sequencerReferenceId", nullable = false)
   private SequencerReference sequencerReference;
 
-  // listeners
+  @Transient
   private final Set<MisoListener> listeners = new HashSet<>();
-  private Set<User> watchers = new HashSet<>();
+
+  @ManyToMany(targetEntity = UserImpl.class)
+  @JoinTable(name = "Run_Watcher", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
+  private Set<User> watchUsers = new HashSet<>();
+
+  @Transient
+  // not Hibernate-managed
+  private Group watchGroup;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
+  @ManyToOne(targetEntity = SequencingParametersImpl.class)
+  @JoinColumn(name = "sequencingParameters_parametersId")
   private SequencingParameters sequencingParameters;
+
+  @OneToOne(targetEntity = RunDerivedInfo.class)
+  @PrimaryKeyJoinColumn
+  private RunDerivedInfo derivedInfo;
 
   @Override
   public User getLastModifier() {
@@ -124,7 +158,13 @@ public abstract class AbstractRun implements Run {
     this.lastModifier = lastModifier;
   }
 
-  private final Collection<ChangeLog> changeLog = new ArrayList<>();
+  @Override
+  public Date getLastUpdated() {
+    return (derivedInfo == null ? null : derivedInfo.getLastModified());
+  }
+
+  @OneToMany(targetEntity = RunChangeLog.class, mappedBy = "run", cascade = CascadeType.ALL)
+  private final Collection<ChangeLog> changeLogs = new ArrayList<>();
 
   @Override
   public long getId() {
@@ -147,13 +187,13 @@ public abstract class AbstractRun implements Run {
   }
 
   @Override
-  public abstract List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers();
+  public abstract List<SequencerPartitionContainer> getSequencerPartitionContainers();
 
   @Override
-  public abstract void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers);
+  public abstract void setSequencerPartitionContainers(List<SequencerPartitionContainer> containers);
 
   @Override
-  public abstract void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer);
+  public abstract void addSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer);
 
   @Override
   public PlatformType getPlatformType() {
@@ -276,7 +316,7 @@ public abstract class AbstractRun implements Run {
     try {
       runQC.setRun(this);
     } catch (MalformedRunException e) {
-      log.error("set run", e);
+      log.error("set run QC", e);
     }
     fireRunQcAddedEvent();
   }
@@ -306,16 +346,6 @@ public abstract class AbstractRun implements Run {
   }
 
   @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
-
-  @Override
   public SequencingParameters getSequencingParameters() {
     return sequencingParameters;
   }
@@ -323,14 +353,6 @@ public abstract class AbstractRun implements Run {
   @Override
   public void setSequencingParameters(SequencingParameters parameters) {
     this.sequencingParameters = parameters;
-  }
-
-  public Document getSubmissionData() {
-    return submissionDocument;
-  }
-
-  public void accept(SubmittableVisitor v) {
-    v.visit(this);
   }
 
   @Override
@@ -433,24 +455,39 @@ public abstract class AbstractRun implements Run {
     }
   }
 
-  @Override
-  public Set<User> getWatchers() {
-    return watchers;
+  public void setWatchUsers(Set<User> watchUsers) {
+    this.watchUsers = watchUsers;
+  }
+
+  public Set<User> getWatchUsers() {
+    return watchUsers;
   }
 
   @Override
-  public void setWatchers(Set<User> watchers) {
-    this.watchers = watchers;
+  public void setWatchGroup(Group watchGroup) {
+    this.watchGroup = watchGroup;
+  }
+
+  public Group getWatchGroup() {
+    return watchGroup;
+  }
+
+  @Override
+  public Set<User> getWatchers() {
+    Set<User> allWatchers = new HashSet<>();
+    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
+    if (watchUsers != null) allWatchers.addAll(watchUsers);
+    return allWatchers;
   }
 
   @Override
   public void addWatcher(User user) {
-    watchers.add(user);
+    watchUsers.add(user);
   }
 
   @Override
   public void removeWatcher(User user) {
-    watchers.remove(user);
+    watchUsers.remove(user);
   }
 
   @Override
@@ -494,8 +531,7 @@ public abstract class AbstractRun implements Run {
   }
 
   @Override
-  public int compareTo(Object o) {
-    Run t = (Run) o;
+  public int compareTo(Run t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
@@ -523,7 +559,7 @@ public abstract class AbstractRun implements Run {
   }
 
   @Override
-  public Collection<ChangeLog> getChangeLog() {
-    return changeLog;
+  public Collection<ChangeLog> getChangeLogs() {
+    return changeLogs;
   }
 }

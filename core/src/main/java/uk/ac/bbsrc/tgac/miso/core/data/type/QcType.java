@@ -25,9 +25,11 @@ package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC
@@ -38,7 +40,11 @@ import javax.persistence.Id;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class QcType implements Comparable, Serializable {
+@Entity
+@Table(name = "QCType")
+public class QcType implements Comparable<QcType>, Serializable {
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
   /** Field libraryTypeId */
@@ -173,8 +179,7 @@ public class QcType implements Comparable, Serializable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    QcType t = (QcType) o;
+  public int compareTo(QcType t) {
     int name = getName().compareTo(t.getName());
     if (name != 0) return name;
 

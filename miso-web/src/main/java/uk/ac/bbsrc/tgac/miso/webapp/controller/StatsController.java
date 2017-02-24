@@ -46,6 +46,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
@@ -60,8 +62,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
  * <p/>
@@ -74,7 +74,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 @RequestMapping("/stats")
 @SessionAttributes("sequencerReference")
 public class StatsController {
-  protected static final Logger log = LoggerFactory.getLogger(StatsController.class);
+  private static final Logger log = LoggerFactory.getLogger(StatsController.class);
   
   private enum ModelKeys {
     SEQUENCER("sequencerReference"),
@@ -140,9 +140,11 @@ public class StatsController {
     SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
     
     if (sr != null) {
+
       Collection<Run> runs = requestManager.listRunsBySequencerId(referenceId);
       Collection<SequencerServiceRecord> serviceRecords = requestManager.listSequencerServiceRecordsBySequencerId(referenceId);
       Collection<SequencerReference> otherSequencers = getOtherSequencers(sr.getId());
+      model.put("preUpgradeSeqRef", requestManager.getSequencerReferenceByUpgradedReferenceId(sr.getId()));
       
       model.put(ModelKeys.SEQUENCER.getKey(), sr);
       model.put(ModelKeys.RUNS.getKey(), runs);
@@ -194,7 +196,7 @@ public class StatsController {
   @RequestMapping(value = "/ls454", method = RequestMethod.GET)
   public ModelAndView allLs454Stats(ModelMap model) throws IOException {
     model.put(ModelKeys.PLATFORM.getKey(), PlatformType.LS454);
-    Collection<SequencerReference> s = new ArrayList<SequencerReference>();
+    Collection<SequencerReference> s = new ArrayList<>();
     for (SequencerReference sr : populateSequencerReferences()) {
       if (sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
         s.add(sr);
@@ -266,7 +268,7 @@ public class StatsController {
   @RequestMapping(value = "/illumina", method = RequestMethod.GET)
   public ModelAndView allIlluminaStats(ModelMap model) throws IOException {
     model.put(ModelKeys.PLATFORM.getKey(), PlatformType.ILLUMINA);
-    Collection<SequencerReference> s = new ArrayList<SequencerReference>();
+    Collection<SequencerReference> s = new ArrayList<>();
     for (SequencerReference sr : populateSequencerReferences()) {
       if (sr.getPlatform() != null && PlatformType.ILLUMINA.equals(sr.getPlatform().getPlatformType())) {
         s.add(sr);
@@ -336,7 +338,7 @@ public class StatsController {
   @RequestMapping(value = "/solid", method = RequestMethod.GET)
   public ModelAndView allSolidStats(ModelMap model) throws IOException {
     model.put(ModelKeys.PLATFORM.getKey(), PlatformType.SOLID);
-    Collection<SequencerReference> s = new ArrayList<SequencerReference>();
+    Collection<SequencerReference> s = new ArrayList<>();
     for (SequencerReference sr : populateSequencerReferences()) {
       if (sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
         s.add(sr);
@@ -422,7 +424,7 @@ public class StatsController {
   @RequestMapping(value = "/pacbio", method = RequestMethod.GET)
   public ModelAndView allPacbioStats(ModelMap model) throws IOException {
     model.put(ModelKeys.PLATFORM.getKey(), PlatformType.PACBIO);
-    Collection<SequencerReference> s = new ArrayList<SequencerReference>();
+    Collection<SequencerReference> s = new ArrayList<>();
     for (SequencerReference sr : populateSequencerReferences()) {
       if (sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
         s.add(sr);

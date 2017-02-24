@@ -35,11 +35,11 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>
-      <div id="totalCount">Studies
-      </div>
+      <span id="totalCount">Studies
+      </span>
     </h1>
 
-    <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingStudiesTable">
+    <table class="display no-border" id="listingStudiesTable">
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {

@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import net.sf.json.JSONObject;
 
@@ -27,5 +28,9 @@ public class DummyIssueTrackerManager implements IssueTrackerManager {
   @Override
   public String getBaseTrackerUrl() {
     return null;
+  }
+
+  @Override
+  public void setConfiguration(Properties properties) {
   }
 }

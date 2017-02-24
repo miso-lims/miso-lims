@@ -27,13 +27,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.w3c.dom.Document;
-
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
@@ -48,10 +48,12 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
-public interface Run extends SecurableByProfile, Submittable<Document>, Comparable, Reportable, Watchable, Deletable, Nameable, Alertable {
+public interface Run
+    extends SecurableByProfile, Comparable<Run>, Reportable, Watchable, Deletable, Nameable, Alertable, ChangeLoggable, Aliasable {
   /** Field PREFIX */
   public static final String PREFIX = "RUN";
 
@@ -72,11 +74,11 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
    */
   public void setSequencerReference(SequencerReference sequencerReference);
 
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers();
+  public List<SequencerPartitionContainer> getSequencerPartitionContainers();
 
-  public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers);
+  public void setSequencerPartitionContainers(List<SequencerPartitionContainer> containers);
 
-  public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer);
+  public void addSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer);
 
   /**
    * Returns the platformType of this Run object.
@@ -113,6 +115,7 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
    * 
    * @return String alias.
    */
+  @Override
   public String getAlias();
 
   /**
@@ -265,9 +268,7 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
 
   Date getLastUpdated();
 
-  void setLastUpdated(Date lastUpdated);
-
-  public Collection<ChangeLog> getChangeLog();
+  public Collection<ChangeLog> getChangeLogs();
 
   /**
    * Returns the user who last modified this item.
@@ -282,4 +283,6 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
   public SequencingParameters getSequencingParameters();
 
   public void setSequencingParameters(SequencingParameters parameters);
+
+  public void setWatchGroup(Group watchGroup);
 }

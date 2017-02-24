@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -46,6 +47,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 
 /**
@@ -60,6 +64,12 @@ public class ProjectD3GraphController {
 
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private StudyService studyService;
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
   public @ResponseBody JSONObject d3graphRest(@PathVariable Long projectId) throws IOException {
@@ -73,7 +83,7 @@ public class ProjectD3GraphController {
       JSONArray projectChildrenArray = new JSONArray();
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
       Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
+      Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
 
       JSONObject runJSON = new JSONObject();
       JSONArray runsArray = new JSONArray();
@@ -103,7 +113,7 @@ public class ProjectD3GraphController {
         JSONArray substudiesArray = new JSONArray();
         substudyJSON.put("name", study.getName());
         substudyJSON.put("description", study.getAlias());
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
+        Collection<Experiment> experiments = experimentService.listAllByStudyId(study.getId());
         if (experiments.size() > 0) {
           JSONObject experimentJSON = new JSONObject();
           JSONArray experimentsArray = new JSONArray();
@@ -133,7 +143,7 @@ public class ProjectD3GraphController {
       sampleJSON.put("name", "Samples");
       sampleJSON.put("description", "");
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.listBySampleId(sample.getId());
         if (libraries.size() == 0) {
 
           String sampleQC = "0";
@@ -205,6 +215,10 @@ public class ProjectD3GraphController {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
 }

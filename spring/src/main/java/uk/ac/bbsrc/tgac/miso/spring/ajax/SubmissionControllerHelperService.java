@@ -56,17 +56,14 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
@@ -79,6 +76,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGeneratorResolverSe
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadJob;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -101,6 +100,10 @@ public class SubmissionControllerHelperService {
   private MisoFilesManager misoFileManager;
   @Autowired
   private FilePathGeneratorResolverService filePathGeneratorResolverService;
+  @Autowired
+  private ExperimentService experimentService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -127,7 +130,7 @@ public class SubmissionControllerHelperService {
 
         // sets the title, alias and description based on form contents
         JSONArray form = JSONArray.fromObject(json.get("form"));
-        Set<SequencerPoolPartition> newPartitions = new HashSet<>();
+        Set<Partition> newPartitions = new HashSet<>();
 
         for (JSONObject j : (Iterable<JSONObject>) form) {
           if (j.getString("name").equals("title")) {
@@ -143,33 +146,10 @@ public class SubmissionControllerHelperService {
           if (j.getString("name").contains("DIL")) {
             Long dilutionId = Long.parseLong(j.getString("name").replaceAll("\\D+", ""));
             Long partitionId = Long.parseLong(j.getString("value").replaceAll("\\D+", ""));
-            // and a new Partition created from the ID
-            PartitionImpl newPartition = new PartitionImpl();
-            newPartition.setId(partitionId);
-            // if the partition is not already in the set of newPartitions:
-            if (newPartitions.add(newPartition)) {
-              // a new pool is created
-              Pool newPool = new PoolImpl();
-              // details of the original partition's pool are copied to the new one
-              Pool oldPool = requestManager.getSequencerPoolPartitionById(partitionId).getPool();
-              newPool.setExperiments(oldPool.getExperiments());
-              newPool.setPlatformType(oldPool.getPlatformType());
-              // the new pool is added to the partition
-              newPartition.setPool(newPool);
-            }
-
-            for (SequencerPoolPartition nextPartition : newPartitions) {
-              if (nextPartition.getId() == partitionId) {
-                Dilution dilution = requestManager.getLibraryDilutionById(dilutionId);
-                Pool pool = nextPartition.getPool();
-                pool.addPoolableElement(dilution);
-              }
-            }
+            Dilution dilution = dilutionService.get(dilutionId);
+            Partition partition = requestManager.getPartitionById(partitionId);
+            newSubmission.getDilutions().put(dilution, partition);
           }
-        }
-        // the set of partitions is added to the new Submission
-        for (SequencerPoolPartition sequencerPoolPartition : newPartitions) {
-          newSubmission.addSubmissionElement(sequencerPoolPartition);
         }
         // the submission is saved
         requestManager.saveSubmission(newSubmission);
@@ -186,7 +166,7 @@ public class SubmissionControllerHelperService {
     try {
       if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = ((Integer) json.get("submissionId")).longValue();
-        Submission<Submittable, Document, Document> submission = requestManager.getSubmissionById(submissionId);
+        Submission submission = requestManager.getSubmissionById(submissionId);
 
         SubmissionActionType action = SubmissionActionType.VALIDATE;
         if (json.has("operation")) {
@@ -195,7 +175,7 @@ public class SubmissionControllerHelperService {
         submission.setSubmissionActionType(action);
 
         try {
-          String s = submissionManager.generateSubmissionMetadata(submission);
+          String s = submissionManager.prepareSubmission(submission).toString();
           return JSONUtils.JSONObjectResponse("metadata", s);
         } catch (SubmissionException se) {
           log.error("cannot preview submission metadata", se);
@@ -264,21 +244,21 @@ public class SubmissionControllerHelperService {
     try {
       if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = ((Integer) json.get("submissionId")).longValue();
-        Submission<Submittable, Document, Document> submission = requestManager.getSubmissionById(submissionId);
+        Submission submission = requestManager.getSubmissionById(submissionId);
         SubmissionActionType action = SubmissionActionType.VALIDATE;
         if (json.has("operation")) {
           action = SubmissionActionType.valueOf(json.getString("operation"));
         }
         submission.setSubmissionActionType(action);
         try {
-          String s = submissionManager.generateSubmissionMetadata(submission);
+          submissionManager.prepareSubmission(submission);
         } catch (SubmissionException se) {
           log.error("validate submission metadata", se);
           return JSONUtils.SimpleJSONError(se.getMessage());
         }
-        Document report = submission.submit(submissionManager);
+        Document report = submissionManager.submit(submission);
         if (report != null) {
-          Map<String, Object> responseMap = (Map<String, Object>) submissionManager.parseResponse(report);
+          Map<String, Object> responseMap = submissionManager.parseResponse(report);
           return JSONUtils.JSONObjectResponse(responseMap);
         } else {
           return JSONUtils.SimpleJSONError("Failed to get submission report. Something went wrong in the submission process");
@@ -304,10 +284,10 @@ public class SubmissionControllerHelperService {
         }
 
         submission.setSubmissionActionType(action);
-        Document report = (Document) submission.submit(submissionManager);
+        Document report = submissionManager.submit(submission);
 
         if (report != null) {
-          Map<String, Object> responseMap = (Map<String, Object>) submissionManager.parseResponse(report);
+          Map<String, Object> responseMap = submissionManager.parseResponse(report);
           return JSONUtils.JSONObjectResponse(responseMap);
         } else {
           return JSONUtils.SimpleJSONError("Failed to get submission report. Something went wrong in the submission process");
@@ -324,7 +304,7 @@ public class SubmissionControllerHelperService {
     try {
       if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = ((Integer) json.get("submissionId")).longValue();
-        Submission<Submittable, Document, Document> submission = requestManager.getSubmissionById(submissionId);
+        Submission submission = requestManager.getSubmissionById(submissionId);
         String response = submissionManager.submitSequenceData(submission);
         return (JSONUtils.SimpleJSONResponse(response));
       } else {
@@ -381,23 +361,19 @@ public class SubmissionControllerHelperService {
         // TODO - get projects from submission
         Submission sub = requestManager.getSubmissionById(submissionId);
         Set<Long> projectIds = new HashSet<>();
-        for (Object o : sub.getSubmissionElements()) {
-          if (o instanceof Project) {
-            projectIds.add(((Project) o).getProjectId());
-          }
 
-          if (o instanceof Study) {
-            projectIds.add(((Study) o).getProject().getProjectId());
-          }
-
-          if (o instanceof Experiment) {
-            projectIds.add(((Experiment) o).getStudy().getProject().getProjectId());
-          }
-
-          if (o instanceof Sample) {
-            projectIds.add(((Sample) o).getProject().getProjectId());
-          }
+        for (Study s : sub.getStudies()) {
+          projectIds.add(s.getProject().getProjectId());
         }
+
+        for (Experiment e : sub.getExperiments()) {
+          projectIds.add(e.getStudy().getProject().getProjectId());
+        }
+
+        for (Sample s : sub.getSamples()) {
+          projectIds.add(s.getProject().getProjectId());
+        }
+
         responseMap.put("projects", JSONArray.fromObject(projectIds));
         return JSONUtils.JSONObjectResponse(responseMap);
       }
@@ -425,7 +401,7 @@ public class SubmissionControllerHelperService {
 
         Project p = requestManager.getProjectById(projectId);
         for (Study s : p.getStudies()) {
-          Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(s.getId());
+          Collection<Experiment> experiments = experimentService.listAllByStudyId(s.getId());
           s.setExperiments(experiments);
         }
         // gets the runs for the project
@@ -442,16 +418,16 @@ public class SubmissionControllerHelperService {
             sb.append("<ul>");
 
             // creates HTML list of sequencing containers for each run
-            Collection<SequencerPartitionContainer<SequencerPoolPartition>> partitionContainers = requestManager
+            Collection<SequencerPartitionContainer> partitionContainers = requestManager
                 .listSequencerPartitionContainersByRunId(r.getId());
-            for (SequencerPartitionContainer<SequencerPoolPartition> partitionContainer : partitionContainers) {
+            for (SequencerPartitionContainer partitionContainer : partitionContainers) {
               sb.append("<li>");
               sb.append("<b>" + partitionContainer.getIdentificationBarcode() + "</b> : " + partitionContainer.getId());
               sb.append("<ul>");
 
               // creates HTML list of partitions for each sequencing container
-              Collection<SequencerPoolPartition> partitions = partitionContainer.getPartitions();
-              for (SequencerPoolPartition part : partitions) {
+              Collection<Partition> partitions = partitionContainer.getPartitions();
+              for (Partition part : partitions) {
 
                 // Checks whether the partition was involved in the project.
                 boolean partitionInvolved = false;
@@ -473,7 +449,7 @@ public class SubmissionControllerHelperService {
 
                     if (sub != null) {
                       // checks checkboxes if the partition is in the submission
-                      if (sub != null && !sub.getSubmissionElements().isEmpty() && sub.getSubmissionElements().contains(part)) {
+                      if (sub != null && sub.getDilutions().containsValue(part)) {
                         sb.append(" checked='checked' ");
                       }
                     }
@@ -485,7 +461,7 @@ public class SubmissionControllerHelperService {
 
                     // creates HTML for list of library dilutions and corresponding datafiles.
                     // gets all the dilutions in that partition's pool.
-                    List<Dilution> poolables = new ArrayList<>(part.getPool().getPoolableElements());
+                    List<LibraryDilution> poolables = new ArrayList<>(part.getPool().getPoolableElements());
                     Collections.sort(poolables);
 
                     FilePathGenerator fpg = filePathGeneratorResolverService.getFilePathGenerator(r.getPlatformType());
@@ -501,16 +477,12 @@ public class SubmissionControllerHelperService {
                       sb.append("<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId()
                           + "' value='PAR_" + part.getId() + "' ");
 
-                      if (sub != null && sub.getSubmissionElements().contains(part)) {
+                      if (sub != null && sub.getDilutions().containsValue(part)) {
                         // checks dilution checkboxes if dilution is in the submission
-                        for (Object o : sub.getSubmissionElements()) {
-                          if (o.equals(part)) {
-                            SequencerPoolPartition subPart = (SequencerPoolPartition) o;
-                            for (Dilution bla : subPart.getPool().getPoolableElements()) {
-                              if (bla.getClass().equals(d.getClass()) && bla.getId() == d.getId()) {
-                                sb.append(" checked='checked' ");
-                              }
-                            }
+                        for (Dilution bla : part.getPool().getPoolableElements()) {
+                          if (sub.getDilutions().containsKey(bla)) {
+                            sb.append(" checked='checked' ");
+                            break;
                           }
                         }
                       }
@@ -577,5 +549,13 @@ public class SubmissionControllerHelperService {
 
   public void setFilePathGeneratorResolverService(FilePathGeneratorResolverService filePathGeneratorResolverService) {
     this.filePathGeneratorResolverService = filePathGeneratorResolverService;
+  }
+
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 }

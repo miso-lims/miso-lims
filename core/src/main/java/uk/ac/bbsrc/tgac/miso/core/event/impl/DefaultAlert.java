@@ -26,12 +26,22 @@ package uk.ac.bbsrc.tgac.miso.core.event.impl;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 
@@ -44,6 +54,9 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
  * @date 07/10/11
  * @since 0.1.2
  */
+
+@Entity
+@Table(name = "Alert")
 public class DefaultAlert implements Alert, Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -53,11 +66,26 @@ public class DefaultAlert implements Alert, Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long alertId = UNSAVED_ID;
+
+  @Column(name = "title", nullable = true)
   private String alertTitle;
+
+  @Column(name = "text", nullable = false)
   private String alertText;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "userId", nullable = false)
   private User user;
+
+  @Column(name = "date", nullable = false)
+  @Temporal(TemporalType.DATE)
   private Date alertDate;
-  private boolean alertRead;
+
+  @Column(name = "isRead", nullable = false)
+  private boolean alertRead = Boolean.FALSE;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "level", nullable = false)
   private AlertLevel alertLevel = AlertLevel.INFO;
 
   public DefaultAlert() {
@@ -107,6 +135,11 @@ public class DefaultAlert implements Alert, Serializable {
   @Override
   public User getAlertUser() {
     return this.user;
+  }
+
+  @Override
+  public void setAlertUser(User user) {
+    this.user = user;
   }
 
   @Override

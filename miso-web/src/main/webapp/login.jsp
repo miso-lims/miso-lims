@@ -31,16 +31,16 @@
 </c:if>
 
 <div id="login-form">
-  <form action="j_spring_security_check" method="POST">
+    <form action="/login" method="POST">
     <div style="margin:0;padding:0;display:inline">
       <table>
         <tr>
-          <td align="right"><label for="j_username">Username</label></td>
-          <td align="left"><input type="text" name="j_username" id="j_username"/></td>
+          <td align="right"><label for="username">Username</label></td>
+          <td align="left"><input type="text" name="username" id="username"/></td>
         </tr>
-        <tr>
-          <td align="right"><label for="j_password">Password</label></td>
-          <td align="left"><input type="password" name="j_password" id="j_password"/></td>
+        <tr>    
+          <td align="right"><label for="password">Password</label></td>
+          <td align="left"><input type="password" name="password" id="password"/></td>
         </tr>
 
         <tr>
@@ -60,8 +60,9 @@
       </table>
     </div>
     <script type="text/javascript">
-      Form.Element.focus('j_username');
+      Form.Element.focus('username');
     </script>
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
   </form>
 </div>
 <script type="text/javascript">

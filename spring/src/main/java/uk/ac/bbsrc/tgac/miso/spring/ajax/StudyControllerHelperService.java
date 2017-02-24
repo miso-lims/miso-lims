@@ -39,9 +39,9 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -57,20 +57,10 @@ public class StudyControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
-  @Autowired
-  private SubmissionManager submissionManager;
+  private StudyService studyService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setSubmissionManager(SubmissionManager submissionManager) {
-    this.submissionManager = submissionManager;
   }
 
   public JSONObject deleteStudy(HttpSession session, JSONObject json) {
@@ -86,7 +76,7 @@ public class StudyControllerHelperService {
       if (json.has("studyId")) {
         Long studyId = json.getLong("studyId");
         try {
-          requestManager.deleteStudy(requestManager.getStudyById(studyId));
+          studyService.delete(studyService.get(studyId));
           return JSONUtils.SimpleJSONResponse("Study deleted");
         } catch (IOException e) {
           log.error("cannot delete study", e);
@@ -104,7 +94,7 @@ public class StudyControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
-      for (Study study : requestManager.listAllStudies()) {
+      for (Study study : studyService.list()) {
         JSONArray inner = new JSONArray();
         inner.add(TableHelper.hyperLinkify("/miso/study/" + study.getId(), study.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/study/" + study.getId(), study.getAlias()));

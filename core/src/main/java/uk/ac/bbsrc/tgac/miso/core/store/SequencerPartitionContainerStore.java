@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 
 /**
  * Defines a DAO interface for storing SequencerPartitionContainers
@@ -36,8 +36,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
  * @author Rob Davey
  * @since 0.1.6
  */
-public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer<SequencerPoolPartition>>,
-    Remover<SequencerPartitionContainer<SequencerPoolPartition>> {
+public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer>,
+    Remover<SequencerPartitionContainer> {
   /**
    * Get the SequencerPartitionContainer that contains a given {@link SequencerPoolPartition}
    * 
@@ -47,7 +47,7 @@ public interface SequencerPartitionContainerStore extends Store<SequencerPartiti
    * @throws java.io.IOException
    *           when
    */
-  SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerByPartitionId(long partitionId) throws IOException;
+  SequencerPartitionContainer getSequencerPartitionContainerByPartitionId(long partitionId) throws IOException;
 
   /**
    * List all SequencerPartitionContainers given a parent Run ID
@@ -58,7 +58,7 @@ public interface SequencerPartitionContainerStore extends Store<SequencerPartiti
    * @throws java.io.IOException
    *           when
    */
-  List<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainersByRunId(long runId) throws IOException;
+  List<SequencerPartitionContainer> listAllSequencerPartitionContainersByRunId(long runId) throws IOException;
 
   /**
    * List all SequencerPartitionContainers given an ID barcode
@@ -69,7 +69,7 @@ public interface SequencerPartitionContainerStore extends Store<SequencerPartiti
    * @throws java.io.IOException
    *           when
    */
-  List<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByBarcode(String barcode) throws IOException;
+  List<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode) throws IOException;
 
   /**
    * List all SequencerPoolPartitions that are contained by a given {@link SequencerPartitionContainer}
@@ -80,15 +80,15 @@ public interface SequencerPartitionContainerStore extends Store<SequencerPartiti
    * @throws java.io.IOException
    *           when
    */
-  Collection<? extends SequencerPoolPartition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException;
-
-  long countContainers() throws IOException;
+  Collection<Partition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException;
 
   long countBySearch(String querystr) throws IOException;
 
-  List<SequencerPartitionContainer<SequencerPoolPartition>> listBySearchOffsetAndNumResults(int offset, int limit, String querystr,
+  List<SequencerPartitionContainer> listBySearchOffsetAndNumResults(int offset, int limit, String querystr,
       String sortDir, String sortCol) throws IOException;
 
-  List<SequencerPartitionContainer<SequencerPoolPartition>> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol)
+  List<SequencerPartitionContainer> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol)
       throws IOException;
+
+  Partition getPartitionById(long partitionId);
 }

@@ -26,7 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 import java.io.IOException;
 import java.util.Collection;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 
 /**
  * Defines a DAO interface for storing Partitions
@@ -34,7 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadable, Remover<SequencerPoolPartition> {
+public interface PartitionStore extends Store<Partition>, Cascadable, Remover<Partition> {
   /**
    * List all Partitions that are part of a Run given a Run ID
    * 
@@ -44,7 +44,7 @@ public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadabl
    * @throws java.io.IOException
    *           when
    */
-  Collection<SequencerPoolPartition> listByRunId(long runId) throws IOException;
+  Collection<Partition> listByRunId(long runId) throws IOException;
 
   /**
    * List all Partitions on a parent SequencerPartitionContainer given a SequencerPartitionContainer ID
@@ -55,7 +55,7 @@ public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadabl
    * @throws java.io.IOException
    *           when
    */
-  Collection<SequencerPoolPartition> listBySequencerPartitionContainerId(long sequencerPartitionContainerId) throws IOException;
+  Collection<Partition> listBySequencerPartitionContainerId(long sequencerPartitionContainerId) throws IOException;
 
   /**
    * List all Partitions that hold an Pool given a Pool ID
@@ -66,7 +66,7 @@ public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadabl
    * @throws java.io.IOException
    *           when
    */
-  Collection<SequencerPoolPartition> listByPoolId(long poolId) throws IOException;
+  Collection<Partition> listByPoolId(long poolId) throws IOException;
 
   /**
    * List all Partitions that are part of a Submission given a Submission ID
@@ -77,5 +77,5 @@ public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadabl
    * @throws java.io.IOException
    *           when
    */
-  Collection<SequencerPoolPartition> listBySubmissionId(long submissionId) throws IOException;
+  Collection<Partition> listBySubmissionId(long submissionId) throws IOException;
 }

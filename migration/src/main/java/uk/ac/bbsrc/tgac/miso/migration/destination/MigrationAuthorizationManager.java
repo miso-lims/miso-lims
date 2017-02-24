@@ -40,47 +40,62 @@ public class MigrationAuthorizationManager implements AuthorizationManager {
 
   @Override
   public boolean isUserAuthenticated() throws IOException {
+    // auth disabled in this manager; allow all access
     return true;
   }
 
   @Override
   public void throwIfUnauthenticated() throws IOException, AuthorizationException {
-    
+    // auth disabled in this manager; do nothing
   }
 
   @Override
   public boolean isAdminUser() throws IOException {
+    // auth disabled in this manager; allow all access
     return true;
   }
 
   @Override
   public void throwIfNonAdmin() throws IOException, AuthorizationException {
-    
+    // auth disabled in this manager; do nothing
   }
 
   @Override
   public boolean readCheck(SecurableByProfile resource) throws IOException {
+    // auth disabled in this manager; allow all access
     return true;
   }
 
   @Override
   public void throwIfNotReadable(SecurableByProfile resource) throws IOException, AuthorizationException {
-    
+    // auth disabled in this manager; do nothing
   }
 
   @Override
   public boolean writeCheck(SecurableByProfile resource) throws IOException {
+    // auth disabled in this manager; allow all access
     return true;
   }
 
   @Override
   public void throwIfNotWritable(SecurableByProfile resource) throws IOException, AuthorizationException {
-    
+    // auth disabled in this manager; do nothing
   }
 
   @Override
   public <T extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered) throws IOException, AuthorizationException {
+    // auth disabled in this manager; allow all access
     return new ArrayList<>(unfiltered);
+  }
+
+  @Override
+  public void throwIfNonAdminOrMatchingOwner(User owner) throws IOException, AuthorizationException {
+    // auth disabled in this manager; do nothing
+  }
+
+  @Override
+  public void throwIfNotInternal() throws IOException, AuthorizationException {
+    // auth disabled in this manager; do nothing
   }
 
 }

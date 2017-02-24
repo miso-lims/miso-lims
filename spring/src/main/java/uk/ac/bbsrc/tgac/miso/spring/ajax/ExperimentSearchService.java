@@ -38,8 +38,10 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
  * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
@@ -53,6 +55,9 @@ public class ExperimentSearchService {
   @Autowired
   private RequestManager requestManager;
 
+  @Autowired
+  private ExperimentService experimentService;
+
   public JSONObject illuminaExperimentSearch(HttpSession session, JSONObject json) {
     StringBuffer sb = new StringBuffer();
     String searchStr = (String) json.get("str");
@@ -65,7 +70,7 @@ public class ExperimentSearchService {
         StringBuilder b = new StringBuilder();
 
         int numMatches = 0;
-        for (Experiment exp : requestManager.listAllExperiments()) {
+        for (Experiment exp : experimentService.listAll()) {
           String experimentName = exp.getName() == null ? null : exp.getName().toLowerCase();
           long experimentId = exp.getId();
 

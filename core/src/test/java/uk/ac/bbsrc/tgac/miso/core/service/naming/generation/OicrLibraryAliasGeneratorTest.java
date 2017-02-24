@@ -6,14 +6,13 @@ import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 
 public class OicrLibraryAliasGeneratorTest {
 
@@ -26,11 +25,9 @@ public class OicrLibraryAliasGeneratorTest {
 
   @Test
   public void test_alias_generation_from_sample() throws Exception {
-    DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
-    Sample sample = dataObjectFactory.getSample();
+    DetailedSample sample = new DetailedSampleImpl();
     sample.setAlias("BART_1273_Br_P_nn_1-1_D_1");
-    Library library = dataObjectFactory.getLibrary();
-    library.setLibraryAdditionalInfo(new LibraryAdditionalInfoImpl());
+    DetailedLibrary library = new DetailedLibraryImpl();
     library.setSample(sample);
     LibraryType libraryType = new LibraryType();
     libraryType.setDescription("Paired End");
@@ -40,7 +37,7 @@ public class OicrLibraryAliasGeneratorTest {
     library.setLibraryStrategyType(libraryStrategyType);
     LibraryDesignCode code = new LibraryDesignCode();
     code.setCode("WG");
-    library.getLibraryAdditionalInfo().setLibraryDesignCode(code);
+    library.setLibraryDesignCode(code);
 
     assertThat(sut.generate(library), is("BART_1273_Br_P_PE_300_WG"));
   }

@@ -15,19 +15,7 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   @Enumerated(EnumType.STRING)
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
 
-  private Double concentration;
-
   private Boolean dnaseTreated;
-
-  @Override
-  public Double getConcentration() {
-    return concentration;
-  }
-
-  @Override
-  public void setConcentration(Double concentration) {
-    this.concentration = concentration;
-  }
 
   @Override
   public StrStatus getStrStatus() {
@@ -56,7 +44,7 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
 
   @Override
   public String toString() {
-    return "SampleStockImpl [strStatus=" + strStatus + ", concentration=" + concentration + ", dnaseTreated=" + dnaseTreated + "]";
+    return "SampleStockImpl [strStatus=" + strStatus + ", dnaseTreated=" + dnaseTreated + "]";
   }
 
 }

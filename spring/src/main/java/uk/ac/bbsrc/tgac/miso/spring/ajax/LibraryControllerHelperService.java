@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -37,10 +37,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -69,37 +67,35 @@ import net.sf.json.JsonConfig;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -111,23 +107,91 @@ import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
  */
 @Ajaxified
 public class LibraryControllerHelperService {
+  public static final class LibraryDilutionBarcodeAssister implements BarcodePrintAssister<LibraryDilution> {
+    private final LibraryDilutionService dilutionService;
+
+    public LibraryDilutionBarcodeAssister(LibraryDilutionService dilutionService) {
+      super();
+      this.dilutionService = dilutionService;
+    }
+
+    @Override
+    public LibraryDilution fetch(long id) throws IOException {
+      return dilutionService.get(id);
+    }
+
+    @Override
+    public void store(LibraryDilution item) throws IOException {
+      dilutionService.update(item);
+    }
+
+    @Override
+    public String getGroupName() {
+      return "dilutions";
+    }
+
+    @Override
+    public String getIdName() {
+      return "dilutionId";
+    }
+
+    @Override
+    public Iterable<LibraryDilution> fetchAll(long projectId) throws IOException {
+      return dilutionService.listByProjectId(projectId);
+    }
+  }
+
+  public static final class LibraryBarcodeAssister implements BarcodePrintAssister<Library> {
+    private final LibraryService libraryService;
+
+    public LibraryBarcodeAssister(LibraryService libraryService) {
+      super();
+      this.libraryService = libraryService;
+    }
+
+    @Override
+    public Library fetch(long id) throws IOException {
+      return libraryService.get(id);
+    }
+
+    @Override
+    public void store(Library library) throws IOException {
+      libraryService.update(library);
+    }
+
+    @Override
+    public String getGroupName() {
+      return "libraries";
+    }
+
+    @Override
+    public String getIdName() {
+      return "libraryId";
+    }
+
+    @Override
+    public Iterable<Library> fetchAll(long projectId) throws IOException {
+      return libraryService.listByProjectId(projectId);
+    }
+  }
+
   protected static final Logger log = LoggerFactory.getLogger(LibraryControllerHelperService.class);
   @Autowired
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-  @Autowired
-  private BarcodeFactory barcodeFactory;
-  @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
-  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
+  private PrinterService printerService;
   @Autowired
   private IndexStore indexStore;
   @Autowired
   private NamingScheme namingScheme;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -152,17 +216,14 @@ public class LibraryControllerHelperService {
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Library library = requestManager.getLibraryById(libraryId);
+      Library library = libraryService.get(libraryId);
       Note note = new Note();
       internalOnly = internalOnly.equals("on") ? "true" : "false";
       note.setInternalOnly(Boolean.parseBoolean(internalOnly));
       note.setText(text);
       note.setOwner(user);
       note.setCreationDate(new Date());
-      library.getNotes().add(note);
-      requestManager.saveLibraryNote(library, note);
-      library.setLastModifier(user);
-      requestManager.saveLibrary(library);
+      libraryService.addNote(library, note);
     } catch (IOException e) {
       log.error("add library note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -176,18 +237,9 @@ public class LibraryControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Library library = requestManager.getLibraryById(libraryId);
-      Note note = requestManager.getNoteById(noteId);
-      if (library.getNotes().contains(note)) {
-        library.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        library.setLastModifier(user);
-        requestManager.saveLibrary(library);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Library does not have note " + noteId + ". Cannot remove");
-      }
+      Library library = libraryService.get(libraryId);
+      libraryService.deleteNote(library, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("delete library note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
@@ -198,7 +250,8 @@ public class LibraryControllerHelperService {
     Long libraryId = json.getLong("libraryId");
     File temploc = getBarcodeFileLocation(session);
     try {
-      Library library = requestManager.getLibraryById(libraryId);
+      Library library = libraryService.get(libraryId);
+      BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = null;
@@ -234,108 +287,12 @@ public class LibraryControllerHelperService {
   }
 
   public JSONObject printLibraryBarcodes(HttpSession session, JSONObject json) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-      }
-
-      Queue<File> thingsToPrint = new LinkedList<>();
-
-      JSONArray ls = JSONArray.fromObject(json.getString("libraries"));
-      for (JSONObject l : (Iterable<JSONObject>) ls) {
-        try {
-          Long libraryId = l.getLong("libraryId");
-          Library library = requestManager.getLibraryById(libraryId);
-          // autosave the barcode if none has been previously generated
-          if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
-            library.setLastModifier(user);
-            requestManager.saveLibrary(library);
-          }
-
-          File f = mps.getLabelFor(library);
-          if (f != null) thingsToPrint.add(f);
-        } catch (IOException e) {
-          log.error("printing barcodes", e);
-          return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
-        }
-      }
-      PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (MisoPrintException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (IOException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new LibraryBarcodeAssister(libraryService));
   }
 
   public JSONObject printLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(LibraryDilution.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-      }
-
-      Queue<File> thingsToPrint = new LinkedList<>();
-
-      JSONArray ls = JSONArray.fromObject(json.getString("dilutions"));
-      for (JSONObject l : (Iterable<JSONObject>) ls) {
-        try {
-          Long dilutionId = l.getLong("dilutionId");
-          LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
-          // autosave the barcode if none has been previously generated
-          if (isStringEmptyOrNull(dilution.getIdentificationBarcode())) {
-            requestManager.saveLibraryDilution(dilution);
-          }
-          File f = mps.getLabelFor(dilution);
-          if (f != null) thingsToPrint.add(f);
-          thingsToPrint.add(f);
-        } catch (IOException e) {
-          log.error("print barcodes", e);
-          return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
-        }
-      }
-      PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (MisoPrintException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (IOException e) {
-      log.error("print barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json,
+        new LibraryDilutionBarcodeAssister(dilutionService));
   }
 
   public JSONObject changeLibraryLocation(HttpSession session, JSONObject json) {
@@ -345,20 +302,9 @@ public class LibraryControllerHelperService {
     try {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
       if (newLocation != null) {
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Library library = requestManager.getLibraryById(libraryId);
-        String oldLocation = library.getLocationBarcode();
+        Library library = libraryService.get(libraryId);
         library.setLocationBarcode(newLocation);
-
-        Note note = new Note();
-        note.setInternalOnly(true);
-        note.setText("Location changed from " + oldLocation + " to " + newLocation + " by " + user.getLoginName() + " on " + new Date());
-        note.setOwner(user);
-        note.setCreationDate(new Date());
-        library.getNotes().add(note);
-        requestManager.saveLibraryNote(library, note);
-        library.setLastModifier(user);
-        requestManager.saveLibrary(library);
+        libraryService.update(library);
       } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
       }
@@ -390,11 +336,9 @@ public class LibraryControllerHelperService {
           return JSONUtils.SimpleJSONError(error);
         }
       }
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Library library = requestManager.getLibraryById(libraryId);
+      Library library = libraryService.get(libraryId);
       library.setIdentificationBarcode(idBarcode);
-      library.setLastModifier(user);
-      requestManager.saveLibrary(library);
+      libraryService.update(library);
     } catch (IOException e) {
       log.debug("Could not change Library identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -407,7 +351,8 @@ public class LibraryControllerHelperService {
     Long dilutionId = json.getLong("dilutionId");
     File temploc = getBarcodeFileLocation(session);
     try {
-      LibraryDilution dil = requestManager.getLibraryDilutionById(dilutionId);
+      LibraryDilution dil = dilutionService.get(dilutionId);
+      BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = barcodeFactory.generateSquareDataMatrix(dil, 400);
@@ -464,13 +409,15 @@ public class LibraryControllerHelperService {
               library.setAlias(libAlias);
               library.setSecurityProfile(sp);
               library.setDescription(descr);
-              library.setPlatformName(platform);
+              library.setPlatformType(platform);
               library.setCreationDate(new Date());
               library.setLocationBarcode(locationBarcode);
               library.setQcPassed(false);
-              library.setLibraryType(requestManager.getLibraryTypeByDescription(type));
-              library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeByName(selectionType));
-              library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeByName(strategyType));
+              library
+                  .setLibraryType(
+                      libraryService.getLibraryTypeByDescriptionAndPlatform(type, library.getPlatformType()));
+              library.setLibrarySelectionType(libraryService.getLibrarySelectionTypeByName(selectionType));
+              library.setLibraryStrategyType(libraryService.getLibraryStrategyTypeByName(strategyType));
               library.setLastModifier(user);
 
               boolean paired = false;
@@ -512,9 +459,9 @@ public class LibraryControllerHelperService {
 
         try {
           List<Library> sortedList = new ArrayList<>(saveSet);
-          Collections.sort(sortedList, new AliasComparator(Library.class));
+          Collections.sort(sortedList, new AliasComparator<>());
           for (Library library : sortedList) {
-            requestManager.saveLibrary(library);
+            libraryService.create(library);
           }
         } catch (Exception e) {
           log.error("Error saving bulk libraries", e);
@@ -546,7 +493,7 @@ public class LibraryControllerHelperService {
 
         StringBuilder libsb = new StringBuilder();
         List<LibraryType> types = new ArrayList<>();
-        for (LibraryType type : requestManager.listLibraryTypesByPlatform(platform)) {
+        for (LibraryType type : libraryService.listLibraryTypesByPlatform(PlatformType.get(platform))) {
           if (!type.getArchived() || type.getId() == originalLibraryTypeId) {
             types.add(type);
           }
@@ -603,7 +550,7 @@ public class LibraryControllerHelperService {
   public JSONObject getLibraryQcTypes(HttpSession session, JSONObject json) {
     try {
       StringBuilder sb = new StringBuilder();
-      Collection<QcType> types = requestManager.listAllLibraryQcTypes();
+      Collection<QcType> types = libraryService.listLibraryQcTypes();
       for (QcType s : types) {
         sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
@@ -639,7 +586,7 @@ public class LibraryControllerHelperService {
     JSONArray targetedSequencingByKit = new JSONArray();
     for (TargetedSequencing targetedSequencing : targetedSequencings) {
       Map<String, Object> targetedSequencingMap = Maps.newHashMap();
-      targetedSequencingMap.put("targetedSequencingId", targetedSequencing.getTargetedSequencingId());
+      targetedSequencingMap.put("targetedSequencingId", targetedSequencing.getId());
       targetedSequencingMap.put("alias", targetedSequencing.getAlias());
       targetedSequencingMap.put("kitDescriptorId", targetedSequencing.getKitDescriptor().getId());
       fullTargetedSequencingCollection.add(targetedSequencingMap);
@@ -674,18 +621,16 @@ public class LibraryControllerHelperService {
       }
       if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
         Long libraryId = Long.parseLong(json.getString("libraryId"));
-        Library library = requestManager.getLibraryById(libraryId);
-        LibraryQC newQc = dataObjectFactory.getLibraryQC();
+        Library library = libraryService.get(libraryId);
+        LibraryQC newQc = new LibraryQCImpl();
         if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
           library.setQcPassed(true);
         }
-        newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
         newQc.setQcType(requestManager.getLibraryQcTypeById(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
         newQc.setInsertSize(Integer.parseInt(json.getString("insertSize")));
-        library.addQc(newQc);
-        requestManager.saveLibraryQC(newQc);
+        libraryService.addQc(library, newQc);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th><th>Insert Size</th></tr>");
@@ -765,13 +710,13 @@ public class LibraryControllerHelperService {
         }
       }
       if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
+        boolean autoGenerateIdBarcodes = json.getBoolean("autoGenerateIdBarcodes");
+        boolean detailedSample = json.getBoolean("detailedSample");
         Long libraryId = Long.parseLong(json.getString("libraryId"));
-        Library library = requestManager.getLibraryById(libraryId);
-        LibraryDilution newDilution = dataObjectFactory.getLibraryDilution();
-        newDilution.setSecurityProfile(library.getSecurityProfile());
-        newDilution.setDilutionCreator(json.getString("dilutionCreator"));
+        Library library = libraryService.get(libraryId);
+        LibraryDilution newDilution = new LibraryDilution();
         newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
-        newDilution.setLastModified(newDilution.getCreationDate());
+        newDilution.setLastUpdated(newDilution.getCreationDate());
         newDilution.setConcentration(Double.parseDouble(json.getString("results")));
         if (json.has("targetedSequencing")) {
           Long libraryDilutionTargetedSequencingId = Long.parseLong(json.getString("targetedSequencing"));
@@ -784,7 +729,7 @@ public class LibraryControllerHelperService {
           newDilution.setIdentificationBarcode(json.getString("idBarcode"));
         }
         library.addDilution(newDilution);
-        requestManager.saveLibraryDilution(newDilution);
+        dilutionService.create(newDilution);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr>");
@@ -793,9 +738,6 @@ public class LibraryControllerHelperService {
           sb.append("<th>Targeted Sequencing</th>");
         }
         sb.append("<th>ID barcode</th>");
-        if (!library.getPlatformName().equals("Illumina")) {
-          sb.append("<th>Add emPCR</th>");
-        }
         sb.append("</tr>");
 
         File temploc = getBarcodeFileLocation(session);
@@ -818,6 +760,8 @@ public class LibraryControllerHelperService {
           sb.append("<td>");
 
           try {
+            BarcodeFactory barcodeFactory = new BarcodeFactory();
+
             barcodeFactory.setPointPixels(1.5f);
             barcodeFactory.setBitmapResolution(600);
             RenderedImage bi = barcodeFactory.generateSquareDataMatrix(dil, 400);
@@ -831,13 +775,14 @@ public class LibraryControllerHelperService {
             log.error("Error generating library dilution barcode", e);
           }
           sb.append("</td>");
+          sb.append("<td id='edit").append(dil.getId()).append("' align='center'>");
+          sb.append("<a href='javascript:void(0);' onclick='Library.dilution.changeLibraryDilutionRow(");
+          sb.append(dil.getId()).append(", ").append(autoGenerateIdBarcodes).append(", ");
+          sb.append(detailedSample).append(")'>");
+          sb.append("<span class='ui-icon ui-icon-pencil'></span></a></td>");
 
-          if (!library.getPlatformName().equals("Illumina")) {
-            sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrRow(" + dil.getId() + ");'>Add emPCR</a></td>");
-          } else {
-            sb.append(
-                "<td><a href='/miso/poolwizard/new/" + library.getSample().getProject().getProjectId() + "'>Construct New Pool</a></td>");
-          }
+          sb.append(
+              "<td><a href='/miso/poolwizard/new/" + library.getSample().getProject().getProjectId() + "'>Construct New Pool</a></td>");
 
           sb.append("</tr>");
         }
@@ -900,17 +845,17 @@ public class LibraryControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       Long dilutionId = Long.parseLong(json.getString("dilutionId"));
-      LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
+      LibraryDilution dilution = dilutionService.get(dilutionId);
       response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "'/>");
       if (!json.getBoolean("autoGenerateIdBarcodes")) {
         response.put("idBarcode",
             "<input type='text' id='idBarcodeValue" + dilutionId + "' value='"
                 + (isStringEmptyOrNull(dilution.getIdentificationBarcode()) ? "" : dilution.getIdentificationBarcode()) + "'/>");
       }
-      if (dilution.getLibrary().getLibraryAdditionalInfo() != null && dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit() != null
-          && dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit().getId() != null && json.getBoolean("detailedSample")) {
+      if (LimsUtils.isDetailedLibrary(dilution.getLibrary()) && ((DetailedLibrary) dilution.getLibrary()).getKitDescriptor() != null
+          && ((DetailedLibrary) dilution.getLibrary()).getKitDescriptor().getId() != null && json.getBoolean("detailedSample")) {
         response.put("targetedSequencings",
-            getTargetedSequencingTypes(dilution.getLibrary().getLibraryAdditionalInfo().getPrepKit().getId()));
+            getTargetedSequencingTypes(((DetailedLibrary) dilution.getLibrary()).getKitDescriptor().getId()));
       }
       response.put("edit",
           "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\", "
@@ -926,7 +871,7 @@ public class LibraryControllerHelperService {
     try {
       if (json.has("dilutionId") && !isStringEmptyOrNull(json.getString("dilutionId"))) {
         Long dilutionId = Long.parseLong(json.getString("dilutionId"));
-        LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
+        LibraryDilution dilution = dilutionService.get(dilutionId);
         dilution.setConcentration(Double.parseDouble(json.getString("result")));
         if (json.has("targetedSequencing")) {
           if (isStringEmptyOrNull(json.getString("targetedSequencing"))) {
@@ -936,8 +881,7 @@ public class LibraryControllerHelperService {
           }
         }
         if (json.has("idBarcode")) dilution.setIdentificationBarcode(json.getString("idBarcode"));
-        dilution.setLastModified(new Date());
-        requestManager.saveLibraryDilution(dilution);
+        dilutionService.update(dilution);
         return JSONUtils.SimpleJSONResponse("OK");
       }
     } catch (Exception e) {
@@ -945,203 +889,6 @@ public class LibraryControllerHelperService {
       return JSONUtils.SimpleJSONError("Failed to edit Library Dilution of this Library: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONError("Cannot add LibraryDilution");
-  }
-
-  public JSONObject addEmPcr(HttpSession session, JSONObject json) {
-    try {
-      for (Object k : json.keySet()) {
-        String key = (String) k;
-        if (isStringEmptyOrNull(json.getString(key))) {
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
-        }
-      }
-      if (json.has("dilutionId") && !isStringEmptyOrNull(json.getString("dilutionId"))) {
-        Long dilutionId = Long.parseLong(json.getString("dilutionId"));
-        LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
-        emPCR pcr = dataObjectFactory.getEmPCR();
-        pcr.setSecurityProfile(dilution.getSecurityProfile());
-        pcr.setPcrCreator(json.getString("pcrCreator"));
-        pcr.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("pcrDate")));
-        pcr.setConcentration(Double.parseDouble(json.getString("results")));
-        pcr.setLibraryDilution(dilution);
-        requestManager.saveEmPCR(pcr);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<tr>");
-        sb.append("<th>ID</th><th>Done By</th><th>Date</th><th>Results</th>");
-        sb.append("<th>Add emPCR Dilution</th>");
-        sb.append("</tr>");
-        for (emPCR p : requestManager.listAllEmPCRsByDilutionId(dilutionId)) {
-          sb.append("<tr>");
-          sb.append("<td>" + p.getId() + "</td>");
-          sb.append("<td>" + p.getPcrCreator() + "</td>");
-          sb.append("<td>" + p.getCreationDate() + "</td>");
-          sb.append("<td>" + p.getConcentration() + " " + p.getUnits() + "</td>");
-          sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrDilutionRow(" + p.getId()
-              + ");'>Add emPCR Dilution</a></td>");
-          sb.append("</tr>");
-        }
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      } else {
-        log.error("Failed to add emPCR to this LibraryDilution: No parent Dilution ID found");
-        return JSONUtils.SimpleJSONError("Failed to add emPCR to this LibraryDilution: No parent Dilution ID found");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add emPCR to this LibraryDilution: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add emPCR to this LibraryDilution: " + e.getMessage());
-    }
-  }
-
-  public JSONObject addEmPcrDilution(HttpSession session, JSONObject json) {
-    try {
-      for (Object k : json.keySet()) {
-        String key = (String) k;
-        if (isStringEmptyOrNull(json.getString(key))) {
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
-        }
-      }
-      if (json.has("pcrId") && !isStringEmptyOrNull(json.getString("pcrId"))) {
-        Long pcrId = Long.parseLong(json.getString("pcrId"));
-        emPCR pcr = requestManager.getEmPCRById(pcrId);
-        emPCRDilution newDilution = dataObjectFactory.getEmPCRDilution();
-        newDilution.setSecurityProfile(pcr.getSecurityProfile());
-        newDilution.setDilutionCreator(json.getString("pcrDilutionCreator"));
-        newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("pcrDilutionDate")));
-        newDilution.setConcentration(Double.parseDouble(json.getString("results")));
-        newDilution.setEmPCR(pcr);
-        requestManager.saveEmPCRDilution(newDilution);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<tr>");
-        sb.append("<th>ID</th><th>Done By</th><th>Date</th><th>Results</th><th>ID Barcode</th>");
-        sb.append("</tr>");
-
-        File temploc = getBarcodeFileLocation(session);
-        for (emPCRDilution dil : requestManager.listAllEmPCRDilutionsByEmPcrId(pcrId)) {
-          sb.append("<tr>");
-          sb.append("<td>" + dil.getId() + "</td>");
-          sb.append("<td>" + dil.getDilutionCreator() + "</td>");
-          sb.append("<td>" + dil.getCreationDate() + "</td>");
-          sb.append("<td>" + dil.getConcentration() + " " + dil.getUnits() + "</td>");
-
-          sb.append("<td>");
-          try {
-            barcodeFactory.setPointPixels(1.5f);
-            barcodeFactory.setBitmapResolution(600);
-            RenderedImage bi = barcodeFactory.generateSquareDataMatrix(dil, 400);
-            if (bi != null) {
-              File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
-              if (ImageIO.write(bi, "png", tempimage)) {
-                sb.append("<img style='border:0;' src='/temp/" + tempimage.getName() + "'/>");
-              }
-            }
-          } catch (IOException e) {
-            log.error("failed to add EmPCR dilution", e);
-          }
-          sb.append("</td>");
-
-          sb.append("<td><a href='/miso/poolwizard/new/" + pcr.getLibraryDilution().getLibrary().getSample().getProject().getProjectId()
-              + "'>Construct New Pool</a></td>");
-          sb.append("</tr>");
-        }
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    } catch (Exception e) {
-      log.error("Failed to add EmPCRDilution to this EmPCR: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add EmPCRDilution to this EmPCR: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONError("Cannot add EmPCRDilution");
-  }
-
-  public JSONObject bulkAddEmPcrs(HttpSession session, JSONObject json) {
-    try {
-      JSONArray pcrs = JSONArray.fromObject(json.getString("pcrs"));
-      // validate
-      boolean ok = true;
-      for (JSONObject pcr : (Iterable<JSONObject>) pcrs) {
-        String pcrCreator = pcr.getString("pcrCreator");
-        String pcrDate = pcr.getString("pcrDate");
-        String concentration = pcr.getString("results");
-
-        if (isStringEmptyOrNull(concentration) || isStringEmptyOrNull(pcrCreator) || isStringEmptyOrNull(pcrDate)) {
-          ok = false;
-        }
-      }
-
-      // persist
-      if (ok) {
-        Map<String, Object> map = new HashMap<>();
-        JSONArray a = new JSONArray();
-        JSONArray errors = new JSONArray();
-        for (JSONObject pcr : (Iterable<JSONObject>) pcrs) {
-          JSONObject j = addEmPcr(session, pcr);
-          j.put("dilutionId", pcr.getString("dilutionId"));
-          if (j.has("error")) {
-            errors.add(j);
-          } else {
-            a.add(j);
-          }
-        }
-        map.put("saved", a);
-        if (!errors.isEmpty()) {
-          map.put("errors", errors);
-        }
-        return JSONUtils.JSONObjectResponse(map);
-      } else {
-        log.error("Failed to add EmPCRs to this Library Dilution: one of the required fields of the selected EmPCR is missing or invalid");
-        return JSONUtils.SimpleJSONError(
-            "Failed to add EmPCRs to this Library Dilution: one of the required fields of the EmPCR is missing or invalid");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add EmPCRs to this Library Dilution: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add EmPCRs to this Library Dilution: " + e.getMessage());
-    }
-  }
-
-  public JSONObject bulkAddEmPcrDilutions(HttpSession session, JSONObject json) {
-    try {
-      JSONArray dilutions = JSONArray.fromObject(json.getString("dilutions"));
-      // validate
-      boolean ok = true;
-      for (JSONObject dil : (Iterable<JSONObject>) dilutions) {
-        String dilutionCreator = dil.getString("pcrDilutionCreator");
-        String dilutionDate = dil.getString("pcrDilutionDate");
-        String concentration = dil.getString("results");
-
-        if (isStringEmptyOrNull(concentration) || isStringEmptyOrNull(dilutionCreator) || isStringEmptyOrNull(dilutionDate)) {
-          ok = false;
-        }
-      }
-
-      // persist
-      if (ok) {
-        Map<String, Object> map = new HashMap<>();
-        JSONArray a = new JSONArray();
-        JSONArray errors = new JSONArray();
-        for (JSONObject dil : (Iterable<JSONObject>) dilutions) {
-          JSONObject j = addEmPcrDilution(session, dil);
-          j.put("pcrId", dil.getString("pcrId"));
-          if (j.has("error")) {
-            errors.add(j);
-          } else {
-            a.add(j);
-          }
-        }
-        map.put("saved", a);
-        if (!errors.isEmpty()) {
-          map.put("errors", errors);
-        }
-        return JSONUtils.JSONObjectResponse(map);
-      } else {
-        log.error(
-            "Failed to add EmPCR Dilutions to this EmPCR: one of the required fields of the selected EmPCR Dilutions is missing or invalid");
-        return JSONUtils.SimpleJSONError(
-            "Failed to add EmPCR Dilutions to this EmPCR: one of the required fields of the selected EmPCR Dilutions is missing or invalid");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add EmPCR Dilutions to this EmPCR: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add EmPCR Dilutions to this EmPCR: " + e.getMessage());
-    }
   }
 
   public JSONObject changeLibraryQCRow(HttpSession session, JSONObject json) {
@@ -1170,7 +917,7 @@ public class LibraryControllerHelperService {
 
         libraryQc.setResults(Double.parseDouble(json.getString("result")));
         libraryQc.setInsertSize(Integer.parseInt(json.getString("insertSize")));
-        requestManager.saveLibraryQC(libraryQc);
+        libraryService.addQc(libraryService.get(libraryQc.getLibrary().getId()), libraryQc);
 
       }
       return JSONUtils.SimpleJSONResponse("done");
@@ -1181,110 +928,32 @@ public class LibraryControllerHelperService {
   }
 
   public JSONObject deleteLibrary(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("error getting current logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("libraryId")) {
-        Long libraryId = json.getLong("libraryId");
-        try {
-          requestManager.deleteLibrary(requestManager.getLibraryById(libraryId));
-          return JSONUtils.SimpleJSONResponse("Library deleted");
-        } catch (IOException e) {
-          log.error("cannot delete library", e);
-          return JSONUtils.SimpleJSONError("Cannot delete library: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No library specified to delete.");
+    if (json.has("libraryId")) {
+      Long libraryId = json.getLong("libraryId");
+      try {
+        libraryService.delete(libraryService.get(libraryId));
+        return JSONUtils.SimpleJSONResponse("Library deleted");
+      } catch (IOException e) {
+        log.error("cannot delete library", e);
+        return JSONUtils.SimpleJSONError("Cannot delete library: " + e.getMessage());
       }
     } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
+      return JSONUtils.SimpleJSONError("No library specified to delete.");
     }
   }
 
   public JSONObject deleteLibraryDilution(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("error getting currently logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("libraryDilutionId")) {
-        Long libraryDilutionId = json.getLong("libraryDilutionId");
-        try {
-          requestManager.deleteLibraryDilution(requestManager.getLibraryDilutionById(libraryDilutionId));
-          return JSONUtils.SimpleJSONResponse("LibraryDilution deleted");
-        } catch (IOException e) {
-          log.error("delete library dilution", e);
-          return JSONUtils.SimpleJSONError("Cannot delete library dilution: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No library dilution specified to delete.");
+    if (json.has("libraryDilutionId")) {
+      Long libraryDilutionId = json.getLong("libraryDilutionId");
+      try {
+        dilutionService.delete(dilutionService.get(libraryDilutionId));
+        return JSONUtils.SimpleJSONResponse("LibraryDilution deleted");
+      } catch (IOException e) {
+        log.error("delete library dilution", e);
+        return JSONUtils.SimpleJSONError("Cannot delete library dilution: " + e.getMessage());
       }
     } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
-    }
-  }
-
-  public JSONObject deleteEmPCR(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("cannot get currently logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("empcrId")) {
-        Long empcrId = json.getLong("empcrId");
-        try {
-          requestManager.deleteEmPCR(requestManager.getEmPCRById(empcrId));
-          return JSONUtils.SimpleJSONResponse("EmPCR deleted");
-        } catch (IOException e) {
-          log.error("cannot delete EmPCR", e);
-          return JSONUtils.SimpleJSONError("Cannot delete EmPCR: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No EmPCR specified to delete.");
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
-    }
-  }
-
-  public JSONObject deleteEmPCRDilution(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("error getting currently logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("deleteEmPCRDilution")) {
-        Long deleteEmPCRDilution = json.getLong("deleteEmPCRDilution");
-        try {
-          requestManager.deleteEmPCRDilution(requestManager.getEmPCRDilutionById(deleteEmPCRDilution));
-          return JSONUtils.SimpleJSONResponse("EmPCRDilution deleted");
-        } catch (IOException e) {
-          log.error("cannot delete EmPCR dilution", e);
-          return JSONUtils.SimpleJSONError("Cannot delete EmPCR dilution: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No EmPCR dilution specified to delete.");
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
+      return JSONUtils.SimpleJSONError("No library dilution specified to delete.");
     }
   }
 
@@ -1296,20 +965,12 @@ public class LibraryControllerHelperService {
     this.requestManager = requestManager;
   }
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
-    this.barcodeFactory = barcodeFactory;
-  }
-
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
-    this.printManager = printManager;
+  public void setPrinterService(PrinterService printerService) {
+    this.printerService = printerService;
   }
 
   public void setLibraryNamingScheme(NamingScheme namingScheme) {
@@ -1318,5 +979,13 @@ public class LibraryControllerHelperService {
 
   public void setIndexStore(IndexStore indexStore) {
     this.indexStore = indexStore;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 }

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -43,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
-import uk.ac.bbsrc.tgac.miso.core.util.DateComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.QcDateComparator;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.responder
@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.DateComparator;
 public class RunQcAddedResponderService extends AbstractResponderService<RunEvent> {
   protected static final Logger log = LoggerFactory.getLogger(RunQcAddedResponderService.class);
 
-  private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
+  private Set<AlerterService> alerterServices = new HashSet<>();
 
   @Override
   public Set<AlerterService> getAlerterServices() {
@@ -84,14 +84,10 @@ public class RunQcAddedResponderService extends AbstractResponderService<RunEven
     Run r = event.getEventObject();
     RunQC lastAdded = null;
 
-    List<RunQC> lqc = new ArrayList<RunQC>(r.getRunQCs());
+    List<RunQC> lqc = new ArrayList<>(r.getRunQCs());
     if (!lqc.isEmpty()) {
-      try {
-        Collections.sort(lqc, new DateComparator(RunQC.class, "getQcDate"));
-        lastAdded = lqc.get(lqc.size() - 1);
-      } catch (NoSuchMethodException e) {
-        log.error("Cannot sort list of run QCs", e);
-      }
+      Collections.sort(lqc, new QcDateComparator<>());
+      lastAdded = lqc.get(lqc.size() - 1);
     }
 
     for (User user : r.getWatchers()) {

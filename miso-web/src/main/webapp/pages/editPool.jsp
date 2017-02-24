@@ -195,8 +195,8 @@
   <tr>
     <td class="h">Location:</td>
     <td>
-      <c:if test="${!empty pool.boxLocation}">${pool.boxLocation},</c:if>
-      <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.boxId}"/>'>${pool.boxAlias}, ${pool.boxPosition}</a></c:if>
+      <c:if test="${!empty pool.box.locationBarcode}">${pool.box.locationBarcode},</c:if>
+      <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.box.id}"/>'>${pool.box.alias}, ${pool.boxPosition}</a></c:if>
     </td>
   </tr>
 </table>
@@ -264,8 +264,8 @@
   </div>
   <div id="qcs" style="display:none;">
   <h1>
-    <div id="qcsTotalCount">
-    </div>
+    <span id="qcsTotalCount">
+    </span>
   </h1>
   <ul class="sddm">
     <li><a
@@ -281,7 +281,7 @@
       </div>
     </li>
   </ul>
-  <span style="clear:both">
+  <div style="clear:both">
     <div id="addPoolQC"></div>
     <div id='addQcForm'>
       <table class="list" id="poolQcTable">
@@ -329,11 +329,11 @@
         jQuery('#qcsTotalCount').html(qcsCount + (qcsCount == 1 ? ' QC' : ' QCs'));
       });
     </script>
-  </span>
+  </div>
   </div>
 </c:if>
 
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#experiments_arrowclick'), 'experiments');")>
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#experiments_arrowclick'), 'experiments');">
   Experiments
   <div id="experiments_arrowclick" class="toggleLeftDown"></div>
 </div>
@@ -367,7 +367,7 @@
 <h2 class="hrule">Select experiments:</h2>
 <table class="in">
   <tr>
-    <td width="30%" style="vertical-align:top">
+    <td style="vertical-align:top;width:30%">
       <label for="selectExpts"><b>Search experiments:</b></label><br/>
       <input type="text" id='selectExpts' name="selectExpts" value=""
              onKeyup="Utils.timer.timedFunc(Pool.search.poolSearchExperiments(this, 'ILLUMINA'),200);"/>
@@ -388,11 +388,11 @@
   <h1>Orders</h1>
   <span onclick="Pool.orders.createOrder()" class="sddm fg-button ui-state-default ui-corner-all">Add Order</span>
 
-  <table cellpadding="0" cellspacing="0" border="0" class="display" id="edit-order-table"></table>
+  <table class="display no-border" id="edit-order-table"></table>
 
   <br/>
   <h1>Order Completion</h1>
-  <table cellpadding="0" cellspacing="0" border="0" class="display" id="order-completion-table"></table>
+  <table class="display no-border" id="order-completion-table"></table>
 </div>
   <br/>
 
@@ -411,7 +411,7 @@
 <c:otherwise>
   <h2>Selected element(s):</h2>
   <div id="pooledList">
-    <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="pooledElementsDatatable">
+    <table class="display no-border full-width" id="pooledElementsDatatable">
 	  <thead>
 	  <tr>
 	    <th>Dilution Name</th>
@@ -524,7 +524,7 @@
   <br/>
   <h1>Runs</h1>
   <div id="runsDatatableDiv">
-      <table cell-padding="0" width="100%" cellspacing="0" border="0" class="display" id="runsDatatable">
+      <table class="display full-width no-border" id="runsDatatable">
       </table>
   </div>
 </div>
@@ -533,7 +533,7 @@
 <c:if test="${not empty pool.changeLog}">
   <br/>
   <h1>Changes</h1>
-  <span style="clear:both">
+  <div style="clear:both">
     <table class="list" id="changelog_table">
       <thead>
       <tr>
@@ -552,7 +552,7 @@
       </c:forEach>
       </tbody>
     </table>
-  </span>
+  </div>
 </c:if>
 
 <div id="order-dialog" title="Order" hidden="true">

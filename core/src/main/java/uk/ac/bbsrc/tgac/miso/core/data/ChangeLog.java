@@ -7,42 +7,36 @@ import com.eaglegenomics.simlims.core.User;
 /**
  * A single entry in the database-generated change log for an object.
  */
-public class ChangeLog {
-  private String columnsChanged;
-  private String summary;
-  private Date time;
-  private User user;
+public interface ChangeLog {
 
-  public String getColumnsChanged() {
-    return columnsChanged;
-  }
+  /**
+   * The id of the entity associated with the ChangeLog.
+   * 
+   * @return The entity id. (e.g. the id of the Box, Pool, etc.)
+   */
+  public Long getId();
 
-  public String getSummary() {
-    return summary;
-  }
+  /**
+   * Set the id of the entity associated with the ChangeLog.
+   * 
+   * @param id The entity id. (e.g. the id of the Box, Pool, etc.)
+   */
+  public void setId(Long id);
 
-  public Date getTime() {
-    return time;
-  }
+  public String getColumnsChanged();
 
-  public void setColumnsChanged(String columnsChanged) {
-    this.columnsChanged = columnsChanged;
-  }
+  public String getSummary();
 
-  public void setSummary(String summary) {
-    this.summary = summary;
-  }
+  public Date getTime();
 
-  public void setTime(Date time) {
-    this.time = time;
-  }
+  public void setColumnsChanged(String columnsChanged);
 
-  public User getUser() {
-    return user;
-  }
+  public void setSummary(String summary);
 
-  public void setUser(User user) {
-    this.user = user;
-  }
+  public void setTime(Date time);
+
+  public User getUser();
+
+  public void setUser(User user);
 
 }

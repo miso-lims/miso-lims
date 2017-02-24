@@ -107,10 +107,10 @@
   </c:choose>
 </table>
 
-<table width="100%">
+<table class="full-width">
   <tbody>
   <tr>
-    <td width="50%" valign="top">
+    <td class="half-width" valign="top">
       <h2>${container.platform.platformType.containerName} Parameters</h2>
 
       <div id="containerPartitions">
@@ -208,19 +208,16 @@
                   </c:otherwise>
                 </c:choose>
               </tr>
-                <%--
-                <tr>
-                  <td>Paired: ${container.paired}</td>
-                </tr>
-                --%>
             </table>
             <div id='partitionErrorDiv'></div>
             <div id="partitionDiv">
               <i class="italicInfo">Click in a ${container.platform.platformType.partitionName} box to beep/type in barcodes, or double click a pool on the
                 right to sequentially add pools to the ${container.platform.platformType.containerName}</i>
               <table class="in">
-                <th>${container.platform.platformType.partitionName} No.</th>
-                <th>Pool</th>
+                <tr>
+                  <th>${container.platform.platformType.partitionName} No.</th>
+                  <th>Pool</th>
+                </tr>
                 <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
                   <tr>
                     <td>${partition.partitionNumber}</td>
@@ -257,7 +254,7 @@
                                 </c:otherwise>
                               </c:choose>
                               </span>
-                              <c:if test="${empty container.run or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                              <c:if test="${empty container.runs or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                               <span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this, "${partition.partitionNumber}");' class='float-right ui-icon ui-icon-circle-close'></span>
                               </c:if>
                             </div>
@@ -278,11 +275,11 @@
         </c:if>
       </div>
     </td>
-    <td width="50%" valign="top">
+    <td class="half-width" valign="top">
       <h2>Available Pools</h2>
       <c:choose>
         <c:when test="${not empty container.platform}">
-          <input id="showOnlyReady" type="checkbox" checked="true"
+          <input id="showOnlyReady" type="checkbox" checked="checked"
                  onclick="Container.pool.toggleReadyToRunCheck(this, '${container.platform.platformType.key}');"/>Only Ready to Run pools?
           <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
             <input type="text" size="8" id="searchPools" name="searchPools"/>
@@ -294,7 +291,7 @@
           </script>
         </c:when>
         <c:otherwise>
-          <input id="showOnlyReady" type="checkbox" checked="true"
+          <input id="showOnlyReady" type="checkbox" checked="checked"
                  onclick="Container.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformTypes]:checked').val());"/>Only Ready to Run pools?
           <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
             <input type="text" size="8" id="searchPools" name="searchPools"/>
@@ -326,7 +323,7 @@
 <c:if test="${not empty containerRuns}">
   <div>
     <h1>${fn:length(containerRuns)} Runs</h1>
-    <span class="clear">
+    <div class="clear">
       <table class="list" id="run_table">
         <thead>
         <tr>
@@ -346,14 +343,14 @@
             <td>${run.status.health}</td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
+              <span class="ui-icon ui-icon-trash"></span>
             </td>
             </sec:authorize>
           </tr>
         </c:forEach>
         </tbody>
       </table>
-    </span>
+    </div>
   </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
@@ -379,7 +376,7 @@
 <c:if test="${not empty container.changeLog}">
   <div>
 	  <h1>Changes</h1>
-	  <span class="clear">
+	  <div class="clear">
 	    <table class="list" id="changelog_table">
 	      <thead>
 	      <tr>
@@ -398,7 +395,7 @@
 	      </c:forEach>
 	      </tbody>
 	    </table>
-	  </span>
+	  </div>
   </div>
 </c:if>
 

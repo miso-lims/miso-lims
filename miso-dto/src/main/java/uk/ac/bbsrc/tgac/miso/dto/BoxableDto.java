@@ -7,6 +7,8 @@ public class BoxableDto {
 
   private String boxPosition;
 
+  private String coordinates;
+
   private Boolean discarded;
 
   /**
@@ -31,6 +33,10 @@ public class BoxableDto {
 
   public String getBoxPosition() {
     return boxPosition;
+  }
+
+  public String getCoordinates() {
+    return coordinates;
   }
 
   public Boolean getDiscarded() {
@@ -63,6 +69,10 @@ public class BoxableDto {
 
   public void setBoxPosition(String boxPosition) {
     this.boxPosition = boxPosition;
+  }
+
+  public void setCoordinates(String coordinates) {
+    this.coordinates = coordinates;
   }
 
   public void setDiscarded(Boolean discarded) {

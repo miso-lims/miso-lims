@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -37,13 +36,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -51,19 +45,10 @@ import java.net.URL;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
@@ -71,6 +56,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -82,8 +68,12 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
@@ -95,8 +85,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 
 /**
  * Utility class to provde helpful functions to MISO
@@ -107,7 +100,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 public class LimsUtils {
   public static final long SYSTEM_USER_ID = 0;
 
-  protected static final Logger log = LoggerFactory.getLogger(LimsUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(LimsUtils.class);
 
   public static String unicodeify(String barcode) {
     log.debug("ORIGINAL :: " + barcode);
@@ -168,17 +161,19 @@ public class LimsUtils {
    * @return String
    * @throws IllegalArgumentException
    */
-  public static String join(Collection s, String delimiter) throws IllegalArgumentException {
+  public static String join(Iterable<?> s, String delimiter) throws IllegalArgumentException {
     if (s == null) {
       throw new IllegalArgumentException("Collection to join must not be null");
     }
     StringBuffer buffer = new StringBuffer();
-    Iterator iter = s.iterator();
-    while (iter.hasNext()) {
-      buffer.append(iter.next());
-      if (iter.hasNext() && delimiter != null) {
+    boolean first = true;
+    for (Object o : s) {
+      if (first) {
+        first = false;
+      } else {
         buffer.append(delimiter);
       }
+      buffer.append(o);
     }
     return buffer.toString();
   }
@@ -201,116 +196,6 @@ public class LimsUtils {
     return buffer.toString();
   }
 
-  public static <T> List<List<T>> partition(List<T> list, int size) {
-
-    if (list == null) throw new NullPointerException("'list' must not be null");
-    if (!(size > 0)) throw new IllegalArgumentException("'size' must be greater than 0");
-
-    return new Partition<>(list, size);
-  }
-
-  private static class Partition<T> extends AbstractList<List<T>> {
-
-    final List<T> list;
-    final int size;
-
-    Partition(List<T> list, int size) {
-      this.list = list;
-      this.size = size;
-    }
-
-    @Override
-    public List<T> get(int index) {
-      int listSize = size();
-      if (listSize < 0) throw new IllegalArgumentException("negative size: " + listSize);
-      if (index < 0) throw new IndexOutOfBoundsException("index " + index + " must not be negative");
-      if (index >= listSize) throw new IndexOutOfBoundsException("index " + index + " must be less than size " + listSize);
-      int start = index * size;
-      int end = Math.min(start + size, list.size());
-      return list.subList(start, end);
-    }
-
-    @Override
-    public int size() {
-      return (list.size() + size - 1) / size;
-    }
-
-    @Override
-    public boolean isEmpty() {
-      return list.isEmpty();
-    }
-  }
-
-  /**
-   * Computes the relative complement of two sets, i.e. those elements that are in A but not in B
-   * 
-   * @param needles of type Set
-   * @param haystack of type Set
-   * @return Set
-   */
-  public static Set relativeComplement(Set needles, Set haystack) {
-    Set diff = (Set) ((HashSet) needles).clone();
-    diff.removeAll(haystack);
-    return diff;
-  }
-
-  /**
-   * SLOWLY computes the relative complement of two sets, i.e. those elements that are in A but not in B, based on an object's given
-   * accessor to a property.
-   * <p/>
-   * This is distinctly less efficient than {@link uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.relativeComplement()} (this method uses
-   * reflection) but can avoid comparing objects by hashcode. This is useful when trying to compare objects that have been persisted, and
-   * therefore have unique IDs and Names, to objects that haven't, and hence have no ID or Name.
-   * <p/>
-   * If an exception occurs, null is returned.
-   * 
-   * @param c of type Class
-   * @param needles of type Set
-   * @param haystack of type Set
-   * @return Set
-   */
-  public static Set relativeComplementByProperty(Class c, String methodName, Set needles, Set haystack) {
-    try {
-      Method m = c.getMethod(methodName);
-      Set diff = (Set) ((HashSet) needles).clone();
-
-      if (diff.size() > haystack.size()) {
-        for (Iterator<?> i = haystack.iterator(); i.hasNext();) {
-          Object h = i.next();
-          String hProp = (String) m.invoke(h);
-          for (Iterator<?> j = diff.iterator(); j.hasNext();) {
-            Object n = j.next();
-            String nProp = (String) m.invoke(n);
-            if (nProp.equals(hProp)) {
-              j.remove();
-            }
-          }
-        }
-      } else {
-        for (Iterator<?> i = diff.iterator(); i.hasNext();) {
-          Object n = i.next();
-          String nProp = (String) m.invoke(n);
-          for (Iterator<?> j = haystack.iterator(); j.hasNext();) {
-            Object h = j.next();
-            String hProp = (String) m.invoke(h);
-            if (nProp.equals(hProp)) {
-              i.remove();
-            }
-          }
-        }
-      }
-      return diff;
-    } catch (ConcurrentModificationException e) {
-      log.error("Backing set modification outside iterator.", e);
-    } catch (NoSuchMethodException e) {
-      log.error("Class " + c.getName() + " doesn't declare a " + methodName + " method.", e);
-    } catch (InvocationTargetException e) {
-      log.error("Cannot invoke " + methodName + " on class " + c.getName(), e);
-    } catch (IllegalAccessException e) {
-      log.error("Cannot invoke " + methodName + " on class " + c.getName(), e);
-    }
-    return null;
-  }
 
   public static String findHyperlinks(String text) {
     if (!LimsUtils.isStringEmptyOrNull(text)) {
@@ -335,10 +220,6 @@ public class LimsUtils {
      * if (locationBarcode is valid) { retrieve text representation of location and return } else { return null; }
      */
     return locationBarcode;
-  }
-
-  public static void unzipFile(File source) {
-    unzipFile(source, null);
   }
 
   public static boolean unzipFile(File source, File destination) {
@@ -496,7 +377,7 @@ public class LimsUtils {
    * @return Map<String, String>
    * @throws IOException when
    */
-  public static Map<String, String> checkPipes(Process process) throws IOException {
+  static Map<String, String> checkPipes(Process process) throws IOException {
     HashMap<String, String> r = new HashMap<>();
     String error = LimsUtils.processStdErr(process);
     if (isStringEmptyOrNull(error)) {
@@ -508,19 +389,6 @@ public class LimsUtils {
       r.put("error", error);
     }
     return r;
-  }
-
-  public static byte[] objectToByteArray(Object o) throws IOException {
-    ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    ObjectOutputStream oos = new ObjectOutputStream(bout);
-    oos.writeObject(o);
-    return bout.toByteArray();
-  }
-
-  public static Object byteArrayToObject(byte[] bytes) throws IOException, ClassNotFoundException {
-    ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
-    ObjectInputStream ois = new ObjectInputStream(bin);
-    return ois.readObject();
   }
 
   /**
@@ -554,6 +422,7 @@ public class LimsUtils {
     while ((line = br.readLine()) != null) {
       sb.append(line);
     }
+    br.close();
     return sb.toString();
   }
 
@@ -562,24 +431,6 @@ public class LimsUtils {
     p.println(s);
     safeClose(p);
     return f;
-  }
-
-  /**
-   * Reads the contents of an InputStream into a byte[]
-   * 
-   * @param in of type InputStream
-   * @return byte[]
-   * @throws IOException when
-   */
-  public static byte[] inputStreamToByteArray(InputStream in) throws IOException {
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-    int nRead;
-    byte[] data = new byte[16384];
-    while ((nRead = in.read(data, 0, data.length)) != -1) {
-      buffer.write(data, 0, nRead);
-    }
-    buffer.flush();
-    return buffer.toByteArray();
   }
 
   /**
@@ -617,9 +468,9 @@ public class LimsUtils {
     return df.format(date);
   }
 
-  public static final Pattern linePattern = Pattern.compile(".*\r?\n");
+  private static final Pattern linePattern = Pattern.compile(".*\r?\n");
 
-  public static Matcher grep(CharBuffer cb, Pattern pattern) {
+  private static Matcher grep(CharBuffer cb, Pattern pattern) {
     Matcher lm = linePattern.matcher(cb); // Line matcher
     Matcher pm = null; // Pattern matcher
     while (lm.find()) {
@@ -636,30 +487,7 @@ public class LimsUtils {
     return null;
   }
 
-  public static Matcher grep(File f, Pattern p) throws IOException {
-    // Charset and decoder for ISO-8859-15
-    Charset charset = Charset.forName("ISO-8859-15");
-    CharsetDecoder decoder = charset.newDecoder();
 
-    // Open the file and then get a channel from the stream
-    FileInputStream fis = new FileInputStream(f);
-    FileChannel fc = fis.getChannel();
-
-    // Get the file's size and then map it into memory
-    int sz = (int) fc.size();
-    MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, sz);
-
-    // Decode the file into a char buffer
-    CharBuffer cb = decoder.decode(bb);
-
-    // Perform the search
-    Matcher m = grep(cb, p);
-
-    // Close the channel and the stream
-    fc.close();
-
-    return m;
-  }
 
   public static Matcher tailGrep(File f, Pattern p, int lines) throws IOException, FileNotFoundException {
     // Open the file and then get a channel from the stream
@@ -679,6 +507,7 @@ public class LimsUtils {
         }
       }
 
+      fis.close();
       int offset = (int) i + 1;
 
       if (offset >= bb.limit()) throw new NoSuchElementException();
@@ -702,26 +531,6 @@ public class LimsUtils {
     }
   }
 
-  public static String reflectString(Object o) {
-    StringBuilder result = new StringBuilder();
-    try {
-      result.append(o.getClass().getName());
-      result.append("\n————————————\n");
-      Class c = o.getClass();
-      Field fieldList[] = c.getDeclaredFields();
-      for (Field entry : fieldList) {
-        result.append(entry.getName());
-        result.append(":");
-        result.append(entry.get(o));
-        result.append("\n");
-      }
-    } catch (Exception e) {
-      log.error("reflect string", e);
-      result.append("\n\nERROR: " + e.getMessage() + "\n\n");
-    }
-    return result.toString();
-  }
-
   // put this anywhere you like in your common code.
   public static void safeClose(Closeable c) {
     try {
@@ -733,34 +542,6 @@ public class LimsUtils {
 
   public static String capitalise(String s) {
     return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-  }
-
-  public static String noddyCamelCaseify(String s) {
-    return Character.toLowerCase(s.charAt(0)) + s.substring(1);
-  }
-
-  public static List<Class<?>> getAllInterfaces(Class<?> cls) {
-    if (cls == null) {
-      return null;
-    }
-    List<Class<?>> list = new ArrayList<>();
-    while (cls != null) {
-      Class[] interfaces = cls.getInterfaces();
-      for (int i = 0; i < interfaces.length; i++) {
-        if (!list.contains(interfaces[i])) {
-          list.add(interfaces[i]);
-        }
-        List superInterfaces = getAllInterfaces(interfaces[i]);
-        for (Iterator it = superInterfaces.iterator(); it.hasNext();) {
-          Class intface = (Class) it.next();
-          if (!list.contains(intface)) {
-            list.add(intface);
-          }
-        }
-      }
-      cls = cls.getSuperclass();
-    }
-    return list;
   }
 
   public static void inheritUsersAndGroups(SecurableByProfile child, SecurityProfile parentProfile) {
@@ -789,7 +570,7 @@ public class LimsUtils {
         ((DetailedSample) child).getSampleClass());
   }
 
-  public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
+  private static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
     for (SampleValidRelationship relation : relations) {
       if (relation.getParent().getId() == parent.getId() && relation.getChild().getId() == child.getId()) {
         return true;
@@ -824,7 +605,7 @@ public class LimsUtils {
       if (poolGroups.containsKey(completion.getPool())) {
         parametersGroup = poolGroups.get(completion.getPool());
       } else {
-        parametersGroup = new HashMap<>();
+        parametersGroup = new TreeMap<>();
         poolGroups.put(completion.getPool(), parametersGroup);
       }
       PoolOrderCompletionGroup groupedCompletions;
@@ -890,6 +671,10 @@ public class LimsUtils {
     return sample instanceof SampleAliquot;
   }
 
+  public static boolean isDetailedLibrary(Library library) {
+    return library instanceof DetailedLibrary;
+  }
+
   public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) throws IOException {
     for (SampleValidRelationship relationship : relationships) {
       if (!relationship.getArchived() && relationship.getChild().getId() == id
@@ -899,4 +684,87 @@ public class LimsUtils {
     }
     return false;
   }
+
+  public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
+    ValidationResult val = namingScheme.validateName(object.getName());
+    if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
+  }
+
+  /**
+   * universal temporary name prefix. TODO: these same methods are in sqlstore DbUtils;
+   * use those when refactoring away the RequestManager.
+   */
+  static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
+
+  /**
+   * Generate a temporary name using a UUID.
+   * 
+   * @return Temporary name
+   */
+  static public String generateTemporaryName() {
+    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
+  }
+
+  /**
+   * Check if the nameable object has a temporary name.
+   * 
+   * @param nameable Nameable object
+   * @return
+   */
+  static public boolean hasTemporaryName(Nameable nameable) {
+    return nameable != null && nameable.getName() != null && nameable.getName().startsWith(TEMPORARY_NAME_PREFIX);
+  }
+
+  /**
+   * Check if the Boxable item has a temporary name
+   * 
+   * @param boxable Boxable item
+   * @return
+   */
+  static public boolean hasTemporaryAlias(Boxable boxable) {
+    return boxable != null && boxable.getAlias() != null && boxable.getAlias().startsWith(TEMPORARY_NAME_PREFIX);
+  }
+
+  /**
+   * Generates a unique barcode for a Nameable entity, and sets the identificationBarcode property for Boxables and LibraryDilutions.
+   * 
+   * @param nameable Nameable object
+   * @throws IOException
+   */
+  public static void generateAndSetIdBarcode(Nameable nameable) throws IOException {
+    String barcode = null;
+    if (nameable instanceof LibraryDilution && nameable.getName() != null) {
+      barcode = nameable.getName();
+      if (((LibraryDilution) nameable).getLibrary() != null
+          && ((LibraryDilution) nameable).getLibrary().getAlias() != null) {
+        barcode += "::" + ((LibraryDilution) nameable).getLibrary().getAlias();
+      }
+      ((LibraryDilution) nameable).setIdentificationBarcode(barcode);
+    } else if (nameable instanceof Boxable && nameable.getName() != null) {
+      barcode = nameable.getName();
+      if (((Boxable) nameable).getAlias() != null) {
+        barcode += "::" + ((Boxable) nameable).getAlias();
+      }
+      ((Boxable) nameable).setIdentificationBarcode(barcode);
+    } else {
+      throw new IOException("Error generating barcode");
+    }
+  }
+
+  public static void appendSet(StringBuilder target, Set<String> items, String prefix) {
+    if (items.isEmpty()) return;
+    target.append(" ");
+    target.append(prefix);
+    target.append(": ");
+    boolean first = true;
+    for (String item : items) {
+      if (first) {
+        first = false;
+      } else {
+        target.append(", ");
+      }
+      target.append(item);
+    }
+  }
+
 }

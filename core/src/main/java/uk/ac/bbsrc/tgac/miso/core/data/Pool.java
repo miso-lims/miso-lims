@@ -27,13 +27,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -52,11 +54,12 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "dilutions" })
-@PrintableBarcode
-public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watchable, Deletable, Alertable, Boxable, Nameable {
+public interface Pool
+    extends SecurableByProfile, Comparable<Pool>, Barcodable, Watchable, Deletable, Alertable, Boxable, Nameable, ChangeLoggable {
 
   /**
    * Sets the ID of this Pool object.
@@ -91,22 +94,22 @@ public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watcha
   public void setAlias(String alias);
 
   /**
-   * Adds a dilution to this Pool
+   * Adds a library dilution to this Pool
    * 
    * @param poolable element of type P
-   * @throws MalformedDilutionException when the Dilution added is not valid
+   * @throws MalformedDilutionException when the LibraryDilution added is not valid
    */
-  public void addPoolableElement(Dilution poolable) throws MalformedDilutionException;
+  public void addPoolableElement(LibraryDilution poolable) throws MalformedDilutionException;
 
   /**
    * Sets the elements of this Pool object.
    */
-  public void setPoolableElements(Set<Dilution> dilutions);
+  public void setPoolableElements(Set<LibraryDilution> dilutions);
 
   /**
    * Returns the elements of this Pool object.
    */
-  public Set<Dilution> getPoolableElements();
+  public Set<LibraryDilution> getPoolableElements();
 
   /**
    * Registers an Experiment to this Pool
@@ -216,10 +219,6 @@ public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watcha
    */
   public void setQcPassed(Boolean qcPassed);
 
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
-
   public Collection<ChangeLog> getChangeLog();
 
   /**
@@ -256,13 +255,6 @@ public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watcha
   public Collection<Note> getNotes();
 
   /**
-   * Adds the last modified date of this Pool object.
-   * 
-   * @param lastModified
-   */
-  void setLastModified(Date lastModified);
-
-  /**
    * Returns the description of this Pool object.
    * 
    * @return String description;
@@ -277,5 +269,7 @@ public interface Pool extends SecurableByProfile, Comparable, Barcodable, Watcha
   void setDescription(String description);
 
   boolean hasDuplicateIndices();
+
+  void setWatchGroup(Group group);
 
 }

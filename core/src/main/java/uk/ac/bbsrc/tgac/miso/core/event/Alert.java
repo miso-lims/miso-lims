@@ -25,10 +25,10 @@ package uk.ac.bbsrc.tgac.miso.core.event;
 
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
@@ -40,7 +40,8 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
  * @date 22-Sep-2011
  * @since 0.1.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Alert extends Comparable<Alert>, Deletable {
   /**
@@ -67,6 +68,8 @@ public interface Alert extends Comparable<Alert>, Deletable {
   public void setAlertText(String alert);
 
   public User getAlertUser();
+
+  public void setAlertUser(User user);
 
   public Date getAlertDate();
 

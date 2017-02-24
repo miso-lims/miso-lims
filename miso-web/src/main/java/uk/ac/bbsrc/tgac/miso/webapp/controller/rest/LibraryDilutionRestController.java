@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -21,13 +20,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 @Controller
 @RequestMapping("/rest/librarydilution")
@@ -35,19 +32,22 @@ public class LibraryDilutionRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryDilutionRestController.class);
 
   @Autowired
-  private RequestManager requestManager;
-
+  private LibraryService libraryService;
   @Autowired
-  private AuthorizationManager authorizationManager;
+  private LibraryDilutionService dilutionService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
   }
 
   @RequestMapping(value = "{dilutionId}", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
   public DilutionDto getDilution(@PathVariable Long dilutionId) throws IOException {
-    LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
+    LibraryDilution dilution = dilutionService.get(dilutionId);
     DilutionDto dilutionDto = Dtos.asDto(dilution);
     return dilutionDto;
   }
@@ -64,8 +64,7 @@ public class LibraryDilutionRestController extends RestController {
     LibraryDilution dilution;
     try {
       dilution = Dtos.to(dilutionDto);
-      dilution.setLibrary(requestManager.getLibraryById(dilutionDto.getLibrary().getId()));
-      id = populateAndSaveDilutionFromDto(dilutionDto, dilution, true);
+      id = dilutionService.create(dilution);
     } catch (ConstraintViolationException e) {
       log.error("Error while creating dilution", e);
       RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
@@ -77,19 +76,6 @@ public class LibraryDilutionRestController extends RestController {
     headers.setLocation(uriComponents.toUri());
     headers.set("Id", id.toString());
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
-  }
-
-  private Long populateAndSaveDilutionFromDto(DilutionDto dilutionDto, LibraryDilution dilution, boolean create) throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    dilution.setDilutionCreator(user.getFullName());
-    if (dilutionDto.getTargetedSequencingId() != null) {
-      dilution.setTargetedSequencing(requestManager.getTargetedSequencingById(dilutionDto.getTargetedSequencingId()));
-    }
-    if (create) {
-      dilution.setCreationDate(new Date());
-    }
-    Long id = requestManager.saveLibraryDilution(dilution);
-    return id;
   }
 
 }

@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Queue;
 
 import javax.servlet.http.HttpSession;
 
@@ -33,24 +32,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -64,46 +60,25 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 public class ProjectTreeControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(ProjectTreeControllerHelperService.class);
   @Autowired
-  private SecurityManager securityManager;
-  @Autowired
   private RequestManager requestManager;
   @Autowired
-  private IssueTrackerManager issueTrackerManager;
+  private ExperimentService experimentService;
   @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
+  private LibraryService libraryService;
   @Autowired
-  private MisoFilesManager misoFileManager;
-  @Autowired
-  private WatchManager watchManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+  private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
 
-  public void setIssueTrackerManager(IssueTrackerManager issueTrackerManager) {
-    this.issueTrackerManager = issueTrackerManager;
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
-  }
-
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
-    this.printManager = printManager;
-  }
-
-  public void setWatchManager(WatchManager watchManager) {
-    this.watchManager = watchManager;
-  }
-
-  /*
+  /**
    * starts with project listing list all the projects and subs define the number of Runs, Samples and Studies return as a JSONarray
    */
-
   public JSONObject listProjectTree(HttpSession session, JSONObject json) {
     try {
       Collection<Project> projects = requestManager.listAllProjects();
@@ -118,7 +93,7 @@ public class ProjectTreeControllerHelperService {
         projectJSON.put("description", p.getAlias());
         Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
         Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
-        Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
+        Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
         int subs = samples.size() + runs.size() + studies.size();
         projectJSON.put("subs", subs);
         projectsArray.add(projectJSON);
@@ -165,7 +140,7 @@ public class ProjectTreeControllerHelperService {
         childArray.add(child);
       }
 
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(projectId);
+      Collection<Study> studies = studyService.listByProjectId(projectId);
 
       if (studies.size() > 0) {
         JSONObject child = new JSONObject();
@@ -232,7 +207,7 @@ public class ProjectTreeControllerHelperService {
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
 
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.listBySampleId(sample.getId());
         if (libraries.size() == 0) {
 
           String sampleQC = "0";
@@ -273,7 +248,7 @@ public class ProjectTreeControllerHelperService {
 
       JSONObject miso = new JSONObject();
 
-      Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sampleId);
+      Collection<Library> libraries = libraryService.listBySampleId(sampleId);
       JSONArray librariesArray = new JSONArray();
 
       for (Library library : libraries) {
@@ -303,7 +278,7 @@ public class ProjectTreeControllerHelperService {
 
       JSONArray childArray = new JSONArray();
 
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(projectId);
+      Collection<Study> studies = studyService.listByProjectId(projectId);
       JSONObject studyJSON = new JSONObject();
 
       studyJSON.put("name", "Studies");
@@ -315,7 +290,7 @@ public class ProjectTreeControllerHelperService {
         substudyJSON.put("id", study.getId());
         substudyJSON.put("show", "STUDY");
 
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
+        Collection<Experiment> experiments = experimentService.listAllByStudyId(study.getId());
         substudyJSON.put("subs", experiments.size());
         childArray.add(substudyJSON);
       }
@@ -338,7 +313,7 @@ public class ProjectTreeControllerHelperService {
 
       long studyId = json.getLong("id");
 
-      Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(studyId);
+      Collection<Experiment> experiments = experimentService.listAllByStudyId(studyId);
       JSONArray experimentsArray = new JSONArray();
       for (Experiment e : experiments) {
         experimentsArray.add(JSONObject.fromObject("{'name': '" + e.getName() + "','description':'" + e.getAlias() + "','color': '2'}"));

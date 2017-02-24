@@ -54,8 +54,8 @@ import net.sourceforge.fluxion.spi.ServiceProvider;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
@@ -96,7 +96,7 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
   }
 
   @Override
-  public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution l) throws SubmissionException {
+  public Set<File> generateFilePath(Partition partition, Dilution l) throws SubmissionException {
     Pool pool = partition.getPool();
     if (pool != null) {
       if (pool.getExperiments() != null) {
@@ -108,7 +108,7 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
             builder.addSelectAsGenQueryValue(RodsGenQueryEnum.COL_DATA_NAME)
                 .addConditionAsGenQueryField(RodsGenQueryEnum.COL_META_DATA_ATTR_NAME, QueryConditionOperators.EQUAL, "run_alias")
                 .addConditionAsGenQueryField(RodsGenQueryEnum.COL_META_DATA_ATTR_VALUE, QueryConditionOperators.EQUAL,
-                    partition.getSequencerPartitionContainer().getRun().getAlias())
+                    partition.getSequencerPartitionContainer().getLastRun().getAlias())
                 .addConditionAsGenQueryField(RodsGenQueryEnum.COL_DATA_NAME, QueryConditionOperators.LIKE, l.getName() + "%")
                 .addOrderByGenQueryField(RodsGenQueryEnum.COL_DATA_NAME, GenQueryOrderByField.OrderByType.ASC);
             IRODSGenQueryFromBuilder irodsQuery = builder.exportIRODSQueryFromBuilder(1);
@@ -149,9 +149,9 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
   }
 
   @Override
-  public Set<File> generateFilePaths(SequencerPoolPartition partition) throws SubmissionException {
+  public Set<File> generateFilePaths(Partition partition) throws SubmissionException {
     Set<File> filePaths = new HashSet<>();
-    if ((partition.getSequencerPartitionContainer().getRun().getFilePath()) == null) {
+    if ((partition.getSequencerPartitionContainer().getLastRun().getFilePath()) == null) {
       throw new SubmissionException("No valid run filepath!");
     }
 

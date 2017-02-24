@@ -103,7 +103,7 @@
 
 </head>
 <body>
-<table border="0" width="100%">
+<table class="full-width no-border">
     <tr>
         <td class="headertable" align="left" onclick="window.location.href='<c:url value='/miso/external/'/>'">
             <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo"
@@ -151,8 +151,8 @@
 </div>
 <sec:authorize access="isAuthenticated()">
     <div id="loggedInBanner">Logged in as:
-        <b id="currentUser"><sec:authentication property="principal.username"/></b> | <a
-                href="<c:url value="/j_spring_security_logout"/>">Logout</a></div>
+        <b id="currentUser"><sec:authentication property="principal.username"/></b> | <a href="<c:url value="/logout" />">Logout</a>
+    </div>
 </sec:authorize>
 
 <div id="content">

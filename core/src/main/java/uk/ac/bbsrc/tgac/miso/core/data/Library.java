@@ -27,17 +27,18 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeName;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -53,12 +54,15 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL) // , using = LibrarySerializer.class)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName("library")
 @JsonIgnoreProperties({ "securityProfile" })
-@PrintableBarcode
-public interface Library extends SecurableByProfile, Comparable, Barcodable, Locatable, Deletable, Boxable {
+public interface Library
+    extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable, ChangeLoggable, Aliasable {
 
+  /** Field UNSAVED_ID */
+  public static final Long UNSAVED_ID = 0L;
   /** Field PREFIX */
   public static final String PREFIX = "LIB";
 
@@ -129,6 +133,14 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    *          notes.
    */
   public void setNotes(Collection<Note> notes);
+
+  /**
+   * Adds a Note to the Set of notes of this Library object.
+   * 
+   * @param note
+   *          Note
+   */
+  public void addNote(Note note);
 
   /**
    * Returns the notes of this Library object.
@@ -242,20 +254,26 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public void setIndices(List<Index> indices);
 
   /**
-   * Returns the platformName of this Library object.
+   * Returns the platformType of this Library object.
    * 
-   * @return String platformName.
+   * @return PlatformType platformType.
    */
-  public String getPlatformName();
+  public PlatformType getPlatformType();
 
   /**
-   * Sets the platformName of this Library object.
+   * Sets the platformType of this Library object.
    * 
-   * @param platformName
-   *          platformName.
+   * @param PlatformType platformType.
    * 
    */
-  public void setPlatformName(String platformName);
+  public void setPlatformType(PlatformType platformType);
+
+  /**
+   * Sets the platformType of this Library object.
+   * 
+   * @param String platformType
+   */
+  public void setPlatformType(String platformName);
 
   /**
    * Returns the initialConcentration of this Library object.
@@ -288,22 +306,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public void setCreationDate(Date date);
 
   /**
-   * Returns the libraryQuant of this Library object.
-   * 
-   * @return Integer libraryQuant.
-   */
-  public Integer getLibraryQuant();
-
-  /**
-   * Sets the libraryQuant of this Library object.
-   * 
-   * @param libraryQuant
-   *          libraryQuant.
-   * 
-   */
-  public void setLibraryQuant(Integer libraryQuant);
-
-  /**
    * Returns the qcPassed of this Library object.
    * 
    * @return Boolean qcPassed.
@@ -318,10 +320,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    *          qcPassed.
    */
   public void setQcPassed(Boolean qcPassed);
-
-  Date getLastUpdated();
-
-  void setLastUpdated(Date lastUpdated);
 
   public Collection<ChangeLog> getChangeLog();
 
@@ -342,11 +340,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
 
   public boolean isLowQuality();
 
-  public LibraryAdditionalInfo getLibraryAdditionalInfo();
-
-  public void setLibraryAdditionalInfo(LibraryAdditionalInfo libraryAdditionalInfo);
-
   public IndexFamily getCurrentFamily();
 
-  void setLastModified(Date lastModified);
 }

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -29,8 +29,6 @@ import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarco
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,11 +38,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
@@ -58,7 +53,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -67,30 +61,24 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
+import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -102,23 +90,54 @@ import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
  */
 @Ajaxified
 public class SampleControllerHelperService {
+  public static final class SampleBarcodeAssister implements BarcodePrintAssister<Sample> {
+    private final RequestManager requestManager;
+    private final SampleService sampleService;
+
+    public SampleBarcodeAssister(RequestManager requestManager, SampleService sampleService) {
+      this.requestManager = requestManager;
+      this.sampleService = sampleService;
+    }
+
+    @Override
+    public Iterable<Sample> fetchAll(long projectId) throws IOException {
+      return requestManager.listAllSamplesByProjectId(projectId);
+    }
+
+    @Override
+    public Sample fetch(long id) throws IOException {
+      return sampleService.get(id);
+    }
+
+    @Override
+    public void store(Sample item) throws IOException {
+      sampleService.update(item);
+    }
+
+    @Override
+    public String getGroupName() {
+      return "samples";
+    }
+
+    @Override
+    public String getIdName() {
+      return "sampleId";
+    }
+  }
+
   protected static final Logger log = LoggerFactory.getLogger(SampleControllerHelperService.class);
   @Autowired
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
   @Autowired
+  private SampleService sampleService;
+  @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-  @Autowired
-  private BarcodeFactory barcodeFactory;
-  @Autowired
-  private PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager;
+  private PrinterService printerService;
   @Autowired
   private NamingScheme namingScheme;
-  @Autowired
-  private CacheHelperService cacheHelperService;
 
   public JSONObject validateSampleAlias(HttpSession session, JSONObject json) {
     try {
@@ -144,138 +163,21 @@ public class SampleControllerHelperService {
     }
   }
 
-  public JSONObject bulkSaveSamples(HttpSession session, JSONObject json) {
-    if (json.has("samples")) {
-      try {
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Project p = requestManager.getProjectById(json.getLong("projectId"));
-        SecurityProfile sp = p.getSecurityProfile();
-        JSONArray a = JSONArray.fromObject(json.get("samples"));
-        Set<Sample> saveSet = new HashSet<Sample>();
-
-        for (JSONObject j : (Iterable<JSONObject>) a) {
-          try {
-            String alias = j.getString("alias");
-
-            ValidationResult aliasValidation = namingScheme.validateSampleAlias(alias);
-            if (aliasValidation.isValid()) {
-              String descr = j.getString("description");
-              String scientificName = j.getString("scientificName");
-              DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
-              String type = j.getString("sampleType");
-
-              Sample news = new SampleImpl();
-              news.setProject(p);
-              news.setAlias(alias);
-              news.setDescription(descr);
-              news.setScientificName(scientificName);
-              news.setSecurityProfile(sp);
-              news.setSampleType(type);
-              news.setLastModifier(user);
-
-              if (j.has("receivedDate") && !isStringEmptyOrNull(j.getString("receivedDate"))) {
-                Date date = df.parse(j.getString("receivedDate"));
-                news.setReceivedDate(date);
-              }
-
-              if (j.has("note") && !isStringEmptyOrNull(j.getString("note"))) {
-                Note note = new Note();
-                note.setOwner(sp.getOwner());
-                note.setText(j.getString("note"));
-                note.setInternalOnly(true);
-
-                if (j.has("receivedDate") && !isStringEmptyOrNull(j.getString("receivedDate"))) {
-                  Date date = df.parse(j.getString("receivedDate"));
-                  note.setCreationDate(date);
-                } else {
-                  note.setCreationDate(new Date());
-                }
-
-                if (j.has("identificationBarcode") && !isStringEmptyOrNull(j.getString("identificationBarcode"))) {
-                  String idBarcode = j.getString("identificationBarcode");
-                  news.setIdentificationBarcode(idBarcode);
-                }
-
-                news.setNotes(Arrays.asList(note));
-              }
-
-              saveSet.add(news);
-            } else {
-              return JSONUtils.SimpleJSONError("The following sample alias doesn't conform to the chosen naming scheme ("
-                  + aliasValidation.getMessage() + ") or already exists: " + j.getString("alias"));
-            }
-          } catch (ParseException e) {
-            log.error("Cannot parse date for sample", e);
-            return JSONUtils.SimpleJSONError("Cannot parse date for sample " + j.getString("alias"));
-          }
-        }
-
-        Set<Sample> samples = new HashSet<Sample>(requestManager.listAllSamples());
-        // relative complement to find objects that aren't already persisted
-        Set<Sample> complement = LimsUtils.relativeComplementByProperty(Sample.class, "getAlias", saveSet, samples);
-
-        if (complement != null && !complement.isEmpty()) {
-          List<Sample> sortedList = new ArrayList<Sample>(complement);
-          List<String> savedSamples = new ArrayList<String>();
-          List<String> taxonErrorSamples = new ArrayList<String>();
-          Collections.sort(sortedList, new AliasComparator(Sample.class));
-
-          for (Sample sample : sortedList) {
-            if ((Boolean) session.getServletContext().getAttribute("taxonLookupEnabled")) {
-              log.info("Checking taxon: " + sample.getScientificName());
-              String taxon = TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName());
-              if (taxon != null) {
-                sample.setTaxonIdentifier(taxon);
-                taxonErrorSamples.add(sample.getAlias());
-              }
-            }
-
-            try {
-              sample.setLastModifier(user);
-              requestManager.saveSample(sample);
-              savedSamples.add(sample.getAlias());
-              log.info("Saved: " + sample.getAlias());
-            } catch (IOException e) {
-              log.error("Couldn't save: " + sample.getAlias(), e);
-            }
-          }
-
-          Map<String, Object> response = new HashMap<String, Object>();
-          response.put("savedSamples", JSONArray.fromObject(savedSamples));
-          response.put("taxonErrorSamples", JSONArray.fromObject(taxonErrorSamples));
-
-          return JSONUtils.JSONObjectResponse(response);
-        } else {
-          return JSONUtils
-              .SimpleJSONError("Error in saving samples - perhaps samples specified already exist in the database with a given alias?");
-        }
-      } catch (NoSuchMethodException e) {
-        log.error("Cannot save samples for project", e);
-        return JSONUtils.SimpleJSONError("Cannot save samples for project " + json.getLong("projectId") + ": " + e.getMessage());
-      } catch (IOException e) {
-        log.error("Cannot save samples for project", e);
-        return JSONUtils.SimpleJSONError("Cannot save samples for project " + json.getLong("projectId") + ": " + e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No samples specified");
-    }
-  }
-
   public JSONObject getSampleQCUsers(HttpSession session, JSONObject json) {
     try {
-      Collection<String> users = new HashSet<String>();
+      Collection<String> users = new HashSet<>();
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       users.add(user.getFullName());
 
       if (json.has("sampleId") && !isStringEmptyOrNull(json.getString("sampleId"))) {
         Long sampleId = Long.parseLong(json.getString("sampleId"));
-        Sample sample = requestManager.getSampleById(sampleId);
+        Sample sample = sampleService.get(sampleId);
 
         Project p = sample.getProject();
         if (p.userCanRead(user)) {
           for (ProjectOverview po : p.getOverviews()) {
             if (po.getSampleGroup() != null) {
-              if (po.getSampleGroup().getEntities().contains(sample)) {
+              if (po.getSamples().contains(sample)) {
                 users.add(po.getPrincipalInvestigator());
               }
             }
@@ -286,7 +188,7 @@ public class SampleControllerHelperService {
       for (String name : users) {
         sb.append("<option value='" + name + "'>" + name + "</option>");
       }
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       map.put("qcUserOptions", sb.toString());
       map.put("sampleId", json.getString("sampleId"));
       return JSONUtils.JSONObjectResponse(map);
@@ -303,7 +205,7 @@ public class SampleControllerHelperService {
       for (QcType s : types) {
         sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
@@ -322,7 +224,7 @@ public class SampleControllerHelperService {
       }
       if (json.has("sampleId") && !isStringEmptyOrNull(json.getString("sampleId"))) {
         Long sampleId = Long.parseLong(json.getString("sampleId"));
-        Sample sample = requestManager.getSampleById(sampleId);
+        Sample sample = sampleService.get(sampleId);
         if (json.get("qcPassed") != null) {
           if ("true".equals(json.getString("qcPassed"))) {
             sample.setQcPassed(true);
@@ -331,7 +233,7 @@ public class SampleControllerHelperService {
           }
         }
 
-        SampleQC newQc = dataObjectFactory.getSampleQC();
+        SampleQC newQc = new SampleQCImpl();
         newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
         newQc.setQcType(requestManager.getSampleQcTypeById(json.getLong("qcType")));
@@ -406,7 +308,7 @@ public class SampleControllerHelperService {
 
       // persist
       if (ok) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         JSONArray a = new JSONArray();
         JSONArray errors = new JSONArray();
         for (JSONObject qc : (Iterable<JSONObject>) qcs) {
@@ -440,20 +342,12 @@ public class SampleControllerHelperService {
     String text = json.getString("text");
 
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Sample sample = requestManager.getSampleById(sampleId);
+      Sample sample = sampleService.get(sampleId);
       Note note = new Note();
-
       internalOnly = internalOnly.equals("on") ? "true" : "false";
-
       note.setInternalOnly(Boolean.parseBoolean(internalOnly));
       note.setText(text);
-      note.setOwner(user);
-      note.setCreationDate(new Date());
-      sample.getNotes().add(note);
-      requestManager.saveSampleNote(sample, note);
-      sample.setLastModifier(user);
-      requestManager.saveSample(sample);
+      sampleService.addNote(sample, note);
     } catch (IOException e) {
       log.error("add sample note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -467,16 +361,9 @@ public class SampleControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
-      Sample sample = requestManager.getSampleById(sampleId);
-      Note note = requestManager.getNoteById(noteId);
-      if (sample.getNotes().contains(note)) {
-        sample.getNotes().remove(note);
-        requestManager.deleteNote(note);
-        requestManager.saveSample(sample);
-        return JSONUtils.SimpleJSONResponse("OK");
-      } else {
-        return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
-      }
+      Sample sample = sampleService.get(sampleId);
+      sampleService.deleteNote(sample, noteId);
+      return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("cannot remove note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
@@ -488,10 +375,10 @@ public class SampleControllerHelperService {
     String barcode = json.getString("barcode");
 
     try {
-      Sample sample = requestManager.getSampleByBarcode(barcode);
+      Sample sample = sampleService.getByBarcode(barcode);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (sample == null) {
-        sample = requestManager.getSampleByBarcode(new String(Base64.decodeBase64(barcode)));
+        sample = sampleService.getByBarcode(new String(Base64.decodeBase64(barcode)));
       }
       if (sample.getReceivedDate() == null) {
         response.put("name", sample.getName());
@@ -517,10 +404,10 @@ public class SampleControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       for (JSONObject s : (Iterable<JSONObject>) ss) {
         Long sampleId = s.getLong("sampleId");
-        Sample sample = requestManager.getSampleById(sampleId);
+        Sample sample = sampleService.get(sampleId);
         sample.setReceivedDate(new Date());
         sample.setLastModifier(user);
-        requestManager.saveSample(sample);
+        sampleService.update(sample);
       }
       response.put("result", "Samples received date saved");
       return response;
@@ -534,7 +421,8 @@ public class SampleControllerHelperService {
     Long sampleId = json.getLong("sampleId");
     File temploc = getBarcodeFileLocation(session);
     try {
-      Sample sample = requestManager.getSampleById(sampleId);
+      Sample sample = sampleService.get(sampleId);
+      BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = null;
@@ -570,62 +458,7 @@ public class SampleControllerHelperService {
   }
 
   public JSONObject printSampleBarcodes(HttpSession session, JSONObject json) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      String serviceName = null;
-      if (json.has("serviceName")) {
-        serviceName = json.getString("serviceName");
-      }
-
-      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
-      if (serviceName == null) {
-        Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Sample.class);
-        if (services.size() == 1) {
-          mps = services.iterator().next();
-          if (mps == null) {
-            return JSONUtils
-                .SimpleJSONError("Unable to resolve a print service for Samples. A service seems to be recognised but cannot be resolved.");
-          }
-        } else {
-          return JSONUtils
-              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      } else {
-        mps = printManager.getPrintService(serviceName);
-        if (mps == null) {
-          return JSONUtils.SimpleJSONError("Unable to resolve a print service for Samples with the name '" + serviceName + "'.");
-        }
-      }
-
-      Queue<File> thingsToPrint = new LinkedList<File>();
-      JSONArray ss = JSONArray.fromObject(json.getString("samples"));
-      for (JSONObject s : (Iterable<JSONObject>) ss) {
-        try {
-          Long sampleId = s.getLong("sampleId");
-          Sample sample = requestManager.getSampleById(sampleId);
-          // autosave the barcode if none has been previously generated
-          if (isStringEmptyOrNull(sample.getIdentificationBarcode())) {
-            sample.setLastModifier(user);
-            requestManager.saveSample(sample);
-          }
-          File f = mps.getLabelFor(sample);
-          if (f != null) thingsToPrint.add(f);
-        } catch (IOException e) {
-          log.error("printing barcodes", e);
-          return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
-        }
-      }
-
-      PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job " + pj.getId() + " : Barcodes printed.");
-    } catch (MisoPrintException e) {
-      log.error("printing barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    } catch (IOException e) {
-      log.error("printing barcodes", e);
-      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new SampleBarcodeAssister(requestManager, sampleService));
   }
 
   public JSONObject changeSampleLocation(HttpSession session, JSONObject json) {
@@ -636,19 +469,15 @@ public class SampleControllerHelperService {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
       if (newLocation != null) {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Sample sample = requestManager.getSampleById(sampleId);
+        Sample sample = sampleService.get(sampleId);
         String oldLocation = sample.getLocationBarcode();
         sample.setLocationBarcode(newLocation);
 
         Note note = new Note();
         note.setInternalOnly(true);
         note.setText("Location changed from " + oldLocation + " to " + newLocation + " by " + user.getLoginName() + " on " + new Date());
-        note.setOwner(user);
-        note.setCreationDate(new Date());
-        sample.getNotes().add(note);
-        requestManager.saveSampleNote(sample, note);
-        sample.setLastModifier(user);
-        requestManager.saveSample(sample);
+        sampleService.addNote(sample, note);
+        sampleService.update(sample);
       } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
       }
@@ -681,10 +510,10 @@ public class SampleControllerHelperService {
         }
       }
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Sample sample = requestManager.getSampleById(sampleId);
+      Sample sample = sampleService.get(sampleId);
       sample.setIdentificationBarcode(idBarcode);
       sample.setLastModifier(user);
-      requestManager.saveSample(sample);
+      sampleService.update(sample);
     } catch (IOException e) {
       log.debug("Could not change Sample identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -716,7 +545,7 @@ public class SampleControllerHelperService {
       if (json.has("sampleId")) {
         Long sampleId = json.getLong("sampleId");
         try {
-          requestManager.deleteSample(requestManager.getSampleById(sampleId));
+          sampleService.delete(sampleId);
           return JSONUtils.SimpleJSONResponse("Sample deleted");
         } catch (IOException e) {
           log.error("delete sample", e);
@@ -730,7 +559,7 @@ public class SampleControllerHelperService {
     }
   }
 
-  public JSONObject removeSampleFromGroup(HttpSession session, JSONObject json) {
+  public JSONObject removeSampleFromOverview(HttpSession session, JSONObject json) {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -740,17 +569,16 @@ public class SampleControllerHelperService {
     }
 
     if (user != null) {
-      if (json.has("sampleId") && json.has("sampleGroupId")) {
+      if (json.has("sampleId") && json.has("overviewId")) {
         Long sampleId = json.getLong("sampleId");
-        Long sampleGroupId = json.getLong("sampleGroupId");
+        Long overviewId = json.getLong("overviewId");
         try {
-          Sample s = requestManager.getSampleById(sampleId);
-          EntityGroup<? extends Nameable, ? extends Nameable> osg = requestManager.getEntityGroupById(sampleGroupId);
-          if (osg.getEntities().contains(s)) {
-            if (osg.getEntities().remove(s)) {
-              requestManager.saveEntityGroup(osg);
+          ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+          Sample s = sampleService.get(sampleId);
+          if (overview.getSamples().contains(s)) {
+            if (overview.getSamples().remove(s)) {
+              requestManager.saveProjectOverview(overview);
 
-              cacheHelperService.evictObjectFromCache(s.getProject(), Project.class);
               return JSONUtils.SimpleJSONResponse("Sample removed from group");
             } else {
               return JSONUtils.SimpleJSONError("Error removing sample from sample group.");
@@ -780,7 +608,7 @@ public class SampleControllerHelperService {
       String sampleQCValue = "NA";
       Collection<SampleQC> sampleQCs = requestManager.listAllSampleQCsBySampleId(sampleId);
       if (sampleQCs.size() > 0) {
-        List<SampleQC> list = new ArrayList(sampleQCs);
+        List<SampleQC> list = new ArrayList<>(sampleQCs);
         Collections.sort(list, new Comparator<SampleQC>() {
           @Override
           public int compare(SampleQC sqc1, SampleQC sqc2) {
@@ -805,27 +633,15 @@ public class SampleControllerHelperService {
     this.requestManager = requestManager;
   }
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
-    this.barcodeFactory = barcodeFactory;
-  }
-
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrintManager(PrintManager<MisoPrintService<?, ?, ?>, Queue<?>> printManager) {
-    this.printManager = printManager;
+  public void setPrinterService(PrinterService printerService) {
+    this.printerService = printerService;
   }
 
   public void setSampleNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setCacheHelperService(CacheHelperService cacheHelperService) {
-    this.cacheHelperService = cacheHelperService;
   }
 }

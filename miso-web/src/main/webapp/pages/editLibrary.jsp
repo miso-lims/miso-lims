@@ -201,7 +201,7 @@
     </c:choose>
 
     <span id="aliasCounter" class="counter"></span>
-    <c:if test="${detailedSample && library.libraryAdditionalInfo.hasNonStandardAlias()}">
+    <c:if test="${detailedSample && library.hasNonStandardAlias()}">
       <ul class="parsley-errors-list filled" id="nonStandardAlias">
         <li class="parsley-custom-error-message">
         Double-check this alias -- it will be saved even if it is duplicated or does not follow the naming standard!
@@ -238,7 +238,7 @@
   </tr>
 </c:if>
 <c:choose>
-  <c:when test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
+  <c:when test="${!empty library.sample && detailedSample}">
     <input type="hidden" value="true" name="paired" id="paired"/>
   </c:when>
   <c:otherwise>
@@ -264,13 +264,13 @@
         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
       <td>Platform - Library Type:</td>
       <td>
-        <form:select id="platformNames" path="platformName" items="${platformNames}"
-                     onchange="Library.ui.changePlatformName(null);" class="validateable"/>
+        <form:select id="platformTypes" path="platformType" items="${platformTypes}"
+                     onchange="Library.ui.changePlatformType(null);" class="validateable"/>
         <form:select id="libraryTypes" path="libraryType"/>
       </td>
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          Library.ui.changePlatformName(<c:out value="${library.libraryType.id}" default="0"/>, function() {
+          Library.ui.changePlatformType(<c:out value="${library.libraryType.id}" default="0"/>, function() {
             <c:if test="${not empty library.libraryType}">jQuery('#libraryTypes').val('${library.libraryType.id}');</c:if>
             Library.setOriginalIndices();
           });
@@ -279,17 +279,17 @@
     </c:when>
     <c:otherwise>
       <td>Platform - Library Type</td>
-      <td>${library.platformName} - ${library.libraryType.description}</td>
+      <td>${library.platformType} - ${library.libraryType.description}</td>
     </c:otherwise>
   </c:choose>
 </tr>
 <tr>
-<c:if test="${!empty library.sample && !empty library.libraryAdditionalInfo}">
+<c:if test="${!empty library.sample && detailedSample}">
   <tr>
     <td>Library Design:</td>
     <td>
-      <miso:select id="libraryDesignTypes" path="libraryAdditionalInfo.libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/>
-      &nbsp;&nbsp;&nbsp;Design Code: <miso:select id="libraryDesignCodes" path="libraryAdditionalInfo.libraryDesignCode" items="${libraryDesignCodes}" itemLabel="code" itemValue="id" defaultLabel="(None)" defaultValue="-1"/>
+      <miso:select id="libraryDesignTypes" path="libraryDesign" items="${libraryDesigns}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" onchange="Library.ui.changeDesign()"/>
+      &nbsp;&nbsp;&nbsp;Design Code: <miso:select id="libraryDesignCodes" path="libraryDesignCode" items="${libraryDesignCodes}" itemLabel="code" itemValue="id" defaultLabel="(None)" defaultValue="-1"/>
     </td>
   </tr>
 </c:if>
@@ -340,22 +340,6 @@
   <td>Indices:</td>
   <td id="indicesDiv">
   </td>
-  <script type="text/javascript">
-    Library = Library || {};
-    Library.indexFamilies = ${indexFamiliesJSON};
-    Library.setOriginalIndices = function() {
-      Library.lastIndexPosition = 0;
-      jQuery('#indicesDiv').empty();
-      document.getElementById('indexFamily').value = '${library.getCurrentFamily().id}';
-      <c:forEach items="${library.indices}" var="index">
-        <c:if test="${index.id != 0}">
-          Library.ui.createIndexBox(${index.id});
-        </c:if>
-      </c:forEach>
-      Library.ui.createIndexNextBox();
-    };
-    Library.setOriginalIndices();
-  </script>
 </tr>
 
 <tr bgcolor="yellow">
@@ -385,11 +369,27 @@
 <tr>
   <td class="h">Location:</td>
   <td>
-    <c:if test="${!empty library.boxLocation}">${library.boxLocation},</c:if>
-    <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.boxId}"/>'>${library.boxAlias}, ${library.boxPosition}</a></c:if>
+    <c:if test="${!empty library.box.locationBarcode}">${ library.box.locationBarcode},</c:if>
+    <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.box.id}"/>'>${library.box.alias}, ${library.boxPosition}</a></c:if>
   </td>
 </tr>
 </table>
+<script type="text/javascript">
+    Library = Library || {};
+    Library.indexFamilies = ${indexFamiliesJSON};
+    Library.setOriginalIndices = function() {
+      Library.lastIndexPosition = 0;
+      jQuery('#indicesDiv').empty();
+      document.getElementById('indexFamily').value = '${library.getCurrentFamily().id}';
+      <c:forEach items="${library.indices}" var="index">
+        <c:if test="${index.id != 0}">
+          Library.ui.createIndexBox(${index.id});
+        </c:if>
+      </c:forEach>
+      Library.ui.createIndexNextBox();
+    };
+    Library.setOriginalIndices();
+  </script>
 <%@ include file="volumeControl.jspf" %>
 
 <c:if test="${detailedSample}">
@@ -400,7 +400,7 @@
   <tr>
     <td>Library Kit:*</td>
     <td>
-      <miso:select id="libraryKit" path="libraryAdditionalInfo.prepKit" items="${prepKits}" itemLabel="name"
+      <miso:select id="libraryKit" path="kitDescriptor" items="${prepKits}" itemLabel="name"
           itemValue="id" defaultLabel="SELECT" defaultValue=""/>
     </td>
   </tr>
@@ -416,15 +416,13 @@
   </c:if>
   <tr>
     <td class="h">Archived:</td>
-    <td><form:checkbox id="archived" path="libraryAdditionalInfo.archived"/></td>
+    <td><form:checkbox id="archived" path="archived"/></td>
   </tr>
 </table>
-<script type="text/javascript">
- jQuery(document).ready(function () {
-   Hot.detailedSample = ${detailedSample};
- });
-</script>
 </c:if>
+<script type="text/javascript">
+  Hot.detailedSample = ${detailedSample};
+</script>
 
 <c:choose>
   <c:when
@@ -478,7 +476,7 @@
                 <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <span style="color:#000000"><a href='#' onclick="Library.ui.deleteLibraryNote('${library.id}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
+                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span></a></span>
                 </c:if>
               </span>
           </div>
@@ -492,8 +490,8 @@
 <br/>
 <c:if test="${library.id != 0}">
 <h1>
-  <div id="qcsTotalCount">
-  </div>
+  <span id="qcsTotalCount">
+  </span>
 </h1>
 <ul class="sddm">
   <li>
@@ -506,7 +504,7 @@
     </div>
   </li>
 </ul>
-<span style="clear:both">
+<div style="clear:both">
   <div id="addLibraryQC"></div>
   <form id='addQcForm'>
     <table class="list" id="libraryQcTable">
@@ -552,7 +550,7 @@
     </table>
     <input type='hidden' id='qcLibraryId' name='id' value='${library.id}'/>
   </form>
-</span>
+</div>
 
 <script type="text/javascript">
   jQuery(document).ready(function () {
@@ -569,8 +567,8 @@
 </script>
 
 <h1>
-  <div id="ldsTotalCount">
-  </div>
+  <span id="ldsTotalCount">
+  </span>
 </h1>
 <ul class="sddm">
   <li>
@@ -579,7 +577,7 @@
     </a>
 
     <div id="ldmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, ${libraryPrepKitId}, ${autoGenerateIdBarcodes}); return false;">
+      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, <c:out value="${library.kitDescriptor.id}" default="0"/>, ${autoGenerateIdBarcodes}); return false;">
         Add Library Dilution
       </a>
       <c:if test="${not empty library.libraryDilutions}">
@@ -588,7 +586,7 @@
     </div>
   </li>
 </ul>
-<span style="clear:both">
+<div style="clear:both">
   <div id="addLibraryDilution"></div>
   <form id='addDilutionForm'>
     <table class="list" id="libraryDilutionTable">
@@ -603,6 +601,7 @@
         </c:if>
         <th>ID Barcode</th>
         <th align="center">Edit</th>
+        <th align="center">Pool</th>
       </tr>
       </thead>
       <tbody>
@@ -638,7 +637,7 @@
                         </a>
 
                         <div id="dil${dil.id}IdBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-                          <a href="javascript:void(0);" onclick="Library.barcode.printDilutionBarcode(${dil.id}, '${library.platformName}');">Print</a>
+                          <a href="javascript:void(0);" onclick="Library.barcode.printDilutionBarcode(${dil.id}, '${library.platformType}');">Print</a>
                         </div>
                       </li>
                     </ul>
@@ -670,10 +669,6 @@
               </a>
             </td>
             <td>
-              <c:if test="${library.platformName eq 'LS454' or library.platformName eq 'Solid'}">
-                <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.id});">Add emPCR</a> 
-                <br />           
-              </c:if>
               <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
             </td>
           </tr>
@@ -683,81 +678,7 @@
     </table>
     <input type='hidden' id='dilLibraryId' name='id' value='${library.id}'/>
   </form>
-</span>
-
-<c:if test="${library.platformName ne 'Illumina'}">
-  <br/>
-  <h1>emPCR</h1>
-
-  <div id="addEmPcr"></div>
-  <form id='addEmPcrForm'>
-    <table class="list" id="emPcrTable">
-      <thead>
-      <tr>
-        <th>Library Dilution ID</th>
-        <th>PCRed By</th>
-        <th>PCR Date</th>
-        <th>Results (${emPCRUnits})</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:if test="${not empty emPCRs}">
-        <c:forEach items="${emPCRs}" var="empcr">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${empcr.libraryDilution.id}</td>
-            <td>${empcr.pcrCreator}</td>
-            <td><fmt:formatDate value="${empcr.creationDate}"/></td>
-            <td>${empcr.concentration} ${emPCRUnits}</td>
-            <td>
-              <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrDilutionRow(${empcr.id});">Add emPCR Dilution</a>
-            </td>
-          </tr>
-        </c:forEach>
-      </c:if>
-      </tbody>
-    </table>
-  </form>
-
-  <h1>emPCR Dilutions</h1>
-
-  <div id="addEmPcrDilution"></div>
-  <form id='addEmPcrDilutionForm'>
-    <table class="list" id="emPcrDilutionTable">
-      <thead>
-      <tr>
-        <th>emPCR ID</th>
-        <th>Done By</th>
-        <th>Date</th>
-        <th>Results (${emPCRDilutionUnits})</th>
-        <th>Construct Pool</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:if test="${not empty emPcrDilutions}">
-        <c:forEach items="${emPcrDilutions}" var="dil">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${dil.emPCR.id}</td>
-            <td>${dil.dilutionCreator}</td>
-            <td><fmt:formatDate value="${dil.creationDate}"/></td>
-            <td>${dil.concentration} ${emPCRDilutionUnits}</td>
-            <td>
-              <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
-            </td>
-          </tr>
-        </c:forEach>
-      </c:if>
-      </tbody>
-    </table>
-  </form>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery("#emPcrDilutionTable").tablesorter({
-        headers: {
-        }
-      });
-    });
-  </script>
-</c:if>
+</div>
 
   <c:if test="${not empty libraryPools}">
     <br/>
@@ -774,7 +695,7 @@
       </li>
     </ul>
 
-    <span style="clear:both">
+    <div style="clear:both">
       <table class="list" id="pools_table">
         <thead>
         <tr>
@@ -798,7 +719,7 @@
             <td>${pool.concentration}</td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
               <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);">
-                <span class="ui-icon ui-icon-trash"/>
+                <span class="ui-icon ui-icon-trash"></span>
               </td>
             </sec:authorize>
           </tr>
@@ -826,7 +747,7 @@
           });
         });
       </script>
-    </span>
+    </div>
   </c:if>
 
   <c:if test="${not empty libraryRuns}">
@@ -882,7 +803,7 @@
           <td>${run.status.health}</td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
+              <span class="ui-icon ui-icon-trash"></span>
             </td>
           </sec:authorize>
         </tr>
@@ -914,26 +835,26 @@
   <c:if test="${not empty library.changeLog}">
     <br/>
     <h1>Changes</h1>
-    <span style="clear:both">
-    <table class="list" id="changelog_table">
-      <thead>
-      <tr>
-      <th>Editor</th>
-      <th>Summary</th>
-      <th>Time</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${library.changeLog}" var="change">
-      <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td>${change.user.fullName} (${change.user.loginName})</td>
-        <td><b>${change.summary}</b></td>
-        <td>${change.time}</td>
-      </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-    </span>
+    <div style="clear:both">
+      <table class="list" id="changelog_table">
+        <thead>
+        <tr>
+        <th>Editor</th>
+        <th>Summary</th>
+        <th>Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach items="${library.changeLog}" var="change">
+        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+          <td>${change.user.fullName} (${change.user.loginName})</td>
+          <td><b>${change.summary}</b></td>
+          <td>${change.time}</td>
+        </tr>
+        </c:forEach>
+        </tbody>
+      </table>
+    </div>
   </c:if>
 </c:if>
 
@@ -979,39 +900,27 @@
   <table id="cinput" class="display">
     <thead>
     <tr>
-      <th style="width: 5%">Select <span sel="none" header="select" class="ui-icon ui-icon-arrowstop-1-s"
-                                         style="float:right"
+      <th style="width: 5%">Select <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                          onclick="DatatableUtils.toggleSelectAll('#cinput', this);"></span></th>
       <th style="width: 10%">Sample</th>
-      <th style="width: 10%">Description <span header="description" class="ui-icon ui-icon-arrowstop-1-s"
-                                               style="float:right"
+      <th style="width: 10%">Description <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                                onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 5%">Paired <span header="paired" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+      <th style="width: 5%">Paired <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                          onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Platform <span header="platform" class="ui-icon ui-icon-arrowstop-1-s"
-                                            style="float:right"
+      <th style="width: 10%">Platform <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                             onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Type <span header="libraryType" class="ui-icon ui-icon-arrowstop-1-s"
-                                        style="float:right"
+      <th style="width: 10%">Type <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                         onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Selection <span header="selectionType" class="ui-icon ui-icon-arrowstop-1-s"
-                                             style="float:right"
+      <th style="width: 10%">Selection <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                              onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Strategy <span header="strategyType" class="ui-icon ui-icon-arrowstop-1-s"
-                                            style="float:right"
+      <th style="width: 10%">Strategy <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                             onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
-      <th style="width: 10%">Index Family <span header="indexFamily" class="ui-icon ui-icon-arrowstop-1-s"
-                                               style="float:right"
-                                               onclick="Library.ui.fillDownIndexFamilySelects('#cinput', this);"></span>
-      </th>
-      <th style="width: 10%">Indices <span header="indices" class="ui-icon ui-icon-arrowstop-1-s"
-                                                style="float:right"
-                                                onclick="Library.ui.fillDownIndexSelects('#cinput', this);"></span>
-      </th>
-      <th style="width: 10%">Location <span header="locationBarcode" class="ui-icon ui-icon-arrowstop-1-s"
-                                                    style="float:right"
-                                                    onclick="DatatableUtils.fillDown('#cinput', this);"></span>
-      </th>
+      <th style="width: 10%">Index Family <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                                               onclick="Library.ui.fillDownIndexFamilySelects('#cinput', this);"></span></th>
+      <th style="width: 10%">Indices <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                                           onclick="Library.ui.fillDownIndexSelects('#cinput', this);"></span></th>
+      <th style="width: 10%">Location <span class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                                            onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
     </tr>
     </thead>
     <tbody>
@@ -1170,7 +1079,7 @@ function setEditables(datatable) {
     return value;
   },
   {
-    data: '{${platformNamesString}}',
+    data: '{${platformTypesString}}',
     type: 'select',
     onblur: 'submit',
     placeholder: '',

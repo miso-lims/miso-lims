@@ -19,15 +19,15 @@
             <div id="pooling">
 
                 <h1>
-                    Import & Export
+                    Import &amp; Export
                 </h1>
 
                 <div class="portlet">
                     <div class="portlet-header">Exports</div>
                     <div class="portlet-content">
-                        <a href="<c:url value="/miso/importexport/exportsamplesheet"/>">Export Sample or Library & Pool
+                        <a href="<c:url value="/miso/importexport/exportsamplesheet"/>">Export Sample or Library &amp; Pool
                             Sheet</a><br/><br/>
-                        Export Sample or Library & Pool Sheet based on either plates or tubes.
+                        Export Sample or Library &amp; Pool Sheet based on either plates or tubes.
                     </div>
                 </div>
 
@@ -41,11 +41,11 @@
                 </div>
 
                 <div class="portlet">
-                    <div class="portlet-header">Import Library & Pool Sheet</div>
+                    <div class="portlet-header">Import Library &amp; Pool Sheet</div>
                     <div class="portlet-content">
-                        <a href="<c:url value="/miso/importexport/importlibrarypoolsheet"/>">Library & Pool Sheet
+                        <a href="<c:url value="/miso/importexport/importlibrarypoolsheet"/>">Library &amp; Pool Sheet
                             Import</a><br/><br/>
-                        Import the Library & Pool Sheet and create libraries, library dilutions and pools.
+                        Import the Library &amp; Pool Sheet and create libraries, library dilutions and pools.
                     </div>
                 </div>
             </div>

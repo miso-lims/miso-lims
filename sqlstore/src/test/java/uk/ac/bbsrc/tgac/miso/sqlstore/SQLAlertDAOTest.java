@@ -3,9 +3,7 @@
  */
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -15,22 +13,24 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
+import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateAlertDao;
 
 /**
  * @author Chris Salt
@@ -39,14 +39,16 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 public class SQLAlertDAOTest extends AbstractDAOTest {
 
   @Autowired
-  @Spy
   private JdbcTemplate template;
 
   @Mock
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
   @InjectMocks
-  private SQLAlertDAO dao;
+  private HibernateAlertDao dao;
+
+  @Autowired
+  private SessionFactory sessionFactory;
 
   /**
    * @throws java.lang.Exception
@@ -55,14 +57,15 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(template);
-    User mockUser = Mockito.mock(User.class);
+    dao.setSessionFactory(sessionFactory);
+    User mockUser = Mockito.mock(UserImpl.class);
     when(mockUser.getUserId()).thenReturn(1L);
     when(securityManager.getUserById(anyLong())).thenReturn(mockUser);
 
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#remove(uk.ac.bbsrc.tgac.miso.core.event.Alert)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#remove(uk.ac.bbsrc.tgac.miso.core.event.Alert)}.
    * 
    * @throws IOException
    */
@@ -79,21 +82,22 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#save(uk.ac.bbsrc.tgac.miso.core.event.Alert)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#save(uk.ac.bbsrc.tgac.miso.core.event.Alert)}.
    * 
    * @throws IOException
    */
   @Test
   public void testSave() throws IOException {
 
-    Alert alert = new DefaultAlert();
     Date date = new Date();
     String title = "title";
     String text = "text";
-    long userId = 1L;
+    User user = new UserImpl();
+    user.setUserId(1L);
     boolean isRead = true;
     AlertLevel level = AlertLevel.CRITICAL;
 
+    Alert alert = new DefaultAlert(user);
     alert.setAlertTitle(title);
     alert.setAlertText(text);
     alert.setAlertDate(date);
@@ -106,13 +110,14 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
 
     assertEquals(title, returnedAlert.getAlertTitle());
     assertEquals(text, returnedAlert.getAlertText());
-    assertEquals(new SimpleDateFormat("yyyy-MM-dd").format(date), returnedAlert.getAlertDate().toString());
+    assertEquals(new SimpleDateFormat("yyyy-MM-dd").format(date),
+        new SimpleDateFormat("yyyy-MM-dd").format(returnedAlert.getAlertDate()));
     assertEquals(isRead, returnedAlert.getAlertRead());
     assertEquals(level, returnedAlert.getAlertLevel());
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#get(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#get(long)}.
    * 
    * @throws IOException
    * @throws ParseException
@@ -126,11 +131,11 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
     assertEquals(new Long(1), alert.getAlertUser().getUserId());
     assertEquals(false, alert.getAlertRead());
     assertEquals(AlertLevel.INFO, alert.getAlertLevel());
-    assertEquals("2012-04-20", alert.getAlertDate().toString());
+    assertEquals("2012-04-20", new SimpleDateFormat("yyyy-MM-dd").format(alert.getAlertDate()));
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#lazyGet(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#lazyGet(long)}.
    * 
    * @throws IOException
    */
@@ -144,7 +149,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listAll()}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listAll()}.
    * 
    * @throws IOException
    */
@@ -156,7 +161,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#count()}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#count()}.
    * 
    * @throws IOException
    */
@@ -167,7 +172,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listByUserId(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listByUserId(long)}.
    * 
    * @throws IOException
    */
@@ -179,7 +184,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listByUserId(long, long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listByUserId(long, long)}.
    * 
    * @throws IOException
    */
@@ -191,7 +196,8 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listByAlertLevel(uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel)}.
+   * Test method for
+   * {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listByAlertLevel(uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel)}.
    * 
    * @throws IOException
    */
@@ -203,7 +209,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listUnreadByUserId(long)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listUnreadByUserId(long)}.
    * 
    * @throws IOException
    */
@@ -217,7 +223,7 @@ public class SQLAlertDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO#listUnreadByAlertLevel(uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel)}.
+   * {@link uk.ac.bbsrc.tgac.miso.sqlstore.HibernateAlertDao#listUnreadByAlertLevel(uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel)}.
    * 
    * @throws IOException
    */

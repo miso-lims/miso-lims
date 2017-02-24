@@ -8,16 +8,17 @@ import java.util.Map;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
@@ -29,7 +30,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -73,7 +73,7 @@ public class ValueTypeLookup {
   private Map<Long, LibraryStrategyType> libraryStrategiesById;
   private Map<String, LibraryStrategyType> libraryStrategiesByName;
   private Map<Long, LibraryType> libraryTypeById;
-  private Map<String, Map<String, LibraryType>> libraryTypeByPlatformAndDescription;
+  private Map<PlatformType, Map<String, LibraryType>> libraryTypeByPlatformAndDescription;
   private Map<Long, LibraryDesign> libraryDesignById;
   private Map<String, Map<String, LibraryDesign>> libraryDesignBySampleClassAliasAndName;
   private Map<Long, LibraryDesignCode> libraryDesignCodeById;
@@ -232,7 +232,7 @@ public class ValueTypeLookup {
 
   private void setLibraryTypes(Collection<LibraryType> libraryTypes) {
     Map<Long, LibraryType> mapById = new UniqueKeyHashMap<>();
-    Map<String, Map<String, LibraryType>> mapByPlatformAndDesc = new UniqueKeyHashMap<>();
+    Map<PlatformType, Map<String, LibraryType>> mapByPlatformAndDesc = new UniqueKeyHashMap<>();
     for (LibraryType lt : libraryTypes) {
       if (!mapByPlatformAndDesc.containsKey(lt.getPlatformType())) {
         mapByPlatformAndDesc.put(lt.getPlatformType(), new UniqueKeyHashMap<String, LibraryType>());
@@ -780,24 +780,28 @@ public class ValueTypeLookup {
       if (LimsUtils.isTissueSample(detailed)) {
         SampleTissue tissue = (SampleTissue) detailed;
 
-        TissueOrigin to = resolve(tissue.getTissueOrigin());
-        if (to == null) throw new IOException(String.format(
-            "TissueOrigin not found: id=%d, alias=%s, description=%s",
-            tissue.getTissueOrigin().getId(),
-            tissue.getTissueOrigin().getAlias(),
-            tissue.getTissueOrigin().getDescription()));
-        tissue.setTissueOrigin(to);
-
-        TissueType tt = resolve(tissue.getTissueType());
-        if (tt == null) {
-          if (tissue.getTissueType() != null) {
-            throw new IOException(
-                String.format("TissueType not found: id=%d, alias=%s", tissue.getTissueType().getId(), tissue.getTissueType().getAlias()));
-          } else {
-            throw new IOException("Sample " + tissue.getAlias() + " is missing a tissueType");
-          }
+        if (tissue.getTissueOrigin() != null) {
+          TissueOrigin to = resolve(tissue.getTissueOrigin());
+          if (to == null) throw new IOException(String.format(
+              "TissueOrigin not found: id=%d, alias=%s, description=%s",
+              tissue.getTissueOrigin().getId(),
+              tissue.getTissueOrigin().getAlias(),
+              tissue.getTissueOrigin().getDescription()));
+          tissue.setTissueOrigin(to);
         }
-        tissue.setTissueType(tt);
+
+        if (tissue.getTissueType() != null) {
+          TissueType tt = resolve(tissue.getTissueType());
+          if (tt == null) {
+            if (tissue.getTissueType() != null) {
+              throw new IOException(
+                  String.format("TissueType not found: id=%d, alias=%s", tissue.getTissueType().getId(), tissue.getTissueType().getAlias()));
+            } else {
+              throw new IOException("Sample " + tissue.getAlias() + " is missing a tissueType");
+            }
+          }
+          tissue.setTissueType(tt);
+        }
 
         if (tissue.getLab() != null) { // optional field
           Lab lab = resolve(tissue.getLab());
@@ -890,14 +894,14 @@ public class ValueTypeLookup {
         throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getQcType().getQcTypeId(), qc.getQcType().getName()));
       qc.setQcType(type);
     }
-    if (library.getLibraryAdditionalInfo() != null) {
-      LibraryAdditionalInfo lai = library.getLibraryAdditionalInfo();
+    if (LimsUtils.isDetailedLibrary(library)) {
+      DetailedLibrary lai = (DetailedLibrary) library;
 
-      if (lai.getPrepKit() != null) { // optional field
-        KitDescriptor kit = resolve(lai.getPrepKit());
+      if (lai.getKitDescriptor() != null) { // optional field
+        KitDescriptor kit = resolve(lai.getKitDescriptor());
         if (kit == null) throw new IOException(
-            String.format("KitDescriptor not found (id=%d or name=%s)", lai.getPrepKit().getId(), lai.getPrepKit().getName()));
-        lai.setPrepKit(kit);
+            String.format("KitDescriptor not found (id=%d or name=%s)", lai.getKitDescriptor().getId(), lai.getKitDescriptor().getName()));
+        lai.setKitDescriptor(kit);
       }
 
       if (lai.getLibraryDesign() != null) { // optional field
@@ -946,10 +950,10 @@ public class ValueTypeLookup {
       run.setPlatformType(platformType);
     }
     if (run.getSequencerPartitionContainers() != null) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> flowcell : run.getSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer flowcell : run.getSequencerPartitionContainers()) {
         if (flowcell.getPlatform() == null) flowcell.setPlatform(platform);
         if (flowcell.getPartitions() != null) {
-          for (SequencerPoolPartition lane : flowcell.getPartitions()) {
+          for (Partition lane : flowcell.getPartitions()) {
             if (lane.getPool() != null && lane.getPool().getPlatformType() == null) {
               lane.getPool().setPlatformType(platformType);
             }

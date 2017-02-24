@@ -24,7 +24,12 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd 
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context.xsd 
+                           http://www.springframework.org/schema/aop 
+                           http://www.springframework.org/schema/aop/spring-aop.xsd"
        default-autowire="byName">
 
     <!-- <context:load-time-weaver aspectj-weaving="on" weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver"/> -->
@@ -68,9 +73,6 @@
   <bean id="libraryControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.LibraryControllerHelperService">
   </bean>
 
-  <bean id="experimentPreview" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentPreview">
-  </bean>
-
   <bean id="projectPreview" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectPreview">
   </bean>
 
@@ -83,16 +85,13 @@
   <bean id="experimentSearchService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentSearchService">
     </bean>
 
-  <bean id="cacheHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.CacheHelperService">
+  <bean id="barcodeHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.BarcodeHelperService">
   </bean>
 
   <bean id="loggedActionService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.logging.LoggedActionService">
   </bean>
 
   <bean id="sequencerReferenceControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.SequencerReferenceControllerHelperService">
-  </bean>
-
-  <bean id="reportingControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ReportingControllerHelperService">
   </bean>
 
   <bean id="flexReportingControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.FlexReportingControllerHelperService">

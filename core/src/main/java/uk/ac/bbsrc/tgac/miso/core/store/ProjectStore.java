@@ -27,9 +27,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * Defines a DAO interface for storing Projects
@@ -37,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface ProjectStore extends Store<Project>, Cascadable, Remover<Project>, NamingSchemeAware {
+public interface ProjectStore extends Store<Project> {
   /**
    * Get a Project given an alias
    * 
@@ -118,4 +119,9 @@ public interface ProjectStore extends Store<Project>, Cascadable, Remover<Projec
    * @throws IOException
    */
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
+
+  void addWatcher(Project project, User watcher);
+
+  void removeWatcher(Project project, User watcher);
+
 }

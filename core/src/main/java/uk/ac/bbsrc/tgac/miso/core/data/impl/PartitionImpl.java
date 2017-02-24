@@ -25,13 +25,25 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPartition;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -42,20 +54,73 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
  * @date 03-Aug-2011
  * @since 0.0.3
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "container" })
-public class PartitionImpl extends AbstractPartition implements SequencerPoolPartition, Serializable {
+@Entity
+@Table(name = "_Partition")
+public class PartitionImpl implements Partition, Serializable {
 
+  public static final Long UNSAVED_ID = 0L;
   private static final long serialVersionUID = 1L;
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "partitionId")
+  private long id = PartitionImpl.UNSAVED_ID;
+
+  @Column(nullable = false)
+  private Integer partitionNumber;
+
+  @ManyToOne(targetEntity = SequencerPartitionContainerImpl.class)
+  @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
+      @JoinColumn(name = "partitions_partitionId") }, inverseJoinColumns = {
+          @JoinColumn(name = "container_containerId") })
+  @JsonBackReference
+  private SequencerPartitionContainer sequencerPartitionContainer = null;
+
+  @ManyToOne(targetEntity = PoolImpl.class)
+  @JoinColumn(name = "pool_poolId")
+  @JsonBackReference
   Pool pool = null;
 
   public PartitionImpl() {
   }
 
   @Override
-  public void buildSubmission() {
+  public SequencerPartitionContainer getSequencerPartitionContainer() {
+    return this.sequencerPartitionContainer;
+  }
+
+  @Override
+  public void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer) {
+    this.sequencerPartitionContainer = sequencerPartitionContainer;
+  }
+
+  @Override
+  public void setId(long id) {
+    this.id = id;
+  }
+
+  @Override
+  public long getId() {
+    return id;
+  }
+
+  @Override
+  public void setPartitionNumber(Integer partitionNumber) {
+    this.partitionNumber = partitionNumber;
+  }
+
+  @Override
+  public Integer getPartitionNumber() {
+    return partitionNumber;
+  }
+
+  @Override
+  public boolean isDeletable() {
+    return getId() != UNSAVED_ID;
   }
 
   @Override
@@ -66,6 +131,50 @@ public class PartitionImpl extends AbstractPartition implements SequencerPoolPar
   @Override
   public void setPool(Pool pool) {
     this.pool = pool;
+  }
+
+  /**
+   * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof PartitionImpl)) return false;
+    PartitionImpl them = (PartitionImpl) obj;
+    // If not saved, then compare resolved actual objects. Otherwise
+    // just compare IDs.
+    if (getId() == PartitionImpl.UNSAVED_ID || them.getId() == PartitionImpl.UNSAVED_ID) {
+      return getPartitionNumber().equals(them.getPartitionNumber())
+          && getSequencerPartitionContainer().equals(them.getSequencerPartitionContainer());
+    } else {
+      return this.getId() == them.getId();
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    if (getId() != PartitionImpl.UNSAVED_ID) {
+      return (int) getId();
+    } else {
+      final int PRIME = 37;
+      int hashcode = -1;
+      if (getPartitionNumber() != null) hashcode = PRIME * hashcode + getPartitionNumber().hashCode();
+      if (getSequencerPartitionContainer() != null) hashcode = PRIME * hashcode + getSequencerPartitionContainer().hashCode();
+      return hashcode;
+    }
+  }
+
+  @Override
+  public int compareTo(Partition t) {
+    if (getId() != 0L && t.getId() != 0L) {
+      if (getId() < t.getId()) return -1;
+      if (getId() > t.getId()) return 1;
+    } else {
+      if (getPartitionNumber() < t.getPartitionNumber()) return -1;
+      if (getPartitionNumber() > t.getPartitionNumber()) return 1;
+    }
+    return 0;
   }
 
   @Override

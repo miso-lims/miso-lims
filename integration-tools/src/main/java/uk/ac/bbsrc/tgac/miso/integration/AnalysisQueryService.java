@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
 
@@ -41,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
  * @since 0.1.3
  */
 public class AnalysisQueryService {
-  protected static final Logger log = LoggerFactory.getLogger(AnalysisQueryService.class);
+  private static final Logger log = LoggerFactory.getLogger(AnalysisQueryService.class);
 
   private String analysisServerHost;
   private int analysisServerPort;

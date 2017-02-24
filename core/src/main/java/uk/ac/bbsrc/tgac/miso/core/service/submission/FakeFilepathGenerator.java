@@ -31,8 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sourceforge.fluxion.spi.ServiceProvider;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
@@ -44,15 +45,15 @@ public class FakeFilepathGenerator implements FilePathGenerator {
 
   // returns a HashSet containing 3 files on the local drive.
   @Override
-  public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution libraryDilution) {
-    Set<File> files = new HashSet<File>();
+  public Set<File> generateFilePath(Partition partition, Dilution libraryDilution) {
+    Set<File> files = new HashSet<>();
     files.add(new File("/storage/miso/datafiles/datafile1.dat"));
     return files;
   }
 
   @Override
-  public Set<File> generateFilePaths(SequencerPoolPartition partition) {
-    Set<File> dataFiles = new HashSet<File>();
+  public Set<File> generateFilePaths(Partition partition) {
+    Set<File> dataFiles = new HashSet<>();
     for (int i = 1; i <= 3; i++) {
       File datafile = new File("/storage/miso/datafiles/datafile" + i + ".dat");
       dataFiles.add(datafile);

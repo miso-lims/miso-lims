@@ -24,10 +24,16 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
   xmlns:util="http://www.springframework.org/schema/util" xmlns:integration="http://www.springframework.org/schema/integration" xmlns:ip="http://www.springframework.org/schema/integration/ip"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-       http://www.springframework.org/schema/tx spring-tx-2.5.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
-       http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                      http://www.springframework.org/schema/tx 
+                      http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+                      http://www.springframework.org/schema/util 
+                      http://www.springframework.org/schema/util/spring-util.xsd
+                      http://www.springframework.org/schema/integration 
+                      http://www.springframework.org/schema/integration/spring-integration.xsd 
+                      http://www.springframework.org/schema/integration/ip 
+                      http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
 
   <bean id="applicationContextProvider" name="applicationContextProvider" class="uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider" />
 

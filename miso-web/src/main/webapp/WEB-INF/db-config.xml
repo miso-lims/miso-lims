@@ -23,86 +23,145 @@
 -->
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jee="http://www.springframework.org/schema/jee" xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
+  xmlns:jee="http://www.springframework.org/schema/jee"
   xmlns:context="http://www.springframework.org/schema/context"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-                        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
-                        http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
-                        http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.2.xsd
-                        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                      http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/tx 
+                      http://www.springframework.org/schema/tx/spring-tx.xsd
+                      http://www.springframework.org/schema/jee 
+                      http://www.springframework.org/schema/jee/spring-jee.xsd
+                      http://www.springframework.org/schema/context 
+                      http://www.springframework.org/schema/context/spring-context.xsd"
   default-autowire="byName">
 
 
   <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    <property name="entityInterceptor" ref="timeShiftInterceptor" />
     <property name="dataSource" ref="dataSource" />
     <property name="annotatedClasses">
       <list>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl</value>
+        <value>com.eaglegenomics.simlims.core.Group</value>
+        <value>com.eaglegenomics.simlims.core.Note</value>
+        <value>com.eaglegenomics.simlims.core.SecurityProfile</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractBox</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractQC</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractRun</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractRunQC</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSample</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.BoxSize</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.BoxUse</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.Index</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.IndexFamily</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.KitImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion.PoolOrderCompletionId</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.Printer</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.StudyType</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.BoxDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.RunDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ExperimentChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.KitDescriptorChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StudyChangeLog</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.type.QcType</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert</value>
       </list>
     </property>
     <property name="hibernateProperties">
       <props>
         <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
         <prop key="hibernate.show_sql">true</prop>
+        <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
       </props>
     </property>
-    <property name="mappingResources">
-      <list>
-        <value>hibernate/miso.hbm.xml</value>
-      </list>
-    </property> 
   </bean>
 
   <tx:annotation-driven/>
   <bean id="jpaDialect"
         class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
   <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
-  <ehcache:annotation-driven cache-manager="cacheManager" proxy-target-class="true"/>
-  <bean id="cacheManager" name="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
-  <bean id="limsHashKeyGenerator" class="com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator">
-    <property name="includeMethod" value="false" />
-    <property name="includeParameterTypes" value="false" />
-  </bean>
   
   <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory" />
     <property name="dataSource" ref="dataSource"/>
+  </bean>
+  
+  <bean id="timeShiftInterceptor" class = "uk.ac.bbsrc.tgac.miso.persistence.impl.util.TimeShiftingInterceptor">
+    <!-- Defaults to UTC/UTC, which will not make any adjustments -->
+    <constructor-arg name="dbZone" value="${miso.timeCorrection.dbZone:UTC}" />
+    <constructor-arg name="uiZone" value="${miso.timeCorrection.uiZone:UTC}" />
   </bean>
   
   <context:component-scan base-package="uk.ac.bbsrc.tgac.miso.persistence" /> 
@@ -119,345 +178,4 @@
 
   <bean name="nativeJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor" />
 
-  <bean id="daoLookup" name="daoLookup" class="uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup">
-    <property name="daos">
-      <map key-type="java.lang.Class">
-        <entry key="uk.ac.bbsrc.tgac.miso.core.event.Alert" value-ref="alertStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR" value-ref="emPCRStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution" value-ref="emPCRDilutionStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution" value-ref="libraryDilutionStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing" value-ref="targetedSequencingStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Box" value-ref="boxStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Experiment" value-ref="experimentStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.EntityGroup" value-ref="entityGroupStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Kit" value-ref="kitStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Library" value-ref="libraryStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.LibraryQC" value-ref="libraryQcStore" />
-        <entry key="com.eaglegenomics.simlims.core.Note" value-ref="noteStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Partition" value-ref="partitionStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Platform" value-ref="platformStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Pool" value-ref="poolStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.PoolQC" value-ref="poolQcStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.PrintJob" value-ref="printJobStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService" value-ref="printServiceStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Project" value-ref="projectStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview" value-ref="projectStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Run" value-ref="runStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.RunQC" value-ref="runQcStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Sample" value-ref="sampleStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SampleQC" value-ref="sampleQcStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer" value-ref="sequencerPartitionContainerStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerReference" value-ref="sequencerReferenceStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord" value-ref="sequencerServiceRecordStore"/>
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Status" value-ref="statusStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Study" value-ref="studyStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Submission" value-ref="submissionStore" />
-      </map>
-    </property>
-  </bean>
-
-  <bean id="projectStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">PERSIST</value>
-    </property>
-    <property name="securityManager" ref="securityManager" />
-    <property name="studyDAO" ref="studyStore" />
-    <property name="sampleDAO" ref="sampleStore" />
-    <property name="entityGroupDAO" ref="entityGroupStore" />
-    <property name="libraryDAO" ref="libraryStore" />
-    <property name="runDAO" ref="runStore" />
-    <property name="noteDAO" ref="noteStore" />
-    <property name="watcherDAO" ref="watcherStore" />
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="studyStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLStudyDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">REMOVE</value>
-    </property>
-    <property name="securityDAO" ref="securityStore" />
-    <property name="changeLogDAO" ref="changeLogStore" />
-    <property name="projectDAO" ref="projectStore" />
-    <property name="experimentDAO" ref="experimentStore" />
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="emPCRDilutionStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDilutionDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">REMOVE</value>
-    </property>
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="emPcrDAO" ref="emPCRStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="libraryDilutionStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">REMOVE</value>
-    </property>
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="libraryDAO" ref="libraryStore" />
-    <property name="targetedSequencingDAO" ref="targetedSequencingStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-    <property name="autoGenerateIdentificationBarcodes">
-      <value>${miso.autoGenerateIdentificationBarcodes}</value>
-    </property>
-  </bean>
-  
-  <bean id="targetedSequencingStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedSequencingDAO">
-    <property name="securityDAO" ref="securityStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="emPCRStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">REMOVE</value>
-    </property>
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="libraryDilutionDAO" ref="libraryDilutionStore" />
-    <property name="emPCRDilutionDAO" ref="emPCRDilutionStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="entityGroupStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEntityGroupDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">REMOVE</value>
-    </property>
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="experimentStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">REMOVE</value>
-    </property>
-    <property name="securityDAO" ref="securityStore" />
-    <property name="changeLogDAO" ref="changeLogStore" />
-    <property name="studyDAO" ref="studyStore" />
-    <property name="poolDAO" ref="poolStore" />
-    <property name="platformDAO" ref="platformStore" />
-    <property name="kitDAO" ref="kitStore" />
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="sampleStore" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao">
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-    <property name="changeLogDao" ref="changeLogStore" />
-    <property name="libraryDao" ref="libraryStore" />
-    <property name="noteDao" ref="noteStore" />
-    <property name="sampleQcDao" ref="sampleQcStore" />
-    <property name="securityDao" ref="securityStore" />
-    <property name="securityProfileDao" ref="securityProfileStore" />
-    <property name="autoGenerateIdentificationBarcodes">
-      <value>${miso.autoGenerateIdentificationBarcodes}</value>
-    </property>
-  </bean>
-
-  <bean id="sampleQcStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">ALL</value>
-    </property>
-    <property name="sampleDAO" ref="sampleStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="libraryQcStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">ALL</value>
-    </property>
-    <property name="libraryDAO" ref="libraryStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="runStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">PERSIST</value>
-    </property>
-    <property name="securityDAO" ref="securityStore" />
-    <property name="changeLogDAO" ref="changeLogStore" />
-    <property name="securityManager" ref="securityManager" />
-    <property name="sequencerPartitionContainerDAO" ref="sequencerPartitionContainerStore" />
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="sequencerReferenceDAO" ref="sequencerReferenceStore" />
-    <property name="statusDAO" ref="statusStore" />
-    <property name="runQcDAO" ref="runQcStore" />
-    <property name="noteDAO" ref="noteStore" />
-    <property name="watcherDAO" ref="watcherStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="runQcStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunQCDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">ALL</value>
-    </property>
-    <property name="runDAO" ref="runStore" />
-    <property name="sequencerPartitionContainerDAO" ref="sequencerPartitionContainerStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="sequencerPartitionContainerStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">PERSIST</value>
-    </property>
-    <property name="securityDAO" ref="securityStore" />
-    <property name="changeLogDAO" ref="changeLogStore" />
-    <property name="partitionDAO" ref="partitionStore" />
-    <property name="runDAO" ref="runStore" />
-    <property name="platformDAO" ref="platformStore" />
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="partitionStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">PERSIST</value>
-    </property>
-    <property name="sequencerPartitionContainerDAO" ref="sequencerPartitionContainerStore" />
-    <property name="poolDAO" ref="poolStore" />
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="libraryStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">REMOVE</value>
-    </property>
-    <property name="securityDAO" ref="securityStore" />
-    <property name="changeLogDAO" ref="changeLogStore" />
-    <property name="noteDAO" ref="noteStore" />
-    <property name="poolDAO" ref="poolStore" />
-    <property name="sampleDAO" ref="sampleStore" />
-    <property name="dilutionDAO" ref="libraryDilutionStore" />
-    <property name="libraryQcDAO" ref="libraryQcStore" />
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="boxDAO" ref="boxStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-    <property name="autoGenerateIdentificationBarcodes">
-      <value>${miso.autoGenerateIdentificationBarcodes}</value>
-    </property>
-  </bean>
-
-  <bean id="noteStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLNoteDAO">
-    <property name="securityDAO" ref="securityStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="platformStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlatformDAO">
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="poolStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">REMOVE</value>
-    </property>
-    <property name="securityDAO" ref="securityStore" />
-    <property name="changeLogDAO" ref="changeLogStore" />
-    <property name="securityManager" ref="securityManager" />
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="experimentDAO" ref="experimentStore" />
-    <property name="poolQcDAO" ref="poolQcStore" />
-    <property name="watcherDAO" ref="watcherStore" />
-    <property name="boxDAO" ref="boxStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-    <property name="noteDAO" ref="noteStore" />
-    <property name="autoGenerateIdentificationBarcodes">
-      <value>${miso.autoGenerateIdentificationBarcodes}</value>
-    </property>
-  </bean>
-
-  <bean id="poolQcStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">ALL</value>
-    </property>
-    <property name="poolDAO" ref="poolStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="printJobStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPrintJobDAO">
-    <property name="securityManager" ref="securityManager" />
-    <property name="printManager" ref="printManager" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="printServiceStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPrintServiceDAO">
-    <property name="printManager" ref="printManager" />
-    <property name="securityManager" ref="securityManager" />
-    <property name="misoFilesManager" ref="misoFileManager" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="statusStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO">
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="securityProfileStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityProfileDAO">
-    <property name="securityManager" ref="securityManager" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="securityStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityDAO">
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="submissionStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTgacSubmissionDAO">
-    <property name="dilutionDAO" ref="libraryDilutionStore" />
-    <property name="experimentDAO" ref="experimentStore" />
-    <property name="partitionDAO" ref="partitionStore" />
-    <property name="sampleDAO" ref="sampleStore" />
-    <property name="studyDAO" ref="studyStore" />
-    <property name="runDAO" ref="runStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="sequencerReferenceStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO">
-    <property name="platformDAO" ref="platformStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="sequencerServiceRecordStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerServiceRecordDAO">
-    <property name="sequencerReferenceDAO" ref="sequencerReferenceStore"/>
-    <property name="jdbcTemplate" ref="interfaceTemplate"/>
-    <property name="misoFilesManager" ref="misoFileManager"/>
-  </bean>
-
-  <bean id="kitStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO">
-    <property name="cascadeType">
-      <value type="javax.persistence.CascadeType">PERSIST</value>
-    </property>
-    <property name="noteDAO" ref="noteStore" />
-    <property name="changeLogDAO" ref="changeLogStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-    <property name="securityDAO" ref="securityStore" />
-  </bean>
-
-  <bean id="alertStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLAlertDAO">
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-    <property name="securityManager" ref="securityManager" />
-  </bean>
-
-  <bean id="watcherStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO">
-    <property name="securityManager" ref="securityManager" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="changeLogStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO">
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="boxStore" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLBoxDAO">
-    <property name="securityDAO" ref="securityStore" />
-    <property name="changeLogDAO" ref="changeLogStore" />
-    <property name="libraryDAO" ref="libraryStore" />
-    <property name="poolDAO" ref="poolStore" />
-    <property name="sampleDAO" ref="sampleStore" />
-    <property name="securityProfileDAO" ref="securityProfileStore" />
-    <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-  
-  <bean name="libraryDesignStore" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao">
-    <property name="libraryDao" ref="libraryStore" />
-  </bean>
 </beans>

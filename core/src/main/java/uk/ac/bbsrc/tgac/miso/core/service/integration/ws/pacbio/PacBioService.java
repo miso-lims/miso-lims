@@ -34,7 +34,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +43,8 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class PacBioService {
-  protected static final Logger log = LoggerFactory.getLogger(PacBioService.class);
-  private final HttpClient httpclient = new DefaultHttpClient();
+  private static final Logger log = LoggerFactory.getLogger(PacBioService.class);
+  private final HttpClient httpclient = HttpClientBuilder.create().build();
   private final URI baseRestUri;
   private final DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 

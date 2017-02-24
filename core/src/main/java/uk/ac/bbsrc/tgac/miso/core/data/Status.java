@@ -23,12 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-
 import com.eaglegenomics.simlims.core.Securable;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 
@@ -38,7 +39,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Status extends Securable {
   /**
@@ -61,16 +63,18 @@ public interface Status extends Securable {
    * files, this field is null.
    * 
    * @return String xml.
+   * @throws UnsupportedEncodingException
    */
-  public String getXml();
+  public String getXml() throws UnsupportedEncodingException;
 
   /**
    * Sets the underlying XML status string of this Status object. Illumina for example produces Status.xml files.
    * 
    * @param xml
    *          String.
+   * @throws UnsupportedEncodingException
    */
-  public void setXml(String xml);
+  public void setXml(String xml) throws UnsupportedEncodingException;
 
   /**
    * Returns the health of this Status object.

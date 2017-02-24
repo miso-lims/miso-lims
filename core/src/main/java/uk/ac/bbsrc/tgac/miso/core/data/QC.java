@@ -36,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface QC extends Securable, Comparable, Deletable {
+public interface QC extends Securable, Comparable<QC>, Deletable {
   public long getId();
 
   public void setId(long id);

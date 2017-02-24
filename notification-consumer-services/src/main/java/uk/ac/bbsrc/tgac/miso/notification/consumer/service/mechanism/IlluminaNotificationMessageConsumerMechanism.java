@@ -47,7 +47,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.Message;
+import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -56,14 +56,11 @@ import org.xml.sax.SAXException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaStatus;
@@ -320,14 +317,14 @@ public class IlluminaNotificationMessageConsumerMechanism
 
           if (r.getSequencerReference() != null) {
             processRunParams(run, r);
-            Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = r.getSequencerPartitionContainers();
+            Collection<SequencerPartitionContainer> fs = r.getSequencerPartitionContainers();
             if (fs.isEmpty()) {
               if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
-                Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager
+                Collection<SequencerPartitionContainer> pfs = requestManager
                     .listSequencerPartitionContainersByBarcode(run.getString("containerId"));
                 if (!pfs.isEmpty()) {
                   if (pfs.size() == 1) {
-                    SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<>(
+                    SequencerPartitionContainer lf = new ArrayList<>(
                         pfs).get(0);
                     if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                       r.setSecurityProfile(lf.getSecurityProfile());
@@ -352,7 +349,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                             + ":: More than one sequencing container has this barcode. Cannot automatically link to a pre-existing barcode.");
                   }
                 } else {
-                  SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
+                  SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
                   f.setSecurityProfile(r.getSecurityProfile());
                   if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                     f.setPlatform(r.getSequencerReference().getPlatform());
@@ -366,13 +363,12 @@ public class IlluminaNotificationMessageConsumerMechanism
                     }
                   }
 
-                  f.initEmptyPartitions();
                   f.setIdentificationBarcode(run.getString("containerId"));
                   r.addSequencerPartitionContainer(f);
                 }
               }
             } else {
-              SequencerPartitionContainer<SequencerPoolPartition> f = fs.iterator().next();
+              SequencerPartitionContainer f = fs.iterator().next();
               f.setSecurityProfile(r.getSecurityProfile());
               if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                 f.setPlatform(r.getSequencerReference().getPlatform());
@@ -387,7 +383,6 @@ public class IlluminaNotificationMessageConsumerMechanism
                     f.setPartitionLimit(1);
                   }
                 }
-                f.initEmptyPartitions();
               } else {
                 if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                   if (f.getPartitions().size() != 1) {
@@ -406,34 +401,6 @@ public class IlluminaNotificationMessageConsumerMechanism
                     log.warn(
                         f.getName() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
                             + ") doesn't match usual number of GA/HiSeq partitions (8)");
-                    log.warn("Attempting fix...");
-                    Map<Integer, Partition> parts = new HashMap<>();
-                    Partition notNullPart = f.getPartitions().get(0);
-                    long notNullPartID = notNullPart.getId();
-                    int notNullPartNum = notNullPart.getPartitionNumber();
-
-                    for (int i = 1; i < 9; i++) {
-                      parts.put(i, null);
-                    }
-
-                    for (Partition p : f.getPartitions()) {
-                      parts.put(p.getPartitionNumber(), p);
-                    }
-
-                    for (Integer num : parts.keySet()) {
-                      if (parts.get(num) == null) {
-                        long newId = (notNullPartID - notNullPartNum) + num;
-                        log.info("Inserting partition at " + num + " with ID " + newId);
-                        SequencerPoolPartition p = new PartitionImpl();
-                        p.setSequencerPartitionContainer(f);
-                        p.setId(newId);
-                        p.setPartitionNumber(num);
-                        p.setSecurityProfile(f.getSecurityProfile());
-                        ((SequencerPartitionContainerImpl) f).addPartition(p);
-                      }
-                    }
-
-                    log.info(f.getName() + ":: partitions now (" + f.getPartitions().size() + ")");
                   }
                 }
               }
@@ -459,8 +426,8 @@ public class IlluminaNotificationMessageConsumerMechanism
     }
     try {
       if (runsToSave.size() > 0) {
-        int[] saved = requestManager.saveRuns(runsToSave);
-        log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
+        requestManager.saveRuns(runsToSave);
+        log.info("Batch saved " + runsToSave.size() + " runs");
       }
     } catch (IOException e) {
       log.error("Couldn't save run batch", e);
@@ -479,7 +446,7 @@ public class IlluminaNotificationMessageConsumerMechanism
         for (SequencingParameters parameters : getParameterSet()) {
           log.debug("Checking run " + run.getString(IlluminaTransformer.JSON_RUN_NAME) + " against parameters " + parameters.getName());
 
-          if (parameters.getPlatformId() == r.getSequencerReference().getPlatform().getId() && parameters.matches(document)) {
+          if (parameters.getPlatform().getId() == r.getSequencerReference().getPlatform().getId() && parameters.matches(document)) {
             log.debug("Matched run " + run.getString(IlluminaTransformer.JSON_RUN_NAME) + " to parameters " + parameters.getName());
             r.setSequencingParameters(parameters);
             break;

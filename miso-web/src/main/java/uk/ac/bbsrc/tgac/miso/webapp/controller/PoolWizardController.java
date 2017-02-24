@@ -32,7 +32,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -42,14 +41,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
 @RequestMapping("/poolwizard")
@@ -58,36 +56,18 @@ public class PoolWizardController {
   protected static final Logger log = LoggerFactory.getLogger(PoolWizardController.class);
 
   @Autowired
-  private SecurityManager securityManager;
-
-  @Autowired
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
+  private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
   @ModelAttribute("studyTypes")
-  public Collection<String> populateStudyTypes() throws IOException {
-    return requestManager.listAllStudyTypes();
+  public Collection<StudyType> populateStudyTypes() throws IOException {
+    return studyService.listTypes();
   }
 
   @ModelAttribute("platformNames")
@@ -104,7 +84,7 @@ public class PoolWizardController {
   
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
-    return AbstractPool.CONCENTRATION_UNITS;
+    return PoolImpl.CONCENTRATION_UNITS;
   }
 
   @ModelAttribute("title")
@@ -122,8 +102,8 @@ public class PoolWizardController {
       }
 
       StringBuilder b = new StringBuilder();
-      for (String st : requestManager.listAllStudyTypes()) {
-        b.append("<option value=\"" + st + "\">" + st + "</option>");
+      for (StudyType st : studyService.listTypes()) {
+        b.append("<option value=\"" + st.getId() + "\">" + st.getName() + "</option>");
       }
 
       model.put("project", p);

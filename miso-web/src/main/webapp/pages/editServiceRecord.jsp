@@ -200,9 +200,9 @@
             </sec:authorize>
           </div>
           <a class="listbox" href="<c:url value='/miso/download/servicerecord/${serviceRecord.id}/${file.key}'/>">
-            <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
+            <span onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
               ${file.value}
-            </div>
+            </span>
           </a>
         </c:forEach>
       </div>

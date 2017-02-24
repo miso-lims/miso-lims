@@ -34,7 +34,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,10 +54,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
+
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -68,12 +68,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
 /**
@@ -100,17 +101,16 @@ public class EditPoolController {
   private RequestManager requestManager;
 
   @Autowired
-  private DataObjectFactory dataObjectFactory;
+  private ChangeLogService changeLogService;
+
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   @Autowired
   private JdbcTemplate interfaceTemplate;
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setRequestManager(RequestManager requestManager) {
@@ -121,9 +121,13 @@ public class EditPoolController {
     this.securityManager = securityManager;
   }
 
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
+  }
+
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return requestManager.listAllChanges("Pool");
+    return changeLogService.listAll("Pool");
   }
 
   @ModelAttribute("platformTypes")
@@ -138,7 +142,7 @@ public class EditPoolController {
 
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
-    return AbstractPool.CONCENTRATION_UNITS;
+    return PoolImpl.CONCENTRATION_UNITS;
   }
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -156,7 +160,7 @@ public class EditPoolController {
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView newUnassignedPool(ModelMap model) throws IOException {
-    return setupForm(AbstractPool.UNSAVED_ID, model);
+    return setupForm(PoolImpl.UNSAVED_ID, model);
   }
 
   @RequestMapping(value = "/{poolId}", method = RequestMethod.GET)
@@ -164,8 +168,8 @@ public class EditPoolController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
-      if (poolId == AbstractPool.UNSAVED_ID) {
-        pool = dataObjectFactory.getPool(user);
+      if (poolId == PoolImpl.UNSAVED_ID) {
+        pool = new PoolImpl(user);
         model.put("title", "New Pool");
       } else {
         pool = requestManager.getPoolById(poolId);
@@ -188,7 +192,7 @@ public class EditPoolController {
 
       ObjectMapper mapper = new ObjectMapper();
       model.put("runsJSON", mapper.writeValueAsString(
-          poolId == AbstractPool.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(requestManager.getRunsByPool(pool))));
+          poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(requestManager.getRunsByPool(pool))));
 
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {
@@ -223,10 +227,10 @@ public class EditPoolController {
     switch (sortColIndex) {
     case 0:
       // sorting directly on name doesn't make sense in the UI
-      sortCol = "ld.dilutionId";
+      sortCol = "dilutionId";
       break;
     case 1:
-      sortCol = "ld.concentration";
+      sortCol = "concentration";
       break;
     default:
       throw new IOException("Unexpected value in elementSelectDataTable sortCol " + sortColIndex);
@@ -239,9 +243,9 @@ public class EditPoolController {
     JSONObject rtn = new JSONObject();
     JSONArray data = new JSONArray();
 
-    List<LibraryDilution> dils = requestManager.getLibraryDilutionsForPoolDataTable(start, length, search, sSortDir_0, sortCol,
-        platformType);
-    int allDilutionsCount = requestManager.countLibraryDilutionsByPlatform(PlatformType.ILLUMINA);
+    List<LibraryDilution> dils = dilutionService.listByPageSizeSearchAndPlatform(start, length, search, platformType, sSortDir_0,
+        sortCol);
+    int allDilutionsCount = dilutionService.countByPlatform(PlatformType.ILLUMINA);
 
     for (LibraryDilution dil : dils) {
       JSONArray inner = new JSONArray();
@@ -260,7 +264,7 @@ public class EditPoolController {
       data.add(inner);
     }
     rtn.put("iTotalRecords", allDilutionsCount);
-    rtn.put("iTotalDisplayRecords", requestManager.countLibraryDilutionsBySearchAndPlatform(search, platformType));
+    rtn.put("iTotalDisplayRecords", dilutionService.countBySearchAndPlatform(search, platformType));
     rtn.put("sEcho", "" + draw);
     rtn.put("aaData", data);
     return rtn.toString();
@@ -289,7 +293,7 @@ public class EditPoolController {
     Pool p = (PoolImpl) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
-      Dilution ld = requestManager.getDilutionByBarcodeAndPlatform(s, p.getPlatformType());
+      LibraryDilution ld = dilutionService.getByBarcode(s);
       if (ld != null) {
         try {
           p.addPoolableElement(ld);
@@ -314,8 +318,7 @@ public class EditPoolController {
       }
       // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
       // update them to avoid reverting the state.
-      if (pool.getId() != AbstractPool.UNSAVED_ID) {
-        @SuppressWarnings("unchecked")
+      if (pool.getId() != PoolImpl.UNSAVED_ID) {
         Pool original = requestManager.getPoolById(pool.getId());
         pool.setPoolableElements(original.getPoolableElements());
       }

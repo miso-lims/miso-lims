@@ -28,8 +28,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -55,10 +53,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  * @author Rob Davey
  * @since 0.0.2
  */
-@Entity
-@DiscriminatorValue("Solid")
 public class SolidRun extends RunImpl {
-  protected static final Logger log = LoggerFactory.getLogger(SolidRun.class);
+  private static final Logger log = LoggerFactory.getLogger(SolidRun.class);
 
   public SolidRun() {
     setPlatformType(PlatformType.SOLID);
@@ -129,15 +125,6 @@ public class SolidRun extends RunImpl {
     } catch (TransformerException e) {
       log.error("parse status XML", e);
     }
-  }
-
-  @Override
-  public void buildSubmission() {
-    /*
-     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
-     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
-     * ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
-     */
   }
 
   /**

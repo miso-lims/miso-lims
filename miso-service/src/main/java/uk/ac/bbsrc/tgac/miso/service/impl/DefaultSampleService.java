@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -60,7 +61,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 @Service
 public class DefaultSampleService implements SampleService {
 
-  protected static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
   @Autowired
   private SampleDao sampleDao;
@@ -242,13 +243,13 @@ public class DefaultSampleService implements SampleService {
     }
     try {
       Long newId = sample.getId();
+      if (!hasTemporaryAlias(sample)) {
+        validateAlias(sample);
+      }
       if (newId == Sample.UNSAVED_ID) {
         newId = sampleDao.addSample(sample);
       } else {
         sampleDao.update(sample);
-      }
-      if (!hasTemporaryAlias(sample)) {
-        validateAlias(sample);
       }
       Sample created = sampleDao.getSample(newId);
 
@@ -256,24 +257,22 @@ public class DefaultSampleService implements SampleService {
       boolean needsUpdate = false;
       if (hasTemporaryName(sample)) {
         created.setName(namingScheme.generateNameFor(created));
+        validateNameOrThrow(created, namingScheme);
         needsUpdate = true;
       }
       if (hasTemporaryAlias(sample)) {
         String generatedAlias = namingScheme.generateSampleAlias(created);
         validateAliasUniqueness(generatedAlias);
         created.setAlias(generatedAlias);
+        validateAlias(created);
         needsUpdate = true;
       }
-      if (isStringBlankOrNull(sample.getAlias())) {
-        sample.setAlias(sample.getName());
+      if (autoGenerateIdBarcodes && isStringEmptyOrNull(created.getIdentificationBarcode())) {
+        // if !autoGenerateIdBarcodes then the identificationBarcode is set by the user
+        generateAndSetIdBarcode(created);
         needsUpdate = true;
       }
-      if (autoGenerateIdBarcodes) {
-        autoGenerateIdBarcode(sample);
-        needsUpdate = true;
-      } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
       if (needsUpdate) {
-        validateAlias(sample);
         sampleDao.update(created);
       }
 
@@ -470,7 +469,7 @@ public class DefaultSampleService implements SampleService {
    */
   private void loadChildEntities(Sample sample) throws IOException {
     if (sample.getProject() != null) {
-      sample.setProject(projectStore.lazyGet(sample.getProject().getId()));
+      sample.setProject(projectStore.get(sample.getProject().getId()));
     }
     if (isDetailedSample(sample)) {
       DetailedSample sai = (DetailedSample) sample;
@@ -519,7 +518,6 @@ public class DefaultSampleService implements SampleService {
    * Updates all timestamps and user data associated with the change
    * 
    * @param sample the Sample to update
-   * @param setCreated specifies whether this is a newly created Sample requiring creation timestamps and user data
    * @throws IOException
    */
   private void setChangeDetails(Sample sample) throws IOException {
@@ -627,7 +625,7 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   public List<Sample> getAll() throws IOException {
-    Collection<Sample> allSamples = sampleDao.getSample();
+    Collection<Sample> allSamples = sampleDao.getSamples();
     return authorizationManager.filterUnreadable(allSamples);
   }
 
@@ -641,35 +639,6 @@ public class DefaultSampleService implements SampleService {
     authorizationManager.throwIfNonAdmin();
     Sample sample = get(sampleId);
     sampleDao.deleteSample(sample);
-  }
-
-  static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_S";
-
-  /**
-   * Generate a temporary name using a UUID.
-   * 
-   * @return Temporary name
-   */
-  static public String generateTemporaryName() {
-    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
-  }
-
-  static public boolean hasTemporaryName(Sample sample) {
-    return sample != null && sample.getName() != null && sample.getName().startsWith(TEMPORARY_NAME_PREFIX);
-  }
-
-  static public boolean hasTemporaryAlias(Sample sample) {
-    return sample != null && sample.getAlias() != null && sample.getAlias().startsWith(TEMPORARY_NAME_PREFIX);
-  }
-
-  /**
-   * Generates a unique barcode. Note that the barcode will change when the alias is changed.
-   * 
-   * @param sample
-   */
-  public void autoGenerateIdBarcode(Sample sample) {
-    String barcode = sample.getName() + "::" + sample.getAlias();
-    sample.setIdentificationBarcode(barcode);
   }
 
   @CoverageIgnore
@@ -714,6 +683,44 @@ public class DefaultSampleService implements SampleService {
   @Override
   public List<Sample> getByAlias(String alias) throws IOException {
     return new ArrayList<>(sampleDao.listByAlias(alias));
+  }
+
+  @Override
+  public Sample getByBarcode(String barcode) throws IOException {
+    Sample sample = sampleDao.getByBarcode(barcode);
+    return (authorizationManager.readCheck(sample) ? sample : null);
+  }
+
+  @Override
+  public void addNote(Sample sample, Note note) throws IOException {
+    Sample managed = sampleDao.get(sample.getId());
+    authorizationManager.throwIfNotWritable(managed);
+    note.setCreationDate(new Date());
+    note.setOwner(authorizationManager.getCurrentUser());
+    managed.addNote(note);
+    sampleDao.save(managed);
+  }
+
+  @Override
+  public void deleteNote(Sample sample, Long noteId) throws IOException {
+    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
+    Sample managed = sampleDao.get(sample.getId());
+    authorizationManager.throwIfNotWritable(managed);
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getNoteId().equals(noteId)) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Sample " + sample.getId());
+    }
+    authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
+    managed.getNotes().remove(deleteNote);
+    sampleDao.save(managed);
   }
 
 }

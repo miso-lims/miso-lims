@@ -34,7 +34,7 @@
 <%@taglib prefix="sessionConversation" uri="/WEB-INF/tld/sessionConversation.tld" %>
 
 <%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-gb">
 <head>
 
   <%-- timestamp to force browser to reload javascript --%>
@@ -96,7 +96,7 @@
 </head>
 
 <body>
-<table border="0" width="100%">
+<table class="full-width no-border">
   <tr>
     <td class="headertable" align="left" onclick="window.location.href='<c:url value='/'/>'">
       <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo"
@@ -111,12 +111,7 @@
 </table>
 
 <div id="navtabs">
-  <sec:authorize access="isAuthenticated()">
-  <script type="text/javascript">
-    <%-- checkUser('<sec:authentication property="principal.username"/>'); --%>
-  </script>
   <ul>
-    </sec:authorize>
 
     <sec:authorize access="isAuthenticated()">
       <li><a href="<c:url value="/miso/mainMenu"/>"><span>Home</span></a></li>
@@ -149,15 +144,13 @@
       </li>
     </sec:authorize>
 
-    <sec:authorize access="isAuthenticated()">
   </ul>
-  </sec:authorize>
 </div>
 
 <sec:authorize access="isAuthenticated()">
-  <div id="loggedInBanner">Logged in as:
-    <b id="currentUser"><sec:authentication property="principal.username"/></b> | <a
-        href="<c:url value="/j_spring_security_logout"/>">Logout</a></div>
+  <div id="loggedInBanner" style="display:inline-block">Logged in as:
+    <b id="currentUser"><sec:authentication property="principal.username"/></b>  | <a href="<c:url value="/logout"/>">Logout</a>
+  </div>
 </sec:authorize>
 
 <div id="content">

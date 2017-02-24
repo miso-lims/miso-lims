@@ -25,6 +25,9 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +45,10 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
  * @author Rob Davey
  * @since 0.0.3
  */
+@Entity
+@Table(name = "RunQC")
 public class RunQCImpl extends AbstractRunQC implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(RunQCImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(RunQCImpl.class);
   /**
    * Construct a new RunQCImpl
    */

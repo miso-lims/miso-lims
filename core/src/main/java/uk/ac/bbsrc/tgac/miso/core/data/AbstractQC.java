@@ -28,6 +28,11 @@ import java.util.Date;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
@@ -38,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
  * @date 25-Jul-2011
  * @since 0.0.3
  */
+@MappedSuperclass
 public abstract class AbstractQC implements QC {
   public static final Long UNSAVED_ID = 0L;
 
@@ -46,7 +52,12 @@ public abstract class AbstractQC implements QC {
   private long qcId = AbstractQC.UNSAVED_ID;
 
   private String qcUserName;
+
+  @ManyToOne(targetEntity = QcType.class)
+  @JoinColumn(name = "qcMethod")
   private QcType qcType;
+
+  @Temporal(TemporalType.DATE)
   private Date qcDate = new Date();
 
   @Override
@@ -128,8 +139,7 @@ public abstract class AbstractQC implements QC {
   }
 
   @Override
-  public int compareTo(Object o) {
-    QC t = (QC) o;
+  public int compareTo(QC t) {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

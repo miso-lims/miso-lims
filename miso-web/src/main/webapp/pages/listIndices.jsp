@@ -33,7 +33,7 @@
     </h1>
 
     <div class="dataTables_wrapper" role="grid">
-    <table cellpadding="0" cellspacing="0" border="0" class="display dataTable" id="listingIndicesTable">
+    <table class="display dataTable no-border" id="listingIndicesTable">
     </table>
     </div>
     <script type="text/javascript">

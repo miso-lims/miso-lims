@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform;
 
@@ -38,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform;
  * @since 0.0.2
  */
 @Entity
+@Table(name = "Platform")
 public class PlatformImpl extends AbstractPlatform implements Serializable {
   public PlatformImpl() {
   }

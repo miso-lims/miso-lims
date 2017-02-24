@@ -22,7 +22,7 @@ BEGIN
     UNION SELECT 'Analyte Stocks',COUNT(*) FROM SampleStock
     UNION SELECT 'Analyte Aliquots',COUNT(*) FROM SampleAliquot
     UNION SELECT 'Libraries',COUNT(*) FROM Library
-    UNION SELECT 'LibraryAdditionalInfo',COUNT(*) FROM LibraryAdditionalInfo
+    UNION SELECT 'DetailedLibrary',COUNT(*) FROM DetailedLibrary
     UNION SELECT 'LibraryChangeLogs',COUNT(*) FROM LibraryChangeLog
     UNION SELECT 'LibraryDilutions',COUNT(*) FROM LibraryDilution
     UNION SELECT 'Pool_Elements',COUNT(*) FROM Pool_Elements
@@ -40,17 +40,22 @@ DROP PROCEDURE IF EXISTS clearData//
 CREATE PROCEDURE clearData ()
 BEGIN
     
+    DELETE FROM SequencerPartitionContainerChangeLog;
     DELETE FROM Run_SequencerPartitionContainer;
     DELETE FROM SequencerPartitionContainer_Partition;
     DELETE FROM SequencerPartitionContainer;
     DELETE FROM _Partition;
-    DELETE FROM Status;
+    DELETE FROM RunChangeLog;
     DELETE FROM Run;
+    DELETE FROM ExperimentChangeLog;
+    DELETE FROM Experiment;
+    DELETE FROM Pool_Note;
     DELETE FROM PoolOrder;
-    DELETE FROM Pool_Elements;
+    DELETE FROM Pool_Dilution;
+    DELETE FROM PoolChangeLog;
     DELETE FROM Pool;
     DELETE FROM LibraryDilution;
-    DELETE FROM LibraryAdditionalInfo;
+    DELETE FROM DetailedLibrary;
     DELETE FROM Library_Index;
     DELETE FROM LibraryChangeLog;
     DELETE FROM Library;
@@ -68,8 +73,8 @@ BEGIN
     DELETE FROM Sample;
     DELETE FROM SampleNumberPerProject;
     DELETE FROM Subproject;
+    DELETE FROM StudyChangeLog;
     DELETE FROM Study;
-    DELETE FROM Project_ProjectOverview;
     DELETE FROM ProjectOverview_Note;
     DELETE FROM ProjectOverview;
     DELETE FROM Project;

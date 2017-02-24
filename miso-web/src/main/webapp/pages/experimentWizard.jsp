@@ -52,11 +52,7 @@
           <input type="hidden" name="projectId" value="${projectId}"/>
           <tr>
             <td>Study Type:</td>
-            <td>
-              <select name="studyType">
-                ${studyTypes}
-              </select>
-            </td>
+            <td><miso:select id="studyType" path="studyType" items="${studyTypes}" itemLabel="name" itemValue="id" /></td>
           </tr>
         </table>
         <br/>

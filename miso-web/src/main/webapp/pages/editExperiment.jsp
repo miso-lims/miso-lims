@@ -296,38 +296,7 @@
     </table>
   </form>
 
-  <c:choose>
-    <c:when test="${experiment.platform.platformType.key ne 'Illumina'}">
-      <h2>EmPCR Kit</h2>
-      <a href='javascript:void(0);' class="add"
-         onclick="Experiment.kit.showEmPcrKitDialog(${experiment.id}); return false;">Add EmPCR Kit</a><br/>
 
-      <form id='addEmPcrKitForm'>
-        <table class="list" id="emPcrKitTable">
-          <thead>
-          <tr>
-            <th>Name</th>
-            <th class="fit">Part Number</th>
-            <th class="fit">Lot Number</th>
-            <th class="fit">Kit Date</th>
-          </tr>
-          </thead>
-          <tbody>
-          <c:if test="${not empty emPcrKits}">
-            <c:forEach items="${emPcrKits}" var="kit">
-              <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                <td class="fit">${kit.kitDescriptor.name}</td>
-                <td>${kit.kitDescriptor.partNumber}</td>
-                <td>${kit.lotNumber}</td>
-                <td>${kit.kitDate}</td>
-              </tr>
-            </c:forEach>
-          </c:if>
-          </tbody>
-        </table>
-      </form>
-    </c:when>
-    <c:otherwise>
       <h2>Clustering Kit</h2>
       <a href='javascript:void(0);' class="add"
          onclick="Experiment.kit.showClusteringKitDialog(${experiment.id}); return false;">Add Clustering Kit</a><br/>
@@ -356,8 +325,7 @@
           </tbody>
         </table>
       </form>
-    </c:otherwise>
-  </c:choose>
+
 
   <h2>Sequencing Kit</h2>
   <a href='javascript:void(0);' class="add"
@@ -394,7 +362,7 @@
   <c:if test="${not empty experiment.changeLog}">
     <br/>
     <h1>Changes</h1>
-    <span style="clear:both">
+    <div style="clear:both">
       <table class="list" id="changelog_table">
         <thead>
         <tr>
@@ -413,7 +381,7 @@
         </c:forEach>
         </tbody>
       </table>
-    </span>
+    </div>
   </c:if>
 </div>
 </div>

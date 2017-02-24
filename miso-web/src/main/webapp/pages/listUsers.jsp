@@ -50,8 +50,8 @@
     </sec:authorize>
 
     <h1>
-      <div id="totalCount">
-      </div>
+      <span id="totalCount">
+      </span>
     </h1>
     <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
     </form>
@@ -79,12 +79,12 @@
           </td>
           <td class="fit">
             <sec:authorize access="hasRole('ROLE_TECH')">
-            <a href='<c:url value="/miso/tech/user/${user.userId}"/>'>Edit</a></td>
-          </sec:authorize>
-
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <a href='<c:url value="/miso/admin/user/${user.userId}"/>'>Edit</a></td>
-          </sec:authorize>
+              <a href='<c:url value="/miso/tech/user/${user.userId}"/>'>Edit</a>
+            </sec:authorize>
+            <sec:authorize access="hasRole('ROLE_ADMIN')">
+              <a href='<c:url value="/miso/admin/user/${user.userId}"/>'>Edit</a>
+            </sec:authorize>
+          </td>
         </tr>
       </c:forEach>
       </tbody>

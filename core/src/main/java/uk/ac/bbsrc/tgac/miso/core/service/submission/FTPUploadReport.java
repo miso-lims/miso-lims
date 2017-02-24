@@ -35,12 +35,12 @@ import org.slf4j.LoggerFactory;
  * Created by IntelliJ IDEA. User: collesa Date: 26/04/12 Time: 17:18 To change this template use File | Settings | File Templates.
  */
 public class FTPUploadReport implements UploadReport {
-  private List<UploadJob> uploadJobs = new ArrayList<UploadJob>() {
+  private final List<UploadJob> uploadJobs = new ArrayList<UploadJob>() {
   };
 
   private String status;
   private String message;
-  protected static final Logger log = LoggerFactory.getLogger(FTPUploadReport.class);
+  private static final Logger log = LoggerFactory.getLogger(FTPUploadReport.class);
 
   public FTPUploadReport(List<FTPUploadJob> FTPUploadJobs) {
     log.debug("FTPUploadReport has been created for submission:");

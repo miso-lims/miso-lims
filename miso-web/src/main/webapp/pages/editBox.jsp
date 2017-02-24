@@ -260,10 +260,10 @@
     Box.visual.create({
       div: '#boxContentsTable',
       size: {
-        rows: Box.boxJSON.size.rows,
-        cols: Box.boxJSON.size.columns
+        rows: Box.boxJSON.rows,
+        cols: Box.boxJSON.cols
       },
-      data: Box.boxJSON.boxables
+      data: Box.boxJSON.items
     });
     jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
     Box.ui.createListingBoxablesTable(Box.boxJSON);
@@ -294,13 +294,35 @@
 <div id="boxContentsList" style="clear:both;">
   <table id="listingBoxablesTable" class="display"></table>
 </div>
+  <c:if test="${not empty box.changeLog}">
+    <br/>
+    <h1>Changes</h1>
+    <div style="clear:both">
+      <table class="list" id="changelog_table">
+        <thead>
+        <tr>
+          <th>Editor</th>
+          <th>Summary</th>
+          <th>Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach items="${box.changeLog}" var="change">
+          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+            <td>${change.user.fullName} (${change.user.loginName})</td>
+            <td><b>${change.summary}</b></td>
+            <td>${change.time}</td>
+          </tr>
+        </c:forEach>
+        </tbody>
+      </table>
+    </div>
+  </c:if>
 </c:if>
 
 <div id='dialogDialog' title='Scan' hidden='true'>
   <div id='dialogInfoAbove'></div>
-  <center>
-  <div id="dialogVisual"></div>
-  </center>
+  <div id="dialogVisual" style="text-align:center;"></div>
   <div id="dialogInfoBelow"></div>
 </div>
 </div>

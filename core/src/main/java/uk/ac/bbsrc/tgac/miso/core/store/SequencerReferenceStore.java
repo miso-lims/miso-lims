@@ -37,16 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @since 0.0.2
  */
 public interface SequencerReferenceStore extends Store<SequencerReference>, Remover<SequencerReference> {
-  /**
-   * Get a SequencerReference that holds information about a Run given a Run ID
-   * 
-   * @param runId
-   *          of type long
-   * @return SequencerReference
-   * @throws IOException
-   *           when
-   */
-  SequencerReference getByRunId(long runId) throws IOException;
 
   /**
    * Get a SequencerReference by a given name
@@ -58,6 +48,17 @@ public interface SequencerReferenceStore extends Store<SequencerReference>, Remo
    *           when
    */
   SequencerReference getByName(String referenceName) throws IOException;
+
+  /**
+   * Get the SequencerReference which was the pre-upgrade SequencerReference for the SequencerReference provided (by its id)
+   * Returns null if provided SequencerReference has not been upgraded.
+   * 
+   * @param upgradedReferenceId
+   *          of type long
+   * @return SequencerReference
+   * @throws IOException if there is more than one pre-upgrade SequencerReference for the provided SequencerReference
+   */
+  SequencerReference getByUpgradedReference(long upgradedReferenceId) throws IOException;
 
   /**
    * Get all SequencerReferences of a given PlatformType, e.g. PlatformType.ILLUMINA

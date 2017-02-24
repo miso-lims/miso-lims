@@ -119,11 +119,11 @@
             </c:choose>
           </td>
         </tr>
-        <c:if test="${sequencerReference.preUpgradeSequencerReference != null}">
+        <c:if test="${preUpgradeSeqRef != null}">
           <tr>
             <td class="h">Upgraded From:</td>
             <td>
-              <a href="<c:url value='/miso/sequencer/${sequencerReference.preUpgradeSequencerReference.id}'/>">${sequencerReference.preUpgradeSequencerReference.name}</a>
+              <a href="<c:url value='/miso/sequencer/${preUpgradeSeqRef.id}'/>">${preUpgradeSeqRef.name}</a>
             </td>
           </tr>
         </c:if>

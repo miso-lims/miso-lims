@@ -2,10 +2,11 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DetailedSampleDto extends SampleDto {
 
   private Long parentId;
@@ -24,6 +25,7 @@ public class DetailedSampleDto extends SampleDto {
   private String groupId;
   private String groupDescription;
   private Boolean isSynthetic;
+  private Double concentration;
   private boolean nonStandardAlias;
   private Long identityId;
 
@@ -63,7 +65,7 @@ public class DetailedSampleDto extends SampleDto {
     return detailedQcStatusId;
   }
 
-  @JsonSerialize(include = JsonSerialize.Inclusion.ALWAYS)
+  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setDetailedQcStatusId(Long detailedQcStatusId) {
     this.detailedQcStatusId = detailedQcStatusId;
   }
@@ -146,6 +148,14 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setSynthetic(Boolean isSynthetic) {
     this.isSynthetic = isSynthetic;
+  }
+
+  public Double getConcentration() {
+    return concentration;
+  }
+
+  public void setConcentration(Double concentration) {
+    this.concentration = concentration;
   }
 
   public boolean getNonStandardAlias() {

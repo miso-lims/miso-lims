@@ -60,9 +60,7 @@
           <tbody>
           <tr>
             <td>Study Type:</td>
-            <td>
-              <select name="studyType">${studyTypes}</select>
-            </td>
+            <td><miso:select id="studyType" path="studyType" items="${studyTypes}" itemLabel="name" itemValue="id" /></td>
           </tr>
           <tr>
             <td>Study Description:</td>
@@ -111,8 +109,8 @@
     </table>
 
     <h1>
-      <div id="qcsTotalCount">
-      </div>
+      <span id="qcsTotalCount">
+      </span>
     </h1>
     <ul class="sddm">
       <li>
@@ -128,7 +126,7 @@
         </div>
       </li>
     </ul>
-    <span style="clear:both">
+    <div style="clear:both">
       <div id="addPoolQC"></div>
       <div id='addQcForm'>
         <table class="list" id="poolQcTable">
@@ -170,9 +168,9 @@
           jQuery('#qcsTotalCount').html(jQuery('#poolQcTable>tbody>tr:visible').length.toString() + " QCs");
         });
       </script>
-    </span>
+    </div>
 
-    <table width="100%">
+    <table class="full-width">
       <tbody>
       <tr>
         <td width="50%" valign="top">

@@ -40,7 +40,7 @@ public class DefaultNameValidator implements NameValidator {
       if (!customPattern.matcher(value).matches()) return ValidationResult.failed(getValidationMessage());
     } else {
       String prefix = value.substring(0, 3);
-      if (DefaultMisoEntityPrefix.getByName(prefix) == null || !defaultPattern.matcher(value).matches()) {
+      if (DefaultMisoEntityPrefix.valueOf(prefix) == null || !defaultPattern.matcher(value).matches()) {
         return ValidationResult.failed(getValidationMessage());
       }
     }

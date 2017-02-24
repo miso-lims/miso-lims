@@ -34,14 +34,22 @@ import java.util.Comparator;
  * @date 01/12/11
  * @since 0.1.3
  */
-public class AlphanumericComparator implements Comparator {
+public abstract class AlphanumericComparator<T> implements Comparator<T> {
+  protected abstract String getProperty(T object);
   @Override
-  public int compare(Object firstObjToCompare, Object secondObjToCompare) {
-    String firstString = firstObjToCompare.toString();
-    String secondString = secondObjToCompare.toString();
+  public final int compare(T firstObjToCompare, T secondObjToCompare) {
+    String firstString = getProperty(firstObjToCompare);
+    String secondString = getProperty(secondObjToCompare);
 
-    if (secondString == null || firstString == null) {
+    if (secondString == null && firstString == null) {
       return 0;
+    }
+
+    if (firstString == null && secondString != null) {
+      return -1;
+    }
+    if (firstString != null && secondString == null) {
+      return 1;
     }
 
     int lengthFirstStr = firstString.length();
