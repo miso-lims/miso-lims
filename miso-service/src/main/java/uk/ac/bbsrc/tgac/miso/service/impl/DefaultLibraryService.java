@@ -369,8 +369,7 @@ public class DefaultLibraryService implements LibraryService {
     } catch (MalformedLibraryQcException e) {
       throw new IOException("Malformed Library QC");
     }
-    libraryQcDao.save(qc);
-    libraryDao.save(library);
+    libraryDao.save(managed);
   }
 
   @Override
