@@ -63,6 +63,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
@@ -761,7 +762,8 @@ public class EditSampleController {
         samplesDtos.add(Dtos.asDto(sample));
       }
       model.put("title", "Bulk Edit Samples");
-      model.put("samplesJSON", mapper.writeValueAsString(samplesDtos));
+      model.put("samplesJSON", mapper.writerFor(new TypeReference<List<SampleDto>>() {
+      }).writeValueAsString(samplesDtos));
       model.put("method", "Edit");
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
     } catch (IOException ex) {
@@ -787,7 +789,8 @@ public class EditSampleController {
         samplesDtos.add(Dtos.asDto(sample));
       }
       model.put("title", "Bulk Create Samples");
-      model.put("samplesJSON", mapper.writeValueAsString(samplesDtos));
+      model.put("samplesJSON", mapper.writerFor(new TypeReference<List<SampleDto>>() {
+      }).writeValueAsString(samplesDtos));
       model.put("method", "Create");
       model.put("sampleClassId", sampleClassId);
       return new ModelAndView("/pages/bulkEditSamples.jsp", model);
