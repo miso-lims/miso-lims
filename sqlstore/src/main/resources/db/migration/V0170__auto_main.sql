@@ -24,9 +24,11 @@ DELETE FROM RunQC_Partition WHERE NOT EXISTS (
 DELETE FROM Run_Note WHERE notes_noteId NOT IN (SELECT noteId FROM Note);
 DELETE FROM Run_SequencerPartitionContainer WHERE containers_containerId NOT IN (SELECT containerId FROM SequencerPartitionContainer);
 DELETE FROM Run_SequencerPartitionContainer WHERE run_runId NOT IN (SELECT runId FROM Run);
+DELETE FROM Sample_Note WHERE notes_noteId NOT IN (SELECT noteId FROM Note);
 DELETE FROM Sample_Note WHERE sample_sampleId NOT IN (SELECT sampleId FROM Sample);
 DELETE FROM SequencerPartitionContainer_Partition WHERE container_containerId NOT IN (SELECT containerId FROM SequencerPartitionContainer);
 DELETE FROM SequencerPartitionContainer_Partition WHERE partitions_partitionId NOT IN (SELECT partitionId  FROM _Partition);
+DELETE FROM Library_Note WHERE notes_noteId NOT IN (SELECT noteId FROM Note);
 
 -- Changes for Hibernate
 

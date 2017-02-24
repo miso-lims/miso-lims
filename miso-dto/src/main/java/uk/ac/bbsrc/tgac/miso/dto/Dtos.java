@@ -1023,6 +1023,7 @@ public class Dtos {
     } else {
       to = new LibraryImpl();
     }
+    to.setId(from.getId());
     to.setAlias(from.getAlias());
     to.setName(from.getName());
     to.setDescription(from.getDescription());
@@ -1176,9 +1177,11 @@ public class Dtos {
     } catch (ParseException e) {
       // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
     }
-    TargetedSequencing ts = new TargetedSequencing();
-    if (from.getTargetedSequencingId() != null) ts.setId(from.getTargetedSequencingId());
-    to.setTargetedSequencing(ts);
+    if (from.getTargetedSequencingId() != null) {
+      TargetedSequencing ts = new TargetedSequencing();
+      ts.setId(from.getTargetedSequencingId());
+      to.setTargetedSequencing(ts);
+    }
     return to;
   }
 
