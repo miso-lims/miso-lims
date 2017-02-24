@@ -1,3 +1,20 @@
+# 0.2.50
+
+Changes:
+
+ * Fix dilution and library bulk saving (#722)
+ * Fix pools not loading in boxes
+ * Fix Library QC save (#720)
+ * GLT-1530 move concentration to DetailedSample (#718)
+ * GLT-1502 make changelog for changing indices (#712)
+ * GLT-1184: fix partition numbers and ordering (#714)
+ * GLT-1526 add pools to lanes (#711)
+ * Fix bug causing pool order completions to be incorrect
+ * Update release notes and docs to use Java 8 (#710)
+
+Bad:
+ * Some samples display stacktrace org.hibernate.exception.SQLGrammarException
+
 # 0.2.49
 
 Changes:
