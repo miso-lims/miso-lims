@@ -29,11 +29,11 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.49-oicr</version>
+    <version>0.2.50-oicr-SNAPSHOT</version>
   </parent>
   <groupId>miso-external-web</groupId>
   <artifactId>miso-external-web</artifactId>
-  <version>0.2.49-oicr</version>
+  <version>0.2.50-oicr-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>miso-external-web</name>
   <dependencies>
