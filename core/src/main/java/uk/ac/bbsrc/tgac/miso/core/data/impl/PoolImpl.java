@@ -166,7 +166,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @JsonManagedReference
   private final Collection<PoolQC> poolQCs = new TreeSet<>();
 
-  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'P')")
+  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'Pool')")
   private String position;
 
   private Boolean qcPassed;
