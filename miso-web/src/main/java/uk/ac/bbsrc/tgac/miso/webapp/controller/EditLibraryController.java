@@ -63,6 +63,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
@@ -825,7 +826,8 @@ public class EditLibraryController {
         }
       }
       model.put("title", "Bulk Edit Libraries");
-      model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
+      model.put("librariesJSON", mapper.writerFor(new TypeReference<List<LibraryDto>>() {
+      }).writeValueAsString(libraryDtos));
       model.put("method", "Edit");
 
       JSONArray libraryDesigns = new JSONArray();
@@ -857,7 +859,8 @@ public class EditLibraryController {
         libraryDtos.add(Dtos.asDto(library));
       }
       model.put("title", "Bulk Create Dilutions");
-      model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
+      model.put("librariesJSON", mapper.writerFor(new TypeReference<List<LibraryDto>>() {
+      }).writeValueAsString(libraryDtos));
       model.put("method", "Propagate");
       return new ModelAndView("/pages/bulkEditDilutions.jsp", model);
     } catch (IOException ex) {

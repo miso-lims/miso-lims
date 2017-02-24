@@ -173,7 +173,7 @@ var Dilution = {
           dilution.name = obj.name;
         }
 
-        dilution.library = obj.library;
+        dilution.library = Dilution.hot.librariesJSON.filter(function(original) { return original.id = obj.library.id; })[0];
         dilution.identificationBarcode = obj.identificationBarcode;
         dilution.concentration = obj.concentration;
         dilution.creationDate = obj.creationDate;
