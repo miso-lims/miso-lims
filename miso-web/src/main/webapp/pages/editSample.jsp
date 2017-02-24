@@ -401,6 +401,10 @@
           </tr>
         </c:if>
         <tr>
+          <td class="h">Concentration (nM):</td>
+          <td><form:input id="concentration" path="concentration"/></td>
+        </tr>
+        <tr>
           <td class="h">Sample Class:*</td>
           <td>
             <c:choose>
@@ -611,10 +615,6 @@
                   </c:forEach>
                 </form:select>
               </td>
-            </tr>
-            <tr>
-              <td class="h">Concentration (nM):</td>
-              <td><form:input id="concentration" path="concentration"/></td>
             </tr>
             <c:if test="${sample.sampleClass.DNAseTreatable}">
               <tr>

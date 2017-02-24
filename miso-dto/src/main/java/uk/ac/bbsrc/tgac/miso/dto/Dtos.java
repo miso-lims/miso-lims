@@ -281,6 +281,9 @@ public class Dtos {
     if (from.isSynthetic() != null) {
       dto.setSynthetic(from.isSynthetic());
     }
+    if (from.getConcentration() != null) {
+      dto.setConcentration(from.getConcentration());
+    }
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     if (from.getDetailedQcStatus() != null) {
       dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
@@ -330,6 +333,9 @@ public class Dtos {
     }
     if (from.getSynthetic() != null) {
       to.setSynthetic(from.getSynthetic());
+    }
+    if (from.getConcentration() != null) {
+      to.setConcentration(from.getConcentration());
     }
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
@@ -473,7 +479,6 @@ public class Dtos {
 
   private static SampleStockDto asStockSampleDto(SampleStock from) {
     SampleStockDto dto = new SampleStockDto();
-    dto.setConcentration(from.getConcentration());
     dto.setStrStatus(from.getStrStatus().getLabel());
     dto.setDnaseTreated(from.getDNAseTreated());
     return dto;
@@ -481,7 +486,6 @@ public class Dtos {
 
   private static SampleStock toStockSample(SampleStockDto from) {
     SampleStock to = new SampleStockImpl();
-    to.setConcentration(from.getConcentration());
     if (from.getStrStatus() != null) {
       to.setStrStatus(from.getStrStatus());
     }

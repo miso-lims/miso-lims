@@ -25,6 +25,7 @@ public class DetailedSampleDto extends SampleDto {
   private String groupId;
   private String groupDescription;
   private Boolean isSynthetic;
+  private Double concentration;
   private boolean nonStandardAlias;
   private Long identityId;
 
@@ -147,6 +148,14 @@ public class DetailedSampleDto extends SampleDto {
 
   public void setSynthetic(Boolean isSynthetic) {
     this.isSynthetic = isSynthetic;
+  }
+
+  public Double getConcentration() {
+    return concentration;
+  }
+
+  public void setConcentration(Double concentration) {
+    this.concentration = concentration;
   }
 
   public boolean getNonStandardAlias() {
