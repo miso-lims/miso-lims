@@ -215,6 +215,9 @@ public class HibernateLibraryDao implements LibraryStore {
 
   @Override
   public List<Library> getByBarcodeList(List<String> barcodeList) throws IOException {
+    if (barcodeList.isEmpty()) {
+      return Collections.emptyList();
+    }
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.add(Restrictions.in("identificationBarcode", barcodeList));
     @SuppressWarnings("unchecked")
