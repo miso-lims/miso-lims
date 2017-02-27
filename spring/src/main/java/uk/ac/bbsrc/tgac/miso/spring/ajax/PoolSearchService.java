@@ -186,6 +186,10 @@ public class PoolSearchService {
     String lowquality = p.getHasLowQualityMembers() ? " lowquality" : "";
     b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight" + lowquality
         + "\"' onMouseOut='this.className=\"dashboard" + lowquality + "\"' class='dashboard" + lowquality + "'>");
+    if (p.getHasLowQualityMembers()) {
+      b.append("<span class=\"lowquality-right\">Contains low-quality library</span>");
+    }
+
     if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationDate() + "</b><br/>");
     } else {

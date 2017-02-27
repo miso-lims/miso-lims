@@ -352,7 +352,7 @@
 </tr>
 
 <tr>
-  <td>Low Quality Sequencing:</td>
+  <td style="color:#a93232">Low Quality Sequencing:</td>
   <td>
     <form:checkbox path="lowQuality"/>
   </td>

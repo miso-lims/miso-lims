@@ -487,50 +487,18 @@
             </c:otherwise>
           </c:choose>
         </tr>
-        <tr>
-          <c:choose>
-            <c:when test="${empty container.locationBarcode}">
-              <td>Location:</td>
-              <td><form:input
-                  path="sequencerPartitionContainers[${containerCount.index}].locationBarcode"/></td>
-            </c:when>
-            <c:otherwise>
-              <td>Location:</td>
-              <td>
-                <span id="locationBarcode">${container.locationBarcode}</span>
-                <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <a href="javascript:void(0);"
-                     onclick="Run.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), ${containerCount.index})">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
-                  </a>
-                </c:if>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
-        <tr>
-          <c:choose>
-            <c:when test="${empty container.validationBarcode}">
-              <td>Validation:</td>
-              <td><form:input
-                  path="sequencerPartitionContainers[${containerCount.index}].validationBarcode"/></td>
-            </c:when>
-            <c:otherwise>
-              <td>Validation:</td>
-              <td>
-                <span id="validationBarcode">${container.validationBarcode}</span>
-                <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <a href="javascript:void(0);"
-                     onclick="editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
-                  </a>
-                </c:if>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
+        <c:if test="${not empty container.locationBarcode}">
+          <tr>
+            <td>Location:</td>
+            <td><span id="locationBarcode">${container.locationBarcode}</span></td>
+          </tr>
+        </c:if>
+        <c:if  test="${not empty container.validationBarcode}">
+          <tr>
+            <td>Validation:</td>
+            <td><span id="validationBarcode">${container.validationBarcode}</span></td>
+          </tr>
+        </c:if>
       </table>
       <div id='partitionErrorDiv' class="parsley-custom-error-message"></div>
       <div id="partitionDiv">
@@ -551,8 +519,11 @@
                 <c:choose>
                   <c:when test="${not empty partition.pool}">
                     <div class="dashboard">
+                      <c:if test="${partition.pool.hasLowQualityMembers}">
+                        <span class="lowquality-right">Contains low-quality library</span>
+                      </c:if>
                       <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
-                          ${partition.pool.name}
+                          ${partition.pool.name}: <c:if test="${not empty partition.pool.alias}"><b>${partition.pool.alias}</b></c:if>
                         (${partition.pool.creationDate})
                       </a><br/>
                       <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
