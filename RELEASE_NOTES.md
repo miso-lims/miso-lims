@@ -1,3 +1,9 @@
+# 0.2.51
+
+Changes:
+
+ * Fix LDAP concurrency filter configuration
+
 # 0.2.50
 
 Changes:

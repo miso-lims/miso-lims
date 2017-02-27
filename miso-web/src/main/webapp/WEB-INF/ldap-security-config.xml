@@ -118,8 +118,8 @@
   </bean>
 
   <bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">
-    <property name="sessionRegistry" ref="sessionRegistry" />
-    <property name="expiredUrl" value="/login.jsp?login_error=2" />
+    <constructor-arg ref="sessionRegistry" />
+    <constructor-arg value="/login.jsp?login_error=2" />
   </bean>
 
   <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
