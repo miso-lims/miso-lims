@@ -29,7 +29,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.50-oicr</version>
+    <version>0.2.51-oicr-SNAPSHOT</version>
   </parent>
   <artifactId>integration-tools</artifactId>
   <packaging>jar</packaging>
