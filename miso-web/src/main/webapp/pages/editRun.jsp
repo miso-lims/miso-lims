@@ -526,6 +526,8 @@
                           ${partition.pool.name}: <c:if test="${not empty partition.pool.alias}"><b>${partition.pool.alias}</b></c:if>
                         (${partition.pool.creationDate})
                       </a><br/>
+                      ${partition.pool.pooledElements.size} dilutions 
+                      <br/>
                       <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
                         <c:choose>
                           <c:when test="${not empty partition.pool.experiments}">
