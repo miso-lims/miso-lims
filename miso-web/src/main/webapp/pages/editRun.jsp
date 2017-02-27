@@ -199,12 +199,12 @@
   </tr>
   </c:if>
   <tr>
-    <td>Paired End:</td>
+    <td><label for="paired">Paired End:</label></td>
     <td>
       <c:choose>
         <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:checkbox
             value="${run.pairedEnd}" path="pairedEnd" disabled="disabled"/></c:when>
-        <c:otherwise><form:checkbox value="${run.pairedEnd}" path="pairedEnd"/></c:otherwise>
+        <c:otherwise><form:checkbox value="${run.pairedEnd}" path="pairedEnd" id="paired"/></c:otherwise>
       </c:choose>
     </td>
   </tr>

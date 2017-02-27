@@ -279,8 +279,8 @@
       <h2>Available Pools</h2>
       <c:choose>
         <c:when test="${not empty container.platform}">
-          <input id="showOnlyReady" type="checkbox" checked="checked"
-                 onclick="Container.pool.toggleReadyToRunCheck(this, '${container.platform.platformType.key}');"/>Only Ready to Run pools?
+          <label><input id="showOnlyReady" type="checkbox" checked="checked"
+                 onclick="Container.pool.toggleReadyToRunCheck(this, '${container.platform.platformType.key}');"/>Only Ready to Run pools?</label>
           <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
             <input type="text" size="8" id="searchPools" name="searchPools"/>
           </div>
@@ -291,8 +291,8 @@
           </script>
         </c:when>
         <c:otherwise>
-          <input id="showOnlyReady" type="checkbox" checked="checked"
-                 onclick="Container.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformTypes]:checked').val());"/>Only Ready to Run pools?
+          <label><input id="showOnlyReady" type="checkbox" checked="checked"
+                 onclick="Container.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformTypes]:checked').val());"/>Only Ready to Run pools?</label>
           <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
             <input type="text" size="8" id="searchPools" name="searchPools"/>
           </div>
