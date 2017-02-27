@@ -57,10 +57,10 @@ public class HibernatePoolDao implements PoolStore {
 
   @Autowired
   private JdbcTemplate jdbcTemplate;
-  
+
   @Autowired
   private SecurityStore securityStore;
-  
+
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -115,6 +115,9 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public Collection<Pool> getByBarcodeList(List<String> barcodeList) throws IOException {
+    if (barcodeList.isEmpty()) {
+      return Collections.emptyList();
+    }
     Criteria criteria = createCriteria();
     criteria.add(Restrictions.in("identificationBarcode", barcodeList));
     @SuppressWarnings("unchecked")
@@ -182,6 +185,9 @@ public class HibernatePoolDao implements PoolStore {
     idCriteria.setProjection(Projections.distinct(Projections.property("pools.id")));
     @SuppressWarnings("unchecked")
     List<Long> ids = idCriteria.list();
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
+    }
     Criteria criteria = createCriteria();
     criteria.add(Restrictions.in("id", ids));
     @SuppressWarnings("unchecked")

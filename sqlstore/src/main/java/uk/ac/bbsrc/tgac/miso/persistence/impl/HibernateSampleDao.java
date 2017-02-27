@@ -107,6 +107,9 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
 
   @Override
   public Collection<Sample> getByBarcodeList(List<String> barcodeList) throws IOException {
+    if (barcodeList.isEmpty()) {
+      return Collections.emptyList();
+    }
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     criteria.add(Restrictions.in("identificationBarcode", barcodeList));
     @SuppressWarnings("unchecked")
