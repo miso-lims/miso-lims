@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -147,6 +148,9 @@ public class HibernateSecurityDao implements SecurityStore {
 
   @Override
   public Collection<Group> listGroupsByIds(Collection<Long> groupIds) throws IOException {
+    if (groupIds.isEmpty()) {
+      return Collections.emptyList();
+    }
     Criteria criteria = currentSession().createCriteria(UserImpl.class);
     criteria.add(Restrictions.in("id", groupIds));
     @SuppressWarnings("unchecked")
@@ -176,6 +180,9 @@ public class HibernateSecurityDao implements SecurityStore {
 
   @Override
   public Collection<User> listUsersByIds(Collection<Long> userIds) throws IOException {
+    if (userIds.isEmpty()) {
+      return Collections.emptyList();
+    }
     Criteria criteria = currentSession().createCriteria(UserImpl.class);
     criteria.add(Restrictions.in("id", userIds));
     @SuppressWarnings("unchecked")
