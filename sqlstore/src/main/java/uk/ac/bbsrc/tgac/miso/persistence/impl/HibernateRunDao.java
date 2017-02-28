@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -182,13 +183,20 @@ public class HibernateRunDao implements RunStore {
 
   @Override
   public List<Run> listByProjectId(long projectId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
-    criteria.createAlias("r.containers", "container").createAlias("container.partitions", "partition");
-    criteria.createAlias("partition.pool", "pool").createAlias("pool.pooledElements", "dilution");
-    criteria.createAlias("dilution.library", "library").createAlias("library.sample", "sample");
-    criteria.createAlias("sample.project", "project");
-    criteria.add(Restrictions.eq("project.id", projectId));
-    criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+    Criteria idCriteria = currentSession().createCriteria(RunImpl.class, "r");
+    idCriteria.createAlias("r.containers", "container").createAlias("container.partitions", "partition");
+    idCriteria.createAlias("partition.pool", "pool").createAlias("pool.pooledElements", "dilution");
+    idCriteria.createAlias("dilution.library", "library").createAlias("library.sample", "sample");
+    idCriteria.createAlias("sample.project", "project");
+    idCriteria.add(Restrictions.eq("project.id", projectId));
+    idCriteria.setProjection(Projections.distinct(Projections.property("r.id")));
+    @SuppressWarnings("unchecked")
+    List<Long> ids = idCriteria.list();
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    criteria.add(Restrictions.in("id", ids));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
