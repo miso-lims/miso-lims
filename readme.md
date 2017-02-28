@@ -27,7 +27,11 @@ The simplest way to get MISO up and running quickly is to use
 [Docker](https://www.docker.com/). Images of the most recent MISO releases are
 available on Docker Hub in
 [misolims/miso-lims](https://hub.docker.com/r/misolims/miso-lims/). The Docker
-container is intended as a demonstration and not a permanent installation.
+container is intended as a demonstration and not a permanent installation. Please 
+note that shutting down the Docker container deletes all MISO data, and 
+restarting the Docker container starts up with a fresh MISO. If you wish to 
+store your data longer-term when testing out MISO, please follow the instructions 
+for _Running an Instance of MISO_ below.
 
 To use it:
 
