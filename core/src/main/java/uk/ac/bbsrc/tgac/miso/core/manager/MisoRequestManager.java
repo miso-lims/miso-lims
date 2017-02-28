@@ -1065,6 +1065,7 @@ public class MisoRequestManager implements RequestManager {
         original.setLastUpdated(new Date());
         overview = original;
       }
+      overview.setLastUpdated(new Date());
       return projectStore.saveOverview(overview);
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");

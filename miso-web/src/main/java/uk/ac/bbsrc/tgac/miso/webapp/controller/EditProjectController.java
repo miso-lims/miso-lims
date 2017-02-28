@@ -429,6 +429,9 @@ public class EditProjectController {
         throw new SecurityException("Permission denied.");
       }
       requestManager.saveProject(project);
+      for (ProjectOverview overview : project.getOverviews()) {
+        requestManager.saveProjectOverview(overview);
+      }
       session.setComplete();
       model.clear();
       return "redirect:/miso/project/" + project.getProjectId();
