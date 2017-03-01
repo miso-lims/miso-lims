@@ -1062,7 +1062,6 @@ public class MisoRequestManager implements RequestManager {
         original.setEndDate(overview.getEndDate());
         original.setNumProposedSamples(overview.getNumProposedSamples());
         original.setAllSampleQcPassed(overview.getAllSampleQcPassed());
-        original.setLastUpdated(new Date());
         overview = original;
       }
       overview.setLastUpdated(new Date());
