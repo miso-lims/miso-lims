@@ -243,7 +243,7 @@
   </c:when>
   <c:otherwise>
 	<tr>
-	  <td>Paired:</td>
+	  <td><label for="paired">Paired:</label></td>
 	  <td>
 	    <c:choose>
 	      <c:when test="${library.id != 0}">
@@ -352,9 +352,9 @@
 </tr>
 
 <tr>
-  <td>Low Quality Sequencing:</td>
+  <td style="color:#a93232"><label for="lowQuality">Low Quality Sequencing:</label></td>
   <td>
-    <form:checkbox path="lowQuality"/>
+    <form:checkbox path="lowQuality" id="lowQuality"/>
   </td>
 </tr>
 
@@ -363,7 +363,7 @@
   <td><form:input id="volume" path="volume"/></td>
 </tr>
 <tr>
-  <td>Discarded:</td>
+  <td><label for="discarded">Discarded:</label></td>
   <td><form:checkbox id="discarded" path="discarded"/></td>
 </tr>
 <tr>
@@ -415,7 +415,7 @@
   </tr>
   </c:if>
   <tr>
-    <td class="h">Archived:</td>
+    <td class="h"><label for="archived">Archived:</label></td>
     <td><form:checkbox id="archived" path="archived"/></td>
   </tr>
 </table>

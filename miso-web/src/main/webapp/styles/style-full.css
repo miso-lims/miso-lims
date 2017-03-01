@@ -98,6 +98,14 @@ span.lowquality {
 	font-weight: bold;
 }
 
+span.lowquality-right {
+  color: #a93232;
+  font-weight: bold;
+  float: right;
+  top: 0;
+  right: 0;
+}
+
 div.lowquality {
 	border-color: #a93232;
 }

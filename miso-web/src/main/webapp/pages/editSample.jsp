@@ -310,7 +310,7 @@
       <td><form:input id="volume" path="volume"/></td>
     </tr>
     <tr>
-      <td>Discarded:</td>
+      <td><label for="discarded">Discarded:</label></td>
       <td><form:checkbox id="discarded" path="discarded"/></td>
     </tr>
     <tr>
@@ -618,7 +618,7 @@
             </tr>
             <c:if test="${sample.sampleClass.DNAseTreatable}">
               <tr>
-                <td class="h">DNAse Treated:</td>
+                <td class="h"><label for="DNAseTreated">DNAse Treated:</label></td>
                 <td><form:checkbox id="DNAseTreated" path="DNAseTreated"/></td>
               </tr>
             </c:if>
