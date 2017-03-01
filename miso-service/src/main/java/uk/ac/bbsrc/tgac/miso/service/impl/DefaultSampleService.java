@@ -574,6 +574,7 @@ public class DefaultSampleService implements SampleService {
       dTarget.setArchived(dSource.getArchived());
       dTarget.setGroupDescription(dSource.getGroupDescription());
       dTarget.setGroupId(dSource.getGroupId());
+      dTarget.setDetailedQcStatus(dSource.getDetailedQcStatus());
       dTarget.setDetailedQcStatusNote(dSource.getDetailedQcStatusNote());
 
       if (isIdentitySample(target)) {
