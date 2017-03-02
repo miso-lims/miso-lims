@@ -79,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -588,10 +589,12 @@ public class LibraryControllerHelperService {
       Map<String, Object> targetedSequencingMap = Maps.newHashMap();
       targetedSequencingMap.put("targetedSequencingId", targetedSequencing.getId());
       targetedSequencingMap.put("alias", targetedSequencing.getAlias());
-      targetedSequencingMap.put("kitDescriptorId", targetedSequencing.getKitDescriptor().getId());
-      fullTargetedSequencingCollection.add(targetedSequencingMap);
-      if (libraryPrepKitId != null && libraryPrepKitId.equals(targetedSequencing.getKitDescriptor().getId())) {
-        targetedSequencingByKit.add(targetedSequencingMap);
+      for (KitDescriptor kitDescriptor : targetedSequencing.getKitDescriptors()) {
+        targetedSequencingMap.put("kitDescriptorId", kitDescriptor.getId());
+        fullTargetedSequencingCollection.add(targetedSequencingMap);
+        if (libraryPrepKitId != null && libraryPrepKitId.equals(kitDescriptor.getId())) {
+          targetedSequencingByKit.add(targetedSequencingMap);
+        }
       }
     }
     if (libraryPrepKitId != null) {

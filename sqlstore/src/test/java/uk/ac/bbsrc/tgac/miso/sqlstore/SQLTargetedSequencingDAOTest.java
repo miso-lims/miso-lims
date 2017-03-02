@@ -31,9 +31,9 @@ public class SQLTargetedSequencingDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllCountIsAtLeastThree() throws Exception {
+  public void testListAllCountIsAtLeastTwo() throws Exception {
     Collection<TargetedSequencing> targetedSequencingList = dao.listAll();
-    assertThat("count of all targeted sequencing items", targetedSequencingList.size(), is(greaterThanOrEqualTo(3)));
+    assertThat("count of all targeted sequencing items", targetedSequencingList.size(), is(greaterThanOrEqualTo(2)));
   }
 
   @Test
@@ -44,8 +44,8 @@ public class SQLTargetedSequencingDAOTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testCountIsAtLeastThree() throws Exception {
+  public void testCountIsAtLeastTwo() throws Exception {
     int actual = dao.count();
-    assertThat("count of targeted sequencing entries", actual, is(greaterThanOrEqualTo(3)));
+    assertThat("count of targeted sequencing entries", actual, is(greaterThanOrEqualTo(2)));
   }
 }

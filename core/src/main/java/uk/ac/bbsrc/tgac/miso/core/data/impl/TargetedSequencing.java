@@ -1,13 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -33,9 +38,11 @@ public class TargetedSequencing {
   @Column(nullable = false)
   private String description;
 
-  @ManyToOne(targetEntity = KitDescriptor.class)
-  @JoinColumn(name = "kitDescriptorId")
-  private KitDescriptor kitDescriptor;
+  @ManyToMany(targetEntity = KitDescriptor.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "TargetedSequencing_KitDescriptor", joinColumns = {
+      @JoinColumn(name = "targetedSequencingId") }, inverseJoinColumns = {
+          @JoinColumn(name = "kitDescriptorId") })
+  private final Collection<KitDescriptor> kitDescriptors = new HashSet<>();
 
   @Column(nullable = false)
   private boolean archived;
@@ -100,22 +107,8 @@ public class TargetedSequencing {
     this.description = description;
   }
 
-  /**
-   * Returns the kit descriptor chosen, which will restrict the targeted sequencing that is available.
-   * 
-   * @return kitDescriptor of type KitDescriptor
-   */
-  public KitDescriptor getKitDescriptor() {
-    return kitDescriptor;
-  }
-
-  /**
-   * Sets the kit descriptor chosen, which will restrict the targeted sequencing that is available.
-   * 
-   * @param kitDescriptor of type KitDescriptor
-   */
-  public void setKitDescriptor(KitDescriptor kitDescriptor) {
-    this.kitDescriptor = kitDescriptor;
+  public Collection<KitDescriptor> getKitDescriptors() {
+    return kitDescriptors;
   }
 
   public User getCreatedBy() {
