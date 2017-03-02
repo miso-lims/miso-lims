@@ -1,3 +1,4 @@
+<!DOCTYPE xml>
 <aspectj>
     <!-- <weaver options="-verbose -showWeaveInfo "> -->
     <weaver>
