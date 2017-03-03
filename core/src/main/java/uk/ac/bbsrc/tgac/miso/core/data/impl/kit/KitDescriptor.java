@@ -83,7 +83,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
   @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor")
   private final Collection<ChangeLog> changelog = new ArrayList<>();
 
-  @ManyToMany(targetEntity = TargetedSequencing.class)
+  @ManyToMany
   @JoinTable(name = "TargetedSequencing_KitDescriptor", inverseJoinColumns = {
       @JoinColumn(name = "targetedSequencingId") }, joinColumns = {
           @JoinColumn(name = "kitDescriptorId") })
@@ -281,6 +281,10 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
 
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
+  }
+
+  public Collection<TargetedSequencing> getTargetedSequencing() {
+    return targetedSequencing;
   }
 
   /**

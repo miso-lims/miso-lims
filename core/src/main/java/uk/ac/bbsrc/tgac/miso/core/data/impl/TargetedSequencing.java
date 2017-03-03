@@ -4,14 +4,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -38,10 +36,7 @@ public class TargetedSequencing {
   @Column(nullable = false)
   private String description;
 
-  @ManyToMany(targetEntity = KitDescriptor.class, cascade = CascadeType.ALL)
-  @JoinTable(name = "TargetedSequencing_KitDescriptor", joinColumns = {
-      @JoinColumn(name = "targetedSequencingId") }, inverseJoinColumns = {
-          @JoinColumn(name = "kitDescriptorId") })
+  @ManyToMany(mappedBy = "targetedSequencing")
   private final Collection<KitDescriptor> kitDescriptors = new HashSet<>();
 
   @Column(nullable = false)
@@ -107,10 +102,6 @@ public class TargetedSequencing {
     this.description = description;
   }
 
-  public Collection<KitDescriptor> getKitDescriptors() {
-    return kitDescriptors;
-  }
-
   public User getCreatedBy() {
     return createdBy;
   }
@@ -149,6 +140,25 @@ public class TargetedSequencing {
 
   public void setArchived(boolean archived) {
     this.archived = archived;
+  }
+
+  /**
+   * Returns all Library Prep Kits that are associated with this TargetedSequencing.
+   * 
+   * @return Collection of KitDescriptor
+   */
+  public Collection<KitDescriptor> getKitDescriptors() {
+    return kitDescriptors;
+  }
+
+  /**
+   * Sets the Collection of Library Prep Kits associated with this TargetedSequeincing.
+   * 
+   * @param kitDescriptors Collection of KitDescriptor
+   */
+  public void setKitDescriptors(Collection<KitDescriptor> kitDescriptors) {
+    this.kitDescriptors.clear();
+    this.kitDescriptors.addAll(kitDescriptors);
   }
 
 }

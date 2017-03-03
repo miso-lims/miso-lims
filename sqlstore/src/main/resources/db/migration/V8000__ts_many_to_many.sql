@@ -2,7 +2,6 @@ CREATE TABLE `TargetedSequencingTemp` (
   `targetedSequencingId` bigint(20) NOT NULL AUTO_INCREMENT,
   `alias` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
-  `kitDescriptorId` bigint(20) NOT NULL,
   `archived` bit(1) NOT NULL DEFAULT b'0',
   `createdBy` bigint(20) NOT NULL,
   `creationDate` datetime NOT NULL,
@@ -23,8 +22,8 @@ CREATE TABLE TargetedSequencing_KitDescriptor (
   CONSTRAINT TK_KitDescriptor_FK FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO TargetedSequencingTemp(targetedSequencingId, alias, description, kitDescriptorId, archived, createdBy, creationDate, updatedBy, lastUpdated)
-SELECT targetedSequencingId, alias, description, kitDescriptorId, archived, createdBy, creationDate, updatedBy, lastUpdated FROM TargetedSequencing;
+INSERT INTO TargetedSequencingTemp(targetedSequencingId, alias, description, archived, createdBy, creationDate, updatedBy, lastUpdated)
+SELECT targetedSequencingId, alias, description, archived, createdBy, creationDate, updatedBy, lastUpdated FROM TargetedSequencing;
 
 INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptorId)
 SELECT targetedSequencingId, kitDescriptorId FROM TargetedSequencing;
@@ -58,7 +57,6 @@ deallocate prepare stmt;
 
 DROP TABLE TargetedSequencing;
 ALTER TABLE TargetedSequencingTemp RENAME TO TargetedSequencing;
-ALTER TABLE TargetedSequencing DROP COLUMN kitDescriptorId;
 
 ALTER TABLE LibraryDilution ADD CONSTRAINT FK_ld_targetedSequencing_targetedSequencingId FOREIGN KEY (targetedSequencingId) REFERENCES TargetedSequencing (targetedSequencingId);
 ALTER TABLE TargetedSequencing_KitDescriptor ADD CONSTRAINT TK_TargetedSequencing_FK FOREIGN KEY (targetedSequencingId) REFERENCES TargetedSequencing (targetedSequencingId);
