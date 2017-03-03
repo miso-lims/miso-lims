@@ -20,6 +20,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
     @Index(name = "PoolChangeLog_poolId_changeTime", columnNames = { "poolId", "changeTime" }) })
 public class PoolChangeLog extends AbstractChangeLog {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long poolChangeLogId;

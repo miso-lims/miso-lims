@@ -29,12 +29,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.ls454
  * <p/>
- * TODO Info
  * 
  * @author Rob Davey
  * @since 0.1.4
  */
 public class LS454Status extends StatusImpl {
+
+  private static final long serialVersionUID = 1L;
   String runLog = null;
 
   public LS454Status() {

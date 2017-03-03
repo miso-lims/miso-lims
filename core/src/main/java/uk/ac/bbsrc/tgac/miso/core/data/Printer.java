@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -18,7 +19,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 
 @Entity
 @Table(name = "Printer")
-public class Printer implements Deletable {
+public class Printer implements Deletable, Serializable {
+
+  private static final long serialVersionUID = 1L;
   public static final long UNSAVED_ID = 0;
 
   @Column(nullable = false)

@@ -21,6 +21,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
         "containerId", "changeTime" }) })
 public class SequencerPartitionContainerChangeLog extends AbstractChangeLog {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long sequencerPartitionContainerChangeLogId;

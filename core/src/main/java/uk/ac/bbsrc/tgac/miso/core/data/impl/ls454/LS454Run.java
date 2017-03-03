@@ -33,12 +33,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.ls454
  * <p/>
- * TODO Info
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class LS454Run extends RunImpl {
+
+  private static final long serialVersionUID = 1L;
 
   public LS454Run() {
     setPlatformType(PlatformType.LS454);

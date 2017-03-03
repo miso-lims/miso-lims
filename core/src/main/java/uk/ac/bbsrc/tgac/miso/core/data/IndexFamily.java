@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +48,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
 @Table(name = "IndexFamily")
-public class IndexFamily {
+public class IndexFamily implements Serializable {
+
+  private static final long serialVersionUID = 1L;
   // TODO: this is intended to be immutable, but it is not
   public static final IndexFamily NULL = new IndexFamily();
 

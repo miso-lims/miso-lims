@@ -29,12 +29,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio
  * <p/>
- * TODO Info
  * 
  * @author Rob Davey
  * @since 0.1.6
  */
 public class PacBioStatus extends StatusImpl {
+
+  private static final long serialVersionUID = 1L;
   String metadata = null;
 
   public PacBioStatus() {

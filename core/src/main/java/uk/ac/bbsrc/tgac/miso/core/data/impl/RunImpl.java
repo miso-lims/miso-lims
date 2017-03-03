@@ -58,6 +58,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 @Entity
 @Table(name = "Run")
 public class RunImpl extends AbstractRun implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   protected static final Logger log = LoggerFactory.getLogger(RunImpl.class);
 
   @ManyToMany(targetEntity = SequencerPartitionContainerImpl.class, cascade = CascadeType.ALL)

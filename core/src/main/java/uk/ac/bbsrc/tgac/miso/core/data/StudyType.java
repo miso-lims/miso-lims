@@ -1,12 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "StudyType")
-public class StudyType {
+public class StudyType implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   @Id
   private long typeId;
   private String name;

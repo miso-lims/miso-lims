@@ -33,6 +33,8 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.3
  */
 public class MisoNamingException extends Exception {
+  private static final long serialVersionUID = 1L;
+
   public MisoNamingException(String s) {
     super(s);
   }

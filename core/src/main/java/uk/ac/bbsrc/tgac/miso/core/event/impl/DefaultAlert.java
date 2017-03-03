@@ -60,7 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 public class DefaultAlert implements Alert, Serializable {
 
   private static final long serialVersionUID = 1L;
-
   public static final Long UNSAVED_ID = 0L;
 
   @Id

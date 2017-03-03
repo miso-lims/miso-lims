@@ -33,6 +33,8 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since version
  */
 public class StatusException extends Exception {
+  private static final long serialVersionUID = 1L;
+
   public StatusException(String s) {
     super(s);
   }

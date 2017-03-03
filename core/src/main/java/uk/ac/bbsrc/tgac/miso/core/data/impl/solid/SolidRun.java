@@ -48,12 +48,13 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.solid
  * <p/>
- * TODO Info
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class SolidRun extends RunImpl {
+
+  private static final long serialVersionUID = 1L;
   private static final Logger log = LoggerFactory.getLogger(SolidRun.class);
 
   public SolidRun() {
