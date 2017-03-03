@@ -1122,6 +1122,9 @@ Library.ui = {
           "sTitle": "Location",
           "mData": "locationLabel",
           "iSortPriority": 0,
+          "mRender": function (data, type, full) {
+            return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+          },
           "bSortable": false
         },
         {

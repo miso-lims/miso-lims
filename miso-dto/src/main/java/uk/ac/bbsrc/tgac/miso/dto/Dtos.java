@@ -521,6 +521,7 @@ public class Dtos {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
+    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     dto.setSampleType(from.getSampleType());
     if (from.getReceivedDate() != null) {
       dto.setReceivedDate(dateTimeFormatter.print(from.getReceivedDate().getTime()));
@@ -1005,6 +1006,7 @@ public class Dtos {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
+    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     return dto;
   }
 
@@ -1211,6 +1213,7 @@ public class Dtos {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
+    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     return dto;
   }
 
