@@ -749,13 +749,7 @@ public class DefaultSampleService implements SampleService {
     authorizationManager.throwIfNotWritable(managed);
     qc.setQcCreator(authorizationManager.getCurrentUsername());
 
-    // update concentration and/or volume if QC is of relevant type
-    if ("Qubit".equals(qc.getQcType().getName()) && managed instanceof DetailedSample) {
-      ((DetailedSample) managed).setConcentration(qc.getResults());
-    }
-    if ("Volume Check".equals(qc.getQcType().getName())) {
-      managed.setVolume(qc.getResults());
-    }
+    // TODO: update concentration and/or volume if QC is of relevant type
     managed.addQc(qc);
     sampleDao.save(managed);
   }

@@ -362,10 +362,7 @@ public class DefaultLibraryService implements LibraryService {
     authorizationManager.throwIfNotWritable(managed);
     qc.setQcCreator(authorizationManager.getCurrentUsername());
 
-    // update concentration if QC is of relevant type
-    if ("QuBit".equals(qc.getQcType().getName())) {
-      managed.setInitialConcentration(qc.getResults());
-    }
+    // TODO: update concentration if QC is of relevant type
     libraryQcDao.save(qc);
     libraryDao.save(library);
   }
