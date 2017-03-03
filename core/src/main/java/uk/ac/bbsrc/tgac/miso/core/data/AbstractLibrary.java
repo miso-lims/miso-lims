@@ -75,8 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
@@ -313,14 +311,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public void addQc(LibraryQC libraryQc) throws MalformedLibraryQcException {
+  public void addQc(LibraryQC libraryQc) {
     this.libraryQCs.add(libraryQc);
-    try {
-      libraryQc.setLibrary(this);
-    } catch (final MalformedLibraryException e) {
-      // TODO : This doesn't throw any exceptions. Remove.
-      log.error("add QC", e);
-    }
+    libraryQc.setLibrary(this);
   }
 
   @Override

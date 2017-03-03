@@ -40,7 +40,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -154,10 +153,8 @@ public interface Library
    * 
    * @param libraryQC
    *          of type LibraryQC
-   * @throws MalformedLibraryQcException
-   *           when the LibraryQC being added is not valid
    */
-  public void addQc(LibraryQC libraryQC) throws MalformedLibraryQcException;
+  public void addQc(LibraryQC libraryQC);
 
   /**
    * Returns the libraryQCs of this Library object.

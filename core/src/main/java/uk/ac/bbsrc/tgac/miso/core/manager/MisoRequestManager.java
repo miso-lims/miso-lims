@@ -1342,7 +1342,7 @@ public class MisoRequestManager implements RequestManager {
           } else if (sourcePool.getId() != managedPool.getId()) {
             managedPartition.setPool(getPoolById(sourcePool.getId()));
           }
-          continue;
+          break;
         }
       }
     }

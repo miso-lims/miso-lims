@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -54,6 +55,7 @@ public class SampleDto {
   private Long updatedById;
   private String updatedByUrl;
   private String lastModified;
+  private List<SampleQcDto> qcs;
 
   public Long getId() {
     return id;
@@ -232,6 +234,14 @@ public class SampleDto {
 
   public void setBoxId(Long boxId) {
     this.boxId = boxId;
+  }
+
+  public List<SampleQcDto> getQcs() {
+    return qcs;
+  }
+
+  public void setQcs(List<SampleQcDto> qcs) {
+    this.qcs = qcs;
   }
 
   public void writeUrls(UriComponentsBuilder uriBuilder) {

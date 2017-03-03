@@ -514,7 +514,6 @@
         <th>QC Date</th>
         <th>Method</th>
         <th>Results</th>
-        <th>Insert Size</th>
         <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
           <th align="center">Edit</th>
@@ -531,10 +530,9 @@
 
             <fmt:formatNumber var="resultsRounded"
               value="${qc.results}"
-              maxFractionDigits="2" />
+              maxFractionDigits="${qc.qcType.precisionAfterDecimal}" />
 
             <td id="result${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
-            <td id="insert${qc.id}">${qc.insertSize} bp</td>
             <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
               <td id="edit${qc.id}" align="center">

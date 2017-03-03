@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -45,6 +46,7 @@ public class LibraryDto {
   private String url;
   private Double volume;
   private Long boxId;
+  private List<LibraryQcDto> qcs;
 
   public String getAlias() {
     return alias;
@@ -148,6 +150,10 @@ public class LibraryDto {
 
   public Boolean getQcPassed() {
     return qcPassed;
+  }
+
+  public List<LibraryQcDto> getQcs() {
+    return qcs;
   }
 
   public String getUrl() {
@@ -269,6 +275,10 @@ public class LibraryDto {
   @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
+  }
+
+  public void setQcs(List<LibraryQcDto> qcs) {
+    this.qcs = qcs;
   }
 
   public void setUrl(String url) {

@@ -70,7 +70,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -104,6 +103,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
@@ -116,6 +116,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
@@ -204,6 +205,17 @@ public class EditSampleController {
   @ModelAttribute("sampleOptions")
   public String getSampleOptions(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     return mapper.writeValueAsString(sampleOptionsController.getSampleOptions(uriBuilder, response));
+  }
+
+  @ModelAttribute("qcTypes")
+  public List<QcTypeDto> getSampleQcTypes() {
+    List<QcTypeDto> qcTypes = new ArrayList<>();
+    try {
+      qcTypes = Dtos.asQcTypeDtos(sampleService.listSampleQcTypes());
+    } catch (IOException e) {
+      log.error("Error getting QC Types", e);
+    }
+    return qcTypes;
   }
 
   public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId)
@@ -318,7 +330,7 @@ public class EditSampleController {
 
   @ModelAttribute("sampleQCUnits")
   public String sampleQCUnits() throws IOException {
-    return AbstractSampleQC.UNITS;
+    return SampleQCImpl.UNITS;
   }
 
   @ModelAttribute("libraryDilutionUnits")

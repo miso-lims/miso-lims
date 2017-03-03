@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -37,7 +36,7 @@ public class HibernateSampleQcDao implements SampleQcStore {
   @Override
   public long save(SampleQC sampleQc) throws IOException {
     long id;
-    if (sampleQc.getId() == AbstractSampleQC.UNSAVED_ID) {
+    if (sampleQc.getId() == SampleQCImpl.UNSAVED_ID) {
       id = (long) currentSession().save(sampleQc);
     } else {
       currentSession().update(sampleQc);

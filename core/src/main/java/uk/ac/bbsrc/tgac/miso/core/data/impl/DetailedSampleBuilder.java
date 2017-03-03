@@ -42,8 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -157,14 +155,9 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public void addQc(SampleQC sampleQc) throws MalformedSampleQcException {
+  public void addQc(SampleQC sampleQc) {
     this.sampleQCs.add(sampleQc);
-    try {
-      sampleQc.setSample(this);
-    } catch (MalformedSampleException e) {
-      // This is never actually thrown
-      throw new RuntimeException(e);
-    }
+    sampleQc.setSample(this);
   }
 
   @Override
