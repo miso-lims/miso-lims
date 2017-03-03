@@ -44,9 +44,14 @@ public class LibraryDto {
   private String indexFamilyName;
   private String url;
   private Double volume;
+  private Long boxId;
 
   public String getAlias() {
     return alias;
+  }
+
+  public Long getBoxId() {
+    return boxId;
   }
 
   public Double getConcentration() {
@@ -155,6 +160,10 @@ public class LibraryDto {
 
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  public void setBoxId(Long boxId) {
+    this.boxId = boxId;
   }
 
   public void setConcentration(Double concentration) {

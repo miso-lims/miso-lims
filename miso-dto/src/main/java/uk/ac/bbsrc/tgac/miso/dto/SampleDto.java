@@ -39,6 +39,7 @@ public class SampleDto {
   // Skipped security profile
   private String identificationBarcode;
   private String locationLabel;
+  private Long boxId;
   private String sampleType;
   private String receivedDate;
   private Boolean qcPassed;
@@ -223,6 +224,14 @@ public class SampleDto {
 
   public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
+  }
+
+  public Long getBoxId() {
+    return boxId;
+  }
+
+  public void setBoxId(Long boxId) {
+    this.boxId = boxId;
   }
 
   public void writeUrls(UriComponentsBuilder uriBuilder) {

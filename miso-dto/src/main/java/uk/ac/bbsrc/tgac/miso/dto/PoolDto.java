@@ -24,6 +24,8 @@ public class PoolDto {
   private String creationDate;
   private String lastModified;
   private String description;
+  private Long boxId;
+
 
   public String getAlias() {
     return alias;
@@ -31,6 +33,10 @@ public class PoolDto {
 
   public Integer getAvgInsertSize() {
     return avgInsertSize;
+  }
+
+  public Long getBoxId() {
+    return boxId;
   }
 
   public Double getConcentration() {
@@ -87,6 +93,10 @@ public class PoolDto {
 
   public void setAvgInsertSize(Integer avgInsertSize) {
     this.avgInsertSize = avgInsertSize;
+  }
+
+  public void setBoxId(Long boxId) {
+    this.boxId = boxId;
   }
 
   public void setConcentration(Double concentration) {
