@@ -69,6 +69,26 @@ public class LibraryDto {
     return identificationBarcode;
   }
 
+  public Long getIndex1Id() {
+    return index1Id;
+  }
+
+  public String getIndex1Label() {
+    return index1Label;
+  }
+
+  public Long getIndex2Id() {
+    return index2Id;
+  }
+
+  public String getIndex2Label() {
+    return index2Label;
+  }
+
+  public String getIndexFamilyName() {
+    return indexFamilyName;
+  }
+
   public String getLastModified() {
     return lastModified;
   }
@@ -81,12 +101,12 @@ public class LibraryDto {
     return libraryStrategyTypeId;
   }
 
-  public Long getLibraryTypeId() {
-    return libraryTypeId;
-  }
-
   public String getLibraryTypeAlias() {
     return libraryTypeAlias;
+  }
+
+  public Long getLibraryTypeId() {
+    return libraryTypeId;
   }
 
   public String getLocationLabel() {
@@ -109,6 +129,10 @@ public class LibraryDto {
     return parentSampleAlias;
   }
 
+  public Long getParentSampleClassId() {
+    return parentSampleClassId;
+  }
+
   public Long getParentSampleId() {
     return parentSampleId;
   }
@@ -119,26 +143,6 @@ public class LibraryDto {
 
   public Boolean getQcPassed() {
     return qcPassed;
-  }
-
-  public Long getIndex1Id() {
-    return index1Id;
-  }
-
-  public Long getIndex2Id() {
-    return index2Id;
-  }
-
-  public String getIndex1Label() {
-    return index1Label;
-  }
-
-  public String getIndex2Label() {
-    return index2Label;
-  }
-
-  public String getIndexFamilyName() {
-    return indexFamilyName;
   }
 
   public String getUrl() {
@@ -172,6 +176,31 @@ public class LibraryDto {
   @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public void setIndex1Id(Long index1Id) {
+    this.index1Id = index1Id;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public void setIndex1Label(String index1Label) {
+    this.index1Label = index1Label;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public void setIndex2Id(Long index2Id) {
+    this.index2Id = index2Id;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public void setIndex2Label(String index2Label) {
+    this.index2Label = index2Label;
+  }
+
+  @JsonInclude(JsonInclude.Include.ALWAYS)
+  public void setIndexFamilyName(String indexFamilyName) {
+    this.indexFamilyName = indexFamilyName;
   }
 
   @JsonInclude(JsonInclude.Include.ALWAYS)
@@ -216,16 +245,12 @@ public class LibraryDto {
     this.parentSampleAlias = parentSampleAlias;
   }
 
-  public void setParentSampleId(Long parentSampleId) {
-    this.parentSampleId = parentSampleId;
-  }
-
-  public Long getParentSampleClassId() {
-    return parentSampleClassId;
-  }
-
   public void setParentSampleClassId(Long parentSampleClassId) {
     this.parentSampleClassId = parentSampleClassId;
+  }
+
+  public void setParentSampleId(Long parentSampleId) {
+    this.parentSampleId = parentSampleId;
   }
 
   public void setPlatformType(String platformType) {
@@ -237,31 +262,6 @@ public class LibraryDto {
     this.qcPassed = qcPassed;
   }
 
-  @JsonInclude(JsonInclude.Include.ALWAYS)
-  public void setIndex1Id(Long index1Id) {
-    this.index1Id = index1Id;
-  }
-
-  @JsonInclude(JsonInclude.Include.ALWAYS)
-  public void setIndex2Id(Long index2Id) {
-    this.index2Id = index2Id;
-  }
-
-  @JsonInclude(JsonInclude.Include.ALWAYS)
-  public void setIndex1Label(String index1Label) {
-    this.index1Label = index1Label;
-  }
-
-  @JsonInclude(JsonInclude.Include.ALWAYS)
-  public void setIndex2Label(String index2Label) {
-    this.index2Label = index2Label;
-  }
-
-  @JsonInclude(JsonInclude.Include.ALWAYS)
-  public void setIndexFamilyName(String indexFamilyName) {
-    this.indexFamilyName = indexFamilyName;
-  }
-
   public void setUrl(String url) {
     this.url = url;
   }
@@ -270,12 +270,12 @@ public class LibraryDto {
     this.volume = volume;
   }
 
+  public void writeUrls(URI baseUri) {
+    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/library/{id}").buildAndExpand(getId()).toUriString());
+  }
+
   public void writeUrls(UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     writeUrls(baseUri);
-  }
-
-  public void writeUrls(URI baseUri) {
-    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/library/{id}").buildAndExpand(getId()).toUriString());
   }
 }

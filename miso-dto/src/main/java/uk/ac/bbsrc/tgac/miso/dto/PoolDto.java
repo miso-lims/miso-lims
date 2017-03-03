@@ -53,12 +53,12 @@ public class PoolDto {
     return identificationBarcode;
   }
 
-  public String getLocationLabel() {
-    return locationLabel;
-  }
-
   public String getLastModified() {
     return lastModified;
+  }
+
+  public String getLocationLabel() {
+    return locationLabel;
   }
 
   public String getName() {
@@ -111,13 +111,13 @@ public class PoolDto {
     this.identificationBarcode = identificationBarcode;
   }
 
+  public void setLastModified(String lastModified) {
+    this.lastModified = lastModified;
+  }
+
   @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setLocationLabel(String locationLabel) {
     this.locationLabel = locationLabel;
-  }
-
-  public void setLastModified(String lastModified) {
-    this.lastModified = lastModified;
   }
 
   public void setName(String name) {
@@ -140,16 +140,16 @@ public class PoolDto {
     this.url = url;
   }
 
-  public void writeUrls(UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    writeUrls(baseUri);
-  }
-
   public void writeUrls(URI baseUri) {
     setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/pool/{id}").buildAndExpand(getId()).toUriString());
     for (DilutionDto ldto : getPooledElements()) {
       ldto.setLibraryUrl(
           UriComponentsBuilder.fromUri(baseUri).path("/rest/library/{id}").buildAndExpand(ldto.getLibrary().getId()).toUriString());
     }
+  }
+
+  public void writeUrls(UriComponentsBuilder uriBuilder) {
+    URI baseUri = uriBuilder.build().toUri();
+    writeUrls(baseUri);
   }
 }
