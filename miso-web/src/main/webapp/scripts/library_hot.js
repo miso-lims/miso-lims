@@ -6,7 +6,8 @@ Library.hot = {
   libraryData: null,
   showQcs: false,
   libraryTypeAliases: {},
-  
+  hideCols: [],
+
   getLibraryTypeAliasLists: function () {
     var usedTypes = Library.hot.librariesJSON.map(function (lib) {
       return lib.libraryTypeId;
@@ -265,7 +266,7 @@ Library.hot = {
         data: 'alias',
         validator: Hot.requiredText,
         renderer: Hot.requiredTextRenderer,
-        include: true
+        include: !(Library.hot.hideCols.indexOf("libraryAlias") > -1)
       },
       {
         header: 'Sample Alias',
@@ -282,7 +283,7 @@ Library.hot = {
       {
         header: 'Description',
         data: 'description',
-        include: true
+        include: !(Library.hot.hideCols.indexOf("description") > -1)
       },
       {
         header: 'Design',
@@ -381,7 +382,7 @@ Library.hot = {
         data: 'volume',
         type: 'numeric',
         format: '0.0',
-        include: true
+        include: !(Library.hot.hideCols.indexOf("volume") > -1)
       },
       {
         header: 'Kit',

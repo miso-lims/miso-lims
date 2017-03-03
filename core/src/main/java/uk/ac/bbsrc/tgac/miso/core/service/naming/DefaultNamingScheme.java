@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -24,6 +26,13 @@ public class DefaultNamingScheme extends AbstractNamingScheme {
   private NameValidator libraryAliasValidator = new DefaultLibraryAliasValidator();
   private NameGenerator<Library> libraryAliasGenerator = new DefaultLibraryAliasGenerator();
   private NameValidator projectShortNameValidator = new AllowAnythingValidator();
+
+  /**
+   * Creates a new DefaultNamingScheme and attempts to autowire all of its validators' and generators' dependencies.
+   */
+  public DefaultNamingScheme() {
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(libraryAliasGenerator);
+  }
 
   @Override
   public void setNameGenerator(NameGenerator<Nameable> generator) {

@@ -45,15 +45,15 @@
     ${method} Libraries
     <button id="saveLibraries" class="fg-button ui-state-default ui-corner-all">Save</button>
   </h1>
-  
+
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
     <div id="hothelp_arrowclick" class="toggleLeft"></div>
   </div>
   <div id="hothelpdiv" class="note" style="display:none;">
     <p>To fill all empty cells in a column with the value of your selected cell(s), <b>double-click</b> the square in the bottom right of your selected cell(s).
-      <br/>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your 
+      <br/>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your
       filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
-      <br/>To fill down a column with values following an incremental (+1) pattern, select two adjacent cells in a column and then either drag down, or 
+      <br/>To fill down a column with values following an incremental (+1) pattern, select two adjacent cells in a column and then either drag down, or
       double-click the square in the bottom right of the selected cells.
     </p>
   </div>
@@ -69,7 +69,7 @@
    <div id="ctrlV" class="note">
      <p>Paste values using Ctrl + V in Windows or Linux, or Command-V (&#8984;-V) on a Mac.</p>
    </div>
- 
+
    <div id="saveSuccesses"  class="parsley-success hidden">
      <p id="successMessages"></p>
    </div>
@@ -78,20 +78,26 @@
        <p>The following rows failed to save:</p>
        <p id="errorMessages"></p>
      </div>
-   
+
    <div id="hotContainer"></div>
- 
+
  </div>
-  
+
   <script type="text/javascript">
     jQuery(document).ready(function () {
       Library.hot.librariesJSON = ${librariesJSON};
-      Library.hot.librariesJSON = Hot.sortByProperty(Library.hot.librariesJSON, 'parentSampleAlias');
+      Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
+
+      if (Hot.detailedSample) {
+        Library.hot.librariesJSON = Hot.sortByProperty(Library.hot.librariesJSON, 'parentSampleAlias');
+      }
+      
+	  Library.hot.hideCols = ${hideCols};
+
       Hot.dropdownRef = ${referenceDataJSON};
       Hot.dropdownRef.platformTypes = ${platformTypes};
       Hot.dropdownRef.indices = ${indices};
       Hot.dropdownRef.indexFamilies = {};
-      Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
       Hot.saveButton = document.getElementById('saveLibraries');
       Library.hot.propagateOrEdit = "${method}";
       Library.designs = ${libraryDesignsJSON};
