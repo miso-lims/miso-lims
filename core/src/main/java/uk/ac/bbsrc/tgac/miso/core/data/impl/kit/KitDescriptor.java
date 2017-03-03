@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -34,6 +35,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -45,6 +48,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.KitDescriptorChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -78,6 +82,12 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
 
   @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor")
   private final Collection<ChangeLog> changelog = new ArrayList<>();
+
+  @ManyToMany
+  @JoinTable(name = "TargetedSequencing_KitDescriptor", inverseJoinColumns = {
+      @JoinColumn(name = "targetedSequencingId") }, joinColumns = {
+          @JoinColumn(name = "kitDescriptorId") })
+  private final Collection<TargetedSequencing> targetedSequencing = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
@@ -271,6 +281,10 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
 
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
+  }
+
+  public Collection<TargetedSequencing> getTargetedSequencing() {
+    return targetedSequencing;
   }
 
   /**

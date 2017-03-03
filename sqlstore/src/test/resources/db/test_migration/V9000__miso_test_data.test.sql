@@ -259,11 +259,15 @@ INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,
 (2,'5678','Freezer3','LOT35',NOW(),2);
 
 DELETE FROM `TargetedSequencing`;
-INSERT INTO `TargetedSequencing`(`targetedSequencingId`,`alias`,`description`,`kitDescriptorId`, `archived`, `createdBy`,`creationDate`,`updatedBy`,`lastUpdated`) VALUES
-(1,'HALO_IBP','Master Chief',1,0,1,NOW(),1,NOW()),
-(2,'Thunderbolts','of lightening, very very frightening',1,0,1,NOW(),1,NOW()),
-(3,'Thunderbolts','of lightening, very very frightening',2,0,1,NOW(),1,NOW());
+INSERT INTO `TargetedSequencing`(`targetedSequencingId`,`alias`,`description`, `archived`, `createdBy`,`creationDate`,`updatedBy`,`lastUpdated`) VALUES
+(1,'HALO_IBP','Master Chief',0,1,NOW(),1,NOW()),
+(2,'Thunderbolts','of lightening, very very frightening',0,1,NOW(),1,NOW());
 
+DELETE FROM TargetedSequencing_KitDescriptor;
+INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptorId) VALUES
+(1,1),
+(2,1),
+(2,2);
 
 DELETE FROM `LibraryDilution`;
 INSERT INTO `LibraryDilution`(`dilutionId`, `concentration`, `library_libraryId`, `identificationBarcode`, `creationDate`, `dilutionUserName`, `name`, `securityProfile_profileId`) 
