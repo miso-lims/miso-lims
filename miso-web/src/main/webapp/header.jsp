@@ -134,9 +134,13 @@
       <li><a href="<c:url value="/miso/projects"/>"><span>My Projects</span></a></li>
     </sec:authorize>
 
+    <!-- // TODO: put me back in when the Reports tab doesn't cause MISO to crash mysteriously and randomly
+    
     <sec:authorize access="hasRole('ROLE_INTERNAL')">
       <li><a href="<c:url value="/miso/flexreports"/>"><span>Reports</span></a></li>
     </sec:authorize>
+    
+     -->
 
     <sec:authorize access="isAuthenticated()">
       <li>
