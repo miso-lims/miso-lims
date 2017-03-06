@@ -1017,6 +1017,7 @@ public class Dtos {
       }
     }
     dto.setVolume(from.getVolume());
+    dto.setDnaSize(from.getDnaSize());
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
@@ -1089,6 +1090,7 @@ public class Dtos {
       to.setIndices(indices);
     }
     to.setVolume(from.getVolume());
+    to.setDnaSize(from.getDnaSize());
 
     if (from.getQcs() != null && !from.getQcs().isEmpty()) {
       for (LibraryQcDto qcDto : from.getQcs()) {

@@ -181,6 +181,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")
   private String position;
 
+  private Long dnaSize;
+
   @Override
   public String getBoxPosition() {
     return position;
@@ -540,6 +542,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public Long getDnaSize() {
+    return dnaSize;
+  }
+
+  @Override
+  public void setDnaSize(Long dnaSize) {
+    this.dnaSize = dnaSize;
+  }
+
+  @Override
   public int hashCode() {
     return new HashCodeBuilder(3, 33)
         .appendSuper(super.hashCode())
@@ -584,4 +596,5 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(qcPassed, other.qcPassed)
         .isEquals();
   }
+
 }

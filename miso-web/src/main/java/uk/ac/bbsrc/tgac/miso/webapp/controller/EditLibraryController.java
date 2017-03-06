@@ -253,6 +253,21 @@ public class EditLibraryController {
     return types;
   }
 
+  @ModelAttribute("hideCols")
+  public String populateHideCols() {
+    JSONArray hideCols = new JSONArray();
+    if (!showDescription) {
+      hideCols.add("description");
+    }
+    if (!showVolume) {
+      hideCols.add("volume");
+    }
+    if (!showLibraryAlias) {
+      hideCols.add("libraryAlias");
+    }
+    return hideCols.toString();
+  }
+
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return libraryService.getLibraryColumnSizes();
@@ -844,21 +859,10 @@ public class EditLibraryController {
       libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
       model.put("libraryDesignsJSON", libraryDesigns.toString());
       JSONArray libraryDesignCodes = new JSONArray();
-      JSONArray hideCols = new JSONArray();
       libraryDesignCodes.addAll(requestManager.listLibraryDesignCodes());
-      if(!showDescription){
-        hideCols.add("description");
-      }
-      if(!showVolume){
-        hideCols.add("volume");
-      }
-      if(!showLibraryAlias){
-        hideCols.add("libraryAlias");
-      }
 
       model.put("libraryDesignCodesJSON", libraryDesignCodes.toString());
       model.put("method", "Propagate");
-      model.put("hideCols", hideCols);
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

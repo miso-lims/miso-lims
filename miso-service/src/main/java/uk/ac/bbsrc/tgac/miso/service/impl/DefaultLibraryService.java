@@ -525,6 +525,7 @@ public class DefaultLibraryService implements LibraryService {
     } else {
       target.setVolume(source.getVolume());
     }
+    target.setDnaSize(source.getDnaSize());
     target.setLibraryType(source.getLibraryType());
     target.setLibrarySelectionType(source.getLibrarySelectionType());
     target.setLibraryStrategyType(source.getLibraryStrategyType());

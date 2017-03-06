@@ -359,6 +359,10 @@
 </tr>
 
 <tr>
+  <td>Size (bp):</td>
+  <td><form:input id="dnaSize" path="dnaSize"/></td>
+</tr>
+<tr>
   <td>Volume (&#181;l):</td>
   <td><form:input id="volume" path="volume"/></td>
 </tr>
