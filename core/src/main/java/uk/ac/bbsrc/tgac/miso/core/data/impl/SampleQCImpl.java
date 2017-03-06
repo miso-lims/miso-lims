@@ -105,7 +105,7 @@ public class SampleQCImpl extends AbstractQC implements SampleQC, Serializable {
   }
 
   /**
-   * Equivalency is based on getRunId() if set, otherwise on name
+   * Equivalency is based on getSampleId() if set, otherwise on name
    */
   @Override
   public boolean equals(Object obj) {

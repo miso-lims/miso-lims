@@ -592,6 +592,7 @@ public class DefaultSampleService implements SampleService {
       dTarget.setGroupId(dSource.getGroupId());
       dTarget.setDetailedQcStatus(dSource.getDetailedQcStatus());
       dTarget.setDetailedQcStatusNote(dSource.getDetailedQcStatusNote());
+      dTarget.setConcentration(dSource.getConcentration());
 
       if (isIdentitySample(target)) {
         Identity iTarget = (Identity) target;
@@ -616,7 +617,6 @@ public class DefaultSampleService implements SampleService {
         SampleStock ssTarget = (SampleStock) target;
         SampleStock ssSource = (SampleStock) source;
         ssTarget.setStrStatus(ssSource.getStrStatus());
-        ssTarget.setConcentration(ssSource.getConcentration());
         ssTarget.setDNAseTreated(ssSource.getDNAseTreated());
       }
     }

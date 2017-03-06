@@ -1350,7 +1350,6 @@ public class Dtos {
 
   private static SampleQC to(SampleQcDto from) {
     SampleQC to = new SampleQCImpl();
-    to.setId(from.getId());
     to.setQcType(to(from.getQcType()));
     to.setResults(from.getResults());
     return to;

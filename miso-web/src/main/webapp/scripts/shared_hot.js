@@ -1,5 +1,5 @@
 /**
-* Module for Handsontsble code which is shared between multiple instances
+* Module for Handsontable code which is shared between multiple instances
 */
 var Hot = {
   detailedSample: null,

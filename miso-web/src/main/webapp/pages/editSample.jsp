@@ -404,10 +404,6 @@
           </tr>
         </c:if>
         <tr>
-          <td class="h">Concentration (nM):</td>
-          <td><form:input id="concentration" path="concentration"/></td>
-        </tr>
-        <tr>
           <td class="h">Sample Class:*</td>
           <td>
             <c:choose>
@@ -457,6 +453,10 @@
           <td>
             <form:input id="groupDescription" path="groupDescription"/>
           </td>
+        </tr>
+        <tr>
+          <td class="h">Concentration (nM):</td>
+          <td><form:input id="concentration" path="concentration"/></td>
         </tr>
       </table>
 

@@ -1204,6 +1204,19 @@ Sample.hot = {
       if (obj.concentration) {
         sample.concentration = obj.concentration;
       }
+      
+      // add RNA values
+      sample.qcs = [];
+      if (obj.rin && obj.rin != '') {
+        sample.qcs.push(makeSampleQC('RIN', obj.rin));
+      }
+      
+      function makeSampleQC(qcMethod, qcResults) {
+        return {
+          results: qcResults,
+          qcType: 
+        };
+      }
     } catch (e) {
       console.log(e);
       return null;
