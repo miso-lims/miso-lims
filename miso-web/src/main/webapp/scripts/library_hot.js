@@ -190,6 +190,7 @@ Library.hot = {
     indexFamilyName: '',
     index1Label: '',
     index2Label: '',
+    dnaSize: null,
     volume: null,
     kitDescriptorId: null,
     kitDescriptorName: null,
@@ -375,6 +376,12 @@ Library.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: ['unknown', 'true', 'false'],
+        include: true
+      },
+      {
+        header: 'Size (bp)',
+        data: 'dnaSize',
+        type: 'numeric',
         include: true
       },
       {
@@ -635,6 +642,7 @@ Library.hot = {
         }
       }
 
+      lib.dnaSize = obj.dnaSize;
       lib.volume = obj.volume;
 
       if (Hot.detailedSample) {

@@ -47,6 +47,7 @@ public class LibraryDto {
   private Double volume;
   private Long boxId;
   private List<LibraryQcDto> qcs;
+  private Long dnaSize;
 
   public String getAlias() {
     return alias;
@@ -287,6 +288,14 @@ public class LibraryDto {
 
   public void setVolume(Double volume) {
     this.volume = volume;
+  }
+
+  public Long getDnaSize() {
+    return dnaSize;
+  }
+
+  public void setDnaSize(Long dnaSize) {
+    this.dnaSize = dnaSize;
   }
 
   public void writeUrls(URI baseUri) {

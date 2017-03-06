@@ -339,4 +339,8 @@ public interface Library
 
   public IndexFamily getCurrentFamily();
 
+  Long getDnaSize();
+
+  void setDnaSize(Long dnaSize);
+
 }
