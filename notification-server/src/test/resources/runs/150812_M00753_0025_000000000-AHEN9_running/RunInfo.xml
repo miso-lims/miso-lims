@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!DOCTYPE xml>
 <RunInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2">
   <Run Id="150812_M00753_0025_000000000-AHEN9" Number="25">
     <Flowcell>000000000-AHEN9</Flowcell>
