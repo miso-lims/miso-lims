@@ -5,6 +5,7 @@ CALL addTargetedSequencing('SureSelect v4','GSLE Legacy','Agilent SureSelect XT'
 CALL addTargetedSequencing('SureSelect v4','GSLE Legacy','Agilent SureSelect XT2',1);
 CALL addTargetedSequencing('AmpliSeq Cancer Panel v1','GSLE Legacy','AmpliSeq Cancer Panel V1',0);
 CALL addTargetedSequencing('Ion AmpliSeq Exome','GSLE Legacy','AmpliSeq-Illumina Exome V1',1);
+CALL addTargetedSequencing('BART_IAD40521_1','GSLE Legacy','AmpliSeq-Illumina V1', 0);
 CALL addTargetedSequencing('BART_IAD40521_3','GSLE Legacy','AmpliSeq-Illumina V1',0);
 CALL addTargetedSequencing('BART_IAD40521_23','GSLE Legacy','AmpliSeq-KAPA Hyper Prep V1',0);
 CALL addTargetedSequencing('Ion AmpliSeq Cancer Panel v1','GSLE Legacy','AmpliSeq-KAPA Hyper Prep V1',0);
