@@ -313,6 +313,7 @@ public class MisoServiceManager {
     rm.setSecurityManager(securityManager);
     rm.setLibraryDilutionStore(dilutionDao);
     rm.setChangeLogStore(changeLogDao);
+    rm.setSequencerPartitionContainerStore(sequencerPartitionContainerDao);
     setRequestManager(rm);
   }
 
@@ -829,6 +830,7 @@ public class MisoServiceManager {
   }
 
   private void updateSequencerPartitionContainerDaoDependencies() {
+    if (requestManager != null) requestManager.setSequencerPartitionContainerStore(getSequencerPartitionContainerDao());
   }
 
   public HibernateStatusDao getStatusDao() {

@@ -53,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
 public interface Run
-    extends SecurableByProfile, Comparable<Run>, Reportable, Watchable, Deletable, Nameable, Alertable, ChangeLoggable, Aliasable {
+    extends SecurableByProfile, Comparable<Run>, Reportable<Run>, Watchable, Deletable, Nameable, Alertable, ChangeLoggable, Aliasable {
   /** Field PREFIX */
   public static final String PREFIX = "RUN";
 
@@ -77,6 +77,15 @@ public interface Run
   public List<SequencerPartitionContainer> getSequencerPartitionContainers();
 
   public void setSequencerPartitionContainers(List<SequencerPartitionContainer> containers);
+
+  /**
+   * Sets a single SequencerPartitionContainer for this Run as long as the run previously had 0-1 containers.
+   * Cannot replace multiple containers with a single container
+   * 
+   * @param container
+   * @throws IllegalArgumentException if the Run already has more than one container
+   */
+  public void setSequencerPartitionContainer(SequencerPartitionContainer container);
 
   public void addSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer);
 

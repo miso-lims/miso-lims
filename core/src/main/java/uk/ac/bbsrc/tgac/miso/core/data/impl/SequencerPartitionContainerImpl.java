@@ -37,7 +37,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -86,10 +85,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   private String identificationBarcode;
   private String locationBarcode;
 
-  @ManyToMany(targetEntity = RunImpl.class)
-  @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
-      @JoinColumn(name = "containers_containerId") }, inverseJoinColumns = {
-      @JoinColumn(name = "Run_runId") })
+  @ManyToMany(targetEntity = RunImpl.class, mappedBy = "containers")
   private Collection<Run> runs = null;
 
   @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
@@ -222,7 +218,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     return runs;
   }
 
-  @Override
   public void setRuns(Collection<Run> runs) {
     this.runs = runs;
   }
@@ -244,16 +239,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
       }
     }
     return lastRun;
-  }
-
-  @Override
-  public void setRun(Run run) {
-    if (run != null && runs.size() > 1) {
-      throw new IllegalArgumentException("Cannot set single run on a container with multiple runs already linked!");
-    } else {
-      runs = new ArrayList<>();
-      if (run != null) runs.add(run);
-    }
   }
 
   @Override

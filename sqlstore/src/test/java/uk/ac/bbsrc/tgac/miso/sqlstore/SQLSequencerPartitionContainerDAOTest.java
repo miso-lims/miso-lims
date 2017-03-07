@@ -153,7 +153,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     Run run = Mockito.mock(RunImpl.class);
     Mockito.when(run.getId()).thenReturn(1L);
     spc.setIdentificationBarcode("ABCDEFXX");
-    spc.setRun(run);
 
     assertEquals(4L, dao.save(spc));
     SequencerPartitionContainer savedSPC = dao.get(4L);
@@ -191,34 +190,6 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     assertNotNull(insertedSpc);
     assertTrue(dao.remove(spc));
     assertNull(dao.get(insertedSpc.getId()));
-  }
-
-  @Test
-  public void testRemoveContainerFromRun() throws IOException {
-    Long runId = 1L;
-    List<SequencerPartitionContainer> spcByRunId = dao.listAllSequencerPartitionContainersByRunId(runId);
-    assertEquals(1, spcByRunId.size());
-
-    SequencerPartitionContainer fetchedSPC = spcByRunId.iterator().next();
-    Run removeTarget = null;
-    for (Run run : fetchedSPC.getRuns()) {
-      if (run.getId() == runId) removeTarget = run;
-    }
-    if (removeTarget != null) {
-      fetchedSPC.getRuns().remove(removeTarget);
-      dao.save(fetchedSPC);
-    }
-    assertEquals(0, dao.listAllSequencerPartitionContainersByRunId(runId).size());
-  }
-
-  @Test
-  public void testRemoveContainerFromUnassociatedRun() throws IOException {
-    assertEquals(1, dao.listAllSequencerPartitionContainersByRunId(1L).size());
-
-    SequencerPartitionContainer spc = dao.get(2L);
-    spc.setRun(null);
-    dao.save(spc);
-    assertEquals(1, dao.listAllSequencerPartitionContainersByRunId(1L).size());
   }
 
   private SequencerPartitionContainer makeSPC(String identificationBarcode) throws IOException {
