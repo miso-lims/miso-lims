@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -53,7 +54,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @Entity
 @Table(name = "Kit")
-public class KitImpl implements Kit {
+public class KitImpl implements Kit, Serializable {
+
+  private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

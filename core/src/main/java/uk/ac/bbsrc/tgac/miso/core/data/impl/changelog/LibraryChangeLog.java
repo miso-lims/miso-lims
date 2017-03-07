@@ -20,6 +20,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
     @Index(name = "LibraryChangeLog_libraryId_changeTime", columnNames = { "libraryId", "changeTime" }) })
 public class LibraryChangeLog extends AbstractChangeLog {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long libraryChangeLogId;

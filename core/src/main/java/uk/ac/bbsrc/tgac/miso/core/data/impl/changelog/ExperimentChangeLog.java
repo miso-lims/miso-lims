@@ -20,6 +20,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
     @Index(name = "ExperimentChangeLog_experimentId_changeTime", columnNames = { "experimentId", "changeTime" }) })
 public class ExperimentChangeLog extends AbstractChangeLog {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long experimentChangeLogId;

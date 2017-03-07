@@ -33,6 +33,8 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.1.6RC
  */
 public class AlertingException extends Exception {
+  private static final long serialVersionUID = 1L;
+
   public AlertingException(String s) {
     super(s);
   }

@@ -32,6 +32,8 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.1.9
  */
 public class MalformedPoolQcException extends Exception {
+  private static final long serialVersionUID = 1L;
+
   public MalformedPoolQcException(String s) {
     super(s);
   }

@@ -32,6 +32,8 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class MalformedLibraryQcException extends Exception {
+  private static final long serialVersionUID = 1L;
+
   public MalformedLibraryQcException(String s) {
     super(s);
   }

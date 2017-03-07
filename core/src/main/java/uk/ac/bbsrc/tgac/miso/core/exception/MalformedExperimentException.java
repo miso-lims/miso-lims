@@ -32,6 +32,7 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class MalformedExperimentException extends Exception {
+  private static final long serialVersionUID = 1L;
   public MalformedExperimentException(String s) {
     super(s);
   }

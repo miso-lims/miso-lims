@@ -12,6 +12,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 @Table(name = "SampleAliquot")
 public class SampleAliquotImpl extends DetailedSampleImpl implements SampleAliquot {
 
+  private static final long serialVersionUID = 1L;
+
   @OneToOne(targetEntity = SamplePurposeImpl.class)
   @JoinColumn(name = "samplePurposeId")
   private SamplePurpose samplePurpose;

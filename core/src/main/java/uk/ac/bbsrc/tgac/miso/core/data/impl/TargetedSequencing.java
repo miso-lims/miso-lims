@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -22,8 +23,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
 @Table(name = "TargetedSequencing")
-public class TargetedSequencing {
+public class TargetedSequencing implements Serializable {
 
+  private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
 
   @Id

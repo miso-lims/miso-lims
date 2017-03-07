@@ -20,6 +20,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
     @Index(name = "SampleChangeLog_sampleId_changeTime", columnNames = { "sampleId", "changeTime" }) })
 public class SampleChangeLog extends AbstractChangeLog {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long sampleChangeLogId;
