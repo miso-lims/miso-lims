@@ -1,3 +1,5 @@
+-- ts_many_to_many
+
 CREATE TABLE `TargetedSequencingTemp` (
   `targetedSequencingId` bigint(20) NOT NULL AUTO_INCREMENT,
   `alias` varchar(255) NOT NULL,
@@ -60,3 +62,43 @@ ALTER TABLE TargetedSequencingTemp RENAME TO TargetedSequencing;
 
 ALTER TABLE LibraryDilution ADD CONSTRAINT FK_ld_targetedSequencing_targetedSequencingId FOREIGN KEY (targetedSequencingId) REFERENCES TargetedSequencing (targetedSequencingId);
 ALTER TABLE TargetedSequencing_KitDescriptor ADD CONSTRAINT TK_TargetedSequencing_FK FOREIGN KEY (targetedSequencingId) REFERENCES TargetedSequencing (targetedSequencingId);
+
+
+-- archived_qcTypes
+
+ALTER TABLE QCType ADD COLUMN archived BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE QCType ADD COLUMN precisionAfterDecimal INT NOT NULL DEFAULT 0;
+
+-- StartNoTest
+DELETE FROM QCType WHERE name = 'STR';
+UPDATE QCType SET precisionAfterDecimal = 0 WHERE name = 'Tape Station';
+UPDATE QCType SET precisionAfterDecimal = -1 WHERE name = 'DNAse Treated';
+UPDATE QCType SET name = 'Qubit' WHERE name = 'QuBit';
+-- EndNoTest
+
+ALTER TABLE LibraryQC ADD CONSTRAINT fk_libraryQc_library FOREIGN KEY (library_libraryId) REFERENCES Library (libraryId);
+ALTER TABLE LibraryQC ADD CONSTRAINT fk_libraryQc_qcType FOREIGN KEY (qcMethod) REFERENCES QCType (qcTypeId);
+
+-- StartNoTest
+INSERT INTO QCType (name, description, qcTarget, units) 
+SELECT 'Insert Size', 'Insert Size', 'Library', 'bp' FROM DUAL
+WHERE NOT EXISTS (SELECT * FROM QCType WHERE qcTarget = 'Library' AND units = 'bp') LIMIT 1;
+
+SELECT qcTypeId INTO @tapeStationId FROM QCType WHERE qcTarget = 'Library' AND units = 'bp'; 
+INSERT INTO LibraryQC (library_libraryId, qcUserName, qcDate, results, qcMethod, insertSize) 
+  SELECT library_libraryId, qcUserName, qcDate, insertSize, @tapeStationId, 1 FROM LibraryQC WHERE insertSize <> 0;
+-- EndNoTest
+
+ALTER TABLE SampleQC CHANGE COLUMN qcUserName qcCreator varchar(255) NOT NULL;
+ALTER TABLE LibraryQC CHANGE COLUMN qcUserName qcCreator varchar(255) NOT NULL;
+ALTER TABLE PoolQC CHANGE COLUMN qcUserName qcCreator varchar(255) NOT NULL;
+ALTER TABLE RunQC CHANGE COLUMN qcUserName qcCreator varchar(255) NOT NULL;
+
+
+-- library_size
+
+ALTER TABLE Library ADD COLUMN dnaSize bigint(20);
+
+UPDATE Library SET dnaSize = (SELECT insertSize FROM LibraryQC WHERE LibraryQC.library_libraryId = Library.libraryId AND insertSize IS NOT NULL AND insertSize != 0 ORDER BY qcDate LIMIT 1);
+
+
