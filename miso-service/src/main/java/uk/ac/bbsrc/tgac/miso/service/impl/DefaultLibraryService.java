@@ -34,8 +34,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -361,10 +361,10 @@ public class DefaultLibraryService implements LibraryService {
     Library managed = libraryDao.get(library.getId());
     authorizationManager.throwIfNotWritable(managed);
     qc.setQcCreator(authorizationManager.getCurrentUsername());
-
+    qc.setLibrary(managed);
     // TODO: update concentration if QC is of relevant type
     libraryQcDao.save(qc);
-    libraryDao.save(library);
+    libraryDao.save(managed);
   }
 
   @Override
