@@ -190,6 +190,16 @@
         <artifactId>groovy-maven-plugin</artifactId>
         <executions>
           <execution>
+            <id>concat-migrate</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <source>${project.basedir}/src/main/resources/db/scripts/concat_migrate.groovy</source>
+            </configuration>
+          </execution>
+          <execution>
             <id>translate-schema</id>
             <phase>generate-test-resources</phase>
             <goals>
