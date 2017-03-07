@@ -478,8 +478,9 @@ public class PoolControllerHelperService {
           StringBuilder sb = new StringBuilder();
 
           Experiment e = new ExperimentImpl();
-          e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType() + "_" + (s.getExperiments().size() + 1));
-          e.setTitle(s.getProject().getName() + " " + r.getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
+          e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType().getName() + "_" + (s.getExperiments().size() + 1));
+          e.setTitle(
+              s.getProject().getName() + " " + r.getPlatformType().getKey() + " " + s.getStudyType().getName() + " experiment (Auto-gen)");
           e.setDescription(s.getProject().getAlias());
           e.setPlatform(r.getSequencerReference().getPlatform());
           e.setStudy(s);

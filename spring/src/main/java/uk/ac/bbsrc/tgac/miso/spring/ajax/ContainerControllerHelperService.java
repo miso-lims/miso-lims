@@ -533,7 +533,8 @@ public class ContainerControllerHelperService {
                 + ". At least one study must be available for each project associated with this Pool.");
           } else {
             for (Study s : studies) {
-              b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
+              b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType().getName()
+                  + ")</option>");
             }
           }
           b.append("</select>");
@@ -583,8 +584,9 @@ public class ContainerControllerHelperService {
       StringBuilder sb = new StringBuilder();
 
       Experiment e = new ExperimentImpl();
-      e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType() + "_" + (s.getExperiments().size() + 1));
-      e.setTitle(s.getProject().getName() + " " + platform.getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
+      e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType().getName() + "_" + (s.getExperiments().size() + 1));
+      e.setTitle(s.getProject().getName() + " " + platform.getPlatformType().getKey() + " " + s.getStudyType().getName()
+          + " experiment (Auto-gen)");
       e.setDescription(s.getProject().getAlias());
       e.setPlatform(platform);
       e.setStudy(s);
