@@ -12,6 +12,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 @Table(name = "SampleStock")
 public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
 
+  private static final long serialVersionUID = 1L;
+
   @Enumerated(EnumType.STRING)
   private StrStatus strStatus = StrStatus.NOT_SUBMITTED;
 

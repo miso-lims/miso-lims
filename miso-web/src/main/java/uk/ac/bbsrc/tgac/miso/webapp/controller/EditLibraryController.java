@@ -71,7 +71,6 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -84,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -92,9 +92,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
@@ -145,6 +147,17 @@ public class EditLibraryController {
   @Autowired
   private KitService kitService;
 
+  @Autowired
+  private NamingScheme namingScheme;
+
+  public NamingScheme getNamingScheme() {
+    return namingScheme;
+  }
+
+  public void setNamingScheme(NamingScheme namingScheme) {
+    this.namingScheme = namingScheme;
+  }
+
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
@@ -175,7 +188,12 @@ public class EditLibraryController {
   private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
-
+  @Value("${miso.display.library.bulk.libraryalias}")
+  private Boolean showLibraryAlias;
+  @Value("${miso.display.library.bulk.description}")
+  private Boolean showDescription;
+  @Value("${miso.display.library.bulk.volume}")
+  private Boolean showVolume;
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
     return metrixEnabled;
@@ -233,6 +251,21 @@ public class EditLibraryController {
     List<LibraryType> types = new ArrayList<>(libraryService.listLibraryTypes());
     Collections.sort(types);
     return types;
+  }
+
+  @ModelAttribute("hideCols")
+  public String populateHideCols() {
+    JSONArray hideCols = new JSONArray();
+    if (!showDescription) {
+      hideCols.add("description");
+    }
+    if (!showVolume) {
+      hideCols.add("volume");
+    }
+    if (!showLibraryAlias) {
+      hideCols.add("libraryAlias");
+    }
+    return hideCols.toString();
   }
 
   @ModelAttribute("maxLengths")
@@ -328,7 +361,7 @@ public class EditLibraryController {
 
   @ModelAttribute("libraryQCUnits")
   public String libraryQCUnits() {
-    return AbstractLibraryQC.UNITS;
+    return LibraryQCImpl.UNITS;
   }
 
   @ModelAttribute("libraryDilutionUnits")
@@ -756,7 +789,7 @@ public class EditLibraryController {
    * used to edit samples with ids from given {sampleIds} sends Dtos objects which will then be used for editing in grid
    */
   @RequestMapping(value = "/bulk/propagate/{sampleIds}", method = RequestMethod.GET)
-  public ModelAndView editPropagateSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
+  public ModelAndView editPropagateSamples(@PathVariable String sampleIds, ModelMap model) throws IOException, MisoNamingException {
     try {
       List<Long> idList = getIdsFromString(sampleIds);
       ObjectMapper mapper = new ObjectMapper();
@@ -775,6 +808,12 @@ public class EditLibraryController {
           hasPlain = true;
         }
         LibraryDto library = isDetailedSampleEnabled() ? new DetailedLibraryDto() : new LibraryDto();
+        if (namingScheme.hasLibraryAliasGenerator()) {
+          Library tempLibrary = new LibraryImpl();
+          tempLibrary.setSample(sample);
+          final String libraryAlias = namingScheme.generateLibraryAlias(tempLibrary);
+          library.setAlias(libraryAlias);
+        }
         library.setParentSampleId(sample.getId());
         library.setParentSampleAlias(sample.getAlias());
 
@@ -787,6 +826,32 @@ public class EditLibraryController {
         throw new IOException("Cannot mix plain and detailed samples.");
       }
 
+      libraryDtos.sort(new Comparator<LibraryDto>() {
+
+        @Override
+        public int compare(LibraryDto o1, LibraryDto o2) {
+          int rtn = 0;
+          if (o1 == null || o2 == null || o1.getParentSampleAlias() == null || o2.getParentSampleAlias() == null) {
+            throw new RuntimeException("Cannot compare null Objects!");
+          }
+          String alias1 = o1.getParentSampleAlias();
+          String alias2 = o2.getParentSampleAlias();
+          String regex = "\\D";
+          List<String> alias1Nums = new ArrayList<>(Arrays.asList(alias1.split(regex)));
+          List<String> alias2Nums = new ArrayList<>(Arrays.asList(alias2.split(regex)));
+
+          alias1Nums.removeAll(Arrays.asList(""));
+          alias2Nums.removeAll(Arrays.asList(""));
+          if (alias1Nums.size() != alias2Nums.size()) {
+            // give up, just compare by default.
+            rtn = alias1.compareTo(alias2);
+          }
+          for (int i = 0; i < alias1Nums.size() && rtn == 0; i++) {
+            rtn = Integer.compare(Integer.valueOf(alias1Nums.get(i)), Integer.valueOf(alias2Nums.get(i)));
+          }
+          return rtn;
+        }
+      });
       model.put("title", "Bulk Create Libraries");
       model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
       model.put("platformTypes", mapper.writeValueAsString(populatePlatformTypes(Collections.<String> emptyList())));
@@ -795,6 +860,7 @@ public class EditLibraryController {
       model.put("libraryDesignsJSON", libraryDesigns.toString());
       JSONArray libraryDesignCodes = new JSONArray();
       libraryDesignCodes.addAll(requestManager.listLibraryDesignCodes());
+
       model.put("libraryDesignCodesJSON", libraryDesignCodes.toString());
       model.put("method", "Propagate");
       return new ModelAndView("/pages/bulkEditLibraries.jsp", model);

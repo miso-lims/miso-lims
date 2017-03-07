@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -57,8 +58,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @Entity
 @Table(name = "Indices")
-public class Index implements Nameable {
+public class Index implements Nameable, Serializable {
 
+  private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
 
   public static void sort(final List<Index> indices) {

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
   ~ Copyright (c) 2017. Earlham Institute, Norwich, UK, and
-  ~ the Ontario Institute for Cancer Research, Ontario, Canada. 
-  ~ MISO project contacts: Robert Davey @ EI (formerly TGAC), 
-  ~ Morgan Taschuk @ OICR 
+  ~ the Ontario Institute for Cancer Research, Ontario, Canada.
+  ~ MISO project contacts: Robert Davey @ EI (formerly TGAC),
+  ~ Morgan Taschuk @ OICR
   ~
   ~ **********************************************************************
   ~
-  ~ This file is part of MISO. 
+  ~ This file is part of MISO.
   ~
-  ~ MISO is free software: you can redistribute it and/or modify 
-  ~ it under the terms of the GNU General Public License as published by 
-  ~ the Free Software Foundation, either version 3 of the License, or 
-  ~ (at your option) any later version. 
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
   ~
-  ~ MISO is distributed in the hope that it will be useful, 
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
   ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  ~ GNU General Public License for more details. 
+  ~ GNU General Public License for more details.
   ~
-  ~ You should have received a copy of the GNU General Public License 
+  ~ You should have received a copy of the GNU General Public License
   ~ along with MISO. If not, see <http://www.gnu.org/licenses />.
   ~
   ~ ********************************************************************** -->
@@ -27,7 +27,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
-  <version>0.2.51-oicr-SNAPSHOT</version>
+  <version>0.2.52-oicr-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MISO Framework</name>
   <url>http://www.tgac.ac.uk/miso</url>

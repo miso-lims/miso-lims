@@ -332,6 +332,7 @@ public class ERASubmissionManager implements SubmissionManager {
             List<LibraryQC> qcs = new ArrayList<>(relevantLibrary.getLibraryQCs());
             int insert = 0;
             for (LibraryQC qc : qcs) {
+
               insert += qc.getInsertSize();
             }
             layout.setAttribute("NOMINAL_LENGTH", String.valueOf(insert / qcs.size()));

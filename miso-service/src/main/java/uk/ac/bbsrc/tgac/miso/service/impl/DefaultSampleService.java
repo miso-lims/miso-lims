@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
@@ -31,16 +32,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl.IdentityBuilder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
@@ -100,6 +105,12 @@ public class DefaultSampleService implements SampleService {
   private TissueMaterialDao tissueMaterialDao;
 
   @Autowired
+  private SampleQcStore sampleQcDao;
+
+  @Autowired
+  private SecurityManager securityManager;
+
+  @Autowired
   private LabService labService;
 
   @Autowired
@@ -156,6 +167,14 @@ public class DefaultSampleService implements SampleService {
 
   public void setTissueMaterialDao(TissueMaterialDao tissueMaterialDao) {
     this.tissueMaterialDao = tissueMaterialDao;
+  }
+
+  public void setSampleQcDao(SampleQcStore sampleQcDao) {
+    this.sampleQcDao = sampleQcDao;
+  }
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
   }
 
   public void setLabService(LabService labService) {
@@ -574,6 +593,7 @@ public class DefaultSampleService implements SampleService {
       dTarget.setArchived(dSource.getArchived());
       dTarget.setGroupDescription(dSource.getGroupDescription());
       dTarget.setGroupId(dSource.getGroupId());
+      dTarget.setDetailedQcStatus(dSource.getDetailedQcStatus());
       dTarget.setDetailedQcStatusNote(dSource.getDetailedQcStatusNote());
 
       if (isIdentitySample(target)) {
@@ -723,4 +743,40 @@ public class DefaultSampleService implements SampleService {
     sampleDao.save(managed);
   }
 
+  @Override
+  public void addQc(Sample sample, SampleQC qc) throws IOException {
+    Sample managed = get(sample.getId());
+    authorizationManager.throwIfNotWritable(managed);
+    qc.setQcCreator(authorizationManager.getCurrentUsername());
+
+    // TODO: update concentration and/or volume if QC is of relevant type
+    managed.addQc(qc);
+    sampleDao.save(managed);
+  }
+
+  @Override
+  public void deleteQc(Sample sample, Long qcId) throws IOException {
+    if (qcId == null || qcId.equals(SampleQCImpl.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Sample QC");
+    }
+    Sample managed = sampleDao.get(sample.getId());
+    authorizationManager.throwIfNotWritable(managed);
+    SampleQC deleteQc = null;
+    for (SampleQC qc : managed.getSampleQCs()) {
+      if (qc.getId() == qcId) {
+        deleteQc = qc;
+        break;
+      }
+    }
+    if (deleteQc == null) throw new IOException("QC " + qcId + " not found for Sample " + sample.getId());
+    authorizationManager.throwIfNonAdminOrMatchingOwner(securityManager.getUserByLoginName(deleteQc.getQcCreator()));
+    managed.getSampleQCs().remove(deleteQc);
+    sampleQcDao.remove(deleteQc);
+    sampleDao.save(managed);
+  }
+
+  @Override
+  public Collection<QcType> listSampleQcTypes() throws IOException {
+    return sampleQcDao.listAllSampleQcTypes();
+  }
 }

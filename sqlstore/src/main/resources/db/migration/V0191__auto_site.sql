@@ -1,3 +1,5 @@
+-- all_targeted_sequencing
+-- StartNoTest
 -- StartNoTest
 CALL addTargetedSequencing('Agilent SureSelectXT MethylSeq', 'TGL', 'Agilent SureSelectXT MethylSeq', 0);
 CALL addTargetedSequencing('SureSelect Clinical Research Exome (Cat#: 5190-7338)','GSLE Legacy','Agilent SureSelect XT',0);
@@ -60,3 +62,5 @@ CALL addTargetedSequencing('Thunderbolts','GSLE Legacy','Thunderbolt Cancer Pane
 CALL addTargetedSequencing('TruSeq Amplicon - Cancer Panel','GSLE Legacy','TruSeq Amplicon - Cancer Panel',0);
 CALL addTargetedSequencing('SimSenSeq_JCK2_panel_1','GSLE Legacy','GA_PE',0);
 -- EndNoTest
+-- EndNoTest
+

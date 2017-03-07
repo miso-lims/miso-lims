@@ -27,26 +27,29 @@ var Container = Container || {
     var barcode = jQuery("input", jQuery(t).parent()).val();
     var seqRef = jQuery('#sequencerReference :checked').val();
     var container_cId = jQuery('input[name=container_cId]').val();
-    if (!Utils.validation.isNullCheck(barcode)) {
-      Fluxion.doAjax(
-        'containerControllerHelperService',
-        'lookupContainer',
-        {
-          'barcode': barcode,
-          'sequencerReferenceId':seqRef,
-          'container_cId':container_cId,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': self.processLookup
-        }
-      );
-    }
+    Fluxion.doAjax(
+      'containerControllerHelperService',
+      'lookupContainer',
+      {
+        'barcode': barcode,
+        'sequencerReferenceId':seqRef,
+        'container_cId':container_cId,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': self.processLookup
+      }
+    );
   },
 
   processLookup: function (json) {
+    if (json.unique) {
+      jQuery('#partitionErrorDiv').html(json.unique);
+      jQuery('#partitionErrorDiv').addClass('parsley-success').removeClass('parsley-custom-error-message');
+    }
     if (json.error) {
       jQuery('#partitionErrorDiv').html(json.error);
+      jQuery('#partitionErrorDiv').addClass('parsley-custom-error-message').removeClass('parsley-success');
     }
     else {
       if (json.verify) {
@@ -118,6 +121,7 @@ var Container = Container || {
     // Sequencer select field validation
     jQuery('#sequencerReference').attr('class', 'form-control');
     jQuery('#sequencerReference').attr('required', 'true');
+    jQuery('#sequencerReference').attr('min', 1);
     jQuery('#sequencerReference').attr('data-parsley-error-message', 'You must select a Sequencer.');
     jQuery('#sequencerReference').attr('data-parsley-errors-container', '#sequencerReferenceError');
   
@@ -242,7 +246,7 @@ Container.ui = {
   },
 
   populateContainerOptions: function (form) {
-    if (form.value !== 0) {
+    if (form.value != 0) {
       Fluxion.doAjax(
         'containerControllerHelperService',
         'populateContainerOptions',
@@ -261,6 +265,8 @@ Container.ui = {
           }
         }
       );
+    } else {
+      
     }
   },
 
@@ -430,7 +436,7 @@ Container.ui = {
       }
     }).fnSetFilteringDelay();
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Create Sequencing Container</button>");
+    jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sequencing Container</button>");
   }
 };
 

@@ -75,8 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
@@ -182,6 +180,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private Box box;
   @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")
   private String position;
+
+  private Integer dnaSize;
 
   @Override
   public String getBoxPosition() {
@@ -313,14 +313,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public void addQc(LibraryQC libraryQc) throws MalformedLibraryQcException {
+  public void addQc(LibraryQC libraryQc) {
     this.libraryQCs.add(libraryQc);
-    try {
-      libraryQc.setLibrary(this);
-    } catch (final MalformedLibraryException e) {
-      // TODO : This doesn't throw any exceptions. Remove.
-      log.error("add QC", e);
-    }
+    libraryQc.setLibrary(this);
   }
 
   @Override
@@ -547,6 +542,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public Integer getDnaSize() {
+    return dnaSize;
+  }
+
+  @Override
+  public void setDnaSize(Integer dnaSize) {
+    this.dnaSize = dnaSize;
+  }
+
+  @Override
   public int hashCode() {
     return new HashCodeBuilder(3, 33)
         .appendSuper(super.hashCode())
@@ -591,4 +596,5 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(qcPassed, other.qcPassed)
         .isEquals();
   }
+
 }

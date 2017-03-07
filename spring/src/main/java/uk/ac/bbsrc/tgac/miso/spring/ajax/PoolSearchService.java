@@ -47,6 +47,7 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -186,17 +187,25 @@ public class PoolSearchService {
     String lowquality = p.getHasLowQualityMembers() ? " lowquality" : "";
     b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight" + lowquality
         + "\"' onMouseOut='this.className=\"dashboard" + lowquality + "\"' class='dashboard" + lowquality + "'>");
+    if (p.getHasLowQualityMembers()) {
+      b.append("<span class=\"lowquality-right\">Contains low-quality library</span>");
+    }
+
     if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationDate() + "</b><br/>");
     } else {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
     }
 
-    Collection<LibraryDilution> ds = p.getPoolableElements();
-    for (LibraryDilution d : ds) {
-      b.append("<span" + (d.getLibrary().isLowQuality() ? " class='lowquality'" : "") + ">" + d.getName() + " ("
-          + d.getLibrary().getSample().getProject().getAlias() + ") : " + d.getConcentration() + " "
-          + d.getUnits() + "</span><br/>");
+    List<LibraryDilution> ds = new ArrayList<>(p.getPoolableElements());
+    for (int i = 0; i < Math.min(ds.size(), 5); i++) {
+      Project proj = ds.get(i).getLibrary().getSample().getProject();
+      b.append("<span" + (ds.get(i).getLibrary().isLowQuality() ? " class='lowquality'" : "") + ">" + ds.get(i).getName() + " ("
+          + (proj.getShortName() == null ? proj.getAlias() : proj.getShortName()) + ") : " + ds.get(i).getConcentration() + " "
+          + ds.get(i).getUnits() + "</span><br/>");
+    }
+    if (ds.size() > 5) {
+      b.append("<span>...and " + (ds.size() - 5) + " more</span><br/>");
     }
 
     b.append("<br/><i>");

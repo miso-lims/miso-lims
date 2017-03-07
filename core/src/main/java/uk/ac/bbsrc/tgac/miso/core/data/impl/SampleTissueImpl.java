@@ -17,6 +17,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 @Table(name = "SampleTissue")
 public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue {
 
+  private static final long serialVersionUID = 1L;
+
   private String externalInstituteIdentifier;
 
   @OneToOne(targetEntity = LabImpl.class)

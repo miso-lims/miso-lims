@@ -31,7 +31,7 @@
       <sessionConversation:insertSessionConversationId attributeName="group"/>
 
       <h1><c:choose><c:when
-          test="${not empty group.groupId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
+          test="${group.groupId != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Group
         <button onclick="return Group.validateGroup();" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>

@@ -84,7 +84,7 @@
       <li>
         <div class="breadcrumbsbubbleInfo">
           <div class="trigger">
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.alias}</a>
+            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${detailedSample ? sample.project.shortName : sample.project.alias}</a>
           </div>
           <div class="breadcrumbspopup">
               ${sample.project.name}
@@ -187,7 +187,10 @@
               <option value="">SELECT</option>
               <c:forEach items="${accessibleProjects}" var="proj">
                 <option value="${proj.id}" <c:if test="${proj.id == sample.project.id}">selected="selected"</c:if>>
-                    ${proj.name}: ${proj.alias}
+                  <c:choose>
+                    <c:when test="${detailedSample}">${proj.shortName} (${proj.name})</c:when>
+                    <c:otherwise>{proj.name}: ${proj.alias}</c:otherwise>
+                  </c:choose>
                 </option>
               </c:forEach>
             </form:select>
@@ -310,7 +313,7 @@
       <td><form:input id="volume" path="volume"/></td>
     </tr>
     <tr>
-      <td>Discarded:</td>
+      <td><label for="discarded">Discarded:</label></td>
       <td><form:checkbox id="discarded" path="discarded"/></td>
     </tr>
     <tr>
@@ -618,7 +621,7 @@
             </tr>
             <c:if test="${sample.sampleClass.DNAseTreatable}">
               <tr>
-                <td class="h">DNAse Treated:</td>
+                <td class="h"><label for="DNAseTreated">DNAse Treated:</label></td>
                 <td><form:checkbox id="DNAseTreated" path="DNAseTreated"/></td>
               </tr>
             </c:if>
@@ -887,6 +890,13 @@
         </table>
         <input type='hidden' id='sampleId' name='id' value='${sample.id}'/>
       </form>
+      <script type="text/javascript">
+      jQuery(document).ready(function () {
+        jQuery('#sampleQcTable').tablesorter();
+        var totalQcsCount = jQuery('#sampleQcTable>tbody>tr:visible').length;
+        jQuery('#qcsTotalCount').html(totalQcsCount + (totalQcsCount == 1 ? ' QC' : ' QCs'));
+      });
+      </script>
     </div>
   <br/>
   <a id="library"></a>
@@ -941,10 +951,7 @@
     </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
-    	// display sample QCs table, and count samples and libraries
-      jQuery('#sampleQcTable').tablesorter();
-      var totalQcsCount = jQuery('#sampleQcTable>tbody>tr:visible').length;
-      jQuery('#qcsTotalCount').html(totalQcsCount + (totalQcsCount == 1 ? ' QC' : ' QCs'));
+    	// count libraries
       var visibleLibsCount = jQuery('#library_table>tbody>tr:visible').length;
       jQuery('#librariesTotalCount').html(visibleLibsCount + (visibleLibsCount == 1 ? ' Library' : ' Libraries'));
 

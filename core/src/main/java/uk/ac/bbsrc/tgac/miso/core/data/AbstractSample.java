@@ -67,8 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -268,13 +266,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public void addQc(SampleQC sampleQc) throws MalformedSampleQcException {
+  public void addQc(SampleQC sampleQc) {
     this.sampleQCs.add(sampleQc);
-    try {
-      sampleQc.setSample(this);
-    } catch (MalformedSampleException e) {
-      log.error("add QC", e);
-    }
+    sampleQc.setSample(this);
   }
 
   @Override

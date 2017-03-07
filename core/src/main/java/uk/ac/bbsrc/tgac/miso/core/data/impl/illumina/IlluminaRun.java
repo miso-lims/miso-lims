@@ -54,6 +54,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  * @since 0.0.2
  */
 public class IlluminaRun extends RunImpl {
+
+  private static final long serialVersionUID = 1L;
   private static final Logger log = LoggerFactory.getLogger(IlluminaRun.class);
 
   public IlluminaRun() {

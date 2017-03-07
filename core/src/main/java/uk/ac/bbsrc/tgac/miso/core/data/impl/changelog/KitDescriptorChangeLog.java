@@ -19,6 +19,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
     @Index(name = "KitDescriptorChangeLog_kitDescriptorId_changeTime", columnNames = { "kitDescriptorId", "changeTime" }) })
 public class KitDescriptorChangeLog extends AbstractChangeLog {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long kitDescriptorChangeLogId;

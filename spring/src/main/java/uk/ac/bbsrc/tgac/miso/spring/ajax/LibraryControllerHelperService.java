@@ -79,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -91,6 +92,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
@@ -192,6 +194,8 @@ public class LibraryControllerHelperService {
   private LibraryService libraryService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private KitService kitService;
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -571,7 +575,11 @@ public class LibraryControllerHelperService {
 
     Map<String, Object> targetedSequencingTypes = Maps.newHashMap();
     try {
-      targetedSequencingTypes.put("targetedSequencings", getTargetedSequencingTypes(libraryPrepKitId));
+      if (libraryPrepKitId != null) {
+        targetedSequencingTypes.put("targetedSequencings", getTargetedSequencingTypes(libraryPrepKitId));
+      } else {
+        targetedSequencingTypes.put("targetedSequencings", getTargetedSequencingTypes());
+      }
       return JSONUtils.JSONObjectResponse(targetedSequencingTypes);
     } catch (IOException e) {
       log.error("Cannot list all Targeted Sequencing entries ", e);
@@ -579,26 +587,37 @@ public class LibraryControllerHelperService {
     return JSONUtils.SimpleJSONError("Cannot list all Targeted Sequencing entries");
   }
 
-  public JSONArray getTargetedSequencingTypes(Long libraryPrepKitId) throws IOException {
+  public JSONArray getTargetedSequencingTypes() throws IOException {
     Collection<TargetedSequencing> targetedSequencings = getNonArchivedTargetedSequencing(
         requestManager.listAllTargetedSequencing());
     JSONArray fullTargetedSequencingCollection = new JSONArray();
-    JSONArray targetedSequencingByKit = new JSONArray();
+
     for (TargetedSequencing targetedSequencing : targetedSequencings) {
+      for (KitDescriptor kitDescriptor : targetedSequencing.getKitDescriptors()) {
+        Map<String, Object> targetedSequencingMap = Maps.newHashMap();
+        targetedSequencingMap.put("targetedSequencingId", targetedSequencing.getId());
+        targetedSequencingMap.put("alias", targetedSequencing.getAlias());
+        targetedSequencingMap.put("kitDescriptorId", kitDescriptor.getId());
+        fullTargetedSequencingCollection.add(targetedSequencingMap);
+      }
+    }
+
+    return fullTargetedSequencingCollection;
+  }
+
+  public JSONArray getTargetedSequencingTypes(Long libraryPrepKitId) throws IOException {
+    JSONArray targetedSequencingByKit = new JSONArray();
+    
+    for (TargetedSequencing targetedSequencing : getNonArchivedTargetedSequencing(
+        kitService.getKitDescriptorById(libraryPrepKitId).getTargetedSequencing())) {
       Map<String, Object> targetedSequencingMap = Maps.newHashMap();
       targetedSequencingMap.put("targetedSequencingId", targetedSequencing.getId());
       targetedSequencingMap.put("alias", targetedSequencing.getAlias());
-      targetedSequencingMap.put("kitDescriptorId", targetedSequencing.getKitDescriptor().getId());
-      fullTargetedSequencingCollection.add(targetedSequencingMap);
-      if (libraryPrepKitId != null && libraryPrepKitId.equals(targetedSequencing.getKitDescriptor().getId())) {
-        targetedSequencingByKit.add(targetedSequencingMap);
-      }
+      targetedSequencingMap.put("kitDescriptorId", libraryPrepKitId);
+      targetedSequencingByKit.add(targetedSequencingMap);
     }
-    if (libraryPrepKitId != null) {
-      return targetedSequencingByKit;
-    } else {
-      return fullTargetedSequencingCollection;
-    }
+
+    return targetedSequencingByKit;
   }
 
   private Collection<TargetedSequencing> getNonArchivedTargetedSequencing(Collection<TargetedSequencing> targetedSequencings) {

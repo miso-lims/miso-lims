@@ -28,8 +28,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
-
 /**
  * A QC that is specifically carried out on a given {@link Sample}
  * 
@@ -53,10 +51,8 @@ public interface SampleQC extends QC {
    * 
    * @param sample
    *          sample.
-   * @throws MalformedSampleException
-   *           when the Sample being set is not valid
    */
-  public void setSample(Sample sample) throws MalformedSampleException;
+  public void setSample(Sample sample);
 
   /**
    * Returns the results of this QC object.

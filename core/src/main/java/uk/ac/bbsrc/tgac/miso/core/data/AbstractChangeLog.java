@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -15,7 +16,9 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 @MappedSuperclass
-public abstract class AbstractChangeLog implements ChangeLog {
+public abstract class AbstractChangeLog implements ChangeLog, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   @Column(length = 500)
   private String columnsChanged;

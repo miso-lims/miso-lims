@@ -173,13 +173,13 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Ready To Run</td>
+    <td class="h"><label for="readyToRun">Ready To Run:</label></td>
     <c:choose>
     <c:when test="${pool.id != 0}">
-      <td><form:checkbox path="readyToRun"/></td>
+      <td><form:checkbox path="readyToRun" id="readyToRun"/></td>
     </c:when>
     <c:otherwise>
-      <td><form:checkbox path="readyToRun" checked="checked" /></td>
+      <td><form:checkbox path="readyToRun" checked="checked" id="readyToRun"/></td>
     </c:otherwise>
     </c:choose>
   </tr>
@@ -189,7 +189,7 @@
     <td><form:input id="volume" path="volume"/></td>
   </tr>
   <tr>
-    <td>Discarded:</td>
+    <td><label for="discarded">Discarded:</label></td>
     <td><form:checkbox id="discarded" path="discarded"/></td>
   </tr>
   <tr>

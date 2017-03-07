@@ -122,8 +122,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
    * Construct a new SequencerPartitionContainer with a default empty SecurityProfile
    */
   public SequencerPartitionContainerImpl() {
-    setSecurityProfile(new SecurityProfile());
-    setPartitionLimit(DEFAULT_PARTITION_LIMIT);
+    this(new SecurityProfile());
   }
 
   /**
@@ -132,7 +131,12 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
    * @param user of type User
    */
   public SequencerPartitionContainerImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
+    this(new SecurityProfile(user));
+  }
+
+  private SequencerPartitionContainerImpl(SecurityProfile securityProfile) {
+    setSecurityProfile(securityProfile);
+    setPartitionLimit(DEFAULT_PARTITION_LIMIT);
   }
 
   @Override
@@ -299,6 +303,9 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @Override
   public void setPartitions(List<Partition> partitions) {
     this.partitions = partitions;
+    for (Partition p : partitions) {
+      p.setSequencerPartitionContainer(this);
+    }
     Collections.sort(partitions, partitionNumberComparator);
   }
 

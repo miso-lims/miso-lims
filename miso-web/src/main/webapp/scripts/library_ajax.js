@@ -84,6 +84,11 @@ var Library = Library || {
     jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
     
+    // Library size validation
+    jQuery('#dnaSize').attr('class', 'form-control');
+    jQuery('#dnaSize').attr('data-parsley-maxlength', '10');
+    jQuery('#dnaSize').attr('data-parsley-type', 'number');
+
     // Volume validation
     jQuery('#volume').attr('class', 'form-control');
     jQuery('#volume').attr('data-parsley-maxlength', '10');
@@ -1122,6 +1127,9 @@ Library.ui = {
           "sTitle": "Location",
           "mData": "locationLabel",
           "iSortPriority": 0,
+          "mRender": function (data, type, full) {
+            return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+          },
           "bSortable": false
         },
         {

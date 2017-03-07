@@ -47,18 +47,16 @@ public class QcType implements Comparable<QcType>, Serializable {
 
   public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryTypeId */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long qcTypeId = QcType.UNSAVED_ID;
-  /** Field name */
   private String name;
-  /** Field description */
   private String description;
-  /** Field qcTarget */
+  /** Refers to the entity to which this QcType can be applied (e.g. Sample, Pool, Run) */
   private String qcTarget;
-  /** Field units */
   private String units;
+  private Integer precisionAfterDecimal;
+  private boolean archived;
 
   /**
    * Returns the qcTypeId of this QcType object.
@@ -155,6 +153,44 @@ public class QcType implements Comparable<QcType>, Serializable {
     this.units = units;
   }
 
+  /**
+   * Represents the number of digits after a decimal that this QcType is capable of offering.
+   * A precision of zero represents an Integer.
+   * A precision of -1 represents a boolean. A QC performed with a boolean precision QcType should have a result of either 1 or 0.
+   * 
+   * @return Integer precisionAfterDecimal
+   */
+  public Integer getPrecisionAfterDecimal() {
+    return precisionAfterDecimal;
+  }
+
+  /**
+   * Sets the precision of this QcType object.
+   * 
+   * @param precisionAfterDecimal
+   */
+  public void setPrecisionAfterDecimal(Integer precisionAfterDecimal) {
+    this.precisionAfterDecimal = precisionAfterDecimal;
+  }
+
+  /**
+   * Returns whether this QcType is archived
+   * 
+   * @return boolean archived
+   */
+  public boolean isArchived() {
+    return archived;
+  }
+
+  /**
+   * Sets the archived value for this QcType object.
+   * 
+   * @param archived
+   */
+  public void setArchived(boolean archived) {
+    this.archived = archived;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj == null) return false;
@@ -163,7 +199,7 @@ public class QcType implements Comparable<QcType>, Serializable {
     QcType them = (QcType) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    return getName().equals(them.getName());
+    return getName().equals(them.getName()) && getQcTarget().equals(them.getQcTarget());
   }
 
   @Override

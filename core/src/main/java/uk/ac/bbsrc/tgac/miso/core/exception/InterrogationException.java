@@ -33,6 +33,8 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class InterrogationException extends Exception {
+  private static final long serialVersionUID = 1L;
+
   public InterrogationException(String s) {
     super(s);
   }

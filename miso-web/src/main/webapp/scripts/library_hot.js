@@ -6,7 +6,8 @@ Library.hot = {
   libraryData: null,
   showQcs: false,
   libraryTypeAliases: {},
-  
+  hideCols: [],
+
   getLibraryTypeAliasLists: function () {
     var usedTypes = Library.hot.librariesJSON.map(function (lib) {
       return lib.libraryTypeId;
@@ -189,6 +190,7 @@ Library.hot = {
     indexFamilyName: '',
     index1Label: '',
     index2Label: '',
+    dnaSize: null,
     volume: null,
     kitDescriptorId: null,
     kitDescriptorName: null,
@@ -265,7 +267,7 @@ Library.hot = {
         data: 'alias',
         validator: Hot.requiredText,
         renderer: Hot.requiredTextRenderer,
-        include: true
+        include: !(Library.hot.hideCols.indexOf("libraryAlias") > -1)
       },
       {
         header: 'Sample Alias',
@@ -282,7 +284,7 @@ Library.hot = {
       {
         header: 'Description',
         data: 'description',
-        include: true
+        include: !(Library.hot.hideCols.indexOf("description") > -1)
       },
       {
         header: 'Design',
@@ -377,11 +379,17 @@ Library.hot = {
         include: true
       },
       {
+        header: 'Size (bp)',
+        data: 'dnaSize',
+        type: 'numeric',
+        include: true
+      },
+      {
         header: 'Vol. (&#181;l)',
         data: 'volume',
         type: 'numeric',
         format: '0.0',
-        include: true
+        include: !(Library.hot.hideCols.indexOf("volume") > -1)
       },
       {
         header: 'Kit',
@@ -634,6 +642,7 @@ Library.hot = {
         }
       }
 
+      lib.dnaSize = obj.dnaSize;
       lib.volume = obj.volume;
 
       if (Hot.detailedSample) {

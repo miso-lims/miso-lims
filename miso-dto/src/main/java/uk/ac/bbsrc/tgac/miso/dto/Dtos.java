@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -33,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -44,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
@@ -63,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
@@ -73,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
@@ -88,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 public class Dtos {
@@ -521,6 +527,7 @@ public class Dtos {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
+    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     dto.setSampleType(from.getSampleType());
     if (from.getReceivedDate() != null) {
       dto.setReceivedDate(dateTimeFormatter.print(from.getReceivedDate().getTime()));
@@ -540,6 +547,9 @@ public class Dtos {
     dto.setDiscarded(from.isDiscarded());
     dto.setLastModified(getDateAsString(from.getLastModified()));
 
+    if (from.getSampleQCs() != null && !from.getSampleQCs().isEmpty()) {
+      dto.setQcs(asSampleQcDtos(from.getSampleQCs()));
+    }
     return dto;
   }
 
@@ -592,6 +602,12 @@ public class Dtos {
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());
       to.getProject().setProjectId(from.getProjectId());
+    }
+
+    if (from.getQcs() != null && !from.getQcs().isEmpty()) {
+      for (SampleQcDto qcDto : from.getQcs()) {
+        to.addQc(to(qcDto));
+      }
     }
     return to;
   }
@@ -1001,10 +1017,15 @@ public class Dtos {
       }
     }
     dto.setVolume(from.getVolume());
+    dto.setDnaSize(from.getDnaSize());
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
+    if (from.getLibraryQCs() != null && !from.getLibraryQCs().isEmpty()) {
+      dto.setQcs(asLibraryQcDtos(from.getLibraryQCs()));
+    }
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
+    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     return dto;
   }
 
@@ -1023,7 +1044,10 @@ public class Dtos {
     } else {
       to = new LibraryImpl();
     }
-    to.setId(from.getId());
+    if (from.getId() != null) {
+      to.setId(from.getId());
+    }
+
     to.setAlias(from.getAlias());
     to.setName(from.getName());
     to.setDescription(from.getDescription());
@@ -1066,6 +1090,13 @@ public class Dtos {
       to.setIndices(indices);
     }
     to.setVolume(from.getVolume());
+    to.setDnaSize(from.getDnaSize());
+
+    if (from.getQcs() != null && !from.getQcs().isEmpty()) {
+      for (LibraryQcDto qcDto : from.getQcs()) {
+        to.addQc(to(qcDto));
+      }
+    }
 
     return to;
   }
@@ -1177,11 +1208,9 @@ public class Dtos {
     } catch (ParseException e) {
       // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
     }
-    if (from.getTargetedSequencingId() != null) {
-      TargetedSequencing ts = new TargetedSequencing();
-      ts.setId(from.getTargetedSequencingId());
-      to.setTargetedSequencing(ts);
-    }
+    TargetedSequencing ts = new TargetedSequencing();
+    if (from.getTargetedSequencingId() != null) ts.setId(from.getTargetedSequencingId());
+    to.setTargetedSequencing(ts);
     return to;
   }
 
@@ -1211,6 +1240,7 @@ public class Dtos {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
+    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     return dto;
   }
 
@@ -1279,6 +1309,92 @@ public class Dtos {
     List<ContainerDto> dtoList = new ArrayList<>();
     for (SequencerPartitionContainer container : containerSubset) {
       dtoList.add(asDto(container));
+    }
+    return dtoList;
+  }
+
+  private static QcTypeDto asDto(QcType from) {
+    QcTypeDto dto = new QcTypeDto();
+    dto.setId(from.getQcTypeId());
+    dto.setName(from.getName());
+    dto.setDescription(from.getDescription());
+    dto.setQcTarget(from.getQcTarget());
+    dto.setUnits(from.getUnits());
+    dto.setPrecisionAfterDecimal(from.getPrecisionAfterDecimal());
+    dto.setArchived(from.isArchived());
+    return dto;
+  }
+
+  private static QcType to(QcTypeDto from) {
+    QcType to = new QcType();
+    to.setQcTypeId(from.getId());
+    to.setName(from.getName());
+    to.setDescription(from.getDescription());
+    to.setQcTarget(from.getQcTarget());
+    to.setUnits(from.getUnits());
+    to.setPrecisionAfterDecimal(from.getPrecisionAfterDecimal());
+    to.setArchived(from.isArchived());
+    return to;
+  }
+
+  private static SampleQcDto asDto(SampleQC from) {
+    SampleQcDto dto = new SampleQcDto();
+    dto.setId(from.getId());
+    dto.setQcDate(dateFormatter.print(new DateTime(from.getQcDate())));
+    dto.setQcCreator(from.getQcCreator());
+    dto.setQcType(asDto(from.getQcType()));
+    dto.setResults(from.getResults());
+    dto.setSampleId(from.getSample().getId());
+    return dto;
+  }
+
+  private static SampleQC to(SampleQcDto from) {
+    SampleQC to = new SampleQCImpl();
+    to.setId(from.getId());
+    to.setQcType(to(from.getQcType()));
+    to.setResults(from.getResults());
+    return to;
+  }
+
+  private static LibraryQcDto asDto(LibraryQC from) {
+    LibraryQcDto dto = new LibraryQcDto();
+    dto.setId(from.getId());
+    dto.setQcDate(dateFormatter.print(new DateTime(from.getQcDate())));
+    dto.setQcCreator(from.getQcCreator());
+    dto.setQcType(asDto(from.getQcType()));
+    dto.setResults(from.getResults());
+    dto.setLibraryId(from.getLibrary().getId());
+    return dto;
+  }
+
+  private static LibraryQC to(LibraryQcDto from) {
+    LibraryQC to = new LibraryQCImpl();
+    to.setId(from.getId());
+    to.setQcType(to(from.getQcType()));
+    to.setResults(from.getResults());
+    return to;
+  }
+
+  public static List<SampleQcDto> asSampleQcDtos(Collection<SampleQC> qcSubset) {
+    List<SampleQcDto> dtoList = new ArrayList<>();
+    for (SampleQC qc : qcSubset) {
+      dtoList.add(asDto(qc));
+    }
+    return dtoList;
+  }
+
+  public static List<LibraryQcDto> asLibraryQcDtos(Collection<LibraryQC> qcSubset) {
+    List<LibraryQcDto> dtoList = new ArrayList<>();
+    for (LibraryQC qc : qcSubset) {
+      dtoList.add(asDto(qc));
+    }
+    return dtoList;
+  }
+
+  public static List<QcTypeDto> asQcTypeDtos(Collection<QcType> qcTypeSubset) {
+    List<QcTypeDto> dtoList = new ArrayList<>();
+    for (QcType qcType : qcTypeSubset) {
+      dtoList.add(asDto(qcType));
     }
     return dtoList;
   }

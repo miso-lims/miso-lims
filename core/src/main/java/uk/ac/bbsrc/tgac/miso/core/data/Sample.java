@@ -34,7 +34,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -200,10 +199,8 @@ public interface Sample
    * 
    * @param sampleQc
    *          of type SampleQC
-   * @throws MalformedSampleQcException
-   *           when the SampleQC registered is not valid
    */
-  public void addQc(SampleQC sampleQc) throws MalformedSampleQcException;
+  public void addQc(SampleQC sampleQc);
 
   /**
    * Returns the sampleType of this Sample object.

@@ -62,7 +62,6 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -76,8 +75,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
@@ -177,7 +176,7 @@ public class EditProjectController {
 
   @ModelAttribute("sampleQCUnits")
   public String sampleQCUnits() throws IOException {
-    return AbstractSampleQC.UNITS;
+    return SampleQCImpl.UNITS;
   }
 
   @ModelAttribute("poolConcentrationUnits")
@@ -217,11 +216,7 @@ public class EditProjectController {
     Collections.sort(libraries, new AliasComparator<>());
     for (Library l : libraries) {
       for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
-        try {
-          l.addQc(qc);
-        } catch (MalformedLibraryQcException e) {
-          throw new IOException(e);
-        }
+        l.addQc(qc);
       }
     }
 
@@ -429,6 +424,9 @@ public class EditProjectController {
         throw new SecurityException("Permission denied.");
       }
       requestManager.saveProject(project);
+      for (ProjectOverview overview : project.getOverviews()) {
+        requestManager.saveProjectOverview(overview);
+      }
       session.setComplete();
       model.clear();
       return "redirect:/miso/project/" + project.getProjectId();

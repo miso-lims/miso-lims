@@ -27,7 +27,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -35,14 +34,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -363,20 +361,15 @@ public class DefaultLibraryService implements LibraryService {
     Library managed = libraryDao.get(library.getId());
     authorizationManager.throwIfNotWritable(managed);
     qc.setQcCreator(authorizationManager.getCurrentUsername());
-    try {
-      qc.setLibrary(managed);
-      managed.addQc(qc);
-    } catch (MalformedLibraryException e) {
-      throw new IOException("Malformed Library " + managed.getName() + " in the database...", e);
-    } catch (MalformedLibraryQcException e) {
-      throw new IOException("Malformed Library QC");
-    }
+    qc.setLibrary(managed);
+    // TODO: update concentration if QC is of relevant type
+    libraryQcDao.save(qc);
     libraryDao.save(managed);
   }
 
   @Override
   public void deleteQc(Library library, Long qcId) throws IOException {
-    if (qcId == null || qcId.equals(AbstractLibraryQC.UNSAVED_ID)) {
+    if (qcId == null || qcId.equals(LibraryQCImpl.UNSAVED_ID)) {
       throw new IllegalArgumentException("Cannot delete an unsaved Library QC");
     }
     Library managed = libraryDao.get(library.getId());
@@ -532,6 +525,7 @@ public class DefaultLibraryService implements LibraryService {
     } else {
       target.setVolume(source.getVolume());
     }
+    target.setDnaSize(source.getDnaSize());
     target.setLibraryType(source.getLibraryType());
     target.setLibrarySelectionType(source.getLibrarySelectionType());
     target.setLibraryStrategyType(source.getLibraryStrategyType());

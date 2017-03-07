@@ -19,6 +19,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 @Table(appliesTo = "BoxChangeLog", indexes = { @Index(name = "BoxChangeLog_boxId_changeTime", columnNames = { "boxId", "changeTime" }) })
 public class BoxChangeLog extends AbstractChangeLog {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long boxChangeLogId;

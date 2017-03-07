@@ -17,6 +17,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 @Table(name = "RunChangeLog")
 public class RunChangeLog extends AbstractChangeLog {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long runChangeLogId;

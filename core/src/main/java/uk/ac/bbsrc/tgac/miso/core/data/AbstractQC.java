@@ -34,6 +34,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 /**
@@ -51,7 +53,7 @@ public abstract class AbstractQC implements QC {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long qcId = AbstractQC.UNSAVED_ID;
 
-  private String qcUserName;
+  private String qcCreator;
 
   @ManyToOne(targetEntity = QcType.class)
   @JoinColumn(name = "qcMethod")
@@ -72,12 +74,12 @@ public abstract class AbstractQC implements QC {
 
   @Override
   public String getQcCreator() {
-    return qcUserName;
+    return qcCreator;
   }
 
   @Override
-  public void setQcCreator(String qcUserName) {
-    this.qcUserName = qcUserName;
+  public void setQcCreator(String qcCreator) {
+    this.qcCreator = qcCreator;
   }
 
   @Override
@@ -103,6 +105,16 @@ public abstract class AbstractQC implements QC {
   @Override
   public boolean isDeletable() {
     return getId() != AbstractQC.UNSAVED_ID;
+  }
+
+  @Override
+  public boolean userCanRead(User user) {
+    return true;
+  }
+
+  @Override
+  public boolean userCanWrite(User user) {
+    return true;
   }
 
   /**

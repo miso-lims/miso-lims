@@ -41,6 +41,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform;
 @Entity
 @Table(name = "Platform")
 public class PlatformImpl extends AbstractPlatform implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   public PlatformImpl() {
   }
 }

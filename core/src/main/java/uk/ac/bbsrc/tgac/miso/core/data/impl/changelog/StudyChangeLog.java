@@ -20,6 +20,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
     @Index(name = "StudyChangeLog_studyId_changeTime", columnNames = { "studyId", "changeTime" }) })
 public class StudyChangeLog extends AbstractChangeLog {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long studyChangeLogId;

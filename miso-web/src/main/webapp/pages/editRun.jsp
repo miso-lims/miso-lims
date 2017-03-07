@@ -199,12 +199,12 @@
   </tr>
   </c:if>
   <tr>
-    <td>Paired End:</td>
+    <td><label for="pairedEnd">Paired End:</label></td>
     <td>
       <c:choose>
         <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:checkbox
             value="${run.pairedEnd}" path="pairedEnd" disabled="disabled"/></c:when>
-        <c:otherwise><form:checkbox value="${run.pairedEnd}" path="pairedEnd"/></c:otherwise>
+        <c:otherwise><form:checkbox value="${run.pairedEnd}" path="pairedEnd" id="pairedEnd"/></c:otherwise>
       </c:choose>
     </td>
   </tr>
@@ -551,10 +551,15 @@
                 <c:choose>
                   <c:when test="${not empty partition.pool}">
                     <div class="dashboard">
+                    <c:if test="${partition.pool.hasLowQualityMembers}">
+                      <span class="lowquality-right">Contains low-quality library</span>
+                    </c:if>
                       <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
-                          ${partition.pool.name}
+                          ${partition.pool.name}: <c:if test="${not empty partition.pool.alias}"><b>${partition.pool.alias}</b></c:if>
                         (${partition.pool.creationDate})
                       </a><br/>
+                      ${partition.pool.poolableElements.size()} dilutions
+                      <br/>
                       <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
                         <c:choose>
                           <c:when test="${not empty partition.pool.experiments}">

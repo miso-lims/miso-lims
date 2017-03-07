@@ -110,7 +110,8 @@ VALUES
     (8,'poolQcType1', 'qc 1 for pools', 'Pool', 'nM'),
   (9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM'),
   (10,'poolQcType3', 'qc 3 for pools', 'Pool', 'nM'),
-  (11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM');
+  (11,'poolQcType4', 'qc 4 for pools', 'Pool', 'nM'),
+  (12,'InsertSizeQC', 'Insert Size QC', 'Library', 'bp');
 
 DELETE FROM `Printer`;
 INSERT INTO Printer(printerId, name, backend, configuration, driver, enabled) VALUES (1, 'foo', 'CUPS', '{}', 'BRADY_1D', 1);
@@ -182,7 +183,7 @@ VALUES (1,NULL,'SAM1','Inherited from TEST_0001',1,'SAM1::TEST_0001_Bn_P_nn_1-1_
 (17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1);
 
 DELETE FROM `SampleQC`;
-INSERT INTO `SampleQC`(`sample_sampleId`, `qcUserName`, `qcDate`, `qcMethod`, `results`) 
+INSERT INTO `SampleQC`(`sample_sampleId`, `qcCreator`, `qcDate`, `qcMethod`, `results`) 
 VALUES (1,'admin','2015-08-27',1,5),
 (2,'admin','2015-08-27',1,5),
 (3,'admin','2015-08-27',1,5),
@@ -259,11 +260,15 @@ INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,
 (2,'5678','Freezer3','LOT35',NOW(),2);
 
 DELETE FROM `TargetedSequencing`;
-INSERT INTO `TargetedSequencing`(`targetedSequencingId`,`alias`,`description`,`kitDescriptorId`, `archived`, `createdBy`,`creationDate`,`updatedBy`,`lastUpdated`) VALUES
-(1,'HALO_IBP','Master Chief',1,0,1,NOW(),1,NOW()),
-(2,'Thunderbolts','of lightening, very very frightening',1,0,1,NOW(),1,NOW()),
-(3,'Thunderbolts','of lightening, very very frightening',2,0,1,NOW(),1,NOW());
+INSERT INTO `TargetedSequencing`(`targetedSequencingId`,`alias`,`description`, `archived`, `createdBy`,`creationDate`,`updatedBy`,`lastUpdated`) VALUES
+(1,'HALO_IBP','Master Chief',0,1,NOW(),1,NOW()),
+(2,'Thunderbolts','of lightening, very very frightening',0,1,NOW(),1,NOW());
 
+DELETE FROM TargetedSequencing_KitDescriptor;
+INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptorId) VALUES
+(1,1),
+(2,1),
+(2,2);
 
 DELETE FROM `LibraryDilution`;
 INSERT INTO `LibraryDilution`(`dilutionId`, `concentration`, `library_libraryId`, `identificationBarcode`, `creationDate`, `dilutionUserName`, `name`, `securityProfile_profileId`) 
@@ -283,12 +288,12 @@ VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27','admin','LDI1',1),
 (14,2,14,'LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27','admin','LDI14',1);
 
 DELETE FROM `LibraryQC`;
-INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `qcUserName`, `qcDate`, `qcMethod`, `results`, `insertSize`) 
+INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `qcCreator`, `qcDate`, `qcMethod`, `results`, `insertSize`) 
 VALUES (1,1,'admin','2015-08-27',4,3,300),(2,2,'admin','2015-08-27',4,3,300),(3,3,'admin','2015-08-27',4,3,300),
 (4,4,'admin','2015-08-27',4,3,300),(5,5,'admin','2015-08-27',4,3,300),(6,6,'admin','2015-08-27',4,3,300),
 (7,7,'admin','2015-08-27',4,3,300),(8,8,'admin','2015-08-27',4,3,300),(9,9,'admin','2015-08-27',4,3,300),
 (10,10,'admin','2015-08-27',4,3,300),(11,11,'admin','2015-08-27',4,3,300),(12,12,'admin','2015-08-27',4,3,300),
-(13,13,'admin','2015-08-27',4,3,300),(14,14,'admin','2015-08-27',4,3,300);
+(13,13,'admin','2015-08-27',4,3,300),(14,14,'admin','2015-08-27',4,3,300),(15,2,'admin','2015-08-27',12,300,1);
 
 DELETE FROM `Library_Index`;
 INSERT INTO `Library_Index` 
@@ -374,7 +379,7 @@ VALUES
 (32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_32',16,1, 9);
 
 DELETE FROM `PoolQC`;
-INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `qcUserName`, `qcDate`, `qcMethod`, `results`)
+INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `qcCreator`, `qcDate`, `qcMethod`, `results`)
 VALUES (1,1,'person','2016-03-18',1,12.3),
 (2,1,'person','2016-03-18',1,45.6),
 (3,2,'person','2016-03-18',1,7.89);
@@ -424,7 +429,7 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55');
 
 DELETE FROM RunQC;
-INSERT INTO `RunQC`(`run_runId`, `qcUserName`, `qcDate`, `qcMethod`, `information`, `doNotProcess`)
+INSERT INTO `RunQC`(`run_runId`, `qcCreator`, `qcDate`, `qcMethod`, `information`, `doNotProcess`)
 VALUES ( 1, 'username1', '2016-01-26', 1, 'information1', 1),
 ( 2, 'username2', '2016-02-26', 2, 'information2', 0),
 ( 3, 'username3', '2015-03-26', 3, 'information3', 1);

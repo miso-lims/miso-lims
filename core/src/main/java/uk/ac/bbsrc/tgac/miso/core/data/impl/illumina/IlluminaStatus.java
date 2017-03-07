@@ -51,6 +51,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  * @since 0.0.2
  */
 public class IlluminaStatus extends StatusImpl {
+
+  private static final long serialVersionUID = 1L;
   private static final Logger log = LoggerFactory.getLogger(IlluminaStatus.class);
   String statusXml = null;
 

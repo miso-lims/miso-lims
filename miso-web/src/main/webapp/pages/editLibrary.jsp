@@ -243,7 +243,7 @@
   </c:when>
   <c:otherwise>
 	<tr>
-	  <td>Paired:</td>
+	  <td><label for="paired">Paired:</label></td>
 	  <td>
 	    <c:choose>
 	      <c:when test="${library.id != 0}">
@@ -352,18 +352,22 @@
 </tr>
 
 <tr>
-  <td>Low Quality Sequencing:</td>
+  <td style="color:#a93232"><label for="lowQuality">Low Quality Sequencing:</label></td>
   <td>
-    <form:checkbox path="lowQuality"/>
+    <form:checkbox path="lowQuality" id="lowQuality"/>
   </td>
 </tr>
 
+<tr>
+  <td>Size (bp):</td>
+  <td><form:input id="dnaSize" path="dnaSize"/></td>
+</tr>
 <tr>
   <td>Volume (&#181;l):</td>
   <td><form:input id="volume" path="volume"/></td>
 </tr>
 <tr>
-  <td>Discarded:</td>
+  <td><label for="discarded">Discarded:</label></td>
   <td><form:checkbox id="discarded" path="discarded"/></td>
 </tr>
 <tr>
@@ -415,7 +419,7 @@
   </tr>
   </c:if>
   <tr>
-    <td class="h">Archived:</td>
+    <td class="h"><label for="archived">Archived:</label></td>
     <td><form:checkbox id="archived" path="archived"/></td>
   </tr>
 </table>
@@ -514,7 +518,6 @@
         <th>QC Date</th>
         <th>Method</th>
         <th>Results</th>
-        <th>Insert Size</th>
         <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
           <th align="center">Edit</th>
@@ -531,10 +534,9 @@
 
             <fmt:formatNumber var="resultsRounded"
               value="${qc.results}"
-              maxFractionDigits="2" />
+              maxFractionDigits="${qc.qcType.precisionAfterDecimal}" />
 
             <td id="result${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
-            <td id="insert${qc.id}">${qc.insertSize} bp</td>
             <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
               <td id="edit${qc.id}" align="center">

@@ -216,7 +216,7 @@ public class ContainerControllerHelperService {
       String instrumentModel = sr.getPlatform().getInstrumentModel();
       if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
         b.append("<i class='italicInfo'>Click in a " + PlatformType.get("Illumina").getPartitionName()
-            + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the "
+            + " box to beep/type in pool tube barcodes, or double click a pool on the right to sequentially add pools to the "
             + PlatformType.get("Illumina").getContainerName() + "</i>");
         b.append("<table class='in'>");
         b.append("<th>" + PlatformType.get("Illumina").getPartitionName() + " No.</th>");
@@ -244,7 +244,7 @@ public class ContainerControllerHelperService {
         b.append("<div id='containerdiv0'> </div>");
       } else {
         b.append("<i class='italicInfo'>Click in a " + PlatformType.get("Illumina").getPartitionName()
-            + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the "
+            + " box to beep/type in pool tube barcodes, or double click a pool on the right to sequentially add pools to the "
             + PlatformType.get("Illumina").getContainerName() + "</i>");
         b.append("<table class='in'>");
         b.append("<th>" + PlatformType.get("Illumina").getPartitionName() + " No.</th>");
@@ -384,7 +384,7 @@ public class ContainerControllerHelperService {
 
     StringBuilder b = new StringBuilder();
     b.append("<i class='italicInfo'>Click in a " + platformType.getPartitionName()
-        + " box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the "
+        + " box to beep/type in pool tube barcodes, or double click a pool on the right to sequentially add pools to the "
         + platformType.getContainerName() + "</i>");
     b.append("<table class='in'>");
     b.append("<th>" + platformType.getPartitionName() + " No.</th>");
@@ -698,7 +698,7 @@ public class ContainerControllerHelperService {
             return JSONUtils.SimpleJSONError("Multiple containers found with serial number " + barcode);
           }
         } else {
-          return JSONUtils.JSONObjectResponse("error", "No containers with this serial number.");
+          return JSONUtils.JSONObjectResponse("unique", "No containers with this serial number exist yet.");
         }
       } catch (IOException e) {
         log.error("unable to lookup serial number", e);

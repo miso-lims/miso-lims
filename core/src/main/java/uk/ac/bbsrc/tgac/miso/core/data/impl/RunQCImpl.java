@@ -24,8 +24,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.slf4j.Logger;
@@ -33,9 +38,13 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractRunQC;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -47,8 +56,24 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
  */
 @Entity
 @Table(name = "RunQC")
-public class RunQCImpl extends AbstractRunQC implements Serializable {
+public class RunQCImpl extends AbstractQC implements RunQC, Serializable {
+
+  private static final long serialVersionUID = 1L;
   private static final Logger log = LoggerFactory.getLogger(RunQCImpl.class);
+
+  @ManyToOne(targetEntity = RunImpl.class)
+  @JoinColumn(name = "run_runId")
+  private Run run;
+  private String information;
+
+  @OneToMany(targetEntity = PartitionImpl.class)
+  @JoinTable(name = "RunQC_Partition", joinColumns = {
+      @JoinColumn(name = "runQc_runQcId", nullable = false, updatable = false) }, inverseJoinColumns = {
+          @JoinColumn(name = "partition_partitionId", nullable = false)
+      })
+  private List<Partition> partitionSelections;
+  private boolean doNotProcess;
+
   /**
    * Construct a new RunQCImpl
    */
@@ -75,12 +100,73 @@ public class RunQCImpl extends AbstractRunQC implements Serializable {
   }
 
   @Override
-  public boolean userCanRead(User user) {
-    return true;
+  public Run getRun() {
+    return run;
   }
 
   @Override
-  public boolean userCanWrite(User user) {
-    return true;
+  public void setRun(Run run) throws MalformedRunException {
+    this.run = run;
+  }
+
+  @Override
+  public String getInformation() {
+    return information;
+  }
+
+  @Override
+  public void setInformation(String information) {
+    this.information = LimsUtils.findHyperlinks(information);
+  }
+
+  @Override
+  public boolean getDoNotProcess() {
+    return doNotProcess;
+  }
+
+  @Override
+  public void setDoNotProcess(boolean doNotProcess) {
+    this.doNotProcess = doNotProcess;
+  }
+
+  @Override
+  public List<Partition> getPartitionSelections() {
+    return partitionSelections;
+  }
+
+  @Override
+  public void setPartitionSelections(List<Partition> partitionSelections) {
+    this.partitionSelections = partitionSelections;
+  }
+
+  /**
+   * Equivalency is based on getRunId() if set, otherwise on name
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof SampleQC)) return false;
+    SampleQC them = (SampleQC) obj;
+    // If not saved, then compare resolved actual objects. Otherwise
+    // just compare IDs.
+    if (this.getId() == AbstractQC.UNSAVED_ID || them.getId() == AbstractQC.UNSAVED_ID) {
+      return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate())
+          && this.getQcType().equals(them.getQcType());
+    } else {
+      return this.getId() == them.getId();
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    if (getId() != AbstractQC.UNSAVED_ID) {
+      return (int) getId();
+    } else {
+      int hashcode = getQcCreator().hashCode();
+      hashcode = 37 * hashcode + getQcDate().hashCode();
+      hashcode = 37 * hashcode + getQcType().hashCode();
+      return hashcode;
+    }
   }
 }

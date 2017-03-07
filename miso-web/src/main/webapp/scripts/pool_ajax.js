@@ -480,6 +480,9 @@ Pool.ui = {
           "sTitle": "Location",
           "mData": "locationLabel",
           "bSortable": false,
+          "mRender": function (data, type, full) {
+            return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+          },
           "iSortPriority" : 0
         },
         {

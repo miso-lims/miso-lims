@@ -346,19 +346,33 @@ CREATE PROCEDURE addTargetedSequencing(
   iArchived tinyint(1)
 ) BEGIN
   DECLARE errorMessage varchar(300);
-  DECLARE kitId, createUser bigint(20);
+  DECLARE kitId, createUser, exitingTargetedSequencingId, newTargetedSequencingId bigint(20);
   DECLARE createTime datetime DEFAULT CURRENT_TIMESTAMP;
   
   SELECT kitDescriptorId INTO kitId FROM KitDescriptor WHERE name = iKitName;
   IF kitId IS NULL THEN
-    SET errorMessage = CONCAT('KitDescriptor ''', iKitId, ''' not found.');
+    SET errorMessage = CONCAT('KitDescriptor ''', iKitName, ''' not found.');
     SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
   END IF;
   
-  IF NOT EXISTS (SELECT 1 FROM TargetedSequencing WHERE alias = iAlias AND kitDescriptorId = kitId) THEN
-  SET createUser = getAdminUserId();
-    INSERT INTO TargetedSequencing(alias, description, kitDescriptorId, archived, createdBy, creationDate, updatedBy, lastUpdated)
-    VALUES (iAlias, iDescription, kitId, archived, createUser, createTime, createUser, createTime);
+  IF NOT EXISTS (
+    SELECT 1 FROM TargetedSequencing AS t
+    JOIN TargetedSequencing_KitDescriptor AS tk ON t.targetedSequencingId = tk.targetedSequencingId
+    WHERE t.alias = iAlias 
+    AND tk.kitDescriptorId = kitId
+    ) THEN
+    SELECT targetedSequencingId INTO exitingTargetedSequencingId FROM TargetedSequencing WHERE alias = iAlias;
+    IF exitingTargetedSequencingId IS NULL THEN
+       SET createUser = getAdminUserId();
+       INSERT INTO TargetedSequencing(alias, description, archived, createdBy, creationDate, updatedBy, lastUpdated)
+       VALUES (iAlias, iDescription, iArchived, createUser, createTime, createUser, createTime);
+       SET newTargetedSequencingId = LAST_INSERT_ID();
+       INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptorId)
+       VALUES(newTargetedSequencingId, kitId);
+    ELSE
+       INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptorId)
+       VALUES(exitingTargetedSequencingId, kitId);
+    END IF;
   END IF;
 END//
 
@@ -407,3 +421,43 @@ END//
 
 DELIMITER ;
 -- EndNoTest
+DROP TRIGGER IF EXISTS BeforeInsertLibrary;
+DROP TRIGGER IF EXISTS BeforeInsertPool;
+DROP TRIGGER IF EXISTS BeforeInsertSample;
+DROP TRIGGER IF EXISTS BoxChange;
+DROP TRIGGER IF EXISTS BoxInsert;
+DROP TRIGGER IF EXISTS DetailedLibraryChange;
+DROP TRIGGER IF EXISTS DetailedSampleChange;
+DROP TRIGGER IF EXISTS ExperimentChange;
+DROP TRIGGER IF EXISTS ExperimentInsert;
+DROP TRIGGER IF EXISTS IdentityChange;
+DROP TRIGGER IF EXISTS KitDescriptorChange;
+DROP TRIGGER IF EXISTS KitDescriptorInsert;
+DROP TRIGGER IF EXISTS LibraryAdditionalInfoChange;
+DROP TRIGGER IF EXISTS LibraryChange;
+DROP TRIGGER IF EXISTS LibraryDilutionChange;
+DROP TRIGGER IF EXISTS LibraryDilutionInsert;
+DROP TRIGGER IF EXISTS LibraryInsert;
+DROP TRIGGER IF EXISTS PartitionChange;
+DROP TRIGGER IF EXISTS PlateChange;
+DROP TRIGGER IF EXISTS PlateInsert;
+DROP TRIGGER IF EXISTS PoolChange;
+DROP TRIGGER IF EXISTS PoolInsert;
+DROP TRIGGER IF EXISTS PoolOrderChange;
+DROP TRIGGER IF EXISTS PoolOrderDelete;
+DROP TRIGGER IF EXISTS PoolOrderInsert;
+DROP TRIGGER IF EXISTS RunChange;
+DROP TRIGGER IF EXISTS RunInsert;
+DROP TRIGGER IF EXISTS SampleAdditionalInfoChange;
+DROP TRIGGER IF EXISTS SampleAliquotChange;
+DROP TRIGGER IF EXISTS SampleCVSlideChange;
+DROP TRIGGER IF EXISTS SampleChange;
+DROP TRIGGER IF EXISTS SampleInsert;
+DROP TRIGGER IF EXISTS SampleLCMTubeChange;
+DROP TRIGGER IF EXISTS SampleStockChange;
+DROP TRIGGER IF EXISTS SampleTissueChange;
+DROP TRIGGER IF EXISTS SequencerPartitionContainerChange;
+DROP TRIGGER IF EXISTS SequencerPartitionContainerInsert;
+DROP TRIGGER IF EXISTS StatusChange;
+DROP TRIGGER IF EXISTS StudyChange;
+DROP TRIGGER IF EXISTS StudyInsert;

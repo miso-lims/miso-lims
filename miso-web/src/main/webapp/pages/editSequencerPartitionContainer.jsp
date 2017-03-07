@@ -224,9 +224,9 @@
                     <td width="90%">
                       <c:choose>
                         <c:when test="${not empty partition.pool}">
-                          <ul partition="${partitionCount.index}" bind="partitions[${partitionCount.index}].pool"
+                          <div class="dashboard" style="position:relative">
+                            <ul partition="${partitionCount.index}" bind="partitions[${partitionCount.index}].pool"
                               class="runPartitionDroppable">
-                            <div class="dashboard" style="position:relative">
                                 <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(container.platformType.key)}/${partition.pool.id}"/>'> --%>
                               <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
                                   ${partition.pool.name}
@@ -257,8 +257,8 @@
                               <c:if test="${empty container.runs or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                               <span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this, "${partition.partitionNumber}");' class='float-right ui-icon ui-icon-circle-close'></span>
                               </c:if>
-                            </div>
-                          </ul>
+                            </ul>
+                          </div>
                         </c:when>
                         <c:otherwise>
                           <div id="p_div_${partitionCount.index}" class="elementListDroppableDiv">
@@ -279,8 +279,8 @@
       <h2>Available Pools</h2>
       <c:choose>
         <c:when test="${not empty container.platform}">
-          <input id="showOnlyReady" type="checkbox" checked="checked"
-                 onclick="Container.pool.toggleReadyToRunCheck(this, '${container.platform.platformType.key}');"/>Only Ready to Run pools?
+          <label><input id="showOnlyReady" type="checkbox" checked="checked"
+                 onclick="Container.pool.toggleReadyToRunCheck(this, '${container.platform.platformType.key}');"/>Only Ready to Run pools?</label>
           <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
             <input type="text" size="8" id="searchPools" name="searchPools"/>
           </div>
@@ -291,8 +291,8 @@
           </script>
         </c:when>
         <c:otherwise>
-          <input id="showOnlyReady" type="checkbox" checked="checked"
-                 onclick="Container.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformTypes]:checked').val());"/>Only Ready to Run pools?
+          <label><input id="showOnlyReady" type="checkbox" checked="checked"
+                 onclick="Container.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformTypes]:checked').val());"/>Only Ready to Run pools?</label>
           <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
             <input type="text" size="8" id="searchPools" name="searchPools"/>
           </div>

@@ -41,6 +41,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 @Entity
 @Table(name = "SequencerReference")
 public class SequencerReferenceImpl extends AbstractSequencerReference implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   /**
    * Constructor SequencerReferenceImpl creates a new SequencerReference instance
    * 
