@@ -47,7 +47,7 @@ public class LibraryDto {
   private Double volume;
   private Long boxId;
   private List<LibraryQcDto> qcs;
-  private Long dnaSize;
+  private Integer dnaSize;
 
   public String getAlias() {
     return alias;
@@ -290,11 +290,11 @@ public class LibraryDto {
     this.volume = volume;
   }
 
-  public Long getDnaSize() {
+  public Integer getDnaSize() {
     return dnaSize;
   }
 
-  public void setDnaSize(Long dnaSize) {
+  public void setDnaSize(Integer dnaSize) {
     this.dnaSize = dnaSize;
   }
 

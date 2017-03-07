@@ -181,7 +181,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")
   private String position;
 
-  private Long dnaSize;
+  private Integer dnaSize;
 
   @Override
   public String getBoxPosition() {
@@ -542,12 +542,12 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public Long getDnaSize() {
+  public Integer getDnaSize() {
     return dnaSize;
   }
 
   @Override
-  public void setDnaSize(Long dnaSize) {
+  public void setDnaSize(Integer dnaSize) {
     this.dnaSize = dnaSize;
   }
 
