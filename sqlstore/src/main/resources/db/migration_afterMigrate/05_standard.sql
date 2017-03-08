@@ -238,7 +238,7 @@ FOR EACH ROW
     NEW.sample_sampleId,
     'qc',
     (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sample_sampleId),
-    CONCAT('QC added: ', (SELECT name FROM QCType WHERE qcTypeId = NEW.qcMethod)
+    CONCAT('QC added: ', (SELECT name FROM QCType WHERE qcTypeId = NEW.qcMethod))
   )//
 
 DROP TRIGGER IF EXISTS SampleQcUpdate//
@@ -247,10 +247,8 @@ FOR EACH ROW
   BEGIN
     DECLARE log_message varchar(500) CHARACTER SET utf8;
     SET log_message = CONCAT_WS(', ',
-      CASE WHEN NEW.qcMethod <> OLD.qcMethod OR NEW.results <> OLD.results 
-        THEN CONCAT('Updated QC: ', (SELECT name FROM QCType WHERE qcTypeId = OLD.qcTypeId), ' ', OLD.results, ' ', (SELECT units FROM
-QCType WHERE qcTypeId = OLD.qcTypeId), ' → ', (SELECT name FROM QCType WHERE qcTypeId = NEW.qcTypeId), ' ', NEW.results, ' ', (SELECT units FROM QCType WHERE qcTypeId = NEW
-qcTypeId)) END;
+      CASE WHEN NEW.results <> OLD.results 
+        THEN CONCAT('Updated ', (SELECT name FROM QCType WHERE qcTypeId = NEW.qcMethod), ' QC: ', OLD.results, ' → ', NEW.results, (SELECT units FROM QCType WHERE qcTypeId = NEW.qcMethod)) END);
       IF log_message IS NOT NULL AND log_message <> '' THEN
         INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
           NEW.sample_sampleId,
