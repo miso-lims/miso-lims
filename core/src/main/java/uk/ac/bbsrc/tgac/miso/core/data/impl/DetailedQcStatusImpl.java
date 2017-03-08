@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -20,7 +21,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 
 @Entity
 @Table(name = "DetailedQcStatus", uniqueConstraints = @UniqueConstraint(columnNames = { "status", "description" }))
-public class DetailedQcStatusImpl implements DetailedQcStatus {
+public class DetailedQcStatusImpl implements DetailedQcStatus, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

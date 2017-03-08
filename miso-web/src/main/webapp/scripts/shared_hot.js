@@ -367,8 +367,16 @@ var Hot = {
    * @param attribute of type string ("alias" or "name")
    */
   saveTableData: function (attribute, action) {
+    // Prototype.js implements its own toJSON functions, which are causing errors.
+    // TODO when more time: look into removing Prototype.js
+    if(window.Prototype) {
+      delete Object.prototype.toJSON;
+      delete Array.prototype.toJSON;
+      delete Hash.prototype.toJSON;
+      delete String.prototype.toJSON;
+    }
     // send table data through the parser to get a data array that isn't merely a reference to Hot.hotTable.getSourceData()
-    data = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
+    data = JSON.parse(JSON.stringify(Hot.hotTable.getSourceData()));
       
     // add previously-saved (alias/name) to success message, and placeholders for items to be saved
     Hot.messages.success = data.map(function (dil) { return (dil.saved === true ? dil[attribute] : null); });

@@ -124,7 +124,7 @@
 
         // get SampleOptions and make the appropriate table
         if (Hot.detailedSample && Sample.hot.createOrEdit == "Create") {
-          Sample.hot.sampleClassId = parseInt(${sampleClassId});
+          Sample.hot.sampleClassId = parseInt("${sampleClassId}");
           Hot.fetchSampleOptions(Sample.hot.makeBulkCreateTable);
         } else {
           Hot.fetchSampleOptions(Sample.hot.makeBulkEditTable);
