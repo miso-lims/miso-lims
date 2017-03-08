@@ -372,6 +372,7 @@ public class DefaultLibraryService implements LibraryService {
     authorizationManager.throwIfNotWritable(managed);
     // TODO: update concentration if QC is of relevant type
     managed.addQc(qc);
+    managed.setLastModifier(authorizationManager.getCurrentUser());
     libraryDao.save(managed);
   }
 
@@ -392,7 +393,7 @@ public class DefaultLibraryService implements LibraryService {
     if (deleteQc == null) throw new IOException("QC " + qcId + " not found for Library " + library.getId());
     authorizationManager.throwIfNonAdminOrMatchingOwner(securityManager.getUserByLoginName(deleteQc.getQcCreator()));
     managed.getLibraryQCs().remove(deleteQc);
-    libraryQcDao.remove(deleteQc);
+    managed.setLastModifier(authorizationManager.getCurrentUser());
     libraryDao.save(managed);
   }
 

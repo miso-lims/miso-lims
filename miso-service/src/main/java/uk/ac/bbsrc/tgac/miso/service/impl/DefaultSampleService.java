@@ -759,6 +759,7 @@ public class DefaultSampleService implements SampleService {
     
     // TODO: update concentration and/or volume if QC is of relevant type
     managed.addQc(qc);
+    managed.setLastModifier(authorizationManager.getCurrentUser());
     sampleDao.save(managed);
   }
 
@@ -787,6 +788,7 @@ public class DefaultSampleService implements SampleService {
     if (deleteQc == null) throw new IOException("QC " + qcId + " not found for Sample " + sample.getId());
     authorizationManager.throwIfNonAdminOrMatchingOwner(securityManager.getUserByLoginName(deleteQc.getQcCreator()));
     managed.getSampleQCs().remove(deleteQc);
+    managed.setLastModifier(authorizationManager.getCurrentUser());
     sampleQcDao.remove(deleteQc);
     sampleDao.save(managed);
   }
