@@ -43,7 +43,7 @@ public interface StatusStore extends Store<Status> {
    * @return
    * @throws IOException
    */
-  public Status getByRunName(String runName) throws IOException;
+  public Status getByRunAlias(String runName) throws IOException;
 
   /**
    * List all Statuses for a given sequencer machine name

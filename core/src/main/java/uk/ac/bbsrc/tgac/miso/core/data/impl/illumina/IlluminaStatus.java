@@ -78,13 +78,13 @@ public class IlluminaStatus extends StatusImpl {
           setStartDate(new SimpleDateFormat("yyMMdd").parse(m.group(1)));
           setInstrumentName(m.group(2));
         }
-        setRunName(runName);
+        setRunAlias(runName);
         setHealth(HealthType.Unknown);
       } else {
         String runStarted = statusDoc.getElementsByTagName("RunStarted").item(0).getTextContent();
         setStartDate(new SimpleDateFormat("EEEE, MMMMM dd, yyyy h:mm aaa").parse(runStarted));
         setInstrumentName(statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());
-        setRunName(statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
+        setRunAlias(statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
         setHealth(HealthType.Unknown);
       }
       setXml(statusXml);

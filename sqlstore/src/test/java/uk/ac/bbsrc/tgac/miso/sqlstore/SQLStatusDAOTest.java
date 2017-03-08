@@ -72,7 +72,7 @@ public class SQLStatusDAOTest extends AbstractDAOTest {
     status.setStartDate(start);
     status.setLastUpdated(lastModified);
     status.setInstrumentName(instrument);
-    status.setRunName(runName);
+    status.setRunAlias(runName);
     status.setXml(xml);
 
     long id = dao.save(status);
@@ -86,7 +86,7 @@ public class SQLStatusDAOTest extends AbstractDAOTest {
     assertEquals(format.format(start), format.format(rtn.getStartDate()));
     assertEquals(instrument, rtn.getInstrumentName());
     assertNotSame(format.format(lastModified), rtn.getLastUpdated().toString());
-    assertEquals(runName, rtn.getRunName());
+    assertEquals(runName, rtn.getRunAlias());
     // TODO: Better xml assertion.
     assertNotNull(rtn.getXml());
 
@@ -152,7 +152,7 @@ public class SQLStatusDAOTest extends AbstractDAOTest {
     assertEquals(start, format.format(status.getStartDate()));
     assertEquals(instrument, status.getInstrumentName());
     assertTrue(status.getLastUpdated().after(calendar.getTime()));
-    assertEquals(runName, status.getRunName());
+    assertEquals(runName, status.getRunAlias());
     // TODO assert xml is still the same. Converting back isn't straightforward.
     // "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!--Illumina RTA Status Report-->\n<Status>\n <Software>Illumina RTA
     // 1.12.4.2</Software>\n <RunName>120323_h1179_0070_BC0JHTACXX</RunName>\n <InstrumentName>H1179</InstrumentName>\n <RunStarted>Tuesday,
@@ -165,13 +165,13 @@ public class SQLStatusDAOTest extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO#getByRunName(java.lang.String)}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO#getByRunAlias(java.lang.String)}.
    * 
    * @throws IOException
    */
   @Test
   public void testGetByRunName() throws IOException {
-    Status status = dao.getByRunName("120412_h1179_0073_BC075RACXX");
+    Status status = dao.getByRunAlias("120412_h1179_0073_BC075RACXX");
     assertNotNull(status);
   }
 

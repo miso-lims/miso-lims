@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
@@ -84,6 +86,12 @@ public class ContainerControllerHelperService {
   private ExperimentService experimentService;
   @Autowired
   private StudyService studyService;
+  @Autowired
+  private RunStore runStore;
+
+  public void setRunStore(RunStore runStore) {
+    this.runStore = runStore;
+  }
 
   public JSONObject getPlatformTypes(HttpSession session, JSONObject json) throws IOException {
     StringBuilder b = new StringBuilder();
@@ -533,7 +541,8 @@ public class ContainerControllerHelperService {
                 + ". At least one study must be available for each project associated with this Pool.");
           } else {
             for (Study s : studies) {
-              b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
+              b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType().getName()
+                  + ")</option>");
             }
           }
           b.append("</select>");
@@ -583,8 +592,9 @@ public class ContainerControllerHelperService {
       StringBuilder sb = new StringBuilder();
 
       Experiment e = new ExperimentImpl();
-      e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType() + "_" + (s.getExperiments().size() + 1));
-      e.setTitle(s.getProject().getName() + " " + platform.getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
+      e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType().getName() + "_" + (s.getExperiments().size() + 1));
+      e.setTitle(s.getProject().getName() + " " + platform.getPlatformType().getKey() + " " + s.getStudyType().getName()
+          + " experiment (Auto-gen)");
       e.setDescription(s.getProject().getAlias());
       e.setPlatform(platform);
       e.setStudy(s);
@@ -777,9 +787,8 @@ public class ContainerControllerHelperService {
     try {
       if (json.has("containerId")) {
         Long containerId = json.getLong("containerId");
-        SequencerPartitionContainer container = requestManager.getSequencerPartitionContainerById(containerId);
-
-        for (Run run : container.getRuns()) {
+        List<Run> runs = runStore.listBySequencerPartitionContainerId(containerId);
+        for (Run run : runs) {
           if (run != null && "Completed".equals(run.getStatus().getHealth().getKey())) {
             return JSONUtils.SimpleJSONResponse("yes");
           }

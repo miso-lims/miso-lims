@@ -118,7 +118,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     when(sequencerReferenceDAO.get(Matchers.anyLong())).thenReturn(emptySR);
     emptyStatus.setHealth(HealthType.Unknown);
     emptyStatus.setInstrumentName("srName");
-    emptyStatus.setRunName("runName");
+    emptyStatus.setRunAlias("runName");
     emptyStatus.setLastUpdated(new Date());
     emptyStatus.setStartDate(new Date());
     when(statusDao.get(Matchers.anyLong())).thenReturn(emptyStatus);

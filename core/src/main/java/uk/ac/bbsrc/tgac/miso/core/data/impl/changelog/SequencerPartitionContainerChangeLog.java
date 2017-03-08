@@ -25,7 +25,7 @@ public class SequencerPartitionContainerChangeLog extends AbstractChangeLog {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long sequencerPartitionContainerChangeLogId;
+  private Long containerChangeLogId;
 
   @ManyToOne(fetch = FetchType.LAZY, targetEntity = SequencerPartitionContainerImpl.class)
   @JoinColumn(name = "containerId", nullable = false, updatable = false)
@@ -42,7 +42,7 @@ public class SequencerPartitionContainerChangeLog extends AbstractChangeLog {
   }
 
   public Long getSequencerPartitionContainerChangeLogId() {
-    return sequencerPartitionContainerChangeLogId;
+    return containerChangeLogId;
   }
 
   public void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer) {

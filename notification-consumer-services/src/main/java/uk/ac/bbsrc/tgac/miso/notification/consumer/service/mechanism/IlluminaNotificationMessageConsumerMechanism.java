@@ -127,7 +127,7 @@ public class IlluminaNotificationMessageConsumerMechanism
       sb.append("Processing " + runName);
       log.debug("Processing " + runName);
       Status is = new IlluminaStatus();
-      is.setRunName(runName);
+      is.setRunAlias(runName);
       Run r = null;
 
       Matcher m = p.matcher(runName);
@@ -187,7 +187,7 @@ public class IlluminaNotificationMessageConsumerMechanism
             }
 
             if (r.getSequencerReference() == null) {
-              log.error("Cannot save " + is.getRunName() + ": no sequencer reference available.");
+              log.error("Cannot save " + is.getRunAlias() + ": no sequencer reference available.");
             } else {
               log.debug("Setting sequencer reference: " + sr.getName());
 
@@ -417,7 +417,7 @@ public class IlluminaNotificationMessageConsumerMechanism
             runsToSave.add(r);
           }
         } else {
-          log.warn("\\_ Run not saved. Saving status: " + is.getRunName());
+          log.warn("\\_ Run not saved. Saving status: " + is.getRunAlias());
           requestManager.saveStatus(is);
         }
       } catch (IOException ioe) {

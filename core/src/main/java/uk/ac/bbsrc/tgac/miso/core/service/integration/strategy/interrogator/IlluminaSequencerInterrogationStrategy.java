@@ -102,7 +102,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
             String runStarted = statusDoc.getElementsByTagName("RunStarted").item(0).getTextContent();
             status.setStartDate(new SimpleDateFormat("EEEE, MMMMM dd, yyyy h:mm aaa").parse(runStarted));
             status.setInstrumentName(statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());
-            status.setRunName(statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
+            status.setRunAlias(statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
             s.add(status);
           } catch (ParserConfigurationException e) {
             log.error("list all statuses", e);
@@ -126,7 +126,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
     String regex = ".*/([\\d]+_" + name + "_[\\d]+_[A-z0-9_]*)/.*";
     Pattern p = Pattern.compile(regex);
     for (Status s : listAllStatus(sr)) {
-      Matcher m = p.matcher(s.getRunName());
+      Matcher m = p.matcher(s.getRunAlias());
       if (m.matches()) {
         sts.add(s);
       }
@@ -215,7 +215,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
             String runStarted = statusDoc.getElementsByTagName("RunStarted").item(0).getTextContent();
             status.setStartDate(new SimpleDateFormat("EEEE, MMMMM dd, yyyy h:mm aaa").parse(runStarted));
             status.setInstrumentName(statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());
-            status.setRunName(runName);
+            status.setRunAlias(runName);
             return status;
           }
         }

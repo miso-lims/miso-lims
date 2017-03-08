@@ -125,9 +125,9 @@ public interface Status extends Securable {
 
   public void setInstrumentName(String instrumentName);
 
-  public String getRunName();
+  public String getRunAlias();
 
-  public void setRunName(String runName);
+  public void setRunAlias(String runName);
 
   public Date getLastUpdated();
 
