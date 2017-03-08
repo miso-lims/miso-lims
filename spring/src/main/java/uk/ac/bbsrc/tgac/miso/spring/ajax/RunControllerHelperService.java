@@ -985,7 +985,8 @@ public class RunControllerHelperService {
                 + ". At least one study must be available for each project associated with this Pool. Double click to add a different pool");
           } else {
             for (Study s : studies) {
-              b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
+              b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType().getName()
+                  + ")</option>");
             }
           }
           b.append("</select>");

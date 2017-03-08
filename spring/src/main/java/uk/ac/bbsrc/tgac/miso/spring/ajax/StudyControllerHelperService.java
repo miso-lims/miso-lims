@@ -99,7 +99,7 @@ public class StudyControllerHelperService {
         inner.add(TableHelper.hyperLinkify("/miso/study/" + study.getId(), study.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/study/" + study.getId(), study.getAlias()));
         inner.add(study.getDescription());
-        inner.add(study.getStudyType());
+        inner.add(study.getStudyType().getName());
 
         jsonArray.add(inner);
       }
