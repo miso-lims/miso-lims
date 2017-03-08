@@ -204,7 +204,7 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
     if (dilution.getLibrary() != null) {
       dilution.setLibrary(libraryDao.get(dilution.getLibrary().getId()));
     }
-    if (dilution.getTargetedSequencing() != null) {
+    if (dilution.getTargetedSequencing() != null && dilution.getTargetedSequencing().getId() != null) {
       dilution.setTargetedSequencing(targetedSequencingDao.get(dilution.getTargetedSequencing().getId()));
     }
   }
