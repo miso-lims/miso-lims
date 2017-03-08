@@ -56,6 +56,7 @@ BEGIN
     DELETE FROM Pool;
     DELETE FROM LibraryDilution;
     DELETE FROM DetailedLibrary;
+    DELETE FROM Library_Note;
     DELETE FROM Library_Index;
     DELETE FROM LibraryChangeLog;
     DELETE FROM Library;
