@@ -615,6 +615,19 @@ Sample.hot = {
       .filter(function (kit) { return kit.kitType == 'Extraction'; })
       .map(function (kit) { return kit.name; });
   },
+  
+  /**
+   * Checks if the first sample in the sample being created/updated is an RNA sample
+   */
+  isFirstSampleRNA: function () {
+    var firstSample;
+    if (Sample.hot.createOrEdit == 'Create') {
+      firstSample = Sample.hot.newSamplesJSON[0];
+    } else if (Sample.hot.createOrEdit == 'Edit') {
+      firstSample = Sample.hot.samplesJSON[0];
+    }
+    return firstSample.sampleClassAlias.indexOf("RNA") != -1;
+  },
 
   /**
    * Returns a list of the columns will be displayed for the current situation
@@ -627,6 +640,7 @@ Sample.hot = {
     var isDetailed = targetSampleCategory != null;
     var sampleClass = Hot.detailedSample ? Hot.getObjById(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos) : null;
     var sampleClassAlias = sampleClass ? sampleClass.alias : null;
+    var rnaSamples = Sample.hot.isFirstSampleRNA();
 	  // We assume we have a linear progression of information that must be
 	  // collected as a sample progressed through the hierarchy.
     var progression = ['Identity', 'Tissue', 'Tissue Processing', 'Stock', 'Aliquot'];
@@ -935,14 +949,14 @@ Sample.hot = {
         data: 'rin',
         type: 'numeric',
         format: '0.00',
-        include: showQcs
+        include: showQcs && rnaSamples
       },
       {
         header: 'New DV200',
         data: 'dv200',
         type: 'numeric',
         format: '0.00',
-        include: showQcs
+        include: showQcs && rnaSamples
       },
       {
         header: 'QC Passed?',
