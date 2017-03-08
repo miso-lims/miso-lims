@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,7 +37,6 @@ import javax.persistence.Table;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.AutoPopulatingList;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -67,8 +67,7 @@ public class RunImpl extends AbstractRun implements Serializable {
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
       @JoinColumn(name = "Run_runId") }, inverseJoinColumns = {
           @JoinColumn(name = "containers_containerId") })
-  private List<SequencerPartitionContainer> containers = new AutoPopulatingList<>(
-      SequencerPartitionContainerImpl.class);
+  private List<SequencerPartitionContainer> containers = new ArrayList<>();
 
   /**
    * Construct a new Run with a default empty SecurityProfile
@@ -104,6 +103,17 @@ public class RunImpl extends AbstractRun implements Serializable {
   @Override
   public void setSequencerPartitionContainers(List<SequencerPartitionContainer> containers) {
     this.containers = containers;
+  }
+
+  @Override
+  public void setSequencerPartitionContainer(SequencerPartitionContainer container) {
+    if (this.containers != null && this.containers.size() > 1) {
+      throw new IllegalArgumentException("Cannot set single container on a run with multiple containers already linked!");
+    } else {
+      List<SequencerPartitionContainer> list = new ArrayList<>();
+      list.add(container);
+      this.containers = list;
+    }
   }
 
   @Override

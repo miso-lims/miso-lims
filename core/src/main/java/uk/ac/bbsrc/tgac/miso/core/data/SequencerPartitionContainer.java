@@ -60,14 +60,6 @@ public interface SequencerPartitionContainer
   Collection<Run> getRuns();
 
   /**
-   * Sets the runs of this Container object.
-   * 
-   * @param runs The runs of which this Container is a part.
-   * 
-   */
-  void setRuns(Collection<Run> runs);
-
-  /**
    * Returns the {@link Run} with
    * a) the latest start date (of the runs which have a known status), or
    * b) the last modified date
@@ -140,7 +132,5 @@ public interface SequencerPartitionContainer
   public Collection<ChangeLog> getChangeLog();
 
   public Date getLastModified();
-
-  void setRun(Run run);
 
 }

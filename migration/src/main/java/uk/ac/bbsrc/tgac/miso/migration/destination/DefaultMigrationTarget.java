@@ -667,15 +667,18 @@ public class DefaultMigrationTarget implements MigrationTarget {
    * @throws IllegalStateException if there are conflicting description or barcodes
    */
   private void mergePools(Pool fromPool, Pool toPool) throws IOException {
-    Collection<LibraryDilution> fromPoolables = fromPool.getPoolableElements();
-    Collection<LibraryDilution> toPoolables = toPool.getPoolableElements();
-    toPoolables.addAll(fromPoolables);
-    setPoolModifiedDetails(toPool);
-    serviceManager.getRequestManager().savePool(toPool);
-    for (Note note : fromPool.getNotes()) {
-      serviceManager.getRequestManager().savePoolNote(toPool, note);
+    if (fromPool.getId() != PoolImpl.UNSAVED_ID) {
+      Collection<LibraryDilution> fromPoolables = fromPool.getPoolableElements();
+      Collection<LibraryDilution> toPoolables = toPool.getPoolableElements();
+      toPoolables.addAll(fromPoolables);
+      setPoolModifiedDetails(toPool);
+      serviceManager.getRequestManager().savePool(toPool);
+      for (Note note : fromPool.getNotes()) {
+        serviceManager.getRequestManager().savePoolNote(toPool, note);
+      }
+      log.debug(String.format("Merged new pool %s with existing pool '%s'", fromPool.getAlias(), toPool.getAlias()));
     }
-    log.debug(String.format("Merged new pool %s with existing pool '%s'", fromPool.getAlias(), toPool.getAlias()));
+    fromPool.setId(toPool.getId());
   }
 
   /**

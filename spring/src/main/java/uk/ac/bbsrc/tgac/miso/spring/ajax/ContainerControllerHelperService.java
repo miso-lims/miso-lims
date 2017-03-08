@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
@@ -84,6 +86,12 @@ public class ContainerControllerHelperService {
   private ExperimentService experimentService;
   @Autowired
   private StudyService studyService;
+  @Autowired
+  private RunStore runStore;
+
+  public void setRunStore(RunStore runStore) {
+    this.runStore = runStore;
+  }
 
   public JSONObject getPlatformTypes(HttpSession session, JSONObject json) throws IOException {
     StringBuilder b = new StringBuilder();
@@ -777,9 +785,8 @@ public class ContainerControllerHelperService {
     try {
       if (json.has("containerId")) {
         Long containerId = json.getLong("containerId");
-        SequencerPartitionContainer container = requestManager.getSequencerPartitionContainerById(containerId);
-
-        for (Run run : container.getRuns()) {
+        List<Run> runs = runStore.listBySequencerPartitionContainerId(containerId);
+        for (Run run : runs) {
           if (run != null && "Completed".equals(run.getStatus().getHealth().getKey())) {
             return JSONUtils.SimpleJSONResponse("yes");
           }

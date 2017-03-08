@@ -1124,12 +1124,13 @@ public class MisoRequestManager implements RequestManager {
             }
           }
         }
-        managed.getSequencerPartitionContainers().clear();
+        List<SequencerPartitionContainer> saveContainers = new ArrayList<>();
         for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
           SequencerPartitionContainer managedContainer = getSequencerPartitionContainerById(container.getId());
-          updatePartitionPools(container, managedContainer);
-          managed.addSequencerPartitionContainer(managedContainer);
+          updateContainer(container, managedContainer);
+          saveContainers.add(managedContainer);
         }
+        managed.setSequencerPartitionContainers(saveContainers);
         managed.setNotes(run.getNotes());
         managed.setSequencingParameters(run.getSequencingParameters());
         runStore.save(managed);
@@ -1313,10 +1314,7 @@ public class MisoRequestManager implements RequestManager {
         return sequencerPartitionContainerStore.save(container);
       } else {
         SequencerPartitionContainer managed = getSequencerPartitionContainerById(container.getId());
-        managed.setIdentificationBarcode(container.getIdentificationBarcode());
-        managed.setLocationBarcode(container.getLocationBarcode());
-        managed.setValidationBarcode(container.getValidationBarcode());
-        updatePartitionPools(container, managed);
+        updateContainer(container, managed);
         return sequencerPartitionContainerStore.save(managed);
       }
     } else {
@@ -1324,8 +1322,11 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  private void updatePartitionPools(SequencerPartitionContainer source,
-      SequencerPartitionContainer managed) throws IOException {
+  private void updateContainer(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException {
+    managed.setIdentificationBarcode(source.getIdentificationBarcode());
+    managed.setLocationBarcode(source.getLocationBarcode());
+    managed.setValidationBarcode(source.getValidationBarcode());
+
     for (Partition sourcePartition : source.getPartitions()) {
       for (Partition managedPartition : managed.getPartitions()) {
         if (sourcePartition == null || managedPartition == null) {
