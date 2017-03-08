@@ -25,6 +25,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -543,6 +544,7 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   public void update(Sample sample) throws IOException {
+    if (!sample.getSampleQCs().isEmpty()) bulkAddQcs(sample);
     Sample updatedSample = get(sample.getId());
     authorizationManager.throwIfNotWritable(updatedSample);
     applyChanges(updatedSample, sample);
@@ -742,13 +744,30 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   public void addQc(Sample sample, SampleQC qc) throws IOException {
-    Sample managed = get(sample.getId());
-    authorizationManager.throwIfNotWritable(managed);
+    if (qc.getQcType() == null || qc.getQcType().getQcTypeId() == null) {
+      throw new IllegalArgumentException("QC Type cannot be null");
+    }
+    QcType managedQcType = sampleQcDao.getSampleQcTypeById(qc.getQcType().getQcTypeId());
+    if (managedQcType == null) {
+      throw new IllegalArgumentException("QC Type " + qc.getQcType().getQcTypeId() + " is not applicable for samples");
+    }
+    qc.setQcType(managedQcType);
     qc.setQcCreator(authorizationManager.getCurrentUsername());
 
+    Sample managed = get(sample.getId());
+    authorizationManager.throwIfNotWritable(managed);
+    
     // TODO: update concentration and/or volume if QC is of relevant type
     managed.addQc(qc);
     sampleDao.save(managed);
+  }
+
+  @Override
+  public void bulkAddQcs(Sample sample) throws IOException {
+    for (SampleQC qc : sample.getSampleQCs()) {
+      if (qc.getId() == AbstractQC.UNSAVED_ID) addQc(sample, qc);
+      // TODO: make QCs updatable too
+    }
   }
 
   @Override

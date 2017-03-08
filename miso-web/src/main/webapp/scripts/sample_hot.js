@@ -431,6 +431,7 @@ Sample.hot = {
     Hot.colConf = Sample.hot.generateColumnData(true);
 
     Hot.hotTable.updateSettings({ columns: Hot.colConf, colHeaders: Hot.getValues('header', Hot.colConf) });
+    Hot.hotTable.render();
   },
 
   /**
@@ -920,14 +921,28 @@ Sample.hot = {
         data: 'volume',
         type: 'numeric',
         format: '0.00',
-        include: showQcs || show['Stock']
+        include: showQcs || show['Stock'] || show['Aliquot']
       },
       {
         header: 'Conc. (ng/&#181;l)',
         data: 'concentration',
         type: 'numeric',
         format: '0.00',
-        include: show['Stock']
+        include: showQcs || show['Stock'] || show['Aliquot']
+      },
+      {
+        header: 'New RIN',
+        data: 'rin',
+        type: 'numeric',
+        format: '0.00',
+        include: showQcs
+      },
+      {
+        header: 'New DV200',
+        data: 'dv200',
+        type: 'numeric',
+        format: '0.00',
+        include: showQcs
       },
       {
         header: 'QC Passed?',
@@ -1164,6 +1179,34 @@ Sample.hot = {
       if (obj.groupDescription && obj.groupDescription.length) {
         sample.groupDescription = obj.groupDescription;
       }
+      
+      sample.detailedQcStatusId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.descriptionPredicate(obj.detailedQcStatusDescription), Hot.sampleOptions.detailedQcStatusesDtos), 'id');
+      sample.detailedQcStatusNote = obj.detailedQcStatusNote;
+
+      if (obj.volume) {
+        sample.volume = obj.volume;
+      }
+      if (obj.concentration) {
+        sample.concentration = obj.concentration;
+      }
+      
+      // add RNA values
+      sample.qcs = [];
+      if (obj.rin && obj.rin != '') {
+        sample.qcs.push(makeSampleQC('RIN', obj.rin));
+      }
+      if (obj.dv200 && obj.dv200 != '') {
+        sample.qcs.push(makeSampleQC('DV200', obj.dv200));
+      }
+      
+      function makeSampleQC(qcMethod, qcResults) {
+        return {
+          results: qcResults,
+          qcType: { 
+            id: Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.namePredicate(qcMethod), Hot.dropdownRef.qcTypes), 'id')
+          }
+        };
+      }
 
       // add SampleCategory-specific attributes.
       switch (Sample.hot.getCategoryFromClassId(sample.sampleClassId)) {
@@ -1193,29 +1236,6 @@ Sample.hot = {
           sample.type = 'LCM Tube'; // add type info for deserialization
         }
         break;
-      }
-
-      sample.detailedQcStatusId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.descriptionPredicate(obj.detailedQcStatusDescription), Hot.sampleOptions.detailedQcStatusesDtos), 'id');
-      sample.detailedQcStatusNote = obj.detailedQcStatusNote;
-
-      if (obj.volume) {
-        sample.volume = obj.volume;
-      }
-      if (obj.concentration) {
-        sample.concentration = obj.concentration;
-      }
-      
-      // add RNA values
-      sample.qcs = [];
-      if (obj.rin && obj.rin != '') {
-        sample.qcs.push(makeSampleQC('RIN', obj.rin));
-      }
-      
-      function makeSampleQC(qcMethod, qcResults) {
-        return {
-          results: qcResults,
-          qcType: 
-        };
       }
     } catch (e) {
       console.log(e);

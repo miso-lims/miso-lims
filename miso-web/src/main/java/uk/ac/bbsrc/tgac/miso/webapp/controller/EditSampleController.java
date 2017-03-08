@@ -361,6 +361,7 @@ public class EditSampleController {
     final List<String> sampleTypes = new ArrayList<>(requestManager.listAllSampleTypes());
     final List<String> strStatuses = new ArrayList<>();
     final List<String> donorSexes = new ArrayList<>();
+    final List<QcTypeDto> qcTypes = new ArrayList<>(Dtos.asQcTypeDtos(sampleService.listSampleQcTypes()));
     JSONArray allProjects = new JSONArray();
     for (Project fullProject : requestManager.listAllProjects()) {
       JSONObject project = new JSONObject();
@@ -381,6 +382,7 @@ public class EditSampleController {
     hot.put("projects", allProjects);
     hot.put("strStatuses", strStatuses);
     hot.put("donorSexes", donorSexes);
+    hot.put("qcTypes", qcTypes);
 
     return hot;
   }
