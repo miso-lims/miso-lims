@@ -119,7 +119,7 @@ public class SolidNotificationMessageConsumerMechanism
         String xml = run.getString("status");
         Status is = new SolidStatus(xml);
         is.setHealth(ht);
-        is.setRunName(runName);
+        is.setRunAlias(runName);
 
         Run r = null;
         Matcher m = p.matcher(runName);
@@ -135,7 +135,7 @@ public class SolidNotificationMessageConsumerMechanism
         try {
           if (attemptRunPopulation) {
             if (r == null) {
-              log.debug("Saving new run and status: " + is.getRunName());
+              log.debug("Saving new run and status: " + is.getRunAlias());
               r = new SolidRun(xml);
               r.getStatus().setHealth(ht);
               if (run.has("fullPath")) {
@@ -188,7 +188,7 @@ public class SolidNotificationMessageConsumerMechanism
                 }
               }
             } else {
-              log.debug("Updating existing run and status: " + is.getRunName());
+              log.debug("Updating existing run and status: " + is.getRunAlias());
 
               r.setAlias(runName);
               r.setPlatformType(PlatformType.SOLID);
@@ -250,7 +250,7 @@ public class SolidNotificationMessageConsumerMechanism
 
                 // update status if run isn't completed or failed
                 if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)) {
-                  log.debug("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> "
+                  log.debug("Saving previously saved status: " + is.getRunAlias() + " (" + r.getStatus().getHealth().getKey() + " -> "
                       + is.getHealth().getKey() + ")");
                   r.setStatus(is);
                 }

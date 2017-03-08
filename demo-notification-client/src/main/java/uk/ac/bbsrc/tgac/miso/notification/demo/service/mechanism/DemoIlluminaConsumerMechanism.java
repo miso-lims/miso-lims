@@ -81,7 +81,7 @@ public class DemoIlluminaConsumerMechanism implements NotificationMessageConsume
       sb.append("Processing " + runName);
       log.debug("Processing " + runName);
       Status is = new IlluminaStatus();
-      is.setRunName(runName);
+      is.setRunAlias(runName);
 
       Run r = new IlluminaRun();
       r.setPlatformRunId(0);

@@ -67,10 +67,10 @@ public class HibernateStatusDao implements StatusStore {
   }
 
   @Override
-  public Status getByRunName(String runName) throws IOException {
-    runName = DbUtils.convertStringToSearchQuery(runName);
+  public Status getByRunAlias(String runAlias) throws IOException {
+    runAlias = DbUtils.convertStringToSearchQuery(runAlias);
     Criteria criteria = currentSession().createCriteria(StatusImpl.class);
-    criteria.add(Restrictions.ilike("runName", runName));
+    criteria.add(Restrictions.ilike("runAlias", runAlias));
     criteria.setMaxResults(1);
     return (Status) criteria.uniqueResult();
   }

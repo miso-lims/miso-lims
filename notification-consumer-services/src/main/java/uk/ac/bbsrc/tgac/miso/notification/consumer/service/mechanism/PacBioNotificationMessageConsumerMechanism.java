@@ -137,7 +137,7 @@ public class PacBioNotificationMessageConsumerMechanism
           if (!status.startsWith("ERROR")) {
             Status is = new PacBioStatus(status);
             is.setHealth(ht);
-            is.setRunName(runName);
+            is.setRunAlias(runName);
 
             Run r = null;
 
@@ -153,7 +153,7 @@ public class PacBioNotificationMessageConsumerMechanism
 
             if (attemptRunPopulation) {
               if (r == null) {
-                log.info("\\_ Saving new run and status: " + is.getRunName());
+                log.info("\\_ Saving new run and status: " + is.getRunAlias());
                 r = new PacBioRun(status);
                 r.setAlias(run.getString("runName"));
                 r.setDescription(m.group(1));
@@ -190,10 +190,10 @@ public class PacBioNotificationMessageConsumerMechanism
 
                   r.setSequencerReference(sr);
                 } else {
-                  log.error("\\_ Cannot save " + is.getRunName() + ": no sequencer reference available.");
+                  log.error("\\_ Cannot save " + is.getRunAlias() + ": no sequencer reference available.");
                 }
               } else {
-                log.info("\\_ Updating existing run and status: " + is.getRunName());
+                log.info("\\_ Updating existing run and status: " + is.getRunAlias());
 
                 r.setAlias(runName);
 
@@ -240,7 +240,7 @@ public class PacBioNotificationMessageConsumerMechanism
 
                   // update status if run isn't completed or failed
                   if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)) {
-                    log.info("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> "
+                    log.info("Saving previously saved status: " + is.getRunAlias() + " (" + r.getStatus().getHealth().getKey() + " -> "
                         + is.getHealth().getKey() + ")");
                     r.setStatus(is);
                   }
@@ -314,7 +314,7 @@ public class PacBioNotificationMessageConsumerMechanism
                 runsToSave.add(r);
               }
             } else {
-              log.warn("\\_ Run not saved. Saving status: " + is.getRunName());
+              log.warn("\\_ Run not saved. Saving status: " + is.getRunAlias());
               requestManager.saveStatus(is);
             }
           }

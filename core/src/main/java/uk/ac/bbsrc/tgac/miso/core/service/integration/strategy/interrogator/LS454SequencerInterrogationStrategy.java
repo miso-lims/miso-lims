@@ -109,7 +109,7 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
             for (int i = 0; i < n.getChildNodes().getLength(); i++) {
               Node child = n.getChildNodes().item(i);
               if (child instanceof Element && ((Element) child).getTagName().equals("id")) {
-                status.setRunName(child.getTextContent());
+                status.setRunAlias(child.getTextContent());
               }
             }
             s.add(status);
@@ -218,7 +218,7 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
             for (int i = 0; i < n.getChildNodes().getLength(); i++) {
               Node child = n.getChildNodes().item(i);
               if (child instanceof Element && ((Element) child).getTagName().equals("id")) {
-                status.setRunName(child.getTextContent());
+                status.setRunAlias(child.getTextContent());
               }
             }
             return status;

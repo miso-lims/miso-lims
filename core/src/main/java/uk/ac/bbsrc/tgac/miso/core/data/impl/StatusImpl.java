@@ -72,8 +72,8 @@ public class StatusImpl implements Status, Serializable {
   @Column(nullable = false)
   private String instrumentName;
   private byte[] xml;
-  @Column(nullable = false)
-  private String runName;
+  @Column(name = "runName", nullable = false)
+  private String runAlias;
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
@@ -93,7 +93,7 @@ public class StatusImpl implements Status, Serializable {
    *          of type String
    */
   public StatusImpl(String runName) {
-    setRunName(runName);
+    setRunAlias(runName);
     setHealth(HealthType.Unknown);
     setStartDate(new Date());
   }
@@ -167,13 +167,13 @@ public class StatusImpl implements Status, Serializable {
   }
 
   @Override
-  public String getRunName() {
-    return runName;
+  public String getRunAlias() {
+    return runAlias;
   }
 
   @Override
-  public void setRunName(String runName) {
-    this.runName = runName;
+  public void setRunAlias(String runAlias) {
+    this.runAlias = runAlias;
   }
 
   @Override
@@ -205,7 +205,7 @@ public class StatusImpl implements Status, Serializable {
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
     if (getId().equals(StatusImpl.UNSAVED_ID) || them.getId().equals(StatusImpl.UNSAVED_ID)) {
-      return getRunName().equals(them.getRunName());
+      return getRunAlias().equals(them.getRunAlias());
     } else {
       return getId().equals(them.getId()) && getHealth().equals(them.getHealth()) && getStartDate().equals(them.getStartDate())
           && getCompletionDate().equals(them.getCompletionDate());
@@ -219,7 +219,7 @@ public class StatusImpl implements Status, Serializable {
     } else {
       final int PRIME = 31;
       int result = 1;
-      result = (result * PRIME) + (getRunName() == null ? 0 : getRunName().hashCode());
+      result = (result * PRIME) + (getRunAlias() == null ? 0 : getRunAlias().hashCode());
       return result;
     }
   }
