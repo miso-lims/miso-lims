@@ -86,6 +86,7 @@ import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
@@ -109,6 +110,8 @@ public class EditProjectController {
   @Autowired
   private ExperimentService experimentService;
   @Autowired
+  private SampleService sampleService;
+  @Autowired
   private LibraryService libraryService;
   @Autowired
   private LibraryDilutionService dilutionService;
@@ -125,6 +128,10 @@ public class EditProjectController {
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   public void setLibraryService(LibraryService libraryService) {
@@ -167,7 +174,7 @@ public class EditProjectController {
   @ModelAttribute("sampleQcTypesString")
   public String sampleTypesString() throws IOException {
     List<String> types = new ArrayList<>();
-    for (QcType s : requestManager.listAllSampleQcTypes()) {
+    for (QcType s : sampleService.listSampleQcTypes()) {
       types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");
     }
     Collections.sort(types);
