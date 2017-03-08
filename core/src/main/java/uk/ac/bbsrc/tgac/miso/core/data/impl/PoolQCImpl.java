@@ -39,6 +39,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.QC;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 
 
@@ -126,6 +127,24 @@ public class PoolQCImpl extends AbstractQC implements PoolQC, Serializable {
       hashcode = 37 * hashcode + getResults().hashCode();
       return hashcode;
     }
+  }
+
+  @Override
+  public int compareTo(QC t) {
+    PoolQC s = (PoolQC) t;
+    if (getId() != 0L && t.getId() != 0L) {
+      if (getId() < s.getId()) return -1;
+      if (getId() > s.getId()) return 1;
+    } else if (getQcType() != null && s.getQcType() != null && getResults() != null && s.getResults() != null && getQcDate() != null
+        && s.getQcDate() != null) {
+      int type = getQcType().compareTo(s.getQcType());
+      if (type != 0) return type;
+      int results = getResults().compareTo(s.getResults());
+      if (results != 0) return results;
+      int creator = getQcDate().compareTo(s.getQcDate());
+      if (creator != 0) return creator;
+    }
+    return 0;
   }
 
   @Override
