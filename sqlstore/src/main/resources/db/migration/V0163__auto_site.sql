@@ -1,13 +1,7 @@
--- harmonize_TGL_kd_ts
 -- StartNoTest
---StartNoTest
-CALL addTargetedSequencing('Agilent SureSelectXT MethylSeq', 'TGL', 'Agilent SureSelectXT MethylSeq', 0);
-CALL addTargetedSequencing('IDT xGEN Exome Research Panel v1', 'TGL', 'IDT xGEN Exome Research Panel v1', 0);
-CALL addTargetedSequencing('TruSeq RNA Access', 'TGL', 'TruSeq RNA Access', 0);
-CALL addTargetedSequencing('Roche SeqCap Epi CpGiant', 'TGL', 'Roche SeqCap Epi CpGiant', 0);
-CALL addTargetedSequencing('TruSeq Methylation Epic Exome', 'TGL', 'TruSeq Methylation Epic Exome', 0);
-
-CALL addKitDescriptor('Agilent SureSelect Human All Exon V5 + UTRs', 1, 'Agilent', 1, 'Library', 'Illumina', 'TGL');
+INSERT INTO KitDescriptor(name, version, manufacturer, partNumber, kitType, platformType, description, lastModifier)
+  SELECT 'Agilent SureSelect Human All Exon V5 + UTRs', 1, 'Agilent', 1, 'Library', 'Illumina', 'TGL', (SELECT userId FROM User WHERE loginName = 'admin') FROM DUAL
+  WHERE NOT EXISTS (SELECT 1 FROM KitDescriptor WHERE name = 'Agilent SureSelect Human All Exon V5 + UTRs');
 
 UPDATE TargetedSequencing SET kitDescriptorId = (SELECT kitDescriptorId FROM KitDescriptor WHERE name = 'Agilent SureSelect Human All Exon V6 Cosmic') WHERE alias = 'Agilent SureSelect Human All Exon V6 Cosmic';
 UPDATE TargetedSequencing SET kitDescriptorId = (SELECT kitDescriptorId FROM KitDescriptor WHERE name = 'Agilent SureSelect Human All Exon V5 + UTRs') WHERE alias = 'Agilent SureSelect Human All Exon V5 + UTRs';
@@ -22,13 +16,4 @@ UPDATE LibraryAdditionalInfo SET kitDescriptorId = (
   SELECT kitDescriptorId FROM TargetedSequencing WHERE alias = 'Agilent SureSelect Human All Exon V5 + UTRs')
 WHERE libraryId IN (SELECT library_libraryId FROM LibraryDilution WHERE targetedSequencingId IN (SELECT targetedSequencingId FROM TargetedSequencing 
 WHERE alias = 'Agilent SureSelect Human All Exon V5 + UTRs'));
---EndNoTest
 -- EndNoTest
-
--- tarseq_mouse_all_exon
--- StartNoTest
---StartNoTest
-CALL addTargetedSequencing('SureSelect Mouse All Exon', '', 'Agilent SureSelect XT', 0);
---EndNoTest
--- EndNoTest
-
