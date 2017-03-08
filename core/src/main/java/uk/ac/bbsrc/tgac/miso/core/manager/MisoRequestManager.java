@@ -1089,12 +1089,12 @@ public class MisoRequestManager implements RequestManager {
         run.getStatus().setLastUpdated(new Date());
 
         run.setName(generateTemporaryName());
-        run.getStatus().setRunName(run.getName());
+        run.getStatus().setRunAlias(run.getName());
         run.setId(runStore.save(run));
         try {
           String name = namingScheme.generateNameFor(run);
           run.setName(name);
-          run.getStatus().setRunName(run.getAlias());
+          run.getStatus().setRunAlias(run.getAlias());
 
           validateNameOrThrow(run, namingScheme);
           return runStore.save(run);
@@ -1113,7 +1113,7 @@ public class MisoRequestManager implements RequestManager {
         managed.getStatus().setStartDate(run.getStatus().getStartDate());
         managed.getStatus().setCompletionDate(run.getStatus().getCompletionDate());
         managed.getStatus().setInstrumentName(run.getStatus().getInstrumentName());
-        managed.getStatus().setRunName(managed.getName());
+        managed.getStatus().setRunAlias(managed.getAlias());
         managed.getStatus().setXml(run.getStatus().getXml());
         for (RunQC runQc : run.getRunQCs()) {
           if (!managed.getRunQCs().contains(runQc)) {
@@ -1356,7 +1356,7 @@ public class MisoRequestManager implements RequestManager {
         original.setHealth(status.getHealth());
         original.setCompletionDate(status.getCompletionDate());
         original.setXml(status.getXml());
-        original.setRunName(status.getRunName());
+        original.setRunAlias(status.getRunAlias());
         status = original;
       }
       return statusStore.save(status);
@@ -1551,7 +1551,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Status getStatusByRunName(String runName) throws IOException {
     if (statusStore != null) {
-      return statusStore.getByRunName(runName);
+      return statusStore.getByRunAlias(runName);
     } else {
       throw new IOException("No statusStore available. Check that it has been declared in the Spring config.");
     }

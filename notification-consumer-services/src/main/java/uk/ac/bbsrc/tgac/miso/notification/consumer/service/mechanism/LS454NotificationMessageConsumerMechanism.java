@@ -139,7 +139,7 @@ public class LS454NotificationMessageConsumerMechanism
         if (!runLog.startsWith("ERROR")) {
           Status is = new LS454Status(runLog);
           is.setHealth(ht);
-          is.setRunName(runName);
+          is.setRunAlias(runName);
 
           Run r = null;
           Matcher m = p.matcher(runName);
@@ -156,7 +156,7 @@ public class LS454NotificationMessageConsumerMechanism
           try {
             if (attemptRunPopulation) {
               if (r == null) {
-                log.debug("\\_ Saving new run and status: " + is.getRunName());
+                log.debug("\\_ Saving new run and status: " + is.getRunAlias());
                 r = new LS454Run();
                 r.setAlias(run.getString("runName"));
                 r.setDescription(m.group(3));
@@ -193,10 +193,10 @@ public class LS454NotificationMessageConsumerMechanism
                   r.setSequencerReference(sr);
                   runsToSave.add(r);
                 } else {
-                  log.error("\\_ Cannot save " + is.getRunName() + ": no sequencer reference available.");
+                  log.error("\\_ Cannot save " + is.getRunAlias() + ": no sequencer reference available.");
                 }
               } else {
-                log.debug("\\_ Updating existing run and status: " + is.getRunName());
+                log.debug("\\_ Updating existing run and status: " + is.getRunAlias());
 
                 r.setAlias(runName);
 
@@ -252,7 +252,7 @@ public class LS454NotificationMessageConsumerMechanism
 
                 // update status if run isn't completed or failed
                 if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)) {
-                  log.debug("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> "
+                  log.debug("Saving previously saved status: " + is.getRunAlias() + " (" + r.getStatus().getHealth().getKey() + " -> "
                       + is.getHealth().getKey() + ")");
                   r.setStatus(is);
                 }

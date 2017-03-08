@@ -80,7 +80,7 @@ public class SolidStatus extends StatusImpl {
           setStartDate(new SimpleDateFormat("yyyyMMdd").parse(m.group(2)));
           setInstrumentName(m.group(1));
         }
-        setRunName(runName);
+        setRunAlias(runName);
         setHealth(HealthType.Unknown);
       } else {
         String runName = statusDoc.getElementsByTagName("name").item(3).getTextContent();
@@ -110,7 +110,7 @@ public class SolidStatus extends StatusImpl {
           }
         }
 
-        setRunName(runName);
+        setRunAlias(runName);
         setHealth(HealthType.Unknown);
 
         setXml(statusXml);
