@@ -108,6 +108,9 @@ public class LibraryDilution implements Dilution, Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
+  @Column(nullable = true)
+  private Double volume;
+
   private String identificationBarcode;
   private Long preMigrationId;
 
@@ -259,6 +262,16 @@ public class LibraryDilution implements Dilution, Serializable {
   @Override
   public void setPreMigrationId(Long preMigrationId) {
     this.preMigrationId = preMigrationId;
+  }
+
+  @Override
+  public Double getVolume() {
+    return volume;
+  }
+
+  @Override
+  public void setVolume(Double volume) {
+    this.volume = volume;
   }
 
   @Override

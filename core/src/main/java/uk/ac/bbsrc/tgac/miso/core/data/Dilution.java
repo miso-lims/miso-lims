@@ -124,4 +124,8 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable<Dil
 
   void setPools(Set<Pool> pools);
 
+  public Double getVolume();
+
+  public void setVolume(Double volume);
+
 }
