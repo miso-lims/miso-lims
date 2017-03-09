@@ -13,7 +13,7 @@ for (String type : ["afterMigrate", "beforeMigrate"]) {
   final File sources = new File(basedir + '/src/main/resources/db/migration_' + type)
   println('Concatenating schema files from ' + sources.absolutePath + '...')
 
-  for (File file : sources.listFiles()) {
+  for (File file : sources.listFiles().sort{a,b -> a.name <=> b.name}) {
     if (!file.isFile() || !file.name.endsWith(".sql")) {
       continue
     }
