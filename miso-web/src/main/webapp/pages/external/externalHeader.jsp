@@ -118,7 +118,6 @@
 </table>
 
 <script type="text/javascript">
-    setBaseUrl("<c:url value="/miso/external/"/>");
     jQuery(function() {
         //all hover and click logic for buttons
         jQuery(".fg-button:not(.ui-state-disabled)")

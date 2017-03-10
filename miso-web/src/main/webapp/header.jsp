@@ -41,7 +41,6 @@
   <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
 
   <title><c:if test="${not empty title}">${title} &mdash; </c:if>MISO LIMS ${initParam['miso.name']}</title>
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js'/>"></script>
   <script type="text/javascript"
           src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax.js'/>"></script>
           
@@ -166,7 +165,6 @@
 </c:if>
 <sec:authorize access="isAuthenticated()">
   <script type="text/javascript">
-    setBaseUrl("<c:url value="/"/>");
     jQuery(function () {
       //all hover and click logic for buttons
       jQuery(".fg-button:not(.ui-state-disabled)")

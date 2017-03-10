@@ -271,12 +271,6 @@
               <cssFinalFile>style.css</cssFinalFile>
               <jsSourceDir>scripts</jsSourceDir>
               <jsSourceFiles>
-                <jsSourceFile>scriptaculous/activityInput.js</jsSourceFile>
-                <jsSourceFile>scriptaculous/effects.js</jsSourceFile>
-                <jsSourceFile>scriptaculous/dragdrop.js</jsSourceFile>
-                <jsSourceFile>scriptaculous/slider.js</jsSourceFile>
-                <jsSourceFile>scriptaculous/sound.js</jsSourceFile>
-                <jsSourceFile>scriptaculous/controls.js</jsSourceFile>
                 <jsSourceFile>lims.js</jsSourceFile>
                 <jsSourceFile>search.js</jsSourceFile>
                 <jsSourceFile>experiment_ajax.js</jsSourceFile>

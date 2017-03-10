@@ -24,12 +24,10 @@ function (beanId, eventId, serverParams, clientParams) {
   }
   else {
     if (clientParams.ajaxType && clientParams.ajaxType == "periodical") {
-      //instead of returning the function response, return the periodical updater
-      //as the response gets injected into the supplied clientParams.updateElement anyway
-      //this means that you can call the functions on the Ajax.PeriodicalUpdater
-      //such as stop(), which is kind of important :)
-      ajax.doAjax(beanId, eventId, serverParams, clientParams);
-      return ajax.getProgressUpdater();
+	  // instead of returning the function response, return null since no one
+	  // consumes this result anyway
+	  ajax.doAjax(beanId, eventId, serverParams, clientParams);
+      return null;
     }
     else {
       //a vanilla Ajax.Request call
@@ -67,11 +65,6 @@ Fluxion.Ajax = {};
 Fluxion.Ajax.newAjax = function(url) {
   var aj = this;
   aj.passthrough = {};
-  aj.pu = null;
-
-  this.getProgressUpdater = function() {
-    return aj.pu;
-  };
 
   this.getPassthroughResponse = function() {
     return aj.passthrough.response;
@@ -94,17 +87,12 @@ Fluxion.Ajax.newAjax = function(url) {
   };
 
   var stopUpdater = function() {
-    aj.pu.stop();
+    if (aj.interval) { window.clearInterval(aj.interval); }
   };
 
   this.doAjax =
   function(beanId, eventId, serverParams, clientParams) {
     if (clientParams && clientParams.ajaxType && clientParams.ajaxType == "periodical") {
-      //var update = null;
-      //if (clientParams.updateElement) {
-//        update = clientParams.updateElement;
-//      }
-//      else {
         var frameId = "FRAME-" + Math.floor(Math.random() * 99999);
         var frame = document.createElement("iframe");
         frame.setAttribute("id", frameId);
@@ -114,7 +102,6 @@ Fluxion.Ajax.newAjax = function(url) {
         frame.style.cssText = "width:0;height:0;visibility:hidden;";
         document.getElementsByTagName("body")[0].appendChild(frame);
         var update = frameId;
-//      }
 
       var freq = 1;
       var decay = 1;
@@ -124,130 +111,112 @@ Fluxion.Ajax.newAjax = function(url) {
       if (clientParams.updateDecay) {
         decay = clientParams.updateDecay;
       }
-      aj.pu = new Ajax.PeriodicalUpdater(update, url,
-      { method:'post',
-        postBody:
-            ('servicename=' + beanId +
-             '&action=' + eventId +
-             '&params=' + encodeURIComponent(JSON.stringify(serverParams))),
-        onLoading:function(request) {
+      aj.interval = window.setInterval(function() {
+        if (aj.xhr && aj.xhr.readyState != XMLHttpRequest.DONE) {
           if (clientParams.doOnLoading) {
             processJavascript(clientParams.doOnLoading);
           }
-        },
-        onSuccess:function(response) {
-          var json = JSON.parse(response.responseText);
-          if (clientParams.passthrough) {
-            process(json);
-          }
-          else {
-            if (json.error) {
-              stopUpdater();
-              if (clientParams && clientParams.doOnError) {
-                if (Object.prototype.toString.apply(clientParams.doOnError) === '[object Array]') {
-                  if (clientParams.doOnError.length == 1) {
-                    var d = clientParams.doOnError[0];
-                    return d(decodeEncodedJSON(json));
-                  }
-                  else {
+          return;
+        }
+        aj.xhr = new XMLHttpRequest();
+        aj.xhr.open('POST', url, true);
+        aj.xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        aj.xhr.setRequestHeader('Accept', 'application/json');
+        aj.xhr.onreadystatechange = function() {
+          if (aj.xhr.readyState == XMLHttpRequest.DONE && aj.xhr.status == 200) {
+            var json = JSON.parse(aj.xhr.responseText);
+            if (clientParams.passthrough) {
+              process(json);
+            }
+            else {
+              if (json.error) {
+                stopUpdater();
+                if (clientParams && clientParams.doOnError) {
+                  if (Array.isArray(clientParams.doOnError)) {
                     for (var i = 0; i < clientParams.doOnError.length; i++) {
                       var d = clientParams.doOnError[i];
                       d(decodeEncodedJSON(json));
                     }
                   }
+                  else {
+                    return clientParams.doOnError(decodeEncodedJSON(json));
+                  }
                 }
                 else {
-                  return clientParams.doOnError(decodeEncodedJSON(json));
+                  alert("Error: " + json.error);
+                }
+              }
+              else if (json.sessiontimeout) {
+                if (confirm("Your session has expired.")) {
+                  window.location.reload(true);
                 }
               }
               else {
-                alert("Error: " + json.error);
-              }
-            }
-            else if (json.sessiontimeout) {
-              if (confirm("Your session has expired.")) {
-                window.location.reload(true);
-              }
-            }
-            else {
-              if (json.stopUpdater) {
-                stopUpdater();
-              }
-
-              if (clientParams.updateElement) {
-                json.response = decodeResponse(json.response);
-                if (clientParams && clientParams.updateElement) {
-                  processOutputJSON(clientParams.updateElement, json.response);
+                if (json.stopUpdater) {
+                  stopUpdater();
                 }
-              }
 
-              if (json.doOnSuccess) {
-                if (Object.prototype.toString.apply(json.doOnSuccess) === '[object Array]') {
-                  var ja = json.doOnSuccess;
-                  for (var i = 0; i < ja.length; i++) {
-                    processJavascript(ja[i]);
+                if (clientParams.updateElement) {
+                  json.response = decodeResponse(json.response);
+                  if (clientParams && clientParams.updateElement) {
+                    processOutputJSON(clientParams.updateElement, json.response);
                   }
                 }
-                else {
-                  processJavascript(json.doOnSuccess);
-                }
-              }
 
-              if (clientParams.doOnSuccess) {
-                if (Object.prototype.toString.apply(clientParams.doOnSuccess) === '[object Array]') {
-                  if (clientParams.doOnSuccess.length == 1) {
-                    var d = clientParams.doOnSuccess[0];
-                    return d(decodeEncodedJSON(json));
+                if (json.doOnSuccess) {
+                  if (Array.isArray(json.doOnSuccess)) {
+                    var ja = json.doOnSuccess;
+                    for (var i = 0; i < ja.length; i++) {
+                      processJavascript(ja[i]);
+                    }
                   }
                   else {
+                    processJavascript(json.doOnSuccess);
+                  }
+                }
+
+                if (clientParams.doOnSuccess) {
+                  if (Array.isArray(clientParams.doOnSuccess)) {
                     for (var i = 0; i < clientParams.doOnSuccess.length; i++) {
                       var d = clientParams.doOnSuccess[i];
                       d(decodeEncodedJSON(json));
                     }
                   }
-                }
-                else {
-                  return clientParams.doOnSuccess(decodeEncodedJSON(json));
+                  else {
+                    return clientParams.doOnSuccess(decodeEncodedJSON(json));
+                  }
                 }
               }
             }
+          } else if (aj.xhr.readyState == XMLHttpRequest.DONE) {
+            errFunc(aj.xhr);
           }
-        },
-        frequency:freq,
-        decay:decay,
-        onFailure:errFunc
-      });
-    }
-    else {
-      new Ajax.Request(url,
-      { method:'post',
-        postBody:
-            ('servicename=' + beanId +
-             '&action=' + eventId +
-             '&params=' + encodeURIComponent(JSON.stringify(serverParams))),
-        onLoading:function(request) {
-          if (clientParams && clientParams.doOnLoading) {
-            clientParams.doOnLoading();
-          }
-        },
-        onSuccess:function(response) {
-          var json = JSON.parse(response.responseText);
+        };
+        aj.xhr.send('servicename=' + beanId +
+                 '&action=' + eventId +
+                 '&params=' + encodeURIComponent(JSON.stringify(serverParams)));
+      }, freq * 1000);
+    } else {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
+      xhr.setRequestHeader('Accept', 'application/json');
+      if (clientParams && clientParams.doOnLoading) {
+        clientParams.doOnLoading();
+      }
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+          var json = JSON.parse(xhr.responseText);
           if (clientParams && clientParams.passthrough) {
             process(json);
           }
           else {
             if (json.error) {
               if (clientParams && clientParams.doOnError) {
-                if (Object.prototype.toString.apply(clientParams.doOnError) === '[object Array]') {
-                  if (clientParams.doOnError.length == 1) {
-                    var d = clientParams.doOnError[0];
-                    return d(decodeEncodedJSON(json));
-                  }
-                  else {
-                    for (var i = 0; i < clientParams.doOnError.length; i++) {
-                      var d = clientParams.doOnError[i];
-                      d(decodeEncodedJSON(json));
-                    }
+                if (Array.isArray(clientParams.doOnError)) {
+                  for (var i = 0; i < clientParams.doOnError.length; i++) {
+                    var d = clientParams.doOnError[i];
+                    d(decodeEncodedJSON(json));
                   }
                 }
                 else {
@@ -271,7 +240,7 @@ Fluxion.Ajax.newAjax = function(url) {
               }
 
               if (json.doOnSuccess) {
-                if (Object.prototype.toString.apply(json.doOnSuccess) === '[object Array]') {
+                if (Array.isArray(json.doOnSuccess)) {
                   var ja = json.doOnSuccess;
                   for (var i = 0; i < ja.length; i++) {
                     processJavascript(ja[i]);
@@ -283,16 +252,10 @@ Fluxion.Ajax.newAjax = function(url) {
               }
 
               if (clientParams && clientParams.doOnSuccess) {
-                if (Object.prototype.toString.apply(clientParams.doOnSuccess) === '[object Array]') {
-                  if (clientParams.doOnSuccess.length == 1) {
-                    var d = clientParams.doOnSuccess[0];
-                    return d(decodeEncodedJSON(json));
-                  }
-                  else {
-                    for (var i = 0; i < clientParams.doOnSuccess.length; i++) {
-                      var d = clientParams.doOnSuccess[i];
-                      d(decodeEncodedJSON(json));
-                    }
+                if (Array.isArray(clientParams.doOnSuccess)) {
+                  for (var i = 0; i < clientParams.doOnSuccess.length; i++) {
+                    var d = clientParams.doOnSuccess[i];
+                    d(decodeEncodedJSON(json));
                   }
                 }
                 else {
@@ -301,9 +264,13 @@ Fluxion.Ajax.newAjax = function(url) {
               }
             }
           }
-        },
-        onFailure:errFunc
-      });
+        } else if (xhr.readyState == XMLHttpRequest.DONE) {
+         errFunc(xhr);
+        }
+      };
+      xhr.send('servicename=' + beanId +
+             '&action=' + eventId +
+             '&params=' + encodeURIComponent(JSON.stringify(serverParams)));
     }
   };
 };
@@ -341,127 +308,11 @@ var processJavascript = function(script) {
 };
 
 var processOutputJSON = function(updateElement, output) {
-  $(updateElement).innerHTML = output;
+  document.getElementById(updateElement).innerHTML = output;
 };
 
 var errFunc = function(t) {
   alert('Error ' + t.status + ' -- ' + t.statusText);
-};
-
-Fluxion.Ajax.newAjaxUpload = function (ajaxProgressUrl, formId) {
-  var uploadDone = false;
-  var progressupdater;
-  var json = {};
-
-  var containerId = "CONTAINER-" + Math.floor(Math.random() * 99999);
-  var frameId = "FRAME-" + Math.floor(Math.random() * 99999);
-  var container = null;
-  var frame = null;
-
-  $(formId).setAttribute("target", frameId);
-
-  //create the invisible iframe into which the file will be uploaded
-  init();
-
-  function init() {
-    container = document.createElement("div");
-    container.setAttribute("id", containerId);
-    frame = document.createElement("iframe");
-    frame.setAttribute("id", frameId);
-    frame.setAttribute("name", frameId);
-    //frame.setAttribute("src", "");
-    frame.setAttribute("style", "width:0;height:0;visibility:hidden;");
-    frame.style.cssText = "width:0;height:0;visibility:hidden;";
-
-    container.appendChild(frame);
-    $(formId).appendChild(container);
-
-    // IE hack: we need to set id and name if undefined.
-    if (! frames[frameId].id) {
-      frames[frameId].id = frameId;
-    }
-    if (! frames[frameId].name) {
-      frames[frameId].name = frameId;
-    }
-  }
-
-  this.doAjaxUpload =
-  function (beanId, eventId, serverParams, clientParams, validationParams) {
-    progressupdater =
-    new Ajax.PeriodicalUpdater(clientParams.progressElement, ajaxProgressUrl, {
-      asynchronous:true,
-      onSuccess: function(request) {
-        json = JSON.parse(request.responseText);
-
-        if (json.error != null) {
-          alert("Error: " + json.error);
-        }
-        else {
-          if (!uploadDone) {
-            var pc = 0;
-            if (json.bytes_read && json.content_length) {
-              pc = 100 * (json.bytes_read / json.content_length);
-            }
-            if (pc != 100) {
-              $(clientParams.statusElement).innerHTML =
-              "Uploading: " + pc + "% complete...<br/>";
-            }
-            else {
-              $(clientParams.statusElement).innerHTML = "Upload complete<br/>";
-              new Effect.Highlight($(clientParams.statusElement));
-              progressupdater.stop();
-              uploadDone = true;
-              //$(container).remove();
-            }
-          }
-        }
-      },
-      onComplete: function() {
-//        if (validationParams) {
-//          //do some validation on uploaded object
-//          doValidation(validationParams);
-//        }
-        json.frameId = frameId;
-
-        if (json.doOnSuccess) {
-          if (Object.prototype.toString.apply(json.doOnSuccess) === '[object Array]') {
-            var ja = json.doOnSuccess;
-            frame.onload = function(ja) {
-              for (var i = 0; i < ja.length; i++) {
-                processJavascript(ja[i]);
-              }
-            };
-          }
-          else {
-            frame.onload = processJavascript(json.doOnSuccess);
-          }
-        }
-
-        if (clientParams && clientParams.doOnSuccess) {
-          if (Object.prototype.toString.apply(clientParams.doOnSuccess) === '[object Array]') {
-            frame.onload = function(clientParams, json) {
-              for (var i = 0; i < clientParams.doOnSuccess.length; i++) {
-                var d = clientParams.doOnSuccess[i];
-                json.response = "OK";
-                d(decodeEncodedJSON(json));
-              }
-            };
-          }
-          else {
-            json.response = "OK";
-            frame.onload = clientParams.doOnSuccess(decodeEncodedJSON(json));
-          }
-        }
-      },
-      frequency:1,
-      method: 'post',
-      postBody:
-          ('servicename=' + beanId +
-           '&action=' + eventId +
-           '&params=' + encodeURIComponent(JSON.stringify(serverParams))),
-      onFailure: errFunc
-    });
-  };
 };
 
 var doValidation = function (params) {
