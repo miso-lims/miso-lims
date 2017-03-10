@@ -681,7 +681,7 @@ Sample.hot = {
         },
         allowEmpty: true,
         extraneous: true,
-        include: !isDetailed || show['Tissue']
+        include: true
       },
       {
         header: 'Matrix Barcode',
@@ -706,7 +706,7 @@ Sample.hot = {
         validator: Hot.requiredText,
         renderer: Hot.requiredTextRenderer,
         extraneous: true,
-        include: !isDetailed || show['Tissue']
+        include: true
       },
 
       // Parent columns
