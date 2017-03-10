@@ -76,14 +76,19 @@
 		<div id="saveSuccesses"  class="parsley-success hidden">
 	    <p id="successMessages"></p>
 	  </div>
-	    <div id="saveErrors" class="bs-callout bs-callout-warning hidden">
-	      <h2>Oh snap!</h2>
-	      <p>The following rows failed to save:</p>
-	      <p id="errorMessages"></p>
-	    </div>
-		<c:if test="${detailedSample}">
+    <div id="saveErrors" class="bs-callout bs-callout-warning hidden">
+      <h2>Oh snap!</h2>
+      <p>The following rows failed to save:</p>
+      <p id="errorMessages"></p>
+    </div>
+    <c:choose>
+		<c:when test="${detailedSample && method eq 'Edit'}">
 			<button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Show QCs Columns</button>
-		</c:if>
+		</c:when>
+    <c:otherwise>
+      <p>You will be able to bulk add additional QCs once these samples are saved.</p>
+    </c:otherwise>
+    </c:choose>
 		
 		<div id="hotContainer"></div>
 	
@@ -124,7 +129,7 @@
 
         // get SampleOptions and make the appropriate table
         if (Hot.detailedSample && Sample.hot.createOrEdit == "Create") {
-          Sample.hot.sampleClassId = parseInt(${sampleClassId});
+          Sample.hot.sampleClassId = parseInt("${sampleClassId}");
           Hot.fetchSampleOptions(Sample.hot.makeBulkCreateTable);
         } else {
           Hot.fetchSampleOptions(Sample.hot.makeBulkEditTable);

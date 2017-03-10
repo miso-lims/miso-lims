@@ -210,17 +210,35 @@ public class QcType implements Comparable<QcType>, Serializable {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
+      if (getQcTarget() != null) hashcode = 37 * hashcode + getQcTarget().hashCode();
       return hashcode;
     }
   }
 
   @Override
   public int compareTo(QcType t) {
-    int name = getName().compareTo(t.getName());
-    if (name != 0) return name;
+    if (getName() != null && t.getName() != null) {
+      int name = getName().compareTo(t.getName());
+      if (name != 0) return name;
+    }
 
     if (getQcTypeId() < t.getQcTypeId()) return -1;
     if (getQcTypeId() > t.getQcTypeId()) return 1;
     return 0;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getQcTypeId());
+    sb.append(" : ");
+    sb.append(getName());
+    sb.append(" : ");
+    sb.append(getDescription());
+    sb.append(" : ");
+    sb.append(getQcTarget());
+    sb.append(" : ");
+    sb.append(getUnits());
+    return sb.toString();
   }
 }

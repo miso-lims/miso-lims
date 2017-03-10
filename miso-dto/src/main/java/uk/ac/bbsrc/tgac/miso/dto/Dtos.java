@@ -124,7 +124,7 @@ public class Dtos {
 
   public static TissueOrigin to(TissueOriginDto from) {
     TissueOrigin to = new TissueOriginImpl();
-    to.setId(from.getId());
+    if (from.getId() != null) to.setId(from.getId());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     return to;
@@ -153,7 +153,7 @@ public class Dtos {
 
   public static TissueType to(TissueTypeDto from) {
     TissueType to = new TissueTypeImpl();
-    to.setId(from.getId());
+    if (from.getId() != null) to.setId(from.getId());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     return to;
@@ -569,9 +569,7 @@ public class Dtos {
       to = new SampleImpl();
     }
 
-    if (from.getId() != null) {
-      to.setId(from.getId());
-    }
+    if (from.getId() != null) to.setId(from.getId());
     if (!isStringEmptyOrNull(from.getAccession())) {
       to.setAccession(from.getAccession());
     }
@@ -942,7 +940,7 @@ public class Dtos {
 
   public static PoolOrder to(PoolOrderDto from) {
     PoolOrder to = new PoolOrderImpl();
-    to.setId(from.getId());
+    if (from.getId() != null) to.setId(from.getId());
     to.setPartitions(from.getPartitions());
     return to;
   }
@@ -1044,9 +1042,7 @@ public class Dtos {
     } else {
       to = new LibraryImpl();
     }
-    if (from.getId() != null) {
-      to.setId(from.getId());
-    }
+    if (from.getId() != null) to.setId(from.getId());
 
     to.setAlias(from.getAlias());
     to.setName(from.getName());
@@ -1149,7 +1145,7 @@ public class Dtos {
 
   public static Box to(BoxDto from) {
     Box to = new BoxImpl();
-    to.setId(from.getId());
+    if (from.getId() != null) to.setId(from.getId());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
@@ -1188,9 +1184,7 @@ public class Dtos {
 
   public static LibraryDilution to(DilutionDto from) {
     LibraryDilution to = new LibraryDilution();
-    if (from.getId() != null) {
-      to.setId(from.getId());
-    }
+    if (from.getId() != null) to.setId(from.getId());
     if (!isStringEmptyOrNull(from.getName())) {
       to.setName(from.getName());
     }
@@ -1208,9 +1202,10 @@ public class Dtos {
     } catch (ParseException e) {
       // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
     }
-    TargetedSequencing ts = new TargetedSequencing();
-    if (from.getTargetedSequencingId() != null) ts.setId(from.getTargetedSequencingId());
-    to.setTargetedSequencing(ts);
+    if (from.getTargetedSequencingId() != null) {
+      to.setTargetedSequencing(new TargetedSequencing());
+      to.getTargetedSequencing().setId(from.getTargetedSequencingId());
+    }
     return to;
   }
 
@@ -1327,7 +1322,7 @@ public class Dtos {
 
   private static QcType to(QcTypeDto from) {
     QcType to = new QcType();
-    to.setQcTypeId(from.getId());
+    if (from.getId() != null) to.setQcTypeId(from.getId());
     to.setName(from.getName());
     to.setDescription(from.getDescription());
     to.setQcTarget(from.getQcTarget());
@@ -1350,7 +1345,7 @@ public class Dtos {
 
   private static SampleQC to(SampleQcDto from) {
     SampleQC to = new SampleQCImpl();
-    to.setId(from.getId());
+    if (from.getId() != null) to.setId(from.getId());
     to.setQcType(to(from.getQcType()));
     to.setResults(from.getResults());
     return to;
@@ -1369,7 +1364,7 @@ public class Dtos {
 
   private static LibraryQC to(LibraryQcDto from) {
     LibraryQC to = new LibraryQCImpl();
-    to.setId(from.getId());
+    if (from.getId() != null) to.setId(from.getId());
     to.setQcType(to(from.getQcType()));
     to.setResults(from.getResults());
     return to;

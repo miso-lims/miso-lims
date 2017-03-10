@@ -296,8 +296,6 @@ public interface RequestManager {
 
   public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException;
 
-  public Collection<QcType> listAllSampleQcTypes() throws IOException;
-
   public Collection<QcType> listAllLibraryQcTypes() throws IOException;
 
   public Collection<QcType> listAllPoolQcTypes() throws IOException;
@@ -315,7 +313,6 @@ public interface RequestManager {
   // DELETES
 
   public void deleteSample(Sample sample) throws IOException;
-
 
   public void deleteRun(Run run) throws IOException;
 

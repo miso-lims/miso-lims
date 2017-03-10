@@ -1143,11 +1143,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<QcType> listAllSampleQcTypes() throws IOException {
-    return backingManager.listAllSampleQcTypes();
-  }
-
-  @Override
   public Collection<QcType> listAllLibraryQcTypes() throws IOException {
     return backingManager.listAllLibraryQcTypes();
   }

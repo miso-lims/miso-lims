@@ -40,6 +40,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.QC;
 
 
 /**
@@ -146,5 +147,18 @@ public class LibraryQCImpl extends AbstractQC implements LibraryQC, Serializable
       hashcode = 37 * hashcode + getResults().hashCode();
       return hashcode;
     }
+  }
+
+  @Override
+  public int compareTo(QC t) {
+    LibraryQC s = (LibraryQC) t;
+    int compare = super.compareTo(t);
+    if (compare != 0) {
+      return compare;
+    } else if (getResults() != null && s.getResults() != null) {
+      compare = getResults().compareTo(s.getResults());
+      return compare;
+    }
+    return compare;
   }
 }

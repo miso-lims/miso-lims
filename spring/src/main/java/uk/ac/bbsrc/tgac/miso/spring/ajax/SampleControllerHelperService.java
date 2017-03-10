@@ -201,7 +201,7 @@ public class SampleControllerHelperService {
   public JSONObject getSampleQcTypes(HttpSession session, JSONObject json) {
     try {
       StringBuilder sb = new StringBuilder();
-      Collection<QcType> types = requestManager.listAllSampleQcTypes();
+      Collection<QcType> types = sampleService.listSampleQcTypes();
       for (QcType s : types) {
         sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }

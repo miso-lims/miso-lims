@@ -750,15 +750,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<QcType> listAllSampleQcTypes() throws IOException {
-    if (sampleQcStore != null) {
-      return sampleQcStore.listAllSampleQcTypes();
-    } else {
-      throw new IOException("No sampleQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<QcType> listAllLibraryQcTypes() throws IOException {
     if (libraryQcStore != null) {
       return libraryQcStore.listAllLibraryQcTypes();

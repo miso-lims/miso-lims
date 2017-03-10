@@ -40,6 +40,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
@@ -168,5 +169,18 @@ public class RunQCImpl extends AbstractQC implements RunQC, Serializable {
       hashcode = 37 * hashcode + getQcType().hashCode();
       return hashcode;
     }
+  }
+
+  @Override
+  public int compareTo(QC t) {
+    RunQC s = (RunQC) t;
+    int compare = super.compareTo(t);
+    if (compare != 0) {
+      return compare;
+    } else if (getInformation() != null && s.getInformation() != null) {
+      compare = getInformation().compareTo(s.getInformation());
+      return compare;
+    }
+    return compare;
   }
 }

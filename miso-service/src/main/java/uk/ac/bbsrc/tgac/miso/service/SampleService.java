@@ -51,7 +51,10 @@ public interface SampleService {
 
   void addQc(Sample sample, SampleQC qc) throws IOException;
 
+  void bulkAddQcs(Sample sample) throws IOException;
+
   public void deleteQc(Sample sample, Long qcId) throws IOException;
 
   Collection<QcType> listSampleQcTypes() throws IOException;
+
 }
