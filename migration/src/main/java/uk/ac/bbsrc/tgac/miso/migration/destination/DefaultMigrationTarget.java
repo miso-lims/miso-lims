@@ -257,7 +257,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     } else {
       sample.setId(serviceManager.getSampleService().create(sample));
     }
-
+    if (sample.getAlias() == null) throw new IllegalStateException("Sample saved with null alias");
     log.debug("Saved sample " + sample.getAlias());
   }
 

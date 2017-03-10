@@ -223,9 +223,6 @@ public class DefaultSampleService implements SampleService {
         try {
           detailed.setParent(findOrCreateParent(detailed));
           detailed.inheritPermissions(detailed.getParent());
-          if (detailed.getParent().hasNonStandardAlias()) {
-            detailed.setNonStandardAlias(true);
-          }
         } catch (MisoNamingException e) {
           throw new IOException(e.getMessage(), e);
         }

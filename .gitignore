@@ -1,4 +1,8 @@
+*.war
+*.swp
 bin/
+log/
+logs/
 test_file.txt
 # Eclipse IDE files and directories.
 .classpath
