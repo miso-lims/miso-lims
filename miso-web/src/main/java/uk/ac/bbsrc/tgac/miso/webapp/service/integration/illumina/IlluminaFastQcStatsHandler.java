@@ -25,12 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.service.integration.illumina;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
-
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.integration.illumina
@@ -42,14 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
  * @since version
  */
 public class IlluminaFastQcStatsHandler {
-  private Logger log = LoggerFactory.getLogger(getClass());
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   public void parseStatsMessage(Message<Map<String, String>> message) {
     Map<String, String> stats = message.getPayload();

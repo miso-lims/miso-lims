@@ -36,8 +36,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
@@ -52,13 +50,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 @Controller
 public class ListRunsController {
   protected static final Logger log = LoggerFactory.getLogger(ListRunsController.class);
-
-  @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   @Autowired
   private RequestManager requestManager;

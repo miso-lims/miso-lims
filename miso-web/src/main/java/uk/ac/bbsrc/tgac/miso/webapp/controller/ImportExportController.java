@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,19 +11,6 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping("/importexport")
 public class ImportExportController {
-  @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
-
-  @Autowired
-  private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
-
-  public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   @RequestMapping("")
   public ModelAndView index(ModelMap model) {

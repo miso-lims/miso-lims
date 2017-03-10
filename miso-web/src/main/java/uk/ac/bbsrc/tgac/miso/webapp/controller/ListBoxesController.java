@@ -14,21 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 @Controller
 public class ListBoxesController {
   protected static final Logger log = LoggerFactory.getLogger(ListBoxesController.class);
-
-  @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   @Autowired
   private RequestManager requestManager;

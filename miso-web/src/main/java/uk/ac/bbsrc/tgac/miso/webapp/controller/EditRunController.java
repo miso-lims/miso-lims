@@ -66,7 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
@@ -92,9 +91,6 @@ public class EditRunController {
   private RequestManager requestManager;
 
   @Autowired
-  private RunAlertManager runAlertManager;
-
-  @Autowired
   private ChangeLogService changeLogService;
 
   private RunStatsManager runStatsManager;
@@ -111,10 +107,6 @@ public class EditRunController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  public void setRunAlertManager(RunAlertManager runAlertManager) {
-    this.runAlertManager = runAlertManager;
   }
 
   public void setRunStatsManager(RunStatsManager runStatsManager) {

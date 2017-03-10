@@ -25,33 +25,14 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
 @Controller
 public class ListProjectsController {
   protected static final Logger log = LoggerFactory.getLogger(ListProjectsController.class);
-
-  @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   @ModelAttribute("title")
   public String title() {

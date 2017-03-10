@@ -31,9 +31,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -54,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.QC;
 public class LibraryQCImpl extends AbstractQC implements LibraryQC, Serializable {
 
   private static final long serialVersionUID = 1L;
-  private static final Logger log = LoggerFactory.getLogger(LibraryQCImpl.class);
   public static final String UNITS = "nM";
 
   private Double results;

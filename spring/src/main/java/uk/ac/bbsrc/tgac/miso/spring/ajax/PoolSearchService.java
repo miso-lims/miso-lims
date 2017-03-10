@@ -38,8 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
@@ -67,8 +65,6 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 public class PoolSearchService {
 
   protected static final Logger log = LoggerFactory.getLogger(PoolSearchService.class);
-  @Autowired
-  private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
   @Autowired
@@ -224,10 +220,6 @@ public class PoolSearchService {
         + p.getPlatformType().getKey() + "</div>");
     b.append("</div>");
     return b.toString();
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   public void setRequestManager(RequestManager requestManager) {
