@@ -7,6 +7,7 @@ import uk.ac.bbsrc.tgac.miso.integration.test.BoxScannerTests;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScan;
 import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScanner;
+
 import ca.on.oicr.gsi.visionmate.RackType;
 import ca.on.oicr.gsi.visionmate.RackType.Manufacturer;
 import ca.on.oicr.gsi.visionmate.Scan;
@@ -15,6 +16,8 @@ import ca.on.oicr.gsi.visionmate.mockServer.MockScannerServer;
 
 public class VisionMateScannerTests extends BoxScannerTests<VisionMateScanner> {
   
+  private static final int SERVER_PORT = 8503;
+
   private static MockScannerServer server;
   private static VisionMateScanner client;
   
@@ -22,8 +25,8 @@ public class VisionMateScannerTests extends BoxScannerTests<VisionMateScanner> {
   
   @BeforeClass
   public static void setup() throws IntegrationException {
-    server = new MockScannerServer();
-    client = new VisionMateScanner("127.0.0.1", 8000, 2000, 5000);
+    server = new MockScannerServer(SERVER_PORT);
+    client = new VisionMateScanner("127.0.0.1", SERVER_PORT, 2000, 5000);
   }
   
   @Override
