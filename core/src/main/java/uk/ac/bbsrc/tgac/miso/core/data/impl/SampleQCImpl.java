@@ -30,9 +30,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -54,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 public class SampleQCImpl extends AbstractQC implements SampleQC, Serializable {
 
   private static final long serialVersionUID = 1L;
-  private static final Logger log = LoggerFactory.getLogger(SampleQCImpl.class);
   public static final String UNITS = "ng/&#181;l";
 
   private Double results;
@@ -140,18 +136,13 @@ public class SampleQCImpl extends AbstractQC implements SampleQC, Serializable {
   @Override
   public int compareTo(QC t) {
     SampleQC s = (SampleQC) t;
-    if (getId() != 0L && t.getId() != 0L) {
-      if (getId() < s.getId()) return -1;
-      if (getId() > s.getId()) return 1;
-    } else if (getQcType() != null && s.getQcType() != null && getResults() != null && s.getResults() != null && getQcDate() != null
-        && s.getQcDate() != null) {
-      int type = getQcType().compareTo(s.getQcType());
-      if (type != 0) return type;
-      int results = getResults().compareTo(s.getResults());
-      if (results != 0) return results;
-      int creator = getQcDate().compareTo(s.getQcDate());
-      if (creator != 0) return creator;
+    int compare = super.compareTo(t);
+    if (compare != 0) {
+      return compare;
+    } else if (getResults() != null && s.getResults() != null) {
+      compare = getResults().compareTo(s.getResults());
+      return compare;
     }
-    return 0;
+    return compare;
   }
 }

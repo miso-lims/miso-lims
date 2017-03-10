@@ -138,7 +138,7 @@ public abstract class AbstractQC implements QC {
 
   @Override
   public int hashCode() {
-    if (getId() != 0L && getId() != AbstractQC.UNSAVED_ID) {
+    if (getId() != AbstractQC.UNSAVED_ID) {
       return (int) getId();
     } else {
       final int PRIME = 37;
@@ -152,7 +152,7 @@ public abstract class AbstractQC implements QC {
 
   @Override
   public int compareTo(QC t) {
-    if (getId() != 0L && t.getId() != 0L) {
+    if (getId() != AbstractQC.UNSAVED_ID && t.getId() != AbstractQC.UNSAVED_ID) {
       if (getId() < t.getId()) return -1;
       if (getId() > t.getId()) return 1;
     } else if (getQcType() != null && t.getQcType() != null && getQcDate() != null && t.getQcDate() != null) {

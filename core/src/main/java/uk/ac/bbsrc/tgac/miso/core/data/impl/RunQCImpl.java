@@ -174,18 +174,13 @@ public class RunQCImpl extends AbstractQC implements RunQC, Serializable {
   @Override
   public int compareTo(QC t) {
     RunQC s = (RunQC) t;
-    if (getId() != 0L && t.getId() != 0L) {
-      if (getId() < s.getId()) return -1;
-      if (getId() > s.getId()) return 1;
-    } else if (getQcType() != null && s.getQcType() != null && getInformation() != null && s.getInformation() != null && getQcDate() != null
-        && s.getQcDate() != null) {
-      int type = getQcType().compareTo(s.getQcType());
-      if (type != 0) return type;
-      int info = getInformation().compareTo(s.getInformation());
-      if (info != 0) return info;
-      int creator = getQcDate().compareTo(s.getQcDate());
-      if (creator != 0) return creator;
+    int compare = super.compareTo(t);
+    if (compare != 0) {
+      return compare;
+    } else if (getInformation() != null && s.getInformation() != null) {
+      compare = getInformation().compareTo(s.getInformation());
+      return compare;
     }
-    return 0;
+    return compare;
   }
 }

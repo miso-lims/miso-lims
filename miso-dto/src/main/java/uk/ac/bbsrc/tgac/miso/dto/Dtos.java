@@ -1202,9 +1202,10 @@ public class Dtos {
     } catch (ParseException e) {
       // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
     }
-    TargetedSequencing ts = new TargetedSequencing();
-    if (from.getTargetedSequencingId() != null) ts.setId(from.getTargetedSequencingId());
-    to.setTargetedSequencing(ts);
+    if (from.getTargetedSequencingId() != null) {
+      to.setTargetedSequencing(new TargetedSequencing());
+      to.getTargetedSequencing().setId(from.getTargetedSequencingId());
+    }
     return to;
   }
 
@@ -1322,6 +1323,12 @@ public class Dtos {
   private static QcType to(QcTypeDto from) {
     QcType to = new QcType();
     if (from.getId() != null) to.setQcTypeId(from.getId());
+    to.setName(from.getName());
+    to.setDescription(from.getDescription());
+    to.setQcTarget(from.getQcTarget());
+    to.setUnits(from.getUnits());
+    to.setPrecisionAfterDecimal(from.getPrecisionAfterDecimal());
+    to.setArchived(from.isArchived());
     return to;
   }
 
