@@ -641,6 +641,10 @@ Sample.hot = {
     var sampleClass = Hot.detailedSample ? Hot.getObjById(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos) : null;
     var sampleClassAlias = sampleClass ? sampleClass.alias : null;
     var rnaSamples = Sample.hot.isFirstSampleRNA();
+    if (rnaSamples && isDetailed && Sample.hot.createOrEdit == 'Edit') {
+      // add the bulk create QCs columns if editing RNA samples (TODO: update once there are more QCs in place)
+      jQuery('#addQcsDiv').html('<button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Show QC Columns</button>');
+    }
 	  // We assume we have a linear progression of information that must be
 	  // collected as a sample progressed through the hierarchy.
     var progression = ['Identity', 'Tissue', 'Tissue Processing', 'Stock', 'Aliquot'];

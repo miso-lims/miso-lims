@@ -562,7 +562,7 @@ FOR EACH ROW
     NEW.library_libraryId,
     '',
     (SELECT lastModifier FROM Library WHERE libraryId = NEW.library_libraryId),
-    CONCAT('Library dilution ', NEW.name, ' created.'))//
+    CONCAT('Library dilution LDI', NEW.dilutionId, ' created.'))//
 
 DROP TRIGGER IF EXISTS BeforeInsertLibrary//
 
