@@ -60,34 +60,26 @@ public class OicrMigrationNamingScheme extends OicrNamingScheme {
 
     @Override
     public String generate(Sample sample) throws MisoNamingException {
-      // attempt to ignore up to two levels of non-standard aliases. Since the child-portion of the alias is appended
+      // Attempt to ignore non-standard aliases in the hierarchy. Since the child-portion of the alias is appended
       // to the parent's or grandparent's alias in most cases, this will allow the generation of non-standard aliases
-      // when there are non-standard aliases in the hierarchy
 
       int changed = 0;
       DetailedSample detailed = null;
-      DetailedSample parent = null;
-      DetailedSample grandparent = null;
       if (LimsUtils.isDetailedSample(sample)) {
         detailed = (DetailedSample) sample;
-        parent = detailed.getParent();
-        if (parent != null && parent.hasNonStandardAlias()) {
-          changed = 1;
+        for (DetailedSample parent = detailed.getParent(); parent != null && parent.hasNonStandardAlias(); parent = parent.getParent()) {
+          changed++;
           parent.setNonStandardAlias(false);
-          grandparent = parent.getParent();
-          if (grandparent != null && grandparent.hasNonStandardAlias()) {
-            changed = 2;
-            grandparent.setNonStandardAlias(false);
-          }
         }
       }
       String alias = super.generate(sample);
       if (changed > 0) {
         detailed.setNonStandardAlias(true);
-        parent.setNonStandardAlias(true);
-      }
-      if (changed > 1) {
-        grandparent.setNonStandardAlias(true);
+        DetailedSample parent = detailed;
+        for (int i = 0; i < changed; i++) {
+          parent = parent.getParent();
+          parent.setNonStandardAlias(true);
+        }
       }
       return alias;
     }
