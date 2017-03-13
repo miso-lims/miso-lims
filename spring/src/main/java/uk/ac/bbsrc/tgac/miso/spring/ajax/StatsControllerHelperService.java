@@ -31,11 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -56,18 +55,12 @@ import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 public class StatsControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(StatsControllerHelperService.class);
   @Autowired
-  private SecurityManager securityManager;
-  @Autowired
   private RequestManager requestManager;
 
   private RunStatsManager runStatsManager;
 
   @Autowired
   private NotificationQueryService notificationQueryService;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;

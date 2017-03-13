@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
@@ -73,9 +72,6 @@ public class BoxControllerHelperService {
 
   @Autowired
   private BoxScanner boxScanner;
-
-  @Autowired
-  private SecurityManager securityManager;
 
   /**
    * Returns a JSONObject of HTML for making the /miso/boxes table

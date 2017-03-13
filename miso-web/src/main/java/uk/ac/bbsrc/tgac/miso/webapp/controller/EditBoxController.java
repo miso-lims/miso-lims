@@ -33,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 
 @Controller
@@ -50,9 +49,6 @@ public class EditBoxController {
 
   @Autowired
   private ChangeLogService changeLogService;
-
-  @Autowired
-  private BoxScanner boxScanner;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;

@@ -63,6 +63,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.lowagie.text.Document;
 
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
@@ -120,7 +121,7 @@ public class ReportsController {
         try {
           if (format.equals(PDF)) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            List<Project> projects = new ArrayList<Project>(Arrays.asList(project));
+            List<Project> projects = new ArrayList<>(Arrays.asList(project));
             new ITextProjectDecorator(projects, new Document(), baos).buildReport();
 
             response.setHeader("Expires", "0");
@@ -151,7 +152,7 @@ public class ReportsController {
       try {
         if (format.equals(PDF)) {
           ByteArrayOutputStream baos = new ByteArrayOutputStream();
-          List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
+          List<Project> projects = new ArrayList<>(requestManager.listAllProjects());
           Document document = new Document();
           new ITextProjectDecorator(projects, document, baos).buildReport();
           response.setHeader("Expires", "0");

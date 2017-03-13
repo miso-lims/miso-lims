@@ -42,8 +42,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.NotificationGatewayService;
@@ -68,9 +66,6 @@ public class MessageConsumerController {
   private NotificationGatewayService notificationGatewayService;
 
   @Autowired
-  private SecurityManager securityManager;
-
-  @Autowired
   private RequestManager requestManager;
 
   public void setNotificationGatewayService(NotificationGatewayService notificationGatewayService) {
@@ -79,10 +74,6 @@ public class MessageConsumerController {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   @RequestMapping(value = "/illumina/run/status", method = RequestMethod.POST)

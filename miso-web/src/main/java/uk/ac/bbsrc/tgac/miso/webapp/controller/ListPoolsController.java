@@ -39,8 +39,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -57,13 +55,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 @Controller
 public class ListPoolsController {
   protected static final Logger log = LoggerFactory.getLogger(ListPoolsController.class);
-
-  @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   @Autowired
   private RequestManager requestManager;

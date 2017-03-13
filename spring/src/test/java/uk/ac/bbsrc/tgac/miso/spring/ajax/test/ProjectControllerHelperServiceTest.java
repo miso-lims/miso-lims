@@ -1,14 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +22,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -56,7 +51,6 @@ public class ProjectControllerHelperServiceTest {
     MockitoAnnotations.initMocks(this);
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public final void testDeleteProjectFile() throws Exception {
     final String fileName = "file_name";
@@ -68,7 +62,7 @@ public class ProjectControllerHelperServiceTest {
     final SecurityContextImpl context = new SecurityContextImpl();
     context.setAuthentication(authentication);
     SecurityContextHolder.setContext(context);
-    when(misoFileManager.getFileNames(any(Class.class), any(String.class))).thenReturn(new ArrayList<String>(Arrays.asList(fileName)));
+    when(misoFileManager.getFileNames(any(Class.class), any(String.class))).thenReturn(new ArrayList<>(Arrays.asList(fileName)));
     final JSONObject json = new JSONObject();
 
     json.put("hashcode", fileName.hashCode());
@@ -81,7 +75,6 @@ public class ProjectControllerHelperServiceTest {
     assertEquals("OK", response.get("response"));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public final void testDeleteProjectFileNoPermission() throws IOException {
     final String fileName = "file_name";
@@ -107,7 +100,6 @@ public class ProjectControllerHelperServiceTest {
   }
 
   @Test(expected = JSONException.class)
-  @SuppressWarnings("unchecked")
   public final void testDeleteProjectFileBadJson() throws Exception {
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");
@@ -121,7 +113,6 @@ public class ProjectControllerHelperServiceTest {
     projectControllerHelperService.deleteProjectFile(null, json);
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public final void testDeleteProjectFileIOException() throws Exception {
     final String fileName = "file_name";
@@ -133,7 +124,7 @@ public class ProjectControllerHelperServiceTest {
     final SecurityContextImpl context = new SecurityContextImpl();
     context.setAuthentication(authentication);
     SecurityContextHolder.setContext(context);
-    when(misoFileManager.getFileNames(any(Class.class), any(String.class))).thenReturn(new ArrayList<String>(Arrays.asList(fileName)));
+    when(misoFileManager.getFileNames(any(Class.class), any(String.class))).thenReturn(new ArrayList<>(Arrays.asList(fileName)));
     final JSONObject json = new JSONObject();
 
     json.put("hashcode", fileName.hashCode());

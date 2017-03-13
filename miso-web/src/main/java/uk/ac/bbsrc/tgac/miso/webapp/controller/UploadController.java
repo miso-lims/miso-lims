@@ -57,7 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -79,8 +78,6 @@ public class UploadController {
   public RequestManager requestManager;
   @Autowired
   public FilesManager filesManager;
-  @Autowired
-  private MisoFilesManager misoFileManager;
   @Autowired
   public MisoFormsService misoFormsService;
   @Autowired
@@ -110,10 +107,6 @@ public class UploadController {
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
-  }
-
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
   }
 
   public void setMisoFormsService(MisoFormsService misoFormsService) {
