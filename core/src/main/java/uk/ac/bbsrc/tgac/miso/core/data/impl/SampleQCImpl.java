@@ -30,13 +30,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
+import uk.ac.bbsrc.tgac.miso.core.data.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 
@@ -53,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 public class SampleQCImpl extends AbstractQC implements SampleQC, Serializable {
 
   private static final long serialVersionUID = 1L;
-  private static final Logger log = LoggerFactory.getLogger(SampleQCImpl.class);
   public static final String UNITS = "ng/&#181;l";
 
   private Double results;
@@ -105,7 +102,7 @@ public class SampleQCImpl extends AbstractQC implements SampleQC, Serializable {
   }
 
   /**
-   * Equivalency is based on getRunId() if set, otherwise on name
+   * Equivalency is based on getSampleId() if set, otherwise on name
    */
   @Override
   public boolean equals(Object obj) {
@@ -134,5 +131,18 @@ public class SampleQCImpl extends AbstractQC implements SampleQC, Serializable {
       hashcode = 37 * hashcode + getResults().hashCode();
       return hashcode;
     }
+  }
+
+  @Override
+  public int compareTo(QC t) {
+    SampleQC s = (SampleQC) t;
+    int compare = super.compareTo(t);
+    if (compare != 0) {
+      return compare;
+    } else if (getResults() != null && s.getResults() != null) {
+      compare = getResults().compareTo(s.getResults());
+      return compare;
+    }
+    return compare;
   }
 }

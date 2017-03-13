@@ -24,7 +24,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 @Controller
 @RequestMapping("/rest/librarydilution")
@@ -32,13 +31,7 @@ public class LibraryDilutionRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryDilutionRestController.class);
 
   @Autowired
-  private LibraryService libraryService;
-  @Autowired
   private LibraryDilutionService dilutionService;
-
-  public void setLibraryService(LibraryService libraryService) {
-    this.libraryService = libraryService;
-  }
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;

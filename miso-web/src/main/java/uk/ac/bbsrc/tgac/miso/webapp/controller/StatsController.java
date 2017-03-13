@@ -46,8 +46,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
@@ -103,13 +101,6 @@ public class StatsController {
     public String getKey() {
       return key;
     }
-  }
-  
-  @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   @Autowired

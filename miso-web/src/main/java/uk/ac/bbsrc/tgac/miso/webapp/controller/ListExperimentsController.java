@@ -36,10 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 
 /**
@@ -55,20 +52,7 @@ public class ListExperimentsController {
   protected static final Logger log = LoggerFactory.getLogger(ListExperimentsController.class);
 
   @Autowired
-  private SecurityManager securityManager;
-  @Autowired
   private ExperimentService experimentService;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   @ModelAttribute("title")
   public String title() {

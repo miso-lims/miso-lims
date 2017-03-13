@@ -30,14 +30,11 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -50,16 +47,12 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 public class ProjectPreview {
   protected static final Logger log = LoggerFactory.getLogger(ProjectPreview.class);
   @Autowired
-  private SecurityManager securityManager;
-  @Autowired
   private RequestManager requestManager;
 
   public JSONObject previewProject(HttpSession session, JSONObject json) {
-    StringBuffer sb = new StringBuffer();
     String projectId = (String) json.get("projectId");
 
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Project project = requestManager.getProjectById(Long.parseLong(projectId));
 
       session.setAttribute("project", project);
@@ -82,10 +75,6 @@ public class ProjectPreview {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed");
     }
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   public void setRequestManager(RequestManager requestManager) {

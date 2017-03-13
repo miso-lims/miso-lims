@@ -38,7 +38,6 @@ import org.springframework.messaging.Message;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -51,20 +50,13 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.0.3
  */
 public class IlluminaCortexStatsHandler {
-  private Logger log = LoggerFactory.getLogger(getClass());
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   @Autowired
   private MisoFilesManager misoFileManager;
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
   }
 
   public void parseStatsMessage(Message<Map<String, Map<String, byte[]>>> message) throws IOException {

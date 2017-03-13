@@ -32,7 +32,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -41,9 +40,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -61,9 +57,6 @@ public class ExperimentWizardController {
   protected static final Logger log = LoggerFactory.getLogger(ExperimentWizardController.class);
 
   @Autowired
-  private SecurityManager securityManager;
-
-  @Autowired
   private RequestManager requestManager;
 
   @Autowired
@@ -75,10 +68,6 @@ public class ExperimentWizardController {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   @ModelAttribute("studyTypes")
@@ -114,8 +103,6 @@ public class ExperimentWizardController {
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
       StringBuilder a = new StringBuilder();
       StringBuilder b = new StringBuilder();
 

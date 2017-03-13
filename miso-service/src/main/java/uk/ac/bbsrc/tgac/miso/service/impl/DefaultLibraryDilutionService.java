@@ -220,6 +220,7 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
     target.setConcentration(source.getConcentration());
     target.setTargetedSequencing(source.getTargetedSequencing());
     target.setIdentificationBarcode(source.getIdentificationBarcode());
+    target.setVolume(source.getVolume());
   }
 
   public void setDilutionDao(LibraryDilutionStore dilutionDao) {

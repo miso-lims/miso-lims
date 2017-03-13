@@ -31,15 +31,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.QC;
 
 
 /**
@@ -53,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 public class LibraryQCImpl extends AbstractQC implements LibraryQC, Serializable {
 
   private static final long serialVersionUID = 1L;
-  private static final Logger log = LoggerFactory.getLogger(LibraryQCImpl.class);
   public static final String UNITS = "nM";
 
   private Double results;
@@ -146,5 +143,18 @@ public class LibraryQCImpl extends AbstractQC implements LibraryQC, Serializable
       hashcode = 37 * hashcode + getResults().hashCode();
       return hashcode;
     }
+  }
+
+  @Override
+  public int compareTo(QC t) {
+    LibraryQC s = (LibraryQC) t;
+    int compare = super.compareTo(t);
+    if (compare != 0) {
+      return compare;
+    } else if (getResults() != null && s.getResults() != null) {
+      compare = getResults().compareTo(s.getResults());
+      return compare;
+    }
+    return compare;
   }
 }

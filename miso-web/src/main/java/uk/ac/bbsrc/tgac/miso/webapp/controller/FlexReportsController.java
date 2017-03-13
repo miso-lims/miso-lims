@@ -41,34 +41,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import net.sf.json.JSONObject;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @RequestMapping("/flexreports")
 @Controller
 public class FlexReportsController {
   protected static final Logger log = LoggerFactory.getLogger(FlexReportsController.class);
-
-  private static final String HTML = "html";
-  private static final String PDF = "pdf";
-  private static final String XLS = "xls";
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   @Autowired
   private JdbcTemplate interfaceTemplate;

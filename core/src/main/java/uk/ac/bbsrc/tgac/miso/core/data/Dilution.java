@@ -44,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-@JsonIgnoreProperties({ "securityProfile", "internalPoolableElements" })
+@JsonIgnoreProperties({ "securityProfile" })
 public interface Dilution extends SecurableByProfile, Barcodable, Comparable<Dilution>, Deletable, Nameable {
 
   /**
@@ -123,5 +123,9 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable<Dil
   Set<Pool> getPools();
 
   void setPools(Set<Pool> pools);
+
+  public Double getVolume();
+
+  public void setVolume(Double volume);
 
 }

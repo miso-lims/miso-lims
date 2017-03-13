@@ -358,12 +358,21 @@ public class DefaultLibraryService implements LibraryService {
 
   @Override
   public void addQc(Library library, LibraryQC qc) throws IOException {
+    if (qc.getQcType() == null || qc.getQcType().getQcTypeId() == null) {
+      throw new IllegalArgumentException("QC Type cannot be null");
+    }
+    QcType managedQcType = libraryQcDao.getLibraryQcTypeById(qc.getQcType().getQcTypeId());
+    if (managedQcType == null) {
+      throw new IllegalArgumentException("QC Type " + qc.getQcType().getQcTypeId() + " is not applicable for libraries");
+    }
+    qc.setQcType(managedQcType);
+    qc.setQcCreator(authorizationManager.getCurrentUsername());
+
     Library managed = libraryDao.get(library.getId());
     authorizationManager.throwIfNotWritable(managed);
-    qc.setQcCreator(authorizationManager.getCurrentUsername());
-    qc.setLibrary(managed);
     // TODO: update concentration if QC is of relevant type
-    libraryQcDao.save(qc);
+    managed.addQc(qc);
+    managed.setLastModifier(authorizationManager.getCurrentUser());
     libraryDao.save(managed);
   }
 
@@ -384,7 +393,7 @@ public class DefaultLibraryService implements LibraryService {
     if (deleteQc == null) throw new IOException("QC " + qcId + " not found for Library " + library.getId());
     authorizationManager.throwIfNonAdminOrMatchingOwner(securityManager.getUserByLoginName(deleteQc.getQcCreator()));
     managed.getLibraryQCs().remove(deleteQc);
-    libraryQcDao.remove(deleteQc);
+    managed.setLastModifier(authorizationManager.getCurrentUser());
     libraryDao.save(managed);
   }
 

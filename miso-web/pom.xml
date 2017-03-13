@@ -271,12 +271,6 @@
               <cssFinalFile>style.css</cssFinalFile>
               <jsSourceDir>scripts</jsSourceDir>
               <jsSourceFiles>
-                <jsSourceFile>scriptaculous/activityInput.js</jsSourceFile>
-                <jsSourceFile>scriptaculous/effects.js</jsSourceFile>
-                <jsSourceFile>scriptaculous/dragdrop.js</jsSourceFile>
-                <jsSourceFile>scriptaculous/slider.js</jsSourceFile>
-                <jsSourceFile>scriptaculous/sound.js</jsSourceFile>
-                <jsSourceFile>scriptaculous/controls.js</jsSourceFile>
                 <jsSourceFile>lims.js</jsSourceFile>
                 <jsSourceFile>search.js</jsSourceFile>
                 <jsSourceFile>experiment_ajax.js</jsSourceFile>
@@ -312,33 +306,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-fluxion-ajax-js</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>uk.ac.tgac.fluxion.ajax</groupId>
-                  <artifactId>fluxion-ajax-js</artifactId>
-                  <version>1.0</version>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                </artifactItem>
-              </artifactItems>
-              <excludes>META-INF</excludes>
-              <outputDirectory>target/ROOT/scripts/fluxion-ajax/</outputDirectory>
-              <overWriteReleases>true</overWriteReleases>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

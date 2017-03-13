@@ -36,8 +36,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
@@ -54,13 +52,6 @@ public class ListSubmissionsController {
   protected static final Logger log = LoggerFactory.getLogger(ListSubmissionsController.class);
 
   @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
   private RequestManager requestManager;
 
   public void setRequestManager(RequestManager requestManager) {
@@ -75,7 +66,7 @@ public class ListSubmissionsController {
   @RequestMapping("/submissions")
   public ModelAndView listSubmissions() throws IOException {
     try {
-      List<Submission> subs = new ArrayList<Submission>(requestManager.listAllSubmissions());
+      List<Submission> subs = new ArrayList<>(requestManager.listAllSubmissions());
       Collections.sort(subs);
       return new ModelAndView("/pages/listSubmissions.jsp", "submissions", subs);
     } catch (IOException ex) {

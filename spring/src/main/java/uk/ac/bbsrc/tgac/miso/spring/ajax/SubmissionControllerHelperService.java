@@ -47,8 +47,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -91,8 +89,6 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 public class SubmissionControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(SubmissionControllerHelperService.class);
   @Autowired
-  private SecurityManager securityManager;
-  @Autowired
   private RequestManager requestManager;
   @Autowired
   private SubmissionManager submissionManager;
@@ -130,7 +126,6 @@ public class SubmissionControllerHelperService {
 
         // sets the title, alias and description based on form contents
         JSONArray form = JSONArray.fromObject(json.get("form"));
-        Set<Partition> newPartitions = new HashSet<>();
 
         for (JSONObject j : (Iterable<JSONObject>) form) {
           if (j.getString("name").equals("title")) {
@@ -320,7 +315,6 @@ public class SubmissionControllerHelperService {
     try {
       if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = json.getLong("submissionId");
-        Map<String, Object> responseMap;
         JSONObject report = new JSONObject();
 
         JSONArray jsonUploadJobs = new JSONArray();
@@ -529,10 +523,6 @@ public class SubmissionControllerHelperService {
       return JSONUtils.SimpleJSONError("Failed to populate project for submission");
     }
     return JSONUtils.SimpleJSONError("Cannot populate project for submission");
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   public void setRequestManager(RequestManager requestManager) {

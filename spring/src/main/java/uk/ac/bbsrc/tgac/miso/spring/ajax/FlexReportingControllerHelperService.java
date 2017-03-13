@@ -42,9 +42,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.google.json.JsonSanitizer;
 
 import net.sf.json.JSONArray;
@@ -86,21 +84,13 @@ public class FlexReportingControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(FlexReportingControllerHelperService.class);
 
   @Autowired
-  private SecurityManager securityManager;
-  @Autowired
   private RequestManager requestManager;
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
   private StudyService studyService;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -445,7 +435,6 @@ public class FlexReportingControllerHelperService {
 
   public JSONArray buildSampleRelationReport(Project project, List<Run> runs) {
     JSONArray jsonArray = new JSONArray();
-    StringBuilder sb = new StringBuilder();
     try {
 
       Set<Library> librariesInRun = new HashSet<>();
@@ -1187,10 +1176,6 @@ public class FlexReportingControllerHelperService {
       log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   public void setRequestManager(RequestManager requestManager) {

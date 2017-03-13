@@ -431,6 +431,7 @@ Sample.hot = {
     Hot.colConf = Sample.hot.generateColumnData(true);
 
     Hot.hotTable.updateSettings({ columns: Hot.colConf, colHeaders: Hot.getValues('header', Hot.colConf) });
+    Hot.hotTable.render();
   },
 
   /**
@@ -614,6 +615,19 @@ Sample.hot = {
       .filter(function (kit) { return kit.kitType == 'Extraction'; })
       .map(function (kit) { return kit.name; });
   },
+  
+  /**
+   * Checks if the first sample in the sample being created/updated is an RNA sample
+   */
+  isFirstSampleRNA: function () {
+    var firstSample;
+    if (Sample.hot.createOrEdit == 'Create') {
+      firstSample = Sample.hot.newSamplesJSON[0];
+    } else if (Sample.hot.createOrEdit == 'Edit') {
+      firstSample = Sample.hot.samplesJSON[0];
+    }
+    return firstSample.sampleClassAlias.indexOf("RNA") != -1;
+  },
 
   /**
    * Returns a list of the columns will be displayed for the current situation
@@ -626,6 +640,11 @@ Sample.hot = {
     var isDetailed = targetSampleCategory != null;
     var sampleClass = Hot.detailedSample ? Hot.getObjById(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos) : null;
     var sampleClassAlias = sampleClass ? sampleClass.alias : null;
+    var rnaSamples = Sample.hot.isFirstSampleRNA();
+    if (rnaSamples && isDetailed && Sample.hot.createOrEdit == 'Edit') {
+      // add the bulk create QCs columns if editing RNA samples (TODO: update once there are more QCs in place)
+      jQuery('#addQcsDiv').html('<button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Show QC Columns</button>');
+    }
 	  // We assume we have a linear progression of information that must be
 	  // collected as a sample progressed through the hierarchy.
     var progression = ['Identity', 'Tissue', 'Tissue Processing', 'Stock', 'Aliquot'];
@@ -681,7 +700,7 @@ Sample.hot = {
         },
         allowEmpty: true,
         extraneous: true,
-        include: !isDetailed || show['Tissue']
+        include: true
       },
       {
         header: 'Matrix Barcode',
@@ -706,7 +725,7 @@ Sample.hot = {
         validator: Hot.requiredText,
         renderer: Hot.requiredTextRenderer,
         extraneous: true,
-        include: !isDetailed || show['Tissue']
+        include: true
       },
 
       // Parent columns
@@ -920,14 +939,28 @@ Sample.hot = {
         data: 'volume',
         type: 'numeric',
         format: '0.00',
-        include: showQcs || show['Stock']
+        include: showQcs || show['Stock'] || show['Aliquot']
       },
       {
         header: 'Conc. (ng/&#181;l)',
         data: 'concentration',
         type: 'numeric',
         format: '0.00',
-        include: show['Stock']
+        include: showQcs || show['Stock'] || show['Aliquot']
+      },
+      {
+        header: 'New RIN',
+        data: 'rin',
+        type: 'numeric',
+        format: '0.00',
+        include: showQcs && rnaSamples
+      },
+      {
+        header: 'New DV200',
+        data: 'dv200',
+        type: 'numeric',
+        format: '0.00',
+        include: showQcs && rnaSamples
       },
       {
         header: 'QC Passed?',
@@ -1164,6 +1197,34 @@ Sample.hot = {
       if (obj.groupDescription && obj.groupDescription.length) {
         sample.groupDescription = obj.groupDescription;
       }
+      
+      sample.detailedQcStatusId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.descriptionPredicate(obj.detailedQcStatusDescription), Hot.sampleOptions.detailedQcStatusesDtos), 'id');
+      sample.detailedQcStatusNote = obj.detailedQcStatusNote;
+
+      if (obj.volume) {
+        sample.volume = obj.volume;
+      }
+      if (obj.concentration) {
+        sample.concentration = obj.concentration;
+      }
+      
+      // add RNA values
+      sample.qcs = [];
+      if (obj.rin && obj.rin != '') {
+        sample.qcs.push(makeSampleQC('RIN', obj.rin));
+      }
+      if (obj.dv200 && obj.dv200 != '') {
+        sample.qcs.push(makeSampleQC('DV200', obj.dv200));
+      }
+      
+      function makeSampleQC(qcMethod, qcResults) {
+        return {
+          results: qcResults,
+          qcType: { 
+            id: Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.namePredicate(qcMethod), Hot.dropdownRef.qcTypes), 'id')
+          }
+        };
+      }
 
       // add SampleCategory-specific attributes.
       switch (Sample.hot.getCategoryFromClassId(sample.sampleClassId)) {
@@ -1193,16 +1254,6 @@ Sample.hot = {
           sample.type = 'LCM Tube'; // add type info for deserialization
         }
         break;
-      }
-
-      sample.detailedQcStatusId = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.descriptionPredicate(obj.detailedQcStatusDescription), Hot.sampleOptions.detailedQcStatusesDtos), 'id');
-      sample.detailedQcStatusNote = obj.detailedQcStatusNote;
-
-      if (obj.volume) {
-        sample.volume = obj.volume;
-      }
-      if (obj.concentration) {
-        sample.concentration = obj.concentration;
       }
     } catch (e) {
       console.log(e);
