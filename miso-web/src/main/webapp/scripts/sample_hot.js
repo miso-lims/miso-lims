@@ -1410,7 +1410,7 @@ Sample.hot = {
     if (continueValidation === false) return false;
 
     // send table data through the parser to get a copy of (not a reference to) sampleData array
-    var sampleData = JSON.parse(JSON.parse(JSON.stringify(Hot.hotTable.getSourceData())));
+    var sampleData = JSON.parse(JSON.stringify(Hot.hotTable.getSourceData()));
 
     // check for SampleValidRelationships
     var validRelationships = Sample.hot.assessValidRelationships(sampleData);
