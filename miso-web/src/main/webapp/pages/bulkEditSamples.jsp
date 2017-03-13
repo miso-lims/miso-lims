@@ -81,14 +81,7 @@
       <p>The following rows failed to save:</p>
       <p id="errorMessages"></p>
     </div>
-    <c:choose>
-		<c:when test="${detailedSample && method eq 'Edit'}">
-			<button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Show QCs Columns</button>
-		</c:when>
-    <c:otherwise>
-      <p>You will be able to bulk add additional QCs once these samples are saved.</p>
-    </c:otherwise>
-    </c:choose>
+    <div id="addQcsDiv"></div>
 		
 		<div id="hotContainer"></div>
 	
