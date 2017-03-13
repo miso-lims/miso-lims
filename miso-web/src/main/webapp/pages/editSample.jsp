@@ -819,6 +819,7 @@
     <div id="hotContainer"></div>
 
     <script type="text/javascript">
+      Sample.hot.createOrEdit = 'Create';
       Hot.dropdownRef = ${referenceDataJSON};
       Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
       Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};

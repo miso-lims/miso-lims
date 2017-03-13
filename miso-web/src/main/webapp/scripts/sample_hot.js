@@ -619,14 +619,12 @@ Sample.hot = {
   /**
    * Checks if the first sample in the sample being created/updated is an RNA sample
    */
-  isFirstSampleRNA: function () {
-    var firstSample;
-    if (Sample.hot.createOrEdit == 'Create') {
-      firstSample = Sample.hot.newSamplesJSON[0];
-    } else if (Sample.hot.createOrEdit == 'Edit') {
-      firstSample = Sample.hot.samplesJSON[0];
+  isSampleRNA: function () {
+    var sampleClasses = Hot.sampleOptions.sampleClassesDtos.filter(function(sc) { return sc.id == parseInt(Sample.hot.sampleClassId); } );
+    if (sampleClasses.length == 0) {
+      return false;
     }
-    return firstSample.sampleClassAlias.indexOf("RNA") != -1;
+    return sampleClasses[0].alias.indexOf("RNA") != -1;
   },
 
   /**
@@ -640,7 +638,7 @@ Sample.hot = {
     var isDetailed = targetSampleCategory != null;
     var sampleClass = Hot.detailedSample ? Hot.getObjById(Sample.hot.sampleClassId, Hot.sampleOptions.sampleClassesDtos) : null;
     var sampleClassAlias = sampleClass ? sampleClass.alias : null;
-    var rnaSamples = Sample.hot.isFirstSampleRNA();
+    var rnaSamples = Sample.hot.isSampleRNA();
     if (rnaSamples && isDetailed && Sample.hot.createOrEdit == 'Edit') {
       // add the bulk create QCs columns if editing RNA samples (TODO: update once there are more QCs in place)
       jQuery('#addQcsDiv').html('<button id="addQcs" onclick="Sample.hot.regenerateWithQcs();">Show QC Columns</button>');
