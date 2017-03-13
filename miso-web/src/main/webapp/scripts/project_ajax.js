@@ -161,15 +161,14 @@ Project.ui = {
 
   createListingProjectsTable: function () {
     jQuery('#listingProjectsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    function projectIdFromColumn(x) {
+      return parseInt(x.match(/PRO(\d+)/)[1]);
+    }
     jQuery.fn.dataTableExt.oSort['no-pro-asc'] = function (x, y) {
-      var a = parseInt(x.replace(/^PRO/i, ""));
-      var b = parseInt(y.replace(/^PRO/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+      return projectIdFromColumn(x) - projectIdFromColumn(y);
     };
     jQuery.fn.dataTableExt.oSort['no-pro-desc'] = function (x, y) {
-      var a = parseInt(x.replace(/^PRO/i, ""));
-      var b = parseInt(y.replace(/^PRO/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+      return projectIdFromColumn(y) - projectIdFromColumn(x);
     };
     Fluxion.doAjax(
       'projectControllerHelperService',
