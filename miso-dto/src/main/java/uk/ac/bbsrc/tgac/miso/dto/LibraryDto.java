@@ -48,6 +48,9 @@ public class LibraryDto {
   private Long boxId;
   private List<LibraryQcDto> qcs;
   private Integer dnaSize;
+  private Double qcQubit;
+  private Double qcTapeStation;
+  private Double qcQPcr;
 
   public String getAlias() {
     return alias;
@@ -305,5 +308,29 @@ public class LibraryDto {
   public void writeUrls(UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     writeUrls(baseUri);
+  }
+
+  public Double getQcQubit() {
+    return qcQubit;
+  }
+
+  public void setQcQubit(Double qcQubit) {
+    this.qcQubit = qcQubit;
+  }
+
+  public Double getQcTapeStation() {
+    return qcTapeStation;
+  }
+
+  public void setQcTapeStation(Double qcTapeStation) {
+    this.qcTapeStation = qcTapeStation;
+  }
+
+  public Double getQcQPcr() {
+    return qcQPcr;
+  }
+
+  public void setQcQPcr(Double qcQPcr) {
+    this.qcQPcr = qcQPcr;
   }
 }

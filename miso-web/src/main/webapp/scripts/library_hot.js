@@ -194,7 +194,10 @@ Library.hot = {
     volume: null,
     kitDescriptorId: null,
     kitDescriptorName: null,
-    archived: false
+    archived: false,
+    qcQubit: null,
+    qcTapeStation: null,
+    qcQPcr: null
   },
   
   /**
@@ -371,6 +374,15 @@ Library.hot = {
         include: true
       },
       {
+        header: 'Kit',
+        data: 'kitDescriptorName',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Library.hot.getKitDescriptors(),
+        renderer: Hot.requiredAutocompleteRenderer,
+        include: detailedBool
+      },
+      {
         header: 'QC Passed?',
         data: 'qcPassed',
         type: 'dropdown',
@@ -392,13 +404,25 @@ Library.hot = {
         include: !(Library.hot.hideCols.indexOf("volume") > -1)
       },
       {
-        header: 'Kit',
-        data: 'kitDescriptorName',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Library.hot.getKitDescriptors(),
-        renderer: Hot.requiredAutocompleteRenderer,
-        include: detailedBool
+        header: 'Qubit (ng/&#181;l)',
+        data: 'qcQubit',
+        type: 'numeric',
+        format: '0.0',
+        include: Library.hot.propagateOrEdit == 'Edit'
+      },
+      {
+        header: 'TapeStation (bp)',
+        data: 'qcTapeStation',
+        type: 'numeric',
+        format: '0.0',
+        include: Library.hot.propagateOrEdit == 'Edit'
+      },
+      {
+        header: 'qPCR (mol/&#181;l)',
+        data: 'qcQPcr',
+        type: 'numeric',
+        format: '0.0',
+        include: Library.hot.propagateOrEdit == 'Edit'
       }
     ].filter(function(col) { return col.include; });
   },
@@ -644,6 +668,15 @@ Library.hot = {
 
       lib.dnaSize = obj.dnaSize;
       lib.volume = obj.volume;
+      if (lib.qcQubit) {
+        lib.qcQubit = obj.qcQubit;
+      }
+      if (lib.qcTapeStation) {
+        lib.qcTapeStation = obj.qcTapeStation;
+      }
+      if (lib.qcQPcr) {
+        lib.qcQPcr = obj.qcQPcr;
+      }
 
       if (Hot.detailedSample) {
         lib.type = 'Detailed';
