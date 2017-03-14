@@ -1734,7 +1734,7 @@ public class MisoRequestManager implements RequestManager {
             relocationFlush = true;
           }
           if (item.getBox() == null) {
-            message.append("Added ").append(item.getAlias()).append(" (").append(item.getName()).append(") to").append(entry.getKey());
+            message.append("Added ").append(item.getAlias()).append(" (").append(item.getName()).append(") to ").append(entry.getKey());
           }
           newNames.add(item.getName());
           contents.put(entry.getKey(), item);

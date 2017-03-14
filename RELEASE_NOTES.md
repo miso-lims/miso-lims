@@ -1,3 +1,17 @@
+# 0.2.52
+
+Changes:
+
+ * Removed link to experiments list pending stability improvements
+ * Bulk create RNA sample QCs
+ * Adjusted fields displayed on bulk Create/Edit Samples page
+ * Added size field to library
+ * Added flush cache function via URL
+ * Hyperlinked box locations on List pages
+ * Added configuration to show/hide certain columns on propagate samples page
+ * Updated user interface for creating runs and containers
+ * Many bug fixes and stability improvements
+
 # 0.2.51
 
 Changes:

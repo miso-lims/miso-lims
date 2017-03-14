@@ -1,18 +1,22 @@
 package uk.ac.bbsrc.tgac.miso.integration.test.visionmate;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.test.BoxScannerTests;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScan;
 import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScanner;
+
 import ca.on.oicr.gsi.visionmate.RackType;
 import ca.on.oicr.gsi.visionmate.RackType.Manufacturer;
 import ca.on.oicr.gsi.visionmate.Scan;
 import ca.on.oicr.gsi.visionmate.ServerConfig;
 import ca.on.oicr.gsi.visionmate.mockServer.MockScannerServer;
 
+// TODO: re-enable after server port-assignment has been "randomized" to prevent collisions
+@Ignore
 public class VisionMateScannerTests extends BoxScannerTests<VisionMateScanner> {
   
   private static MockScannerServer server;

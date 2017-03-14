@@ -33,7 +33,6 @@
   </parent>
   <groupId>miso-external-web</groupId>
   <artifactId>miso-external-web</artifactId>
-  <version>0.2.52-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>miso-external-web</name>
   <dependencies>
