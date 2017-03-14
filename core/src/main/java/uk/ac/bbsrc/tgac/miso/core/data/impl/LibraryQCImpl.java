@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -54,9 +53,6 @@ public class LibraryQCImpl extends AbstractQC implements LibraryQC, Serializable
   public static final String UNITS = "nM";
 
   private Double results;
-
-  @Column(nullable = false)
-  private Integer insertSize;
 
   @ManyToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "library_libraryId")
@@ -101,16 +97,6 @@ public class LibraryQCImpl extends AbstractQC implements LibraryQC, Serializable
   @Override
   public void setResults(Double results) {
     this.results = results;
-  }
-
-  @Override
-  public Integer getInsertSize() {
-    return insertSize;
-  }
-
-  @Override
-  public void setInsertSize(Integer insertSize) {
-    this.insertSize = insertSize;
   }
 
   /**

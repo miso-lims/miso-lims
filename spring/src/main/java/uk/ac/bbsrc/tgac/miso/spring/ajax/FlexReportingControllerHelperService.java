@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -54,7 +54,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -463,15 +462,17 @@ public class FlexReportingControllerHelperService {
                             indexInfo.append(index.getSequence() + ")<br/>");
                           }
 
-                          List<LibraryQC> list = new ArrayList<>(libraryInRun.getLibraryQCs());
-                          LibraryQC libraryQc = list.get(list.size() - 1);
-
-                          jsonArray.add(
-                              JsonSanitizer.sanitize(
-                                  "[\"" + sample.getAlias() + "\",\"" + sample.getDescription() + "\",\"" + sample.getSampleType() + "\",\""
-                                      + libraryInRun.getName() + "\",\"" + dilution.getName() + "\",\"" + indexInfo.toString() + "\",\""
-                                      + Integer.toString(libraryQc.getInsertSize()) + "\",\"" + run.getAlias() + "\",\""
-                                      + spp.getPartitionNumber().toString() + "\"]"));
+                          JSONArray row = new JSONArray();
+                          row.add(sample.getAlias());
+                          row.add(sample.getDescription());
+                          row.add(sample.getSampleType());
+                          row.add(libraryInRun.getName());
+                          row.add(dilution.getName());
+                          row.add(indexInfo.toString());
+                          row.add(Integer.toString(libraryInRun.getDnaSize()));
+                          row.add(run.getAlias());
+                          row.add(spp.getPartitionNumber().toString());
+                          jsonArray.add(row);
                         }
                       }
                     }

@@ -343,6 +343,7 @@ public class ImportExportControllerHelperService {
                 Matcher m = digitPattern.matcher(bp);
                 if (m.matches()) {
                   insertSize = Integer.valueOf(m.group(1));
+                  library.setDnaSize(insertSize);
                 } else {
                   throw new InputFormException(
                       "Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid");
@@ -359,7 +360,6 @@ public class ImportExportControllerHelperService {
                 try {
                   LibraryQC lqc = new LibraryQCImpl();
                   lqc.setLibrary(library);
-                  lqc.setInsertSize(insertSize);
                   lqc.setResults(Double.valueOf(jsonArrayElement.getString(5)));
                   lqc.setQcCreator(user.getLoginName());
                   lqc.setQcDate(new Date());
@@ -388,9 +388,9 @@ public class ImportExportControllerHelperService {
                 try {
                   LibraryQC lqc = new LibraryQCImpl();
                   lqc.setLibrary(library);
-                  lqc.setInsertSize(insertSize);
                   lqc.setResults(Double.valueOf(jsonArrayElement.getString(7)));
                   lqc.setQcType(requestManager.getLibraryQcTypeByName("Bioanalyzer"));
+
                   if (!library.getLibraryQCs().contains(lqc)) {
                     library.addQc(lqc);
                     libraryService.addQc(library, lqc);
