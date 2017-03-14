@@ -53,6 +53,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
@@ -73,6 +76,9 @@ public class LibraryRestController extends RestController {
 
   @Autowired
   private LibraryService libraryService;
+
+  @Autowired
+  private RequestManager requestManager;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -134,6 +140,24 @@ public class LibraryRestController extends RestController {
       throw new RestException("No such library.", Status.NOT_FOUND);
     }
     library = Dtos.to(libraryDto);
+    if (libraryDto.getQcQubit() != null) {
+      LibraryQC qc = new LibraryQCImpl();
+      qc.setQcType(requestManager.getLibraryQcTypeByName("Qubit"));
+      qc.setResults(libraryDto.getQcQubit());
+      libraryService.addQc(library, qc);
+    }
+    if (libraryDto.getQcTapeStation() != null) {
+      LibraryQC qc = new LibraryQCImpl();
+      qc.setQcType(requestManager.getLibraryQcTypeByName("Tape Station"));
+      qc.setResults(libraryDto.getQcTapeStation());
+      libraryService.addQc(library, qc);
+    }
+    if (libraryDto.getQcQPcr() != null) {
+      LibraryQC qc = new LibraryQCImpl();
+      qc.setQcType(requestManager.getLibraryQcTypeByName("qPCR"));
+      qc.setResults(libraryDto.getQcQPcr());
+      libraryService.addQc(library, qc);
+    }
     libraryService.update(library);
     return new ResponseEntity<>(HttpStatus.OK);
   }
