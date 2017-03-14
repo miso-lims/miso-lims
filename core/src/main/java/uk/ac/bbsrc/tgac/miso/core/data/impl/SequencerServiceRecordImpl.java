@@ -9,6 +9,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord;
 @Table(name = "SequencerServiceRecord")
 public class SequencerServiceRecordImpl extends AbstractSequencerServiceRecord {
 
+  private static final long serialVersionUID = 1L;
+
   public SequencerServiceRecordImpl() {
     
   }
