@@ -60,7 +60,6 @@ public class SQLLibraryQCDAOTest extends AbstractDAOTest {
     library.setId(3L);
     qc.setLibrary(library);
     qc.setQcType(Mockito.mock(QcType.class));
-    qc.setInsertSize(300);
     long id = dao.save(qc);
 
     LibraryQC saved = dao.get(id);

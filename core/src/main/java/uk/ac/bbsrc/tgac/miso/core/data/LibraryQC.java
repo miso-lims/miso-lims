@@ -55,22 +55,6 @@ public interface LibraryQC extends QC {
   public void setLibrary(Library library);
 
   /**
-   * Returns the insertSize (in base pairs) of this LibraryQC object.
-   * 
-   * @return Integer insertSize.
-   */
-  public Integer getInsertSize();
-
-  /**
-   * Sets the insertSize (in base pairs) of this LibraryQC object.
-   * 
-   * @param insertSize
-   *          insertSize.
-   * 
-   */
-  public void setInsertSize(Integer insertSize);
-
-  /**
    * Returns the results of this QC object.
    * 
    * @return Double results.

@@ -1173,7 +1173,6 @@ function bulkLibraryQcTable() {
                         'libraryType',
                         'qcDate',
                         'qcType',
-                        'insertSize',
                         'results'];
 
   jQuery('#library_table').find("tr").each(function () {
@@ -1186,14 +1185,12 @@ function bulkLibraryQcTable() {
   jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
   jQuery("#library_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
   jQuery("#library_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-  jQuery("#library_table tr:first").append("<th>Insert Size</th>");
   jQuery("#library_table tr:first").append("<th>Results</th>");
 
   //columns
   jQuery("#library_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
   jQuery("#library_table tr:gt(0)").append("<td class='dateSelect'></td>");
   jQuery("#library_table tr:gt(0)").append("<td class='typeSelect'></td>");
-  jQuery("#library_table tr:gt(0)").append("<td class='defaultEditable'></td>");
   jQuery("#library_table tr:gt(0)").append("<td class='defaultEditable'></td>");
 
   var datatable = jQuery('#library_table').dataTable({
@@ -1226,7 +1223,7 @@ function bulkLibraryQcTable() {
   });
 
   jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-  jQuery("div.toolbar").html("<button id=\"bulkLibraryQcButton\" onclick=\"Sample.qc.saveBulkLibraryQc();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save QCs</span></button>");
+  jQuery("div.toolbar").html("<button id=\"bulkLibraryQcButton\" onclick=\"Sample.qc.saveBulkLibraryQc('#library_table');\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save QCs</span></button>");
 
   jQuery('#library_table .defaultEditable').editable(function (value, settings) {
     return value;

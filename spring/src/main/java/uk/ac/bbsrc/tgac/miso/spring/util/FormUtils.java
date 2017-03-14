@@ -956,7 +956,6 @@ public class FormUtils {
       try {
         LibraryQC lqc = new LibraryQCImpl();
         lqc.setLibrary(library);
-        lqc.setInsertSize(insertSize);
         lqc.setResults(Double.valueOf(libraryQcMolarity));
         lqc.setQcCreator(u.getLoginName());
         lqc.setQcDate(new Date());
@@ -969,6 +968,17 @@ public class FormUtils {
           }
         } else {
           throw new InputFormException("No such Library QC type '" + libraryQc + "'");
+        }
+
+        LibraryQC lis = new LibraryQCImpl();
+        lis.setLibrary(library);
+        lis.setResults((double) insertSize);
+        lis.setQcCreator(u.getLoginName());
+        lis.setQcDate(new Date());
+        QcType lisqct = libraryQcStore.getLibraryQcTypeByName("Insert Size");
+        lis.setQcType(lisqct);
+        if (lisqct == null) {
+          throw new InputFormException("No such Library QC type 'Insert Size'");
         }
 
         if (insertSize == 0 && lqc.getResults() == 0) {

@@ -132,9 +132,7 @@ Library.qc = {
       var column5 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
       column5.innerHTML = "<input id='libraryQcResults' name='libraryQcResults' type='text'/><span id='units'/>";
       var column6 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
-      column6.innerHTML = "<input id='libraryQcInsertSize' name='libraryQcInsertSize' type='text'/> bp";
-      var column7 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
-      column7.innerHTML = "<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/>Add</a>";
+      column6.innerHTML = "<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("libraryQcDate", 0);
 
@@ -172,7 +170,6 @@ Library.qc = {
         'qcDate': f.libraryQcDate,
         'qcType': f.libraryQcType,
         'results': f.libraryQcResults,
-        'insertSize': f.libraryQcInsertSize,
         'url': ajaxurl
       },
       {

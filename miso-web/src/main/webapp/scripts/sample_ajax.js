@@ -398,7 +398,7 @@ Sample.qc = {
         obj[at] = jQuery(this).text();
       });
       obj.qcCreator = jQuery('#currentUser').text();
-      obj.libraryId = obj.name.substring(3);
+      obj.libraryId = obj.name.match(/LIB(\d+)/)[1];
       aReturn.push(obj);
     }
 
@@ -562,8 +562,7 @@ Sample.library = {
   validateLibraryQcs: function (json) {
     var ok = true;
     for (var i = 0; i < json.length; i++) {
-      if (!json[i].results.match(/[0-9\.]+/) ||
-          !json[i].insertSize.match(/[0-9]+/) ||
+      if (!json[i].results.match(/[0-9]+(\.[0-9]+)?/) ||
           Utils.validation.isNullCheck(json[i].qcDate)) ok = false;
     }
     return ok;

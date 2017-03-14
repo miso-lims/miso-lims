@@ -1,0 +1,1 @@
+ALTER TABLE LibraryQC DROP COLUMN insertSize;
