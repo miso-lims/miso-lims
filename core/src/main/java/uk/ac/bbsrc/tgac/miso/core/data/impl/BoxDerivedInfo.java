@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -15,7 +16,9 @@ import org.hibernate.annotations.Synchronize;
 @Immutable
 @Table(name = "BoxDerivedInfo")
 @Synchronize("Box")
-public class BoxDerivedInfo {
+public class BoxDerivedInfo implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   @Id
   private Long boxId;
