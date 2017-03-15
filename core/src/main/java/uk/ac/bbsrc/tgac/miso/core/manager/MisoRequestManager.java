@@ -988,7 +988,7 @@ public class MisoRequestManager implements RequestManager {
             original.getOverviews().add(po);
           }
         }
-        // TODO: allow securityProfile updates?
+        updateSecurityProfile(original.getSecurityProfile(), project.getSecurityProfile());
         project = original;
       }
       project.getSecurityProfile().setProfileId(saveSecurityProfile(project.getSecurityProfile()));
@@ -998,6 +998,35 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
     }
+  }
+
+  private void updateSecurityProfile(SecurityProfile target, SecurityProfile source) throws IOException {
+    target.setAllowAllInternal(source.isAllowAllInternal());
+    target.setOwner(source.getOwner() == null ? null : securityStore.getUserById(source.getOwner().getUserId()));
+    target.setReadGroups(loadManagedGroups(source.getReadGroups()));
+    target.setWriteGroups(loadManagedGroups(source.getWriteGroups()));
+    target.setReadUsers(loadManagedUsers(source.getReadUsers()));
+    target.setWriteUsers(loadManagedUsers(source.getWriteUsers()));
+  }
+
+  private Collection<Group> loadManagedGroups(Collection<Group> original) throws IOException {
+    if (original == null)
+      return null;
+    List<Group> managed = new ArrayList<>();
+    for (Group item : original) {
+      managed.add(securityStore.getGroupById(item.getGroupId()));
+    }
+    return managed;
+  }
+
+  private Collection<User> loadManagedUsers(Collection<User> original) throws IOException {
+    if (original == null)
+      return null;
+    List<User> managed = new ArrayList<>();
+    for (User item : original) {
+      managed.add(securityStore.getUserById(item.getUserId()));
+    }
+    return managed;
   }
 
   private long saveSecurityProfile(SecurityProfile sp) throws IOException {
