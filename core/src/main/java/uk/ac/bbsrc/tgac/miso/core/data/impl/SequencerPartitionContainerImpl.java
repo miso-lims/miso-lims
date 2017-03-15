@@ -187,7 +187,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @Override
   public String getLabelText() {
-    return getPlatform().getPlatformType().name() + " " + getValidationBarcode();
+    return getIdentificationBarcode() + " (" + getPlatform().getNameAndModel() + ")";
   }
 
   @Override
