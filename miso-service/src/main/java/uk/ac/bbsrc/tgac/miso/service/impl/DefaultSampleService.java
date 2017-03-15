@@ -236,9 +236,7 @@ public class DefaultSampleService implements SampleService {
 
     // pre-save field generation
     sample.setName(generateTemporaryName());
-    if (isDetailedSample(sample) && ((DetailedSample) sample).hasNonStandardAlias()) {
-      // do not validate alias
-    } else if (isStringEmptyOrNull(sample.getAlias()) && namingScheme.hasSampleAliasGenerator()) {
+    if (isStringEmptyOrNull(sample.getAlias()) && namingScheme.hasSampleAliasGenerator()) {
       sample.setAlias(generateTemporaryName());
     } else {
       validateAliasUniqueness(sample.getAlias());
@@ -281,7 +279,12 @@ public class DefaultSampleService implements SampleService {
         String generatedAlias = namingScheme.generateSampleAlias(created);
         validateAliasUniqueness(generatedAlias);
         created.setAlias(generatedAlias);
-        validateAlias(created);
+        if (isDetailedSample(created)) {
+          // generation of non-standard aliases is allowed
+          ((DetailedSample) created).setNonStandardAlias(!namingScheme.validateSampleAlias(generatedAlias).isValid());
+        } else {
+          validateAlias(created);
+        }
         needsUpdate = true;
       }
       if (autoGenerateIdBarcodes && isStringEmptyOrNull(created.getIdentificationBarcode())) {
