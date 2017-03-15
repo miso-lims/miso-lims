@@ -18,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.migration.util.OicrMigrationNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
@@ -257,7 +257,7 @@ public class MisoServiceManager {
   // TODO: Add naming scheme config instead of hard-coding
   private NamingScheme getNamingScheme() {
     if (namingScheme == null) {
-      namingScheme = new OicrMigrationNamingScheme();
+      namingScheme = new OicrNamingScheme();
     }
     return namingScheme;
   }
@@ -302,7 +302,7 @@ public class MisoServiceManager {
     rm.setPoolStore(poolDao);
     rm.setRunStore(runDao);
     rm.setSampleQcStore(sampleQcDao);
-    rm.setNamingScheme(namingScheme);
+    rm.setNamingScheme(getNamingScheme());
     rm.setSecurityStore(securityStore);
     rm.setSecurityProfileStore(securityProfileDao);
     rm.setPoolAlertManager(poolAlertManager);
@@ -1139,7 +1139,7 @@ public class MisoServiceManager {
     svc.setAuthorizationManager(authorizationManager);
     svc.setProjectStore(projectDao);
     svc.setStudyStore(studyDao);
-    svc.setNamingScheme(namingScheme);
+    svc.setNamingScheme(getNamingScheme());
     setStudyService(svc);
   }
 
