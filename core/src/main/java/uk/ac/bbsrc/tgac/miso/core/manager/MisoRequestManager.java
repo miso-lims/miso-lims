@@ -53,6 +53,7 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -87,6 +88,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
@@ -1161,15 +1163,36 @@ public class MisoRequestManager implements RequestManager {
             }
           }
         }
+        Set<String> originalContainers = Barcodable.extractLabels(managed.getSequencerPartitionContainers());
         List<SequencerPartitionContainer> saveContainers = new ArrayList<>();
         for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
           SequencerPartitionContainer managedContainer = getSequencerPartitionContainerById(container.getId());
           updateContainer(container, managedContainer);
           saveContainers.add(managedContainer);
         }
+        Set<String> updatedContainers = Barcodable.extractLabels(saveContainers);
         managed.setSequencerPartitionContainers(saveContainers);
         managed.setNotes(run.getNotes());
         managed.setSequencingParameters(run.getSequencingParameters());
+
+        Set<String> added = new TreeSet<>(updatedContainers);
+        added.removeAll(originalContainers);
+        Set<String> removed = new TreeSet<>(originalContainers);
+        removed.removeAll(updatedContainers);
+        if (!added.isEmpty() || !removed.isEmpty()) {
+          StringBuilder message = new StringBuilder();
+          message.append("Containers");
+          LimsUtils.appendSet(message, added, "added");
+          LimsUtils.appendSet(message, removed, "removed");
+
+          RunChangeLog changeLog = new RunChangeLog();
+          changeLog.setRun(managed);
+          changeLog.setColumnsChanged("containers");
+          changeLog.setSummary(message.toString());
+          changeLog.setTime(new Date());
+          changeLog.setUser(managed.getLastModifier());
+          changeLogStore.create(changeLog);
+        }
         runStore.save(managed);
         if (runAlertManager != null) runAlertManager.update(managed);
         return run.getId();
