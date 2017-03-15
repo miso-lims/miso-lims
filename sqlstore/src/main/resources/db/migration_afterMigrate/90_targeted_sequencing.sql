@@ -67,8 +67,8 @@ CALL addTargetedSequencing('xGen Lockdown AML','GSLE Legacy','KAPA Hyper Prep',1
 CALL addTargetedSequencing('xGen Lockdown AML','GSLE Legacy','KAPA OnBead ',1);
 CALL addTargetedSequencing('xGen Lockdown AML','GSLE Legacy','Kapa Hyper Prep Plus',1);
 
-CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5', 'Human all exon V5', 'KAPA Hyper Prep/Agilent SureSelect XT2', 0);
-CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5 + UTRs', 'Human all exon V5 + UTRs', 'KAPA Hyper Prep/Agilent SureSelect XT2', 0);
-CALL addTargetedSequencing('Agilent SureSelect Human All Exon V6', 'Human all exon V6', 'KAPA Hyper Prep/Agilent SureSelect XT2', 0);
-CALL addTargetedSequencing('Agilent SureSelect Human All Exon V6 Cosmic', 'Human all exon V6 Cosmic', 'KAPA Hyper Prep/Agilent SureSelect XT2', 0);
+CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5', 'Human all exon V5', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
+CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5 + UTRs', 'Human all exon V5 + UTRs', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
+CALL addTargetedSequencing('Agilent SureSelect Human All Exon V6', 'Human all exon V6', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
+CALL addTargetedSequencing('Agilent SureSelect Human All Exon V6 Cosmic', 'Human all exon V6 Cosmic', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
 -- EndNoTest
