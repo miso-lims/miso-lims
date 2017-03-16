@@ -238,7 +238,7 @@ public class DefaultSampleService implements SampleService {
     sample.setName(generateTemporaryName());
     if (isStringEmptyOrNull(sample.getAlias()) && namingScheme.hasSampleAliasGenerator()) {
       sample.setAlias(generateTemporaryName());
-    } else {
+    } else if (!isDetailedSample(sample) || !((DetailedSample) sample).hasNonStandardAlias()) {
       validateAliasUniqueness(sample.getAlias());
     }
     return save(sample).getId();
