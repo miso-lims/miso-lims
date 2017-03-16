@@ -1,7 +1,7 @@
 /**
  * 
  */
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
@@ -36,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateAlertDao;
  * @author Chris Salt
  *
  */
-public class SQLAlertDAOTest extends AbstractDAOTest {
+public class HibernateAlertDaoTest extends AbstractDAOTest {
 
   @Autowired
   private JdbcTemplate template;

@@ -20,7 +20,7 @@
  * * *********************************************************************
  * */
 
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
@@ -44,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
 
-public class SQLPlatformDAOTest extends AbstractDAOTest {
+public class HibernatePlatformDaoTest extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();

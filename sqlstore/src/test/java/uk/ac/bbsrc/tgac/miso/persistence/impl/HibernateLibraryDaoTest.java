@@ -1,5 +1,5 @@
 
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
@@ -34,7 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 
-public class SQLLibraryDAOTest extends AbstractDAOTest {
+public class HibernateLibraryDaoTest extends AbstractDAOTest {
 
   @Autowired
   private JdbcTemplate jdbcTemplate;

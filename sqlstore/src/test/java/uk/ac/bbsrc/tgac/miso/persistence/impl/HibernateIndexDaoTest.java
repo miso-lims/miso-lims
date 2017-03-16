@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-public class HiberateIndexDaoTest extends AbstractDAOTest {
+public class HibernateIndexDaoTest extends AbstractDAOTest {
   private HibernateIndexDao dao;
   @Autowired
   private SessionFactory sessionFactory;

@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolQCDao;
 
-public class SQLPoolQCDAOTest extends AbstractDAOTest {
+public class HibernatePoolQcDaoTest extends AbstractDAOTest {
   
   @Rule
   public ExpectedException expectedException = ExpectedException.none();

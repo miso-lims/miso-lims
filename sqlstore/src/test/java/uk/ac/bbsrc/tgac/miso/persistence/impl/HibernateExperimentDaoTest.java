@@ -1,7 +1,7 @@
 /**
  * 
  */
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -38,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
  * @author Chris Salt
  *
  */
-public class SQLExperimentDAOTest extends AbstractDAOTest {
+public class HibernateExperimentDaoTest extends AbstractDAOTest {
 
   @Autowired
   @Spy

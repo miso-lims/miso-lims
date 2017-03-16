@@ -1,7 +1,7 @@
 /**
  * 
  */
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
  * @author Chris Salt
  *
  */
-public class SQLLibraryQCDAOTest extends AbstractDAOTest {
+public class HibernateLibraryQcDaoTest extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;

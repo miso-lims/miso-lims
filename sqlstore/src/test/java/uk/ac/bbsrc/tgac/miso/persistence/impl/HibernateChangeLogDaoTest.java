@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
-public class SQLChangeLogDAOTest extends AbstractDAOTest {
+public class HibernateChangeLogDaoTest extends AbstractDAOTest {
 
   @Mock
   private HibernateSecurityDao securityDAO;

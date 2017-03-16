@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePrinterDao;
 
-public class SQLPrintServiceDAOTest extends AbstractDAOTest {
+public class HibernatePrintServiceDaoTest extends AbstractDAOTest {
   @Rule
   public final ExpectedException exception = ExpectedException.none();
 

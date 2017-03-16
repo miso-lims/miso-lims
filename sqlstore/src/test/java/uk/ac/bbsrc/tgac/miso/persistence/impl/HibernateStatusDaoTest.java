@@ -1,7 +1,7 @@
 /**
  * 
  */
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStatusDao;
  * @author Chris Salt
  *
  */
-public class SQLStatusDAOTest extends AbstractDAOTest {
+public class HibernateStatusDaoTest extends AbstractDAOTest {
 
   @Autowired
   private JdbcTemplate jdbcTemplate;
