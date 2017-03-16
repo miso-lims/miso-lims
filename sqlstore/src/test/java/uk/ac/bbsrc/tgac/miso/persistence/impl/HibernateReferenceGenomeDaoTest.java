@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
 
-public class SQLReferenceGenomeDAOTest extends AbstractDAOTest {
+public class HibernateReferenceGenomeDaoTest extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;

@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.*;
@@ -31,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 
-public class SQLStudyDAOTest extends AbstractDAOTest {
+public class HibernateStudyDaoTest extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();

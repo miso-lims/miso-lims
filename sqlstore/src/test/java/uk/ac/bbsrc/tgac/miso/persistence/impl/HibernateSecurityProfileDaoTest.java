@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityProfileDao;
 
-public class SQLSecurityProfileDAOTest extends AbstractDAOTest {
+public class HibernateSecurityProfileDaoTest extends AbstractDAOTest {
 
   private static final User USER = new UserImpl();
   private static final Group GROUP = new Group();

@@ -20,7 +20,7 @@
  * * *********************************************************************
  * */
 
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -55,7 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 
-public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
+public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();
