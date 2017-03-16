@@ -688,8 +688,9 @@ Library.hot = {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
       if (xhr.readyState === XMLHttpRequest.DONE) {
-      callback(); // Indicate request has completed.
-        xhr.status === 201 ? Library.hot.successSave(xhr, rowIndex, numberToSave) : Hot.failSave(xhr, rowIndex, numberToSave);
+        var postSave = xhr.status === 201 ? Library.hot.successSave : Hot.failSave;
+        postSave(xhr, rowIndex, numberToSave);
+        callback(); // Indicate request has completed.
       }
     };
     xhr.open('POST', '/miso/rest/library');
