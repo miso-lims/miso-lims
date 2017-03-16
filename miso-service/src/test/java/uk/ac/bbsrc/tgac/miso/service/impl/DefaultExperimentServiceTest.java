@@ -18,7 +18,13 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -26,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -35,8 +42,7 @@ public class DefaultExperimentServiceTest {
   @Rule
   public final ExpectedException thrown = ExpectedException.none();
 
-  @Mock
-  private Experiment experiment;
+  private final Experiment experiment = new ExperimentImpl();
 
   @Mock
   private ExperimentStore experimentStore;
@@ -48,6 +54,8 @@ public class DefaultExperimentServiceTest {
   private StudyStore studyStore;
   @Mock
   private SecurityStore securityStore;
+  @Mock
+  private SecurityProfileStore securityProfileStore;
   @Mock
   private KitStore kitStore;
   @Mock
@@ -61,6 +69,14 @@ public class DefaultExperimentServiceTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
+    experiment.setPlatform(new PlatformImpl());
+    experiment.getPlatform().setId(2L);
+    experiment.setPool(new PoolImpl());
+    experiment.getPool().setId(3L);
+    experiment.setSecurityProfile(new SecurityProfile());
+    experiment.getSecurityProfile().setProfileId(4L);
+    experiment.setStudy(new StudyImpl());
+    experiment.getStudy().setId(5L);
   }
 
   /**
@@ -79,6 +95,10 @@ public class DefaultExperimentServiceTest {
     }).when(authorizationManager).throwIfNotWritable(any(SecurableByProfile.class));
 
     when(experimentStore.save(experiment)).thenReturn(expectedReturn);
+    when(platformStore.get(experiment.getPlatform().getId())).thenReturn(experiment.getPlatform());
+    when(poolStore.get(experiment.getPool().getId())).thenReturn(experiment.getPool());
+    when(studyStore.get(experiment.getStudy().getId())).thenReturn(experiment.getStudy());
+    when(securityProfileStore.get(experiment.getSecurityProfile().getProfileId())).thenReturn(experiment.getSecurityProfile());
 
     assertEquals(expectedReturn, sut.save(experiment));
     verify(experimentStore, times(2)).save(experiment);
