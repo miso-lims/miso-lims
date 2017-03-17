@@ -312,23 +312,22 @@ CREATE TRIGGER StatusChange BEFORE UPDATE ON Status
 FOR EACH ROW
   BEGIN
     DECLARE log_message varchar(500) CHARACTER SET utf8;
-    DECLARE runId bigint(20);
     SET log_message = CONCAT_WS(', ',
       CASE WHEN NEW.health <> OLD.health THEN CONCAT('health: ', COALESCE(OLD.health, 'n/a'), ' → ', COALESCE(NEW.health, 'n/a')) END,
       CASE WHEN (NEW.completionDate IS NULL) <> (OLD.completionDate IS NULL) OR NEW.completionDate <> OLD.completionDate THEN CONCAT('completion date: ', COALESCE(OLD.completionDate, 'n/a'), ' → ', COALESCE(NEW.completionDate, 'n/a')) END,
       CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('start date: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END,
       CASE WHEN NEW.runName <> OLD.runName THEN CONCAT('run name: ', COALESCE(OLD.runName, 'n/a'), ' → ', COALESCE(NEW.runName, 'n/a'), ' (this could be a problem -- inform your MISO administrators if you see this)') END);
-      SET runId = (SELECT runId FROM Run WHERE alias = NEW.runName OR status_statusId = NEW.statusId LIMIT 1);
-    IF runId IS NOT NULL AND log_message IS NOT NULL AND log_message <> '' THEN
-      INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+      INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) SELECT
         runId,
         COALESCE(CONCAT_WS(',',
           CASE WHEN NEW.health <> OLD.health THEN 'health' END,
           CASE WHEN (NEW.completionDate IS NULL) <> (OLD.completionDate IS NULL) OR NEW.completionDate <> OLD.completionDate THEN 'completionDate' END,
           CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN 'startDate' END,
           CASE WHEN NEW.runName <> OLD.runName THEN 'runName' END), ''),
-        (SELECT lastModifier FROM Run WHERE alias = NEW.runName),
-        log_message);
+        lastModifier,
+        log_message
+      FROM Run WHERE alias = NEW.runName OR status_statusId = NEW.statusId;
     END IF;
   END//
 
