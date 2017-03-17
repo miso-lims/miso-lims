@@ -503,6 +503,33 @@
               </td>
             </tr>
             <tr>
+              <td class="h">Passage Number:</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}"><form:input id="passageNumber" path="passageNumber"/></c:when>
+                  <c:otherwise>${!empty sample.passageNumber ? sample.passageNumber : 'n/a'}</c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Times Received:*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}"><form:input id="timesReceived" path="timesReceived"/></c:when>
+                  <c:otherwise>${!empty sample.timesReceived ? sample.timesReceived : 'n/a'}</c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Tube Number:*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}"><form:input id="tubeNumber" path="tubeNumber"/></c:when>
+                  <c:otherwise>${!empty sample.tubeNumber ? sample.tubeNumber : 'n/a'}</c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+            <tr>
               <td class="h">Tissue Material:</td>
               <td>
                 <c:choose>
@@ -529,33 +556,6 @@
               <td>
                <miso:select id="lab" path="lab" items="${labs}" itemLabel="itemLabel" itemValue="id" defaultLabel="SELECT"
                    defaultValue=""/>
-              </td>
-            </tr>
-            <tr>
-              <td class="h">Passage Number:</td>
-              <td>
-                <c:choose>
-                  <c:when test="${sample.id == 0}"><form:input id="passageNumber" path="passageNumber"/></c:when>
-                  <c:otherwise>${!empty sample.passageNumber ? sample.passageNumber : 'n/a'}</c:otherwise>
-                </c:choose>
-              </td>
-            </tr>
-            <tr>
-              <td class="h">Times Received:*</td>
-              <td>
-                <c:choose>
-                  <c:when test="${sample.id == 0}"><form:input id="timesReceived" path="timesReceived"/></c:when>
-                  <c:otherwise>${!empty sample.timesReceived ? sample.timesReceived : 'n/a'}</c:otherwise>
-                </c:choose>
-              </td>
-            </tr>
-            <tr>
-              <td class="h">Tube Number:*</td>
-              <td>
-                <c:choose>
-                  <c:when test="${sample.id == 0}"><form:input id="tubeNumber" path="tubeNumber"/></c:when>
-                  <c:otherwise>${!empty sample.tubeNumber ? sample.tubeNumber : 'n/a'}</c:otherwise>
-                </c:choose>
               </td>
             </tr>
           </table>
