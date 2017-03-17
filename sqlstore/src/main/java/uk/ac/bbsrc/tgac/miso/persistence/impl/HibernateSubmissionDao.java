@@ -61,6 +61,7 @@ public class HibernateSubmissionDao implements SubmissionStore {
 
   @Autowired
   private SessionFactory sessionFactory;
+  @Autowired
   private JdbcTemplate template;
 
   @Override
