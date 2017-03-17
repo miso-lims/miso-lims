@@ -1077,6 +1077,7 @@ public class MisoRequestManager implements RequestManager {
       run.getStatus().setInstrumentName(run.getSequencerReference().getName());
 
       if (run.getId() == AbstractRun.UNSAVED_ID) {
+        run.setLastModifier(getCurrentUser());
         run.getStatus().setLastUpdated(new Date());
 
         run.setName(generateTemporaryName());
@@ -1095,6 +1096,7 @@ public class MisoRequestManager implements RequestManager {
       } else {
         Run managed = getRunById(run.getId());
         log.info("update run: " + managed);
+        managed.setLastModifier(getCurrentUser());
         managed.setAlias(run.getAlias());
         managed.setDescription(run.getDescription());
         managed.setPairedEnd(run.getPairedEnd());
