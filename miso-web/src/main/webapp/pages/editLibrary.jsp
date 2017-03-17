@@ -401,6 +401,12 @@
 <br/>
 <h2>Details</h2>
 <table class="in">
+  <c:if test="${not empty library.preMigrationId}">
+  <tr>
+    <td>GSLE ID:</td>
+    <td><a href="http://lims.res.oicr.on.ca/gsle/GA/templateDetails?template_id=${library.preMigrationId}">${library.preMigrationId}</a>
+  </tr>
+  </c:if>
   <tr>
     <td>Library Kit:*</td>
     <td>
@@ -610,7 +616,11 @@
       <c:if test="${not empty library.libraryDilutions}">
         <c:forEach items="${library.libraryDilutions}" var="dil">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${dil.name}</td>
+            <td>${dil.name}
+            <c:if test="${not empty dil.preMigrationId}">
+            <a href="http://lims.res.oicr.on.ca/gsle/GA/templateDetails?template_id=${dil.preMigrationId}">(GSLE ID: ${dil.preMigrationId})</a>
+            </c:if>
+            </td>
             <td>${dil.dilutionCreator}</td>
             <td><fmt:formatDate value="${dil.creationDate}"/></td>
             <fmt:formatNumber var="concentrationRounded"
