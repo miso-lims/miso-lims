@@ -78,12 +78,12 @@ var Run = Run || {
     jQuery('#run-form').parsley();
     jQuery('#run-form').parsley().validate();
 
-    if(jQuery("#sequencerPartitionContainers\\[0\\]\\.identificationBarcode").length == 0) {
+    if(jQuery("#sequencerPartitionContainers0\\.identificationBarcode").length == 0) {
     	// Serial number is not being modified.
         Validate.updateWarningOrSubmit('#run-form', Run.checkStudiesSelected);
     } else {
     	// Ensure provided serial number is unique.
-    	var serialNumber = jQuery("#sequencerPartitionContainers\\[0\\]\\.identificationBarcode").val();
+    	var serialNumber = jQuery("#sequencerPartitionContainers0\\.identificationBarcode").val();
     	var containerId = null;
 		if(jQuery("#sequencerPartitionContainers0").length > 0) {
 		  containerId = jQuery("#sequencerPartitionContainers0").val();
@@ -103,7 +103,7 @@ var Run = Run || {
                   Validate.updateWarningOrSubmit('#run-form', Run.checkStudiesSelected);
         	  } else {
         		  // Serial number is not unique.
-                  var serialNumberField = jQuery('#sequencerPartitionContainers\\[0\\]\\.identificationBarcode').parsley();
+                  var serialNumberField = jQuery('#sequencerPartitionContainers0\\.identificationBarcode').parsley();
             	  window.ParsleyUI.addError(serialNumberField, "serialNumberError", 'This serial number is already in use. Please choose another.');
             	  return false;
         	  }
@@ -683,7 +683,7 @@ Run.container = {
 
   lookupContainer: function (t, containerNum) {
     var self = this;
-    var barcode = jQuery('#sequencerPartitionContainers\\[' + containerNum + '\\]\\.identificationBarcode').val();
+    var barcode = jQuery('#sequencerPartitionContainers' + containerNum + '\\.identificationBarcode').val();
     if (!Utils.validation.isNullCheck(barcode)) {
       Fluxion.doAjax(
         'runControllerHelperService',
