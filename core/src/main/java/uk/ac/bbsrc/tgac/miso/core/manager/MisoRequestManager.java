@@ -887,7 +887,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void deleteContainer(SequencerPartitionContainer container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
-      if (!sequencerPartitionContainerStore.remove(container)) {
+      if (!sequencerPartitionContainerStore.remove(sequencerPartitionContainerStore.get(container.getId()))) {
         throw new IOException("Unable to delete container.");
       }
     } else {
