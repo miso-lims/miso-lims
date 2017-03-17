@@ -53,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 
 public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest {
 
@@ -182,7 +181,8 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     SequencerPartitionContainer spc = new SequencerPartitionContainerImpl();
     String spcIDBC = "ABCDEFXX";
     spc.setIdentificationBarcode(spcIDBC);
-    spc.setPlatform(Mockito.mock(PlatformImpl.class));
+    spc.setPlatform(new PlatformImpl());
+    spc.getPlatform().setId(1L);
     spc.setLastModifier(emptyUser);
 
     long spcId = dao.save(spc);
