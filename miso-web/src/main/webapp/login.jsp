@@ -60,7 +60,7 @@
       </table>
     </div>
     <script type="text/javascript">
-      Form.Element.focus('username');
+      jQuery('#username').focus();
     </script>
     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
   </form>
