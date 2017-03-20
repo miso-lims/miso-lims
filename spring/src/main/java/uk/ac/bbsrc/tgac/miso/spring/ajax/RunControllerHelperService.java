@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,8 +69,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -131,7 +130,6 @@ public class RunControllerHelperService {
           }
 
           session.setAttribute("run_" + cId, run);
-          responseMap.put("partitions", getPlatformRunOptions(run));
           StringBuilder srb = new StringBuilder();
           srb.append("<select name='sequencer' id='sequencerReference' onchange='Run.ui.populateRunOptions(this);'>");
           srb.append("<option value='0' selected='selected'>Please select...</option>");
@@ -190,55 +188,12 @@ public class RunControllerHelperService {
       run.setSequencerReference(sr);
 
       session.setAttribute("run_" + cId, run);
-      responseMap.put("partitions", getPlatformRunOptions(run));
 
       return JSONUtils.JSONObjectResponse(responseMap);
     } catch (IOException e) {
       log.error("failed to get run options", e);
       return JSONUtils.SimpleJSONError("Failed to get Run options");
     }
-  }
-
-  public JSONObject changeContainer(HttpSession session, JSONObject json) {
-    if (json.has("platform")) {
-      String platform = json.getString("platform");
-      PlatformType pt = PlatformType.get(platform);
-      if (pt != null) {
-        if (pt.equals(PlatformType.ILLUMINA)) {
-          return changeIlluminaContainer(session, json);
-        } else if (pt.equals(PlatformType.LS454)) {
-          return changeLS454Container(session, json);
-        } else if (pt.equals(PlatformType.SOLID)) {
-          return changeSolidContainer(session, json);
-        } else if (pt.equals(PlatformType.IONTORRENT)) {
-          return null;
-        } else if (pt.equals(PlatformType.PACBIO)) {
-          return changePacBioContainer(session, json);
-        } else {
-          return JSONUtils.SimpleJSONError("Unrecognised platform type: " + platform);
-        }
-      }
-    }
-    return JSONUtils.SimpleJSONError("No platform specified");
-  }
-
-  public JSONObject changeChamber(HttpSession session, JSONObject json) {
-    if (json.has("platform")) {
-      String platform = json.getString("platform");
-      PlatformType pt = PlatformType.get(platform);
-      if (pt != null) {
-        if (pt.equals(PlatformType.LS454)) {
-          return changeLS454Chamber(session, json);
-        } else if (pt.equals(PlatformType.SOLID)) {
-          return changeSolidChamber(session, json);
-        } else if (pt.equals(PlatformType.PACBIO)) {
-          return changePacBioChamber(session, json);
-        } else {
-          return JSONUtils.SimpleJSONError("Unrecognised platform type: " + platform);
-        }
-      }
-    }
-    return JSONUtils.SimpleJSONError("No platform specified");
   }
 
   public String containerInfoHtml(PlatformType platformType) {
@@ -255,267 +210,6 @@ public class RunControllerHelperService {
     sb.append("<div id='partitionErrorDiv'> </div>");
     sb.append("<div id='partitionDiv'>");
     return sb.toString();
-  }
-
-  public JSONObject changeIlluminaContainer(HttpSession session, JSONObject json) {
-    StringBuilder b = new StringBuilder();
-    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
-    run.getSequencerPartitionContainers().clear();
-    String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
-    if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
-      b.append("<h2>" + PlatformType.ILLUMINA.getContainerName() + " 1</h2>");
-      b.append(containerInfoHtml(PlatformType.ILLUMINA));
-      b.append("<table class='in'>");
-      b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() + " No.</th>");
-      b.append("<th>Pool</th>");
-
-      b.append(
-          "<tr><td>1 </td><td width='90%'><div id='p_div_0-0' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[0].partitions[0].pool' partition='0_0'></ul></div></td></tr>");
-      b.append("</table>");
-      b.append("</div>");
-
-      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
-      f.setPlatform(run.getSequencerReference().getPlatform());
-      f.setPartitionLimit(1);
-      run.addSequencerPartitionContainer(f);
-    } else if ("Illumina HiSeq 2500".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
-      b.append("<h2>" + PlatformType.ILLUMINA.getContainerName() + " 1</h2>");
-      b.append(containerInfoHtml(PlatformType.ILLUMINA));
-      b.append("Number of " + PlatformType.ILLUMINA.getPartitionName() + "s:");
-      b.append("<input id='lane2' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='2'/>2 ");
-      b.append("<input id='lane8' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
-      b.append("<div id='containerdiv0'> </div>");
-
-      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
-      f.setPlatform(run.getSequencerReference().getPlatform());
-      run.addSequencerPartitionContainer(f);
-    } else {
-      int numContainers = json.getInt("numContainers");
-      run.getSequencerPartitionContainers().clear();
-      for (int i = 0; i < numContainers; i++) {
-        b.append("<h2>" + PlatformType.ILLUMINA.getContainerName() + " " + (i + 1) + "</h2>");
-        b.append("<table class='in'>");
-        b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
-            + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
-            + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
-        b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
-            + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-        b.append("</table>");
-        b.append("<div id='partitionErrorDiv'> </div>");
-        b.append("<div id='partitionDiv'>");
-        b.append("<table class='in'>");
-        b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() + " No.</th>");
-        b.append("<th>Pool</th>");
-        b.append(generateRows(i, 0, 7));
-        b.append("</table>");
-        b.append("</div>");
-
-        SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
-        f.setPlatform(run.getSequencerReference().getPlatform());
-        run.addSequencerPartitionContainer(f);
-      }
-    }
-    return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  public String generateRows(int containerNum, int startRowNum, int endRowNum) {
-    StringBuilder b = new StringBuilder();
-    for (int j = startRowNum; j <= endRowNum; j++) {
-      b.append("<tr><td>" + (j + 1) + " </td>"
-          + "<td width='90%'><div id='p_div_" + containerNum + "-" + j + "' class='elementListDroppableDiv'>"
-          + "<ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + containerNum
-          + "].partitions[" + j + "].pool' partition='" + containerNum + "_" + j + "'>"
-          + "</ul></div>"
-          + "</td></tr>");
-    }
-    return b.toString();
-  }
-
-  public JSONObject changeIlluminaLane(HttpSession session, JSONObject json) {
-    int numLanes = json.getInt("numLanes");
-    int container = json.getInt("container");
-    StringBuilder b = new StringBuilder();
-    b.append("<table class='in'>");
-    b.append("<th>" + PlatformType.ILLUMINA.getPartitionName() + " No.</th>");
-    b.append("<th>Pool</th>");
-
-    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
-    SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
-    f.setPlatform(run.getSequencerReference().getPlatform());
-    f.setPartitionLimit(numLanes);
-
-    b.append(generateRows(container, 0, (numLanes - 1)));
-    b.append("</table>");
-
-    return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  public JSONObject changeLS454Container(HttpSession session, JSONObject json) {
-    StringBuilder b = new StringBuilder();
-    int numContainers = json.getInt("numContainers");
-    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
-    run.getSequencerPartitionContainers().clear();
-
-    for (int i = 0; i < numContainers; i++) {
-      b.append("<h2>" + PlatformType.LS454.getContainerName() + " " + (i + 1) + "</h2>");
-      b.append("<table class='in'>");
-      b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
-          + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
-          + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
-      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
-          + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("</table>");
-      b.append("<div id='partitionErrorDiv'> </div>");
-      b.append("<div id='partitionDiv'>");
-
-      b.append("Number of " + PlatformType.LS454.getPartitionName() + "s:");
-      b.append(generateChamberButtons("LS454", i, 1, 16));
-      b.append("<br/></div>");
-
-      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
-      f.setPlatform(run.getSequencerReference().getPlatform());
-      run.addSequencerPartitionContainer(f);
-    }
-    return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  public String generateChamberButtons(String platformName, int containerNum, int startChamberNum, int endChamberNum) {
-    StringBuilder b = new StringBuilder();
-    for (int i = startChamberNum; i <= endChamberNum; i *= 2) {
-      b.append("<input id='chamber" + i + "' name='container" + containerNum + "Select'"
-          + " onchange='Run.ui.change" + platformName + "Chamber(this, " + containerNum + ");'"
-          + " type='radio' value='" + i + "'/>" + i + " ");
-    }
-    return b.toString();
-  }
-
-  public JSONObject changeLS454Chamber(HttpSession session, JSONObject json) {
-    int numChambers = json.getInt("numChambers");
-    int container = json.getInt("container");
-    StringBuilder b = new StringBuilder();
-    b.append("<table class='in'>");
-    b.append("<th>" + PlatformType.LS454.getPartitionName() + " No.</th>");
-    b.append("<th>Pool</th>");
-
-    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
-    SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
-    f.setPlatform(run.getSequencerReference().getPlatform());
-    f.setPartitionLimit(numChambers);
-
-    b.append(generateRows(container, 0, (numChambers - 1)));
-    b.append("</table>");
-
-    return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  public JSONObject changeSolidContainer(HttpSession session, JSONObject json) {
-    int numContainers = json.getInt("numContainers");
-    StringBuilder b = new StringBuilder();
-    SolidRun run = (SolidRun) session.getAttribute("run_" + json.getString("run_cId"));
-    run.getSequencerPartitionContainers().clear();
-
-    for (int i = 0; i < numContainers; i++) {
-      b.append("<h2>" + PlatformType.SOLID.getContainerName() + " " + (i + 1) + "</h2>");
-      b.append("<table class='in'>");
-      b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
-          + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
-          + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
-      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
-          + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("</table>");
-      b.append("<div id='partitionErrorDiv'> </div>");
-      b.append("<div id='partitionDiv'>");
-      if ("AB SOLiD 5500xl".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
-        b.append("<table class='in'>");
-        b.append("<th>" + PlatformType.SOLID.getPartitionName() + " No.</th>");
-        b.append("<th>Pool</th>");
-
-        b.append(generateRows(i, 0, 5));
-        b.append("</table>");
-      } else {
-
-        b.append("Number of " + PlatformType.SOLID.getPartitionName() + "s:");
-        b.append(generateChamberButtons("Solid", i, 1, 16));
-      }
-      b.append("<div id='containerdiv" + i + "'> </div>");
-      b.append("</div>");
-      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
-      f.setPlatform(run.getSequencerReference().getPlatform());
-      run.addSequencerPartitionContainer(f);
-    }
-    return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  public JSONObject changeSolidChamber(HttpSession session, JSONObject json) {
-    int numChambers = json.getInt("numChambers");
-    int container = json.getInt("container");
-
-    SolidRun run = (SolidRun) session.getAttribute("run_" + json.getString("run_cId"));
-    SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
-    f.setPlatform(run.getSequencerReference().getPlatform());
-    f.setPartitionLimit(numChambers);
-
-    StringBuilder b = new StringBuilder();
-    b.append("<table class='in'>");
-    b.append("<th>" + PlatformType.SOLID.getPartitionName() + " No.</th>");
-    b.append("<th>Pool</th>");
-
-    b.append(generateRows(container, 0, (numChambers - 1)));
-    b.append("</table>");
-    return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  public JSONObject changePacBioContainer(HttpSession session, JSONObject json) {
-    int numContainers = json.getInt("numContainers");
-    StringBuilder b = new StringBuilder();
-    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
-    run.getSequencerPartitionContainers().clear();
-
-    for (int i = 0; i < numContainers; i++) {
-      b.append("<h2>" + PlatformType.PACBIO.getContainerName() + " " + (i + 1) + "</h2>");
-      b.append("<table class='in'>");
-      b.append("<tr><td>Serial Number:</td><td><button onclick='Run.container.lookupContainer(this, " + i
-          + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
-          + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
-      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
-          + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("</table>");
-      b.append("<div id='partitionErrorDiv'> </div>");
-      b.append("<div id='partitionDiv'>");
-
-      b.append("Number of " + PlatformType.PACBIO.getPartitionName() + "s:");
-      for (int j = 1; j <= 8; j++) {
-        b.append("<input id='chamber" + j + "' name='container" + i + "Select'"
-            + " onchange='Container.ui.changeContainerPacBioChamber(this, " + i + ");'"
-            + " type='radio' value='" + j + "'/>" + j + " ");
-      }
-
-      b.append("<br/><div id='containerdiv" + i + "'> </div>");
-      b.append("</div>");
-      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
-      f.setPlatform(run.getSequencerReference().getPlatform());
-      run.addSequencerPartitionContainer(f);
-    }
-    return JSONUtils.SimpleJSONResponse(b.toString());
-  }
-
-  public JSONObject changePacBioChamber(HttpSession session, JSONObject json) {
-    int numChambers = json.getInt("numChambers");
-    int container = json.getInt("container");
-
-    Run run = (Run) session.getAttribute("run_" + json.getString("run_cId"));
-    SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
-    f.setPlatform(run.getSequencerReference().getPlatform());
-    f.setPartitionLimit(numChambers);
-
-    StringBuilder b = new StringBuilder();
-    b.append("<table class='in'>");
-    b.append("<th>" + PlatformType.PACBIO.getPartitionName() + " No.</th>");
-    b.append("<th>Pool</th>");
-    b.append(generateRows(container, 0, numChambers));
-    b.append("</table>");
-
-    return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
   public JSONObject getRunQCUsers(HttpSession session, JSONObject json) {
@@ -663,98 +357,33 @@ public class RunControllerHelperService {
     return JSONUtils.SimpleJSONError("Cannot add RunQC");
   }
 
-  private String getPlatformRunOptions(Run run) throws IOException {
-    StringBuilder b = new StringBuilder();
-    b.append("<span id='containerspan'>Containers: ");
-    for (int i = 0; i < run.getSequencerReference().getPlatform().getNumContainers(); i++) {
-      b.append("<input id='container" + (i + 1) + "' name='containerselect' ");
-      b.append("onchange='Run.container.changeContainer(" + (i + 1) + "," + "\""
-          + run.getSequencerReference().getPlatform().getPlatformType().getKey() + "\"," + run.getSequencerReference().getId()
-          + ");' type='radio' value='" + (i + 1) + "'/>" + (i + 1));
-    }
-    b.append("</span><br/>");
-    b.append("<div id='containerdiv' class='note ui-corner-all'> </div>");
-    return b.toString();
-  }
-
-  public JSONObject lookupContainer(HttpSession session, JSONObject json) {
-    if (json.has("barcode") && !isStringEmptyOrNull(json.getString("barcode")) && json.has("containerNum")) {
-      try {
-        String barcode = json.getString("barcode");
-        long containerNum = json.getLong("containerNum");
-        Collection<SequencerPartitionContainer> fs = requestManager
-            .listSequencerPartitionContainersByBarcode(barcode);
-        if (!fs.isEmpty()) {
-          JSONObject confirm = new JSONObject();
-          StringBuilder sb = new StringBuilder();
-          if (fs.size() == 1) {
-            // replace container div
-            SequencerPartitionContainer f = new ArrayList<>(fs)
-                .get(0);
-            sb.append("<table class='in'>");
-            sb.append("<th>Partition No.</th>");
-            sb.append("<th>Pool</th>");
-            for (Partition p : f.getPartitions()) {
-              sb.append("<tr>");
-              sb.append("<td>" + p.getPartitionNumber() + "</td>");
-              sb.append("<td width='90%'>");
-              if (p.getPool() != null) {
-                confirm.put(p.getPartitionNumber(), p.getPool().getName());
-
-                sb.append("<ul partition='" + (p.getPartitionNumber() - 1) + "' bind='sequencerPartitionContainers[" + containerNum
-                    + "].partitions[" + (p.getPartitionNumber() - 1) + "].pool' class='runPartitionDroppable'>");
-                sb.append("<div class='dashboard'>");
-                sb.append(p.getPool().getName());
-                sb.append("(" + LimsUtils.getDateAsString(p.getPool().getCreationDate()) + ")<br/>");
-                sb.append("<span style='font-size:8pt'>");
-                if (!p.getPool().getExperiments().isEmpty()) {
-                  sb.append("<i>");
-                  for (Experiment e : p.getPool().getExperiments()) {
-                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getPoolableElements().size()
-                        + " dilutions)<br/>");
-                  }
-                  sb.append("</i>");
-                  sb.append("<input type='hidden' name='sequencerPartitionContainers[" + containerNum + "].partitions["
-                      + (p.getPartitionNumber() - 1) + "].pool' id='pId" + (p.getPartitionNumber() - 1) + "' value='" + p.getPool().getId()
-                      + "'/>");
-                } else {
-                  sb.append("<i>No experiment linked to this pool</i>");
-                }
-                sb.append("</span>");
-                sb.append("</div>");
-                sb.append("</ul>");
-              } else {
-                confirm.put(p.getPartitionNumber(), "empty");
-
-                sb.append("<div id='p_div_" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
-                sb.append("<ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + containerNum + "].partitions["
-                    + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1)
-                    + "' ondblclick='Run.container.populatePartition(this, " + containerNum + ", " + (p.getPartitionNumber() - 1)
-                    + ");'></ul>");
-                sb.append("</div>");
-              }
-              sb.append("</td>");
-              sb.append("</tr>");
-            }
-            sb.append("</table>");
-            Map<String, Object> responseMap = new HashMap<>();
-            responseMap.put("html", sb.toString());
-            responseMap.put("barcode", f.getIdentificationBarcode());
-            responseMap.put("verify", confirm);
-            return JSONUtils.JSONObjectResponse(responseMap);
-          } else {
-            // choose container
-            return JSONUtils.JSONObjectResponse("html", "");
-          }
-        } else {
-          return JSONUtils.JSONObjectResponse("err", "No containers with this barcode.");
-        }
-      } catch (IOException e) {
-        log.error("unable to lookup barcode", e);
-        return JSONUtils.JSONObjectResponse("err", "Unable to lookup barcode.");
-      }
-    } else {
+  public JSONObject addContainerByBarcode(HttpSession session, JSONObject json) {
+    long runId = json.getLong("runId");
+    if (!json.has("barcode") || isStringEmptyOrNull(json.getString("barcode"))) {
       return JSONUtils.SimpleJSONError("Please supply a barcode to lookup.");
+    }
+    try {
+      Run run = requestManager.getRunById(runId);
+      String barcode = json.getString("barcode");
+      Collection<SequencerPartitionContainer> containers = requestManager
+          .listSequencerPartitionContainersByBarcode(barcode);
+      if (containers.isEmpty()) {
+        return JSONUtils.SimpleJSONError("No containers with this barcode.");
+      }
+      if (containers.size() > 1) {
+        return JSONUtils.SimpleJSONError("Multiple containers with this barcode.");
+      }
+      SequencerPartitionContainer container = containers.iterator().next();
+      if (container.getPlatform().getId() != run.getSequencerReference().getPlatform().getId()) {
+        return JSONUtils.SimpleJSONError(String.format("This container is meant for %s but this run came from %s.",
+            container.getPlatform().getNameAndModel(), run.getSequencerReference().getPlatform().getNameAndModel()));
+      }
+      run.addSequencerPartitionContainer(container);
+      requestManager.saveRun(run);
+      return JSONUtils.SimpleJSONResponse("Success!");
+    } catch (IOException e) {
+      log.error("unable to lookup barcode", e);
+      return JSONUtils.SimpleJSONError("Unable to lookup barcode.");
     }
   }
 
@@ -1070,4 +699,26 @@ public class RunControllerHelperService {
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
+
+  public JSONObject deleteRunContainer(HttpSession session, JSONObject json) {
+    long runId = json.getLong("runId");
+    long containerId = json.getLong("containerId");
+
+    try {
+      Run run = requestManager.getRunById(runId);
+      Iterator<SequencerPartitionContainer> it = run.getSequencerPartitionContainers().iterator();
+      while (it.hasNext()) {
+        SequencerPartitionContainer spc = it.next();
+        if (spc.getId() == containerId) {
+          it.remove();
+        }
+      }
+      requestManager.saveRun(run);
+      return JSONUtils.SimpleJSONResponse("OK");
+    } catch (IOException e) {
+      log.error("delete run container", e);
+      return JSONUtils.SimpleJSONError("Cannot remove container: " + e.getMessage());
+    }
+  }
+
 }

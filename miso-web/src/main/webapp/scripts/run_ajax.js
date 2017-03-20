@@ -304,19 +304,6 @@ Run.qc = {
 };
 
 Run.ui = {
-  editContainerIdBarcode: function (span, fc) {
-    var s = jQuery(span);
-    var barcodeText = jQuery('a[title="idBarcode"]').text();
-    s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].identificationBarcode' name='sequencerPartitionContainers[" + fc + "].identificationBarcode' value='" + barcodeText + "'/>" +
-           "<button onclick='Run.container.lookupContainer(this, " + fc + ");' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
-    if (jQuery('#pencil')) jQuery('#pencil').hide();
-  },
-
-  editContainerLocationBarcode: function (span, fc) {
-    var s = jQuery(span);
-    s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].locationBarcode' name='sequencerPartitionContainers[" + fc + "].locationBarcode' value='" + s.html() + "'/>");
-  },
-
   changePlatformType: function (form, runId) {
     Fluxion.doAjax(
       'runControllerHelperService',
@@ -348,10 +335,6 @@ Run.ui = {
           'url': ajaxurl
         },
         {
-          'doOnSuccess': function (json) {
-            jQuery('#runPartitions').html(json.partitions);
-            jQuery('#container1').click();
-          }
         }
       );
     }
@@ -444,74 +427,6 @@ Run.ui = {
     jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/run/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Run</button>");
   },
 
-  changeIlluminaLane: function (t, container) {
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'changeIlluminaLane',
-      {
-        'platform': 'Illumina',
-        'run_cId': jQuery('input[name=run_cId]').val(),
-        'numLanes': jQuery(t).val(),
-        'container': container,
-        'url': ajaxurl
-      },
-      {
-        'updateElement': 'containerdiv' + container
-      }
-    );
-  },
-
-  changeLS454Chamber: function (t, container) {
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'changeChamber',
-      {
-        'platform': 'LS454',
-        'run_cId': jQuery('input[name=run_cId]').val(),
-        'numChambers': jQuery(t).val(),
-        'container': container,
-        'url': ajaxurl
-      },
-      {
-        'updateElement': 'containerdiv' + container
-      }
-    );
-  },
-
-  changeSolidChamber: function (t, container) {
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'changeChamber',
-      {
-        'platform': 'Solid',
-        'run_cId': jQuery('input[name=run_cId]').val(),
-        'numChambers': t.value,
-        'container': container,
-        'url': ajaxurl
-      },
-      {
-        'updateElement': 'containerdiv' + container
-      }
-    );
-  },
-
-  changePacBioChamber: function (t, container) {
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'changeChamber',
-      {
-        'platform': 'PacBio',
-        'run_cId': jQuery('input[name=run_cId]').val(),
-        'numChambers': t.value,
-        'container': container,
-        'url': ajaxurl
-      },
-      {
-        'updateElement': 'containerdiv' + container
-      }
-    );
-  },
-
   showRunNoteDialog: function (runId) {
     var self = this;
     jQuery('#addRunNoteDialog')
@@ -564,6 +479,58 @@ Run.ui = {
         {
           'runId': runId,
           'noteId': noteId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': Utils.page.pageReload
+        }
+      );
+    }
+  },
+
+  addContainerByBarcode: function (runId) {
+    jQuery('#addRunNoteDialog')
+      .html("<form><p>Adding a container will lose any unsaved changes!</p>" +
+            "<fieldset class='dialog'>" +
+            "<label for='containerBarcode'></label>" +
+            "<input type='text' name='containerBarcode' id='containerBarcode' class='text ui-widget-content ui-corner-all' />" +
+            "</fieldset></form>");
+
+    jQuery('#addRunNoteDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add": function () {
+          Fluxion.doAjax(
+            'runControllerHelperService',
+            'addContainerByBarcode',
+            {
+              'runId': runId,
+              'barcode': jQuery('#containerBarcode').val(),
+              'url': ajaxurl
+            },
+            {
+              'doOnSuccess': Utils.page.pageReload
+            }
+          );
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
+        }
+      }
+    });
+  },
+
+  removeContainer: function(runId, containerId) {
+    if (confirm("Are you sure you want to remove this container?")) {
+      Fluxion.doAjax(
+        'runControllerHelperService',
+        'deleteRunContainer',
+        {
+          'runId': runId,
+          'containerId': containerId,
           'url': ajaxurl
         },
         {
@@ -664,63 +631,6 @@ Run.pool = {
 };
 
 Run.container = {
-  changeContainer: function (numContainers, platform, seqrefId) {
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'changeContainer',
-      {
-        'platform': platform,
-        'run_cId': jQuery('input[name=run_cId]').val(),
-        'numContainers': numContainers,
-        'sequencerReferenceId': seqrefId,
-        'url': ajaxurl
-      },
-      {
-        'updateElement': 'containerdiv'
-      }
-    );
-  },
-
-  lookupContainer: function (t, containerNum) {
-    var self = this;
-    var barcode = jQuery('#sequencerPartitionContainers' + containerNum + '\\.identificationBarcode').val();
-    if (!Utils.validation.isNullCheck(barcode)) {
-      Fluxion.doAjax(
-        'runControllerHelperService',
-        'lookupContainer',
-        {
-          'barcode': barcode,
-          'containerNum': containerNum,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': self.processLookup
-        }
-      );
-    }
-  },
-
-  processLookup: function (json) {
-    if (json.err) {
-      jQuery('#partitionErrorDiv').html(json.err);
-    }
-    else {
-      if (json.verify) {
-        var dialogStr = "Container Properties\n\n";
-        for (var key in json.verify) {
-          if (json.verify.hasOwnProperty(key)) {
-            dialogStr += "Partition " + key + ": " + json.verify[key] + "\n";
-          }
-        }
-
-        if (confirm("Found container '" + json.barcode + "'. Import this container?\n\n" + dialogStr)) {
-          jQuery('#partitionErrorDiv').html("");
-          jQuery('#partitionDiv').html(json.html);
-        }
-      }
-    }
-  },
-
   populatePartition: function (t, containerNum, partitionNum) {
     var a = jQuery(t);
     a.html("<input type='text' style='width:90%' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><button onclick='Run.container.clearPartition("+partitionNum+")' type='button' class='fg-button ui-state-default ui-corner-all'>Cancel</button><br/><span id='msg" + partitionNum + "'/>");

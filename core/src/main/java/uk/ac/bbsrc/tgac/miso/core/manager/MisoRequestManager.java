@@ -1112,6 +1112,20 @@ public class MisoRequestManager implements RequestManager {
 
         run.setName(generateTemporaryName());
         run.getStatus().setRunAlias(run.getName());
+
+        if (!run.getSequencerPartitionContainers().isEmpty()) {
+          List<SequencerPartitionContainer> containersToSave = new ArrayList<>();
+          for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
+            SequencerPartitionContainer managedContainer = getSequencerPartitionContainerById(container.getId());
+            if (managedContainer == null) {
+              containersToSave.add(container);
+            } else {
+              updateContainer(container, managedContainer);
+              containersToSave.add(managedContainer);
+            }
+          }
+          run.setSequencerPartitionContainers(containersToSave);
+        }
         run.setId(runStore.save(run));
         try {
           String name = namingScheme.generateNameFor(run);
