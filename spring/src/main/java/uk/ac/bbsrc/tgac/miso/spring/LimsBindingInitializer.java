@@ -421,7 +421,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       public SequencerPartitionContainer resolveById(long id) throws Exception {
         return requestManager.getSequencerPartitionContainerById(id);
       }
-    }.register(binder).register(binder, List.class, "sequencerPartitionContainers");
+    }.register(binder).register(binder, List.class, "containers");
 
     new BindingConverterById<Library>(Library.class) {
       @Override
