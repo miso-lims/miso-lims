@@ -105,6 +105,7 @@
     </div>
 </div>
 <script type="text/javascript">
+  jQuery(document).ready(function() {
     Dashboard.showLatestReceivedtSamples();
     Search.loadAll();
     Utils.timer.typewatchFunc(jQuery('#searchProject'), function () {
@@ -124,7 +125,8 @@
     }, 300, 2);
     Utils.timer.typewatchFunc(jQuery('#searchPool'), function () {
       Search.dashboardSearch(jQuery('#searchPool'))
-  }, 300, 2);
+    }, 300, 2);
+  });
 </script>
 <%@ include file="adminsub.jsp" %>
 
