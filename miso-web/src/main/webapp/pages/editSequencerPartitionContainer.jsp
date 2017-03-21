@@ -88,20 +88,14 @@
   <c:choose>
     <c:when test="${container.id != 0 and not empty container.platform}">
       <tr>
-        <td>Sequencer*:</td>
-        <td id="sequencerReferenceSelect" platformId="${container.platform.id}">${container.platform.instrumentModel}</td>
-      </tr>
-    </c:when>
-    <c:when test="${container.id != 0}">
-      <tr>
-        <td>Sequencer*:</td>
-        <td id="sequencerReferenceSelect"><i>Not yet processed on a run - unknown</i></td>
+        <td>Sequencer Model*:</td>
+        <td><input type="hidden" id="platformSelect" name="platformSelect" value="${container.platform.id}"/>${container.platform.instrumentModel}</td>
       </tr>
     </c:when>
     <c:otherwise>
       <tr>
-        <td>Sequencer:</td>
-        <td id="sequencerReferenceSelect"><i>Please choose a platform above...</i></td>
+        <td>Sequencer Model:</td>
+        <td><i id="platformSelect">Please choose a platform above...</i></td>
       </tr>
     </c:otherwise>
   </c:choose>

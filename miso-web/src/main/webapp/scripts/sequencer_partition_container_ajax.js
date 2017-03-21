@@ -119,11 +119,11 @@ var Container = Container || {
     jQuery('#platformTypes').attr('data-parsley-class-handler', '#platformTypesDiv');
     
     // Sequencer select field validation
-    jQuery('#sequencerReference').attr('class', 'form-control');
-    jQuery('#sequencerReference').attr('required', 'true');
-    jQuery('#sequencerReference').attr('min', 1);
-    jQuery('#sequencerReference').attr('data-parsley-error-message', 'You must select a Sequencer.');
-    jQuery('#sequencerReference').attr('data-parsley-errors-container', '#sequencerReferenceError');
+    jQuery('#platform').attr('class', 'form-control');
+    jQuery('#platform').attr('required', 'true');
+    jQuery('#platform').attr('min', 1);
+    jQuery('#platform').attr('data-parsley-error-message', 'You must select a sequencer model.');
+    jQuery('#platform').attr('data-parsley-errors-container', '#platformError');
   
     // Radio button validation: ensure a Container number is selected
     jQuery('#containerselect').attr('class', 'form-control');
@@ -238,7 +238,7 @@ Container.ui = {
       },
       {
         'doOnSuccess': function (json) {
-          jQuery('#sequencerReferenceSelect').html(json.sequencers);
+          jQuery('#platformSelect').html(json.platforms);
           Container.pool.poolSearch("", form.value);
         }
       }
@@ -251,13 +251,12 @@ Container.ui = {
         'containerControllerHelperService',
         'populateContainerOptions',
         {
-          'sequencerReference': form.value,
+          'platform': form.value,
           'container_cId': jQuery('input[name=container_cId]').val(),
           'url': ajaxurl
         },
         {
           'doOnSuccess': function (json) {
-            jQuery('#sequencerReferenceSelect').attr("platformId", json.platformId);
             if (json.partitions) {
               jQuery('#containerPartitions').html(json.partitions);
             }
@@ -270,15 +269,14 @@ Container.ui = {
     }
   },
 
-  changeContainer: function (numContainers, platform, seqrefId) {
+  changeContainer: function (numContainers, platformId) {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'changeContainer',
       {
-        'platform': platform,
+        'platformId': platformId,
         'container_cId': jQuery('input[name=container_cId]').val(),
         'numContainers': numContainers,
-        'sequencerReferenceId': seqrefId,
         'url': ajaxurl
       },
       {
@@ -536,7 +534,7 @@ Container.partition = {
   selectContainerStudy: function (partition, poolId, projectId) {
     Utils.ui.disableButton('studySelectButton-' + partition + '_' + poolId);
     var studyId = jQuery("select[name='poolStudies" + partition + "_" + projectId + "'] :selected").val();
-    var platformId = jQuery("#sequencerReferenceSelect").attr("platformId");
+    var platformId = jQuery("#platformSelect").val() || jQuery("#platformSelect").find(":selected").val();
 
     Fluxion.doAjax(
       'containerControllerHelperService',
