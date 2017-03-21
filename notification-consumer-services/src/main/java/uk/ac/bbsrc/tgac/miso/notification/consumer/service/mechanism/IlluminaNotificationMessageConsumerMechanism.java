@@ -61,9 +61,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
@@ -126,7 +126,9 @@ public class IlluminaNotificationMessageConsumerMechanism
       String runName = run.getString(IlluminaTransformer.JSON_RUN_NAME);
       sb.append("Processing " + runName);
       log.debug("Processing " + runName);
-      Status is = new IlluminaStatus();
+      // https://jira.oicr.on.ca/browse/GLT-1611
+      // Changed back to IlluminaStatus() in future.
+      Status is = new StatusImpl();
       is.setRunAlias(runName);
       Run r = null;
 
@@ -147,7 +149,9 @@ public class IlluminaNotificationMessageConsumerMechanism
             log.debug("Saving new run and status: " + runName);
             if (!run.has(IlluminaTransformer.JSON_STATUS)) {
               // probably MiSeq
-              r = new IlluminaRun();
+              // https://jira.oicr.on.ca/browse/GLT-1611
+              // Changed back to IlluminaRun() in future.
+              r = new RunImpl();
               r.setPlatformRunId(Integer.parseInt(m.group(2)));
               r.setAlias(runName);
               r.setFilePath(runName);
@@ -155,10 +159,14 @@ public class IlluminaNotificationMessageConsumerMechanism
               r.setPairedEnd(false);
               is.setHealth(ht);
               r.setStatus(is);
+              r.setPlatformType(PlatformType.ILLUMINA);
             } else {
               String xml = run.getString(IlluminaTransformer.JSON_STATUS);
-              is = new IlluminaStatus(xml);
-              r = new IlluminaRun(xml);
+              // https://jira.oicr.on.ca/browse/GLT-1611
+              // Changed back to IlluminaStatus(xml) in future.
+              r = new RunImpl();
+              ((RunImpl) r).illuminaRunConfig(xml, null);
+              is = r.getStatus();
               is.setHealth(ht);
               r.getStatus().setHealth(ht);
             }

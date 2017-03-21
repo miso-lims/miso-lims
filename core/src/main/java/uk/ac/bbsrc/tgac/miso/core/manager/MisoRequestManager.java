@@ -1106,6 +1106,7 @@ public class MisoRequestManager implements RequestManager {
       run.getStatus().setInstrumentName(run.getSequencerReference().getName());
 
       if (run.getId() == AbstractRun.UNSAVED_ID) {
+        run.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(run.getSecurityProfile())));
         run.setLastModifier(getCurrentUser());
         run.getStatus().setLastUpdated(new Date());
 
@@ -1167,17 +1168,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void saveRuns(Collection<Run> runs) throws IOException {
     if (runStore != null) {
-      List<Run> newRuns = new ArrayList<>();
-      List<Run> savedRuns = new ArrayList<>();
       for (Run run : runs) {
-        if (run.getId() == AbstractRun.UNSAVED_ID) {
-          newRuns.add(run);
-        } else {
-          savedRuns.add(run);
-        }
-      }
-      runStore.saveAll(newRuns);
-      for (Run run : savedRuns) {
         saveRun(run);
       }
     } else {
