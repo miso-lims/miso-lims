@@ -19,6 +19,8 @@ import ca.on.oicr.gsi.visionmate.mockServer.MockScannerServer;
 @Ignore
 public class VisionMateScannerTests extends BoxScannerTests<VisionMateScanner> {
   
+  private static final int SERVER_PORT = 8503;
+
   private static MockScannerServer server;
   private static VisionMateScanner client;
   
@@ -26,8 +28,8 @@ public class VisionMateScannerTests extends BoxScannerTests<VisionMateScanner> {
   
   @BeforeClass
   public static void setup() throws IntegrationException {
-    server = new MockScannerServer();
-    client = new VisionMateScanner("127.0.0.1", 8000, 2000, 5000);
+    server = new MockScannerServer(SERVER_PORT);
+    client = new VisionMateScanner("127.0.0.1", SERVER_PORT, 2000, 5000);
   }
   
   @Override
