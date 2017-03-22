@@ -395,19 +395,19 @@ public class IlluminaNotificationMessageConsumerMechanism
                 if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                   if (f.getPartitions().size() != 1) {
                     log.warn(
-                        f.getName() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
+                        f.getIdentificationBarcode() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
                             + ") doesn't match usual number of MiSeq/NextSeq partitions (1)");
                   }
                 } else if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("2500")) {
                   if (f.getPartitions().size() != 2 && f.getPartitions().size() != 8) {
                     log.warn(
-                        f.getName() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
+                        f.getIdentificationBarcode() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
                             + ") doesn't match usual number of HiSeq 2500 partitions (2/8)");
                   }
                 } else {
                   if (f.getPartitions().size() != 8) {
                     log.warn(
-                        f.getName() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
+                        f.getIdentificationBarcode() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
                             + ") doesn't match usual number of GA/HiSeq partitions (8)");
                   }
                 }
