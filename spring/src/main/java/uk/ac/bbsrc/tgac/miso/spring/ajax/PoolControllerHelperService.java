@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -64,7 +64,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -521,20 +520,12 @@ public class PoolControllerHelperService {
         Collection<? extends Dilution> dls = pool.getPoolableElements();
         if (dls.size() > 0) {
           int sum = 0;
-          int count = 0;
           for (Dilution ld : dls) {
-            List<LibraryQC> libraryQCs = new ArrayList<>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getId()));
-            if (libraryQCs.size() > 0) {
-              LibraryQC libraryQC = libraryQCs.get(libraryQCs.size() - 1);
-              sum += libraryQC.getInsertSize();
-              count++;
+            if (ld.getLibrary().getDnaSize() != null) {
+              sum += ld.getLibrary().getDnaSize();
             }
           }
-          if (count > 0) {
-            b.append(Math.round(sum / count) + " bp");
-          }
-        } else {
-          b.append("No QC");
+          b.append(Math.round(sum / dls.size()) + " bp");
         }
         j.put(pool.getId(), b.toString());
       }
@@ -554,22 +545,12 @@ public class PoolControllerHelperService {
       Collection<? extends Dilution> dls = pool.getPoolableElements();
       if (dls.size() > 0) {
         int sum = 0;
-        int count = 0;
         for (Dilution ld : dls) {
-          List<LibraryQC> libraryQCs = new ArrayList<>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getId()));
-          if (libraryQCs.size() > 0) {
-            LibraryQC libraryQC = libraryQCs.get(libraryQCs.size() - 1);
-            sum += libraryQC.getInsertSize();
-            count++;
+          if (ld.getLibrary().getDnaSize() != null) {
+            sum += ld.getLibrary().getDnaSize();
           }
         }
-        if (count > 0) {
-          b.append(Math.round(sum / count) + " bp");
-        } else {
-          b.append("No QC");
-        }
-      } else {
-        b.append("No QC");
+        b.append(Math.round(sum / dls.size()) + " bp");
       }
       j.put("response", b.toString());
       return j;

@@ -55,8 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioRun;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
@@ -135,7 +134,9 @@ public class PacBioNotificationMessageConsumerMechanism
       if (!isStringEmptyOrNull(status)) {
         try {
           if (!status.startsWith("ERROR")) {
-            Status is = new PacBioStatus(status);
+            // https://jira.oicr.on.ca/browse/GLT-1611
+            // Changed back to PacBioStatus(status) in future.
+            Status is = new StatusImpl();
             is.setHealth(ht);
             is.setRunAlias(runName);
 
@@ -154,7 +155,12 @@ public class PacBioNotificationMessageConsumerMechanism
             if (attemptRunPopulation) {
               if (r == null) {
                 log.info("\\_ Saving new run and status: " + is.getRunAlias());
-                r = new PacBioRun(status);
+                // https://jira.oicr.on.ca/browse/GLT-1611
+                // Changed back to PacBioRun(status) in future.
+                r = new RunImpl();
+                r.setPlatformType(PlatformType.PACBIO);
+                r.setStatus(is);
+
                 r.setAlias(run.getString("runName"));
                 r.setDescription(m.group(1));
                 r.setPairedEnd(false);
@@ -248,7 +254,7 @@ public class PacBioNotificationMessageConsumerMechanism
               }
 
               if (r.getSequencerReference() != null) {
-                List<SequencerPartitionContainer> fs = ((PacBioRun) r).getSequencerPartitionContainers();
+                List<SequencerPartitionContainer> fs = r.getSequencerPartitionContainers();
                 if (fs.isEmpty()) {
                   if (run.has("plateId") && !isStringEmptyOrNull(run.getString("plateId"))) {
                     Collection<SequencerPartitionContainer> pfs = requestManager

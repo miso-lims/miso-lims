@@ -21,7 +21,7 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
@@ -53,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxDao;
 
-public class SQLBoxDAOTest extends AbstractDAOTest {
+public class HibernateBoxDaoTest extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();

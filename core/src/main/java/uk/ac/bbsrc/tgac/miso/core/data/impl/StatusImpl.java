@@ -25,7 +25,11 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,11 +41,19 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -55,6 +67,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 @Table(name = "Status")
 public class StatusImpl implements Status, Serializable {
   private static final long serialVersionUID = 1L;
+
+  protected static final Logger log = LoggerFactory.getLogger(StatusImpl.class);
 
   public static final Long UNSAVED_ID = 0L;
 
@@ -235,5 +249,39 @@ public class StatusImpl implements Status, Serializable {
     sb.append(" : ");
     sb.append(getInstrumentName());
     return sb.toString();
+  }
+
+  public void parseIlluminaStatusXml(String statusXml) {
+    try {
+      Document statusDoc = SubmissionUtils.emptyDocument();
+      SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
+
+      if (statusDoc.getDocumentElement().getTagName().equals("error")) {
+        String runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
+        String runDirRegex = "(\\d{6})_([A-z0-9]+)_(\\d+)_[A-z0-9_]*";
+        Matcher m = Pattern.compile(runDirRegex).matcher(runName);
+        if (m.matches()) {
+          setStartDate(new SimpleDateFormat("yyMMdd").parse(m.group(1)));
+          setInstrumentName(m.group(2));
+        }
+        setRunAlias(runName);
+        setHealth(HealthType.Unknown);
+      } else {
+        String runStarted = statusDoc.getElementsByTagName("RunStarted").item(0).getTextContent();
+        setStartDate(new SimpleDateFormat("EEEE, MMMMM dd, yyyy h:mm aaa").parse(runStarted));
+        setInstrumentName(statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());
+        setRunAlias(statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
+        setHealth(HealthType.Unknown);
+      }
+      setXml(statusXml);
+    } catch (ParserConfigurationException e) {
+      log.error("parse status XML", e);
+    } catch (TransformerException e) {
+      log.error("parse status XML", e);
+    } catch (ParseException e) {
+      log.error("parse status XML", e);
+    } catch (UnsupportedEncodingException e) {
+      log.error("parse status XML", e);
+    }
   }
 }

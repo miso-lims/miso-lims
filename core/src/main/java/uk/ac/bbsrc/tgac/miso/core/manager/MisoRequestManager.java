@@ -53,6 +53,7 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -87,6 +88,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
@@ -887,7 +889,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void deleteContainer(SequencerPartitionContainer container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
-      if (!sequencerPartitionContainerStore.remove(container)) {
+      if (!sequencerPartitionContainerStore.remove(sequencerPartitionContainerStore.get(container.getId()))) {
         throw new IOException("Unable to delete container.");
       }
     } else {
@@ -988,7 +990,7 @@ public class MisoRequestManager implements RequestManager {
             original.getOverviews().add(po);
           }
         }
-        // TODO: allow securityProfile updates?
+        updateSecurityProfile(original.getSecurityProfile(), project.getSecurityProfile());
         project = original;
       }
       project.getSecurityProfile().setProfileId(saveSecurityProfile(project.getSecurityProfile()));
@@ -998,6 +1000,35 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
     }
+  }
+
+  private void updateSecurityProfile(SecurityProfile target, SecurityProfile source) throws IOException {
+    target.setAllowAllInternal(source.isAllowAllInternal());
+    target.setOwner(source.getOwner() == null ? null : securityStore.getUserById(source.getOwner().getUserId()));
+    target.setReadGroups(loadManagedGroups(source.getReadGroups()));
+    target.setWriteGroups(loadManagedGroups(source.getWriteGroups()));
+    target.setReadUsers(loadManagedUsers(source.getReadUsers()));
+    target.setWriteUsers(loadManagedUsers(source.getWriteUsers()));
+  }
+
+  private Collection<Group> loadManagedGroups(Collection<Group> original) throws IOException {
+    if (original == null)
+      return null;
+    List<Group> managed = new ArrayList<>();
+    for (Group item : original) {
+      managed.add(securityStore.getGroupById(item.getGroupId()));
+    }
+    return managed;
+  }
+
+  private Collection<User> loadManagedUsers(Collection<User> original) throws IOException {
+    if (original == null)
+      return null;
+    List<User> managed = new ArrayList<>();
+    for (User item : original) {
+      managed.add(securityStore.getUserById(item.getUserId()));
+    }
+    return managed;
   }
 
   private long saveSecurityProfile(SecurityProfile sp) throws IOException {
@@ -1077,10 +1108,26 @@ public class MisoRequestManager implements RequestManager {
       run.getStatus().setInstrumentName(run.getSequencerReference().getName());
 
       if (run.getId() == AbstractRun.UNSAVED_ID) {
+        run.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(run.getSecurityProfile())));
+        run.setLastModifier(getCurrentUser());
         run.getStatus().setLastUpdated(new Date());
 
         run.setName(generateTemporaryName());
         run.getStatus().setRunAlias(run.getName());
+
+        if (!run.getSequencerPartitionContainers().isEmpty()) {
+          List<SequencerPartitionContainer> containersToSave = new ArrayList<>();
+          for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
+            SequencerPartitionContainer managedContainer = getSequencerPartitionContainerById(container.getId());
+            if (managedContainer == null) {
+              containersToSave.add(container);
+            } else {
+              updateContainer(container, managedContainer);
+              containersToSave.add(managedContainer);
+            }
+          }
+          run.setSequencerPartitionContainers(containersToSave);
+        }
         run.setId(runStore.save(run));
         try {
           String name = namingScheme.generateNameFor(run);
@@ -1095,6 +1142,7 @@ public class MisoRequestManager implements RequestManager {
       } else {
         Run managed = getRunById(run.getId());
         log.info("update run: " + managed);
+        managed.setLastModifier(getCurrentUser());
         managed.setAlias(run.getAlias());
         managed.setDescription(run.getDescription());
         managed.setPairedEnd(run.getPairedEnd());
@@ -1115,15 +1163,36 @@ public class MisoRequestManager implements RequestManager {
             }
           }
         }
+        Set<String> originalContainers = Barcodable.extractLabels(managed.getSequencerPartitionContainers());
         List<SequencerPartitionContainer> saveContainers = new ArrayList<>();
         for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
           SequencerPartitionContainer managedContainer = getSequencerPartitionContainerById(container.getId());
           updateContainer(container, managedContainer);
           saveContainers.add(managedContainer);
         }
+        Set<String> updatedContainers = Barcodable.extractLabels(saveContainers);
         managed.setSequencerPartitionContainers(saveContainers);
         managed.setNotes(run.getNotes());
         managed.setSequencingParameters(run.getSequencingParameters());
+
+        Set<String> added = new TreeSet<>(updatedContainers);
+        added.removeAll(originalContainers);
+        Set<String> removed = new TreeSet<>(originalContainers);
+        removed.removeAll(updatedContainers);
+        if (!added.isEmpty() || !removed.isEmpty()) {
+          StringBuilder message = new StringBuilder();
+          message.append("Containers");
+          LimsUtils.appendSet(message, added, "added");
+          LimsUtils.appendSet(message, removed, "removed");
+
+          RunChangeLog changeLog = new RunChangeLog();
+          changeLog.setRun(managed);
+          changeLog.setColumnsChanged("containers");
+          changeLog.setSummary(message.toString());
+          changeLog.setTime(new Date());
+          changeLog.setUser(managed.getLastModifier());
+          changeLogStore.create(changeLog);
+        }
         runStore.save(managed);
         if (runAlertManager != null) runAlertManager.update(managed);
         return run.getId();
@@ -1136,17 +1205,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void saveRuns(Collection<Run> runs) throws IOException {
     if (runStore != null) {
-      List<Run> newRuns = new ArrayList<>();
-      List<Run> savedRuns = new ArrayList<>();
       for (Run run : runs) {
-        if (run.getId() == AbstractRun.UNSAVED_ID) {
-          newRuns.add(run);
-        } else {
-          savedRuns.add(run);
-        }
-      }
-      runStore.saveAll(newRuns);
-      for (Run run : savedRuns) {
         saveRun(run);
       }
     } else {
@@ -1302,6 +1361,8 @@ public class MisoRequestManager implements RequestManager {
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       if (container.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
+        container.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(container.getSecurityProfile())));
+        container.setPlatform(platformStore.get(container.getPlatform().getId()));
         return sequencerPartitionContainerStore.save(container);
       } else {
         SequencerPartitionContainer managed = getSequencerPartitionContainerById(container.getId());

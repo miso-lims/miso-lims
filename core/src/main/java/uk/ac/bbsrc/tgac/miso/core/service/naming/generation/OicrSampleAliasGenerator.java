@@ -40,7 +40,6 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
 
     try {
       for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
-        if (parent.hasNonStandardAlias()) throw new IllegalArgumentException("Cannot generate alias due to nonstandard alias on a parent");
         if (isAliquotSample(parent)) {
           return addSiblingTag(parent.getAlias(), detailed);
         }

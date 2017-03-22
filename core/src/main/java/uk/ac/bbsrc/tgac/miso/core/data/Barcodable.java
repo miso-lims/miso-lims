@@ -23,6 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -56,4 +59,12 @@ public interface Barcodable extends Nameable {
    *          identificationBarcode.
    */
   public void setIdentificationBarcode(String identificationBarcode);
+
+  public static <T extends Barcodable> Set<String> extractLabels(Iterable<T> items) {
+    Set<String> labels = new TreeSet<>();
+    for (T item : items) {
+      labels.add(item.getLabelText());
+    }
+    return labels;
+  }
 }

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -65,7 +65,6 @@ public class ExperimentWizardController {
   @Autowired
   private StudyService studyService;
 
-
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
@@ -102,27 +101,7 @@ public class ExperimentWizardController {
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
-    try {
-      StringBuilder a = new StringBuilder();
-      StringBuilder b = new StringBuilder();
-
-      for (Platform platform : requestManager.listAllPlatforms()) {
-        a.append("<option value=\"" + platform.getId() + "\">" + platform.getNameAndModel() + "</option>");
-      }
-
-      for (StudyType st : studyService.listTypes()) {
-        b.append("<option value=\"" + st.getId() + "\">" + st.getName() + "</option>");
-      }
-
-      model.put("projectId", projectId);
-      model.put("platforms", a.toString());
-      model.put("studyTypes", b.toString());
-      return new ModelAndView("/pages/experimentWizard.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show experiment wizard", ex);
-      }
-      throw ex;
-    }
+    model.put("projectId", projectId);
+    return new ModelAndView("/pages/experimentWizard.jsp", model);
   }
 }

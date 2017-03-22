@@ -1,3 +1,24 @@
+-- update_kit_names
+-- StartNoTest
+--StartNoTest
+UPDATE KitDescriptor SET name = 'KAPA Hyper Prep and SureSelect XT' WHERE name = 'KAPA Hyper Prep & SureSelect XT';
+UPDATE KitDescriptor SET name = 'AmpliSeq and NEB' WHERE name = 'AmpliSeq & NEB';
+UPDATE KitDescriptor SET name = 'KAPA Hyper Prep and IDT xGen' WHERE name = 'KAPA Hyper Prep & IDT xGen';
+UPDATE KitDescriptor SET name = 'KAPA Hyper Prep and SureSelect XT2 v5' WHERE name = 'KAPA Hyper Prep & SureSelect XT2 v5';
+--EndNoTest
+-- EndNoTest
+
+-- delete_institute_typo
+-- StartNoTest
+-- StartNoTest
+SELECT instituteId INTO @centre FROM Institute WHERE alias = 'Sheba Medical Centre';
+DELETE FROM Lab WHERE instituteId = @centre;
+DELETE FROM Institute WHERE instituteId = @centre;
+-- EndNoTest
+-- EndNoTest
+
+-- Unspecified_Tissue
+-- StartNoTest
 -- StartNoTest
 
 SELECT userId INTO @user FROM User WHERE loginName = 'admin';
@@ -15,3 +36,5 @@ VALUES ((SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'), @unspe
     (@unspecified, (SELECT sampleClassId FROM SampleClass WHERE alias = 'Xenograft Tissue'), @user, @time, @user, @time, 1);
 
 -- EndNoTest
+-- EndNoTest
+

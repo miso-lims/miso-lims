@@ -20,7 +20,7 @@
  * * *********************************************************************
  * */
 
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -53,9 +53,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 
-public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
+public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();
@@ -182,7 +181,8 @@ public class SQLSequencerPartitionContainerDAOTest extends AbstractDAOTest {
     SequencerPartitionContainer spc = new SequencerPartitionContainerImpl();
     String spcIDBC = "ABCDEFXX";
     spc.setIdentificationBarcode(spcIDBC);
-    spc.setPlatform(Mockito.mock(PlatformImpl.class));
+    spc.setPlatform(new PlatformImpl());
+    spc.getPlatform().setId(1L);
     spc.setLastModifier(emptyUser);
 
     long spcId = dao.save(spc);

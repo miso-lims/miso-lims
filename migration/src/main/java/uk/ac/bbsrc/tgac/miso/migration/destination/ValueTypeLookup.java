@@ -503,8 +503,7 @@ public class ValueTypeLookup {
    * resolve the TissueOrigin
    * @return the existing TissueOrigin if a matching one is found; null otherwise
    */
-  @VisibleForTesting
-  TissueOrigin resolve(TissueOrigin tissueOrigin) {
+  public TissueOrigin resolve(TissueOrigin tissueOrigin) {
     if (tissueOrigin == null) return null;
     if (tissueOrigin.getId() != null) return tissueOriginsById.get(tissueOrigin.getId());
     if (tissueOrigin.getAlias() != null) {

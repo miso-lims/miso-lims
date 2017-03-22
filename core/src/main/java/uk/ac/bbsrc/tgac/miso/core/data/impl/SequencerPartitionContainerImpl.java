@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -88,17 +88,17 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @ManyToMany(targetEntity = RunImpl.class, mappedBy = "containers")
   private Collection<Run> runs = null;
 
-  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
   @ManyToOne(targetEntity = PlatformImpl.class)
-  @JoinColumn(name = "platform")
+  @JoinColumn(name = "platform", nullable = false)
   private Platform platform;
 
   private String validationBarcode;
 
-  @OneToMany(targetEntity = SequencerPartitionContainerChangeLog.class, mappedBy = "sequencerPartitionContainer")
+  @OneToMany(targetEntity = SequencerPartitionContainerChangeLog.class, mappedBy = "sequencerPartitionContainer", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -187,7 +187,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @Override
   public String getLabelText() {
-    return getPlatform().getPlatformType().name() + " " + getValidationBarcode();
+    return getIdentificationBarcode() + " (" + getPlatform().getNameAndModel() + ")";
   }
 
   @Override

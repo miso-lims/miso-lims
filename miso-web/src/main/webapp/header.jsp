@@ -21,6 +21,7 @@
   ~ **********************************************************************
   --%>
 
+<%@ page import="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" %>
 <!DOCTYPE html>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -151,8 +152,11 @@
 </div>
 
 <sec:authorize access="isAuthenticated()">
-  <div id="loggedInBanner" style="display:inline-block">Logged in as:
-    <b id="currentUser"><sec:authentication property="principal.username"/></b>  | <a href="<c:url value="/logout"/>">Logout</a>
+  <div id="loggedInBanner" style="display:inline-block">
+    <a href="${ApplicationContextProvider.getBugUrl()}" target="_blank">Report a problem</a> |
+    Logged in as:
+    <b id="currentUser"><sec:authentication property="principal.username"/></b>
+    | <a href="<c:url value="/logout"/>">Logout</a>
   </div>
 </sec:authorize>
 

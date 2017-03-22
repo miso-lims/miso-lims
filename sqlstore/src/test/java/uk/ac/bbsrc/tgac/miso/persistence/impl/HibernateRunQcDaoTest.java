@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunQcDao;
 
-public class SQLRunQCDAOTest extends AbstractDAOTest {
+public class HibernateRunQcDaoTest extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();

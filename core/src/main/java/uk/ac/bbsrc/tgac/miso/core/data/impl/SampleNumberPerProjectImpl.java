@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -20,7 +21,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 
 @Entity
 @Table(name = "SampleNumberPerProject")
-public class SampleNumberPerProjectImpl implements SampleNumberPerProject {
+public class SampleNumberPerProjectImpl implements SampleNumberPerProject, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

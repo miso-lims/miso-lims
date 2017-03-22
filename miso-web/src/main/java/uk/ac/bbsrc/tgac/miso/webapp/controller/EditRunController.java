@@ -344,7 +344,6 @@ public class EditRunController {
           }
         }
       }
-      run.setLastModifier(user);
       requestManager.saveRun(run);
       session.setComplete();
       model.clear();

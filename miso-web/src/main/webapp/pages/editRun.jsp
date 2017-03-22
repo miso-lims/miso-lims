@@ -409,210 +409,135 @@
 
 <div id="runinfo">
 <h1>Containers</h1>
+<c:if test="${run.id != 0}"><button type="button" onclick="return Run.ui.addContainerByBarcode(${run.id});" class="fg-button ui-state-default ui-corner-all">Add Container</button></c:if>
 <table class="full-width">
 <tbody>
 <tr>
 <td class="half-width" valign="top">
 
 <div id="runPartitions">
-<c:choose>
-<c:when test="${empty run.sequencerPartitionContainers}">
-  <c:if test="${not empty run.sequencerReference}">
-    Container:
-     <c:forEach var="platformContainerCount" begin="1"
-                end="${run.sequencerReference.platform.numContainers}" step="1"
-                varStatus="platformContainer">
-       <input id='container${platformContainerCount}select' name='containerselect'
-              onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
-              type='radio'
-              value='${platformContainerCount}'/>${platformContainerCount}
-     </c:forEach>
-   </c:if>
-  <br/>
+<c:if test="${run.id == 0}"><p>Please save the run before adding sequencing containers.</p></c:if>
+<c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="containerCount">
+  <div class="note ui-corner-all">
+    <h2>${run.platformType.containerName} ${containerCount.count}</h2>
+    <ul class="sddm">
+      <li>
+        <a onmouseover="mopen('containermenu${containerCount.index}')" onmouseout="mclosetime()">Options
+          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+        </a>
 
-  <div id='containerdiv' class="note ui-corner-all"></div>
-</c:when>
-<c:otherwise>
-  <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="containerCount">
-    <div class="note ui-corner-all">
-      <h2>${run.platformType.containerName} ${containerCount.count}</h2>
-      <c:if test="${not empty container.identificationBarcode}">
-        <ul class="sddm">
-          <li>
-            <a onmouseover="mopen('containermenu')" onmouseout="mclosetime()">Options
-              <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-            </a>
-
-            <div class="run" id="containermenu"
-                 onmouseover="mcancelclosetime()"
-                 onmouseout="mclosetime()">
-              <c:if test="${run.platformType.key eq 'Illumina'}">
-                <a href="javascript:void(0);"
-                   onclick="Run.container.generateCasava17DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
-                  CSV (pre-1.8)</a>
-                <a href="javascript:void(0);"
-                   onclick="Run.container.generateCasava18DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
-                  CSV (1.8+)</a>
-              </c:if>
-            </div>
-          </li>
-        </ul>
-      </c:if>
-      <div style="clear:both"></div>
+        <div class="run" id="containermenu${containerCount.index}"
+             onmouseover="mcancelclosetime()"
+             onmouseout="mclosetime()">
+          <c:if test="${run.platformType.key eq 'Illumina'}">
+            <a href="javascript:void(0);"
+               onclick="Run.container.generateCasava17DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
+              CSV (pre-1.8)</a>
+            <a href="javascript:void(0);"
+               onclick="Run.container.generateCasava18DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
+              CSV (1.8+)</a>
+          </c:if>
+          <a href="javascript: Run.ui.removeContainer(${run.id}, ${container.id});">Remove from Run</a>
+        </div>
+      </li>
+    </ul>
+    <div style="clear:both"></div>
+    <table class="in">
+      <tr>
+        <td>Serial Number:</td>
+        <td>
+          <form:input path="sequencerPartitionContainers[${containerCount.index}].identificationBarcode"/>
+        </td>
+      </tr>
+      <tr>
+        <td>Location:</td>
+        <td><form:input
+            path="sequencerPartitionContainers[${containerCount.index}].locationBarcode"/></td>
+      </tr>
+      <tr>
+        <td>Validation:</td>
+        <td><form:input
+            path="sequencerPartitionContainers[${containerCount.index}].validationBarcode"/></td>
+      </tr>
+    </table>
+    <div id='partitionErrorDiv' class="parsley-custom-error-message"></div>
+    <div id="partitionDiv">
+      <i class="italicInfo">Click in a ${run.platformType.partitionName} box to beep/type in barcodes, or double click a
+        pool on the right to sequentially add pools to the ${run.platformType.containerName}</i>
       <table class="in">
         <tr>
-          <c:choose>
-            <c:when test="${empty container.identificationBarcode}">
-              <td>Serial Number:</td>
-              <td>
-                <button id="pencil" onclick='Run.container.lookupContainer(this, ${containerCount.index});'
-                        type='button' class='right-button ui-state-default ui-corner-all'>
-                  Lookup
-                </button>
-                <div style='overflow:hidden'>
-                  <form:input
-                      path="sequencerPartitionContainers[${containerCount.index}].identificationBarcode"/>
-                </div>
-              </td>
-            </c:when>
-            <c:otherwise>
-              <td>Serial Number:</td>
-              <td>
-                <span id="idBarcode"><a href='<c:url value="/miso/container/${container.id}"/>' title='idBarcode'>${container.identificationBarcode}</a></span>
-                <a href="javascript:void(0);"
-                   onclick="Run.ui.editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
-                  <span id="pencil" class="fg-button ui-icon ui-icon-pencil"></span>
-                </a>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
-        <tr>
-          <c:choose>
-            <c:when test="${empty container.locationBarcode}">
-              <td>Location:</td>
-              <td><form:input
-                  path="sequencerPartitionContainers[${containerCount.index}].locationBarcode"/></td>
-            </c:when>
-            <c:otherwise>
-              <td>Location:</td>
-              <td>
-                <span id="locationBarcode">${container.locationBarcode}</span>
-                <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <a href="javascript:void(0);"
-                     onclick="Run.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), ${containerCount.index})">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
-                  </a>
-                </c:if>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
-        <tr>
-          <c:choose>
-            <c:when test="${empty container.validationBarcode}">
-              <td>Validation:</td>
-              <td><form:input
-                  path="sequencerPartitionContainers[${containerCount.index}].validationBarcode"/></td>
-            </c:when>
-            <c:otherwise>
-              <td>Validation:</td>
-              <td>
-                <span id="validationBarcode">${container.validationBarcode}</span>
-                <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <a href="javascript:void(0);"
-                     onclick="editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
-                  </a>
-                </c:if>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
-      </table>
-      <div id='partitionErrorDiv' class="parsley-custom-error-message"></div>
-      <div id="partitionDiv">
-        <i class="italicInfo">Click in a ${run.platformType.partitionName} box to beep/type in barcodes, or double click a
-          pool on the right to sequentially add pools to the ${run.platformType.containerName}</i>
-        <table class="in">
+            <th>${run.platformType.partitionName} No.</th>
+            <th>Pool</th>
+            <c:if test="${statsAvailable}">
+              <th>Stats</th>
+            </c:if>
+          </tr>
+        <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
           <tr>
-	          <th>${run.platformType.partitionName} No.</th>
-	          <th>Pool</th>
-	          <c:if test="${statsAvailable}">
-	            <th>Stats</th>
-	          </c:if>
-	        </tr>
-          <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
-            <tr>
-              <td>${partition.partitionNumber}</td>
-              <td style="width:90%;">
-                <c:choose>
-                  <c:when test="${not empty partition.pool}">
-                    <div class="dashboard">
-                    <c:if test="${partition.pool.hasLowQualityMembers}">
-                      <span class="lowquality-right">Contains low-quality library</span>
-                    </c:if>
-                      <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
-                          ${partition.pool.name}: <c:if test="${not empty partition.pool.alias}"><b>${partition.pool.alias}</b></c:if>
-                        (${partition.pool.creationDate})
-                      </a><br/>
-                      ${partition.pool.poolableElements.size()} dilutions
-                      <br/>
-                      <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
-                        <c:choose>
-                          <c:when test="${not empty partition.pool.experiments}">
-                            <i><c:forEach items="${partition.pool.experiments}" var="experiment">
-                              ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.poolableElements)} dilutions)<br/>
-                            </c:forEach>
-                            </i>
-                            <script>
-                              jQuery(document).ready(function () {
-                                Run.container.checkPoolExperiment('#partition_span_${partitionCount.index}', ${partition.pool.id}, ${partitionCount.index});
-                              });
-                            </script>
-                            <input type="hidden"
-                                   name="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
-                                   id="pId${partitionCount.index}"
-                                   value="${partition.pool.id}"/>
-                          </c:when>
-                          <c:otherwise>
-                            <i>No experiment linked to this pool</i>
-                          </c:otherwise>
-                        </c:choose>
-                      </span>
-                    </div>
-                  </c:when>
-                  <c:otherwise>
-                    <div id="p_div_${partitionCount.index}"
-                         class="elementListDroppableDiv">
-                      <div class="runPartitionDroppable"
-                           bind="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
-                           partition="${containerCount.index}_${partitionCount.index}"
-                           ondblclick='Run.container.populatePartition(this, ${containerCount.index}, ${partitionCount.index});'></div>
-                    </div>
-                  </c:otherwise>
-                </c:choose>
+            <td>${partition.partitionNumber}</td>
+            <td style="width:90%;">
+              <c:choose>
+                <c:when test="${not empty partition.pool}">
+                  <div class="dashboard">
+                  <c:if test="${partition.pool.hasLowQualityMembers}">
+                    <span class="lowquality-right">Contains low-quality library</span>
+                  </c:if>
+                    <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
+                        ${partition.pool.name}: <c:if test="${not empty partition.pool.alias}"><b>${partition.pool.alias}</b></c:if>
+                      (${partition.pool.creationDate})
+                    </a><br/>
+                    ${partition.pool.poolableElements.size()} dilutions
+                    <br/>
+                    <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
+                      <c:choose>
+                        <c:when test="${not empty partition.pool.experiments}">
+                          <i><c:forEach items="${partition.pool.experiments}" var="experiment">
+                            ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.poolableElements)} dilutions)<br/>
+                          </c:forEach>
+                          </i>
+                          <script>
+                            jQuery(document).ready(function () {
+                              Run.container.checkPoolExperiment('#partition_span_${partitionCount.index}', ${partition.pool.id}, ${partitionCount.index});
+                            });
+                          </script>
+                          <input type="hidden"
+                                 name="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
+                                 id="pId${partitionCount.index}"
+                                 value="${partition.pool.id}"/>
+                        </c:when>
+                        <c:otherwise>
+                          <i>No experiment linked to this pool</i>
+                        </c:otherwise>
+                      </c:choose>
+                    </span>
+                  </div>
+                </c:when>
+                <c:otherwise>
+                  <div id="p_div_${partitionCount.index}"
+                       class="elementListDroppableDiv">
+                    <div class="runPartitionDroppable"
+                         bind="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
+                         partition="${containerCount.index}_${partitionCount.index}"
+                         ondblclick='Run.container.populatePartition(this, ${containerCount.index}, ${partitionCount.index});'></div>
+                  </div>
+                </c:otherwise>
+              </c:choose>
+            </td>
+            <c:if test="${statsAvailable}">
+              <td><img id="charttrigger" src="<c:url value='/styles/images/chart-bar-icon.png'/>"
+                       border="0"
+                       onclick="Stats.getPartitionStats(${run.id}, ${partition.partitionNumber}); checkstats(${run.id}, ${partition.partitionNumber}); ">
               </td>
-              <c:if test="${statsAvailable}">
-                <td><img id="charttrigger" src="<c:url value='/styles/images/chart-bar-icon.png'/>"
-                         border="0"
-                         onclick="Stats.getPartitionStats(${run.id}, ${partition.partitionNumber}); checkstats(${run.id}, ${partition.partitionNumber}); ">
-                </td>
-              </c:if>
-            </tr>
-          </c:forEach>
-        </table>
-      </div>
-      <input type="hidden" value="${container.id}"
-             id="sequencerPartitionContainers${containerCount.count-1}"
-             name="sequencerPartitionContainers"/>
+            </c:if>
+          </tr>
+        </c:forEach>
+      </table>
     </div>
-  </c:forEach>
-</c:otherwise>
-</c:choose>
-  <%-- <form:hidden path="sequencerPartitionContainers"/> --%>
+    <input type="hidden" value="${container.id}"
+           id="sequencerPartitionContainers${containerCount.count-1}"
+           name="sequencerPartitionContainers"/>
+  </div>
+</c:forEach>
 </div>
 </td>
 <td class="half-width" valign="top">

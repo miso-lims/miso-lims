@@ -26,6 +26,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -236,11 +237,9 @@ public class DefaultSampleService implements SampleService {
 
     // pre-save field generation
     sample.setName(generateTemporaryName());
-    if (isDetailedSample(sample) && ((DetailedSample) sample).hasNonStandardAlias()) {
-      // do not validate alias
-    } else if (isStringEmptyOrNull(sample.getAlias()) && namingScheme.hasSampleAliasGenerator()) {
+    if (isStringEmptyOrNull(sample.getAlias()) && namingScheme.hasSampleAliasGenerator()) {
       sample.setAlias(generateTemporaryName());
-    } else {
+    } else if (!isDetailedSample(sample) || !((DetailedSample) sample).hasNonStandardAlias()) {
       validateAliasUniqueness(sample.getAlias());
     }
     return save(sample).getId();
@@ -281,7 +280,12 @@ public class DefaultSampleService implements SampleService {
         String generatedAlias = namingScheme.generateSampleAlias(created);
         validateAliasUniqueness(generatedAlias);
         created.setAlias(generatedAlias);
-        validateAlias(created);
+        if (isDetailedSample(created)) {
+          // generation of non-standard aliases is allowed
+          ((DetailedSample) created).setNonStandardAlias(!namingScheme.validateSampleAlias(generatedAlias).isValid());
+        } else {
+          validateAlias(created);
+        }
         needsUpdate = true;
       }
       if (autoGenerateIdBarcodes && isStringEmptyOrNull(created.getIdentificationBarcode())) {
@@ -353,7 +357,7 @@ public class DefaultSampleService implements SampleService {
       throws IOException, ConstraintViolationException {
     if (!isUniqueExternalNameWithinProjectRequired()) return;
     for (Identity existingIdentity : getIdentitiesByExternalNameOrAlias(newExternalName)) {
-        // not an issue if it matches an identity from another project
+      // not an issue if it matches an identity from another project
       if (existingIdentity.getProject().getId() != sample.getProject().getId()) continue;
       Set<String> intersection = new HashSet<>(IdentityImpl.getSetFromString(newExternalName));
       intersection.retainAll(IdentityImpl.getSetFromString(existingIdentity.getExternalName()));
@@ -369,7 +373,7 @@ public class DefaultSampleService implements SampleService {
    * Finds an existing parent Sample or creates a new one if necessary
    * 
    * @param sample must contain parent (via {@link DetailedSample#getParent() getParent}), including externalName if a new parent is
-   * to be created. An existing parent may be specified by including its sampleId or externalName
+   *          to be created. An existing parent may be specified by including its sampleId or externalName
    * 
    * @return
    * @throws IOException
@@ -481,7 +485,7 @@ public class DefaultSampleService implements SampleService {
    * </ul>
    * 
    * @param sample the Sample to load entities into. Must contain at least the IDs of objects to load (e.g. to load the persisted Project
-   * into sample.project, sample.project.id must be set)
+   *          into sample.project, sample.project.id must be set)
    * @throws IOException
    */
   private void loadChildEntities(Sample sample) throws IOException {
@@ -572,7 +576,6 @@ public class DefaultSampleService implements SampleService {
     target.setDescription(source.getDescription());
     target.setSampleType(source.getSampleType());
     target.setReceivedDate(source.getReceivedDate());
-    target.setQcPassed(source.getQcPassed());
     target.setScientificName(source.getScientificName());
     target.setTaxonIdentifier(source.getTaxonIdentifier());
 
@@ -592,9 +595,18 @@ public class DefaultSampleService implements SampleService {
       dTarget.setArchived(dSource.getArchived());
       dTarget.setGroupDescription(dSource.getGroupDescription());
       dTarget.setGroupId(dSource.getGroupId());
+      dTarget.setConcentration(dSource.getConcentration());
+
+      Boolean qcPassed;
       dTarget.setDetailedQcStatus(dSource.getDetailedQcStatus());
       dTarget.setDetailedQcStatusNote(dSource.getDetailedQcStatusNote());
-      dTarget.setConcentration(dSource.getConcentration());
+      if (dSource.getDetailedQcStatus() == null) {
+        qcPassed = null;
+      } else {
+        DetailedQcStatus managedQcStatus = detailedQcStatusDao.getDetailedQcStatus(dSource.getDetailedQcStatus().getId());
+        qcPassed = managedQcStatus == null ? null : managedQcStatus.getStatus();
+      }
+      dTarget.setQcPassed(qcPassed);
 
       if (isIdentitySample(target)) {
         Identity iTarget = (Identity) target;
@@ -621,6 +633,8 @@ public class DefaultSampleService implements SampleService {
         ssTarget.setStrStatus(ssSource.getStrStatus());
         ssTarget.setDNAseTreated(ssSource.getDNAseTreated());
       }
+    } else {
+      target.setQcPassed(source.getQcPassed());
     }
   }
 
@@ -756,7 +770,7 @@ public class DefaultSampleService implements SampleService {
 
     Sample managed = get(sample.getId());
     authorizationManager.throwIfNotWritable(managed);
-    
+
     // TODO: update concentration and/or volume if QC is of relevant type
     managed.addQc(qc);
     managed.setLastModifier(authorizationManager.getCurrentUser());

@@ -704,7 +704,6 @@ public class ContainerControllerHelperService {
             responseMap.put("verify", confirm);
             return JSONUtils.JSONObjectResponse(responseMap);
           } else {
-            // choose container
             return JSONUtils.SimpleJSONError("Multiple containers found with serial number " + barcode);
           }
         } else {

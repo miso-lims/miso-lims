@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 
-public class SQLSecurityDAOTest extends AbstractDAOTest {
+public class HibernateSecurityDaoTest extends AbstractDAOTest {
   
   @Rule
   public final ExpectedException exception = ExpectedException.none();

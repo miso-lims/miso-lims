@@ -607,7 +607,7 @@ public class LibraryControllerHelperService {
 
   public JSONArray getTargetedSequencingTypes(Long libraryPrepKitId) throws IOException {
     JSONArray targetedSequencingByKit = new JSONArray();
-    
+
     for (TargetedSequencing targetedSequencing : getNonArchivedTargetedSequencing(
         kitService.getKitDescriptorById(libraryPrepKitId).getTargetedSequencing())) {
       Map<String, Object> targetedSequencingMap = Maps.newHashMap();
@@ -642,24 +642,19 @@ public class LibraryControllerHelperService {
         Long libraryId = Long.parseLong(json.getString("libraryId"));
         Library library = libraryService.get(libraryId);
         LibraryQC newQc = new LibraryQCImpl();
-        if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
-          library.setQcPassed(true);
-        }
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
         newQc.setQcType(requestManager.getLibraryQcTypeById(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
-        newQc.setInsertSize(Integer.parseInt(json.getString("insertSize")));
         libraryService.addQc(library, newQc);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th><th>Insert Size</th></tr>");
+        sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th></tr>");
         for (LibraryQC qc : library.getLibraryQCs()) {
           sb.append("<tr>");
           sb.append("<td>" + qc.getQcCreator() + "</td>");
           sb.append("<td>" + qc.getQcDate() + "</td>");
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
           sb.append("<td>" + LimsUtils.round(qc.getResults(), 2) + " " + qc.getQcType().getUnits() + "</td>");
-          sb.append("<td>" + qc.getInsertSize() + " bp</td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
@@ -677,15 +672,12 @@ public class LibraryControllerHelperService {
       // validate
       boolean ok = true;
       for (JSONObject qc : (Iterable<JSONObject>) qcs) {
-        String qcPassed = qc.getString("qcPassed");
         String qcType = qc.getString("qcType");
         String results = qc.getString("results");
         String qcCreator = qc.getString("qcCreator");
         String qcDate = qc.getString("qcDate");
-        String insertSize = qc.getString("insertSize");
 
-        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator) || isStringEmptyOrNull(qcDate)
-            || isStringEmptyOrNull(insertSize)) {
+        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator) || isStringEmptyOrNull(qcDate)) {
           ok = false;
         }
       }
@@ -918,7 +910,6 @@ public class LibraryControllerHelperService {
       Long libraryId = Long.parseLong(json.getString("libraryId"));
 
       response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "'/>");
-      response.put("insertSize", "<input type='text' id='insertSize" + qcId + "' value='" + libraryQc.getInsertSize() + "'/>");
       response.put("edit",
           "<a href='javascript:void(0);' onclick='Library.qc.editLibraryQC(\"" + qcId + "\",\"" + libraryId + "\");'>Save</a>");
       return response;
@@ -935,7 +926,6 @@ public class LibraryControllerHelperService {
         LibraryQC libraryQc = requestManager.getLibraryQCById(qcId);
 
         libraryQc.setResults(Double.parseDouble(json.getString("result")));
-        libraryQc.setInsertSize(Integer.parseInt(json.getString("insertSize")));
         libraryService.addQc(libraryService.get(libraryQc.getLibrary().getId()), libraryQc);
 
       }

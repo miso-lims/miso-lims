@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
@@ -21,12 +23,12 @@ import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -46,6 +48,9 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
 
   @Autowired
   private SecurityStore securityStore;
+
+  @Autowired
+  private SecurityProfileStore securityProfileStore;
 
   @Autowired
   private StudyStore studyStore;
@@ -100,6 +105,17 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
       authorizationManager.throwIfNotWritable(experiment);
       if (experiment.getId() == ExperimentImpl.UNSAVED_ID) {
         experiment.setName(DbUtils.generateTemporaryName());
+        experiment.setPlatform(platformStore.get(experiment.getPlatform().getId()));
+        if (experiment.getPool() != null) {
+          experiment.setPool(poolStore.get(experiment.getPool().getId()));
+        }
+        experiment.setStudy(studyStore.get(experiment.getStudy().getId()));
+        if (experiment.getSecurityProfile().getProfileId() == SecurityProfile.UNSAVED_ID) {
+          securityProfileStore.save(experiment.getSecurityProfile());
+        } else {
+          experiment.setSecurityProfile(securityProfileStore.get(experiment.getSecurityProfile().getProfileId()));
+        }
+
         experimentStore.save(experiment);
         String name = namingScheme.generateNameFor(experiment);
         experiment.setName(name);
@@ -121,7 +137,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
       original.setAlias(experiment.getAlias());
       original.setDescription(experiment.getDescription());
       original.setName(experiment.getName());
-      original.setPlatform(platformStore.get(experiment.getPlatform().getId()));
+      original.setPlatform(experiment.getPool() == null ? null : platformStore.get(experiment.getPlatform().getId()));
       original.setPool(poolStore.get(experiment.getPool().getId()));
       original.setStudy(studyStore.get(experiment.getStudy().getId()));
       original.setSecurityProfile(securityStore.getSecurityProfileById(experiment.getSecurityProfile().getProfileId()));

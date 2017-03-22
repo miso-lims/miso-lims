@@ -23,10 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -34,9 +38,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -46,6 +53,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -144,5 +154,53 @@ public class RunImpl extends AbstractRun implements Serializable {
     changeLog.setColumnsChanged(columnsChanged);
     changeLog.setUser(user);
     return changeLog;
+  }
+
+  // https://jira.oicr.on.ca/browse/GLT-1611
+  // Copied from IlluminaRun. Can be removed in the future.
+  public void illuminaRunConfig(String statusXml, User user) {
+    try {
+      setPlatformType(PlatformType.ILLUMINA);
+      Document statusDoc = SubmissionUtils.emptyDocument();
+      if (!isStringEmptyOrNull(statusXml)) {
+        SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
+
+        String runName = (statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
+        setPairedEnd(false);
+
+        if (!statusDoc.getDocumentElement().getTagName().equals("error")) {
+          if (statusDoc.getElementsByTagName("IsPairedEndRun").getLength() > 0) {
+            boolean paired = Boolean.parseBoolean(statusDoc.getElementsByTagName("IsPairedEndRun").item(0).getTextContent().toLowerCase());
+            setPairedEnd(paired);
+          }
+        }
+
+        String runDirRegex = "[\\d]+_([A-z0-9\\-])+_([\\d])+_([A-z0-9_\\+\\-]*)";
+        Matcher m = Pattern.compile(runDirRegex).matcher(runName);
+        if (m.matches()) {
+          setPlatformRunId(Integer.parseInt(m.group(2)));
+        }
+
+        setAlias(runName);
+        setFilePath(runName);
+        setDescription(m.group(3));
+        setPlatformType(PlatformType.ILLUMINA);
+
+        StatusImpl status = new StatusImpl();
+        status.parseIlluminaStatusXml(statusXml);
+        setStatus(status);
+        if (user != null) {
+          setSecurityProfile(new SecurityProfile(user));
+        } else {
+          setSecurityProfile(new SecurityProfile());
+        }
+      } else {
+        log.error("No status XML for this run");
+      }
+    } catch (ParserConfigurationException e) {
+      log.error("Cannot parse status", e);
+    } catch (TransformerException e) {
+      log.error("Cannot parse status: " + statusXml, e);
+    }
   }
 }

@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -15,8 +16,10 @@ import javax.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 
 @MappedSuperclass
-public abstract class AbstractSequencerServiceRecord implements SequencerServiceRecord {
+public abstract class AbstractSequencerServiceRecord implements SequencerServiceRecord, Serializable {
   
+  private static final long serialVersionUID = 1L;
+
   public static final long UNSAVED_ID = 0L;
   
   @Id

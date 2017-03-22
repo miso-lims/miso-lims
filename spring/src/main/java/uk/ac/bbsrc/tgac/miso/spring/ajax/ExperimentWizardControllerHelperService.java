@@ -72,34 +72,6 @@ public class ExperimentWizardControllerHelperService {
   @Autowired
   private ExperimentService experimentService;
 
-  public JSONObject loadExperimentPlatform(HttpSession session, JSONObject json) {
-
-    StringBuilder b = new StringBuilder();
-    try {
-      for (Platform platform : requestManager.listAllPlatforms()) {
-        b.append("<option value=\"" + platform.getId() + "\">" + platform.getNameAndModel() + "</option>");
-      }
-    } catch (IOException e) {
-      log.debug("Failed to change ReportType", e);
-      return JSONUtils.SimpleJSONError("Failed to load platform");
-    }
-    return JSONUtils.JSONObjectResponse("html", b.toString());
-  }
-
-  public JSONObject loadExperimentStudyTypes(HttpSession session, JSONObject json) {
-
-    StringBuilder b = new StringBuilder();
-    try {
-      for (StudyType st : studyService.listTypes()) {
-        b.append("<option value=\"" + st.getId() + "\">" + st.getName() + "</option>");
-      }
-    } catch (IOException e) {
-      log.debug("Failed to change ReportType", e);
-      return JSONUtils.SimpleJSONError("Failed to load study types");
-    }
-    return JSONUtils.JSONObjectResponse("html", b.toString());
-  }
-
   public JSONObject addStudyExperiment(HttpSession session, JSONObject json) {
     StudyType studyType = null;
     Long projectId = null;
@@ -117,6 +89,9 @@ public class ExperimentWizardControllerHelperService {
           ids.add(Long.parseLong(j.getString("value")));
         } else if (j.getString("name").equals("studyType")) {
           studyType = studyService.getType(j.getLong("value"));
+          if (studyType == null) {
+            return JSONUtils.SimpleJSONError("Selected study type is not valid.");
+          }
         }
       }
 
@@ -137,7 +112,7 @@ public class ExperimentWizardControllerHelperService {
         String alias = null;
         String description = null;
         String platformIdStr = null;
-        String poolBarcode = null;
+        Long poolId = null;
 
         for (JSONObject j : (Iterable<JSONObject>) a) {
           if (j.getString("name").equals("title" + i)) {
@@ -149,7 +124,7 @@ public class ExperimentWizardControllerHelperService {
           } else if (j.getString("name").equals("platform" + i)) {
             platformIdStr = j.getString("value");
           } else if (j.getString("name").equals("pool" + i)) {
-            poolBarcode = j.getString("value");
+            poolId = j.getLong("value");
           }
         }
         Long platformId = Long.parseLong(platformIdStr);
@@ -160,8 +135,8 @@ public class ExperimentWizardControllerHelperService {
         e.setAlias(alias);
         e.setTitle(title);
         e.setPlatform(requestManager.getPlatformById(platformId));
-        if (poolBarcode != null) {
-          e.setPool(requestManager.getPoolByBarcode(poolBarcode));
+        if (poolId != null) {
+          e.setPool(requestManager.getPoolById(poolId));
         }
         e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         experimentService.save(e);

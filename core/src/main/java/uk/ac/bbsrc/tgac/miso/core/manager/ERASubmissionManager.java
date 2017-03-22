@@ -40,7 +40,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -78,7 +77,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -328,14 +326,8 @@ public class ERASubmissionManager implements SubmissionManager {
       if (relevantLibrary != null) {
         if (relevantLibrary.getPaired()) {
           layout = xml.getOwnerDocument().createElementNS(null, "PAIRED");
-          if (!relevantLibrary.getLibraryQCs().isEmpty()) {
-            List<LibraryQC> qcs = new ArrayList<>(relevantLibrary.getLibraryQCs());
-            int insert = 0;
-            for (LibraryQC qc : qcs) {
-
-              insert += qc.getInsertSize();
-            }
-            layout.setAttribute("NOMINAL_LENGTH", String.valueOf(insert / qcs.size()));
+          if (relevantLibrary.getDnaSize() != null) {
+            layout.setAttribute("NOMINAL_LENGTH", relevantLibrary.getDnaSize().toString());
           } else {
             layout.setAttribute("NOMINAL_LENGTH", "0");
           }

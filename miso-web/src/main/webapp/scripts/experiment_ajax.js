@@ -135,7 +135,7 @@ Experiment.pool = {
     var poolSel = jQuery(id);
     if (poolSel.is(':empty')) {
       var newpool = pool.clone().appendTo(poolSel);
-      newpool.append("<input type='hidden' id='pool" + pool.attr("bind") + "' name='pool' value='" + pool.attr("bind") + "'/>");
+      newpool.append("<input type='hidden' id='pool" + pool.attr("bind") + "' name='pool" + newid + "' value='" + pool.attr("bind") + "'/>");
       newpool.remove('.pType');
       newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Experiment.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
       newpool.removeAttr("ondblclick");

@@ -1,3 +1,18 @@
+# 0.2.53
+
+Changes:
+
+ * Fix many bugs preventing run notifications
+ * Make adding/removing containers from a run work reliably
+ * Improve library QC types, remove insert size
+ * Allow updating the security profile for a project
+ * Group the fields for sample alias together for easier entry
+ * Improve many change logs
+ * Update qcPassed based on detailedQcStatus changes
+ * Make Experiment Wizard save correctly
+ * Add a link to file a ticket
+ * Allow saving of duplicate alias if marked non-standard
+
 # 0.2.52
 
 Changes:

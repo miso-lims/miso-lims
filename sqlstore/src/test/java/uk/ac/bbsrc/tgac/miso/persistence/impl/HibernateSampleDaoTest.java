@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.sqlstore;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
@@ -41,9 +41,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 
-public class SQLSampleDAOTest extends AbstractDAOTest {
+public class HibernateSampleDaoTest extends AbstractDAOTest {
 
-  private static final Logger log = LoggerFactory.getLogger(SQLSampleDAOTest.class);
+  private static final Logger log = LoggerFactory.getLogger(HibernateSampleDaoTest.class);
   @Rule
   public final ExpectedException exception = ExpectedException.none();
 
