@@ -56,7 +56,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
@@ -255,7 +254,7 @@ public class PacBioNotificationMessageConsumerMechanism
               }
 
               if (r.getSequencerReference() != null) {
-                List<SequencerPartitionContainer> fs = ((PacBioRun) r).getSequencerPartitionContainers();
+                List<SequencerPartitionContainer> fs = r.getSequencerPartitionContainers();
                 if (fs.isEmpty()) {
                   if (run.has("plateId") && !isStringEmptyOrNull(run.getString("plateId"))) {
                     Collection<SequencerPartitionContainer> pfs = requestManager
