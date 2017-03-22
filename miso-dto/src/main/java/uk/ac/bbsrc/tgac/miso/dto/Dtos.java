@@ -1271,7 +1271,7 @@ public class Dtos {
       dto.setStartDate("");
     }
     if (from.getStatus() != null && from.getStatus().getCompletionDate() != null) {
-      dto.setEndDate(getDateAsString(from.getStatus().getStartDate()));
+      dto.setEndDate(getDateAsString(from.getStatus().getCompletionDate()));
     }
     return dto;
   }
