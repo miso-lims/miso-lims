@@ -50,6 +50,8 @@ Library.hot = {
         if (!lib.kitDescriptorId) {
           lib.kitDescriptorId = '';
           lib.kitDescriptorName = '';
+        } else {
+          lib.kitDescriptorName = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.kitDescriptorId), Hot.sampleOptions.kitDescriptorsDtos), 'name');
         }
         if (lib.libraryDesignId) {
           lib.libraryDesignAlias = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.libraryDesignId), Library.designs), 'name') || '(None)';
