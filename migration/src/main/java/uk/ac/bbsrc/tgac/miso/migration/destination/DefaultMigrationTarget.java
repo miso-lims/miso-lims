@@ -339,14 +339,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
     return latest;
   }
 
-  private static Date getEarliestChangeDate(Library library) {
-    Date earliest = null;
-    for (ChangeLog change : library.getChangeLog()) {
-      if (earliest == null || change.getTime().before(earliest)) earliest = change.getTime();
-    }
-    return earliest;
-  }
-
   public void saveLibraries(final Collection<Library> libraries) throws IOException {
     log.info("Migrating libraries...");
     for (Library library : libraries) {
@@ -384,7 +376,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     if (isDetailedLibrary(library)) {
 
-      library.setCreationDate(timeStamp);
+      if (library.getCreationDate() == null) library.setCreationDate(timeStamp);
       // Check for duplicate alias
       Collection<Library> dupes = serviceManager.getLibraryService().listByAlias(library.getAlias());
       if (!dupes.isEmpty()) {
@@ -398,18 +390,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
     addLibraryQcs(library, qcs);
     if (replaceChangeLogs) {
       Collection<ChangeLog> changes = library.getChangeLog();
-      copyTimestampsFromChangelog(library);
       library.setId(serviceManager.getLibraryService().create(library));
       saveLibraryChangeLog(library, changes);
     } else {
       library.setId(serviceManager.getLibraryService().create(library));
     }
     log.debug("Saved library " + library.getAlias());
-  }
-
-  private void copyTimestampsFromChangelog(Library library) {
-    Date earliest = getEarliestChangeDate(library);
-    library.setCreationDate(earliest);
   }
 
   private void addLibraryQcs(Library library, Collection<LibraryQC> qcs) throws IOException {
