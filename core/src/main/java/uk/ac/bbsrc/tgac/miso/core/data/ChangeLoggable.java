@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Collection;
+
 import com.eaglegenomics.simlims.core.User;
 
 /**
@@ -7,6 +9,8 @@ import com.eaglegenomics.simlims.core.User;
  *
  */
 public interface ChangeLoggable {
+
+  public Collection<ChangeLog> getChangeLog();
 
   public ChangeLog createChangeLog(String summary, String columnsChanged, User user);
 

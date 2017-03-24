@@ -29,9 +29,11 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -329,7 +331,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
   }
 
-  private static Date getLatestChangeDate(Sample sample) {
+  private static Date getLatestChangeDate(ChangeLoggable sample) {
     Date latest = null;
     for (ChangeLog change : sample.getChangeLog()) {
       if (latest == null || change.getTime().after(latest)) latest = change.getTime();
@@ -374,6 +376,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
     library.inheritPermissions(library.getSample().getProject());
     valueTypeLookup.resolveAll(library);
     library.setLastModifier(migrationUser);
+    Collection<LibraryQC> qcs = new TreeSet<>(library.getLibraryQCs());
+
     for (Note note : library.getNotes()) {
       note.setCreationDate(timeStamp);
       note.setOwner(migrationUser);
@@ -391,6 +395,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         ((DetailedLibrary) library).setNonStandardAlias(true);
       }
     }
+    addLibraryQcs(library, qcs);
     if (replaceChangeLogs) {
       Collection<ChangeLog> changes = library.getChangeLog();
       copyTimestampsFromChangelog(library);
@@ -405,6 +410,15 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private void copyTimestampsFromChangelog(Library library) {
     Date earliest = getEarliestChangeDate(library);
     library.setCreationDate(earliest);
+  }
+
+  private void addLibraryQcs(Library library, Collection<LibraryQC> qcs) throws IOException {
+    Date date = (replaceChangeLogs && library.getChangeLog() != null) ? getLatestChangeDate(library) : timeStamp;
+    for (LibraryQC qc : qcs) {
+      qc.setLibrary(library);
+      qc.setQcCreator(migrationUser.getFullName());
+      qc.setQcDate(date);
+    }
   }
 
   private void saveLibraryChangeLog(Library library, Collection<ChangeLog> changes) throws IOException {
