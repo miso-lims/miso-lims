@@ -559,7 +559,7 @@ public abstract class AbstractRun implements Run {
   }
 
   @Override
-  public Collection<ChangeLog> getChangeLogs() {
+  public Collection<ChangeLog> getChangeLog() {
     return changeLogs;
   }
 }
