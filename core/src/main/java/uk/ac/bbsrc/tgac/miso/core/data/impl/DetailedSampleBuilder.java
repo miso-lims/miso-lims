@@ -879,6 +879,7 @@ public class DetailedSampleBuilder
     sample.setNonStandardAlias(nonStandardAlias);
     sample.setSiblingNumber(siblingNumber);
     sample.setPreMigrationId(preMigrationId);
+    sample.setQCs(sampleQCs);
 
     return sample;
   }
@@ -897,7 +898,6 @@ public class DetailedSampleBuilder
     SampleStock stock = new SampleStockImpl();
     stock.setStrStatus(strStatus);
     stock.setDNAseTreated(dnaseTreated);
-    stock.setQCs(sampleQCs);
     return stock;
   }
 
