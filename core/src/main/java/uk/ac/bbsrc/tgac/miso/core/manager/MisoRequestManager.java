@@ -679,9 +679,11 @@ public class MisoRequestManager implements RequestManager {
   public Collection<PlatformType> listActivePlatformTypes() throws IOException {
     Collection<PlatformType> activePlatformTypes = Lists.newArrayList();
     for (PlatformType platformType : PlatformType.values()) {
-      Collection<SequencerReference> sequencers = listSequencerReferencesByPlatformType(platformType);
-      if (!sequencers.isEmpty()) {
-        activePlatformTypes.add(platformType);
+      for (SequencerReference sequencer : listSequencerReferencesByPlatformType(platformType)) {
+        if (sequencer.isActive()) {
+          activePlatformTypes.add(platformType);
+          break;
+        }
       }
     }
     return activePlatformTypes;
