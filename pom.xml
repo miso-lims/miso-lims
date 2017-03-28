@@ -64,7 +64,7 @@
         <role>Developer</role>
       </roles>
       <timezone>0</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>mtaschuk</id>
@@ -76,7 +76,7 @@
         <role>project contact</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>tdebat</id>
@@ -88,7 +88,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>amasella</id>
@@ -100,7 +100,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>dcooke</id>
@@ -112,7 +112,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>harmstrong</id>
@@ -124,7 +124,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
   <modules>
@@ -486,9 +486,9 @@
         <exclusions>
           <exclusion>
             <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>            
+            <artifactId>javassist</artifactId>
           </exclusion>
-        </exclusions>        
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.hibernate.javax.persistence</groupId>
