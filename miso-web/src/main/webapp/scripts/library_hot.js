@@ -50,6 +50,8 @@ Library.hot = {
         if (!lib.kitDescriptorId) {
           lib.kitDescriptorId = '';
           lib.kitDescriptorName = '';
+        } else {
+          lib.kitDescriptorName = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.kitDescriptorId), Hot.sampleOptions.kitDescriptorsDtos), 'name');
         }
         if (lib.libraryDesignId) {
           lib.libraryDesignAlias = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(lib.libraryDesignId), Library.designs), 'name') || '(None)';
@@ -668,13 +670,13 @@ Library.hot = {
 
       lib.dnaSize = obj.dnaSize;
       lib.volume = obj.volume;
-      if (lib.qcQubit) {
+      if (obj.qcQubit) {
         lib.qcQubit = obj.qcQubit;
       }
-      if (lib.qcTapeStation) {
+      if (obj.qcTapeStation) {
         lib.qcTapeStation = obj.qcTapeStation;
       }
-      if (lib.qcQPcr) {
+      if (obj.qcQPcr) {
         lib.qcQPcr = obj.qcQPcr;
       }
 

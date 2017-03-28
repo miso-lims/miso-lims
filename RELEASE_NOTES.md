@@ -1,3 +1,13 @@
+# 0.2.54
+
+Changes:
+
+ * Make listActivePlatformTypes filter on active sequencers rather than any sequencer
+ * Choose platform for container rather than sequencer
+ * Fix change log method name in run
+ * Don't display an error if an XHR is aborted prematurely
+ * Load previous kit value when editing libraries
+
 # 0.2.53
 
 Changes:

@@ -277,7 +277,7 @@ public interface Run
 
   Date getLastUpdated();
 
-  public Collection<ChangeLog> getChangeLogs();
+  public Collection<ChangeLog> getChangeLog();
 
   /**
    * Returns the user who last modified this item.

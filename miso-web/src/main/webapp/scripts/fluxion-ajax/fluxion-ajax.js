@@ -188,7 +188,7 @@ Fluxion.Ajax.newAjax = function(url) {
                 }
               }
             }
-          } else if (aj.xhr.readyState == XMLHttpRequest.DONE) {
+          } else if (aj.xhr.readyState == XMLHttpRequest.DONE && aj.xhr.status != 0) {
             errFunc(aj.xhr);
           }
         };
@@ -264,7 +264,7 @@ Fluxion.Ajax.newAjax = function(url) {
               }
             }
           }
-        } else if (xhr.readyState == XMLHttpRequest.DONE) {
+        } else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status != 0) {
          errFunc(xhr);
         }
       };

@@ -29,9 +29,11 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -329,20 +331,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
   }
 
-  private static Date getLatestChangeDate(Sample sample) {
+  private static Date getLatestChangeDate(ChangeLoggable sample) {
     Date latest = null;
     for (ChangeLog change : sample.getChangeLog()) {
       if (latest == null || change.getTime().after(latest)) latest = change.getTime();
     }
     return latest;
-  }
-
-  private static Date getEarliestChangeDate(Library library) {
-    Date earliest = null;
-    for (ChangeLog change : library.getChangeLog()) {
-      if (earliest == null || change.getTime().before(earliest)) earliest = change.getTime();
-    }
-    return earliest;
   }
 
   public void saveLibraries(final Collection<Library> libraries) throws IOException {
@@ -374,13 +368,15 @@ public class DefaultMigrationTarget implements MigrationTarget {
     library.inheritPermissions(library.getSample().getProject());
     valueTypeLookup.resolveAll(library);
     library.setLastModifier(migrationUser);
+    Collection<LibraryQC> qcs = new TreeSet<>(library.getLibraryQCs());
+
     for (Note note : library.getNotes()) {
       note.setCreationDate(timeStamp);
       note.setOwner(migrationUser);
     }
     if (isDetailedLibrary(library)) {
 
-      library.setCreationDate(timeStamp);
+      if (library.getCreationDate() == null) library.setCreationDate(timeStamp);
       // Check for duplicate alias
       Collection<Library> dupes = serviceManager.getLibraryService().listByAlias(library.getAlias());
       if (!dupes.isEmpty()) {
@@ -391,9 +387,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
         ((DetailedLibrary) library).setNonStandardAlias(true);
       }
     }
+    addLibraryQcs(library, qcs);
     if (replaceChangeLogs) {
       Collection<ChangeLog> changes = library.getChangeLog();
-      copyTimestampsFromChangelog(library);
       library.setId(serviceManager.getLibraryService().create(library));
       saveLibraryChangeLog(library, changes);
     } else {
@@ -402,9 +398,13 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Saved library " + library.getAlias());
   }
 
-  private void copyTimestampsFromChangelog(Library library) {
-    Date earliest = getEarliestChangeDate(library);
-    library.setCreationDate(earliest);
+  private void addLibraryQcs(Library library, Collection<LibraryQC> qcs) throws IOException {
+    Date date = (replaceChangeLogs && library.getChangeLog() != null) ? getLatestChangeDate(library) : timeStamp;
+    for (LibraryQC qc : qcs) {
+      qc.setLibrary(library);
+      qc.setQcCreator(migrationUser.getFullName());
+      qc.setQcDate(date);
+    }
   }
 
   private void saveLibraryChangeLog(Library library, Collection<ChangeLog> changes) throws IOException {

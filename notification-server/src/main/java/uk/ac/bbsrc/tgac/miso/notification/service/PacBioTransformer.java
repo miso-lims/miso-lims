@@ -50,7 +50,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.pacbio.PacBioService;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.pacbio.PacBioServiceWrapper;
@@ -190,6 +192,8 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
             log.error("Attempting fall-back date resolution...", e);
           } catch (UnsupportedEncodingException e) {
             log.error("Cannot encode plateId to be URL friendly.", e);
+          } catch (JSONException jsonEx) {
+            log.error("run folder does not match expected structure.  Skipping for now. " + rootFile.getName());
           }
         } else {
           log.error(rootFile.getName() + " :: Permission denied");
