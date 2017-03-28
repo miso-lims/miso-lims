@@ -190,6 +190,8 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
             log.error("Attempting fall-back date resolution...", e);
           } catch (UnsupportedEncodingException e) {
             log.error("Cannot encode plateId to be URL friendly.", e);
+          } catch (JSONException jsonEx) {
+            log.error("run folder does not match expected structure.  Skipping for now. " + rootFile.getName());
           }
         } else {
           log.error(rootFile.getName() + " :: Permission denied");
