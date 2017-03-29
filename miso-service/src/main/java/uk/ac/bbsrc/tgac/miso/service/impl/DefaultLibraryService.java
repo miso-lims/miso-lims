@@ -426,9 +426,9 @@ public class DefaultLibraryService implements LibraryService {
     Set<String> original = stringifyIndices(originalIndices);
     Set<String> updated = stringifyIndices(updatedIndices);
     Set<String> added = new TreeSet<>(updated);
-    added.removeAll(originalIndices);
+    added.removeAll(original);
     Set<String> removed = new TreeSet<>(original);
-    removed.removeAll(updatedIndices);
+    removed.removeAll(updated);
 
     if (!added.isEmpty() || !removed.isEmpty()) {
       StringBuilder message = new StringBuilder();
