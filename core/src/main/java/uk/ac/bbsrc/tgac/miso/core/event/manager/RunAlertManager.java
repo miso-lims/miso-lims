@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.event.manager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 @Service
 public class RunAlertManager {
   private static final Logger log = LoggerFactory.getLogger(RunAlertManager.class);
-  Map<Long, Run> runs = new HashMap<>();
+  Map<Long, Run> runs = new ConcurrentHashMap<>();
 
   @Value("${miso.alerting.enabled}")
   private boolean enabled = true;
