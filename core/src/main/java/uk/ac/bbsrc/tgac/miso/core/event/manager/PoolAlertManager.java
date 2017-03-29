@@ -24,10 +24,9 @@
 package uk.ac.bbsrc.tgac.miso.core.event.manager;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +53,8 @@ import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 @Service
 public class PoolAlertManager {
   private static final Logger log = LoggerFactory.getLogger(PoolAlertManager.class);
-  final Map<Long, Pool> pools = new HashMap<>();
-  final Set<User> poolWatchers = new HashSet<>();
+  final Map<Long, Pool> pools = new ConcurrentHashMap<>();
+  final Set<User> poolWatchers = ConcurrentHashMap.newKeySet();
 
   @Value("${miso.alerting.enabled}")
   private boolean enabled = true;
