@@ -271,6 +271,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
     this.platformType = platformType;
   }
 
+  @Override
   public Collection<ChangeLog> getChangeLog() {
     return changelog;
   }

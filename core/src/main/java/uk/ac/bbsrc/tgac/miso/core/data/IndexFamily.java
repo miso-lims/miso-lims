@@ -34,7 +34,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
@@ -62,8 +61,7 @@ public class IndexFamily implements Serializable {
   }
 
   private Boolean archived;
-  @OneToMany(targetEntity = Index.class, fetch = FetchType.EAGER)
-  @JoinColumn(name = "indexFamilyId")
+  @OneToMany(targetEntity = Index.class, fetch = FetchType.EAGER, mappedBy = "family")
   @OrderBy("position, name")
   @JsonManagedReference
   private List<Index> indices;

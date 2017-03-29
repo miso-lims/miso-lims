@@ -38,7 +38,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
@@ -99,7 +98,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @JsonManagedReference
   private Collection<SampleQC> sampleQCs = new TreeSet<>();
 
-  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Sample_Note", joinColumns = {
       @JoinColumn(name = "sample_sampleId") }, inverseJoinColumns = {
           @JoinColumn(name = "notes_noteId") })

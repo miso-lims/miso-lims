@@ -142,7 +142,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @Column(length = NAME_LENGTH)
   private String name;
 
-  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Pool_Note", joinColumns = {
       @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
           @JoinColumn(name = "notes_noteId") })
@@ -185,8 +185,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   // not Hibernate-managed
   private Group watchGroup;
 
-  // Cascade all operations except delete
-  @ManyToMany(targetEntity = UserImpl.class, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+  @ManyToMany(targetEntity = UserImpl.class)
   @JoinTable(name = "Pool_Watcher", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
 

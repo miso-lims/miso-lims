@@ -198,16 +198,23 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public List<Pool> listByProjectId(long projectId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(PoolImpl.class);
-    criteria.createAlias("pooledElements", "dilution");
-    criteria.createAlias("dilution.library", "library");
-    criteria.createAlias("library.sample", "sample");
-    criteria.createAlias("sample.project", "project");
-    criteria.add(Restrictions.eq("project.id", projectId));
-    criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+    Criteria idCriteria = currentSession().createCriteria(PoolImpl.class, "p");
+    idCriteria.createAlias("p.pooledElements", "dilution");
+    idCriteria.createAlias("dilution.library", "library");
+    idCriteria.createAlias("library.sample", "sample");
+    idCriteria.createAlias("sample.project", "project");
+    idCriteria.add(Restrictions.eq("project.id", projectId));
+    idCriteria.setProjection(Projections.distinct(Projections.property("p.id")));
     @SuppressWarnings("unchecked")
-    List<Pool> results = criteria.list();
-    return results;
+    List<Long> ids = idCriteria.list();
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Criteria criteria = currentSession().createCriteria(PoolImpl.class);
+    criteria.add(Restrictions.in("id", ids));
+    @SuppressWarnings("unchecked")
+    List<Pool> pools = criteria.list();
+    return pools;
   }
 
   @Override
@@ -256,9 +263,11 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public long save(final Pool pool) throws IOException {
+    currentSession().flush();
     Long id;
     if (pool.getId() == PoolImpl.UNSAVED_ID) {
       id = (Long) currentSession().save(pool);
+      currentSession().flush();
     } else {
       if (pool.isDiscarded()) {
         getBoxStore().removeBoxableFromBox(pool);
