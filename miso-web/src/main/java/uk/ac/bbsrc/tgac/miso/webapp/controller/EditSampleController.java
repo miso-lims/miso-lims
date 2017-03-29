@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -255,16 +255,19 @@ public class EditSampleController {
 
   public Collection<Project> populateProjects(@RequestParam(value = "projectId", required = false) Long projectId) throws IOException {
     try {
-      if (projectId != null) {
-        Collection<Project> ps = new ArrayList<>();
+      List<Project> ps;
+      if (projectId == null) {
+        ps = new ArrayList<>(requestManager.listAllProjects());
+      } else {
+        ps = new ArrayList<>();
         for (Project p : requestManager.listAllProjects()) {
           if (!p.getProjectId().equals(projectId)) {
             ps.add(p);
           }
         }
-        return ps;
       }
-      return requestManager.listAllProjects();
+      Collections.sort(ps, (a, b) -> a.getAlias().compareTo(b.getAlias()));
+      return ps;
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list projects", ex);
