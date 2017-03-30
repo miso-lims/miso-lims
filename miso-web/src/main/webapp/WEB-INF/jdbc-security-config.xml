@@ -47,7 +47,6 @@
     <security:access-denied-handler error-page="/accessDenied.jsp"/>
     <security:csrf disabled="true" />
 
-    <security:custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
     <security:custom-filter position="FORM_LOGIN_FILTER" ref="jdbcAuthFilter" />
     <security:remember-me data-source-ref="dataSource" user-service-ref="jdbcUserAuthService" remember-me-parameter="_spring_security_remember_me" />
 
@@ -69,11 +68,6 @@
 
     <security:session-management invalid-session-url="/login.jsp" session-fixation-protection="none" />
   </security:http>
-
-  <bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">
-    <constructor-arg ref="sessionRegistry" />
-    <constructor-arg value="/login.jsp?login_error=2" />
-  </bean>
 
   <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 
