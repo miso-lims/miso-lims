@@ -55,6 +55,7 @@ CALL addTargetedSequencing('SureSelect v4','GSLE Legacy','KAPA Hyper Prep',1);
 CALL addTargetedSequencing('SureSelect v5', 'FFPE-R', 'Agilent SureSelect XT2', 0);
 CALL addTargetedSequencing('SureSelect v5','GSLE Legacy','KAPA Hyper Prep',1);
 CALL addTargetedSequencing('SureSelect v5','GSLE Legacy','QXT',0);
+CALL addTargetedSequencing('SureSelect v5','FFPE-R','KAPA Hyper Prep and SureSelect XT2 v5',0);
 CALL addTargetedSequencing('Thunderbolts','GSLE Legacy','Thunderbolt Cancer Panel',0);
 CALL addTargetedSequencing('TruSeq Amplicon - Cancer Panel','GSLE Legacy','GA_PE',1);
 CALL addTargetedSequencing('TruSeq Amplicon - Cancer Panel','GSLE Legacy','TruSeq Amplicon - Cancer Panel',0);
