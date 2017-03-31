@@ -100,7 +100,7 @@ public class SampleController extends RestController {
   public List<SampleDto> getSamples(UriComponentsBuilder uriBuilder) throws IOException {
     List<Sample> samples = sampleService.getAll();
     // return all samples
-    List<SampleDto> sampleDtos = Dtos.asSampleDtos(samples);
+    List<SampleDto> sampleDtos = Dtos.asSampleDtos(samples, true);
     for (SampleDto sampleDto : sampleDtos) {
       sampleDto.writeUrls(uriBuilder);
     }
@@ -132,7 +132,7 @@ public class SampleController extends RestController {
         sampleSubset = sampleService.getByPageAndSize(iDisplayStart, iDisplayLength, sortCol, sSortDir);
         numMatches = numSamples;
       }
-      List<SampleDto> sampleDtos = Dtos.asSampleDtos(sampleSubset);
+      List<SampleDto> sampleDtos = Dtos.asSampleDtos(sampleSubset, false);
       for (SampleDto sampleDto : sampleDtos) {
         sampleDto.writeUrls(uriBuilder);
       }
