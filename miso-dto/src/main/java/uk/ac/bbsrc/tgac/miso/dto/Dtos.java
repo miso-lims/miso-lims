@@ -1209,7 +1209,7 @@ public class Dtos {
     return to;
   }
 
-  public static PoolDto asDto(Pool from) {
+  public static PoolDto asDto(Pool from, boolean includeContents) {
     PoolDto dto = new PoolDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1224,13 +1224,17 @@ public class Dtos {
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
     }
-    Set<DilutionDto> pooledElements = new HashSet<>();
-    for (Dilution ld : from.getPoolableElements()) {
-      if (ld != null) {
-        pooledElements.add(asDto(ld));
+    if (includeContents) {
+      Set<DilutionDto> pooledElements = new HashSet<>();
+      for (Dilution ld : from.getPoolableElements()) {
+        if (ld != null) {
+          pooledElements.add(asDto(ld));
+        }
       }
+      dto.setPooledElements(pooledElements);
+    } else {
+      dto.setPooledElements(Collections.emptySet());
     }
-    dto.setPooledElements(pooledElements);
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
@@ -1239,10 +1243,10 @@ public class Dtos {
     return dto;
   }
 
-  public static List<PoolDto> asPoolDtos(Collection<Pool> poolSubset) {
+  public static List<PoolDto> asPoolDtos(Collection<Pool> poolSubset, boolean includeContents) {
     List<PoolDto> dtoList = new ArrayList<>();
     for (Pool pool : poolSubset) {
-      dtoList.add(asDto(pool));
+      dtoList.add(asDto(pool, includeContents));
     }
     return dtoList;
   }

@@ -152,7 +152,7 @@ public class PoolRestController extends RestController {
 
   public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)
       throws IOException {
-    List<PoolDto> poolDtos = Dtos.asPoolDtos(pools);
+    List<PoolDto> poolDtos = Dtos.asPoolDtos(pools, false);
     for (PoolDto poolDto : poolDtos) {
       poolDto.writeUrls(uriBuilder);
     }
