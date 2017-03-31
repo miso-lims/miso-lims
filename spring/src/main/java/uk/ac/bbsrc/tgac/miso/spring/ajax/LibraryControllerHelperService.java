@@ -607,9 +607,9 @@ public class LibraryControllerHelperService {
 
   public JSONArray getTargetedSequencingTypes(Long libraryPrepKitId) throws IOException {
     JSONArray targetedSequencingByKit = new JSONArray();
-
+    KitDescriptor kd = kitService.getKitDescriptorById(libraryPrepKitId);
     for (TargetedSequencing targetedSequencing : getNonArchivedTargetedSequencing(
-        kitService.getKitDescriptorById(libraryPrepKitId).getTargetedSequencing())) {
+        kd.getTargetedSequencing())) {
       Map<String, Object> targetedSequencingMap = Maps.newHashMap();
       targetedSequencingMap.put("targetedSequencingId", targetedSequencing.getId());
       targetedSequencingMap.put("alias", targetedSequencing.getAlias());
