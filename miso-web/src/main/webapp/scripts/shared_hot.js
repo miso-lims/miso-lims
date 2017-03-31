@@ -218,6 +218,7 @@ var Hot = {
     for (var i = 0; i < Hot.colConf.length; i++) {
       if (Hot.colConf[i].data == attrName) return i;
     }
+    return -1;
   },
   
   /**
