@@ -124,7 +124,12 @@ Fluxion.Ajax.newAjax = function(url) {
         aj.xhr.setRequestHeader('Accept', 'application/json');
         aj.xhr.onreadystatechange = function() {
           if (aj.xhr.readyState == XMLHttpRequest.DONE && aj.xhr.status == 200) {
-            var json = JSON.parse(aj.xhr.responseText);
+            try {
+              var json = JSON.parse(aj.xhr.responseText);
+            } catch (e) {
+              alert("Internal server error.");
+              return;
+            }
             if (clientParams.passthrough) {
               process(json);
             }
@@ -206,7 +211,12 @@ Fluxion.Ajax.newAjax = function(url) {
       }
       xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-          var json = JSON.parse(xhr.responseText);
+          try {
+            var json = JSON.parse(xhr.responseText);
+          } catch (e) {
+            alert("Internal server error.");
+            return;
+          }
           if (clientParams && clientParams.passthrough) {
             process(json);
           }
