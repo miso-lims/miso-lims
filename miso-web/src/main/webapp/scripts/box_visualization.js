@@ -693,7 +693,7 @@ Box.PrepareScannerDialog = function() {
       buttons: {}
     });
     jQuery('#dialogDialog').dialog('open');
-    Box.scan.prepareScanner(Box.boxJSON.rows, Box.boxJSON.columns);
+    Box.scan.prepareScanner(Box.boxJSON.rows, Box.boxJSON.cols);
   };
 
   self.error = function() {
