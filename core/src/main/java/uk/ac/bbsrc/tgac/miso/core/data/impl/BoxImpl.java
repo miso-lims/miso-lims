@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.MapKeyClass;
@@ -38,7 +39,7 @@ public class BoxImpl extends AbstractBox implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(BoxImpl.class);
 
   // The contents of the Box
-  @ManyToAny(metaColumn = @Column(name = "targetType"))
+  @ManyToAny(metaColumn = @Column(name = "targetType"), fetch = FetchType.LAZY)
   @MapKeyColumn(name = "position", unique = true)
   @MapKeyClass(String.class)
   @JoinTable(name = "BoxPosition", joinColumns = { @JoinColumn(name = "boxId") }, inverseJoinColumns = {

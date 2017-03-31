@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -133,7 +134,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @PrimaryKeyJoinColumn
   private SampleDerivedInfo derivedInfo;
 
-  @ManyToOne(targetEntity = BoxImpl.class)
+  @ManyToOne(targetEntity = BoxImpl.class, fetch = FetchType.LAZY)
   @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = sampleId AND bp.targetType LIKE 'Sample%')")
   private Box box;
 

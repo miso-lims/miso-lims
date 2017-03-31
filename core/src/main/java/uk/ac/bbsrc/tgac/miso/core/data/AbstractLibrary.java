@@ -36,6 +36,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -175,7 +176,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @PrimaryKeyJoinColumn
   private LibraryDerivedInfo derivedInfo;
 
-  @ManyToOne(targetEntity = BoxImpl.class)
+  @ManyToOne(targetEntity = BoxImpl.class, fetch = FetchType.LAZY)
   @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")
   private Box box;
   @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")

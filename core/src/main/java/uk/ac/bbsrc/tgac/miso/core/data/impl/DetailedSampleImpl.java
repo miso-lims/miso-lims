@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
@@ -28,7 +29,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne(optional = true, targetEntity = DetailedSampleImpl.class)
+  @ManyToOne(optional = true, targetEntity = DetailedSampleImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "parentId", nullable = true)
   private DetailedSample parent;
 
