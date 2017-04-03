@@ -64,7 +64,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -221,12 +220,6 @@ public class EditProjectController {
   public Collection<Library> populateProjectLibraries(long projectId) throws IOException {
     List<Library> libraries = new ArrayList<>(libraryService.listByProjectId(projectId));
     Collections.sort(libraries, new AliasComparator<>());
-    for (Library l : libraries) {
-      for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
-        l.addQc(qc);
-      }
-    }
-
     return libraries;
   }
 

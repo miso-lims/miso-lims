@@ -34,7 +34,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -95,9 +94,7 @@ public class LibraryDilution implements Dilution, Serializable {
   @JoinColumn(name = "targetedSequencingId")
   private TargetedSequencing targetedSequencing;
 
-  @ManyToMany(targetEntity = PoolImpl.class)
-  @JoinTable(name = "Pool_Dilution", joinColumns = { @JoinColumn(name = "dilution_dilutionId") }, inverseJoinColumns = {
-      @JoinColumn(name = "pool_poolId") })
+  @ManyToMany(targetEntity = PoolImpl.class, mappedBy = "pooledElements")
   @JsonManagedReference
   private Set<Pool> pools;
 
