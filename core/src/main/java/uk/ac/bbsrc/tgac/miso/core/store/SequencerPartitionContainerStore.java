@@ -29,6 +29,8 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 /**
  * Defines a DAO interface for storing SequencerPartitionContainers
@@ -37,7 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
  * @since 0.1.6
  */
 public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer>,
-    Remover<SequencerPartitionContainer> {
+    Remover<SequencerPartitionContainer>, PaginatedDataSource<SequencerPartitionContainer, PaginationFilter> {
   /**
    * Get the SequencerPartitionContainer that contains a given {@link SequencerPoolPartition}
    * 
@@ -81,14 +83,6 @@ public interface SequencerPartitionContainerStore extends Store<SequencerPartiti
    *           when
    */
   Collection<Partition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException;
-
-  long countBySearch(String querystr) throws IOException;
-
-  List<SequencerPartitionContainer> listBySearchOffsetAndNumResults(int offset, int limit, String querystr,
-      String sortDir, String sortCol) throws IOException;
-
-  List<SequencerPartitionContainer> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol)
-      throws IOException;
 
   Partition getPartitionById(long partitionId);
 }

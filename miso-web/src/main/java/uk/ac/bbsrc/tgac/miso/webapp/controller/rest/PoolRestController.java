@@ -12,18 +12,16 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
-
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,10 +54,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PoolPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 
 /**
  * A controller to handle all REST requests for Pools
@@ -70,6 +71,22 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 @RequestMapping("/rest/pool")
 @SessionAttributes("pool")
 public class PoolRestController extends RestController {
+  private final JQueryDataTableBackend<Pool, PoolDto, PoolPaginationFilter> jQueryBackend = new JQueryDataTableBackend<Pool, PoolDto, PoolPaginationFilter>() {
+
+    @Override
+    protected PoolDto asDto(Pool model, UriComponentsBuilder builder) {
+      PoolDto dto = Dtos.asDto(model, false);
+      dto.writeUrls(builder);
+      return dto;
+    }
+
+    @Override
+    protected PaginatedDataSource<Pool, PoolPaginationFilter> getSource() throws IOException {
+      return poolService;
+    }
+
+  };
+
   protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
   @Autowired
@@ -77,6 +94,9 @@ public class PoolRestController extends RestController {
 
   @Autowired
   private LibraryDilutionService dilutionService;
+
+  @Autowired
+  private PoolService poolService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -114,40 +134,12 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<PoolDto> getDTPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    if (request.getParameter("iDisplayStart") != null && PlatformType.getKeys().contains(platform)) {
-      PlatformType platformType = PlatformType.get(platform);
-      Long numPools = requestManager.countPoolsByPlatform(platformType);
-      // get request params from DataTables
-      Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
-      Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
-      String sSearch = request.getParameter("sSearch");
-      String sSortDir = request.getParameter("sSortDir_0");
-      String sortColIndex = request.getParameter("iSortCol_0");
-      String sortCol = request.getParameter("mDataProp_" + sortColIndex);
-
-      // get requested subset of pools
-      Collection<Pool> poolSubset;
-      Long numMatches;
-
-      if (!isStringEmptyOrNull(sSearch)) {
-        poolSubset = requestManager
-            .getPoolsByPageSizeSearchPlatform(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol, platformType);
-        numMatches = requestManager.getNumPoolsBySearch(platformType, sSearch);
-      } else {
-        poolSubset = requestManager.getPoolsByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol, platformType);
-        numMatches = numPools;
-      }
-      List<PoolDto> poolDtos = serializePools(poolSubset, uriBuilder);
-
-      DataTablesResponseDto<PoolDto> dtResponse = new DataTablesResponseDto<>();
-      dtResponse.setITotalRecords(numPools);
-      dtResponse.setITotalDisplayRecords(numMatches);
-      dtResponse.setAaData(poolDtos);
-      dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
-      return dtResponse;
-    } else {
-      throw new RestException("Request must specify platform and DataTables parameters");
+    if (!PlatformType.getKeys().contains(platform)) {
+      throw new RestException("Invalid platform type.");
     }
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.get(platform));
+    return jQueryBackend.get(filter, request, response, uriBuilder);
   }
 
   public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)

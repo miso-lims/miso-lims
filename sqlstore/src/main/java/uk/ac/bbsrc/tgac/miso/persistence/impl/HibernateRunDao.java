@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -28,14 +29,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateRunDao implements RunStore {
+public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run, PaginationFilter> {
+
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "status");
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateRunDao.class);
 
+  private static final String WATCHERS_GROUP = "RunWatchers";
+  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "description" };
   @Autowired
   private SessionFactory sessionFactory;
   @Autowired
@@ -43,7 +49,8 @@ public class HibernateRunDao implements RunStore {
   @Autowired
   private JdbcTemplate template;
 
-  private Session currentSession() {
+  @Override
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 
@@ -68,7 +75,7 @@ public class HibernateRunDao implements RunStore {
   }
 
   private Group getRunWatcherGroup() throws IOException {
-    return securityStore.getGroupByName("RunWatchers");
+    return securityStore.getGroupByName(WATCHERS_GROUP);
   }
 
   private Run withWatcherGroup(Run run) throws IOException {
@@ -143,7 +150,7 @@ public class HibernateRunDao implements RunStore {
   @Override
   public List<Run> listBySearch(String query) throws IOException {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    criteria.add(DbUtils.searchRestrictions(query, "name", "alias", "description"));
+    criteria.add(DbUtils.searchRestrictions(query, SEARCH_PROPERTIES));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
@@ -262,31 +269,6 @@ public class HibernateRunDao implements RunStore {
   }
 
   @Override
-  public List<Run> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol)
-      throws IOException {
-    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
-    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    if ("lastUpdated".equals(sortCol)) sortCol = "status.lastUpdated";
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
-    if (querystr != null) {
-      criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
-    }
-    criteria.createAlias("derivedInfo", "derivedInfo");
-    criteria.createAlias("status", "status");
-    criteria.setFirstResult(offset);
-    criteria.setMaxResults(limit);
-    criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
-    @SuppressWarnings("unchecked")
-    List<Run> runs = criteria.list();
-    return withWatcherGroup(runs);
-  }
-
-  @Override
-  public List<Run> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException {
-    return listBySearchOffsetAndNumResults(offset, limit, null, sortDir, sortCol);
-  }
-
-  @Override
   public long countBySearch(String querystr) throws IOException {
     Criteria criteria = currentSession().createCriteria(RunImpl.class);
     criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
@@ -328,4 +310,44 @@ public class HibernateRunDao implements RunStore {
     currentSession().update(run);
   }
 
+  @Override
+  public void setAdditionalPaginationCriteria(PaginationFilter filter, Criteria criteria) {
+    if (filter.getProjectId() != null) {
+      criteria.createAlias("containers", "container");
+      criteria.createAlias("container.partitions", "partition");
+      criteria.createAlias("partition.pool", "pool");
+      criteria.createAlias("pool.pooledElements", "dilution");
+      criteria.createAlias("dilution.library", "library");
+      criteria.createAlias("library.sample", "sample");
+      criteria.createAlias("sample.project", "project");
+    }
+  }
+
+  @Override
+  public String getProjectColumn() {
+    return "project.id";
+  }
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return STANDARD_ALIASES;
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    if ("lastModified".equals(original)) return "derivedInfo.lastModified";
+    if ("lastUpdated".equals(original)) return "status.lastUpdated";
+    return original;
+
+  }
+
+  @Override
+  public Class<? extends Run> getRealClass() {
+    return RunImpl.class;
+  }
 }

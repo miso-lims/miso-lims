@@ -23,12 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
-import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,10 +50,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError;
 
 /**
@@ -76,6 +75,23 @@ public class RunRestController extends RestController {
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private RunService runService;
+
+  private final JQueryDataTableBackend<Run, RunDto, PaginationFilter> jQueryBackend = new JQueryDataTableBackend<Run, RunDto, PaginationFilter>() {
+
+    @Override
+    protected RunDto asDto(Run model, UriComponentsBuilder builder) {
+      RunDto dto = Dtos.asDto(model);
+      dto.writeUrls(builder);
+      return dto;
+    }
+
+    @Override
+    protected PaginatedDataSource<Run, PaginationFilter> getSource() throws IOException {
+      return runService;
+    }
+  };
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -130,42 +146,7 @@ public class RunRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<RunDto> getDTRuns(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder)
       throws IOException {
-    if (request.getParameterMap().size() > 0) {
-      Long numRuns = Long.valueOf(requestManager.countRuns());
-      // get request params from DataTables
-      Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
-      Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
-      String sSearch = request.getParameter("sSearch");
-      String sSortDir = request.getParameter("sSortDir_0");
-      String sortColIndex = request.getParameter("iSortCol_0");
-      String sortCol = request.getParameter("mDataProp_" + sortColIndex);
-
-      // get requested subset of runs
-      Collection<Run> runSubset;
-      Long numMatches;
-
-      if (!isStringEmptyOrNull(sSearch)) {
-        runSubset = requestManager.getRunsByPageSizeSearch(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol);
-        numMatches = Long.valueOf(requestManager.countRunsBySearch(sSearch));
-      } else {
-        runSubset = requestManager.getRunsByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol);
-        numMatches = numRuns;
-      }
-      List<RunDto> runDtos = Dtos.asRunDtos(runSubset);
-      URI baseUri = uriBuilder.build().toUri();
-      for (RunDto runDto : runDtos) {
-        runDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/run/{id}").buildAndExpand(runDto.getId()).toUriString());
-      }
-
-      DataTablesResponseDto<RunDto> dtResponse = new DataTablesResponseDto<>();
-      dtResponse.setITotalRecords(numRuns);
-      dtResponse.setITotalDisplayRecords(numMatches);
-      dtResponse.setAaData(runDtos);
-      dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
-      return dtResponse;
-    } else {
-      throw new RestException("Request must specify DataTables parameters.");
-    }
+    return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
   }
 
   @ExceptionHandler(Exception.class)

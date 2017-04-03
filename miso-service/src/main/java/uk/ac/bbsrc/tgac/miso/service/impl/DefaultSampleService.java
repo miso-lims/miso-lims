@@ -50,6 +50,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
@@ -63,10 +65,11 @@ import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultSampleService implements SampleService {
+public class DefaultSampleService implements SampleService, AuthorizedPaginatedDataSource<Sample, PaginationFilter> {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
@@ -676,29 +679,9 @@ public class DefaultSampleService implements SampleService {
 
   @CoverageIgnore
   @Override
-  public List<Sample> getByPageAndSize(int offset, int size, String sortCol, String sortDir) throws IOException {
-    Collection<Sample> samples = sampleDao.listByOffsetAndNumResults(offset, size, sortCol, sortDir);
-    return authorizationManager.filterUnreadable(samples);
-  }
-
-  @CoverageIgnore
-  @Override
-  public List<Sample> getByPageAndSizeAndSearch(int offset, int size, String querystr, String sortCol, String sortDir) throws IOException {
-    Collection<Sample> samples = sampleDao.listBySearchOffsetAndNumResults(offset, size, querystr, sortCol, sortDir);
-    return authorizationManager.filterUnreadable(samples);
-  }
-
-  @CoverageIgnore
-  @Override
   public List<Sample> getBySearch(String querystr) throws IOException {
     Collection<Sample> samples = sampleDao.listBySearch(querystr);
     return authorizationManager.filterUnreadable(samples);
-  }
-
-  @CoverageIgnore
-  @Override
-  public Long countBySearch(String querystr) throws IOException {
-    return sampleDao.countBySearch(querystr);
   }
 
   @Override
@@ -811,4 +794,15 @@ public class DefaultSampleService implements SampleService {
   public Collection<QcType> listSampleQcTypes() throws IOException {
     return sampleQcDao.listAllSampleQcTypes();
   }
+
+  @Override
+  public PaginatedDataSource<Sample, PaginationFilter> getBackingPaginationSource() {
+    return sampleDao;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
 }

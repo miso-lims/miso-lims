@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.core.util.PoolPaginationFilter;
 
 @Transactional
 public class HibernatePoolDaoTest extends AbstractDAOTest {
@@ -135,7 +136,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     testPool.setVolume(10D);
     testPool.setQcPassed(true);
     testPool.setDescription("Description changed");
-    
+
     User user = new UserImpl();
     user.setUserId(1L);
     testPool.setLastModifier(user);
@@ -329,32 +330,48 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
 
   @Test
   public void testCountIlluminaPools() throws IOException {
-    assertTrue(dao.countPoolsBySearch(PlatformType.ILLUMINA, null) > 0);
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.ILLUMINA);
+    assertTrue(dao.count(filter) > 0);
   }
 
   @Test
   public void testCountIlluminaPoolsBadSearch() throws IOException {
-    assertEquals(0L, dao.countPoolsBySearch(PlatformType.ILLUMINA, "; DROP TABLE Pool;"));
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.ILLUMINA);
+    filter.setQuery("DROP TABLE Pool;");
+    assertEquals(0L, dao.count(filter));
   }
 
   @Test
   public void testCountIlluminaPoolsBySearch() throws IOException {
-    assertEquals(2L, dao.countPoolsBySearch(PlatformType.ILLUMINA, "IPO1"));
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.ILLUMINA);
+    filter.setQuery("IPO1");
+    assertEquals(2L, dao.count(filter));
   }
 
   @Test
   public void testCountIlluminaPoolsEmptySearch() throws IOException {
-    assertTrue(dao.countPoolsBySearch(PlatformType.ILLUMINA, "") > 0);
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.ILLUMINA);
+    filter.setQuery("");
+    assertTrue(dao.count(filter) > 0);
   }
 
   @Test
   public void testCountPacBioPools() throws IOException {
-    assertEquals(0L, dao.countPoolsBySearch(PlatformType.PACBIO, null));
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.PACBIO);
+    assertEquals(0L, dao.count(filter));
   }
 
   @Test
   public void testCountPacBioPoolsBySearch() throws IOException {
-    assertEquals(0L, dao.countPoolsBySearch(PlatformType.PACBIO, "IPO1"));
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.PACBIO);
+    filter.setQuery("IPO1");
+    assertEquals(0L, dao.count(filter));
   }
 
   @Test
@@ -408,28 +425,28 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListByIlluminaBadSearchWithLimit() throws IOException {
-    List<Pool> pools = dao
-        .listBySearchOffsetAndNumResultsAndPlatform(5, 3, "; DROP TABLE Pool;", "asc", "id", PlatformType.ILLUMINA);
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.ILLUMINA);
+    filter.setQuery("; DROP TABLE Pool;");
+    List<Pool> pools = dao.list(filter, 5, 3, true, "id");
     assertEquals(0L, pools.size());
   }
 
   @Test
   public void testListByIlluminaEmptySearchWithLimit() throws IOException {
-    List<Pool> pools = dao
-        .listBySearchOffsetAndNumResultsAndPlatform(5, 3, "", "asc", "id", PlatformType.ILLUMINA);
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.ILLUMINA);
+    filter.setQuery("");
+    List<Pool> pools = dao.list(filter, 5, 3, true, "id");
     assertEquals(3L, pools.size());
   }
 
   @Test
-  public void testListByIlluminaOffsetBadSortDir() throws IOException {
-    List<Pool> pools = dao.listBySearchOffsetAndNumResultsAndPlatform(5, 3, null, "BARK", "id", PlatformType.ILLUMINA);
-    assertEquals(3, pools.size());
-  }
-
-  @Test
   public void testListByIlluminaSearchWithLimit() throws IOException {
-    List<Pool> pools = dao
-        .listBySearchOffsetAndNumResultsAndPlatform(5, 3, "IPO", "asc", "id", PlatformType.ILLUMINA);
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.ILLUMINA);
+    filter.setQuery("IPO");
+    List<Pool> pools = dao.list(filter, 5, 3, true, "id");
     assertEquals(3, pools.size());
     assertEquals(6L, pools.get(0).getId());
   }
@@ -453,19 +470,25 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
   @Test
   public void testListIlluminaOffsetBadLimit() throws IOException {
     exception.expect(IOException.class);
-    dao.listBySearchOffsetAndNumResultsAndPlatform(5, -3, null, "asc", "id", PlatformType.ILLUMINA);
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.ILLUMINA);
+    dao.list(filter, 5, -3, true, "id");
   }
 
   @Test
   public void testListIlluminaOffsetThreeWithThreeSamplesPerPageOrderLastMod() throws IOException {
-    List<Pool> pools = dao.listBySearchOffsetAndNumResultsAndPlatform(3, 3, null, "desc", "lastModified", PlatformType.ILLUMINA);
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.ILLUMINA);
+    List<Pool> pools = dao.list(filter, 3, 3, false, "lastModified");
     assertEquals(3, pools.size());
     assertEquals(7, pools.get(0).getId());
   }
 
   @Test
   public void testListIlluminaPoolsWithLimitAndOffset() throws IOException {
-    assertEquals(3, dao.listBySearchOffsetAndNumResultsAndPlatform(5, 3, null, "ASC", "id", PlatformType.ILLUMINA).size());
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setPlatformType(PlatformType.ILLUMINA);
+    assertEquals(3, dao.list(filter, 5, 3, true, "id").size());
   }
 
   @Test

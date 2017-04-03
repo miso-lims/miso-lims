@@ -1,5 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
+import org.springframework.web.util.UriComponentsBuilder;
+
 public class ContainerDto {
   private Long id;
   // identificationBarcode is displayed as "serial number" to the user
@@ -64,6 +68,17 @@ public class ContainerDto {
 
   public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
+  }
+
+  public void writeUrls(URI baseUri) {
+    setUrl(
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/run/container/{barcode}")
+            .buildAndExpand(getIdentificationBarcode()).toUriString());
+  }
+
+  public void writeUrls(UriComponentsBuilder uriBuilder) {
+    URI baseUri = uriBuilder.build().toUri();
+    writeUrls(baseUri);
   }
 
 }
