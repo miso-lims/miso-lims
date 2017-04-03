@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -277,6 +276,7 @@ public interface Run
 
   Date getLastUpdated();
 
+  @Override
   public Collection<ChangeLog> getChangeLog();
 
   /**
@@ -292,6 +292,4 @@ public interface Run
   public SequencingParameters getSequencingParameters();
 
   public void setSequencingParameters(SequencingParameters parameters);
-
-  public void setWatchGroup(Group watchGroup);
 }

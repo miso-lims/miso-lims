@@ -2086,65 +2086,9 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Long countPoolsByPlatform(PlatformType platform) throws IOException {
-    if (poolStore != null) {
-      return poolStore.countPoolsBySearch(platform, null);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Long getNumPoolsBySearch(PlatformType platform, String querystr) throws IOException {
-    if (poolStore != null) {
-      return poolStore.countPoolsBySearch(platform, querystr);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  };
-
-  @Override
-  public List<Pool> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
-      String sortCol, PlatformType platform) throws IOException {
-    if (poolStore != null) {
-      return poolStore.listBySearchOffsetAndNumResultsAndPlatform(offset, limit, querystr, sortDir, sortCol, platform);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public List<Pool> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
-      PlatformType platform) throws IOException {
-    if (poolStore != null) {
-      return poolStore.listBySearchOffsetAndNumResultsAndPlatform(offset, limit, null, sortDir, sortCol, platform);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Long countRuns() throws IOException {
     if (runStore != null) {
       return runStore.countRuns();
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public List<Run> getRunsByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException {
-    if (runStore != null) {
-      return runStore.listBySearchOffsetAndNumResults(offset, limit, querystr, sortDir, sortCol);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public List<Run> getRunsByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException {
-    if (runStore != null) {
-      return runStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
     } else {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
     }
@@ -2172,35 +2116,6 @@ public class MisoRequestManager implements RequestManager {
   public Long countContainers() throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return Long.valueOf(sequencerPartitionContainerStore.count());
-    } else {
-      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public List<SequencerPartitionContainer> getContainersByPageSizeSearch(int offset, int limit, String querystr,
-      String sortDir, String sortCol) throws IOException {
-    if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.listBySearchOffsetAndNumResults(offset, limit, querystr, sortDir, sortCol);
-    } else {
-      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public List<SequencerPartitionContainer> getContainersByPageAndSize(int offset, int limit, String sortDir,
-      String sortCol) throws IOException {
-    if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.listByOffsetAndNumResults(offset, limit, sortDir, sortCol);
-    } else {
-      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Long countContainersBySearch(String querystr) throws IOException {
-    if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.countBySearch(querystr);
     } else {
       throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
     }

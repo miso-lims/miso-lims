@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,6 +59,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
@@ -80,6 +80,21 @@ public class SampleController extends RestController {
 
   @Autowired
   private SampleClassService sampleClassService;
+
+  private final JQueryDataTableBackend<Sample, SampleDto, PaginationFilter> jQueryBackend = new JQueryDataTableBackend<Sample, SampleDto, PaginationFilter>() {
+
+    @Override
+    protected SampleDto asDto(Sample model, UriComponentsBuilder builder) {
+      SampleDto dto = Dtos.asMinimalDto(model);
+      dto.writeUrls(builder);
+      return dto;
+    }
+
+    @Override
+    protected PaginatedDataSource<Sample, PaginationFilter> getSource() throws IOException {
+      return sampleService;
+    }
+  };
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
@@ -111,41 +126,7 @@ public class SampleController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<SampleDto> getDTSamples(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    if (request.getParameterMap().size() > 0) {
-      Long numSamples = sampleService.countAll();
-      // get request params from DataTables
-      Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
-      Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
-      String sSearch = request.getParameter("sSearch");
-      String sSortDir = request.getParameter("sSortDir_0");
-      String sortColIndex = request.getParameter("iSortCol_0");
-      String sortCol = request.getParameter("mDataProp_" + sortColIndex);
-
-      // get requested subset of samples
-      Collection<Sample> sampleSubset;
-      Long numMatches;
-
-      if (!isStringEmptyOrNull(sSearch)) {
-        sampleSubset = sampleService.getByPageAndSizeAndSearch(iDisplayStart, iDisplayLength, sSearch, sortCol, sSortDir);
-        numMatches = sampleService.countBySearch(sSearch);
-      } else {
-        sampleSubset = sampleService.getByPageAndSize(iDisplayStart, iDisplayLength, sortCol, sSortDir);
-        numMatches = numSamples;
-      }
-      List<SampleDto> sampleDtos = Dtos.asSampleDtos(sampleSubset, false);
-      for (SampleDto sampleDto : sampleDtos) {
-        sampleDto.writeUrls(uriBuilder);
-      }
-
-      DataTablesResponseDto<SampleDto> dtResponse = new DataTablesResponseDto<>();
-      dtResponse.setITotalRecords(numSamples);
-      dtResponse.setITotalDisplayRecords(numMatches);
-      dtResponse.setAaData(sampleDtos);
-      dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
-      return dtResponse;
-    } else {
-      throw new RestException("Malformed Request: must send parameters in request to endpoint /samples/dt");
-    }
+    return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
   }
 
   @RequestMapping(value = "/sample", method = RequestMethod.POST, headers = { "Content-type=application/json" })

@@ -362,35 +362,13 @@ public interface RequestManager {
 
   public Collection<LibraryDesignCode> listLibraryDesignCodes() throws IOException;
 
-  public Long countPoolsByPlatform(PlatformType platform) throws IOException;
-
-  public List<Pool> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
-      String sortCol, PlatformType platform) throws IOException;
-
-  public List<Pool> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
-      PlatformType platform) throws IOException;
-
-  public Long getNumPoolsBySearch(PlatformType platform, String querystr) throws IOException;
-
   public Long countRuns() throws IOException;
-
-  public List<Run> getRunsByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException;
-
-  public List<Run> getRunsByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException;
 
   public Long countRunsBySearch(String querystr) throws IOException;
 
   public Run getLatestRunBySequencerPartitionContainerId(Long containerId) throws IOException;
 
   public Long countContainers() throws IOException;
-
-  public List<SequencerPartitionContainer> getContainersByPageSizeSearch(int offset, int limit, String querystr,
-      String sortDir, String sortCol) throws IOException;
-
-  public List<SequencerPartitionContainer> getContainersByPageAndSize(int offset, int limit, String sortDir,
-      String sortCol) throws IOException;
-
-  public Long countContainersBySearch(String querystr) throws IOException;
 
   public List<Run> getRunsByPool(Pool pool) throws IOException;
 

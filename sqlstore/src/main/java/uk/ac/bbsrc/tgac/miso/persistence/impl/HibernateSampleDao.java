@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -43,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  */
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
+public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, BaseHibernatePaginatedDataSource<Sample, PaginationFilter> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 
@@ -84,7 +86,8 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     return getSamples().size();
   }
 
-  private Session currentSession() {
+  @Override
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 
@@ -217,7 +220,8 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
    * @param querystr
    * @return
    */
-  private Criterion searchRestrictions(String querystr) {
+  @Override
+  public Criterion searchRestrictions(String querystr) {
     Criterion search = DbUtils.searchRestrictions(querystr, "alias", "identificationBarcode", "name");
 
     String str = DbUtils.convertStringToSearchQuery(querystr);
@@ -233,62 +237,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     @SuppressWarnings("unchecked")
     List<Sample> records = criteria.list();
     return records;
-  }
-
-  @Override
-  public Long countBySearch(String querystr) throws IOException {
-    if (isStringEmptyOrNull(querystr)) {
-      return countAll();
-    } else {
-      Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-      criteria.add(searchRestrictions(querystr));
-      return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
-    }
-  }
-
-  @Override
-  public List<Sample> listBySearchOffsetAndNumResults(int offset, int resultsPerPage, String querystr, String sortCol, String sortDir)
-      throws IOException {
-    if (offset < 0 || resultsPerPage < 0) throw new IOException("Limit and Offset must not be less than zero");
-    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(searchRestrictions(querystr));
-    // required to sort by 'derivedInfo.lastModified', which is the field on which we
-    // want to sort most List X pages
-    criteria.createAlias("derivedInfo", "derivedInfo");
-    criteria.setFirstResult(offset);
-    criteria.setMaxResults(resultsPerPage);
-    criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
-    criteria.setProjection(Projections.property("id"));
-    @SuppressWarnings("unchecked")
-    List<Long> ids = criteria.list();
-    if (ids.isEmpty()) {
-      return Collections.emptyList();
-    }
-    // We do this in two steps to make a smaller query that that the database can optimise
-    Criteria sampleCriteria = currentSession().createCriteria(SampleImpl.class);
-    sampleCriteria.add(Restrictions.in("id", ids));
-    sampleCriteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
-    sampleCriteria.createAlias("derivedInfo", "derivedInfo");
-    @SuppressWarnings("unchecked")
-    List<Sample> requestedPage = sampleCriteria.list();
-    return requestedPage;
-  }
-
-  @Override
-  public List<Sample> listByOffsetAndNumResults(int offset, int resultsPerPage, String sortCol, String sortDir) throws IOException {
-    if (offset < 0 || resultsPerPage < 0) throw new IOException("Limit and Offset must not be less than zero");
-    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    // required to sort by 'derivedInfo.lastModified', which is the field on which we
-    // want to sort most List X pages
-    criteria.createAlias("derivedInfo", "derivedInfo");
-    criteria.setFirstResult(offset);
-    criteria.setMaxResults(resultsPerPage);
-    criteria.addOrder("asc".equalsIgnoreCase(sortDir.toLowerCase()) ? Order.asc(sortCol) : Order.desc(sortCol));
-    @SuppressWarnings("unchecked")
-    List<Sample> requestedPage = criteria.list();
-    return requestedPage;
   }
 
   @Override
@@ -359,4 +307,27 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator {
     criteria.add(Restrictions.eq("preMigrationId", id));
     return (Sample) criteria.uniqueResult();
   }
+
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo");
+
+  @Override
+  public String getProjectColumn() {
+    return "project.id";
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return STANDARD_ALIASES;
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    return "lastModified".equals(original) ? "derivedInfo.lastModified" : original;
+  }
+
+  @Override
+  public Class<? extends Sample> getRealClass() {
+    return SampleImpl.class;
+  }
+
 }

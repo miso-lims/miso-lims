@@ -1,17 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -24,28 +20,23 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSequencerPartitionContainerDao implements SequencerPartitionContainerStore {
+public class HibernateSequencerPartitionContainerDao
+    implements SequencerPartitionContainerStore, HibernatePaginatedDataSource<SequencerPartitionContainer, PaginationFilter> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSequencerPartitionContainerDao.class);
 
+  private final static String[] SEARCH_PROPERTIES = new String[] { "identificationBarcode" };
   @Autowired
   private SessionFactory sessionFactory;
 
-  private Session currentSession() {
+  @Override
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
-  }
-
-  private Criterion searchRestrictions(String querystr) {
-    String sanitizedQuery = DbUtils.convertStringToSearchQuery(querystr);
-    Criterion criteria = Restrictions.or(Restrictions.eq("spc.platform", PlatformType.get(sanitizedQuery)),
-        Restrictions.ilike("spc.identificationBarcode", sanitizedQuery));
-    return criteria;
   }
 
   @Override
@@ -147,62 +138,6 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
   }
 
   @Override
-  public long countBySearch(String querystr) throws IOException {
-    if (isStringEmptyOrNull(querystr)) {
-      return count();
-    } else {
-      Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class, "spc");
-      criteria.add(searchRestrictions(querystr));
-      return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
-    }
-  }
-
-  @Override
-  public List<SequencerPartitionContainer> listBySearchOffsetAndNumResults(int offset, int limit, String querystr,
-      String sortDir, String sortCol) throws IOException {
-    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
-    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class, "spc");
-    criteria.add(searchRestrictions(querystr));
-    // required to sort by 'derivedInfo.lastModifier'
-    criteria.createAlias("derivedInfo", "derivedInfo");
-    criteria.setFirstResult(offset);
-    criteria.setMaxResults(limit);
-    criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
-    criteria.setProjection(Projections.property("id"));
-    @SuppressWarnings("unchecked")
-    List<Long> ids = criteria.list();
-    if (ids.isEmpty()) {
-      return Collections.emptyList();
-    }
-    // We do this in two steps to make a smaller query that that the database can optimise
-    Criteria query = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
-    query.add(Restrictions.in("id", ids));
-    query.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
-    query.createAlias("derivedInfo", "derivedInfo");
-    @SuppressWarnings("unchecked")
-    List<SequencerPartitionContainer> records = query.list();
-    return records;
-  }
-
-  @Override
-  public List<SequencerPartitionContainer> listByOffsetAndNumResults(int offset, int limit, String sortDir,
-      String sortCol) throws IOException {
-    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
-    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
-    // I don't know why this alias is required, but without it, you can't sort by 'derivedInfo.lastModifier', which is the field on which we
-    // want to sort most List X pages
-    criteria.createAlias("derivedInfo", "derivedInfo");
-    criteria.setFirstResult(offset);
-    criteria.setMaxResults(limit);
-    criteria.addOrder("asc".equalsIgnoreCase(sortDir.toLowerCase()) ? Order.asc(sortCol) : Order.desc(sortCol));
-    @SuppressWarnings("unchecked")
-    List<SequencerPartitionContainer> records = criteria.list();
-    return records;
-  }
-
-  @Override
   public Partition getPartitionById(long partitionId) {
     return (Partition) currentSession().get(PartitionImpl.class, partitionId);
   }
@@ -213,6 +148,33 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo");
+
+  @Override
+  public String getProjectColumn() {
+    return null;
+  }
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return STANDARD_ALIASES;
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    return "lastModified".equals(original) ? "derivedInfo.lastModified" : original;
+  }
+
+  @Override
+  public Class<? extends SequencerPartitionContainer> getRealClass() {
+    return SequencerPartitionContainerImpl.class;
   }
 
 }

@@ -33,23 +33,7 @@ public interface SampleDao extends SampleStore {
    */
   boolean aliasExists(String alias) throws IOException;
 
-  /**
-   * List all Samples by desired page with given page size.
-   *
-   * @param page of type int
-   * @param size of type int
-   * @param sortDir of type String
-   * @return Collection<Sample>
-   * @throws IOException
-   */
-  Collection<Sample> listByOffsetAndNumResults(int page, int size, String sortCol, String sortDir) throws IOException;
-
-  List<Sample> listBySearchOffsetAndNumResults(int offset, int resultsPerPage, String querystr, String sortCol, String sortDir)
-      throws IOException;
-
   Long countAll() throws IOException;
-
-  Long countBySearch(String querystr) throws IOException;
 
   /**
    * List all the identities which have at least one external name which (partially) matches the input String.

@@ -12,8 +12,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
-public interface SampleService {
+public interface SampleService extends PaginatedDataSource<Sample, PaginationFilter> {
 
   Sample get(Long sampleId) throws IOException;
 
@@ -23,10 +25,6 @@ public interface SampleService {
 
   List<Sample> getAll() throws IOException;
 
-  List<Sample> getByPageAndSize(int page, int size, String sortCol, String sortDir) throws IOException;
-
-  List<Sample> getByPageAndSizeAndSearch(int page, int size, String querystr, String sortCol, String sortDir) throws IOException;
-
   List<Sample> getBySearch(String querystr) throws IOException;
 
   List<Sample> getByAlias(String alias) throws IOException;
@@ -34,8 +32,6 @@ public interface SampleService {
   void delete(Long sampleId) throws IOException;
 
   Long countAll() throws IOException;
-
-  Long countBySearch(String querystr) throws IOException;
 
   Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
 

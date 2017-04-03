@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateLibraryDaoTest extends AbstractDAOTest {
 
@@ -194,7 +194,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListWithLimitAndOffset() throws IOException {
-    assertEquals(3, dao.listByOffsetAndNumResults(5, 3, "ASC", "id").size());
+    assertEquals(3, dao.list(new PaginationFilter(), 5, 3, true, "id").size());
   }
 
   @Test
@@ -214,31 +214,29 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListBySearchWithLimit() throws IOException {
-    List<Library> libraries = dao.listBySearchOffsetAndNumResults(2, 3, "Bn_R", "desc", "lastModified");
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("Bn_R");
+    List<Library> libraries = dao.list(filter, 2, 3, false, "lastModified");
     assertEquals(3, libraries.size());
     assertEquals(10L, libraries.get(0).getId());
   }
 
   @Test
   public void testListByIlluminaBadSearchWithLimit() throws IOException {
-    List<Library> libraries = dao.listBySearchOffsetAndNumResults(5, 3, "; DROP TABLE Library;", "asc", "id");
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("; DROP TABLE Library;");
+    List<Library> libraries = dao.list(filter, 5, 3, true, "id");
     assertEquals(0L, libraries.size());
-  }
-
-  @Test
-  public void testListOffsetBadSortDir() throws IOException {
-    List<Library> libraries = dao.listByOffsetAndNumResults(5, 3, "BARK", "id");
-    assertEquals(3, libraries.size());
   }
 
   @Test(expected = IOException.class)
   public void testListIlluminaOffsetBadLimit() throws IOException {
-    dao.listByOffsetAndNumResults(5, -3, "asc", "id");
+    dao.list(new PaginationFilter(), 5, -3, true, "id");
   }
 
   @Test
   public void testListOffsetThreeWithThreeLibsPerPageOrderLastMod() throws IOException {
-    List<Library> libraries = dao.listByOffsetAndNumResults(3, 3, "desc", "lastModified");
+    List<Library> libraries = dao.list(new PaginationFilter(), 3, 3, false, "lastModified");
     assertEquals(3, libraries.size());
     assertEquals(11, libraries.get(0).getId());
   }
