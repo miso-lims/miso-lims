@@ -149,6 +149,16 @@ public class RunRestController extends RestController {
     return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
   }
 
+  @RequestMapping(value = "/dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<RunDto> getDTRunsByProject(@PathVariable("id") Long id, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder)
+      throws IOException {
+    PaginationFilter filter = new PaginationFilter();
+    filter.setProjectId(id);
+    return jQueryBackend.get(filter, request, response, uriBuilder);
+  }
+
   @ExceptionHandler(Exception.class)
   public @ResponseBody RestError handleError(HttpServletRequest request, HttpServletResponse response, Exception exception) {
     return RestExceptionHandler.handleException(request, response, exception);

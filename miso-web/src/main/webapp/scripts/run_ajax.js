@@ -340,7 +340,7 @@ Run.ui = {
     }
   },
 
-  createListingRunsTable: function () {
+  createListingRunsTable: function (projectId) {
     jQuery('#listingRunsTable').html("");    
     jQuery('#listingRunsTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
@@ -407,7 +407,7 @@ Run.ui = {
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
-      "sAjaxSource": "/miso/rest/run/dt",
+      "sAjaxSource": "/miso/rest/run/dt" + (projectId ? "/project/" + projectId : ""),
       "fnServerData": function (sSource, aoData, fnCallback) {
         jQuery('#listingRunsTable').addClass('disabled');
         jQuery.ajax({
@@ -423,6 +423,9 @@ Run.ui = {
         jQuery('#listingRunsTable_paginate').find('.fg-button').removeClass('fg-button');
       }
     })).fnSetFilteringDelay();
+  },
+  createListingRunsTableMain: function () {
+    Run.ui.createListingRunsTable(null);
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
     jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/run/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Run</button>");
   },
