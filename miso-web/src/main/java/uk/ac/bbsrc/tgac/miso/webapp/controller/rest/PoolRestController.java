@@ -142,6 +142,15 @@ public class PoolRestController extends RestController {
     return jQueryBackend.get(filter, request, response, uriBuilder);
   }
 
+  @RequestMapping(value = "dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<PoolDto> getDTPoolsByProject(@PathVariable("id") Long id, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+    PoolPaginationFilter filter = new PoolPaginationFilter();
+    filter.setProjectId(id);
+    return jQueryBackend.get(filter, request, response, uriBuilder);
+  }
+
   public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)
       throws IOException {
     List<PoolDto> poolDtos = Dtos.asPoolDtos(pools, false);

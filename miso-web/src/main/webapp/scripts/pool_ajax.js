@@ -412,8 +412,12 @@ Pool.ui = {
     );
   },
 
-  createListingPoolsTable: function (platform, poolConcentrationUnits) {
+  createListingPoolsTablePlatform: function (platform, poolConcentrationUnits) {
     var table = 'listing' + platform + 'PoolsTable';
+    // This URL has to be singular because of mapping in PoolRestController
+    Pool.ui.createListingPoolsTable(table, poolConcentrationUnits, "/miso/rest/pool/dt/platform/" + platform);
+  },
+  createListingPoolsTable: function(table, poolConcentrationUnits, url) {
     jQuery('#'+table).html('');
 
     jQuery('#'+table).dataTable(Utils.setSortFromPriority({
@@ -479,7 +483,7 @@ Pool.ui = {
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
-      "sAjaxSource": "/miso/rest/pool/dt/platform/" + platform, // has to be singular because of mapping in PoolRestController
+      "sAjaxSource": url,
       "fnServerData": function (sSource, aoData, fnCallback) {
         jQuery('#'+table).addClass('disabled');
         jQuery.ajax({
