@@ -183,4 +183,14 @@ public class LibraryRestController extends RestController {
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
   }
+
+  @RequestMapping(value = "/dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<LibraryDto> getLibrariesForProject(@PathVariable("id") Long id, HttpServletRequest request,
+      HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    PaginationFilter filter = new PaginationFilter();
+    filter.setProjectId(id);
+    return jQueryBackend.get(filter, request, response, uriBuilder);
+  }
 }
