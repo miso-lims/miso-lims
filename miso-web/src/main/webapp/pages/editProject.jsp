@@ -1076,85 +1076,20 @@
 </div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runsdiv');">
-  ${fn:length(projectRuns)} Runs
+  Runs
   <div id="runs_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="runsdiv" style="display:none;">
-  <h1>${fn:length(projectRuns)} Runs</h1>
+  <h1>Runs</h1>
 
-  <table class="list no-border full-width" id="run_table">
-    <thead>
-    <tr>
-      <th>Run Name</th>
-      <th>Run Alias</th>
-      <th>Partitions</th>
-      <sec:authorize access="hasRole('ROLE_ADMIN')">
-        <th class="fit">DELETE</th>
-      </sec:authorize>
-    </tr>
-    </thead>
-    <tbody>
-    <c:forEach items="${projectRuns}" var="run" varStatus="runCount">
-      <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-        <td><a href="<c:url value='/miso/run/${run.id}'/>"><b>${run.name}</b></a></td>
-        <td><a href="<c:url value='/miso/run/${run.id}'/>">${run.alias}</a></td>
-        <td>
-          <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="fCount">
-            <table class="containerSummary">
-              <tr>
-                <c:forEach items="${container.partitions}" var="partition">
-                  <td id="partition${runCount.count}_${fCount.count}_${partition.partitionNumber}"
-                      class="smallbox">${partition.partitionNumber}</td>
-                  <c:forEach items="${partition.pool.experiments}" var="experiment">
-                    <c:if test="${experiment.study.project.id eq project.id}">
-                      <script type="text/javascript">
-                        jQuery(document).ready(function () {
-                          jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').addClass("partitionOccupied");
-                        });
-                      </script>
-                    </c:if>
-                  </c:forEach>
-                </c:forEach>
-              </tr>
-            </table>
-            <c:if test="${fn:length(run.sequencerPartitionContainers) > 1}">
-              <br/>
-            </c:if>
-          </c:forEach>
-        </td>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
-            <span class="ui-icon ui-icon-trash"></span>
-          </td>
-        </sec:authorize>
-      </tr>
-    </c:forEach>
-    </tbody>
+  <table class="display no-border" id="listingRunsTable">
   </table>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery('#run_table').dataTable({
-        "aaSorting": [
-          [0, 'asc'],
-          [1, 'asc']
-        ],
-        "aoColumns": [
-          null,
-          null,
-          null
-          <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-        ],
-        "iDisplayLength": 50,
-        "bJQueryUI": true,
-        "bRetrieve": true,
-        "sPaginationType": "full_numbers",
-        "fnDrawCallback": function (oSettings) {
-          jQuery('#run_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-        }
-      });
-    });
-  </script>
 </div>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    Run.ui.createListingRunsTable(${project.id});
+  });
+</script>
 </c:when>
 </c:choose>
 

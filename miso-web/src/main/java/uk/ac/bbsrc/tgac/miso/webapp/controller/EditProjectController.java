@@ -367,7 +367,6 @@ public class EditProjectController {
       } else {
         project = requestManager.getProjectById(projectId);
         model.put("title", "Project " + projectId);
-        model.put("projectRuns", populateProjectRuns(projectId));
 
         Collection<Library> libraries = populateProjectLibraries(projectId);
 

@@ -44,7 +44,7 @@
     
     <script type="text/javascript">
       jQuery(document).ready(function () {
-        Run.ui.createListingRunsTable();
+        Run.ui.createListingRunsTableMain();
       });
     </script>
   </div>
