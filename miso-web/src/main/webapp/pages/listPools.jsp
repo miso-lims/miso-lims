@@ -68,7 +68,7 @@
           <table class="display no-border" id="listing${pt}PoolsTable"></table>
           <script type="text/javascript">
             jQuery(document).ready(function () {
-              Pool.ui.createListingPoolsTable('${pt}', '${poolConcentrationUnits}');
+              Pool.ui.createListingPoolsTablePlatform('${pt}', '${poolConcentrationUnits}');
             });
           </script>
         </div>

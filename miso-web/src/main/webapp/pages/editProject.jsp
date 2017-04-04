@@ -996,84 +996,21 @@
 </div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_arrowclick'), 'poolsdiv');">
-  ${fn:length(projectPools)} Pools
+  Pools
   <div id="pools_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="poolsdiv" style="display:none;">
   <a id="pool"></a>
 
-  <h1>${fn:length(projectPools)} Pools</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('poolsmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="poolsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <c:if test="${not empty projectPools}">
-          <a href="javascript:void(0);" onclick="Pool.barcode.selectPoolBarcodesToPrint('#pools_table');">Print Barcodes ...</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
-  <div style="clear:both">
-    <table class="list no-border full-width" id="pools_table">
-      <thead>
-      <tr>
-        <th>Pool Name</th>
-        <th>Pool Alias</th>
-        <th>Pool Platform</th>
-        <th>Pool Creation Date</th>
-        <th>Pool Concentration (${poolConcentrationUnits})</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${projectPools}" var="pool">
-        <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b><a href="<c:url value='/miso/pool/${pool.id}'/>">${pool.name}</a></b></td>
-          <td><a href="<c:url value='/miso/pool/${pool.id}'/>">${pool.alias}</a></td>
-          <td>${pool.platformType.key}</td>
-          <td>${pool.creationDate}</td>
-          <td>${pool.concentration}</td>
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"></span>
-            </td>
-          </sec:authorize>
-        </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#pools_table').dataTable({
-          "aaSorting": [
-            [1, 'asc'],
-            [3, 'asc']
-          ],
-          "aoColumns": [
-            null,
-            { "sType": 'natural' },
-            null,
-            null,
-            null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true,
-          "sPaginationType": "full_numbers",
-          "fnDrawCallback": function (oSettings) {
-            jQuery('#pools_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-          }
-        });
-      });
-    </script>
-  </div>
+  <h1>Pools</h1>
+  <table class="display no-border" id="listingPoolsTable">
+  </table>
 </div>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    Pool.ui.createListingPoolsTable('listingPoolsTable', '${poolConcentrationUnits}', '/miso/rest/pool/dt/project/${project.id}');
+  });
+</script>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runsdiv');">
   Runs
