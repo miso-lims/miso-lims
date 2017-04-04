@@ -33,6 +33,7 @@
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
 
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 <link rel="stylesheet" href="<c:url value='/styles/progress.css'/>" type="text/css">
 
 <div id="maincontent">
@@ -797,7 +798,6 @@
                     <hr>
                     <a href="javascript:void(0);" onclick="Project.ui.receiveSamples('#overview_samplegroup_table_'+${overview.id});">Receive Samples</a>
                     <a href="javascript:void(0);" onclick="bulkSampleQcTable('#overview_samplegroup_table_'+${overview.id});">QC Samples</a>
-                    <%-- <a href='<c:url value="/miso/library/new/${overview.sampleGroup.entities.id}#tab-2"/>'>Add Libraries</a> --%>
                     <a href='<c:url value="/miso/importexport/importlibrarypoolsheet"/>'>Import Library Sheet</a>
                     <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#overview_samplegroup_table_'+${overview.id});">Print Barcodes ...</a>
                   </c:if>
@@ -894,228 +894,20 @@
 </div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#libraries_arrowclick'), 'librariesdiv');">
-  ${fn:length(projectLibraries)} Libraries
+  Libraries
   <div id="libraries_arrowclick" class="toggleLeft"></div>
 </div>
 
 <div id="librariesdiv" style="display:none;">
-  <div id="librarytabs">
-    <ul>
-      <li><a href="#libtab-1"><span>All</span></a></li>
-      <c:if test="${not empty project.overviews}">
-        <li><a href="#libtab-2"><span>By Group</span></a></li>
-      </c:if>
-    </ul>
-
-    <div id="libtab-1">
-      <a id="library"></a>
-
-      <h1>${fn:length(projectLibraries)} Libraries</h1>
-      <ul class="sddm">
-        <li>
-          <a onmouseover="mopen('librarymenu')" onmouseout="mclosetime()">Options
-            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-          </a>
-
-          <div id="librarymenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-            <c:if test="${not empty project.samples}">
-              <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
-            </c:if>
-
-            <c:if test="${not empty projectLibraries}">
-              <a href="javascript:void(0);" onclick="bulkLibraryQcTable('#library_table');" class="add">QC these Libraries</a>
-              <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#library_table', '${libraryDilutionUnits}');" class="add">Add Library Dilutions</a>
-              <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#library_table');">Print Barcodes ...</a>
-            </c:if>
-          </div>
-        </li>
-      </ul>
-
-      <div style="clear:both">
-        <table class="list" id="library_table">
-          <thead>
-          <tr>
-            <th>Library Name</th>
-            <th>Library Alias</th>
-            <th>Date</th>
-            <th>Library Description</th>
-            <th>Library Type</th>
-            <th>Library Platform</th>
-            <th>Indices</th>
-            <th>Insert Size</th>
-            <th>QC Passed</th>
-            <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <th class="fit">DELETE</th>
-            </sec:authorize>
-          </tr>
-          </thead>
-          <tbody>
-          <c:forEach items="${projectLibraries}" var="library">
-            <tr libraryId="${library.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-              <td><b><a href="<c:url value='/miso/library/${library.id}'/>">${library.name}</a></b></td>
-              <td><a href="<c:url value='/miso/library/${library.id}'/>">${library.alias}</a></td>
-              <td>${library.creationDate}</td>
-              <td>${library.description}</td>
-              <td>${library.libraryType.description}</td>
-              <td>${library.platformType}</td>
-              <td><c:if test="${not empty library.indices}">
-                <c:forEach items="${library.indices}" varStatus="status" var="index">
-                  <c:if test="${status.index gt 0}"><br/></c:if>
-                  ${status.count}: ${index.name} (${index.sequence})
-                </c:forEach>
-              </c:if></td>
-              <td><c:forEach var="qc" items="${library.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
-              <td>${library.qcPassed}</td>
-              <sec:authorize access="hasRole('ROLE_ADMIN')">
-                <td class="misoicon" onclick="Library.deleteLibrary(${library.id}, Utils.page.pageReload);">
-                  <span class="ui-icon ui-icon-trash"></span>
-                </td>
-              </sec:authorize>
-            </tr>
-          </c:forEach>
-          </tbody>
-        </table>
-        <script type="text/javascript">
-          jQuery(document).ready(function () {
-            jQuery('#library_table').dataTable({
-              "aaSorting": [
-                [1, 'asc']
-              ],
-              "aoColumns": [
-                null,
-                { "sType": 'natural' },
-                { "sType": 'natural' },
-                { "sType": 'natural' },
-                null,
-                null,
-                null,
-                null,
-                null
-                <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-              ],
-              "iDisplayLength": 50,
-              "bJQueryUI": true,
-              "bRetrieve": true,
-              "sPaginationType": "full_numbers",
-              "fnDrawCallback": function (oSettings) {
-                jQuery('#library_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-              }
-            });
-          });
-        </script>
-      </div>
-    </div>
-    <div id="libtab-2">
-      <c:forEach items="${project.overviews}" var="overview" varStatus="ov">
-        <c:if test="${not empty overview.sampleGroup}">
-        <div id="overviewlibdiv${overview.id}" class="ui-corner-all simplebox">
-          <h1>Group ${overview.sampleGroup.id} Libraries</h1>
-          <ul class="sddm">
-            <li>
-              <a onmouseover="mopen('librarygroupmenu${overview.sampleGroup.id}')" onmouseout="mclosetime()">Options
-                <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-              </a>
-
-              <div id="librarygroupmenu${overview.sampleGroup.id}" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-                <c:if test="${not empty project.samples}">
-                  <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
-                </c:if>
-
-                <c:if test="${not empty projectLibraries}">
-                  <a href="javascript:void(0);" onclick="bulkLibraryQcTable('#overview_librarygroup_table_${overview.id}');" class="add">QC these Libraries</a>
-                  <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#overview_librarygroup_table_${overview.id}', '${libraryDilutionUnits}');" class="add">Add Library Dilutions</a>
-                  <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#overview_librarygroup_table_${overview.id}');">Print Barcodes ...</a>
-                </c:if>
-              </div>
-            </li>
-          </ul>
-
-          <span style="clear:both">
-            <c:if test="${not empty libraryGroupMap[overview.id]}">
-            <table class="list" id="overview_librarygroup_table_${overview.id}">
-              <thead>
-              <tr>
-                <th>Library Name</th>
-                <th>Library Alias</th>
-                <th>Date</th>
-                <th>Library Description</th>
-                <th>Library Type</th>
-                <th>Library Platform</th>
-                <th>Indices</th>
-                <th>Insert Size</th>
-                <th>QC Passed</th>
-                <sec:authorize access="hasRole('ROLE_ADMIN')">
-                  <th class="fit">DELETE</th>
-                </sec:authorize>
-              </tr>
-              </thead>
-              <tbody>
-              <c:forEach items="${libraryGroupMap[overview.id]}" var="grouplib" varStatus="lg">
-                <tr libraryId="${grouplib.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                  <td><b><a href="<c:url value='/miso/library/${grouplib.id}'/>">${grouplib.name}</a></b></td>
-                  <td><a href="<c:url value='/miso/library/${grouplib.id}'/>">${grouplib.alias}</a></td>
-                  <td>${grouplib.creationDate}</td>
-                  <td>${grouplib.description}</td>
-                  <td>${grouplib.libraryType.description}</td>
-                  <td>${grouplib.platformType}</td>
-                  <td><c:if test="${not empty grouplib.indices}">
-                    <c:forEach items="${grouplib.indices}" varStatus="status" var="index">
-                       <c:if test="${status.index gt 0}"><br/></c:if>
-                       ${status.count}: ${index.name} (${index.sequence})
-                    </c:forEach>
-                  </c:if></td>
-                  <td><c:forEach var="qc" items="${grouplib.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
-                  <td>${grouplib.qcPassed}</td>
-                  <sec:authorize access="hasRole('ROLE_ADMIN')">
-                    <td class="misoicon" onclick="Library.deleteLibrary(${grouplib.id}, Utils.page.pageReload);">
-                      <span class="ui-icon ui-icon-trash"></span>
-                    </td>
-                  </sec:authorize>
-                </tr>
-              </c:forEach>
-              </tbody>
-            </table>
-            <script type="text/javascript">
-              jQuery(document).ready(function () {
-                jQuery('#overview_librarygroup_table_'+${overview.id}).dataTable({
-                  "aaSorting": [
-                    [1, 'asc']
-                  ],
-                  "aoColumns": [
-                    null,
-                    { "sType": 'natural' },
-                    { "sType": 'natural' },
-                    { "sType": 'natural' },
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                    <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-                  ],
-                  "iDisplayLength": 50,
-                  "bJQueryUI": true,
-                  "bRetrieve": true,
-                  "sPaginationType": "full_numbers",
-                  "fnDrawCallback": function (oSettings) {
-                    jQuery('#overview_librarygroup_table_'+${overview.id}+'_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-                  }
-                });
-              });
-            </script>
-            </c:if>
-          </span>
-        </div>
-        </c:if>
-      </c:forEach>
-    </div>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery("#librarytabs").tabs();
-      });
-    </script>
-  </div>
+  <h1>Libraries</h1>
+  <table class="display no-border" id="listingLibrariesTable">
+  </table>
 </div>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    Library.ui.createListingLibrariesTable(${project.id});
+  });
+</script>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#librarydils_arrowclick'), 'librarydilsdiv');">
   ${fn:length(projectLibraryDilutions)} Library Dilutions
@@ -1404,12 +1196,6 @@ jQuery(document).ready(function () {
     <script type="text/javascript">
       projectId_sample = ${project.id};
       sampleQcTypesString = {${sampleQcTypesString}};
-    </script>
-</c:if>
-
-<c:if test="${not empty projectLibraries}">
-    <script type="text/javascript">
-      libraryQcTypesString = {${libraryQcTypesString}};
     </script>
 </c:if>
 

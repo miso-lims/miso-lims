@@ -370,7 +370,6 @@ public class EditProjectController {
         model.put("projectRuns", populateProjectRuns(projectId));
 
         Collection<Library> libraries = populateProjectLibraries(projectId);
-        model.put("projectLibraries", libraries);
 
         Collection<LibraryDilution> libraryDilutions = populateProjectLibraryDilutions(libraries);
         model.put("projectLibraryDilutions", libraryDilutions);

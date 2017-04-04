@@ -42,7 +42,7 @@
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {
-        Library.ui.createListingLibrariesTable();
+        Library.ui.createListingLibrariesTableMain();
       });
     </script>
   </div>
