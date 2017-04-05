@@ -411,105 +411,21 @@
 <c:otherwise>
   <h2>Selected element(s):</h2>
   <div id="pooledList">
-    <table class="display no-border full-width" id="pooledElementsDatatable">
-	  <thead>
-	  <tr>
-	    <th>Dilution Name</th>
-	    <th>Concentration (${libraryDilutionUnits})</th>
-	    <th>Library</th>
-	    <th>Sample</th>
-	    <th>Indices</th>
-	    <th>Low Quality</th>
-	    <th>Remove</th>
-	  </tr>
-	  </thead>
-	  <tbody>
-	    <c:if test="${not empty pool.poolableElements}">
-		  <c:forEach items="${pool.poolableElements}" var="dil">
-		    <tr id="pooled_${dil.name}">
-		      <td>${dil.name}</td>
-		      <td>${dil.concentration}</td>
-		      <td><a href="<c:url value="/miso/library/${dil.library.id}"/>">${dil.library.alias} (${dil.library.name})</a></td>
-		      <td><a href="<c:url value="/miso/sample/${dil.library.sample.id}"/>">${dil.library.sample.alias} (${dil.library.sample.name})</a></td>
-		      <td><c:forEach items="${dil.library.indices}" var="index" varStatus="iCount">
-		        <c:if test="${iCount.count gt 1}"><br/></c:if>${iCount.count}: ${index.label}
-		        </c:forEach></td>
-		      <td><c:if test="${dil.library.lowQuality}">&#9888;</c:if></td>
-		      <td><span onclick='Pool.ui.removePooledElement(${pool.id}, ${dil.id}, "${dil.name}");' class="ui-icon ui-icon-circle-close ui-button"></span></td>
-		    </tr>
-		  </c:forEach>
-	    </c:if>
-	  </tbody>
-    </table>
+    <table class="display no-border full-width" id="includedTable"></table>
   </div>
 
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery('#pooledElementsDatatable').dataTable({
-        "aaSorting": [
-          [0, 'desc']              
-        ],
-        "aoColumns": [
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "iDisplayLength": 50,
-        "bJQueryUI": true,
-        "bRetrieve": true,
-        "sPaginationType": "full_numbers"
-      });
-    });
-  </script>
-  
   <h2 class="hrule">Select poolable elements:</h2>
   
-  <div id="elementSelectDatatableDiv"></div>
+  <div id="elementSelectDatatableDiv">
+    <table class="display no-border full-width" id="availableTable"></table>
+  </div>
   
   <script type="text/javascript">
       jQuery(document).ready(function () {
-          Pool.ui.createElementSelectDatatable('${pool.platformType.key}', ${pool.id}, '${libraryDilutionUnits}');
+          Pool.ui.dilutionConcentrationUnits = '${libraryDilutionUnits}';
+          Pool.ui.createIncludedDilutionTable(${pool.id});
+          Pool.ui.createAvailableDilutionTable(${pool.id});
       });
-  </script>
-
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery('#runsDatatable').dataTable({
-        "aaData": ${runsJSON},
-        "aaSorting": [
-          [0, 'desc']
-        ],
-        "aoColumns": [
-          {
-            "sTitle" : "Name",
-            "mData" : "name",
-            "mRender": function (data, type, full) {
-              return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
-            }
-          },
-          {
-            "sTitle" : "Alias",
-            "mData" : "alias",
-            "mRender": function (data, type, full) {
-              return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
-            }
-          },
-          { "sTitle" : "Status", "mData" : "status" },
-          { "sTitle" : "Start Date", "mData" : "startDate" },
-          { "sTitle" : "End Date", "mData" : "endDate" },
-          { "sTitle" : "Type", "mData" : "platformType" },
-          { "sTitle" : "Last Modified", "mData" : "lastUpdated" }
-        ],
-        "iDisplayLength": 50,
-        "bJQueryUI": true,
-        "bRetrieve": true,
-        "sPaginationType": "full_numbers"
-      });
-    });
   </script>
 </c:otherwise>
 </c:choose>
@@ -528,6 +444,42 @@
       </table>
   </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#runsDatatable').dataTable({
+      "aaData": ${runsJSON},
+      "aaSorting": [
+        [0, 'desc']
+      ],
+      "aoColumns": [
+        {
+          "sTitle" : "Name",
+          "mData" : "name",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle" : "Alias",
+          "mData" : "alias",
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
+          }
+        },
+        { "sTitle" : "Status", "mData" : "status" },
+        { "sTitle" : "Start Date", "mData" : "startDate" },
+        { "sTitle" : "End Date", "mData" : "endDate" },
+        { "sTitle" : "Type", "mData" : "platformType" },
+        { "sTitle" : "Last Modified", "mData" : "lastUpdated" }
+      ],
+      "iDisplayLength": 50,
+      "bJQueryUI": true,
+      "bRetrieve": true,
+      "sPaginationType": "full_numbers"
+    });
+  });
+</script>
 </c:if>
 
 <c:if test="${not empty pool.changeLog}">

@@ -63,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
@@ -266,7 +267,10 @@ public class PoolWizardControllerHelperService {
       StringBuilder b = new StringBuilder();
 
       JSONArray a = new JSONArray();
-      List<LibraryDilution> dls = new ArrayList<>(dilutionService.listByProjectIdAndPlatform(projectId, platformType));
+      DilutionPaginationFilter filter = new DilutionPaginationFilter();
+      filter.setPlatformType(platformType);
+      filter.setProjectId(projectId);
+      List<LibraryDilution> dls = new ArrayList<>(dilutionService.list(filter, 0, 0, false, "id"));
       Collections.sort(dls);
       for (Dilution dl : dls) {
         if (dl.getLibrary().getQcPassed() != null) {

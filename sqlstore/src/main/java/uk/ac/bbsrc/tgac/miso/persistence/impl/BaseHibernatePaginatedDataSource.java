@@ -77,7 +77,9 @@ public interface BaseHibernatePaginatedDataSource<T, Filter extends PaginationFi
     setAdditionalPaginationCriteria(filter, idCriteria);
 
     idCriteria.setFirstResult(offset);
-    idCriteria.setMaxResults(limit);
+    if (limit > 0) {
+      idCriteria.setMaxResults(limit);
+    }
     // We need to keep both the id column and the sort column in the result set for the database to provide us with sorted, duplicate-free
     // results. We will throw the sort property out later.
     idCriteria.setProjection(

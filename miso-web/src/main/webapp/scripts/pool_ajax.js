@@ -501,75 +501,104 @@ Pool.ui = {
     })).fnSetFilteringDelay();
   },
 
-  createElementSelectDatatable : function(platform, poolId, libraryDilutionConcentrationUnits) {
+  createDilutionDatatable : function(poolId, kind, action, actionStyle) {
+    jQuery('#' + kind + 'Table').dataTable({
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "/miso/rest/librarydilution/dt/pool/" + poolId + "/" + kind,
+        "aoColumns": [
+          {
+            "sTitle": "Dilution Name",
+            "sType":"natural",
+            "mData": "name"
+          },
+          {
+            "sTitle": "Conc. (" + Pool.ui.dilutionConcentrationUnits + ")",
+            "sType": "natural", "mData": "concentration"
+          },
+          {
+            "sTitle": "Library",
+            "sType":"natural",
+            "bSortable": false,
+            "mData": "library"
+          },
+          {
+            "sTitle": "Sample",
+            "sType":"natural",
+            "bSortable": false,
+            "mData": "sample"
+          },
+          {
+            "sTitle": "Indices",
+            "sType":"natural",
+            "bSortable": false,
+            "mData": "indices"
+          },
+          {
+            "sTitle": "Low Quality",
+            "bSortable": false,
+            "mData": "lowquality"
+          },
+          {
+            "sTitle": "Action",
+            "bSortable": false,
+            "mData": "id",
+            "mRender": function (data, type, full) {
+              return "<span onclick='" + action + "(" + poolId + ", " + data + ");' class='ui-icon ui-button " + actionStyle + "' style='cursor: pointer'></span>";
+            }
+          }
+        ],
+        "bJQueryUI": true,
+        "iDisplayLength":  25,
+        "sPaginationType": "full_numbers",
+        "aaSorting":[
+          [0,"desc"]
+        ],
+        "fnDrawCallback": function () {
+          jQuery('#' + kind + 'Table_paginate').find('.fg-button').removeClass('fg-button');
+        }
+      });
+  },
+  createIncludedDilutionTable: function(poolId) {
+      Pool.ui.createDilutionDatatable(poolId, 'included', 'Pool.ui.removeDilution', 'ui-icon-circle-close');
+  },
+  createAvailableDilutionTable: function(poolId) {
+      Pool.ui.createDilutionDatatable(poolId, 'available', 'Pool.ui.addDilution', 'ui-icon-plusthick');
+  },
 
-		jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
-
-	    jQuery('#elementSelectDatatable').dataTable({
-	    	"bProcessing": true,
-	    	"bServerSide": true,
-	    	"sAjaxSource": "/miso/pool/elementSelectDataTable",
-	        "fnServerParams": function ( aoData ) {
-	            aoData.push( { "name": "poolId", "value": poolId } );
-	            aoData.push( { "name": "platform", "value": platform } );
-
-	        },
-	        "aoColumns": [
-	          { "sTitle": "Dilution Name", "sType":"natural"},
-	          { "sTitle": "Conc. ("+libraryDilutionConcentrationUnits+")", "sType":"natural"},
-	          { "sTitle": "Library", "sType":"natural", "bSortable": false},
-	          { "sTitle": "Sample", "sType":"natural", "bSortable": false},
-	          { "sTitle": "Indices", "sType":"natural", "bSortable": false},
-	          { "sTitle": "Low Quality", "bSortable": false},
-	          { "sTitle": "Add", "bSortable": false}
-	        ],
-	        "bJQueryUI": true,
-	        "iDisplayLength":  25,
-	        "sPaginationType": "full_numbers",
-	        "aaSorting":[
-	          [0,"desc"]
-	        ],
-	        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-	          jQuery(nRow).attr("id", "poolable_" + aData[0]);
-	          if (jQuery('#pooled_' + aData[0]).length) {
-	            jQuery('td:eq(6)', nRow).addClass('disabled');
-	            jQuery('td:eq(6)', nRow).prop('disabled', true);
-	            jQuery('td:eq(6)', nRow).css('cursor', 'default');
-	          } else {
-	            jQuery('td:eq(6)', nRow).css('cursor', 'pointer');
-	          }
-	        },
-	        "fnDrawCallback": function () {
-	          jQuery('#elementSelectDatatable_paginate').find('.fg-button').removeClass('fg-button');
-	        }
-	      });
-	  },
-
-  removePooledElement : function (poolId, dilutionId, elementName) {
-    var extra = (jQuery('#pooledElementsDatatable').dataTable().fnGetData().length == 1) ? '\n\nDeleting this item would make the pool empty.' : '';
-    if (confirm("Are you sure you want to remove " + elementName + " from this pool?" + extra)) {
+  addDilution : function(poolId, dilutionId) {
       Fluxion.doAjax(
         'poolControllerHelperService',
-        'removePooledElement',
+        'addPoolableElement',
         {
           'poolId':poolId,
           'dilutionId':dilutionId,
           'url':ajaxurl
         },
         {
+          'doOnSuccess': function (json) {
+            jQuery('#includedTable').dataTable().fnDestroy();
+            Pool.ui.createIncludedDilutionTable(poolId);
+          }
+        }
+      );
+  },
+
+  removeDilution : function (poolId, dilutionId) {
+    var extra = (jQuery('#includedTable').dataTable().fnGetData().length == 1) ? '\n\nDeleting this item would make the pool empty.' : '';
+    if (confirm("Are you sure you want to remove this dilution from this pool?" + extra)) {
+      Fluxion.doAjax(
+        'poolControllerHelperService',
+        'removePooledElement',
+        {
+          'poolId': poolId,
+          'dilutionId': dilutionId,
+          'url':ajaxurl
+        },
+        {
           'doOnSuccess': function() {
-            function findByName (arrayElement, index, array) {
-              return arrayElement[0] == elementName;
-            }
-            var indexToDelete = jQuery('#pooledElementsDatatable').dataTable().fnGetData().findIndex(findByName);
-            // remove it from the Selected element(s) table
-            jQuery('#pooledElementsDatatable').dataTable().fnDeleteRow(indexToDelete);
-            // re-enable the Add button on Select poolable elements table if it's been disabled
-            if (jQuery('#poolable_' + elementName).length && jQuery('#poolable_' + elementName).children().last().hasClass('disabled')) {
-              jQuery('#poolable_' + elementName).children().last().removeClass('disabled');
-              jQuery('#poolable_' + elementName).children().last().prop('disabled', false);
-              jQuery('#poolable_' + elementName).children().last().css('cursor', 'pointer');
-            }
+            jQuery('#includedTable').dataTable().fnDestroy();
+            Pool.ui.createIncludedDilutionTable(poolId);
           }
         }
       );
@@ -691,98 +720,6 @@ Pool.search = {
         }
       }
     );
-  },
-
-  poolSearchEmPcrDilution : function(input, platform) {
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'poolSearchEmPcrDilution',
-      {
-        'str':jQuery(input).val(),
-        'platform':platform,
-        'id':input.id,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          jQuery('#searchDilutionResult').css('visibility', 'visible');
-          jQuery('#searchDilutionResult').html(json.html);
-        }
-      }
-    );
-  },
-
-  poolSearchElements : function(input, platform) {
-    Fluxion.doAjax(
-      'poolSearchService',
-      'poolSearchElements',
-      {
-        'str':jQuery(input).val(),
-        'platform':platform,
-        'id':input.id,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          jQuery('#searchElementsResult').css('visibility', 'visible');
-          jQuery('#searchElementsResult').html(json.html);
-          jQuery(input).blur(function() {
-            jQuery('#searchElementsResult :first-child').hide();
-          });
-        }
-      }
-    );
-  },
-
-  poolSearchSelectElement : function(poolId, elementId, elementName) {
-    if (jQuery("#pooled_" + elementName).length > 0) {
-      alert("Element " + elementName + " is already part of this pool.");
-      jQuery('#searchElementsResult').css('visibility', 'hidden');
-    } else {
-      function addElement () {
-        var addToPooled = [];
-        var poolable = jQuery('#poolable_' + elementName).clone();
-        poolable.children().each(function (index, value) {
-          addToPooled.push(jQuery(value).html());
-        });
-        addToPooled.pop();
-        addToPooled.push('<span id="pooled_' + elementName + '" onclick="Pool.ui.removePooledElement(' + poolId + ', ' + elementId + ', \'' + elementName + '\');" class="ui-icon ui-button ui-icon-circle-close"></span>');
-        jQuery('#pooledElementsDatatable').dataTable().fnAddData(addToPooled);
-        jQuery('#searchElementsResult').css('visibility', 'hidden');
-      }
-      function disableAddAndFadeCheckmark (addRowId) {
-        // add checkmark beside plus button then fade out
-        var checkmark = '<div><img id="checkmark_' + addRowId + '" src="/styles/images/ok.png" height="25" width="25" /></div>';
-        var addTd = jQuery('#' + addRowId).children().last();
-        addTd.prop('disabled', true);
-        addTd.css('float', 'left');
-        addTd.children().last().append(checkmark);
-        addTd.addClass('disabled');
-        jQuery('#checkmark_' + addRowId).fadeOut("slow", function () {
-          jQuery(this).parent().parent().parent().css('clear', 'both');
-          jQuery(this).parent().remove();
-          addTd.css('cursor', 'default');
-        });
-      }
-      Fluxion.doAjax(
-        'poolControllerHelperService',
-        'addPoolableElement',
-        {
-          'poolId':poolId,
-          'dilutionId':elementId,
-          'url':ajaxurl
-        },
-        {
-          'doOnSuccess': function (json) {
-            // add row to Pooled elements table
-            addElement();
-            // add success checkmark and disable the 'Add' td in Select poolable elements table
-            var tableRowId = 'poolable_' + elementName;
-            disableAddAndFadeCheckmark(tableRowId);
-          }
-        }
-      );
-    }
   }
 };
 
