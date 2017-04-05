@@ -25,7 +25,10 @@ SELECT userId INTO @user FROM User WHERE loginName = 'admin';
 SET @time = NOW();
 
 INSERT INTO SampleClass(alias, sampleCategory, createdBy, creationDate, updatedBy, lastUpdated)
-VALUES ('Unspecified Tissue', 'Tissue', @user, @time, @user, @time);
+SELECT * FROM (
+  SELECT 'Unspecified Tissue', 'Tissue', @user AS creator, @time AS created, @user AS modifier, @time AS modified FROM DUAL
+) AS data
+WHERE NOT EXISTS (SELECT 1 FROM SampleClass WHERE alias = 'Unspecified Tissue' AND sampleCategory = 'Tissue');
 
 SET @unspecified = LAST_INSERT_ID();
 INSERT INTO SampleValidRelationship(parentId, childId, createdBy, creationDate, updatedBy, lastUpdated, archived)
