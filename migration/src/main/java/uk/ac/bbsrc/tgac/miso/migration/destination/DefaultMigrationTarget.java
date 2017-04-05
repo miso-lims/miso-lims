@@ -667,7 +667,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
    * @throws IllegalStateException if there are conflicting description or barcodes
    */
   private void mergePools(Pool fromPool, Pool toPool) throws IOException {
-    if (fromPool.getId() != PoolImpl.UNSAVED_ID) {
+    if (fromPool.getId() == PoolImpl.UNSAVED_ID) {
       Collection<LibraryDilution> fromPoolables = fromPool.getPoolableElements();
       Collection<LibraryDilution> toPoolables = toPool.getPoolableElements();
       toPoolables.addAll(fromPoolables);
