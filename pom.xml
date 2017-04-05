@@ -64,7 +64,7 @@
         <role>Developer</role>
       </roles>
       <timezone>0</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>mtaschuk</id>
@@ -76,7 +76,7 @@
         <role>project contact</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>tdebat</id>
@@ -88,7 +88,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>amasella</id>
@@ -100,7 +100,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>dcooke</id>
@@ -112,7 +112,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>harmstrong</id>
@@ -124,7 +124,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
   <modules>
@@ -145,9 +145,9 @@
   </modules>
   <!-- SVN connection -->
   <scm>
-    <connection>scm:git:https://www.github.com/TGAC/miso-lims</connection>
-    <developerConnection>scm:git:git@github.com:TGAC/miso-lims</developerConnection>
-    <url>http://www.github.com/TGAC/miso-lims</url>
+    <connection>scm:git:https://www.github.com/oicr-gsi/miso-lims</connection>
+    <developerConnection>scm:git:git@github.com:oicr-gsi/miso-lims</developerConnection>
+    <url>http://www.github.com/oicr-gsi/miso-lims</url>
     <tag>v0.2.55</tag>
   </scm>
   <!-- Bug Tracker -->
