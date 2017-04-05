@@ -1,8 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -33,11 +31,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.core.util.PoolPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernatePoolDao implements PoolStore {
+public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource<Pool, PoolPaginationFilter> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernatePoolDao.class);
 
@@ -49,6 +48,8 @@ public class HibernatePoolDao implements PoolStore {
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode", "description" };
 
   private static final String TABLE_NAME = "Pool";
+
+  private static final String WATCHER_GROUP = "PoolWatchers";
 
   @Autowired
   private BoxStore boxStore;
@@ -77,23 +78,11 @@ public class HibernatePoolDao implements PoolStore {
     return (int) c;
   }
 
-  @Override
-  public long countPoolsBySearch(PlatformType platform, String queryStr) throws IOException {
-    Criteria criteria = createCriteria().setProjection(Projections.rowCount());
-    if (platform != null) {
-      criteria.add(Restrictions.eq("platformType", platform));
-    }
-    if (!isStringEmptyOrNull(queryStr)) {
-      criteria.add(DbUtils.searchRestrictions(queryStr, SEARCH_PROPERTIES));
-    }
-    long c = (Long) criteria.uniqueResult();
-    return (int) c;
-  }
-
   public Criteria createCriteria() {
     return currentSession().createCriteria(PoolImpl.class);
   }
 
+  @Override
   public Session currentSession() {
     return sessionFactory.getCurrentSession();
   }
@@ -135,7 +124,7 @@ public class HibernatePoolDao implements PoolStore {
   }
 
   private Group getPoolWatcherGroup() throws IOException {
-    return securityStore.getGroupByName("PoolWatchers");
+    return securityStore.getGroupByName(WATCHER_GROUP);
   }
 
   public SecurityStore getSecurityStore() {
@@ -198,45 +187,23 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public List<Pool> listByProjectId(long projectId) throws IOException {
+    Criteria idCriteria = currentSession().createCriteria(PoolImpl.class, "p");
+    idCriteria.createAlias("p.pooledElements", "dilution");
+    idCriteria.createAlias("dilution.library", "library");
+    idCriteria.createAlias("library.sample", "sample");
+    idCriteria.createAlias("sample.project", "project");
+    idCriteria.add(Restrictions.eq("project.id", projectId));
+    idCriteria.setProjection(Projections.distinct(Projections.property("p.id")));
+    @SuppressWarnings("unchecked")
+    List<Long> ids = idCriteria.list();
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
+    }
     Criteria criteria = currentSession().createCriteria(PoolImpl.class);
-    criteria.createAlias("pooledElements", "dilution");
-    criteria.createAlias("dilution.library", "library");
-    criteria.createAlias("library.sample", "sample");
-    criteria.createAlias("sample.project", "project");
-    criteria.add(Restrictions.eq("project.id", projectId));
-    criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+    criteria.add(Restrictions.in("id", ids));
     @SuppressWarnings("unchecked")
-    List<Pool> results = criteria.list();
-    return results;
-  }
-
-  @Override
-  public List<Pool> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String search, String sortDir,
-      String sortCol, PlatformType platform) throws IOException {
-
-    sortCol = updateSortCol(sortCol);
-    if (offset < 0 || resultsPerPage < 0) {
-      throw new IOException("Limit and Offset must be greater than zero");
-    }
-
-    final Criteria criteria = createCriteria();
-    // required to sort by 'derivedInfo.lastModified', which is the field on which we
-    // want to sort most List X pages
-    criteria.createAlias("derivedInfo", "derivedInfo");
-    if ("asc".equalsIgnoreCase(sortDir)) {
-      criteria.addOrder(Order.asc(sortCol));
-    } else if ("desc".equalsIgnoreCase(sortDir)) {
-      criteria.addOrder(Order.desc(sortCol));
-    }
-    criteria.add(Restrictions.eq("platformType", platform));
-    if (!isStringEmptyOrNull(search)) {
-      criteria.add(DbUtils.searchRestrictions(search, SEARCH_PROPERTIES));
-    }
-    criteria.setFirstResult(offset);
-    criteria.setMaxResults(resultsPerPage);
-    @SuppressWarnings("unchecked")
-    List<Pool> results = criteria.list();
-    return withWatcherGroup(results);
+    List<Pool> pools = criteria.list();
+    return pools;
   }
 
   @Override
@@ -256,9 +223,11 @@ public class HibernatePoolDao implements PoolStore {
 
   @Override
   public long save(final Pool pool) throws IOException {
+    currentSession().flush();
     Long id;
     if (pool.getId() == PoolImpl.UNSAVED_ID) {
       id = (Long) currentSession().save(pool);
+      currentSession().flush();
     } else {
       if (pool.isDiscarded()) {
         getBoxStore().removeBoxableFromBox(pool);
@@ -293,13 +262,6 @@ public class HibernatePoolDao implements PoolStore {
     this.sessionFactory = sessionFactory;
   }
 
-  private String updateSortCol(String sortCol) {
-    sortCol = sortCol.replaceAll("[^\\w]", "");
-    if ("id".equals(sortCol)) sortCol = "poolId";
-    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    return sortCol;
-  }
-
   private List<Pool> withWatcherGroup(List<Pool> pools) throws IOException {
     Group group = getPoolWatcherGroup();
     for (Pool pool : pools) {
@@ -314,4 +276,48 @@ public class HibernatePoolDao implements PoolStore {
     }
     return pool;
   }
+
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo");
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
+  public String getProjectColumn() {
+    return "project.id";
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return STANDARD_ALIASES;
+  }
+
+  @Override
+  public String propertyForSortColumn(String sortCol) {
+    sortCol = sortCol.replaceAll("[^\\w]", "");
+    if ("id".equals(sortCol)) sortCol = "poolId";
+    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
+    return sortCol;
+  }
+
+  @Override
+  public void setAdditionalPaginationCriteria(PoolPaginationFilter filter, Criteria criteria) {
+    if (filter.getPlatformType() != null) {
+      criteria.add(Restrictions.eq("platformType", filter.getPlatformType()));
+    }
+    if (filter.getProjectId() != null) {
+      criteria.createAlias("pooledElements", "dilution");
+      criteria.createAlias("dilution.library", "library");
+      criteria.createAlias("library.sample", "sample");
+      criteria.createAlias("sample.project", "project");
+    }
+  }
+
+  @Override
+  public Class<? extends Pool> getRealClass() {
+    return PoolImpl.class;
+  }
+
 }

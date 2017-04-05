@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest {
 
@@ -212,61 +213,66 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
 
   @Test
   public void testListWithLimitAndOffset() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.listByOffsetAndNumResults(1, 2, "asc", "id");
+    List<SequencerPartitionContainer> spcs = dao.list(new PaginationFilter(), 1, 2, true, "id");
     assertEquals(2, spcs.size());
     assertEquals(2, spcs.get(0).getId());
   }
 
   @Test
   public void testCountBySearch() throws IOException {
-    assertEquals(3, dao.countBySearch("C0"));
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("C0");
+    assertEquals(3, dao.count(filter));
   }
 
   @Test
   public void testCountByEmptySearch() throws IOException {
-    assertEquals(4L, dao.countBySearch(""));
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("");
+    assertEquals(4L, dao.count(filter));
   }
 
   @Test
   public void testCountByBadSearch() throws IOException {
-    assertEquals(0L, dao.countBySearch("; DROP TABLE SequencerPartitionContainer;"));
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("; DROP TABLE SequencerPartitionContainer;");
+    assertEquals(0L, dao.count(filter));
   }
 
   @Test
   public void testListBySearchWithLimit() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.listBySearchOffsetAndNumResults(2, 2, "C0", "asc", "id");
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("C0");
+    List<SequencerPartitionContainer> spcs = dao.list(filter, 2, 2, true, "id");
     assertEquals(1, spcs.size());
     assertEquals(4L, spcs.get(0).getId());
   }
 
   @Test
   public void testListByEmptySearchWithLimit() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.listBySearchOffsetAndNumResults(0, 3, "", "asc", "id");
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("");
+    List<SequencerPartitionContainer> spcs = dao.list(filter, 0, 3, true, "id");
     assertEquals(3L, spcs.size());
   }
 
   @Test
   public void testListByBadSearchWithLimit() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao
-        .listBySearchOffsetAndNumResults(0, 2, "; DROP TABLE SequencerPartitionContainer;", "asc", "id");
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("; DROP TABLE SequencerPartitionContainer;");
+    List<SequencerPartitionContainer> spcs = dao.list(filter, 0, 2, true, "id");
     assertEquals(0L, spcs.size());
-  }
-
-  @Test
-  public void testListByOffsetBadSortDir() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.listByOffsetAndNumResults(1, 3, "BARK", "id");
-    assertEquals(3, spcs.size());
   }
 
   @Test
   public void testListOffsetBadLimit() throws IOException {
     exception.expect(IOException.class);
-    dao.listByOffsetAndNumResults(5, -3, "asc", "id");
+    dao.list(new PaginationFilter(), 5, -3, true, "id");
   }
 
   @Test
   public void testListOffsetThreeWithThreeSamplesPerPageOrderLastMod() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.listByOffsetAndNumResults(2, 2, "desc", "lastModified");
+    List<SequencerPartitionContainer> spcs = dao.list(new PaginationFilter(), 2, 2, false, "lastModified");
     assertEquals(2, spcs.size());
     assertEquals(2, spcs.get(0).getId());
   }

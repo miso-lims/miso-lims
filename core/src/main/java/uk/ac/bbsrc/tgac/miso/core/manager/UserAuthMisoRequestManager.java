@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -1086,7 +1086,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return backingManager.listAllSampleTypes();
   }
 
-
   @Override
   public Collection<Pool> listPoolsByProjectId(long projectId) throws IOException {
     Collection<Pool> pools = backingManager.listPoolsByProjectId(projectId);
@@ -1225,7 +1224,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return backingManager.getBoxColumnSizes();
   }
 
-
   @Override
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
     return backingManager.getPoolColumnSizes();
@@ -1312,68 +1310,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Long countPoolsByPlatform(PlatformType platform) throws IOException {
-    return backingManager.countPoolsByPlatform(platform);
-  }
-
-  @Override
-  public Long getNumPoolsBySearch(PlatformType platform, String querystr) throws IOException {
-    return backingManager.getNumPoolsBySearch(platform, querystr);
-  };
-
-  @Override
-  public List<Pool> getPoolsByPageSizeSearchPlatform(int offset, int limit, String querystr, String sortDir,
-      String sortCol, PlatformType platform) throws IOException {
-    User user = getCurrentUser();
-    List<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.getPoolsByPageSizeSearchPlatform(offset, limit, querystr, sortDir, sortCol, platform)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public List<Pool> getPoolsByPageAndSize(int offset, int limit, String sortDir, String sortCol,
-      PlatformType platform) throws IOException {
-    User user = getCurrentUser();
-    List<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.getPoolsByPageAndSize(offset, limit, sortDir, sortCol, platform)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Long countRuns() throws IOException {
     return backingManager.countRuns();
-  }
-
-  @Override
-  public List<Run> getRunsByPageSizeSearch(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException {
-    User user = getCurrentUser();
-    List<Run> accessibles = new ArrayList<>();
-    for (Run run : backingManager.getRunsByPageSizeSearch(offset, limit, querystr, sortDir, sortCol)) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public List<Run> getRunsByPageAndSize(int offset, int limit, String sortDir, String sortCol) throws IOException {
-    User user = getCurrentUser();
-    List<Run> accessibles = new ArrayList<>();
-    for (Run run : backingManager.getRunsByPageAndSize(offset, limit, sortDir, sortCol)) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
   }
 
   @Override
@@ -1391,39 +1329,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Long countContainers() throws IOException {
     return backingManager.countContainers();
-  }
-
-  @Override
-  public List<SequencerPartitionContainer> getContainersByPageSizeSearch(int offset, int limit, String querystr,
-      String sortDir, String sortCol) throws IOException {
-    User user = getCurrentUser();
-    List<SequencerPartitionContainer> accessibles = new ArrayList<>();
-    for (SequencerPartitionContainer spc : backingManager.getContainersByPageSizeSearch(offset, limit, querystr,
-        sortDir, sortCol)) {
-      if (spc.userCanRead(user)) {
-        accessibles.add(spc);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public List<SequencerPartitionContainer> getContainersByPageAndSize(int offset, int limit, String sortDir,
-      String sortCol) throws IOException {
-    User user = getCurrentUser();
-    List<SequencerPartitionContainer> accessibles = new ArrayList<>();
-    for (SequencerPartitionContainer spc : backingManager.getContainersByPageAndSize(offset, limit, sortDir,
-        sortCol)) {
-      if (spc.userCanRead(user)) {
-        accessibles.add(spc);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Long countContainersBySearch(String querystr) throws IOException {
-    return backingManager.countContainersBySearch(querystr);
   }
 
   @Override

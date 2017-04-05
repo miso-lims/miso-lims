@@ -15,8 +15,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
-public interface LibraryService {
+public interface LibraryService extends PaginatedDataSource<Library, PaginationFilter> {
 
   Library get(long libraryId) throws IOException;
 
@@ -31,10 +33,6 @@ public interface LibraryService {
   long countBySearch(String querystr) throws IOException;
 
   List<Library> list() throws IOException;
-
-  List<Library> listByPageAndSize(int offset, int size, String sortDir, String sortCol) throws IOException;
-
-  List<Library> listByPageSizeAndSearch(int offset, int size, String querystr, String sortDir, String sortCol) throws IOException;
 
   Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
 
@@ -89,4 +87,5 @@ public interface LibraryService {
   void addQc(Library library, LibraryQC qc) throws IOException;
 
   void deleteQc(Library library, Long qcId) throws IOException;
+
 }

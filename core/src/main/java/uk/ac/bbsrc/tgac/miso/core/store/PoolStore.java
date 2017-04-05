@@ -32,6 +32,8 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PoolPaginationFilter;
 
 /**
  * Defines a DAO interface for storing Pools
@@ -39,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PoolStore extends Store<Pool>, Remover<Pool> {
+public interface PoolStore extends Store<Pool>, Remover<Pool>, PaginatedDataSource<Pool, PoolPaginationFilter> {
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Library} by means of that Library's
@@ -104,31 +106,7 @@ public interface PoolStore extends Store<Pool>, Remover<Pool> {
    */
   public Map<String, Integer> getPoolColumnSizes() throws IOException;
 
-  /**
-   * 
-   * @param offset of type int
-   * @param resultsPerPage of type int
-   * @param querystr of type String (or null for wildcard)
-   * @param sortDir of type String
-   * @param platform o type PlatformType
-   * @return a list of pools for given platform of size resultsPerPage which match the querystr
-   * @throws IOException
-   */
-  List<Pool> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String querystr,
-      String sortDir, String sortCol, PlatformType platform) throws IOException;
-
-
-  /**
-   * 
-   * @param platformName of type String
-   * @param querystr of type String (or null for wildcard)
-   * @return a count of how many pools for given platform match the querystr (or null for wildcard)
-   * @throws IOException
-   */
-  long countPoolsBySearch(PlatformType platform, String querystr) throws IOException;
-
   void removeWatcher(Pool pool, User watcher);
 
   void addWatcher(Pool pool, User watcher);
-
 }

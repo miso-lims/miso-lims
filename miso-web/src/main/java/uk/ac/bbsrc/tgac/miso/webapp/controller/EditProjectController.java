@@ -64,8 +64,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -221,12 +219,6 @@ public class EditProjectController {
   public Collection<Library> populateProjectLibraries(long projectId) throws IOException {
     List<Library> libraries = new ArrayList<>(libraryService.listByProjectId(projectId));
     Collections.sort(libraries, new AliasComparator<>());
-    for (Library l : libraries) {
-      for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
-        l.addQc(qc);
-      }
-    }
-
     return libraries;
   }
 
@@ -243,12 +235,6 @@ public class EditProjectController {
     List<LibraryDilution> dilutions = new ArrayList<>(dilutionService.listByProjectId(projectId));
     Collections.sort(dilutions);
     return dilutions;
-  }
-
-  public Collection<Pool> populateProjectPools(long projectId) throws IOException {
-    List<Pool> pools = new ArrayList<>(requestManager.listPoolsByProjectId(projectId));
-    Collections.sort(pools);
-    return pools;
   }
 
   public boolean existsAnyEmPcrLibrary(Collection<LibraryDilution> projectLibraryDilutions) throws IOException {
@@ -374,16 +360,12 @@ public class EditProjectController {
       } else {
         project = requestManager.getProjectById(projectId);
         model.put("title", "Project " + projectId);
-        model.put("projectRuns", populateProjectRuns(projectId));
 
         Collection<Library> libraries = populateProjectLibraries(projectId);
-        model.put("projectLibraries", libraries);
 
         Collection<LibraryDilution> libraryDilutions = populateProjectLibraryDilutions(libraries);
         model.put("projectLibraryDilutions", libraryDilutions);
         model.put("existsAnyEmPcrLibrary", existsAnyEmPcrLibrary(libraryDilutions));
-
-        model.put("projectPools", populateProjectPools(projectId));
 
         model.put("libraryGroupMap", populateLibraryGroupMap(project, libraries));
 

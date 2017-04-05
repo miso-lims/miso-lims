@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -34,11 +35,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateLibraryDao implements LibraryStore {
+public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedDataSource<Library, PaginationFilter> {
 
   private interface AdjacencySelector {
     Criterion generateCriterion(String associationPath, Long libraryId);
@@ -85,13 +87,12 @@ public class HibernateLibraryDao implements LibraryStore {
   @Value("${miso.detailed.sample.enabled:false}")
   private boolean detailedSampleEnabled;
 
-  private Session currentSession() {
+  @Override
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 
-  private Criterion searchRestrictions(String querystr) {
-    return DbUtils.searchRestrictions(querystr, "name", "alias", "description", "identificationBarcode");
-  }
+  private final static String[] SEARCH_FIELDS = new String[] { "name", "alias", "description", "identificationBarcode" };
 
   @Override
   public long save(Library library) throws IOException {
@@ -151,7 +152,7 @@ public class HibernateLibraryDao implements LibraryStore {
   @Override
   public List<Library> listBySearch(String query) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(searchRestrictions(query));
+    criteria.add(DbUtils.searchRestrictions(query, SEARCH_FIELDS));
     @SuppressWarnings("unchecked")
     List<Library> records = criteria.list();
     return records;
@@ -305,50 +306,7 @@ public class HibernateLibraryDao implements LibraryStore {
     return DbUtils.getColumnSizes(template, "Library");
   }
 
-  @Override
-  public List<Library> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol)
-      throws IOException {
-    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
-    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(searchRestrictions(querystr));
-    // required to sort by 'derivedInfo.lastModified', which is the field on which we
-    // want to sort most List X pages
-    criteria.createAlias("derivedInfo", "derivedInfo");
-    criteria.setFirstResult(offset);
-    criteria.setMaxResults(limit);
-    criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
-    criteria.setProjection(Projections.property("id"));
-    @SuppressWarnings("unchecked")
-    List<Long> ids = criteria.list();
-    if (ids.isEmpty()) {
-      return Collections.emptyList();
-    }
-    // We do this in two steps to make a smaller query that that the database can optimise
-    Criteria query = currentSession().createCriteria(LibraryImpl.class);
-    query.add(Restrictions.in("id", ids));
-    query.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
-    query.createAlias("derivedInfo", "derivedInfo");
-    @SuppressWarnings("unchecked")
-    List<Library> records = query.list();
-    return records;
-  }
-
-  @Override
-  public List<Library> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException {
-    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
-    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    // required to sort by 'derivedInfo.lastModified', which is the field on which we
-    // want to sort most List X pages
-    criteria.createAlias("derivedInfo", "derivedInfo");
-    criteria.setFirstResult(offset);
-    criteria.setMaxResults(limit);
-    criteria.addOrder("asc".equalsIgnoreCase(sortDir.toLowerCase()) ? Order.asc(sortCol) : Order.desc(sortCol));
-    @SuppressWarnings("unchecked")
-    List<Library> records = criteria.list();
-    return records;
-  }
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "sample");
 
   @Override
   public long countLibrariesBySearch(String querystr) throws IOException {
@@ -356,7 +314,7 @@ public class HibernateLibraryDao implements LibraryStore {
       return count();
     } else {
       Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-      criteria.add(searchRestrictions(querystr));
+      criteria.add(DbUtils.searchRestrictions(querystr, SEARCH_FIELDS));
       return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
     }
   }
@@ -433,4 +391,30 @@ public class HibernateLibraryDao implements LibraryStore {
   public void setDetailedSampleEnabled(boolean detailedSampleEnabled) {
     this.detailedSampleEnabled = detailedSampleEnabled;
   }
+
+  @Override
+  public String getProjectColumn() {
+    return "sample.project.id";
+  }
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_FIELDS;
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return STANDARD_ALIASES;
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    return "lastModified".equals(original) ? "derivedInfo.lastModified" : original;
+  }
+
+  @Override
+  public Class<? extends Library> getRealClass() {
+    return LibraryImpl.class;
+  }
+
 }

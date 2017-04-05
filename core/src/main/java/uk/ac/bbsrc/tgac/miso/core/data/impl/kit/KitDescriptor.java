@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -81,13 +82,25 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
   private String description = "";
 
   @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor")
-  private final Collection<ChangeLog> changelog = new ArrayList<>();
+  private Collection<ChangeLog> changelog = new ArrayList<>();
 
-  @ManyToMany
+  @ManyToMany(targetEntity = TargetedSequencing.class)
   @JoinTable(name = "TargetedSequencing_KitDescriptor", inverseJoinColumns = {
       @JoinColumn(name = "targetedSequencingId") }, joinColumns = {
           @JoinColumn(name = "kitDescriptorId") })
-  private final Collection<TargetedSequencing> targetedSequencing = new HashSet<>();
+  private Set<TargetedSequencing> targetedSequencing = new HashSet<>();
+
+  public void setChangelog(Collection<ChangeLog> changelog) {
+    this.changelog = changelog;
+  }
+
+  public void setTargetedSequencing(Set<TargetedSequencing> targetedSequencing) {
+    this.targetedSequencing = targetedSequencing;
+  }
+
+  public Collection<ChangeLog> getChangelog() {
+    return changelog;
+  }
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
@@ -271,6 +284,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
     this.platformType = platformType;
   }
 
+  @Override
   public Collection<ChangeLog> getChangeLog() {
     return changelog;
   }
@@ -283,7 +297,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
     this.lastModifier = lastModifier;
   }
 
-  public Collection<TargetedSequencing> getTargetedSequencing() {
+  public Set<TargetedSequencing> getTargetedSequencing() {
     return targetedSequencing;
   }
 

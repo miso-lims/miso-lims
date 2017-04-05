@@ -69,8 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateRunDaoTest extends AbstractDAOTest {
 
@@ -440,7 +439,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListWithLimitAndOffset() throws IOException {
-    List<Run> runs = dao.listByOffsetAndNumResults(2, 2, "asc", "id");
+    List<Run> runs = dao.list(new PaginationFilter(), 2, 2, true, "id");
     assertEquals(2, runs.size());
     assertEquals(3L, runs.get(0).getId());
   }
@@ -462,38 +461,39 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListBySearchWithLimit() throws IOException {
-    List<Run> runs = dao.listBySearchOffsetAndNumResults(2, 2, "C0", "asc", "id");
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("C0");
+    List<Run> runs = dao.list(filter, 2, 2, true, "id");
     assertEquals(1, runs.size());
     assertEquals(4L, runs.get(0).getId());
   }
 
   @Test
   public void testListByEmptySearchWithLimit() throws IOException {
-    List<Run> runs = dao.listBySearchOffsetAndNumResults(0, 3, "", "asc", "id");
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("");
+    List<Run> runs = dao.list(filter, 0, 3, true, "id");
     assertEquals(3L, runs.size());
   }
 
   @Test
   public void testListByBadSearchWithLimit() throws IOException {
-    List<Run> runs = dao.listBySearchOffsetAndNumResults(0, 2, "; DROP TABLE Run;", "asc", "id");
+    PaginationFilter filter = new PaginationFilter();
+    filter.setQuery("; DROP TABLE Run;");
+    List<Run> runs = dao.list(filter, 0, 2, true, "id");
     assertEquals(0L, runs.size());
   }
 
-  @Test
-  public void testListByOffsetBadSortDir() throws IOException {
-    List<Run> runs = dao.listByOffsetAndNumResults(1, 3, "BARK", "id");
-    assertEquals(3, runs.size());
-  }
 
   @Test
   public void testListOffsetBadLimit() throws IOException {
     exception.expect(IOException.class);
-    dao.listByOffsetAndNumResults(5, -3, "asc", "id");
+    dao.list(new PaginationFilter(), 5, -3, true, "id");
   }
 
   @Test
   public void testListOffsetThreeWithThreeSamplesPerPageOrderLastMod() throws IOException {
-    List<Run> runs = dao.listByOffsetAndNumResults(2, 2, "desc", "lastModified");
+    List<Run> runs = dao.list(new PaginationFilter(), 2, 2, false, "lastModified");
     assertEquals(2, runs.size());
     assertEquals(2, runs.get(0).getId());
   }

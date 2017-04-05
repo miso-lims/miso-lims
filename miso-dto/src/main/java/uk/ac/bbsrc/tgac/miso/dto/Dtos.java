@@ -251,6 +251,49 @@ public class Dtos {
     return to;
   }
 
+  public static SampleDto asMinimalDto(Sample from) {
+    DetailedSampleDto dto = new DetailedSampleDto();
+    copySampleFields(from, dto);
+
+    if (isDetailedSample(from)) {
+      dto.setSampleClassId(((DetailedSample) from).getSampleClass().getId());
+    }
+    return dto;
+  }
+
+  private static SampleDto copySampleFields(Sample from, SampleDto dto) {
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    dto.setDescription(from.getDescription());
+    dto.setUpdatedById(from.getLastModifier().getUserId());
+    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
+      dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
+    dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
+    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
+    dto.setSampleType(from.getSampleType());
+    if (from.getReceivedDate() != null) {
+      dto.setReceivedDate(dateTimeFormatter.print(from.getReceivedDate().getTime()));
+    }
+    if (from.getQcPassed() != null) {
+      dto.setQcPassed(from.getQcPassed());
+    }
+    if (!isStringEmptyOrNull(from.getAlias())) {
+      dto.setAlias(from.getAlias());
+    }
+    dto.setProjectId(from.getProject().getProjectId());
+    dto.setScientificName(from.getScientificName());
+    if (!isStringEmptyOrNull(from.getTaxonIdentifier())) {
+      dto.setTaxonIdentifier(from.getTaxonIdentifier());
+    }
+    dto.setVolume(from.getVolume());
+    dto.setDiscarded(from.isDiscarded());
+    dto.setLastModified(getDateAsString(from.getLastModified()));
+
+    return dto;
+
+  }
+
   private static DetailedSampleDto asDetailedSampleDto(DetailedSample from) {
     DetailedSampleDto dto = null;
     if (isIdentitySample(from)) {
@@ -516,36 +559,10 @@ public class Dtos {
     } else {
       dto = new SampleDto();
     }
-    dto.setId(from.getId());
+    copySampleFields(from, dto);
     if (!isStringEmptyOrNull(from.getAccession())) {
       dto.setAccession(from.getAccession());
     }
-    dto.setName(from.getName());
-    dto.setDescription(from.getDescription());
-    dto.setUpdatedById(from.getLastModifier().getUserId());
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
-    dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
-    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
-    dto.setSampleType(from.getSampleType());
-    if (from.getReceivedDate() != null) {
-      dto.setReceivedDate(dateTimeFormatter.print(from.getReceivedDate().getTime()));
-    }
-    if (from.getQcPassed() != null) {
-      dto.setQcPassed(from.getQcPassed());
-    }
-    if (!isStringEmptyOrNull(from.getAlias())) {
-      dto.setAlias(from.getAlias());
-    }
-    dto.setProjectId(from.getProject().getProjectId());
-    dto.setScientificName(from.getScientificName());
-    if (!isStringEmptyOrNull(from.getTaxonIdentifier())) {
-      dto.setTaxonIdentifier(from.getTaxonIdentifier());
-    }
-    dto.setVolume(from.getVolume());
-    dto.setDiscarded(from.isDiscarded());
-    dto.setLastModified(getDateAsString(from.getLastModified()));
 
     if (from.getSampleQCs() != null && !from.getSampleQCs().isEmpty()) {
       dto.setQcs(asSampleQcDtos(from.getSampleQCs()));
@@ -553,10 +570,10 @@ public class Dtos {
     return dto;
   }
 
-  public static List<SampleDto> asSampleDtos(Collection<Sample> from) {
+  public static List<SampleDto> asSampleDtos(Collection<Sample> from, boolean full) {
     List<SampleDto> dtoSet = new ArrayList<>();
     for (Sample sample : from) {
-      dtoSet.add(asDto(sample));
+      dtoSet.add(full ? asDto(sample) : asMinimalDto(sample));
     }
     return dtoSet;
   }
@@ -1209,7 +1226,7 @@ public class Dtos {
     return to;
   }
 
-  public static PoolDto asDto(Pool from) {
+  public static PoolDto asDto(Pool from, boolean includeContents) {
     PoolDto dto = new PoolDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1224,13 +1241,17 @@ public class Dtos {
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
     }
-    Set<DilutionDto> pooledElements = new HashSet<>();
-    for (Dilution ld : from.getPoolableElements()) {
-      if (ld != null) {
-        pooledElements.add(asDto(ld));
+    if (includeContents) {
+      Set<DilutionDto> pooledElements = new HashSet<>();
+      for (Dilution ld : from.getPoolableElements()) {
+        if (ld != null) {
+          pooledElements.add(asDto(ld));
+        }
       }
+      dto.setPooledElements(pooledElements);
+    } else {
+      dto.setPooledElements(Collections.emptySet());
     }
-    dto.setPooledElements(pooledElements);
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
@@ -1239,10 +1260,10 @@ public class Dtos {
     return dto;
   }
 
-  public static List<PoolDto> asPoolDtos(Collection<Pool> poolSubset) {
+  public static List<PoolDto> asPoolDtos(Collection<Pool> poolSubset, boolean includeContents) {
     List<PoolDto> dtoList = new ArrayList<>();
     for (Pool pool : poolSubset) {
-      dtoList.add(asDto(pool));
+      dtoList.add(asDto(pool, includeContents));
     }
     return dtoList;
   }

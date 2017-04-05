@@ -1,3 +1,14 @@
+# 0.2.55
+
+Changes:
+
+ * Improved performance of Edit Project page
+ * Added validation of targeted sequencing on bulk Library Dilution entry
+ * Allowance of multiple sign-ins by the same user
+ * Sorting of projects in edit sample list
+ * Improved performance of sample and library list pages
+ * Removed dilution content from list pools page to improve performance
+
 # 0.2.54
 
 Changes:

@@ -52,13 +52,16 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryService implements LibraryService {
+public class DefaultLibraryService implements LibraryService, AuthorizedPaginatedDataSource<Library, PaginationFilter> {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultLibraryService.class);
 
@@ -182,19 +185,6 @@ public class DefaultLibraryService implements LibraryService {
   public List<Library> list() throws IOException {
     Collection<Library> allLibraries = libraryDao.listAll();
     return authorizationManager.filterUnreadable(allLibraries);
-  }
-
-  @Override
-  public List<Library> listByPageAndSize(int offset, int size, String sortDir, String sortCol) throws IOException {
-    Collection<Library> libraries = libraryDao.listByOffsetAndNumResults(offset, size, sortDir, sortCol);
-    return authorizationManager.filterUnreadable(libraries);
-  }
-
-  @Override
-  public List<Library> listByPageSizeAndSearch(int offset, int size, String querystr, String sortDir, String sortCol)
-      throws IOException {
-    Collection<Library> libraries = libraryDao.listBySearchOffsetAndNumResults(offset, size, querystr, sortDir, sortCol);
-    return authorizationManager.filterUnreadable(libraries);
   }
 
   @Override
@@ -426,9 +416,9 @@ public class DefaultLibraryService implements LibraryService {
     Set<String> original = stringifyIndices(originalIndices);
     Set<String> updated = stringifyIndices(updatedIndices);
     Set<String> added = new TreeSet<>(updated);
-    added.removeAll(originalIndices);
+    added.removeAll(original);
     Set<String> removed = new TreeSet<>(original);
-    removed.removeAll(updatedIndices);
+    removed.removeAll(updated);
 
     if (!added.isEmpty() || !removed.isEmpty()) {
       StringBuilder message = new StringBuilder();
@@ -656,6 +646,16 @@ public class DefaultLibraryService implements LibraryService {
 
   public void setAutoGenerateIdBarcodes(Boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
+  }
+
+  @Override
+  public PaginatedDataSource<Library, PaginationFilter> getBackingPaginationSource() {
+    return libraryDao;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
   }
 
 }

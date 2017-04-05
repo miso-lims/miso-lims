@@ -48,7 +48,12 @@ var Dilution = {
         beforeAutofill: Hot.incrementingAutofill,
       });
       document.getElementById('hotContainer').style.display = '';
-      
+      var tarseqColumnIndex = Hot.getColIndex('targetedSequencingAlias');
+      if (tarseqColumnIndex != -1) {
+        for (var i = 0; i < startingValues.length; i++) {
+          Hot.hotTable.setCellMeta(i, tarseqColumnIndex, 'source', Dilution.hot.getTarSeqs(startingValues[i].library));
+        }
+      }
       // enable save button if it was disabled
       if (Hot.saveButton && Hot.saveButton.classList.contains('disabled')) Hot.toggleButtonAndLoaderImage(Hot.saveButton);
     },
@@ -75,8 +80,8 @@ var Dilution = {
     /**
      * Get targeted sequencing aliases (all or by id) (detailed sample only)
      */
-    getTarSeqs: function () {
-      return Hot.sortByProperty(Dilution.hot.tarSeqs, 'targetedSequencingId').map(Hot.getAlias);
+    getTarSeqs: function (library) {
+      return Hot.sortByProperty(Dilution.hot.tarSeqs, 'targetedSequencingId').filter(function(tarSeq) { return tarSeq.kitDescriptorId == library.kitDescriptorId; }).map(Hot.getAlias);
     },
 
     /**
@@ -153,7 +158,7 @@ var Dilution = {
           data: 'targetedSequencingAlias',
           type: 'dropdown',
           trimDropdown: false,
-          source: Dilution.hot.getTarSeqs(),
+          source: [],
           validator: Hot.permitEmpty,
           include: isDetailed
         }

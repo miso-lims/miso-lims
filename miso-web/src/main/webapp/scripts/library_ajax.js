@@ -1064,7 +1064,7 @@ Library.ui = {
     }
   },
 
-  createListingLibrariesTable: function () {
+  createListingLibrariesTable: function (projectId) {
     jQuery('#listingLibrariesTable').html("");
     jQuery('#listingLibrariesTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
@@ -1074,12 +1074,14 @@ Library.ui = {
           "mRender": function (data, type, full) {
             return "<input type=\"checkbox\" value=\"" + data + "\" class=\"bulkCheckbox\" id=\"bulk_" + data + "\">"
           },
+          "include": !projectId,
           "iSortPriority": 0,
           "bSortable": false
         },
         {
           "sTitle": "Library Name",
           "mData": "id",
+          "include": true,
           "iSortPriority": 1,
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/library/" + data + "\">" + full.name + "</a>";
@@ -1088,6 +1090,7 @@ Library.ui = {
         {
           "sTitle": "Alias",
           "mData": "alias",
+          "include": true,
           "iSortPriority": 0,
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/library/" + full.id + "\">" + data + "</a>";
@@ -1097,6 +1100,7 @@ Library.ui = {
           "sTitle": "Sample Name", 
           "sType": "no-sam",
           "mData": "parentSampleId" ,
+          "include": true,
           "iSortPriority": 0,
           "mRender": function (data, type, full) {
             return "<a href=\"/miso/sample/" + data + "\">" + full.parentSampleAlias + " (SAM" + data + ")</a>";
@@ -1105,6 +1109,7 @@ Library.ui = {
         {
           "sTitle": "QC Passed",
           "mData": "qcPassed",
+          "include": true,
           "iSortPriority": 0,
           "mRender": function (data, type, full) {
             // data is returned as "true", "false", or "null"
@@ -1117,12 +1122,14 @@ Library.ui = {
           "mRender": function (data, type, full) {
             return (data ? (full.index2Label ? data + ", " + full.index2Label : data) : "None");
           },
+          "include": true,
           "iSortPriority": 0,
           "bSortable": false
         },
         {
           "sTitle": "Location",
           "mData": "locationLabel",
+          "include": true,
           "iSortPriority": 0,
           "mRender": function (data, type, full) {
             return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
@@ -1132,16 +1139,18 @@ Library.ui = {
         {
           "sTitle": "Last Updated",
           "mData": "lastModified",
+          "include": true,
           "iSortPriority": 2,
           "bVisible": (Sample.detailedSample ? "true" : "false")
         },
         {
           "sTitle": "Barcode",
           "mData": "identificationBarcode",
+          "include": true,
           "iSortPriority": 0,
           "bVisible": false
         }
-      ],
+      ].filter(function(x) { return x.include; }),
       "bJQueryUI": true,
       "bAutoWidth": false,
       "iDisplayLength": 25,
@@ -1150,7 +1159,7 @@ Library.ui = {
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
-      "sAjaxSource": "/miso/rest/library/dt",
+      "sAjaxSource": "/miso/rest/library/dt" + (projectId ? "/project/" + projectId : ""),
       "fnServerData": function (sSource, aoData, fnCallback) {
         jQuery('#listingLibrariesTable').addClass('disabled');
         jQuery.ajax({
@@ -1169,6 +1178,9 @@ Library.ui = {
         jQuery('#listingLibrariesTable_paginate').find('.fg-button').removeClass('fg-button');
       }
     })).fnSetFilteringDelay();
+  },
+  createListingLibrariesTableMain: function (projectId) {
+    Library.ui.createListingLibrariesTable(null);
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
     
     var selectAll = '<label><input type="checkbox" onchange="Library.ui.checkAll(this)" id="checkAll">Select All</label>';

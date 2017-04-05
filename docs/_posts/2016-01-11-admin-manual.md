@@ -25,7 +25,7 @@ Application Server:
 
 Database Server:
 
-* mySQL 5
+* MySql 5.7
 * Flyway
 
 Notification Server:
@@ -64,7 +64,7 @@ Locally, create a checkout:
     git remote add tgac git@github.com:TGAC/miso-lims.git
 
 # Setting Up the Database Server
-The database server needs to have [MySQL 5](https://www.mysql.com/). The tool
+The database server needs to have [MySQL 5.7](https://www.mysql.com/). The tool
 [Flyway](https://flywaydb.org/) must also be present to migrate the database as
 the application is developed, but it can be installed on a different server so
 long as it can access the database server.

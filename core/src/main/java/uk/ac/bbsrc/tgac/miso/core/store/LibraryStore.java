@@ -35,6 +35,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 /**
  * Defines a DAO interface for storing Libraries
@@ -42,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface LibraryStore extends Store<Library>, Remover<Library> {
+public interface LibraryStore extends Store<Library>, Remover<Library>, PaginatedDataSource<Library, PaginationFilter> {
 
   /**
    * Get a Library given a ID barcode
@@ -215,27 +217,6 @@ public interface LibraryStore extends Store<Library>, Remover<Library> {
    * @throws IOException
    */
   public Map<String, Integer> getLibraryColumnSizes() throws IOException;
-
-  /**
-   *
-   * @param offset of type int
-   * @param resultsPerPage of type int
-   * @param querystr of type String
-   * @param sortDir of type String
-   * @return a list of libraries of size resultsPerPage which match the querystr
-   * @throws IOException
-   */
-  List<Library> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol) throws IOException;
-
-  /**
-   *
-   * @param offset of type int
-   * @param limit of type int
-   * @param sortDir of type String
-   * @return a list of libraries of size limit
-   * @throws IOException
-   */
-  List<Library> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException;
 
   /**
    *

@@ -32,12 +32,12 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
@@ -98,7 +98,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @JsonManagedReference
   private Collection<SampleQC> sampleQCs = new TreeSet<>();
 
-  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Sample_Note", joinColumns = {
       @JoinColumn(name = "sample_sampleId") }, inverseJoinColumns = {
           @JoinColumn(name = "notes_noteId") })
@@ -133,7 +133,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @PrimaryKeyJoinColumn
   private SampleDerivedInfo derivedInfo;
 
-  @ManyToOne(targetEntity = BoxImpl.class)
+  @ManyToOne(targetEntity = BoxImpl.class, fetch = FetchType.LAZY)
   @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = sampleId AND bp.targetType LIKE 'Sample%')")
   private Box box;
 

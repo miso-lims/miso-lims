@@ -31,6 +31,8 @@ import java.util.Map;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 /**
  * Defines a DAO interface for storing Runs
@@ -38,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface RunStore extends Store<Run>, Remover<Run> {
+public interface RunStore extends Store<Run>, Remover<Run>, PaginatedDataSource<Run, PaginationFilter> {
   /**
    * Gets the latest Run, by start date, that is associated with the given container
    *
@@ -147,11 +149,6 @@ public interface RunStore extends Store<Run>, Remover<Run> {
   public Map<String, Integer> getRunColumnSizes() throws IOException;
 
   public long countRuns() throws IOException;
-
-  public List<Run> listBySearchOffsetAndNumResults(int offset, int limit, String querystr, String sortDir, String sortCol)
-      throws IOException;
-
-  public List<Run> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol) throws IOException;
 
   public long countBySearch(String querystr) throws IOException;
 

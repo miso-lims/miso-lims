@@ -12,23 +12,19 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
-import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,9 +47,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
@@ -70,6 +69,25 @@ public class ContainerRestController extends RestController {
 
   @Autowired
   private RequestManager requestManager;
+
+  @Autowired
+  private ContainerService containerService;
+
+  private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto, PaginationFilter> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto, PaginationFilter>() {
+
+    @Override
+    protected ContainerDto asDto(SequencerPartitionContainer model, UriComponentsBuilder builder) {
+      ContainerDto dto = Dtos.asDto(model);
+      dto.writeUrls(builder);
+      return dto;
+    }
+
+    @Override
+    protected PaginatedDataSource<SequencerPartitionContainer, PaginationFilter> getSource() throws IOException {
+      return containerService;
+    }
+
+  };
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -147,44 +165,7 @@ public class ContainerRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<ContainerDto> getContainers(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    if (request.getParameterMap().size() > 0) {
-      Long numContainers = requestManager.countContainers();
-      // get request params from DataTables
-      Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
-      Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
-      String sSearch = request.getParameter("sSearch");
-      String sSortDir = request.getParameter("sSortDir_0");
-      String sortColIndex = request.getParameter("iSortCol_0");
-      String sortCol = request.getParameter("mDataProp_" + sortColIndex);
-
-      // get requested subset of containers
-      Collection<SequencerPartitionContainer> containerSubset;
-      Long numMatches;
-
-      if (!isStringEmptyOrNull(sSearch)) {
-        containerSubset = requestManager.getContainersByPageSizeSearch(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol);
-        numMatches = Long.valueOf(requestManager.countContainersBySearch(sSearch));
-      } else {
-        containerSubset = requestManager.getContainersByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol);
-        numMatches = numContainers;
-      }
-      List<ContainerDto> containerDtos = Dtos.asContainerDtos(containerSubset);
-      URI baseUri = uriBuilder.build().toUri();
-      for (ContainerDto containerDto : containerDtos) {
-        containerDto.setUrl(
-            UriComponentsBuilder.fromUri(baseUri).path("/rest/run/container/{barcode}")
-                .buildAndExpand(containerDto.getIdentificationBarcode()).toUriString());
-      }
-
-      DataTablesResponseDto<ContainerDto> dtResponse = new DataTablesResponseDto<>();
-      dtResponse.setITotalRecords(numContainers);
-      dtResponse.setITotalDisplayRecords(numMatches);
-      dtResponse.setAaData(containerDtos);
-      dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
-      return dtResponse;
-    } else {
-      throw new RestException("Request must specify DataTables parameters.");
-    }
+    return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
   }
 
 }

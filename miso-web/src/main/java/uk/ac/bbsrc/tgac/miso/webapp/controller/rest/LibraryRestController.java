@@ -23,11 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,6 +53,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
@@ -73,6 +72,22 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 @SessionAttributes("library")
 public class LibraryRestController extends RestController {
   private static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
+
+  private final JQueryDataTableBackend<Library, LibraryDto, PaginationFilter> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto, PaginationFilter>() {
+
+
+    @Override
+    protected LibraryDto asDto(Library model, UriComponentsBuilder builder) {
+      LibraryDto dto = Dtos.asDto(model);
+      dto.writeUrls(builder);
+      return dto;
+    }
+
+    @Override
+    protected PaginatedDataSource<Library, PaginationFilter> getSource() throws IOException {
+      return libraryService;
+    }
+  };
 
   @Autowired
   private LibraryService libraryService;
@@ -166,40 +181,16 @@ public class LibraryRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<LibraryDto> getLibraries(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    if (request.getParameterMap().size() > 0) {
-      Long numLibraries = Long.valueOf(libraryService.count());
-      // get request params from DataTables
-      Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
-      Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
-      String sSearch = request.getParameter("sSearch");
-      String sSortDir = request.getParameter("sSortDir_0");
-      String sortColIndex = request.getParameter("iSortCol_0");
-      String sortCol = request.getParameter("mDataProp_" + sortColIndex);
+    return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
+  }
 
-      // get requested subset of libraries
-      Collection<Library> librarySubset;
-      Long numMatches;
-
-      if (!isStringEmptyOrNull(sSearch)) {
-        librarySubset = libraryService.listByPageSizeAndSearch(iDisplayStart, iDisplayLength, sSearch, sSortDir, sortCol);
-        numMatches = Long.valueOf(libraryService.countBySearch(sSearch));
-      } else {
-        librarySubset = libraryService.listByPageAndSize(iDisplayStart, iDisplayLength, sSortDir, sortCol);
-        numMatches = numLibraries;
-      }
-      List<LibraryDto> libraryDtos = Dtos.asLibraryDtos(librarySubset);
-      for (LibraryDto libraryDto : libraryDtos) {
-        libraryDto.writeUrls(uriBuilder);
-      }
-
-      DataTablesResponseDto<LibraryDto> dtResponse = new DataTablesResponseDto<>();
-      dtResponse.setITotalRecords(numLibraries);
-      dtResponse.setITotalDisplayRecords(numMatches);
-      dtResponse.setAaData(libraryDtos);
-      dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
-      return dtResponse;
-    } else {
-      throw new RestException("Request must specify DataTables parameters.");
-    }
+  @RequestMapping(value = "/dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<LibraryDto> getLibrariesForProject(@PathVariable("id") Long id, HttpServletRequest request,
+      HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    PaginationFilter filter = new PaginationFilter();
+    filter.setProjectId(id);
+    return jQueryBackend.get(filter, request, response, uriBuilder);
   }
 }

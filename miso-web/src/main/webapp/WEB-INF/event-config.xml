@@ -39,7 +39,7 @@
          <ref bean="prometheusInterceptor"/>
       </property>
       <property name="pattern">
-         <value>uk\.ac\.bbsrc\.tgac\.miso\.(sqlstore\.SQL|persistence\.impl\.Hibernate).*</value>
+         <value>uk\.ac\.bbsrc\.tgac\.miso\.persistence\.impl\.Hibernate.*</value>
       </property>
    </bean>
 

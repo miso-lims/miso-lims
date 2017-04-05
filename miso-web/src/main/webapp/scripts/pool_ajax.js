@@ -412,30 +412,14 @@ Pool.ui = {
     );
   },
 
-  createListingPoolsTable: function (platform, poolConcentrationUnits) {
+  createListingPoolsTablePlatform: function (platform, poolConcentrationUnits) {
     var table = 'listing' + platform + 'PoolsTable';
+    // This URL has to be singular because of mapping in PoolRestController
+    Pool.ui.createListingPoolsTable(table, poolConcentrationUnits, "/miso/rest/pool/dt/platform/" + platform);
+  },
+  createListingPoolsTable: function(table, poolConcentrationUnits, url) {
     jQuery('#'+table).html('');
 
-    function renderPoolElements (data, type, full) {
-      var elements = data.map(function (ld) {
-        return "<li><a href=\"/miso/library/" + ld.library.id + "\">" + ld.library.alias
-        + (ld.library.index1Label ? "(" + ld.library.index1Label + (ld.library.index2Label ? ", " + ld.library.index2Label + ")" : ")") : "")
-        + "</a>" + "</li>";
-      });
-      var string;
-      if (elements.length === 0) {
-        return "No elements";
-      } else {
-        var selector = "more_" + full.id;
-        var num = "" + elements.length + " dilutions  ";
-        var more = "<span id=\"" + selector + "_fewer\"><a href=\"javascript:void(0);\" onclick=\"jQuery('." + selector + "').show();jQuery('#" + selector + "_fewer').hide();\">"
-          + "(See all...)</a></span>";
-        var els = "<div class='" + selector + "' style='display:none'><ul>"
-          + elements.join('')
-          + "</ul><span><a href=\"javascript:void(0);\" onclick=\"jQuery('." + selector + "').hide();jQuery('#" + selector + "_fewer').show();\">Hide all...</a></span></div>";
-        return num + more + els;
-      }
-    };
     jQuery('#'+table).dataTable(Utils.setSortFromPriority({
       "aoColumns": [
         {
@@ -462,13 +446,6 @@ Pool.ui = {
         {
           "sTitle": "Date Created",
           "mData": "creationDate",
-          "iSortPriority" : 0
-        },
-        {
-          "sTitle": "Elements",
-          "mData": "pooledElements",
-          "mRender": renderPoolElements,
-          "bSortable": false,
           "iSortPriority" : 0
         },
         {
@@ -506,7 +483,7 @@ Pool.ui = {
       "sPaginationType": "full_numbers",
       "bProcessing": true,
       "bServerSide": true,
-      "sAjaxSource": "/miso/rest/pool/dt/platform/" + platform, // has to be singular because of mapping in PoolRestController
+      "sAjaxSource": url,
       "fnServerData": function (sSource, aoData, fnCallback) {
         jQuery('#'+table).addClass('disabled');
         jQuery.ajax({

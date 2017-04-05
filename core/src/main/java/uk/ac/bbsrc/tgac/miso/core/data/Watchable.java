@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Set;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -66,4 +67,7 @@ public interface Watchable {
    */
   @JsonIgnore
   String getWatchableIdentifier();
+
+  public void setWatchGroup(Group watchGroup);
+
 }
