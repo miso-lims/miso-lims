@@ -74,8 +74,6 @@ public class LibraryRestController extends RestController {
   private static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
   private final JQueryDataTableBackend<Library, LibraryDto, PaginationFilter> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto, PaginationFilter>() {
-
-
     @Override
     protected LibraryDto asDto(Library model, UriComponentsBuilder builder) {
       LibraryDto dto = Dtos.asDto(model);
@@ -193,4 +191,5 @@ public class LibraryRestController extends RestController {
     filter.setProjectId(id);
     return jQueryBackend.get(filter, request, response, uriBuilder);
   }
+
 }

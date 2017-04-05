@@ -42,7 +42,6 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -50,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -67,8 +65,6 @@ public class PoolSearchService {
   protected static final Logger log = LoggerFactory.getLogger(PoolSearchService.class);
   @Autowired
   private RequestManager requestManager;
-  @Autowired
-  private LibraryDilutionService dilutionService;
 
   private abstract class PoolSearch {
     public abstract Collection<Pool> all(PlatformType type) throws IOException;
@@ -139,45 +135,6 @@ public class PoolSearchService {
     return JSONUtils.JSONObjectResponse("html", "");
   }
 
-  public JSONObject poolSearchElements(HttpSession session, JSONObject json) {
-    String searchStr = json.getString("str");
-    String platformType = json.getString("platform").toUpperCase();
-    try {
-      if (searchStr.length() > 1) {
-        StringBuilder b = new StringBuilder();
-        List<? extends Dilution> dilutions = new ArrayList<>(
-            dilutionService.listBySearchAndPlatform(searchStr, PlatformType.valueOf(platformType)));
-        if (dilutions.isEmpty()) {
-          // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          dilutions = new ArrayList<>(dilutionService
-              .listBySearchAndPlatform(new String(Base64.decodeBase64(searchStr)), PlatformType.valueOf(platformType)));
-
-        }
-        int numMatches = 0;
-        for (Dilution d : dilutions) {
-          // have to use onmousedown because of blur firing before onclick and hiding the div before it can be added
-          b.append(
-              "<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\""
-                  + " onmousedown=\"Pool.search.poolSearchSelectElement('" + d.getId() + "', '" + d.getName() + "')\">" + "<b>Dilution: "
-                  + d.getName() + "</b><br/>" + "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" + "<b>Sample: "
-                  + d.getLibrary().getSample().getAlias() + "</b><br/>" + "</div>");
-          numMatches++;
-        }
-
-        if (numMatches == 0) {
-          return JSONUtils.JSONObjectResponse("html", "No matches");
-        } else {
-          return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
-        }
-      } else {
-        return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
-      }
-    } catch (IOException e) {
-      log.error("cannot complete pool element search", e);
-      return JSONUtils.SimpleJSONError("Could not complete pool element search: " + e.getMessage());
-    }
-  }
-
   private String poolHtml(Pool p) {
     StringBuilder b = new StringBuilder();
     String lowquality = p.getHasLowQualityMembers() ? " lowquality" : "";
@@ -224,9 +181,5 @@ public class PoolSearchService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setDilutionService(LibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
   }
 }

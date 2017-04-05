@@ -30,10 +30,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -72,13 +70,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
@@ -205,71 +201,6 @@ public class EditProjectController {
     return LimsUtils.join(types, ",");
   }
 
-  public Collection<Run> populateProjectRuns(long projectId) throws IOException {
-    List<Run> runs = new ArrayList<>(requestManager.listAllRunsByProjectId(projectId));
-    Collections.sort(runs, new AliasComparator<>());
-      for (Run r : runs) {
-        RunImpl ri = (RunImpl) r;
-        ri.setSequencerPartitionContainers(new ArrayList<>(
-            requestManager.listSequencerPartitionContainersByRunId(r.getId())));
-      }
-      return runs;
-  }
-
-  public Collection<Library> populateProjectLibraries(long projectId) throws IOException {
-    List<Library> libraries = new ArrayList<>(libraryService.listByProjectId(projectId));
-    Collections.sort(libraries, new AliasComparator<>());
-    return libraries;
-  }
-
-  public Collection<LibraryDilution> populateProjectLibraryDilutions(Collection<Library> projectLibraries) throws IOException {
-    List<LibraryDilution> dilutions = new ArrayList<>();
-    for (Library l : projectLibraries) {
-      dilutions.addAll(dilutionService.listByLibraryId(l.getId()));
-    }
-    Collections.sort(dilutions);
-    return dilutions;
-  }
-
-  public Collection<LibraryDilution> populateProjectLibraryDilutions(long projectId) throws IOException {
-    List<LibraryDilution> dilutions = new ArrayList<>(dilutionService.listByProjectId(projectId));
-    Collections.sort(dilutions);
-    return dilutions;
-  }
-
-  public boolean existsAnyEmPcrLibrary(Collection<LibraryDilution> projectLibraryDilutions) throws IOException {
-    for (LibraryDilution dil : projectLibraryDilutions) {
-      if (dil.getLibrary().getPlatformType().usesEmPCR()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean existsAnyEmPcrLibrary(long projectId) throws IOException {
-    return existsAnyEmPcrLibrary(populateProjectLibraryDilutions(projectId));
-  }
-
-  public Map<Long, Collection<Library>> populateLibraryGroupMap(Project project, Collection<Library> projectLibraries) throws IOException {
-    Map<Long, Collection<Library>> libraryGroupMap = new HashMap<>();
-
-    for (ProjectOverview po : project.getOverviews()) {
-      if (po.getSampleGroup() != null && !po.getSamples().isEmpty()) {
-        Set<Library> libs = new HashSet<>();
-        for (Sample s : po.getSamples()) {
-          for (Library pl : projectLibraries) {
-            if (pl.getSample().equals(s)) {
-              libs.add(pl);
-            }
-          }
-        }
-        libraryGroupMap.put(po.getId(), libs);
-      }
-    }
-
-    return libraryGroupMap;
-  }
-
   @RequestMapping(value = "/graph/{projectId}", method = RequestMethod.GET)
   public @ResponseBody JSONObject graphRest(@PathVariable Long projectId) throws IOException {
     JSONObject j = new JSONObject();
@@ -360,15 +291,6 @@ public class EditProjectController {
       } else {
         project = requestManager.getProjectById(projectId);
         model.put("title", "Project " + projectId);
-
-        Collection<Library> libraries = populateProjectLibraries(projectId);
-
-        Collection<LibraryDilution> libraryDilutions = populateProjectLibraryDilutions(libraries);
-        model.put("projectLibraryDilutions", libraryDilutions);
-        model.put("existsAnyEmPcrLibrary", existsAnyEmPcrLibrary(libraryDilutions));
-
-        model.put("libraryGroupMap", populateLibraryGroupMap(project, libraries));
-
       }
 
       if (project == null) {

@@ -717,90 +717,21 @@
 </script>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#librarydils_arrowclick'), 'librarydilsdiv');">
-  ${fn:length(projectLibraryDilutions)} Library Dilutions
+  Library Dilutions
   <div id="librarydils_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="librarydilsdiv" style="display:none;">
   <a id="librarydil"></a>
 
-  <h1>${fn:length(projectLibraryDilutions)} Library Dilutions</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('librarydilsmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="librarydilsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <c:if test="${not empty projectLibraryDilutions}">
-          <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryDilutionBarcodesToPrint('#librarydils_table');">Print Barcodes ...</a>
-          <a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
-  <div style="clear:both">
-    <table class="list no-border full-width" id="librarydils_table">
-      <thead>
-      <tr>
-        <th>Dilution Name</th>
-        <th>Parent Library</th>
-        <th>Dilution Creator</th>
-        <th>Dilution Creation Date</th>
-        <th>Dilution Platform</th>
-        <th>Dilution Concentration (${libraryDilutionUnits})</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${projectLibraryDilutions}" var="dil">
-        <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b><a href="<c:url value='/miso/library/${dil.library.id}'/>">${dil.name}</a></b></td>
-          <td><a href="<c:url value='/miso/library/${dil.library.id}'/>">${dil.library.alias}</a>
-            <c:if test="${not empty dil.library.indices}">(<c:forEach items="${dil.library.indices}" varStatus="status" var="index"><c:if test="${status.index gt 0}">, </c:if>${index.name}</c:forEach>)</c:if>
-          </td>
-          <td>${dil.dilutionCreator}</td>
-          <td>${dil.creationDate}</td>
-          <td>${dil.library.platformType}</td>
-          <td>${dil.concentration}</td>
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Library.dilution.deleteLibraryDilution(${dil.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"></span>
-            </td>
-          </sec:authorize>
-        </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#librarydils_table').dataTable({
-          "aaSorting": [
-            [1, 'asc'],
-            [3, 'asc']
-          ],
-          "aoColumns": [
-            null,
-            { "sType": 'natural' },
-            null,
-            null,
-            null,
-            null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true,
-          "sPaginationType": "full_numbers",
-          "fnDrawCallback": function (oSettings) {
-            jQuery('#librarydils_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-          }
-        });
-      });
-    </script>
-  </div>
+  <h1>Library Dilutions</h1>
+  <table class="display no-border" id="listingDilutionsTable">
+  </table>
 </div>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    Library.ui.createListingDilutionsTable(${project.id});
+  });
+</script>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_arrowclick'), 'poolsdiv');">
   Pools

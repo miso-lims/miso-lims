@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -20,7 +22,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
@@ -30,8 +38,67 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 public class LibraryDilutionRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryDilutionRestController.class);
 
+  private final JQueryDataTableBackend<LibraryDilution, DilutionDto, DilutionPaginationFilter> jQueryBackend = new JQueryDataTableBackend<LibraryDilution, DilutionDto, DilutionPaginationFilter>() {
+    @Override
+    protected DilutionDto asDto(LibraryDilution model, UriComponentsBuilder builder) {
+      DilutionDto dto = Dtos.asDto(model);
+      if (dto.getLibrary() != null) {
+        dto.getLibrary().writeUrls(builder);
+      }
+      return dto;
+    }
+
+    @Override
+    protected PaginatedDataSource<LibraryDilution, DilutionPaginationFilter> getSource() throws IOException {
+      return dilutionService;
+    }
+  };
+
+  static class SelectRowDto {
+    public String name;
+    public Double concentration;
+    public String library;
+    public String sample;
+    public String indices;
+    public String lowquality;
+    public Long id;
+  }
+
+  private final JQueryDataTableBackend<LibraryDilution, SelectRowDto, DilutionPaginationFilter> jQueryBackendSelect = new JQueryDataTableBackend<LibraryDilution, SelectRowDto, DilutionPaginationFilter>() {
+
+    @Override
+    protected PaginatedDataSource<LibraryDilution, DilutionPaginationFilter> getSource() throws IOException {
+      return dilutionService;
+    }
+
+    @Override
+    protected SelectRowDto asDto(LibraryDilution dil, UriComponentsBuilder builder) {
+      SelectRowDto dto = new SelectRowDto();
+      dto.id = dil.getId();
+      dto.name = dil.getName();
+      dto.concentration = dil.getConcentration();
+      dto.library = String.format("<a href='/miso/library/%d'>%s (%s)</a>", dil.getLibrary().getId(), dil.getLibrary().getAlias(),
+          dil.getLibrary().getName());
+      dto.sample = String.format("<a href='/miso/sample/%d'>%s (%s)</a>", dil.getLibrary().getSample().getId(),
+          dil.getLibrary().getSample().getAlias(), dil.getLibrary().getSample().getName());
+      StringBuilder indices = new StringBuilder();
+      for (final Index index : dil.getLibrary().getIndices()) {
+        indices.append(index.getPosition());
+        indices.append(": ");
+        indices.append(index.getLabel());
+        indices.append("<br/>");
+      }
+      dto.indices = indices.toString();
+      dto.lowquality = dil.getLibrary().isLowQuality() ? "&#9888;" : "";
+      return dto;
+    }
+  };
+
   @Autowired
   private LibraryDilutionService dilutionService;
+
+  @Autowired
+  private RequestManager requestManager;
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
@@ -69,6 +136,36 @@ public class LibraryDilutionRestController extends RestController {
     headers.setLocation(uriComponents.toUri());
     headers.set("Id", id.toString());
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
+  }
+
+  @RequestMapping(value = "dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<DilutionDto> getDilutionsByProject(@PathVariable("id") Long id, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+    DilutionPaginationFilter filter = new DilutionPaginationFilter();
+    filter.setProjectId(id);
+    return jQueryBackend.get(filter, request, response, uriBuilder);
+  }
+
+  @RequestMapping(value = "dt/pool/{id}/available", method = RequestMethod.GET, produces = "application/json")
+  public @ResponseBody DataTablesResponseDto<SelectRowDto> availableDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
+      HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+
+    final Pool pool = requestManager.getPoolById(poolId);
+    DilutionPaginationFilter filter = new DilutionPaginationFilter();
+    filter.setPlatformType(pool.getPlatformType());
+    return jQueryBackendSelect.get(filter, request, response, null);
+  }
+
+  @RequestMapping(value = "dt/pool/{id}/included", method = RequestMethod.GET, produces = "application/json")
+  public @ResponseBody DataTablesResponseDto<SelectRowDto> includedDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
+      HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+
+    DilutionPaginationFilter filter = new DilutionPaginationFilter();
+    filter.setPoolId(poolId);
+    return jQueryBackendSelect.get(filter, request, response, null);
   }
 
 }

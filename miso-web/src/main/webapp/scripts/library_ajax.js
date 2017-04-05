@@ -1196,7 +1196,82 @@ Library.ui = {
     var saveButton = '<button id="go" type="button" onclick="Library.ui.handleBulkAction();">Go</button>';
     document.getElementById('dropdownActions').insertAdjacentHTML('afterend', saveButton);
   },
-  
+   createListingDilutionsTable: function (projectId) {
+    jQuery('#listingDilutionsTable').html("");
+    jQuery('#listingDilutionsTable').dataTable(Utils.setSortFromPriority({
+      "aoColumns": [
+        {
+          "sTitle": "Dilution Name",
+          "mData": "name",
+          "include": true,
+          "iSortPriority": 1,
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/library/" + full.library.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle": "Parent Library",
+          "mData": "library.alias",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": function (data, type, full) {
+            return "<a href=\"/miso/library/" + full.library.id + "\">" + data + "</a>";
+          }
+        },
+        {
+          "sTitle": "Creator",
+          "mData": "dilutionUserName" ,
+          "include": true,
+          "iSortPriority": 0
+        },
+        {
+          "sTitle": "Creation Date",
+          "mData": "creationDate",
+          "include": true,
+          "iSortPriority": 0
+        },
+        {
+          "sTitle": "Platform",
+          "mData": "library.platformType",
+          "include": true,
+          "iSortPriority": 0
+        },
+        {
+          "sTitle": "Concentration",
+          "mData": "concentration",
+          "include": true,
+          "iSortPriority": 0
+        }
+      ].filter(function(x) { return x.include; }),
+      "bJQueryUI": true,
+      "bAutoWidth": false,
+      "iDisplayLength": 25,
+      "iDisplayStart": 0,
+      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+      "sPaginationType": "full_numbers",
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "/miso/rest/librarydilution/dt" + (projectId ? "/project/" + projectId : ""),
+      "fnServerData": function (sSource, aoData, fnCallback) {
+        jQuery('#listingDilutionsTable').addClass('disabled');
+        jQuery.ajax({
+          "dataType": "json",
+          "type": "GET",
+          "url": sSource,
+          "data": aoData,
+          "success": function(d, s, x) {
+             Library.listData = d;
+             fnCallback(d, s, x);
+          }
+        });
+      },
+      "fnDrawCallback": function (oSettings) {
+        jQuery('#listingDilutionsTable').removeClass('disabled');
+        jQuery('#listingDilutionsTable_paginate').find('.fg-button').removeClass('fg-button');
+      }
+    })).fnSetFilteringDelay();
+  },
+
   checkAll: function (el) {
     var checkboxes = document.getElementsByClassName('bulkCheckbox');
     if (el.checked) {
