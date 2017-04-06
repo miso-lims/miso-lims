@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -532,9 +532,9 @@ public class ProjectControllerHelperService {
     final List<Sample> samples = new ArrayList<>();
     if (json.has("samples")) {
       try {
-        final JSONArray a = JSONArray.fromObject(json.get("samples"));
-        for (final JSONObject j : (Iterable<JSONObject>) a) {
-          samples.add(sampleService.get(j.getLong("sampleId")));
+        JSONArray sampleIds = JSONArray.fromObject(json.getString("samples"));
+        for (int index = 0; index < sampleIds.size(); index++) {
+          samples.add(sampleService.get(sampleIds.getLong(index)));
         }
         final File f = misoFileManager.getNewFile(Project.class, projectId.toString(),
             "SampleInformationForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
