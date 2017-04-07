@@ -39,6 +39,8 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -82,6 +84,7 @@ public class UserImpl implements User, Serializable {
   private boolean active = true;
 
   @ManyToMany(targetEntity = Group.class)
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "User_Group", inverseJoinColumns = { @JoinColumn(name = "groups_groupId") }, joinColumns = {
       @JoinColumn(name = "users_userId") })
   private Collection<Group> groups = new HashSet<>();

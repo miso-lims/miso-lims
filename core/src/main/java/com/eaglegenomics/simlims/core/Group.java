@@ -13,6 +13,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 /**
@@ -33,6 +36,7 @@ public class Group implements Serializable, Comparable<Group> {
   private String description = "";
   private String name = "";
   @ManyToMany(targetEntity = UserImpl.class)
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "User_Group", joinColumns = { @JoinColumn(name = "groups_groupId") }, inverseJoinColumns = {
       @JoinColumn(name = "users_userId")
   })

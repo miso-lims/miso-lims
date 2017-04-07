@@ -45,6 +45,8 @@ import javax.persistence.OrderBy;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -86,6 +88,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   private String locationBarcode;
 
   @ManyToMany(targetEntity = RunImpl.class, mappedBy = "containers")
+  @BatchSize(size = 10)
   private Collection<Run> runs = null;
 
   @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
