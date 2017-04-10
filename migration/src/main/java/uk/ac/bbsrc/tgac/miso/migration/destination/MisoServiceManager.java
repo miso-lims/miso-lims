@@ -314,6 +314,9 @@ public class MisoServiceManager {
     rm.setLibraryDilutionStore(dilutionDao);
     rm.setChangeLogStore(changeLogDao);
     rm.setSequencerPartitionContainerStore(sequencerPartitionContainerDao);
+    rm.setBoxStore(boxDao);
+    rm.setSampleStore(sampleDao);
+    rm.setLibraryStore(libraryDao);
     setRequestManager(rm);
   }
 
@@ -501,6 +504,7 @@ public class MisoServiceManager {
   private void updateSampleDaoDependencies() {
     if (sampleService != null) sampleService.setSampleDao(sampleDao);
     if (libraryService != null) libraryService.setSampleDao(sampleDao);
+    if (requestManager != null) requestManager.setSampleStore(sampleDao);
   }
 
   public HibernateChangeLogDao getChangeLogDao() {
@@ -564,6 +568,7 @@ public class MisoServiceManager {
     if (libraryDesignDao != null) libraryDesignDao.setLibraryDao(libraryDao);
     if (libraryService != null) libraryService.setLibraryDao(libraryDao);
     if (dilutionService != null) dilutionService.setLibraryDao(libraryDao);
+    if (requestManager != null) requestManager.setLibraryStore(libraryDao);
   }
 
   public DefaultLibraryService getLibraryService() {
@@ -889,6 +894,7 @@ public class MisoServiceManager {
 
   private void updateBoxDaoDependencies() {
     if (poolDao != null) poolDao.setBoxStore(boxDao);
+    if (requestManager != null) requestManager.setBoxStore(boxDao);
   }
 
   public DefaultLabService getLabService() {

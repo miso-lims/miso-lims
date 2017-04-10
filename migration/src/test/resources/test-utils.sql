@@ -80,6 +80,9 @@ BEGIN
     DELETE FROM ProjectOverview;
     DELETE FROM Project;
     DELETE FROM Note;
+    DELETE FROM BoxPosition;
+    DELETE FROM BoxChangeLog;
+    DELETE FROM Box;
     
 END//
 
