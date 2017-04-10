@@ -559,7 +559,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Boxable> getBoxablesFromBarcodeList(List<String> barcodeList) throws IOException {
+  public Collection<Boxable> getBoxablesFromBarcodeList(Collection<String> barcodeList) throws IOException {
     List<Boxable> boxables = new ArrayList<>();
     if (sampleStore != null && libraryStore != null) {
       boxables.addAll(sampleStore.getByBarcodeList(barcodeList));

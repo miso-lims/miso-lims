@@ -43,9 +43,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
-import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
-import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
@@ -57,10 +55,6 @@ public class BoxControllerHelperService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
-  @Autowired
-  private LibraryService libraryService;
-  @Autowired
-  private SampleService sampleService;
 
   @Autowired
   private RequestManager requestManager;
@@ -255,16 +249,20 @@ public class BoxControllerHelperService {
   }
 
   private Map<String, Boxable> loadBoxables(JSONObject boxJson) throws DuplicateKeyException, IOException {
-    // TODO: This is very database-intenstive. Rewrite
     JSONObject boxablesJson = boxJson.getJSONObject("boxables");
+    Map<String, String> barcodeToPosition = new HashMap<>();
+    for (Object attr : boxablesJson.entrySet()) {
+      @SuppressWarnings("unchecked")
+      Map.Entry<String, ?> entry = (Map.Entry<String, ?>) attr;
+      barcodeToPosition.put(((JSONObject) entry.getValue()).getString("identificationBarcode"), entry.getKey());
+    }
+
     Map<String, Boxable> map = new HashMap<>();
-    Iterator<?> positions = boxablesJson.keys();
-    while (positions.hasNext()) {
-      String position = (String) positions.next();
-      String barcode = boxablesJson.getJSONObject(position).getString("identificationBarcode");
-      Boxable boxable = getBoxableByBarcode(barcode);
-      if (boxable == null) throw new IOException("No boxable found with barcode " + barcode);
-      map.put(position, boxable);
+    for (Boxable boxable : requestManager.getBoxablesFromBarcodeList(barcodeToPosition.keySet())) {
+      map.put(barcodeToPosition.get(boxable.getIdentificationBarcode()), boxable);
+    }
+    if (map.size() != barcodeToPosition.size()) {
+      throw new IOException("No boxable found with supplied barcode.");
     }
     return map;
   }
@@ -913,13 +911,6 @@ public class BoxControllerHelperService {
   @CoverageIgnore
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
-  }
 
-  public void setLibraryService(LibraryService libraryService) {
-    this.libraryService = libraryService;
-  }
-
-  public void setSampleService(SampleService sampleService) {
-    this.sampleService = sampleService;
   }
 }

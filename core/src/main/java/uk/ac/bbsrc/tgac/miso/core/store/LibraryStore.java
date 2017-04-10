@@ -210,7 +210,7 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, Paginate
    * @return Collection<Library>
    * @throws IOException when the objects cannot be retrieved
    */
-  Collection<Library> getByBarcodeList(List<String> barcodeList) throws IOException;
+  Collection<Library> getByBarcodeList(Collection<String> barcodeList) throws IOException;
 
   /**
    * @return a map containing all column names and max lengths from the Library table

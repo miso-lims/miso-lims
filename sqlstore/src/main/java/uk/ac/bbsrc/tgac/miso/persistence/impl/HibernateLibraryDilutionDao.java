@@ -97,7 +97,7 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public Collection<LibraryDilution> getByBarcodeList(List<String> barcodeList) throws IOException {
+  public Collection<LibraryDilution> getByBarcodeList(Collection<String> barcodeList) throws IOException {
     if (barcodeList.isEmpty()) {
       return Collections.emptyList();
     }
