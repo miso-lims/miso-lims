@@ -14,6 +14,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 /**
@@ -46,21 +49,25 @@ public class SecurityProfile implements Serializable {
   private User owner = null;
 
   @ManyToMany(targetEntity = UserImpl.class)
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "SecurityProfile_ReadUser", inverseJoinColumns = { @JoinColumn(name = "readUser_userId") }, joinColumns = {
       @JoinColumn(name = "SecurityProfile_profileId") })
   private Collection<User> readUsers = new HashSet<>();
 
   @ManyToMany(targetEntity = UserImpl.class)
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "SecurityProfile_WriteUser", inverseJoinColumns = { @JoinColumn(name = "writeUser_userId") }, joinColumns = {
       @JoinColumn(name = "SecurityProfile_profileId") })
   private Collection<User> writeUsers = new HashSet<>();
 
   @ManyToMany(targetEntity = Group.class)
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "SecurityProfile_ReadGroup", inverseJoinColumns = { @JoinColumn(name = "readGroup_groupId") }, joinColumns = {
       @JoinColumn(name = "SecurityProfile_profileId") })
   private Collection<Group> readGroups = new HashSet<>();
 
   @ManyToMany(targetEntity = Group.class)
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "SecurityProfile_WriteGroup", inverseJoinColumns = { @JoinColumn(name = "writeGroup_groupId") }, joinColumns = {
       @JoinColumn(name = "SecurityProfile_profileId") })
   private Collection<Group> writeGroups = new HashSet<>();

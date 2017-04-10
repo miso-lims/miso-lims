@@ -53,6 +53,8 @@ import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
@@ -125,6 +127,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private Double initialConcentration;
 
   @ManyToMany(targetEntity = Index.class)
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "Library_Index", joinColumns = {
       @JoinColumn(name = "library_libraryId", nullable = false) }, inverseJoinColumns = {
           @JoinColumn(name = "index_indexId", nullable = false) })

@@ -56,6 +56,8 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
@@ -110,6 +112,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'Pool')")
   @JsonBackReference
   private Box box;
+
   @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
@@ -186,6 +189,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   private Group watchGroup;
 
   @ManyToMany(targetEntity = UserImpl.class)
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "Pool_Watcher", joinColumns = { @JoinColumn(name = "poolId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
 

@@ -48,6 +48,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,6 +131,7 @@ public abstract class AbstractRun implements Run {
   private final Set<MisoListener> listeners = new HashSet<>();
 
   @ManyToMany(targetEntity = UserImpl.class)
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "Run_Watcher", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
 
