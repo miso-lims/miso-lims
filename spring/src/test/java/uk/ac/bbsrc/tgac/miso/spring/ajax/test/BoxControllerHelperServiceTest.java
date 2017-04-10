@@ -182,7 +182,7 @@ public class BoxControllerHelperServiceTest {
     // mock lookups
     Sample sample = makeSample();
     Library library = makeLibrary();
-    when(requestManager.getBoxablesFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample)).thenReturn(Arrays.asList(library));
+    when(requestManager.getBoxablesFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample, library));
 
     // do not add sample/library to box. Testing verifies that this gets done by saveBoxContents by parsing the JSON
     Box box = makeEmptyBox();

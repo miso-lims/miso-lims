@@ -120,7 +120,7 @@ public interface SampleStore extends Store<Sample>, Remover<Sample>, PaginatedDa
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  Collection<Sample> getByBarcodeList(List<String> barcodeList) throws IOException;
+  Collection<Sample> getByBarcodeList(Collection<String> barcodeList) throws IOException;
   
   /**
    * @return a map containing all column names and max lengths from the Sample table

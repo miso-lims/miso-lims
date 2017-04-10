@@ -87,7 +87,7 @@ public interface PoolStore extends Store<Pool>, Remover<Pool>, PaginatedDataSour
    * @throws IOException
    *           when the objects cannot be retrieved
    */
-  Collection<Pool> getByBarcodeList(List<String> barcodeList) throws IOException;
+  Collection<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException;
 
   /**
    * List the Pool associated with a given identificationBarcode

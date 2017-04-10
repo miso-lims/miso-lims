@@ -109,7 +109,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
   }
 
   @Override
-  public Collection<Sample> getByBarcodeList(List<String> barcodeList) throws IOException {
+  public Collection<Sample> getByBarcodeList(Collection<String> barcodeList) throws IOException {
     if (barcodeList.isEmpty()) {
       return Collections.emptyList();
     }
