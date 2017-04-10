@@ -565,6 +565,7 @@ public class MisoRequestManager implements RequestManager {
       boxables.addAll(sampleStore.getByBarcodeList(barcodeList));
       boxables.addAll(libraryStore.getByBarcodeList(barcodeList));
       boxables.addAll(poolStore.getByBarcodeList(barcodeList));
+      boxables.addAll(libraryDilutionStore.getByBarcodeList(barcodeList));
       return boxables;
     } else {
       throw new IOException(
@@ -1766,6 +1767,8 @@ public class MisoRequestManager implements RequestManager {
             item = sampleStore.get(entry.getValue().getId());
           } else if (entry.getValue() instanceof Library) {
             item = libraryStore.get(entry.getValue().getId());
+          } else if (entry.getValue() instanceof LibraryDilution) {
+            item = libraryDilutionStore.get(entry.getValue().getId());
           } else {
             throw new IllegalArgumentException("Unknown boxable: " + entry.getValue().getClass().getName());
           }

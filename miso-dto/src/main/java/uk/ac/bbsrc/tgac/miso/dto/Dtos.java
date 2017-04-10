@@ -1188,6 +1188,7 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
+    dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     LibraryDto ldto = asMinimalDto(from.getLibrary());
     dto.setLibrary(ldto);
     return dto;

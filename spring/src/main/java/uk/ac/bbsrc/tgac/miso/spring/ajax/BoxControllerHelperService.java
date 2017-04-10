@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -116,29 +117,19 @@ public class BoxControllerHelperService {
    * @throws IOException
    */
   public Boxable getBoxableByBarcode(String barcode) throws IOException, DuplicateKeyException {
-    Boxable sample;
-    Boxable library;
-    Boxable pool;
-    sample = sampleService.getByBarcode(barcode);
-    library = libraryService.getByBarcode(barcode);
-    pool = requestManager.getPoolByBarcode(barcode);
-    if ((sample == null ? 0 : 1) + (library == null ? 0 : 1) + (pool == null ? 0 : 1) > 1) {
-      String errorMessage = "";
-      if (sample != null && library != null)
-        errorMessage = "Duplicate barcodes found for both sample " + sample.getName() + " and library " + library.getName();
-      if (sample != null && pool != null)
-        errorMessage = "Duplicate barcodes found for both sample " + sample.getName() + " and pool " + pool.getName();
-      if (library != null && pool != null)
-        errorMessage = "Duplicate barcodes found for both library " + library.getName() + " and pool " + pool.getName();
-      throw new DuplicateKeyException(errorMessage);
-    } else if (sample != null)
-      return sample;
-    else if (library != null)
-      return library;
-    else if (pool != null)
-      return pool;
-    else
+    Collection<Boxable> results = requestManager.getBoxablesFromBarcodeList(Collections.singletonList(barcode));
+    if (results.size() == 0) {
       return null;
+    } else if (results.size() == 1) {
+      return results.iterator().next();
+    }
+    StringBuilder errorMessage = new StringBuilder();
+    errorMessage.append("Duplicate barcodes:");
+    for (Boxable item : results) {
+      errorMessage.append(" ");
+      errorMessage.append(item.getName());
+    }
+    throw new DuplicateKeyException(errorMessage.toString());
   }
 
   /**
@@ -162,7 +153,7 @@ public class BoxControllerHelperService {
         return JSONUtils.SimpleJSONError("Error looking up barcode " + json.getString("barcode") + ": " + e.getMessage());
       } catch (DuplicateKeyException k) {
         log.debug("Multiple items with same barcode", k);
-        return JSONUtils.SimpleJSONError("Multiple items have this barcode: " + k.getMessage());
+        return JSONUtils.SimpleJSONError(k.getMessage());
       }
 
       if (boxable == null) {
@@ -264,6 +255,7 @@ public class BoxControllerHelperService {
   }
 
   private Map<String, Boxable> loadBoxables(JSONObject boxJson) throws DuplicateKeyException, IOException {
+    // TODO: This is very database-intenstive. Rewrite
     JSONObject boxablesJson = boxJson.getJSONObject("boxables");
     Map<String, Boxable> map = new HashMap<>();
     Iterator<?> positions = boxablesJson.keys();

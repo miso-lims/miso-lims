@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -95,6 +96,18 @@ public class HibernateLibraryDilutionDao
     return (LibraryDilution) criteria.uniqueResult();
   }
 
+  @Override
+  public Collection<LibraryDilution> getByBarcodeList(List<String> barcodeList) throws IOException {
+    if (barcodeList.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    criteria.add(Restrictions.in("identificationBarcode", barcodeList));
+    @SuppressWarnings("unchecked")
+    List<LibraryDilution> records = criteria.list();
+    return records;
+  }
+
   public SessionFactory getSessionFactory() {
     return sessionFactory;
   }
@@ -142,5 +155,4 @@ public class HibernateLibraryDilutionDao
       criteria.add(Restrictions.eq("pool.id", filter.getPoolId()));
     }
   }
-
 }
