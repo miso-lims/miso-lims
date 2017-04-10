@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
@@ -59,4 +60,6 @@ public interface LibraryDilutionStore
    *           when
    */
   LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException;
+
+  Collection<LibraryDilution> getByBarcodeList(List<String> barcodeList) throws IOException;
 }
