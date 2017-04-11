@@ -1,3 +1,10 @@
+# 0.2.56
+
+Changes:
+
+ * Make dilutions boxable
+ * Paginate samples and dilutions list on edit project page
+
 # 0.2.55
 
 Changes:
