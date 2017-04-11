@@ -14,6 +14,8 @@ import org.mockito.Mockito;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -47,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
@@ -200,6 +203,16 @@ public class ValueTypeLookupTest {
     tarSeqs.add(makeTargetedSequencing(VALID_LONG, VALID_STRING));
     Mockito.when(tarSeqDao.listAll()).thenReturn(tarSeqs);
     Mockito.when(mgr.getTargetedSequencingDao()).thenReturn(tarSeqDao);
+
+    MisoRequestManager requestMgr = Mockito.mock(MisoRequestManager.class);
+    List<BoxUse> boxUses = Lists.newArrayList();
+    boxUses.add(makeBoxUse(VALID_LONG, VALID_STRING));
+    Mockito.when(requestMgr.listAllBoxUses()).thenReturn(boxUses);
+    Mockito.when(mgr.getRequestManager()).thenReturn(requestMgr);
+
+    List<BoxSize> boxSizes = Lists.newArrayList();
+    boxSizes.add(makeBoxSize(VALID_LONG, 8, 12, true));
+    Mockito.when(requestMgr.listAllBoxSizes()).thenReturn(boxSizes);
 
     sut = new ValueTypeLookup(mgr);
   }
@@ -562,6 +575,44 @@ public class ValueTypeLookupTest {
     tarSeq.setId(id);
     tarSeq.setAlias(alias);
     return tarSeq;
+  }
+
+  @Test
+  public void testResolveBoxUse() throws Exception {
+    assertNotNull(sut.resolve(makeBoxUse(VALID_LONG, VALID_STRING)));
+    assertNotNull(sut.resolve(makeBoxUse(null, VALID_STRING)));
+    assertNull(sut.resolve(makeBoxUse(INVALID_LONG, INVALID_STRING)));
+    assertNull(sut.resolve(makeBoxUse(null, INVALID_STRING)));
+    assertNull(sut.resolve(makeBoxUse(INVALID_LONG, null)));
+    assertNull(sut.resolve(makeBoxUse(null, null)));
+  }
+
+  private BoxUse makeBoxUse(Long id, String alias) {
+    BoxUse boxUse = new BoxUse();
+    if (id != null) boxUse.setId(id);
+    boxUse.setAlias(alias);
+    return boxUse;
+  }
+
+  @Test
+  public void testResolveBoxSize() throws Exception {
+    assertNotNull(sut.resolve(makeBoxSize(VALID_LONG, 8, 12, true)));
+    assertNotNull(sut.resolve(makeBoxSize(null, 8, 12, true)));
+    assertNull(sut.resolve(makeBoxSize(null, 1, 12, true)));
+    assertNull(sut.resolve(makeBoxSize(null, 8, 1, true)));
+    assertNull(sut.resolve(makeBoxSize(null, 8, 12, false)));
+    assertNull(sut.resolve(makeBoxSize(VALID_LONG, 1, 12, true)));
+    assertNull(sut.resolve(makeBoxSize(VALID_LONG, 8, 1, true)));
+    assertNull(sut.resolve(makeBoxSize(VALID_LONG, 8, 12, false)));
+  }
+
+  private BoxSize makeBoxSize(Long id, int rows, int cols, boolean scannable) {
+    BoxSize boxSize = new BoxSize();
+    if (id != null) boxSize.setId(id);
+    boxSize.setRows(rows);
+    boxSize.setColumns(cols);
+    boxSize.setScannable(scannable);
+    return boxSize;
   }
 
 }

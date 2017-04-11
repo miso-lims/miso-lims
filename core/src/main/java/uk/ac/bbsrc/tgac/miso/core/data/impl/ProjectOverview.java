@@ -49,6 +49,8 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,6 +130,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   private boolean libraryPreparationComplete;
   @Transient
   private final Set<MisoListener> listeners = new HashSet<>();
+
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "ProjectOverview_Note", joinColumns = {
       @JoinColumn(name = "overview_overviewId") }, inverseJoinColumns = {
@@ -149,6 +152,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   private Group watchGroup;
 
   @ManyToMany(targetEntity = UserImpl.class)
+  @Fetch(FetchMode.SUBSELECT)
   @JoinTable(name = "ProjectOverview_Watcher", joinColumns = { @JoinColumn(name = "overviewId") }, inverseJoinColumns = {
       @JoinColumn(name = "userId") })
   private Set<User> watchUsers = new HashSet<>();
@@ -481,6 +485,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
     this.startDate = startDate;
   }
 
+  @Override
   public void setWatchGroup(Group watchGroup) {
     this.watchGroup = watchGroup;
   }

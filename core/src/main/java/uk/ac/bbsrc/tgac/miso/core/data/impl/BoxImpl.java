@@ -56,6 +56,7 @@ public class BoxImpl extends AbstractBox implements Serializable {
       @MetaValue(targetEntity = SampleTissueProcessingImpl.class, value = "SampleProcessing"),
       @MetaValue(targetEntity = SampleCVSlideImpl.class, value = "SampleCV"),
       @MetaValue(targetEntity = SampleLCMTubeImpl.class, value = "SampleLCM"),
+      @MetaValue(targetEntity = LibraryDilution.class, value = "Dilution"),
   })
   private Map<String, Boxable> boxableItems = new HashMap<>();
 

@@ -103,7 +103,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   }
 
   @Override
-  public Collection<Pool> getByBarcodeList(List<String> barcodeList) throws IOException {
+  public Collection<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException {
     if (barcodeList.isEmpty()) {
       return Collections.emptyList();
     }

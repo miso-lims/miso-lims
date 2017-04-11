@@ -167,5 +167,4 @@ public class ContainerRestController extends RestController {
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
   }
-
 }

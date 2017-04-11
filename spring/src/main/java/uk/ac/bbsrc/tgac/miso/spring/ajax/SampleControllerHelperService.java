@@ -398,13 +398,11 @@ public class SampleControllerHelperService {
 
   public JSONObject setSampleReceivedDateByBarcode(HttpSession session, JSONObject json) {
     JSONObject response = new JSONObject();
-    JSONArray ss = JSONArray.fromObject(json.getString("samples"));
-
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      for (JSONObject s : (Iterable<JSONObject>) ss) {
-        Long sampleId = s.getLong("sampleId");
-        Sample sample = sampleService.get(sampleId);
+      JSONArray sampleIds = JSONArray.fromObject(json.getString("samples"));
+      for (int index = 0; index < sampleIds.size(); index++) {
+        Sample sample = sampleService.get(sampleIds.getLong(index));
         sample.setReceivedDate(new Date());
         sample.setLastModifier(user);
         sampleService.update(sample);

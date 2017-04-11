@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +9,6 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,25 +16,24 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
+public class HibernateLibraryDilutionDao
+    implements LibraryDilutionStore, HibernatePaginatedDataSource<LibraryDilution, DilutionPaginationFilter> {
+
+  private final static String[] SEARCH_PROPERTIES = new String[] { "name", "identificationBarcode", "library.name", "library.alias",
+      "library.description" };
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("library");
 
   @Autowired
   private SessionFactory sessionFactory;
 
-  private Session currentSession() {
+  @Override
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
-  }
-
-  private void addSearchRestrictions(Criteria criteria, String querystr) {
-    criteria.createAlias("library", "library");
-    criteria
-        .add(DbUtils.searchRestrictions(querystr, "name", "identificationBarcode", "library.name", "library.alias", "library.description"));
   }
 
   @Override
@@ -81,83 +80,9 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
   }
 
   @Override
-  public int countByPlatform(PlatformType platform) throws IOException {
-    if (platform == null) throw new NullPointerException("Cannot look up library dilutions by null platform");
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
-    criteria.createAlias("library", "library");
-    criteria.add(Restrictions.eq("library.platformType", platform));
-    return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
-  }
-
-  @Override
-  public Integer countAllBySearchAndPlatform(String search, PlatformType platform) throws IOException {
-    if (platform == null) throw new NullPointerException("Cannot look up library dilutions by null platform");
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
-    addSearchRestrictions(criteria, search);
-    criteria.add(Restrictions.eq("library.platformType", platform));
-    return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
-  }
-
-  @Override
   public Collection<LibraryDilution> listByLibraryId(long libraryId) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
     criteria.add(Restrictions.eq("library.id", libraryId));
-    @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException {
-    if (platformType == null) throw new NullPointerException("Cannot look up library dilutions by null platform");
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
-    criteria.createAlias("library", "library");
-    criteria.add(Restrictions.eq("library.platformType", platformType));
-    @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
-    criteria.createAlias("library", "library");
-    criteria.createAlias("library.sample", "sample");
-    criteria.createAlias("sample.project", "project");
-    criteria.add(Restrictions.eq("project.id", projectId));
-    @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchAndPlatform(String query, PlatformType platformType)
-      throws IOException {
-    if (platformType == null) throw new NullPointerException("Cannot look up library dilutions by null platform");
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
-    addSearchRestrictions(criteria, query);
-    criteria.add(Restrictions.eq("library.platformType", platformType));
-    @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
-    addSearchRestrictions(criteria, query);
-    @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType)
-      throws IOException {
-    if (platformType == null) throw new NullPointerException("Cannot look up library dilutions by null platform");
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
-    criteria.createAlias("library", "library").createAlias("library.sample", "sample").createAlias("sample.project", "project");
-    criteria.add(Restrictions.and(Restrictions.eq("project.id", projectId), Restrictions.eq("library.platformType", platformType)));
     @SuppressWarnings("unchecked")
     List<LibraryDilution> records = criteria.list();
     return records;
@@ -172,35 +97,14 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
   }
 
   @Override
-  public Collection<LibraryDilution> listAllWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
-    criteria.setMaxResults((int) limit);
-    @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public List<LibraryDilution> listBySearchOffsetAndNumResultsAndPlatform(int offset, int limit, String querystr, String sortDir,
-      String sortCol, PlatformType platform) throws IOException {
-    if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
-    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
-    addSearchRestrictions(criteria, querystr);
-    criteria.setFirstResult(offset);
-    criteria.setMaxResults(limit);
-    criteria.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
-    criteria.setProjection(Projections.property("id"));
-    @SuppressWarnings("unchecked")
-    List<Long> ids = criteria.list();
-    if (ids.isEmpty()) {
+  public Collection<LibraryDilution> getByBarcodeList(Collection<String> barcodeList) throws IOException {
+    if (barcodeList.isEmpty()) {
       return Collections.emptyList();
     }
-    // We do this in two steps to make a smaller query that that the database can optimise
-    Criteria query = currentSession().createCriteria(LibraryDilution.class);
-    query.add(Restrictions.in("id", ids));
-    query.addOrder("asc".equalsIgnoreCase(sortDir) ? Order.asc(sortCol) : Order.desc(sortCol));
+    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    criteria.add(Restrictions.in("identificationBarcode", barcodeList));
     @SuppressWarnings("unchecked")
-    List<LibraryDilution> records = query.list();
+    List<LibraryDilution> records = criteria.list();
     return records;
   }
 
@@ -212,4 +116,43 @@ public class HibernateLibraryDilutionDao implements LibraryDilutionStore {
     this.sessionFactory = sessionFactory;
   }
 
+  @Override
+  public String getProjectColumn() {
+    return "project.id";
+  }
+
+  @Override
+  public Class<? extends LibraryDilution> getRealClass() {
+    return LibraryDilution.class;
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return STANDARD_ALIASES;
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    return original;
+  }
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
+  public void setAdditionalPaginationCriteria(DilutionPaginationFilter filter, Criteria criteria) {
+    if (filter.getProjectId() != null) {
+      criteria.createAlias("library.sample", "sample");
+      criteria.createAlias("sample.project", "project");
+    }
+    if (filter.getPlatformType() != null) {
+      criteria.add(Restrictions.eq("library.platformType", filter.getPlatformType()));
+    }
+    if (filter.getPoolId() != null) {
+      criteria.createAlias("pools", "pool");
+      criteria.add(Restrictions.eq("pool.id", filter.getPoolId()));
+    }
+  }
 }

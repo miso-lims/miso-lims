@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -215,7 +216,7 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedData
   }
 
   @Override
-  public List<Library> getByBarcodeList(List<String> barcodeList) throws IOException {
+  public List<Library> getByBarcodeList(Collection<String> barcodeList) throws IOException {
     if (barcodeList.isEmpty()) {
       return Collections.emptyList();
     }

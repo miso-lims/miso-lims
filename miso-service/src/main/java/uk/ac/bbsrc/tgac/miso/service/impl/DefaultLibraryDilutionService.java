@@ -16,18 +16,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryDilutionService implements LibraryDilutionService {
+public class DefaultLibraryDilutionService
+    implements LibraryDilutionService, AuthorizedPaginatedDataSource<LibraryDilution, DilutionPaginationFilter> {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
@@ -117,30 +120,8 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
   }
 
   @Override
-  public int countByPlatform(PlatformType platform) throws IOException {
-    return dilutionDao.countByPlatform(platform);
-  }
-
-  @Override
-  public int countBySearchAndPlatform(String querystr, PlatformType platform) throws IOException {
-    return dilutionDao.countAllBySearchAndPlatform(querystr, platform);
-  }
-
-  @Override
   public List<LibraryDilution> list() throws IOException {
     Collection<LibraryDilution> allDilutions = dilutionDao.listAll();
-    return authorizationManager.filterUnreadable(allDilutions);
-  }
-
-  @Override
-  public List<LibraryDilution> listBySearchAndPlatform(String querystr, PlatformType platform) throws IOException {
-    Collection<LibraryDilution> allDilutions = dilutionDao.listAllLibraryDilutionsBySearchAndPlatform(querystr, platform);
-    return authorizationManager.filterUnreadable(allDilutions);
-  }
-
-  @Override
-  public List<LibraryDilution> listBySearch(String querystr) throws IOException {
-    Collection<LibraryDilution> allDilutions = dilutionDao.listAllLibraryDilutionsBySearchOnly(querystr);
     return authorizationManager.filterUnreadable(allDilutions);
   }
 
@@ -151,41 +132,9 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
   }
 
   @Override
-  public List<LibraryDilution> listWithLimit(long limit) throws IOException {
-    Collection<LibraryDilution> allDilutions = dilutionDao.listAllWithLimit(limit);
-    return authorizationManager.filterUnreadable(allDilutions);
-  }
-
-  @Override
-  public List<LibraryDilution> listByPlatform(PlatformType platform) throws IOException {
-    Collection<LibraryDilution> allDilutions = dilutionDao.listAllLibraryDilutionsByPlatform(platform);
-    return authorizationManager.filterUnreadable(allDilutions);
-  }
-
-  @Override
-  public List<LibraryDilution> listByProjectId(Long projectId) throws IOException {
-    Collection<LibraryDilution> allDilutions = dilutionDao.listAllLibraryDilutionsByProjectId(projectId);
-    return authorizationManager.filterUnreadable(allDilutions);
-  }
-
-  @Override
-  public List<LibraryDilution> listByProjectIdAndPlatform(Long projectId, PlatformType platform) throws IOException {
-    Collection<LibraryDilution> allDilutions = dilutionDao.listAllLibraryDilutionsByProjectAndPlatform(projectId, platform);
-    return authorizationManager.filterUnreadable(allDilutions);
-  }
-
-  @Override
   public LibraryDilution getByBarcode(String barcode) throws IOException {
     LibraryDilution dilution = dilutionDao.getLibraryDilutionByBarcode(barcode);
     return (authorizationManager.readCheck(dilution) ? dilution : null);
-  }
-
-  @Override
-  public List<LibraryDilution> listByPageSizeSearchAndPlatform(int offset, int size, String querystr, PlatformType platform,
-      String sortDir, String sortCol) throws IOException {
-    Collection<LibraryDilution> allDilutions = dilutionDao.listBySearchOffsetAndNumResultsAndPlatform(offset, size, querystr, sortDir,
-        sortCol, platform);
-    return authorizationManager.filterUnreadable(allDilutions);
   }
 
   /**
@@ -247,4 +196,13 @@ public class DefaultLibraryDilutionService implements LibraryDilutionService {
     this.libraryDao = libraryDao;
   }
 
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public PaginatedDataSource<LibraryDilution, DilutionPaginationFilter> getBackingPaginationSource() {
+    return dilutionDao;
+  }
 }

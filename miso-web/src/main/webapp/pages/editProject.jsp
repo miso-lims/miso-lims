@@ -607,291 +607,98 @@
 </div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_arrowclick'), 'samplesdiv');">
-  ${fn:length(project.samples)} Samples
+  Samples
   <div id="samples_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="samplesdiv" style="display:none;">
 
   <div id="sampletabs">
-    <ul>
-      <li><a href="#samtab-1"><span>All</span></a></li>
-      <c:if test="${not empty project.overviews}">
-        <li><a href="#samtab-2"><span>By Group</span></a></li>
-      </c:if>
+    <h1>Samples</h1>
+    <ul class="sddm">
+      <li>
+        <a onmouseover="mopen('samplemenu')" onmouseout="mclosetime()">Options
+          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+        </a>
+
+        <div id="samplemenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+          <a href='<c:url value="/miso/sample/new/${project.id}#tab-2"/>'>Add Samples</a>
+          <a href="javascript:void(0);" onclick="getBulkSampleInputForm(${project.id});">Get Bulk Sample Input Form</a>
+          <a href="javascript:void(0);" onclick="Project.ui.uploadBulkSampleInputForm();">Import Bulk Sample Input Form</a>
+          <c:if test="${not empty project.samples}">
+            <hr>
+            <a href='<c:url value="/miso/importexport/exportsamplesheet"/>'>Export Sample QC Sheet</a>
+            <a href='<c:url value="/miso/importexport/importsamplesheet"/>'>Import Sample QC Sheet</a>
+            <hr>
+            <a href="javascript:void(0);" onclick="Project.ui.processSampleDeliveryForm(${project.id}, false);">Get Information Form (Tubes)</a>
+            <a href="javascript:void(0);" onclick="Project.ui.processSampleDeliveryForm(${project.id}, true);">Get Information Form (Plate)</a>
+            <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm();">Import Information Form</a>
+           <hr>
+            <a href="javascript:void(0);" onclick="Project.ui.receiveSelectedSamples();">Receive Samples</a>
+            <a href='<c:url value="/miso/importexport/importlibrarypoolsheet"/>'>Import Library Sheet</a>
+            <a href="javascript:void(0);" onclick="Project.barcode.printSelectedSampleBarcodes();">Print Barcodes ...</a>
+          </c:if>
+        </div>
+      </li>
     </ul>
 
-    <div id="samtab-1">
-      <h1>${fn:length(project.samples)} Samples</h1>
-      <ul class="sddm">
-        <li>
-          <a onmouseover="mopen('samplemenu')" onmouseout="mclosetime()">Options
-            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-          </a>
-
-          <div id="samplemenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-            <a href='<c:url value="/miso/sample/new/${project.id}#tab-2"/>'>Add Samples</a>
-            <a href="javascript:void(0);" onclick="getBulkSampleInputForm(${project.id});">Get Bulk Sample Input Form</a>
-            <a href="javascript:void(0);" onclick="Project.ui.uploadBulkSampleInputForm();">Import Bulk Sample Input Form</a>
-            <c:if test="${not empty project.samples}">
-              <hr>
-              <a href='<c:url value="/miso/importexport/exportsamplesheet"/>'>Export Sample QC Sheet</a>
-              <a href='<c:url value="/miso/importexport/importsamplesheet"/>'>Import Sample QC Sheet</a>
-              <hr>
-              <a href="javascript:void(0);" onclick="generateSampleDeliveryForm('#sample_table', ${project.id});">Get Information Form</a>
-              <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm();">Import Information Form</a>
-             <hr>
-              <a href="javascript:void(0);" onclick="Project.ui.receiveSamples('#sample_table');">Receive Samples</a>
-              <a href="javascript:void(0);" onclick="bulkSampleQcTable('#sample_table');">QC Samples</a>
-              <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
-              <a href='<c:url value="/miso/importexport/importlibrarypoolsheet"/>'>Import Library Sheet</a>
-              <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#sample_table');">Print Barcodes ...</a>
-            </c:if>
-          </div>
-        </li>
-      </ul>
-
-      <div style="clear:both">
-        <div id="deliveryformdiv" class="simplebox" style="display:none;">
-          <table class="in">
-            <tr>
-              <td>
-                <form method='post'
-                      id='deliveryform_upload_form'
-                      action='<c:url value="/miso/upload/project/sample-delivery-form"/>'
-                      enctype="multipart/form-data"
-                      target="deliveryform_target_upload"
-                      onsubmit="Utils.fileUpload.fileUploadProgress('deliveryform_upload_form', 'deliveryform_statusdiv', Project.ui.deliveryFormUploadSuccess);">
-                  <input type="hidden" name="projectId" value="${project.id}"/>
-                  <input type="file" name="file"/>
-                  <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-                  <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelSampleDeliveryFormUpload();">
-                    Cancel
-                  </button>
-                </form>
-                <iframe id='deliveryform_target_upload' name='deliveryform_target_upload' src='' style='display: none'></iframe>
-                <div id="deliveryform_statusdiv"></div>
-              </td>
-            </tr>
-          </table>
-        </div>
-
-        <div id="inputformdiv" class="simplebox" style="display:none;">
-          <table class="in">
-            <tr>
-              <td>
-                <form method='post'
-                      id='inputform_upload_form'
-                      action='<c:url value="/miso/upload/project/bulk-input-form"/>'
-                      enctype="multipart/form-data"
-                      target="inputform_target_upload"
-                      onsubmit="Utils.fileUpload.fileUploadProgress('inputform_upload_form', 'inputform_statusdiv', Project.ui.bulkSampleInputFormUploadSuccess);">
-                  <input type="hidden" name="projectId" value="${project.id}"/>
-                  <input type="file" name="file"/>
-                  <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-                  <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelBulkSampleInputFormUpload();">
-                    Cancel
-                  </button>
-                </form>
-                <iframe id='inputform_target_upload' name='inputform_target_upload' src='' style='display: none'></iframe>
-                <div id="inputform_statusdiv"></div>
-              </td>
-            </tr>
-          </table>
-        </div>
-
-        <table class="list" id="sample_table">
-          <thead>
+    <div style="clear:both">
+      <div id="deliveryformdiv" class="simplebox" style="display:none;">
+        <table class="in">
           <tr>
-            <th>Sample Name</th>
-            <th>Sample Alias</th>
-            <th>Sample Description</th>
-            <th>Type</th>
-            <th>Received Date</th>
-            <th>QC Passed</th>
-            <th>QC Result</th>
-            <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <th class="fit">DELETE</th>
-            </sec:authorize>
+            <td>
+              <form method='post'
+                    id='deliveryform_upload_form'
+                    action='<c:url value="/miso/upload/project/sample-delivery-form"/>'
+                    enctype="multipart/form-data"
+                    target="deliveryform_target_upload"
+                    onsubmit="Utils.fileUpload.fileUploadProgress('deliveryform_upload_form', 'deliveryform_statusdiv', Project.ui.deliveryFormUploadSuccess);">
+                <input type="hidden" name="projectId" value="${project.id}"/>
+                <input type="file" name="file"/>
+                <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
+                <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelSampleDeliveryFormUpload();">
+                  Cancel
+                </button>
+              </form>
+              <iframe id='deliveryform_target_upload' name='deliveryform_target_upload' src='' style='display: none'></iframe>
+              <div id="deliveryform_statusdiv"></div>
+            </td>
           </tr>
-          </thead>
-          <tbody>
-          <c:forEach items="${project.samples}" var="sample">
-            <tr sampleId="${sample.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-              <td><b><a href="<c:url value='/miso/sample/${sample.id}'/>">${sample.name}</a></b></td>
-              <td><a href="<c:url value='/miso/sample/${sample.id}'/>">${sample.alias}</a></td>
-              <td>${sample.description}</td>
-              <td>${sample.sampleType}</td>
-              <td>${sample.receivedDate}</td>
-              <td>${sample.qcPassed}</td>
-              <td>${sample.id}</td>
-              <sec:authorize access="hasRole('ROLE_ADMIN')">
-                <td class="misoicon" onclick="Sample.deleteSample(${sample.id}, Utils.page.pageReload);">
-                  <span class="ui-icon ui-icon-trash"></span>
-                </td>
-              </sec:authorize>
-            </tr>
-          </c:forEach>
-          </tbody>
         </table>
-        <script type="text/javascript">
-          jQuery(document).ready(function () {
-            jQuery('#sample_table').dataTable({
-              "aaSorting": [
-                [1, 'asc']
-              ],
-              "aoColumns": [
-                null,
-                { "sType": 'natural' },
-                { "sType": 'natural' },
-                null,
-                null,
-                null,
-                null
-                <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-              ],
-              "iDisplayLength": 50,
-              "bJQueryUI": true,
-              "bRetrieve": true,
-              "sPaginationType": "full_numbers",
-              "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                Fluxion.doAjax(
-                  'sampleControllerHelperService',
-                  'getSampleLastQCRequest',
-                  {
-                    'sampleId': aData[6],
-                    'url': ajaxurl
-                  },
-                  {'doOnSuccess': function (json) {
-                    jQuery('td:eq(6)', nRow).html(json.response);
-                  }
-                  }
-                );
-              },
-              "fnDrawCallback": function (oSettings) {
-                jQuery('#sample_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-              }
-            });
-          });
-        </script>
       </div>
-    </div>
 
-    <div id="samtab-2">
-      <c:forEach items="${project.overviews}" var="overview" varStatus="ov">
-        <c:if test="${not empty overview.sampleGroup}">
-          <div id="overviewsamdiv${overview.id}" class="ui-corner-all simplebox">
-            <h1>Group ${overview.sampleGroup.id} Samples</h1>
-            <ul class="sddm">
-              <li>
-                <a onmouseover="mopen('samplegroupmenu${overview.sampleGroup.id}')" onmouseout="mclosetime()">Options
-                  <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-                </a>
+      <div id="inputformdiv" class="simplebox" style="display:none;">
+        <table class="in">
+          <tr>
+            <td>
+              <form method='post'
+                    id='inputform_upload_form'
+                    action='<c:url value="/miso/upload/project/bulk-input-form"/>'
+                    enctype="multipart/form-data"
+                    target="inputform_target_upload"
+                    onsubmit="Utils.fileUpload.fileUploadProgress('inputform_upload_form', 'inputform_statusdiv', Project.ui.bulkSampleInputFormUploadSuccess);">
+                <input type="hidden" name="projectId" value="${project.id}"/>
+                <input type="file" name="file"/>
+                <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
+                <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelBulkSampleInputFormUpload();">
+                  Cancel
+                </button>
+              </form>
+              <iframe id='inputform_target_upload' name='inputform_target_upload' src='' style='display: none'></iframe>
+              <div id="inputform_statusdiv"></div>
+            </td>
+          </tr>
+        </table>
+      </div>
 
-                <div id="samplegroupmenu${overview.sampleGroup.id}" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-                  <c:if test="${not empty overview.sampleGroup.entities}">
-                    <hr>
-                    <a href='<c:url value="/miso/importexport/exportsamplesheet"/>'>Export Sample QC Sheet</a>
-                    <a href='<c:url value="/miso/importexport/importsamplesheet"/>'>Import Sample QC Sheet</a>
-                    <hr>
-                    <a href="javascript:void(0);" onclick="generateSampleDeliveryForm('#overview_samplegroup_table_'+${overview.id}, ${project.id});">Get Information Form</a>
-                    <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm();">Import Information Form</a>
-                    <hr>
-                    <a href="javascript:void(0);" onclick="Project.ui.receiveSamples('#overview_samplegroup_table_'+${overview.id});">Receive Samples</a>
-                    <a href="javascript:void(0);" onclick="bulkSampleQcTable('#overview_samplegroup_table_'+${overview.id});">QC Samples</a>
-                    <a href='<c:url value="/miso/importexport/importlibrarypoolsheet"/>'>Import Library Sheet</a>
-                    <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#overview_samplegroup_table_'+${overview.id});">Print Barcodes ...</a>
-                  </c:if>
-                </div>
-              </li>
-            </ul>
-
-            <div style="clear:both">
-              <table class="list" id="overview_samplegroup_table_${overview.id}">
-                <thead>
-                <tr>
-                  <th>Sample Name</th>
-                  <th>Sample Alias</th>
-                  <th>Sample Description</th>
-                  <th>Type</th>
-                  <th>Received Date</th>
-                  <th>QC Passed</th>
-                  <th>QC Result</th>
-                  <sec:authorize access="hasRole('ROLE_ADMIN')">
-                    <th class="fit">DELETE</th>
-                  </sec:authorize>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach items="${overview.sampleGroup.entities}" var="sample">
-                  <tr sampleId="${sample.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                    <td><b><a href="<c:url value='/miso/sample/${sample.id}'/>">${sample.name}</a></b></td>
-                    <td><a href="<c:url value='/miso/sample/${sample.id}'/>">${sample.alias}</a></td>
-                    <td>${sample.description}</td>
-                    <td>${sample.sampleType}</td>
-                    <td>${sample.receivedDate}</td>
-                    <td>${sample.qcPassed}</td>
-                    <td>${sample.id}</td>
-                    <sec:authorize access="hasRole('ROLE_ADMIN')">
-                      <td class="misoicon" onclick="Sample.deleteSample(${sample.id}, Utils.page.pageReload);">
-                        <span class="ui-icon ui-icon-trash"></span>
-                      </td>
-                    </sec:authorize>
-                  </tr>
-                </c:forEach>
-                </tbody>
-              </table>
-              <script type="text/javascript">
-                jQuery(document).ready(function () {
-                  jQuery('#overview_samplegroup_table_'+${overview.id}).dataTable({
-                    "aaSorting": [
-                      [1, 'asc']
-                    ],
-                    "aoColumns": [
-                      null,
-                      { "sType": 'natural' },
-                      { "sType": 'natural' },
-                      null,
-                      null,
-                      null,
-                      null
-                      <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-                    ],
-                    "iDisplayLength": 50,
-                    "bJQueryUI": true,
-                    "bRetrieve": true,
-                    "sPaginationType": "full_numbers",
-                    "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                      Fluxion.doAjax(
-                        'sampleControllerHelperService',
-                        'getSampleLastQCRequest',
-                        {
-                          'sampleId': aData[6],
-                          'url': ajaxurl
-                        },
-                        {'doOnSuccess': function (json) {
-                          jQuery('td:eq(6)', nRow).html(json.response);
-                        }
-                        }
-                      );
-                    },
-                    "fnDrawCallback": function (oSettings) {
-                      jQuery('#overview_samplegroup_table_'+${overview.id}+'_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-                    }
-                  });
-                });
-              </script>
-            </div>
-          </div>
-        </c:if>
-      </c:forEach>
+      <table class="list" id="sample_table"></table>
     </div>
   </div>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery("#sampletabs").tabs();
-    });
-  </script>
 </div>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+  Project.ui.createSampleTable(${project.id});
+  });
+</script>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#libraries_arrowclick'), 'librariesdiv');">
   Libraries
@@ -910,90 +717,21 @@
 </script>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#librarydils_arrowclick'), 'librarydilsdiv');">
-  ${fn:length(projectLibraryDilutions)} Library Dilutions
+  Library Dilutions
   <div id="librarydils_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="librarydilsdiv" style="display:none;">
   <a id="librarydil"></a>
 
-  <h1>${fn:length(projectLibraryDilutions)} Library Dilutions</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('librarydilsmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="librarydilsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <c:if test="${not empty projectLibraryDilutions}">
-          <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryDilutionBarcodesToPrint('#librarydils_table');">Print Barcodes ...</a>
-          <a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
-  <div style="clear:both">
-    <table class="list no-border full-width" id="librarydils_table">
-      <thead>
-      <tr>
-        <th>Dilution Name</th>
-        <th>Parent Library</th>
-        <th>Dilution Creator</th>
-        <th>Dilution Creation Date</th>
-        <th>Dilution Platform</th>
-        <th>Dilution Concentration (${libraryDilutionUnits})</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${projectLibraryDilutions}" var="dil">
-        <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b><a href="<c:url value='/miso/library/${dil.library.id}'/>">${dil.name}</a></b></td>
-          <td><a href="<c:url value='/miso/library/${dil.library.id}'/>">${dil.library.alias}</a>
-            <c:if test="${not empty dil.library.indices}">(<c:forEach items="${dil.library.indices}" varStatus="status" var="index"><c:if test="${status.index gt 0}">, </c:if>${index.name}</c:forEach>)</c:if>
-          </td>
-          <td>${dil.dilutionCreator}</td>
-          <td>${dil.creationDate}</td>
-          <td>${dil.library.platformType}</td>
-          <td>${dil.concentration}</td>
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Library.dilution.deleteLibraryDilution(${dil.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"></span>
-            </td>
-          </sec:authorize>
-        </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#librarydils_table').dataTable({
-          "aaSorting": [
-            [1, 'asc'],
-            [3, 'asc']
-          ],
-          "aoColumns": [
-            null,
-            { "sType": 'natural' },
-            null,
-            null,
-            null,
-            null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true,
-          "sPaginationType": "full_numbers",
-          "fnDrawCallback": function (oSettings) {
-            jQuery('#librarydils_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-          }
-        });
-      });
-    </script>
-  </div>
+  <h1>Library Dilutions</h1>
+  <table class="display no-border" id="listingDilutionsTable">
+  </table>
 </div>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    Library.ui.createListingDilutionsTable(${project.id});
+  });
+</script>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_arrowclick'), 'poolsdiv');">
   Pools

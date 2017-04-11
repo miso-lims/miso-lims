@@ -90,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
@@ -139,7 +140,9 @@ public class LibraryControllerHelperService {
 
     @Override
     public Iterable<LibraryDilution> fetchAll(long projectId) throws IOException {
-      return dilutionService.listByProjectId(projectId);
+      DilutionPaginationFilter filter = new DilutionPaginationFilter();
+      filter.setProjectId(projectId);
+      return dilutionService.list(filter, 0, 0, false, "id");
     }
   }
 
@@ -891,7 +894,28 @@ public class LibraryControllerHelperService {
             dilution.setTargetedSequencing(requestManager.getTargetedSequencingById(json.getLong("targetedSequencing")));
           }
         }
-        if (json.has("idBarcode")) dilution.setIdentificationBarcode(json.getString("idBarcode"));
+        if (json.has("idBarcode")) {
+          String idBarcode = json.getString("idBarcode");
+
+          if (isStringEmptyOrNull(idBarcode)) {
+            // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
+            idBarcode = null;
+          } else {
+            List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
+            if (!previouslyBarcodedItems.isEmpty()
+                && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0) instanceof LibraryDilution
+                    && previouslyBarcodedItems.get(0).getId() == dilutionId)) {
+              Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
+              String error = String.format(
+                  "Could not change dilution identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
+                  idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
+              log.debug(error);
+              return JSONUtils.SimpleJSONError(error);
+            }
+          }
+          dilution.setIdentificationBarcode(idBarcode);
+        }
+
         dilutionService.update(dilution);
         return JSONUtils.SimpleJSONResponse("OK");
       }

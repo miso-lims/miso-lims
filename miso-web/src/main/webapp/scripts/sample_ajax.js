@@ -1142,7 +1142,7 @@ Sample.ui = {
           "mRender": function (data, type, full) {
             return Hot.getAliasFromId(data, Sample.sampleClasses) || "Plain";
           },
-          "bVisible": (Sample.detailedSample? "true" : "false"),
+          "bVisible": "true",
           "bSortable": false,
           "iSortPriority": 0
         } : null),

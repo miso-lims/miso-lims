@@ -12,16 +12,18 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
+
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -30,6 +32,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,11 +43,15 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.JoinFormula;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -110,6 +117,16 @@ public class LibraryDilution implements Dilution, Serializable {
 
   private String identificationBarcode;
   private Long preMigrationId;
+
+  @Column(name = "discarded")
+  private boolean discarded;
+
+  @ManyToOne(targetEntity = BoxImpl.class, fetch = FetchType.LAZY)
+  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = dilutionId AND bp.targetType = 'Dilution')")
+  private Box box;
+
+  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = dilutionId AND bp.targetType = 'Dilution')")
+  private String position;
 
   /**
    * Construct a new LibraryDilution with a default empty SecurityProfile
@@ -222,7 +239,7 @@ public class LibraryDilution implements Dilution, Serializable {
 
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
-    this.identificationBarcode = identificationBarcode;
+    this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
   }
 
   @Override
@@ -392,6 +409,46 @@ public class LibraryDilution implements Dilution, Serializable {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
+  }
+
+  @Override
+  public String getAlias() {
+    return name;
+  }
+
+  @Override
+  public Box getBox() {
+    return box;
+  }
+
+  @Override
+  public String getBoxPosition() {
+    return position;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastUpdated;
+  }
+
+  @Override
+  public String getLocationBarcode() {
+    return identificationBarcode;
+  }
+
+  @Override
+  public boolean isDiscarded() {
+    return discarded;
+  }
+
+  @Override
+  public void setAlias(String alias) {
+    name = alias;
+  }
+
+  @Override
+  public void setDiscarded(boolean emptied) {
+    discarded = emptied;
   }
 
 }

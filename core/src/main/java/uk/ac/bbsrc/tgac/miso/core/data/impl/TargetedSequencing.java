@@ -17,6 +17,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -39,6 +42,7 @@ public class TargetedSequencing implements Serializable {
   private String description;
 
   @ManyToMany(mappedBy = "targetedSequencing")
+  @Fetch(FetchMode.SUBSELECT)
   private final Collection<KitDescriptor> kitDescriptors = new HashSet<>();
 
   @Column(nullable = false)

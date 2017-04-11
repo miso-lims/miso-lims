@@ -1180,9 +1180,15 @@ public class Dtos {
     DilutionDto dto = new DilutionDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
+    dto.setDilutionUserName(from.getDilutionCreator());
+    dto.setConcentration(from.getConcentration());
+    if (from.getCreationDate() != null) {
+      dto.setCreationDate(dateFormatter.print(new DateTime(from.getCreationDate())));
+    }
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
+    dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     LibraryDto ldto = asMinimalDto(from.getLibrary());
     dto.setLibrary(ldto);
     return dto;
@@ -1193,6 +1199,9 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setAlias(from.getAlias());
+    if (from.getPlatformType() != null) {
+      dto.setPlatformType(from.getPlatformType().getKey());
+    }
     if (from.getIdentificationBarcode() != null) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }

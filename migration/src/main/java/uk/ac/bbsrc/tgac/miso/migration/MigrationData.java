@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.migration;
 
 import java.util.Collection;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -17,6 +18,7 @@ public class MigrationData {
   private Collection<LibraryDilution> dilutions;
   private Collection<Pool> pools;
   private Collection<Run> runs;
+  private Collection<Box> boxes;
 
   /**
    * @return all Projects to be migrated
@@ -88,6 +90,18 @@ public class MigrationData {
 
   public void setRuns(Collection<Run> runs) {
     this.runs = runs;
+  }
+
+  /**
+   * @return all Boxes to be migrated, including the Boxables they contain. Note: Saving these will
+   *         likely require that the Boxables have been saved first in order to generate foreign keys
+   */
+  public Collection<Box> getBoxes() {
+    return boxes;
+  }
+
+  public void setBoxes(Collection<Box> boxes) {
+    this.boxes = boxes;
   }
 
 }

@@ -286,7 +286,7 @@ public interface RequestManager {
   /**
    * Obtain a list of Boxables by supplied identificationBarcode list
    */
-  public Collection<Boxable> getBoxablesFromBarcodeList(List<String> barcodeList) throws IOException;
+  public Collection<Boxable> getBoxablesFromBarcodeList(Collection<String> barcodeList) throws IOException;
 
   public Collection<SequencerReference> listAllSequencerReferences() throws IOException;
 
