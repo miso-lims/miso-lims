@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
@@ -55,7 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -238,9 +239,7 @@ public class LibraryDilution implements Dilution, Serializable {
 
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
-    if (!LimsUtils.isStringBlankOrNull(identificationBarcode)) {
-      this.identificationBarcode = identificationBarcode;
-    }
+    this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
   }
 
   @Override
