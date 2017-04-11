@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +29,8 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
@@ -152,6 +155,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (mergeRunPools) mergeExistingPartialPools(runs, pools);
     savePools(pools);
     saveRuns(runs);
+    if (data.getBoxes() != null) saveBoxes(data.getBoxes());
   }
 
   public void saveProjects(Collection<Project> projects) throws IOException {
@@ -679,6 +683,54 @@ public class DefaultMigrationTarget implements MigrationTarget {
       log.debug(String.format("Merged new pool %s with existing pool '%s'", fromPool.getAlias(), toPool.getAlias()));
     }
     fromPool.setId(toPool.getId());
+  }
+
+  public void saveBoxes(final Collection<Box> boxes) throws IOException {
+    log.info("Migrating boxes...");
+    for (Box newBox : boxes) {
+      Box box = serviceManager.getRequestManager().getBoxByAlias(newBox.getAlias());
+      if (box == null) {
+        saveBox(newBox);
+      } else {
+        mergeBox(newBox, box);
+      }
+    }
+    log.info(boxes.size() + " boxes migrated.");
+  }
+
+  private void saveBox(Box box) throws IOException {
+    log.debug("Saving new box " + box.getAlias());
+    valueTypeLookup.resolveAll(box);
+    box.setLastModifier(migrationUser);
+    serviceManager.getRequestManager().saveBox(box);
+    log.debug("Saved box " + box.getAlias());
+  }
+
+  private void mergeBox(Box from, Box to) throws IOException {
+    log.debug("Merging box " + from.getAlias() + " with existing box");
+    assertBoxPropertiesMatch(from, to);
+    for (Entry<String, Boxable> entry : from.getBoxables().entrySet()) {
+      if (entry.getValue() != null) {
+        if (to.getBoxable(entry.getKey()) != null) {
+          throw new IllegalStateException(String.format("Box %s position %s is already filled", to.getAlias(), entry.getKey()));
+        }
+        to.setBoxable(entry.getKey(), entry.getValue());
+      }
+    }
+    serviceManager.getRequestManager().saveBox(to);
+    log.debug("Saved changes to box " + to.getAlias());
+  }
+
+  private void assertBoxPropertiesMatch(Box one, Box two) {
+    if (one.getUse() == null || one.getSize() == null
+        || two.getUse() == null || two.getSize() == null
+        || !one.getUse().getAlias().equals(two.getUse().getAlias())
+        || one.getSize().getRows() != two.getSize().getRows()
+        || one.getSize().getColumns() != two.getSize().getColumns()
+        || one.getSize().getScannable() != two.getSize().getScannable()) {
+      throw new IllegalArgumentException(String.format("Can't merge boxes %s and %s due to mismatched properties",
+          one.getAlias(), two.getAlias()));
+    }
   }
 
   /**

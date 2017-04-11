@@ -8,6 +8,9 @@ import java.util.Map;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -92,6 +95,8 @@ public class ValueTypeLookup {
   private Map<String, DetailedQcStatus> detailedQcStatusByDescription;
   private Map<String, ReferenceGenome> referenceGenomeByAlias;
   private Map<String, TargetedSequencing> targetedSequencingByAlias;
+  private Map<String, BoxUse> boxUsesByAlias;
+  private Collection<BoxSize> boxSizes;
   
   /**
    * Create a ValueTypeLookup loaded with data from the provided MisoServiceManager
@@ -120,6 +125,8 @@ public class ValueTypeLookup {
     setDetailedQcStatuses(misoServiceManager.getDetailedQcStatusDao().getDetailedQcStatus());
     setReferenceGenomes(misoServiceManager.getReferenceGenomeService().listAllReferenceGenomeTypes());
     setTargetedSequencings(misoServiceManager.getTargetedSequencingDao().listAll());
+    setBoxUses(misoServiceManager.getRequestManager().listAllBoxUses());
+    setBoxSizes(misoServiceManager.getRequestManager().listAllBoxSizes());
   }
 
   private void setSampleClasses(Collection<SampleClass> sampleClasses) {
@@ -367,6 +374,18 @@ public class ValueTypeLookup {
       mapByAlias.put(tarSeq.getAlias(), tarSeq);
     }
     this.targetedSequencingByAlias = mapByAlias;
+  }
+
+  private void setBoxUses(Collection<BoxUse> boxUses) {
+    Map<String, BoxUse> mapByAlias = new UniqueKeyHashMap<>();
+    for (BoxUse boxUse : boxUses) {
+      mapByAlias.put(boxUse.getAlias(), boxUse);
+    }
+    this.boxUsesByAlias = mapByAlias;
+  }
+
+  private void setBoxSizes(Collection<BoxSize> boxSizes) {
+    this.boxSizes = boxSizes;
   }
 
   /**
@@ -740,6 +759,34 @@ public class ValueTypeLookup {
   }
 
   /**
+   * Attempts to find an existing BoxUse
+   * 
+   * @param boxUse a partially-formed BoxUse, which must have its alias set in order for this method to resolve the BoxUse
+   * @return the existing BoxUse if a matching one is found; null otherwise
+   */
+  BoxUse resolve(BoxUse boxUse) {
+    if (boxUse == null || boxUse.getAlias() == null) return null;
+    return boxUsesByAlias.get(boxUse.getAlias());
+  }
+
+  /**
+   * Attempts to find an existing BoxSize
+   * 
+   * @param boxSize a partially-formed BoxSize, which must have its rows, columns, and scannable properties set in order
+   *          for this method to resolve the BoxSize
+   * @return the existing BoxSize if a matching one is found; null otherwise
+   */
+  BoxSize resolve(BoxSize boxSize) {
+    if (boxSize == null) return null;
+    for (BoxSize s : boxSizes) {
+      if (s.getScannable() == boxSize.getScannable() && s.getRows() == boxSize.getRows() && s.getColumns() == boxSize.getColumns()) {
+        return s;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Resolves all value type entities for a Sample
    * 
    * @param sample the sample containing partially-formed value type entities to be resolved. Full, existing entities are loaded into sample
@@ -930,8 +977,8 @@ public class ValueTypeLookup {
   /**
    * Resolves all value type entities for a Run and its Pools
    * 
-   * @param run the Run containing partially-formed value type entities to be resolved. Full, existing entities are loaded into run in place
-   * of the partially-formed entities
+   * @param run the Run containing partially-formed value type entities to be resolved. Full, existing entities are loaded into
+   *          run in place of the partially-formed entities
    * @throws IOException if no value is found matching the available data in run
    */
   public void resolveAll(Run run) throws IOException {
@@ -965,6 +1012,29 @@ public class ValueTypeLookup {
   public void resolveAll(Project project) {
     ReferenceGenome referenceGenome = resolve(project.getReferenceGenome());
     project.setReferenceGenome(referenceGenome);
+  }
+
+  /**
+   * Resolves all value type entities for a Box
+   * 
+   * @param box the Box containing partially-formed value type entities to be resolved. Full, existing entities are loaded into
+   *          box in place of the partially-formed entities
+   * @throws IOException if no value is found matching the available data in box
+   */
+  public void resolveAll(Box box) throws IOException {
+    BoxUse use = resolve(box.getUse());
+    if (use == null) {
+      throw new IOException(String.format("BoxUse not found (alias=%s)", box.getUse() == null ? null : box.getUse().getAlias()));
+    }
+    box.setUse(use);
+    BoxSize size = resolve(box.getSize());
+    if (size == null) {
+      throw new IOException(String.format("BoxSize not found (rows=%d, cols=%d, scannable=%s)",
+          box.getSize() == null ? null : box.getSize().getRows(),
+          box.getSize() == null ? null : box.getSize().getColumns(),
+          box.getSize() == null ? null : String.valueOf(box.getSize().getScannable())));
+    }
+    box.setSize(size);
   }
 
   /**
