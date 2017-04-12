@@ -60,6 +60,9 @@
     </script>
 </div>
 
+<p>Sample Sheet Type: <input type="radio" id="selectplateform" name="selectForm" onclick="selectForm('plate');"/>Plate
+    | <input type="radio" id="selecttubeform" name="selectForm" onclick="selectForm('tube');"/> Tubes</p>
+
 <form id="sampleExportForm">
 
 </form>
@@ -86,10 +89,18 @@
 
     function selectForm(selection) {
         ImportExport.searchSamples(jQuery('#searchSamples').val());
-        jQuery('#sampleExportForm').html(jQuery('#tubeformholder').html() + jQuery('#librarySelectionHolder').html());
-        showPlatforms();
-        showLibraryStrategyTypesString();
-        showLibrarySelectionString();
+        if (selection == 'tube') {
+            jQuery('#sampleExportForm').html(jQuery('#tubeformholder').html() + jQuery('#librarySelectionHolder').html());
+            showPlatforms();
+            showLibraryStrategyTypesString();
+            showLibrarySelectionString();
+        }
+        else if (selection == 'plate') {
+            jQuery('#sampleExportForm').html(jQuery('#plateformholder').html() + jQuery('#librarySelectionHolder').html());
+            showPlatforms();
+            showLibraryStrategyTypesString();
+            showLibrarySelectionString();
+        }
         jQuery('#exportButtons').show();
     }
 
