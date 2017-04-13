@@ -882,3 +882,6 @@ CREATE OR REPLACE VIEW LibraryDerivedInfo AS
 CREATE OR REPLACE VIEW BoxDerivedInfo AS
   SELECT boxId, MAX(changeTime) AS lastModified FROM BoxChangeLog GROUP BY boxId;
 
+CREATE OR REPLACE VIEW DuplicateBarcodes_Items AS SELECT identificationBarcode, 'Sample' AS targetType, sampleId AS targetId FROM Sample UNION ALL SELECT identificationBarcode, 'Library' AS targetType, libraryId AS targetId FROM Library UNION ALL SELECT identificationBarcode, 'Pool' AS targetType, poolId as TargetId FROM Pool UNION ALL SELECT identificationBarcode, 'Dilution' as targetType, dilutionId as targetId FROM LibraryDilution;
+
+CREATE OR REPLACE VIEW DuplicateBarcodes AS SELECT identificationBarcode, COUNT(*) AS count FROM DuplicateBarcodes_Items WHERE identificationBarcode IS NOT NULL GROUP BY identificationBarcode HAVING count > 1;

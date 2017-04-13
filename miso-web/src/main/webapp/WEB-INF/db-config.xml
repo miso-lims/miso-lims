@@ -57,6 +57,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.BoxSize</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.BoxUse</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.DuplicateBarcodes</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.Index</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.IndexFamily</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.KitImpl</value>

@@ -24,6 +24,20 @@
 <div id="maincontent">
     <div id="contentcolumn">
         <h1>Dashboard</h1>
+        <c:if test="${not empty duplicateBarcodes}">
+          <div class="dashboard_widget">
+            <c:forEach items="${duplicateBarcodes}" var="duplicateBarcode">
+              <div class="widget_title ui-corner-top">Duplicate barcode: ${duplicateBarcode.key}</div>
+              <div class="widget ui-corner-bottom">
+                <div>
+                  <c:forEach items="${duplicateBarcode.value}" var="item">
+                    <a href="${item.url}" class="dashboardresult"> <div onmouseover="this.className='dashboardhighlight'" onmouseout="this.className='dashboard'" class="dashboard">Name: <b>${item.name}</b><br>Alias: <b>${item.alias}</b><br></div></a>
+                  </c:forEach>
+                </div>
+              </div>
+            </div>
+          </c:forEach>
+        </c:if>
         <%--
           <div id="alertbox">
             <fieldset class="alertwidget">

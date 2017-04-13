@@ -25,14 +25,17 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,16 +49,51 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DuplicateBarcodes;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
+import uk.ac.bbsrc.tgac.miso.service.DuplicateBarcodeService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 public class MenuController implements ServletContextAware {
   protected static final Logger log = LoggerFactory.getLogger(MenuController.class);
 
+  public static class DuplicateItem {
+    private String url;
+    private String name;
+    private String alias;
+    public String getUrl() {
+      return url;
+    }
+    public void setUrl(String url) {
+      this.url = url;
+    }
+    public String getName() {
+      return name;
+    }
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public String getAlias() {
+      return alias;
+    }
+
+    public void setAlias(String alias) {
+      this.alias = alias;
+    }
+  }
   ServletContext servletContext;
   @Autowired
   private SecurityManager securityManager;
+
+  @Autowired
+  private DuplicateBarcodeService duplicateBarcodeService;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
@@ -124,6 +162,7 @@ public class MenuController implements ServletContextAware {
       if (checks.keySet().contains("error")) {
         model.put("error", checks.get("error"));
       }
+      model.put("duplicateBarcodes", createMapForDuplicates(duplicateBarcodeService.getAll()));
       if (Arrays.asList(user.getRoles()).contains("ROLE_EXTERNAL") && !Arrays.asList(user.getRoles()).contains("ROLE_INTERNAL")) {
         return new ModelAndView("/pages/external/externalMain.jsp", model);
       } else {
@@ -132,6 +171,32 @@ public class MenuController implements ServletContextAware {
     } catch (IOException e) {
       return new ModelAndView("/login.jsp", model);
     }
+  }
+
+  private Map<String, List<DuplicateItem>> createMapForDuplicates(Collection<DuplicateBarcodes> barcodes) {
+    Map<String, List<DuplicateItem>> results = new HashMap<>();
+    for (DuplicateBarcodes barcode : barcodes) {
+      List<DuplicateItem> resultItems = new ArrayList<>();
+      for (Boxable item : barcode.getItems()) {
+        DuplicateItem duplicateItem = new DuplicateItem();
+        duplicateItem.setName(item.getName());
+        duplicateItem.setAlias(item.getAlias());
+        if (item instanceof LibraryDilution) {
+          duplicateItem.setUrl("/miso/library/" + ((LibraryDilution) item).getLibrary().getId());
+        } else if (item instanceof Library) {
+          duplicateItem.setUrl("/miso/library/" + item.getId());
+        } else if (item instanceof Pool) {
+          duplicateItem.setUrl("/miso/pool/" + item.getId());
+        } else if (item instanceof Sample) {
+          duplicateItem.setUrl("/miso/sample/" + item.getId());
+        } else {
+          throw new IllegalArgumentException();
+        }
+        resultItems.add(duplicateItem);
+      }
+      results.put(barcode.getIdentificationBarcode(), resultItems);
+    }
+    return results;
   }
 
   @RequestMapping("/projectMenu")
