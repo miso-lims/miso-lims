@@ -101,6 +101,7 @@ public class ControllerHelperServiceUtils {
         if (isStringEmptyOrNull(barcodeable.getIdentificationBarcode())) {
           assister.store(barcodeable);
         }
+        thingsToPrint.add(barcodeable);
       }
       printer.printBarcode(thingsToPrint);
       return JSONUtils.SimpleJSONResponse(thingsToPrint.size() + " barcodes printed.");
