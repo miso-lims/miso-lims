@@ -65,6 +65,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -273,7 +274,19 @@ public class EditLibraryController {
     return libraryService.getLibraryColumnSizes();
   }
 
-  private Collection<String> populatePlatformTypes(List<String> current) throws IOException {
+  private List<String> populatePlatformTypes() throws IOException {
+    return populatePlatformTypes(Lists.newArrayList());
+  }
+
+  private List<String> populatePlatformTypes(Library library) throws IOException {
+    if (library.getPlatformType() == null) {
+      return populatePlatformTypes();
+    } else {
+      return populatePlatformTypes(Lists.newArrayList(library.getPlatformType().getKey()));
+    }
+  }
+
+  private List<String> populatePlatformTypes(Collection<String> current) throws IOException {
     Collection<PlatformType> base = requestManager.listActivePlatformTypes();
     if (base.isEmpty()) {
       base = Arrays.asList(PlatformType.values());
@@ -291,7 +304,7 @@ public class EditLibraryController {
   @ModelAttribute("platformTypesString")
   public String platformTypesString() throws IOException {
     List<String> names = new ArrayList<>();
-    List<String> pn = new ArrayList<>(populatePlatformTypes(Collections.<String> emptyList()));
+    List<String> pn = populatePlatformTypes();
     for (String name : pn) {
       names.add("\"" + name + "\"" + ":" + "\"" + name + "\"");
     }
@@ -343,7 +356,7 @@ public class EditLibraryController {
   }
 
   public void populateAvailableIndexFamilies(Library library, ModelMap model) throws IOException {
-    if (isStringEmptyOrNull(library.getPlatformType().getKey())) {
+    if (library.getPlatformType() == null || isStringEmptyOrNull(library.getPlatformType().getKey())) {
       model.put("indexFamiliesJSON", "[]");
       model.put("indexFamilies", Collections.singleton(INDEX_FAMILY_NEEDS_PLATFORM));
     } else {
@@ -668,7 +681,7 @@ public class EditLibraryController {
       model.put("formObj", library);
       model.put("library", library);
 
-      model.put("platformTypes", populatePlatformTypes(Arrays.asList(library.getPlatformType().getKey())));
+      model.put("platformTypes", populatePlatformTypes(library));
       populateAvailableIndexFamilies(library, model);
       addAdjacentLibraries(library, model);
 
@@ -759,7 +772,7 @@ public class EditLibraryController {
 
       model.put("formObj", library);
       model.put("library", library);
-      model.put("platformTypes", populatePlatformTypes(Arrays.asList(library.getPlatformType().getKey())));
+      model.put("platformTypes", populatePlatformTypes());
       populateAvailableIndexFamilies(library, model);
 
       addAdjacentLibraries(library, model);
@@ -854,7 +867,7 @@ public class EditLibraryController {
       });
       model.put("title", "Bulk Create Libraries");
       model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
-      model.put("platformTypes", mapper.writeValueAsString(populatePlatformTypes(Collections.<String> emptyList())));
+      model.put("platformTypes", mapper.writeValueAsString(populatePlatformTypes()));
       JSONArray libraryDesigns = new JSONArray();
       libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
       model.put("libraryDesignsJSON", libraryDesigns.toString());
