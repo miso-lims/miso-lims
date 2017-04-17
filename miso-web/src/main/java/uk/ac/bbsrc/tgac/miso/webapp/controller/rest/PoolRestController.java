@@ -55,7 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PoolPaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
@@ -71,7 +71,7 @@ import uk.ac.bbsrc.tgac.miso.service.PoolService;
 @RequestMapping("/rest/pool")
 @SessionAttributes("pool")
 public class PoolRestController extends RestController {
-  private final JQueryDataTableBackend<Pool, PoolDto, PoolPaginationFilter> jQueryBackend = new JQueryDataTableBackend<Pool, PoolDto, PoolPaginationFilter>() {
+  private final JQueryDataTableBackend<Pool, PoolDto> jQueryBackend = new JQueryDataTableBackend<Pool, PoolDto>() {
 
     @Override
     protected PoolDto asDto(Pool model, UriComponentsBuilder builder) {
@@ -81,7 +81,7 @@ public class PoolRestController extends RestController {
     }
 
     @Override
-    protected PaginatedDataSource<Pool, PoolPaginationFilter> getSource() throws IOException {
+    protected PaginatedDataSource<Pool> getSource() throws IOException {
       return poolService;
     }
 
@@ -137,18 +137,14 @@ public class PoolRestController extends RestController {
     if (!PlatformType.getKeys().contains(platform)) {
       throw new RestException("Invalid platform type.");
     }
-    PoolPaginationFilter filter = new PoolPaginationFilter();
-    filter.setPlatformType(PlatformType.get(platform));
-    return jQueryBackend.get(filter, request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(PlatformType.get(platform)));
   }
 
   @RequestMapping(value = "dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<PoolDto> getDTPoolsByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    PoolPaginationFilter filter = new PoolPaginationFilter();
-    filter.setProjectId(id);
-    return jQueryBackend.get(filter, request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
   public List<PoolDto> serializePools(Collection<Pool> pools, UriComponentsBuilder uriBuilder)

@@ -81,7 +81,7 @@ public class SampleController extends RestController {
   @Autowired
   private SampleClassService sampleClassService;
 
-  private final JQueryDataTableBackend<Sample, SampleDto, PaginationFilter> jQueryBackend = new JQueryDataTableBackend<Sample, SampleDto, PaginationFilter>() {
+  private final JQueryDataTableBackend<Sample, SampleDto> jQueryBackend = new JQueryDataTableBackend<Sample, SampleDto>() {
 
     @Override
     protected SampleDto asDto(Sample model, UriComponentsBuilder builder) {
@@ -91,7 +91,7 @@ public class SampleController extends RestController {
     }
 
     @Override
-    protected PaginatedDataSource<Sample, PaginationFilter> getSource() throws IOException {
+    protected PaginatedDataSource<Sample> getSource() throws IOException {
       return sampleService;
     }
   };
@@ -126,7 +126,7 @@ public class SampleController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<SampleDto> getDTSamples(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder);
   }
 
   @RequestMapping(value = "/samples/dt/project/{id}", method = RequestMethod.GET, produces = { "application/json" })
@@ -134,9 +134,7 @@ public class SampleController extends RestController {
   public DataTablesResponseDto<SampleDto> getDTSamplesByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setProjectId(id);
-    return jQueryBackend.get(filter, request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
   @RequestMapping(value = "/sample", method = RequestMethod.POST, headers = { "Content-type=application/json" })

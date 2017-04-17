@@ -194,7 +194,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListWithLimitAndOffset() throws IOException {
-    assertEquals(3, dao.list(new PaginationFilter(), 5, 3, true, "id").size());
+    assertEquals(3, dao.list(5, 3, true, "id").size());
   }
 
   @Test
@@ -214,29 +214,25 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListBySearchWithLimit() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("Bn_R");
-    List<Library> libraries = dao.list(filter, 2, 3, false, "lastModified");
+    List<Library> libraries = dao.list(2, 3, false, "lastModified", PaginationFilter.query("Bn_R"));
     assertEquals(3, libraries.size());
     assertEquals(10L, libraries.get(0).getId());
   }
 
   @Test
   public void testListByIlluminaBadSearchWithLimit() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("; DROP TABLE Library;");
-    List<Library> libraries = dao.list(filter, 5, 3, true, "id");
+    List<Library> libraries = dao.list(5, 3, true, "id", PaginationFilter.query("; DROP TABLE Library;"));
     assertEquals(0L, libraries.size());
   }
 
   @Test(expected = IOException.class)
   public void testListIlluminaOffsetBadLimit() throws IOException {
-    dao.list(new PaginationFilter(), 5, -3, true, "id");
+    dao.list(5, -3, true, "id");
   }
 
   @Test
   public void testListOffsetThreeWithThreeLibsPerPageOrderLastMod() throws IOException {
-    List<Library> libraries = dao.list(new PaginationFilter(), 3, 3, false, "lastModified");
+    List<Library> libraries = dao.list(3, 3, false, "lastModified");
     assertEquals(3, libraries.size());
     assertEquals(11, libraries.get(0).getId());
   }

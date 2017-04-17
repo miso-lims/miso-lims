@@ -78,7 +78,7 @@ public class RunRestController extends RestController {
   @Autowired
   private RunService runService;
 
-  private final JQueryDataTableBackend<Run, RunDto, PaginationFilter> jQueryBackend = new JQueryDataTableBackend<Run, RunDto, PaginationFilter>() {
+  private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<Run, RunDto>() {
 
     @Override
     protected RunDto asDto(Run model, UriComponentsBuilder builder) {
@@ -88,7 +88,7 @@ public class RunRestController extends RestController {
     }
 
     @Override
-    protected PaginatedDataSource<Run, PaginationFilter> getSource() throws IOException {
+    protected PaginatedDataSource<Run> getSource() throws IOException {
       return runService;
     }
   };
@@ -146,7 +146,7 @@ public class RunRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<RunDto> getDTRuns(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder)
       throws IOException {
-    return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder);
   }
 
   @RequestMapping(value = "/dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
@@ -154,9 +154,7 @@ public class RunRestController extends RestController {
   public DataTablesResponseDto<RunDto> getDTRunsByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder)
       throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setProjectId(id);
-    return jQueryBackend.get(filter, request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
   @ExceptionHandler(Exception.class)

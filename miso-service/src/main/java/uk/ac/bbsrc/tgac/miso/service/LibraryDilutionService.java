@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface LibraryDilutionService extends PaginatedDataSource<LibraryDilution, DilutionPaginationFilter> {
+public interface LibraryDilutionService extends PaginatedDataSource<LibraryDilution> {
 
   LibraryDilution get(long dilutionId) throws IOException;
 

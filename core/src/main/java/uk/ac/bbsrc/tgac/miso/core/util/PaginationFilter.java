@@ -1,28 +1,58 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-public class PaginationFilter {
-  private Long projectId;
-  private String query;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-  public Long getProjectId() {
-    return projectId;
+public abstract interface PaginationFilter {
+
+  public static PaginationFilter platformType(final PlatformType platformType) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item) {
+        sink.setPlatformType(item, platformType);
+      }
+    };
   }
 
-  public String getQuery() {
-    return query;
+  public static PaginationFilter pool(final long poolId) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item) {
+        sink.setPoolId(item, poolId);
+      }
+    };
   }
 
-  /**
-   * Restrict the results to only member of a project.
-   */
-  public void setProjectId(Long projectId) {
-    this.projectId = projectId;
+  public static PaginationFilter pool(final Pool pool) {
+    if (pool.getId() == PoolImpl.UNSAVED_ID) {
+      throw new IllegalArgumentException("Cannot filter by unsaved pool.");
+    }
+    return pool(pool.getId());
   }
 
-  /**
-   * Restrict the results to only items that match a particular search query.
-   */
-  public void setQuery(String query) {
-    this.query = query;
+  public static PaginationFilter project(final long projectId) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item) {
+        sink.setProjectId(item, projectId);
+      }
+    };
   }
+
+  public static PaginationFilter query(final String query) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item) {
+        sink.setQuery(item, query);
+      }
+    };
+  }
+
+  public abstract <T> void apply(PaginationFilterSink<T> sink, T item);
+
 }

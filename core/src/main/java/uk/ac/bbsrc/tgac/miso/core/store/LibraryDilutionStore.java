@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Collection;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
@@ -37,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @since 0.0.2
  */
 public interface LibraryDilutionStore
-    extends Store<LibraryDilution>, Remover<LibraryDilution>, PaginatedDataSource<LibraryDilution, DilutionPaginationFilter> {
+    extends Store<LibraryDilution>, Remover<LibraryDilution>, PaginatedDataSource<LibraryDilution> {
   /**
    * List all LibraryDilutions by a given parent library ID
    *

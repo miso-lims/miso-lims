@@ -30,7 +30,6 @@ import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 /**
  * Defines a DAO interface for storing Samples
@@ -38,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface SampleStore extends Store<Sample>, Remover<Sample>, PaginatedDataSource<Sample, PaginationFilter> {
+public interface SampleStore extends Store<Sample>, Remover<Sample>, PaginatedDataSource<Sample> {
 
   /**
    * List all Samples that match a search criteria

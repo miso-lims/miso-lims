@@ -90,8 +90,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
-import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
@@ -140,9 +140,7 @@ public class LibraryControllerHelperService {
 
     @Override
     public Iterable<LibraryDilution> fetchAll(long projectId) throws IOException {
-      DilutionPaginationFilter filter = new DilutionPaginationFilter();
-      filter.setProjectId(projectId);
-      return dilutionService.list(filter, 0, 0, false, "id");
+      return dilutionService.list(0, 0, false, "id", PaginationFilter.project(projectId));
     }
   }
 
