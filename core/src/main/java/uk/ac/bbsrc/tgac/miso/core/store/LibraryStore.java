@@ -36,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 /**
  * Defines a DAO interface for storing Libraries
@@ -44,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface LibraryStore extends Store<Library>, Remover<Library>, PaginatedDataSource<Library, PaginationFilter> {
+public interface LibraryStore extends Store<Library>, Remover<Library>, PaginatedDataSource<Library> {
 
   /**
    * Get a Library given a ID barcode

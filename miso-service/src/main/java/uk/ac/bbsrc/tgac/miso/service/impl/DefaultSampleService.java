@@ -51,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
@@ -69,7 +68,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultSampleService implements SampleService, AuthorizedPaginatedDataSource<Sample, PaginationFilter> {
+public class DefaultSampleService implements SampleService, AuthorizedPaginatedDataSource<Sample> {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
@@ -797,7 +796,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   @Override
-  public PaginatedDataSource<Sample, PaginationFilter> getBackingPaginationSource() {
+  public PaginatedDataSource<Sample> getBackingPaginationSource() {
     return sampleDao;
   }
 

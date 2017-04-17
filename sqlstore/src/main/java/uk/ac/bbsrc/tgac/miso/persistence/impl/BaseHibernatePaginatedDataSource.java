@@ -14,25 +14,23 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilterSink;
 
 /**
  * Retrieves a collection of items from Hibernate in a paginated way.
  */
 @Transactional(rollbackFor = Exception.class)
-public interface BaseHibernatePaginatedDataSource<T, Filter extends PaginationFilter> extends PaginatedDataSource<T, Filter> {
+public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource<T>, PaginationFilterSink<Criteria> {
 
   @Override
-  public default long count(Filter filter) throws IOException {
+  public default long count(PaginationFilter... filters) throws IOException {
     Criteria criteria = createPaginationCriteria();
-    if (!isStringBlankOrNull(filter.getQuery())) {
-      criteria.add(searchRestrictions(filter.getQuery()));
+    for (PaginationFilter filter : filters) {
+      filter.apply(this, criteria);
     }
-    if (filter.getProjectId() != null) {
-      criteria.add(Restrictions.eq(getProjectColumn(), filter.getProjectId()));
-    }
-    setAdditionalPaginationCriteria(filter, criteria);
     criteria.setProjection(Projections.countDistinct("id"));
     return ((Long) criteria.uniqueResult()).intValue();
 
@@ -58,7 +56,7 @@ public interface BaseHibernatePaginatedDataSource<T, Filter extends PaginationFi
   Class<? extends T> getRealClass();
 
   @Override
-  public default List<T> list(Filter filter, int offset, int limit, boolean sortDir, String sortCol)
+  public default List<T> list(int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filters)
       throws IOException {
 
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
@@ -68,13 +66,9 @@ public interface BaseHibernatePaginatedDataSource<T, Filter extends PaginationFi
     Criteria idCriteria = createPaginationCriteria();
     idCriteria.addOrder(order);
 
-    if (!isStringBlankOrNull(filter.getQuery())) {
-      idCriteria.add(searchRestrictions(filter.getQuery()));
+    for (PaginationFilter filter : filters) {
+      filter.apply(this, idCriteria);
     }
-    if (filter.getProjectId() != null) {
-      idCriteria.add(Restrictions.eq(getProjectColumn(), filter.getProjectId()));
-    }
-    setAdditionalPaginationCriteria(filter, idCriteria);
 
     idCriteria.setFirstResult(offset);
     if (limit > 0) {
@@ -115,10 +109,25 @@ public interface BaseHibernatePaginatedDataSource<T, Filter extends PaginationFi
    */
   Criterion searchRestrictions(String query);
 
-  /**
-   * Add additional restrictions to the {@link Criteria} object. Note, during listing, a collection of IDs is fetched and then these are
-   * used to perform a second query. In that instance, this method is <b>not</b> called for the ID-driven fetch.
-   */
-  default void setAdditionalPaginationCriteria(Filter filter, Criteria criteria) {
+  @Override
+  default void setPlatformType(Criteria item, PlatformType platformType) {
+    throw new IllegalArgumentException();
+  }
+
+  @Override
+  default void setPoolId(Criteria item, long poolId) {
+    throw new IllegalArgumentException();
+  }
+
+  @Override
+  default void setProjectId(Criteria criteria, long projectId) {
+    criteria.add(Restrictions.eq(getProjectColumn(), projectId));
+  }
+
+  @Override
+  default void setQuery(Criteria criteria, String query) {
+    if (!isStringBlankOrNull(query)) {
+      criteria.add(searchRestrictions(query));
+    }
   }
 }

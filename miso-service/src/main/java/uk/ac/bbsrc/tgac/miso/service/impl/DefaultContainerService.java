@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
@@ -15,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultContainerService
-    implements ContainerService, AuthorizedPaginatedDataSource<SequencerPartitionContainer, PaginationFilter> {
+    implements ContainerService, AuthorizedPaginatedDataSource<SequencerPartitionContainer> {
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -27,7 +26,7 @@ public class DefaultContainerService
   }
 
   @Override
-  public PaginatedDataSource<SequencerPartitionContainer, PaginationFilter> getBackingPaginationSource() {
+  public PaginatedDataSource<SequencerPartitionContainer> getBackingPaginationSource() {
     return containerStore;
   }
 

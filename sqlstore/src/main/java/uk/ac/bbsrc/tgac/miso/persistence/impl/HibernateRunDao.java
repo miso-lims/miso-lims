@@ -29,12 +29,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run, PaginationFilter> {
+public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run> {
 
   private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "status");
 
@@ -311,16 +310,15 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public void setAdditionalPaginationCriteria(PaginationFilter filter, Criteria criteria) {
-    if (filter.getProjectId() != null) {
-      criteria.createAlias("containers", "container");
-      criteria.createAlias("container.partitions", "partition");
-      criteria.createAlias("partition.pool", "pool");
-      criteria.createAlias("pool.pooledElements", "dilution");
-      criteria.createAlias("dilution.library", "library");
-      criteria.createAlias("library.sample", "sample");
-      criteria.createAlias("sample.project", "project");
-    }
+  public void setProjectId(Criteria criteria, long projectId) {
+    criteria.createAlias("containers", "container");
+    criteria.createAlias("container.partitions", "partition");
+    criteria.createAlias("partition.pool", "pool");
+    criteria.createAlias("pool.pooledElements", "dilution");
+    criteria.createAlias("dilution.library", "library");
+    criteria.createAlias("library.sample", "sample");
+    criteria.createAlias("sample.project", "project");
+    HibernatePaginatedDataSource.super.setProjectId(criteria, projectId);
   }
 
   @Override

@@ -21,7 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
-import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -30,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultLibraryDilutionService
-    implements LibraryDilutionService, AuthorizedPaginatedDataSource<LibraryDilution, DilutionPaginationFilter> {
+    implements LibraryDilutionService, AuthorizedPaginatedDataSource<LibraryDilution> {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
@@ -202,7 +201,7 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public PaginatedDataSource<LibraryDilution, DilutionPaginationFilter> getBackingPaginationSource() {
+  public PaginatedDataSource<LibraryDilution> getBackingPaginationSource() {
     return dilutionDao;
   }
 }

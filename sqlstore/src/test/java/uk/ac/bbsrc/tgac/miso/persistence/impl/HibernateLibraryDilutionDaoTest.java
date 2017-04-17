@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
@@ -90,81 +90,64 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllWithLimit() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    assertEquals(14, dao.list(filter, 0, 9999, false, "id").size());
-    assertEquals(10, dao.list(filter, 0, 10, false, "id").size());
-    assertEquals(5, dao.list(filter, 0, 5, false, "id").size());
-    assertEquals(14, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(14, dao.list(0, 9999, false, "id").size());
+    assertEquals(10, dao.list(0, 10, false, "id").size());
+    assertEquals(5, dao.list(0, 5, false, "id").size());
+    assertEquals(14, dao.list(0, 0, false, "id").size());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchByName() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setQuery("LDI3");
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    final Collection<LibraryDilution> list = dao.list(filter, 0, 0, false, "id");
+    final Collection<LibraryDilution> list = dao.list(0, 0, false, "id", PaginationFilter.query("LDI3"),
+        PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertEquals(1, list.size());
     assertEquals("LDI3", list.iterator().next().getName());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchByIdentificationBarcode() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setQuery("LDI1::TEST_0001_Bn_P_PE_300_WG");
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    final Collection<LibraryDilution> list = dao.list(filter, 0, 0, false, "id");
+    final Collection<LibraryDilution> list = dao.list(0, 0, false, "id", PaginationFilter.query("LDI1::TEST_0001_Bn_P_PE_300_WG"),
+        PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertEquals(1, list.size());
     assertEquals("LDI1::TEST_0001_Bn_P_PE_300_WG", list.iterator().next().getIdentificationBarcode());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchWithEmptyQueryString() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setQuery("");
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    assertEquals(14, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(14, dao.list(0, 0, false, "id", PaginationFilter.query(""),
+        PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchWithNullQueryString() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    assertEquals(14, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(14, dao.list(0, 0, false, "id",
+        PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchNoneForPlatform() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setQuery("");
-    filter.setPlatformType(PlatformType.SOLID);
-    assertEquals(0, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.query(""),
+        PaginationFilter.platformType(PlatformType.SOLID)).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchOnlyByName() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setQuery("LDI3");
-    assertEquals(1, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(1, dao.list(0, 0, false, "id", PaginationFilter.query("LDI3")).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchOnlyByIdentificationBarcode() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setQuery("LDI1::TEST_0001_Bn_P_PE_300_WG");
-    assertEquals(1, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(1, dao.list(0, 0, false, "id", PaginationFilter.query("LDI1::TEST_0001_Bn_P_PE_300_WG")).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchOnlyWithEmptyQueryString() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setQuery("");
-    assertEquals(14, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(14, dao.list(0, 0, false, "id", PaginationFilter.query("")).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchOnlyWithNullQueryString() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    assertEquals(14, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(14, dao.list(0, 0, false, "id", PaginationFilter.query(null)).size());
   }
 
   @Test
@@ -179,55 +162,42 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllLibraryDilutionsByPlatform() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    assertEquals(14, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(14, dao.list(0, 0, false, "id",
+        PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsByPlatformNone() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setPlatformType(PlatformType.SOLID);
-    assertEquals(0, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(0, dao.list(0, 0, false, "id",
+        PaginationFilter.platformType(PlatformType.SOLID)).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsByProjectId() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setProjectId(1L);
-    assertEquals(14, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(14, dao.list(0, 0, false, "id", PaginationFilter.project(1L)).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsByProjectIdNone() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setProjectId(100L);
-    assertEquals(0, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.project(100L)).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsByProjectAndPlatform() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setProjectId(1L);
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    assertEquals(14, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(14, dao.list(0, 0, false, "id", PaginationFilter.project(1L),
+        PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsByProjectAndPlatformNoneForProject() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setProjectId(100L);
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    assertEquals(0, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.project(100L),
+        PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsByProjectAndPlatformNoneForPlatform() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setProjectId(1L);
-    filter.setPlatformType(PlatformType.SOLID);
-
-    assertEquals(0, dao.list(filter, 0, 0, false, "id").size());
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.project(1L),
+        PaginationFilter.platformType(PlatformType.SOLID)).size());
   }
 
   @Test
@@ -271,38 +241,32 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListBySearchOffsetAndNumResultsAndPlatformNoSearch_100() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    final List<LibraryDilution> results = dao.list(filter, 0, 100, false, "name");
+    final List<LibraryDilution> results = dao.list(0, 100, false, "name",
+        PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertNotNull(results);
     assertEquals(14, results.size());
   }
 
   @Test
   public void testListBySearchOffsetAndNumResultsAndPlatformNoSearch_5() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    final List<LibraryDilution> results = dao.list(filter, 0, 5, false, "name");
+    final List<LibraryDilution> results = dao.list(0, 5, false, "name",
+        PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertNotNull(results);
     assertEquals(5, results.size());
   }
 
   @Test
   public void testListBySearchOffsetAndNumResultsAndPlatformSearchGeneral() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setQuery("LDI");
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    final List<LibraryDilution> results = dao.list(filter, 0, 100, true, "name");
+    final List<LibraryDilution> results = dao.list(0, 100, true, "name", PaginationFilter.query("LDI"),
+        PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertNotNull(results);
     assertEquals(14, results.size());
   }
 
   @Test
   public void testListBySearchOffsetAndNumResultsAndPlatformSearch_1() throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setQuery("LDI2");
-    filter.setPlatformType(PlatformType.ILLUMINA);
-    final List<LibraryDilution> results = dao.list(filter, 0, 100, true, "name");
+    final List<LibraryDilution> results = dao.list(0, 100, true, "name", PaginationFilter.query("LDI2"),
+        PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertNotNull(results);
     assertEquals(1, results.size());
   }

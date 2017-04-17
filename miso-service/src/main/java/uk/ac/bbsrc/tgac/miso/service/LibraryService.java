@@ -16,9 +16,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
-public interface LibraryService extends PaginatedDataSource<Library, PaginationFilter> {
+public interface LibraryService extends PaginatedDataSource<Library> {
 
   Library get(long libraryId) throws IOException;
 

@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,16 +17,16 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 
-public abstract class JQueryDataTableBackend<Model, Dto, Filter extends PaginationFilter> {
+public abstract class JQueryDataTableBackend<Model, Dto> {
 
   protected abstract Dto asDto(Model model, UriComponentsBuilder builder);
 
-  protected abstract PaginatedDataSource<Model, Filter> getSource() throws IOException;
+  protected abstract PaginatedDataSource<Model> getSource() throws IOException;
 
-  public DataTablesResponseDto<Dto> get(Filter filter, HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
+  public DataTablesResponseDto<Dto> get(HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder, PaginationFilter... filters) throws IOException {
     if (request.getParameterMap().size() > 0) {
-      long numItems = getSource().count(filter);
+      long numItems = getSource().count(filters);
       // get request params from DataTables
       Integer iDisplayStart = Integer.parseInt(request.getParameter("iDisplayStart"));
       Integer iDisplayLength = Integer.parseInt(request.getParameter("iDisplayLength"));
@@ -37,13 +38,15 @@ public abstract class JQueryDataTableBackend<Model, Dto, Filter extends Paginati
       // get requested subset of item
       Long numMatches;
 
+      List<PaginationFilter> additionalFilters = new ArrayList<>(Arrays.asList(filters));
       if (!isStringEmptyOrNull(sSearch)) {
-        filter.setQuery(sSearch);
-        numMatches = getSource().count(filter);
+        additionalFilters.add(PaginationFilter.query(sSearch));
+        numMatches = getSource().count(additionalFilters.toArray(filters));
       } else {
         numMatches = numItems;
       }
-      Collection<Model> models = getSource().list(filter, iDisplayStart, iDisplayLength, "asc".equalsIgnoreCase(sSortDir), sortCol);
+      Collection<Model> models = getSource().list(iDisplayStart, iDisplayLength, "asc".equalsIgnoreCase(sSortDir), sortCol,
+          additionalFilters.toArray(filters));
 
       List<Dto> dtos = new ArrayList<>();
       for (Model model : models) {

@@ -7,14 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PoolPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataSource<Pool, PoolPaginationFilter> {
+public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataSource<Pool> {
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -27,7 +26,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public PaginatedDataSource<Pool, PoolPaginationFilter> getBackingPaginationSource() {
+  public PaginatedDataSource<Pool> getBackingPaginationSource() {
     return poolStore;
   }
 

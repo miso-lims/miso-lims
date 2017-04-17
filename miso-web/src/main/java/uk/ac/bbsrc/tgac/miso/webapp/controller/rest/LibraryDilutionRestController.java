@@ -26,8 +26,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -38,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 public class LibraryDilutionRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryDilutionRestController.class);
 
-  private final JQueryDataTableBackend<LibraryDilution, DilutionDto, DilutionPaginationFilter> jQueryBackend = new JQueryDataTableBackend<LibraryDilution, DilutionDto, DilutionPaginationFilter>() {
+  private final JQueryDataTableBackend<LibraryDilution, DilutionDto> jQueryBackend = new JQueryDataTableBackend<LibraryDilution, DilutionDto>() {
     @Override
     protected DilutionDto asDto(LibraryDilution model, UriComponentsBuilder builder) {
       DilutionDto dto = Dtos.asDto(model);
@@ -49,7 +49,7 @@ public class LibraryDilutionRestController extends RestController {
     }
 
     @Override
-    protected PaginatedDataSource<LibraryDilution, DilutionPaginationFilter> getSource() throws IOException {
+    protected PaginatedDataSource<LibraryDilution> getSource() throws IOException {
       return dilutionService;
     }
   };
@@ -64,10 +64,10 @@ public class LibraryDilutionRestController extends RestController {
     public Long id;
   }
 
-  private final JQueryDataTableBackend<LibraryDilution, SelectRowDto, DilutionPaginationFilter> jQueryBackendSelect = new JQueryDataTableBackend<LibraryDilution, SelectRowDto, DilutionPaginationFilter>() {
+  private final JQueryDataTableBackend<LibraryDilution, SelectRowDto> jQueryBackendSelect = new JQueryDataTableBackend<LibraryDilution, SelectRowDto>() {
 
     @Override
-    protected PaginatedDataSource<LibraryDilution, DilutionPaginationFilter> getSource() throws IOException {
+    protected PaginatedDataSource<LibraryDilution> getSource() throws IOException {
       return dilutionService;
     }
 
@@ -142,9 +142,7 @@ public class LibraryDilutionRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<DilutionDto> getDilutionsByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setProjectId(id);
-    return jQueryBackend.get(filter, request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
   @RequestMapping(value = "dt/pool/{id}/available", method = RequestMethod.GET, produces = "application/json")
@@ -153,19 +151,14 @@ public class LibraryDilutionRestController extends RestController {
       UriComponentsBuilder uriBuilder) throws IOException {
 
     final Pool pool = requestManager.getPoolById(poolId);
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setPlatformType(pool.getPlatformType());
-    return jQueryBackendSelect.get(filter, request, response, null);
+    return jQueryBackendSelect.get(request, response, null, PaginationFilter.platformType(pool.getPlatformType()));
   }
 
   @RequestMapping(value = "dt/pool/{id}/included", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody DataTablesResponseDto<SelectRowDto> includedDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-
-    DilutionPaginationFilter filter = new DilutionPaginationFilter();
-    filter.setPoolId(poolId);
-    return jQueryBackendSelect.get(filter, request, response, null);
+    return jQueryBackendSelect.get(request, response, null, PaginationFilter.pool(poolId));
   }
 
 }

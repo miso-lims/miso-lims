@@ -439,7 +439,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListWithLimitAndOffset() throws IOException {
-    List<Run> runs = dao.list(new PaginationFilter(), 2, 2, true, "id");
+    List<Run> runs = dao.list(2, 2, true, "id");
     assertEquals(2, runs.size());
     assertEquals(3L, runs.get(0).getId());
   }
@@ -461,26 +461,20 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListBySearchWithLimit() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("C0");
-    List<Run> runs = dao.list(filter, 2, 2, true, "id");
+    List<Run> runs = dao.list(2, 2, true, "id", PaginationFilter.query("C0"));
     assertEquals(1, runs.size());
     assertEquals(4L, runs.get(0).getId());
   }
 
   @Test
   public void testListByEmptySearchWithLimit() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("");
-    List<Run> runs = dao.list(filter, 0, 3, true, "id");
+    List<Run> runs = dao.list(0, 3, true, "id", PaginationFilter.query(""));
     assertEquals(3L, runs.size());
   }
 
   @Test
   public void testListByBadSearchWithLimit() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("; DROP TABLE Run;");
-    List<Run> runs = dao.list(filter, 0, 2, true, "id");
+    List<Run> runs = dao.list(0, 2, true, "id", PaginationFilter.query("; DROP TABLE Run;"));
     assertEquals(0L, runs.size());
   }
 
@@ -488,12 +482,12 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   @Test
   public void testListOffsetBadLimit() throws IOException {
     exception.expect(IOException.class);
-    dao.list(new PaginationFilter(), 5, -3, true, "id");
+    dao.list(5, -3, true, "id");
   }
 
   @Test
   public void testListOffsetThreeWithThreeSamplesPerPageOrderLastMod() throws IOException {
-    List<Run> runs = dao.list(new PaginationFilter(), 2, 2, false, "lastModified");
+    List<Run> runs = dao.list(2, 2, false, "lastModified");
     assertEquals(2, runs.size());
     assertEquals(2, runs.get(0).getId());
   }

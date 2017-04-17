@@ -73,7 +73,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 public class LibraryRestController extends RestController {
   private static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
-  private final JQueryDataTableBackend<Library, LibraryDto, PaginationFilter> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto, PaginationFilter>() {
+  private final JQueryDataTableBackend<Library, LibraryDto> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto>() {
     @Override
     protected LibraryDto asDto(Library model, UriComponentsBuilder builder) {
       LibraryDto dto = Dtos.asDto(model);
@@ -82,7 +82,7 @@ public class LibraryRestController extends RestController {
     }
 
     @Override
-    protected PaginatedDataSource<Library, PaginationFilter> getSource() throws IOException {
+    protected PaginatedDataSource<Library> getSource() throws IOException {
       return libraryService;
     }
   };
@@ -179,7 +179,7 @@ public class LibraryRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<LibraryDto> getLibraries(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder);
   }
 
   @RequestMapping(value = "/dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
@@ -187,9 +187,7 @@ public class LibraryRestController extends RestController {
   public DataTablesResponseDto<LibraryDto> getLibrariesForProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setProjectId(id);
-    return jQueryBackend.get(filter, request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
 }

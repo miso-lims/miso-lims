@@ -31,12 +31,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
-import uk.ac.bbsrc.tgac.miso.core.util.PoolPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource<Pool, PoolPaginationFilter> {
+public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource<Pool> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernatePoolDao.class);
 
@@ -303,16 +302,17 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   }
 
   @Override
-  public void setAdditionalPaginationCriteria(PoolPaginationFilter filter, Criteria criteria) {
-    if (filter.getPlatformType() != null) {
-      criteria.add(Restrictions.eq("platformType", filter.getPlatformType()));
-    }
-    if (filter.getProjectId() != null) {
-      criteria.createAlias("pooledElements", "dilution");
-      criteria.createAlias("dilution.library", "library");
-      criteria.createAlias("library.sample", "sample");
-      criteria.createAlias("sample.project", "project");
-    }
+  public void setProjectId(Criteria criteria, long projectId) {
+    criteria.createAlias("pooledElements", "dilution");
+    criteria.createAlias("dilution.library", "library");
+    criteria.createAlias("library.sample", "sample");
+    criteria.createAlias("sample.project", "project");
+    HibernatePaginatedDataSource.super.setProjectId(criteria, projectId);
+  }
+
+  @Override
+  public void setPlatformType(Criteria criteria, PlatformType platformType) {
+    criteria.add(Restrictions.eq("platformType", platformType));
   }
 
   @Override

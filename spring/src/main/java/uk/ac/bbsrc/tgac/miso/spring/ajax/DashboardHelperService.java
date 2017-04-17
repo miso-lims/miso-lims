@@ -63,8 +63,8 @@ import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
-import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.AlertService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
@@ -328,11 +328,9 @@ public class DashboardHelperService {
       List<LibraryDilution> libraryDilutions;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        DilutionPaginationFilter filter = new DilutionPaginationFilter();
-        filter.setQuery(searchStr);
-        libraryDilutions = new ArrayList<>(dilutionService.list(filter, 0, 0, false, "id"));
+        libraryDilutions = new ArrayList<>(dilutionService.list(0, 0, false, "id", PaginationFilter.query(searchStr)));
       } else {
-        libraryDilutions = new ArrayList<>(dilutionService.list(new DilutionPaginationFilter(), 0, 50, false, "id"));
+        libraryDilutions = new ArrayList<>(dilutionService.list(0, 50, false, "id"));
       }
 
       if (libraryDilutions.size() > 0) {

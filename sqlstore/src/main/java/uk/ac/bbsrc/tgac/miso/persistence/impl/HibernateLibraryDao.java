@@ -36,12 +36,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedDataSource<Library, PaginationFilter> {
+public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedDataSource<Library> {
 
   private interface AdjacencySelector {
     Criterion generateCriterion(String associationPath, Long libraryId);

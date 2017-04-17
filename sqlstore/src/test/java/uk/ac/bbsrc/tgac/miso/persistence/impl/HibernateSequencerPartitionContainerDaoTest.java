@@ -213,66 +213,55 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
 
   @Test
   public void testListWithLimitAndOffset() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.list(new PaginationFilter(), 1, 2, true, "id");
+    List<SequencerPartitionContainer> spcs = dao.list(1, 2, true, "id");
     assertEquals(2, spcs.size());
     assertEquals(2, spcs.get(0).getId());
   }
 
   @Test
   public void testCountBySearch() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("C0");
-    assertEquals(3, dao.count(filter));
+    assertEquals(3, dao.count(PaginationFilter.query("C0")));
   }
 
   @Test
   public void testCountByEmptySearch() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("");
-    assertEquals(4L, dao.count(filter));
+    assertEquals(4L, dao.count(PaginationFilter.query("")));
   }
 
   @Test
   public void testCountByBadSearch() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("; DROP TABLE SequencerPartitionContainer;");
-    assertEquals(0L, dao.count(filter));
+    assertEquals(0L, dao.count(PaginationFilter.query("; DROP TABLE SequencerPartitionContainer;")));
   }
 
   @Test
   public void testListBySearchWithLimit() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("C0");
-    List<SequencerPartitionContainer> spcs = dao.list(filter, 2, 2, true, "id");
+    List<SequencerPartitionContainer> spcs = dao.list(2, 2, true, "id", PaginationFilter.query("C0"));
     assertEquals(1, spcs.size());
     assertEquals(4L, spcs.get(0).getId());
   }
 
   @Test
   public void testListByEmptySearchWithLimit() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("");
-    List<SequencerPartitionContainer> spcs = dao.list(filter, 0, 3, true, "id");
+    List<SequencerPartitionContainer> spcs = dao.list(0, 3, true, "id", PaginationFilter.query(""));
     assertEquals(3L, spcs.size());
   }
 
   @Test
   public void testListByBadSearchWithLimit() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("; DROP TABLE SequencerPartitionContainer;");
-    List<SequencerPartitionContainer> spcs = dao.list(filter, 0, 2, true, "id");
+    List<SequencerPartitionContainer> spcs = dao.list(0, 2, true, "id",
+        PaginationFilter.query("; DROP TABLE SequencerPartitionContainer;"));
     assertEquals(0L, spcs.size());
   }
 
   @Test
   public void testListOffsetBadLimit() throws IOException {
     exception.expect(IOException.class);
-    dao.list(new PaginationFilter(), 5, -3, true, "id");
+    dao.list(5, -3, true, "id");
   }
 
   @Test
   public void testListOffsetThreeWithThreeSamplesPerPageOrderLastMod() throws IOException {
-    List<SequencerPartitionContainer> spcs = dao.list(new PaginationFilter(), 2, 2, false, "lastModified");
+    List<SequencerPartitionContainer> spcs = dao.list(2, 2, false, "lastModified");
     assertEquals(2, spcs.size());
     assertEquals(2, spcs.get(0).getId());
   }
