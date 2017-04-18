@@ -32,7 +32,6 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,8 +47,6 @@ import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,12 +56,12 @@ import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -133,16 +130,18 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @PrimaryKeyJoinColumn
   private SampleDerivedInfo derivedInfo;
 
-  @ManyToOne(targetEntity = BoxImpl.class, fetch = FetchType.LAZY)
-  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = sampleId AND bp.targetType LIKE 'Sample%')")
-  private Box box;
+  @OneToOne(optional = true)
+  @PrimaryKeyJoinColumn
+  private SampleBoxPosition boxPosition;
 
-  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = sampleId AND bp.targetType LIKE 'Sample%')")
-  private String position;
+  @Override
+  public Box getBox() {
+    return boxPosition == null ? null : boxPosition.getBox();
+  }
 
   @Override
   public String getBoxPosition() {
-    return position;
+    return boxPosition == null ? null : boxPosition.getPosition();
   }
 
   @Override
@@ -183,11 +182,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setAccession(String accession) {
     this.accession = accession;
-  }
-
-  @Override
-  public Box getBox() {
-    return box;
   }
 
   @Override
