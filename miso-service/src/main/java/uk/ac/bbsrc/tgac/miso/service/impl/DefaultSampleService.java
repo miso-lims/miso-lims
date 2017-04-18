@@ -650,6 +650,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   public void applyChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
+    source = deproxify(source);
     if (source instanceof SampleCVSlide) {
       ((SampleCVSlide) target).setSlides(((SampleCVSlide) source).getSlides());
       ((SampleCVSlide) target).setDiscards(((SampleCVSlide) source).getDiscards());

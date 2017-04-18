@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -63,6 +63,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,7 +196,6 @@ public class LimsUtils {
     }
     return buffer.toString();
   }
-
 
   public static String findHyperlinks(String text) {
     if (!LimsUtils.isStringEmptyOrNull(text)) {
@@ -487,8 +487,6 @@ public class LimsUtils {
     return null;
   }
 
-
-
   public static Matcher tailGrep(File f, Pattern p, int lines) throws IOException, FileNotFoundException {
     // Open the file and then get a channel from the stream
     FileInputStream fis = new FileInputStream(f);
@@ -648,27 +646,33 @@ public class LimsUtils {
     return !isDetailedSample(sample);
   }
 
+  private static boolean safeCategoryCheck(Sample sample, String category) {
+    DetailedSample detailedSample = (DetailedSample) sample;
+    if (detailedSample.getSampleClass() == null) return false;
+    return category.equals(detailedSample.getSampleClass().getSampleCategory());
+  }
+
   public static boolean isIdentitySample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
-    return sample instanceof Identity;
+    return sample instanceof Identity || safeCategoryCheck(sample, Identity.CATEGORY_NAME);
   }
 
   public static boolean isTissueSample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
-    return sample instanceof SampleTissue;
+    return sample instanceof SampleTissue || safeCategoryCheck(sample, SampleTissue.CATEGORY_NAME);
   }
 
   public static boolean isTissueProcessingSample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
-    return sample instanceof SampleTissueProcessing;
+    return sample instanceof SampleTissueProcessing || safeCategoryCheck(sample, SampleTissueProcessing.CATEGORY_NAME);
   }
 
   public static boolean isStockSample(Sample sample) {
-    return sample instanceof SampleStock;
+    return sample instanceof SampleStock || safeCategoryCheck(sample, SampleStock.CATEGORY_NAME);
   }
 
   public static boolean isAliquotSample(Sample sample) {
-    return sample instanceof SampleAliquot;
+    return sample instanceof SampleAliquot || safeCategoryCheck(sample, SampleAliquot.CATEGORY_NAME);
   }
 
   public static boolean isDetailedLibrary(Library library) {
@@ -767,4 +771,12 @@ public class LimsUtils {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public static <T> T deproxify(T from) {
+    if (from instanceof HibernateProxy) {
+      HibernateProxy proxy = (HibernateProxy) from;
+      from = (T) proxy.getHibernateLazyInitializer().getImplementation();
+    }
+    return from;
+  }
 }

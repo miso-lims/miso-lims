@@ -251,11 +251,13 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof PoolImpl)) return false;
-    PoolImpl other = (PoolImpl) obj;
-    return new EqualsBuilder().appendSuper(super.equals(obj)).append(description, other.description)
-        .append(pooledElements, other.pooledElements).append(experiments, other.experiments).append(concentration, other.concentration)
-        .append(identificationBarcode, other.identificationBarcode).append(readyToRun, other.readyToRun).append(qcPassed, other.qcPassed)
+    if (!(obj instanceof Pool)) return false;
+    Pool other = (Pool) obj;
+    return new EqualsBuilder().appendSuper(super.equals(obj)).append(description, other.getDescription())
+        .append(pooledElements, other.getPoolableElements()).append(experiments, other.getExperiments())
+        .append(concentration, other.getConcentration())
+        .append(identificationBarcode, other.getIdentificationBarcode()).append(readyToRun, other.getReadyToRun())
+        .append(qcPassed, other.getQcPassed())
         .isEquals();
   }
 
