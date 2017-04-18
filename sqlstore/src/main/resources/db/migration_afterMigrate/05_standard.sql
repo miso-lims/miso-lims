@@ -888,3 +888,24 @@ FROM Sample s
 JOIN BoxPosition bp
   ON bp.targetType LIKE 'Sample%'
   AND bp.targetId = s.sampleId;
+
+CREATE OR REPLACE VIEW LibraryBoxPosition
+AS SELECT l.libraryId, bp.boxId, bp.position
+FROM Library l
+JOIN BoxPosition bp
+  ON bp.targetType LIKE 'Library%'
+  AND bp.targetId = l.libraryId;
+
+CREATE OR REPLACE VIEW DilutionBoxPosition
+AS SELECT d.dilutionId, bp.boxId, bp.position
+FROM LibraryDilution d
+JOIN BoxPosition bp
+  ON bp.targetType = 'Dilution'
+  AND bp.targetId = d.dilutionId;
+
+CREATE OR REPLACE VIEW PoolBoxPosition
+AS SELECT p.poolId, bp.boxId, bp.position
+FROM Pool p
+JOIN BoxPosition bp
+  ON bp.targetType = 'Pool'
+  AND bp.targetId = p.poolId;

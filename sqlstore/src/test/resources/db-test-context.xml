@@ -118,6 +118,9 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ExperimentChangeLog</value>
