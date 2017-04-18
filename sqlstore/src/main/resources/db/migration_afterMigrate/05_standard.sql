@@ -882,3 +882,9 @@ CREATE OR REPLACE VIEW LibraryDerivedInfo AS
 CREATE OR REPLACE VIEW BoxDerivedInfo AS
   SELECT boxId, MAX(changeTime) AS lastModified FROM BoxChangeLog GROUP BY boxId;
 
+CREATE OR REPLACE VIEW SampleBoxPosition
+AS SELECT s.sampleId, bp.boxId, bp.position
+FROM Sample s
+JOIN BoxPosition bp
+  ON bp.targetType LIKE 'Sample%'
+  AND bp.targetId = s.sampleId;
