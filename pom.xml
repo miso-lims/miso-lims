@@ -180,7 +180,8 @@
     <mockito.verison>1.10.19</mockito.verison>
     <slf4j.version>1.6.1</slf4j.version>
     <jersey.version>1.19</jersey.version>
-    <prometheus.version>0.0.15</prometheus.version>
+    <prometheus.version>0.0.21</prometheus.version>
+    <prometheus.jmx.version>0.9</prometheus.jmx.version>
     <jackson.version>2.8.6</jackson.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -311,6 +312,16 @@
         <groupId>io.prometheus</groupId>
         <artifactId>simpleclient_servlet</artifactId>
         <version>${prometheus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_hibernate</artifactId>
+        <version>${prometheus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.prometheus.jmx</groupId>
+        <artifactId>collector</artifactId>
+        <version>${prometheus.jmx.version}</version>
       </dependency>
       <dependency>
         <groupId>org.javassist</groupId>
