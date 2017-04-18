@@ -6,6 +6,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public abstract interface PaginationFilter {
 
+  public static PaginationFilter fulfilled(final boolean isFulfilled) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item) {
+        sink.setFulfilled(item, isFulfilled);
+      }
+    };
+  }
+
   public static PaginationFilter platformType(final PlatformType platformType) {
     return new PaginationFilter() {
 

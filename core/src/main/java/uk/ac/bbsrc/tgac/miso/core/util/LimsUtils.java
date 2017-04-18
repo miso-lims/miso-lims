@@ -50,12 +50,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,9 +71,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -85,9 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -581,61 +572,6 @@ public class LimsUtils {
     BigDecimal bigDecimal = new BigDecimal(value);
     bigDecimal = bigDecimal.setScale(numberOfDigitsAfterDecimalPoint, BigDecimal.ROUND_HALF_UP);
     return bigDecimal.doubleValue();
-  }
-
-  public static SortedSet<HealthType> getUsedHealthTypes(Iterable<PoolOrderCompletion> completions) {
-    SortedSet<HealthType> healths = new TreeSet<>(HealthType.COMPARATOR);
-    addUsedHealthTypes(completions, healths);
-    return healths;
-  }
-
-  public static void addUsedHealthTypes(Iterable<PoolOrderCompletion> completions, SortedSet<HealthType> healths) {
-    for (PoolOrderCompletion completion : completions) {
-      healths.add(completion.getHealth());
-    }
-  }
-
-  public static Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> groupCompletions(
-      Iterable<PoolOrderCompletion> completions) {
-    Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
-    for (PoolOrderCompletion completion : completions) {
-      Map<SequencingParameters, PoolOrderCompletionGroup> parametersGroup;
-      if (poolGroups.containsKey(completion.getPool())) {
-        parametersGroup = poolGroups.get(completion.getPool());
-      } else {
-        parametersGroup = new TreeMap<>();
-        poolGroups.put(completion.getPool(), parametersGroup);
-      }
-      PoolOrderCompletionGroup groupedCompletions;
-      if (parametersGroup.containsKey(completion.getSequencingParameters())) {
-        groupedCompletions = parametersGroup.get(completion.getSequencingParameters());
-      } else {
-        groupedCompletions = new PoolOrderCompletionGroup();
-        parametersGroup.put(completion.getSequencingParameters(), groupedCompletions);
-      }
-      groupedCompletions.add(completion);
-    }
-    return poolGroups;
-  }
-
-  public static Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> filterUnfulfilledCompletions(
-      Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> groups) {
-    Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
-    for (Entry<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> poolEntry : groups.entrySet()) {
-      for (Entry<SequencingParameters, PoolOrderCompletionGroup> parameterEntry : poolEntry.getValue().entrySet()) {
-        if (parameterEntry.getValue().getRemaining() < 1) continue;
-
-        Map<SequencingParameters, PoolOrderCompletionGroup> parametersGroup = null;
-        if (poolGroups.containsKey(poolEntry.getKey())) {
-          parametersGroup = poolGroups.get(poolEntry.getKey());
-        } else {
-          parametersGroup = new HashMap<>();
-          poolGroups.put(poolEntry.getKey(), parametersGroup);
-        }
-        parametersGroup.put(parameterEntry.getKey(), parameterEntry.getValue());
-      }
-    }
-    return poolGroups;
   }
 
   public static boolean isDetailedSample(Sample sample) {
