@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.service.security;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -129,5 +130,8 @@ public interface AuthorizationManager {
    * @throws AuthorizationException if the current user is not authenticated
    */
   public <T extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered) throws IOException, AuthorizationException;
+
+  public <T, P extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered, Function<T, P> getOwner)
+      throws IOException, AuthorizationException;
 
 }

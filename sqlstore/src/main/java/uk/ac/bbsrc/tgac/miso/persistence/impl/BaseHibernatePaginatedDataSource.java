@@ -39,7 +39,8 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   default Criteria createPaginationCriteria() throws IOException {
     Criteria criteria = currentSession().createCriteria(getRealClass());
     for (String alias : listAliases()) {
-      criteria.createAlias(alias, alias);
+      String[] parts = alias.split("\\.");
+      criteria.createAlias(alias, parts[parts.length - 1]);
     }
     return criteria;
   }
@@ -108,6 +109,11 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
    * Create a set of restrictions given the user-supplied search string.
    */
   Criterion searchRestrictions(String query);
+
+  @Override
+  default void setFulfilled(Criteria item, boolean isFulfilled) {
+    throw new IllegalArgumentException();
+  }
 
   @Override
   default void setPlatformType(Criteria item, PlatformType platformType) {

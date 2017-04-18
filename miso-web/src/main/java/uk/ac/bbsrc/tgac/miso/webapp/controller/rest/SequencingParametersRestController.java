@@ -65,9 +65,9 @@ public class SequencingParametersRestController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createSequencingParameters(@RequestBody SequencingParametersDto sequencingParamtersDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
-    Platform platform = requestManager.getPlatformById(sequencingParamtersDto.getPlatformId());
+    Platform platform = requestManager.getPlatformById(sequencingParamtersDto.getPlatform().getId());
     if (platform == null) {
-      throw new RestException("No platform found with ID: " + sequencingParamtersDto.getPlatformId(), Status.BAD_REQUEST);
+      throw new RestException("No platform found with ID: " + sequencingParamtersDto.getPlatform().getId(), Status.BAD_REQUEST);
     }
     SequencingParameters sp = new SequencingParametersImpl();
     sp.setName(sequencingParamtersDto.getName());

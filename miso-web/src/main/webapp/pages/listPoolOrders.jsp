@@ -34,41 +34,21 @@
 
     <div id="tabs"></div>
     <script type="text/javascript">
-       var ordercompletions = ${ordercompletionJSON};
+       var ordercompletions = [
+         { 'htmlElement': 'unful', 'humanName': 'Unfulfilled', 'url': '/miso/rest/poolorder/dt/completions/active' },
+         { 'htmlElement': 'all', 'humanName': 'All', 'url': '/miso/rest/poolorder/dt/completions' },
+       ];
+
        var tabHeader = '<ul>' + ordercompletions.map(function(ocd) { return '<li><a href="#tab-' + ocd.htmlElement + '"><span>' + ocd.humanName + '</span></a></li>'; }).join('') + '</ul>';
        var tabs = ordercompletions.map(function(ocd) {
          return '<div id="tab-' + ocd.htmlElement + '"><h1><div>' + ocd.humanName + '</div></h1>' +
-           '<div class="dataTables_wrapper" role="grid"><table cellpadding="0" cellspacing="0" border="0" class="display dataTable" id="listingPoolOrderTable' +
+           '<div class="dataTables_wrapper" role="grid"><table cellpadding="0" cellspacing="0" border="0" class="display dataTable" id="listingPoolOrderTable-' +
            ocd.htmlElement + '"><thead><tr><th></th><th>Alias</th><th></th><th></th><th></th><th>Completed</th><th>Remaining</th></tr></thead><tbody></tbody></table></div></div>';
        }).join('');
        document.getElementById('tabs').innerHTML = tabHeader + tabs;
-       for (var i = 0; i < ordercompletions.length; i++) {
-         jQuery('#listingPoolOrderTable' + ordercompletions[i].htmlElement).html('');
-         jQuery('#listingPoolOrderTable' + ordercompletions[i].htmlElement).dataTable({
-           "aaData": ordercompletions[i].data ,
-           "aoColumns": [
-             { "sTitle": "Pool Name"},
-             { "sTitle": "Alias"},
-             { "sTitle": "Platform"},
-             { "sTitle": "Sequencing Parameters"}
-           ].concat(ordercompletions[i].headings.map(function(name) { return { "sTitle": name }; })).concat([
-             { "sTitle": "Remaining"},
-             { "sTitle": "Last Updated"}
-           ]),
-           "bJQueryUI": true,
-           "bAutoWidth": false,
-           "iDisplayLength": 25,
-           "sPaginationType": "full_numbers",
-           "aaSorting": [
-             [0, "desc"]
-           ],
-           "fnDrawCallback": function (oSettings) {
-             jQuery('#listingPoolOrderTable' + ordercompletions[i].htmlElement + '_paginate').find('.fg-button').removeClass('fg-button');
-           }
-         });
-       }
         jQuery(document).ready(function () {
           jQuery("#tabs").tabs();
+          ordercompletions.forEach(function(ocd) { Pool.ui.createCompletionTable('listingPoolOrderTable-' + ocd.htmlElement, ocd.url); });
         });
     </script>
   </div>
