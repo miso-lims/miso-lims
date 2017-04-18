@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -1463,6 +1464,22 @@ public class Dtos {
     dto.setInstrumentModel(from.getInstrumentModel());
     dto.setNumContainers(from.getNumContainers());
     return dto;
+  }
+
+  public static ProjectDto asDto(Project from) {
+    ProjectDto dto = new ProjectDto();
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    dto.setAlias(from.getAlias());
+    return dto;
+  }
+
+  public static List<ProjectDto> asProjectDtos(Collection<Project> projects) {
+    List<ProjectDto> dtoList = new ArrayList<>();
+    for (Project project : projects) {
+      dtoList.add(asDto(project));
+    }
+    return dtoList;
   }
 
 }
