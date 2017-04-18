@@ -121,11 +121,6 @@ public interface Library
   public void setSample(Sample sample);
 
   /**
-   * Get the tissue from which this library was derived, if one exists. Null otherwise.
-   */
-  public SampleTissue getSampleTissue();
-
-  /**
    * Sets the notes of this Library object.
    * 
    * @param notes
@@ -318,6 +313,7 @@ public interface Library
    */
   public void setQcPassed(Boolean qcPassed);
 
+  @Override
   public Collection<ChangeLog> getChangeLog();
 
   /**

@@ -797,6 +797,8 @@ public class Dtos {
 
   private static SampleTissueProcessingDto asTissueProcessingSampleDto(SampleTissueProcessing from) {
     SampleTissueProcessingDto dto = null;
+    from = deproxify(from);
+
     if (from instanceof SampleCVSlideImpl) {
       dto = asCVSlideSampleDto((SampleCVSlide) from);
     } else if (from.getClass() == SampleLCMTubeImpl.class) {

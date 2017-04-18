@@ -140,8 +140,8 @@ public class PartitionImpl implements Partition, Serializable {
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof PartitionImpl)) return false;
-    PartitionImpl them = (PartitionImpl) obj;
+    if (!(obj instanceof Partition)) return false;
+    Partition them = (Partition) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
     if (getId() == PartitionImpl.UNSAVED_ID || them.getId() == PartitionImpl.UNSAVED_ID) {

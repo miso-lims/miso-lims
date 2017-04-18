@@ -249,12 +249,12 @@ public class UserImpl implements User, Serializable {
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof UserImpl)) return false;
-    UserImpl them = (UserImpl) obj;
-    if (getId() == UserImpl.UNSAVED_ID || them.getId() == UserImpl.UNSAVED_ID) {
+    if (!(obj instanceof User)) return false;
+    User them = (User) obj;
+    if (getId() == UserImpl.UNSAVED_ID || them.getUserId() == UserImpl.UNSAVED_ID) {
       return this.getLoginName().equals(them.getLoginName());
     } else {
-      return this.getId() == them.getId();
+      return this.getId() == them.getUserId();
     }
   }
 

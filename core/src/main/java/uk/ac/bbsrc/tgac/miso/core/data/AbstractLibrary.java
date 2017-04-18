@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -506,7 +506,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     this.lastModifier = lastModifier;
   }
 
-
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
@@ -523,17 +522,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
       }
     }
     return IndexFamily.NULL;
-  }
-
-  @Override
-  public SampleTissue getSampleTissue() {
-    if (this.getSample() instanceof DetailedSample) {
-
-      for (DetailedSample parent = (DetailedSample) this.getSample(); parent != null; parent = parent.getParent()) {
-        if (parent instanceof SampleTissue) return (SampleTissue) parent;
-      }
-    }
-    return null;
   }
 
   @Override
@@ -566,7 +554,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(qcPassed)
         .toHashCode();
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;

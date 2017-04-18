@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
@@ -27,7 +28,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.OicrSampleAliasGenerator;
 
 public class OicrSampleAliasGeneratorTest {
 
@@ -89,8 +89,11 @@ public class OicrSampleAliasGeneratorTest {
     SampleAliquot aliquot = new SampleAliquotImpl();
     SampleAliquot parent = makeAliquotFromStock();
     parent.setAlias("PROJ_0001_nn_n_nn_1-1_R_12");
+    SampleClass parentSc = new SampleClassImpl();
+    parentSc.setSampleCategory(SampleAliquot.CATEGORY_NAME);
     aliquot.setParent(parent);
     SampleClass sc = new SampleClassImpl();
+    sc.setSampleCategory(SampleAliquot.CATEGORY_NAME);
     sc.setSuffix("MR_");
     aliquot.setSampleClass(sc);
     aliquot.setSiblingNumber(2);
@@ -105,6 +108,7 @@ public class OicrSampleAliasGeneratorTest {
     SampleStock stock = new SampleStockImpl();
     stock.setParent(lcm);
     SampleClass stockSc = new SampleClassImpl();
+    stockSc.setSampleCategory(SampleStock.CATEGORY_NAME);
     stockSc.setSuffix("R_S");
     stock.setSampleClass(stockSc);
     stock.setSiblingNumber(4);
@@ -114,6 +118,7 @@ public class OicrSampleAliasGeneratorTest {
     aliquot.setParent(stock);
     SampleClass aliquotSc = new SampleClassImpl();
     aliquotSc.setSuffix("R_");
+    aliquotSc.setSampleCategory(SampleAliquot.CATEGORY_NAME);
     aliquot.setSampleClass(aliquotSc);
     aliquot.setSiblingNumber(12);
 
@@ -126,6 +131,7 @@ public class OicrSampleAliasGeneratorTest {
     parentStock.setAlias("PROJ_0001_nn_n_nn_1-1_D_S4");
     stock.setParent(parentStock);
     SampleClass sc = new SampleClassImpl();
+    sc.setSampleCategory(SampleStock.CATEGORY_NAME);
     sc.setSuffix("D_S");
     stock.setSampleClass(sc);
     stock.setSiblingNumber(6);
@@ -138,6 +144,7 @@ public class OicrSampleAliasGeneratorTest {
     lcmTube.setAlias("PROJ_0001_nn_n_nn_1-1_LCM02");
     stock.setParent(lcmTube);
     SampleClass sc = new SampleClassImpl();
+    sc.setSampleCategory(SampleStock.CATEGORY_NAME);
     sc.setSuffix("D_S");
     stock.setSampleClass(sc);
     stock.setSiblingNumber(4);
@@ -150,6 +157,7 @@ public class OicrSampleAliasGeneratorTest {
     tissue.setAlias("PROJ_0001_nn_n_nn_1-1");
     stock.setParent(tissue);
     SampleClass sc = new SampleClassImpl();
+    sc.setSampleCategory(SampleStock.CATEGORY_NAME);
     sc.setSuffix("D_S");
     stock.setSampleClass(sc);
     stock.setSiblingNumber(4);
@@ -163,6 +171,7 @@ public class OicrSampleAliasGeneratorTest {
     lcmTube.setParent(tissue);
     lcmTube.setSiblingNumber(2);
     SampleClass sc = new SampleClassImpl();
+    sc.setSampleCategory(SampleTissueProcessing.CATEGORY_NAME);
     sc.setSuffix("LCM");
     lcmTube.setSampleClass(sc);
     return lcmTube;
@@ -170,6 +179,9 @@ public class OicrSampleAliasGeneratorTest {
 
   private SampleTissue makeMinimalTissue() {
     SampleTissue tissue = new SampleTissueImpl();
+    SampleClass sc = new SampleClassImpl();
+    sc.setSampleCategory(SampleTissue.CATEGORY_NAME);
+    tissue.setSampleClass(sc);
     tissue.setParent(makeIdentity());
     tissue.setTimesReceived(1);
     tissue.setTubeNumber(1);
@@ -196,6 +208,9 @@ public class OicrSampleAliasGeneratorTest {
     Identity identity = new IdentityImpl();
     identity.setId(1L);
     identity.setAlias("PROJ_0001");
+    SampleClass sc = new SampleClassImpl();
+    sc.setSampleCategory(Identity.CATEGORY_NAME);
+    identity.setSampleClass(sc);
 
     Project proj = new ProjectImpl();
     proj.setId(1L);
