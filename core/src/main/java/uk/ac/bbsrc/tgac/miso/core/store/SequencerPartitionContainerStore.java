@@ -30,7 +30,6 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 /**
  * Defines a DAO interface for storing SequencerPartitionContainers
@@ -39,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
  * @since 0.1.6
  */
 public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer>,
-    Remover<SequencerPartitionContainer>, PaginatedDataSource<SequencerPartitionContainer, PaginationFilter> {
+    Remover<SequencerPartitionContainer>, PaginatedDataSource<SequencerPartitionContainer> {
   /**
    * Get the SequencerPartitionContainer that contains a given {@link SequencerPoolPartition}
    * 

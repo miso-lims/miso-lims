@@ -48,7 +48,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -73,7 +72,7 @@ public class ContainerRestController extends RestController {
   @Autowired
   private ContainerService containerService;
 
-  private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto, PaginationFilter> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto, PaginationFilter>() {
+  private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto>() {
 
     @Override
     protected ContainerDto asDto(SequencerPartitionContainer model, UriComponentsBuilder builder) {
@@ -83,7 +82,7 @@ public class ContainerRestController extends RestController {
     }
 
     @Override
-    protected PaginatedDataSource<SequencerPartitionContainer, PaginationFilter> getSource() throws IOException {
+    protected PaginatedDataSource<SequencerPartitionContainer> getSource() throws IOException {
       return containerService;
     }
 
@@ -165,6 +164,6 @@ public class ContainerRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<ContainerDto> getContainers(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackend.get(new PaginationFilter(), request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder);
   }
 }

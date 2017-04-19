@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -42,22 +43,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
+import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
-import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
  * A controller to handle all REST requests for Projects
@@ -78,10 +72,6 @@ public class ProjectRestController extends RestController {
   private LibraryService libraryService;
   @Autowired
   private SampleGroupService sampleGroupService;
-  @Autowired
-  private LibraryDilutionService dilutionService;
-  @Autowired
-  private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -91,84 +81,34 @@ public class ProjectRestController extends RestController {
     this.libraryService = libraryService;
   }
 
-  public void setDilutionService(LibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
-  }
-
   @RequestMapping(value = "/alias/{projectAlias}", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String getProjectByAlias(@PathVariable String projectAlias) throws IOException {
+  public @ResponseBody ProjectDto getProjectByAlias(@PathVariable String projectAlias) throws IOException {
     Project project = requestManager.getProjectByAlias(projectAlias);
     if (project == null) {
       throw new RestException("No project found with alias: " + projectAlias, Status.NOT_FOUND);
     }
-    return getProjectById(project.getId());
+    return Dtos.asDto(project);
   }
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String getProjectById(@PathVariable Long projectId) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
+  public @ResponseBody ProjectDto getProjectById(@PathVariable Long projectId) throws IOException {
     Project project = requestManager.getProjectById(projectId);
     if (project == null) {
       throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
     }
-    for (Sample s : project.getSamples()) {
-      if (s.getLibraries().isEmpty()) {
-        for (Library l : libraryService.listBySampleId(s.getId())) {
-          try {
-            s.addLibrary(l);
-          } catch (MalformedLibraryException e) {
-            log.error("get project by id", e);
-          }
-        }
-      }
-
-      if (s.getSampleQCs().isEmpty()) {
-        for (SampleQC qc : requestManager.listAllSampleQCsBySampleId(s.getId())) {
-          s.addQc(qc);
-        }
-      }
-    }
-    return mapper.writeValueAsString(project);
+    return Dtos.asDto(project);
   }
 
   @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String getProjectLibraries(@PathVariable Long projectId) throws IOException {
+  public @ResponseBody List<LibraryDto> getProjectLibraries(@PathVariable Long projectId) throws IOException {
     Collection<Library> lp = libraryService.listByProjectId(projectId);
-    for (Library l : lp) {
-      for (LibraryDilution dil : dilutionService.listByLibraryId(l.getId())) {
-        try {
-          l.addDilution(dil);
-        } catch (MalformedDilutionException e) {
-          log.error("get project libraries", e);
-        }
-      }
-
-      for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
-        l.addQc(qc);
-      }
-    }
-
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.writeValueAsString(lp);
+    return Dtos.asLibraryDtos(lp);
   }
 
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String listAllProjects() throws IOException {
+  public @ResponseBody List<ProjectDto> listAllProjects() throws IOException {
     Collection<Project> lp = requestManager.listAllProjects();
-    for (Project p : lp) {
-      p.setSamples(requestManager.listAllSamplesByProjectId(p.getProjectId()));
-      p.setStudies(studyService.listByProjectId(p.getProjectId()));
-    }
-
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.writeValueAsString(lp);
-  }
-
-  @RequestMapping(value = "lazy", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String lazyListAllProjects() throws IOException {
-    Collection<Project> lp = requestManager.listAllProjects();
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.writeValueAsString(lp);
+    return Dtos.asProjectDtos(lp);
   }
 
   @RequestMapping(value = "{id}/groups", method = RequestMethod.GET, produces = { "application/json" })

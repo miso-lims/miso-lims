@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -35,8 +36,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -88,6 +92,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -797,6 +802,8 @@ public class Dtos {
 
   private static SampleTissueProcessingDto asTissueProcessingSampleDto(SampleTissueProcessing from) {
     SampleTissueProcessingDto dto = null;
+    from = deproxify(from);
+
     if (from instanceof SampleCVSlideImpl) {
       dto = asCVSlideSampleDto((SampleCVSlide) from);
     } else if (from.getClass() == SampleLCMTubeImpl.class) {
@@ -966,7 +973,7 @@ public class Dtos {
     SequencingParametersDto dto = new SequencingParametersDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
-    dto.setPlatformId(from.getPlatform().getId());
+    dto.setPlatform(asDto(from.getPlatform()));
     return dto;
   }
 
@@ -1420,6 +1427,57 @@ public class Dtos {
     List<QcTypeDto> dtoList = new ArrayList<>();
     for (QcType qcType : qcTypeSubset) {
       dtoList.add(asDto(qcType));
+    }
+    return dtoList;
+  }
+
+  public static PoolOrderCompletionDto asDto(PoolOrderCompletion from) {
+    PoolOrderCompletionDto dto = new PoolOrderCompletionDto();
+    dto.setPool(asDto(from.getPool(), false));
+    dto.setParameters(asDto(from.getSequencingParameters()));
+    dto.setLastUpdated(dateTimeFormatter.print(new DateTime(from.getLastUpdated())));
+    dto.setRemaining(from.getRemaining());
+    setPoolOrderValue(from, HealthType.Completed, dto::setCompleted);
+    setPoolOrderValue(from, HealthType.Failed, dto::setFailed);
+    setPoolOrderValue(from, HealthType.Requested, dto::setRequested);
+    setPoolOrderValue(from, HealthType.Running, dto::setRunning);
+    setPoolOrderValue(from, HealthType.Started, dto::setStarted);
+    setPoolOrderValue(from, HealthType.Stopped, dto::setStopped);
+    setPoolOrderValue(from, HealthType.Unknown, dto::setUnknown);
+    return dto;
+
+  }
+
+  private static void setPoolOrderValue(PoolOrderCompletion from, HealthType health, Consumer<Integer> setter) {
+    if (from.getItems().containsKey(health)) {
+      setter.accept(from.getItems().get(health));
+    } else {
+      setter.accept(0);
+    }
+  }
+
+  private static PlatformDto asDto(Platform from) {
+    PlatformDto dto = new PlatformDto();
+    dto.setId(from.getId());
+    dto.setPlatformType(from.getPlatformType().name());
+    dto.setDescription(from.getDescription());
+    dto.setInstrumentModel(from.getInstrumentModel());
+    dto.setNumContainers(from.getNumContainers());
+    return dto;
+  }
+
+  public static ProjectDto asDto(Project from) {
+    ProjectDto dto = new ProjectDto();
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    dto.setAlias(from.getAlias());
+    return dto;
+  }
+
+  public static List<ProjectDto> asProjectDtos(Collection<Project> projects) {
+    List<ProjectDto> dtoList = new ArrayList<>();
+    for (Project project : projects) {
+      dtoList.add(asDto(project));
     }
     return dtoList;
   }

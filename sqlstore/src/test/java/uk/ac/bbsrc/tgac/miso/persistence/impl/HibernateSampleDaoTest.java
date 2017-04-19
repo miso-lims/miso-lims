@@ -249,64 +249,54 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
 
   @Test
   public void getSamplesOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
-    List<Sample> samples = dao.list(new PaginationFilter(), 0, 2, false, "id");
+    List<Sample> samples = dao.list(0, 2, false, "id");
     assertEquals(2, samples.size());
     assertEquals(17L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetThreeWithThreeSamplesPerPageTest() throws Exception {
-    List<Sample> samples = dao.list(new PaginationFilter(), 3, 3, false, "id");
+    List<Sample> samples = dao.list(3, 3, false, "id");
     assertEquals(3, samples.size());
     assertEquals(14L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetThreeWithThreeSamplesPerPageOrderLastModTest() throws Exception {
-    List<Sample> samples = dao.list(new PaginationFilter(), 2, 2, false, "lastModified");
+    List<Sample> samples = dao.list(2, 2, false, "lastModified");
     assertEquals(2, samples.size());
     assertEquals(15L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesBySearchOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("TEST_0006");
-    List<Sample> samples = dao.list(filter, 0, 2, true, "id");
+    List<Sample> samples = dao.list(0, 2, true, "id", PaginationFilter.query("TEST_0006"));
     assertEquals(2, samples.size());
     assertEquals(11L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesBySearchOffsetZeroWithTenSamplesPerPageTest() throws Exception {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("SaM1");
-    List<Sample> samples = dao.list(filter, 0, 10, false, "id");
+    List<Sample> samples = dao.list(0, 10, false, "id", PaginationFilter.query("SaM1"));
     assertEquals(9, samples.size());
     assertEquals(17L, samples.get(0).getId());
   }
 
   @Test
   public void countSamplesBySearch() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("SAM1");
-    Long numSamples = dao.count(filter);
+    Long numSamples = dao.count(PaginationFilter.query("SAM1"));
     assertEquals(Long.valueOf(9L), numSamples);
   }
 
   @Test
   public void countSamplesByBadSearch() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery(";DROP TABLE Sample;");
-    Long numSamples = dao.count(filter);
+    Long numSamples = dao.count(PaginationFilter.query(";DROP TABLE Sample;"));
     assertEquals(Long.valueOf(0), numSamples);
   }
 
   @Test
   public void countSamplesByEmptySearch() throws IOException {
-    PaginationFilter filter = new PaginationFilter();
-    filter.setQuery("");
-    Long numSamples = dao.count(filter);
+    Long numSamples = dao.count(PaginationFilter.query(""));
     assertEquals(Long.valueOf(17L), numSamples);
   }
 

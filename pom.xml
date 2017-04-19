@@ -64,7 +64,7 @@
         <role>Developer</role>
       </roles>
       <timezone>0</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>mtaschuk</id>
@@ -76,7 +76,7 @@
         <role>project contact</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>tdebat</id>
@@ -88,7 +88,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>amasella</id>
@@ -100,7 +100,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>dcooke</id>
@@ -112,7 +112,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>harmstrong</id>
@@ -124,7 +124,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
   <modules>
@@ -148,7 +148,7 @@
     <connection>scm:git:https://www.github.com/oicr-gsi/miso-lims</connection>
     <developerConnection>scm:git:git@github.com:oicr-gsi/miso-lims</developerConnection>
     <url>http://www.github.com/oicr-gsi/miso-lims</url>
-    <tag>v0.2.56</tag>
+    <tag>v0.2.57</tag>
   </scm>
   <!-- Bug Tracker -->
   <issueManagement>
@@ -180,7 +180,8 @@
     <mockito.verison>1.10.19</mockito.verison>
     <slf4j.version>1.6.1</slf4j.version>
     <jersey.version>1.19</jersey.version>
-    <prometheus.version>0.0.15</prometheus.version>
+    <prometheus.version>0.0.21</prometheus.version>
+    <prometheus.jmx.version>0.9</prometheus.jmx.version>
     <jackson.version>2.8.6</jackson.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -311,6 +312,16 @@
         <groupId>io.prometheus</groupId>
         <artifactId>simpleclient_servlet</artifactId>
         <version>${prometheus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_hibernate</artifactId>
+        <version>${prometheus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.prometheus.jmx</groupId>
+        <artifactId>collector</artifactId>
+        <version>${prometheus.jmx.version}</version>
       </dependency>
       <dependency>
         <groupId>org.javassist</groupId>

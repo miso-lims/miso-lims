@@ -33,7 +33,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PoolPaginationFilter;
 
 /**
  * Defines a DAO interface for storing Pools
@@ -41,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PoolPaginationFilter;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PoolStore extends Store<Pool>, Remover<Pool>, PaginatedDataSource<Pool, PoolPaginationFilter> {
+public interface PoolStore extends Store<Pool>, Remover<Pool>, PaginatedDataSource<Pool> {
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Library} by means of that Library's

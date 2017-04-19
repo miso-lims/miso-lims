@@ -24,11 +24,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import io.prometheus.client.hotspot.DefaultExports;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
+import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -36,6 +37,7 @@ import javax.servlet.ServletContextListener;
 import javax.sql.DataSource;
 
 import org.apache.log4j.PropertyConfigurator;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -61,6 +63,10 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+
+import io.prometheus.client.hibernate.HibernateStatisticsCollector;
+import io.prometheus.client.hotspot.DefaultExports;
+import io.prometheus.jmx.JmxCollector;
 
 /**
  * The custom MISO context listener class. On webapp context init, we can do some startup checks, e.g. checking the existence of required
@@ -112,6 +118,13 @@ public class MisoAppListener implements ServletContextListener {
     System.setProperty("java.awt.headless", "true");
 
     initializeNamingSchemes(context, misoProperties);
+
+    new HibernateStatisticsCollector(context.getBeanFactory().getBean(SessionFactory.class), "spring").register();
+    try {
+      new JmxCollector(context.getResource("classpath:tomcat-prometheus.yml").getFile()).register();
+    } catch (MalformedObjectNameException | IOException e) {
+      log.error("Failed to load Prometheus configuration.", e);
+    }
 
     if ("true".equals(misoProperties.get("miso.issuetracker.enabled"))) {
       String trackerType = misoProperties.get("miso.issuetracker.tracker");

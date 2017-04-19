@@ -94,7 +94,7 @@ public class PoolQCImpl extends AbstractQC implements PoolQC, Serializable {
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof PoolQCImpl)) return false;
+    if (!(obj instanceof PoolQC)) return false;
     PoolQC them = (PoolQC) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.

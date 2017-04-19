@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -50,12 +50,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,6 +59,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,9 +71,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -84,9 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -195,7 +187,6 @@ public class LimsUtils {
     }
     return buffer.toString();
   }
-
 
   public static String findHyperlinks(String text) {
     if (!LimsUtils.isStringEmptyOrNull(text)) {
@@ -487,8 +478,6 @@ public class LimsUtils {
     return null;
   }
 
-
-
   public static Matcher tailGrep(File f, Pattern p, int lines) throws IOException, FileNotFoundException {
     // Open the file and then get a channel from the stream
     FileInputStream fis = new FileInputStream(f);
@@ -585,61 +574,6 @@ public class LimsUtils {
     return bigDecimal.doubleValue();
   }
 
-  public static SortedSet<HealthType> getUsedHealthTypes(Iterable<PoolOrderCompletion> completions) {
-    SortedSet<HealthType> healths = new TreeSet<>(HealthType.COMPARATOR);
-    addUsedHealthTypes(completions, healths);
-    return healths;
-  }
-
-  public static void addUsedHealthTypes(Iterable<PoolOrderCompletion> completions, SortedSet<HealthType> healths) {
-    for (PoolOrderCompletion completion : completions) {
-      healths.add(completion.getHealth());
-    }
-  }
-
-  public static Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> groupCompletions(
-      Iterable<PoolOrderCompletion> completions) {
-    Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
-    for (PoolOrderCompletion completion : completions) {
-      Map<SequencingParameters, PoolOrderCompletionGroup> parametersGroup;
-      if (poolGroups.containsKey(completion.getPool())) {
-        parametersGroup = poolGroups.get(completion.getPool());
-      } else {
-        parametersGroup = new TreeMap<>();
-        poolGroups.put(completion.getPool(), parametersGroup);
-      }
-      PoolOrderCompletionGroup groupedCompletions;
-      if (parametersGroup.containsKey(completion.getSequencingParameters())) {
-        groupedCompletions = parametersGroup.get(completion.getSequencingParameters());
-      } else {
-        groupedCompletions = new PoolOrderCompletionGroup();
-        parametersGroup.put(completion.getSequencingParameters(), groupedCompletions);
-      }
-      groupedCompletions.add(completion);
-    }
-    return poolGroups;
-  }
-
-  public static Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> filterUnfulfilledCompletions(
-      Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> groups) {
-    Map<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> poolGroups = new TreeMap<>();
-    for (Entry<Pool, Map<SequencingParameters, PoolOrderCompletionGroup>> poolEntry : groups.entrySet()) {
-      for (Entry<SequencingParameters, PoolOrderCompletionGroup> parameterEntry : poolEntry.getValue().entrySet()) {
-        if (parameterEntry.getValue().getRemaining() < 1) continue;
-
-        Map<SequencingParameters, PoolOrderCompletionGroup> parametersGroup = null;
-        if (poolGroups.containsKey(poolEntry.getKey())) {
-          parametersGroup = poolGroups.get(poolEntry.getKey());
-        } else {
-          parametersGroup = new HashMap<>();
-          poolGroups.put(poolEntry.getKey(), parametersGroup);
-        }
-        parametersGroup.put(parameterEntry.getKey(), parameterEntry.getValue());
-      }
-    }
-    return poolGroups;
-  }
-
   public static boolean isDetailedSample(Sample sample) {
     return sample instanceof DetailedSample;
   }
@@ -648,27 +582,33 @@ public class LimsUtils {
     return !isDetailedSample(sample);
   }
 
+  private static boolean safeCategoryCheck(Sample sample, String category) {
+    DetailedSample detailedSample = (DetailedSample) sample;
+    if (detailedSample.getSampleClass() == null) return false;
+    return category.equals(detailedSample.getSampleClass().getSampleCategory());
+  }
+
   public static boolean isIdentitySample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
-    return sample instanceof Identity;
+    return sample instanceof Identity || safeCategoryCheck(sample, Identity.CATEGORY_NAME);
   }
 
   public static boolean isTissueSample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
-    return sample instanceof SampleTissue;
+    return sample instanceof SampleTissue || safeCategoryCheck(sample, SampleTissue.CATEGORY_NAME);
   }
 
   public static boolean isTissueProcessingSample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
-    return sample instanceof SampleTissueProcessing;
+    return sample instanceof SampleTissueProcessing || safeCategoryCheck(sample, SampleTissueProcessing.CATEGORY_NAME);
   }
 
   public static boolean isStockSample(Sample sample) {
-    return sample instanceof SampleStock;
+    return sample instanceof SampleStock || safeCategoryCheck(sample, SampleStock.CATEGORY_NAME);
   }
 
   public static boolean isAliquotSample(Sample sample) {
-    return sample instanceof SampleAliquot;
+    return sample instanceof SampleAliquot || safeCategoryCheck(sample, SampleAliquot.CATEGORY_NAME);
   }
 
   public static boolean isDetailedLibrary(Library library) {
@@ -767,4 +707,12 @@ public class LimsUtils {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public static <T> T deproxify(T from) {
+    if (from instanceof HibernateProxy) {
+      HibernateProxy proxy = (HibernateProxy) from;
+      from = (T) proxy.getHibernateLazyInitializer().getImplementation();
+    }
+    return from;
+  }
 }

@@ -58,8 +58,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.JoinFormula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
@@ -107,11 +106,6 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   public static final String PREFIX = "IPO";
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
-
-  @ManyToOne(targetEntity = BoxImpl.class)
-  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'Pool')")
-  @JsonBackReference
-  private Box box;
 
   @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool")
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -169,8 +163,9 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @JsonManagedReference
   private final Collection<PoolQC> poolQCs = new TreeSet<>();
 
-  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = poolId AND bp.targetType = 'Pool')")
-  private String position;
+  @OneToOne(optional = true)
+  @PrimaryKeyJoinColumn
+  private PoolBoxPosition boxPosition;
 
   private Boolean qcPassed;
 
@@ -256,11 +251,13 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof PoolImpl)) return false;
-    PoolImpl other = (PoolImpl) obj;
-    return new EqualsBuilder().appendSuper(super.equals(obj)).append(description, other.description)
-        .append(pooledElements, other.pooledElements).append(experiments, other.experiments).append(concentration, other.concentration)
-        .append(identificationBarcode, other.identificationBarcode).append(readyToRun, other.readyToRun).append(qcPassed, other.qcPassed)
+    if (!(obj instanceof Pool)) return false;
+    Pool other = (Pool) obj;
+    return new EqualsBuilder().appendSuper(super.equals(obj)).append(description, other.getDescription())
+        .append(pooledElements, other.getPoolableElements()).append(experiments, other.getExperiments())
+        .append(concentration, other.getConcentration())
+        .append(identificationBarcode, other.getIdentificationBarcode()).append(readyToRun, other.getReadyToRun())
+        .append(qcPassed, other.getQcPassed())
         .isEquals();
   }
 
@@ -275,12 +272,12 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   @Override
   public Box getBox() {
-    return box;
+    return boxPosition == null ? null : boxPosition.getBox();
   }
 
   @Override
   public String getBoxPosition() {
-    return position;
+    return boxPosition == null ? null : boxPosition.getPosition();
   }
 
   @Override

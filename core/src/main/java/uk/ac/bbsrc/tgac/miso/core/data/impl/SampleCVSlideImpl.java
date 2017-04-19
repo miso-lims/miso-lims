@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.deproxify;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -33,7 +35,9 @@ public class SampleCVSlideImpl extends SampleTissueProcessingImpl implements Sam
   public Integer getSlidesRemaining() {
     int slidesConsumed = 0;
     for (Sample child : getChildren()) {
-      if (child != null && child instanceof SampleLCMTube && ((SampleLCMTube) child).getSlidesConsumed() != null) {
+      if (child == null) continue;
+      child = deproxify(child);
+      if (child instanceof SampleLCMTube && ((SampleLCMTube) child).getSlidesConsumed() != null) {
         slidesConsumed += ((SampleLCMTube) child).getSlidesConsumed();
       }
     }

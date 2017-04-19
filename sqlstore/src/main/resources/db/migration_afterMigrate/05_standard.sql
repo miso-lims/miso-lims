@@ -267,7 +267,7 @@ FOR EACH ROW
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
         CASE WHEN (NEW.accession IS NULL) <> (OLD.accession IS NULL) OR NEW.accession <> OLD.accession THEN CONCAT('accession: ', COALESCE(OLD.accession, 'n/a'), ' → ', COALESCE(NEW.accession, 'n/a')) END,
-        CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
+        CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias AND (OLD.alias NOT LIKE 'TEMPORARY%') THEN CONCAT('alias: ', COALESCE(OLD.alias, 'n/a'), ' → ', COALESCE(NEW.alias, 'n/a')) END,
         CASE WHEN (NEW.cycles IS NULL) <> (OLD.cycles IS NULL) OR NEW.cycles <> OLD.cycles THEN CONCAT('cycles: ', COALESCE(OLD.cycles, 'n/a'), ' → ', COALESCE(NEW.cycles, 'n/a')) END,
         CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END,
         CASE WHEN (NEW.filePath IS NULL) <> (OLD.filePath IS NULL) OR NEW.filePath <> OLD.filePath THEN CONCAT('file path: ', COALESCE(OLD.filePath, 'n/a'), ' → ', COALESCE(NEW.filePath, 'n/a')) END,
@@ -312,7 +312,7 @@ FOR EACH ROW
       CASE WHEN NEW.health <> OLD.health THEN CONCAT('health: ', COALESCE(OLD.health, 'n/a'), ' → ', COALESCE(NEW.health, 'n/a')) END,
       CASE WHEN (NEW.completionDate IS NULL) <> (OLD.completionDate IS NULL) OR NEW.completionDate <> OLD.completionDate THEN CONCAT('completion date: ', COALESCE(OLD.completionDate, 'n/a'), ' → ', COALESCE(NEW.completionDate, 'n/a')) END,
       CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('start date: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END,
-      CASE WHEN NEW.runName <> OLD.runName THEN CONCAT('run name: ', COALESCE(OLD.runName, 'n/a'), ' → ', COALESCE(NEW.runName, 'n/a'), ' (this could be a problem -- inform your MISO administrators if you see this)') END);
+      CASE WHEN NEW.runName <> OLD.runName AND (OLD.runName NOT LIKE 'TEMPORARY%') THEN CONCAT('run alias: ', COALESCE(OLD.runName, 'n/a'), ' → ', COALESCE(NEW.runName, 'n/a'), ' (this could be a problem -- inform your MISO administrators if you see this)') END);
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) SELECT
         runId,
@@ -859,10 +859,33 @@ CREATE OR REPLACE VIEW DesiredPartitions AS
     FROM PoolOrder
     GROUP BY poolId, parametersId;
 
-CREATE OR REPLACE VIEW OrderCompletion AS
-  (SELECT poolId, parametersId, num_partitions, health, lastUpdated FROM RunPartitionsByHealth)
-  UNION
-  (SELECT poolId, parametersId, num_partitions, 'Requested' AS health, lastUpdated FROM DesiredPartitions);
+CREATE OR REPLACE VIEW OrderCompletion_Backing AS
+  (SELECT
+    `RunPartitionsByHealth`.`poolId` AS `poolId`,
+    `RunPartitionsByHealth`.`parametersId` AS `parametersId`,
+    `RunPartitionsByHealth`.`num_partitions` AS `num_partitions`,
+    `RunPartitionsByHealth`.`health` AS `health`,
+    `RunPartitionsByHealth`.`lastUpdated` AS `lastUpdated` from `RunPartitionsByHealth`
+  ) UNION ALL (SELECT
+    `DesiredPartitions`.`poolId` AS `poolId`,
+    `DesiredPartitions`.`parametersId` AS `parametersId`,
+    `DesiredPartitions`.`num_partitions` AS `num_partitions`,
+    'Requested' AS `health`,
+    `DesiredPartitions`.`lastUpdated` AS `lastUpdated` FROM `DesiredPartitions`);
+
+CREATE OR REPLACE VIEW OrderCompletion AS SELECT
+    poolId,
+    parametersId,
+    MAX(lastUpdated) as lastUpdated,
+    GREATEST(0, SUM(num_partitions * (CASE health
+      WHEN 'Requested' THEN 1
+      WHEN 'Unknown' THEN 0
+      WHEN 'Failed' THEN 0
+      ELSE -1 END))) AS remaining
+  FROM OrderCompletion_Backing
+  GROUP BY poolId, parametersId;
+
+CREATE OR REPLACE VIEW OrderCompletion_Items AS SELECT poolId, parametersId, health, num_partitions FROM OrderCompletion_Backing;
 
 CREATE OR REPLACE VIEW SampleDerivedInfo AS
   SELECT sampleId, MAX(changeTime) as lastModified FROM SampleChangeLog GROUP BY sampleId;
@@ -882,3 +905,30 @@ CREATE OR REPLACE VIEW LibraryDerivedInfo AS
 CREATE OR REPLACE VIEW BoxDerivedInfo AS
   SELECT boxId, MAX(changeTime) AS lastModified FROM BoxChangeLog GROUP BY boxId;
 
+CREATE OR REPLACE VIEW SampleBoxPosition
+AS SELECT s.sampleId, bp.boxId, bp.position
+FROM Sample s
+JOIN BoxPosition bp
+  ON bp.targetType LIKE 'Sample%'
+  AND bp.targetId = s.sampleId;
+
+CREATE OR REPLACE VIEW LibraryBoxPosition
+AS SELECT l.libraryId, bp.boxId, bp.position
+FROM Library l
+JOIN BoxPosition bp
+  ON bp.targetType LIKE 'Library%'
+  AND bp.targetId = l.libraryId;
+
+CREATE OR REPLACE VIEW DilutionBoxPosition
+AS SELECT d.dilutionId, bp.boxId, bp.position
+FROM LibraryDilution d
+JOIN BoxPosition bp
+  ON bp.targetType = 'Dilution'
+  AND bp.targetId = d.dilutionId;
+
+CREATE OR REPLACE VIEW PoolBoxPosition
+AS SELECT p.poolId, bp.boxId, bp.position
+FROM Pool p
+JOIN BoxPosition bp
+  ON bp.targetType = 'Pool'
+  AND bp.targetId = p.poolId;

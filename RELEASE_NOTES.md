@@ -1,3 +1,14 @@
+# 0.2.57
+
+Changes:
+
+ * Indicate when a dilution is being added/removed from a pool
+ * Fix broken subproject editor
+ * Paginate orders
+ * Fix bug preventing items from printing
+ * Improve database performance
+ * Fix export functionality for sample sheets
+
 # 0.2.56
 
 Changes:

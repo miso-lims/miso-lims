@@ -16,13 +16,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
-import uk.ac.bbsrc.tgac.miso.core.util.DilutionPaginationFilter;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateLibraryDilutionDao
-    implements LibraryDilutionStore, HibernatePaginatedDataSource<LibraryDilution, DilutionPaginationFilter> {
+    implements LibraryDilutionStore, HibernatePaginatedDataSource<LibraryDilution> {
 
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "identificationBarcode", "library.name", "library.alias",
       "library.description" };
@@ -141,18 +141,22 @@ public class HibernateLibraryDilutionDao
     return SEARCH_PROPERTIES;
   }
 
+
   @Override
-  public void setAdditionalPaginationCriteria(DilutionPaginationFilter filter, Criteria criteria) {
-    if (filter.getProjectId() != null) {
-      criteria.createAlias("library.sample", "sample");
-      criteria.createAlias("sample.project", "project");
-    }
-    if (filter.getPlatformType() != null) {
-      criteria.add(Restrictions.eq("library.platformType", filter.getPlatformType()));
-    }
-    if (filter.getPoolId() != null) {
-      criteria.createAlias("pools", "pool");
-      criteria.add(Restrictions.eq("pool.id", filter.getPoolId()));
-    }
+  public void setProjectId(Criteria criteria, long projectId) {
+    criteria.createAlias("library.sample", "sample");
+    criteria.createAlias("sample.project", "project");
+    HibernatePaginatedDataSource.super.setProjectId(criteria, projectId);
+  }
+
+  @Override
+  public void setPoolId(Criteria criteria, long poolId) {
+    criteria.createAlias("pools", "pool");
+    criteria.add(Restrictions.eq("pool.id", poolId));
+  }
+
+  @Override
+  public void setPlatformType(Criteria criteria, PlatformType platformType) {
+    criteria.add(Restrictions.eq("library.platformType", platformType));
   }
 }

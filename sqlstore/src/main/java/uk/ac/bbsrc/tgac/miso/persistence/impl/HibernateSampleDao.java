@@ -31,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -45,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  */
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, BaseHibernatePaginatedDataSource<Sample, PaginationFilter> {
+public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, BaseHibernatePaginatedDataSource<Sample> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 

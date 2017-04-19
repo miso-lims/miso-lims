@@ -32,7 +32,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 /**
  * Defines a DAO interface for storing Runs
@@ -40,7 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface RunStore extends Store<Run>, Remover<Run>, PaginatedDataSource<Run, PaginationFilter> {
+public interface RunStore extends Store<Run>, Remover<Run>, PaginatedDataSource<Run> {
   /**
    * Gets the latest Run, by start date, that is associated with the given container
    *

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -18,18 +19,18 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class DefaultAuthorizationManager implements AuthorizationManager {
-  
+
   public static final String UNKNOWN_USER = "Unknown";
-  
+
   @Autowired
   private SecurityManager securityManager;
-  
+
   private final SecurityContextHolderStrategy securityContextHolderStrategy;
-  
+
   public DefaultAuthorizationManager() {
     this.securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
   }
-  
+
   @Override
   public User getCurrentUser() throws IOException {
     Authentication auth = securityContextHolderStrategy.getContext().getAuthentication();
@@ -44,7 +45,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
     }
     return user;
   }
-  
+
   @Override
   public String getCurrentUsername() {
     User user = null;
@@ -59,31 +60,31 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
       return user.getFullName();
     }
   }
-  
+
   @Override
   public boolean isUserAuthenticated() throws IOException {
     return getCurrentUser() != null;
   }
-  
+
   @Override
   public void throwIfUnauthenticated() throws IOException, AuthorizationException {
     if (!isUserAuthenticated()) {
       throw new AuthorizationException("Current user is not authenticated");
     }
   }
-  
+
   @Override
   public boolean isAdminUser() throws IOException {
     return getCurrentUser().isAdmin();
   }
-  
+
   @Override
   public void throwIfNonAdmin() throws IOException, AuthorizationException {
     if (!isAdminUser()) {
       throw new AuthorizationException("Current user is not admin");
     }
   }
-  
+
   @Override
   public boolean readCheck(SecurableByProfile resource) throws IOException {
     if (resource == null) {
@@ -92,19 +93,19 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
       return resource.userCanRead(getCurrentUser());
     }
   }
-  
+
   @Override
   public void throwIfNotReadable(SecurableByProfile resource) throws IOException, AuthorizationException {
     if (!readCheck(resource)) {
       throw new AuthorizationException("Current user does not have permission to view this resource");
     }
   }
-  
+
   @Override
   public boolean writeCheck(SecurableByProfile resource) throws IOException {
     return resource.userCanWrite(getCurrentUser());
   }
-  
+
   @Override
   public void throwIfNotWritable(SecurableByProfile resource) throws IOException, AuthorizationException {
     if (!writeCheck(resource)) {
@@ -113,12 +114,12 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
   }
 
   @Override
-  public <T extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered) throws IOException {
+  public <T, R extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered, Function<T, R> getOwner) throws IOException {
     throwIfUnauthenticated();
     List<T> filtered = new ArrayList<>();
     if (unfiltered != null) {
       for (T item : unfiltered) {
-        if (readCheck(item)) {
+        if (readCheck(getOwner.apply(item))) {
           filtered.add(item);
         }
       }
@@ -141,6 +142,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
         throw new AuthorizationException("Current user is not admin or owner");
       }
     }
+  }
+
+  @Override
+  public <T extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered) throws IOException, AuthorizationException {
+    return filterUnreadable(unfiltered, x -> x);
   }
 
 }

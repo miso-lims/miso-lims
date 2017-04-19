@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -36,7 +36,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -55,10 +54,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.JoinFormula;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
@@ -66,12 +61,12 @@ import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -89,8 +84,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @MappedSuperclass
 public abstract class AbstractLibrary extends AbstractBoxable implements Library {
-
-  private static final Logger log = LoggerFactory.getLogger(AbstractLibrary.class);
 
   public static final String UNITS = "nM";
 
@@ -179,17 +172,20 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @PrimaryKeyJoinColumn
   private LibraryDerivedInfo derivedInfo;
 
-  @ManyToOne(targetEntity = BoxImpl.class, fetch = FetchType.LAZY)
-  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")
-  private Box box;
-  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = libraryId AND bp.targetType LIKE 'Library%')")
-  private String position;
+  @OneToOne(optional = true)
+  @PrimaryKeyJoinColumn
+  private LibraryBoxPosition boxPosition;
 
   private Integer dnaSize;
 
   @Override
+  public Box getBox() {
+    return boxPosition == null ? null : boxPosition.getBox();
+  }
+
+  @Override
   public String getBoxPosition() {
-    return position;
+    return boxPosition == null ? null : boxPosition.getPosition();
   }
 
   @Override
@@ -230,11 +226,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setAccession(String accession) {
     this.accession = accession;
-  }
-
-  @Override
-  public Box getBox() {
-    return box;
   }
 
   @Override
@@ -515,7 +506,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     this.lastModifier = lastModifier;
   }
 
-
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
@@ -532,17 +522,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
       }
     }
     return IndexFamily.NULL;
-  }
-
-  @Override
-  public SampleTissue getSampleTissue() {
-    if (this.getSample() instanceof DetailedSample) {
-
-      for (DetailedSample parent = (DetailedSample) this.getSample(); parent != null; parent = parent.getParent()) {
-        if (parent instanceof SampleTissue) return (SampleTissue) parent;
-      }
-    }
-    return null;
   }
 
   @Override
@@ -575,7 +554,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(qcPassed)
         .toHashCode();
   }
-  
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;

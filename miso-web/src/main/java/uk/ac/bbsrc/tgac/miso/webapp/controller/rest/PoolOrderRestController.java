@@ -2,10 +2,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
-import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
@@ -25,17 +24,14 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletionGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
@@ -45,6 +41,19 @@ import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 @RequestMapping("/rest")
 @SessionAttributes("poolorder")
 public class PoolOrderRestController extends RestController {
+
+  private final JQueryDataTableBackend<PoolOrderCompletion, PoolOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<PoolOrderCompletion, PoolOrderCompletionDto>() {
+
+    @Override
+    protected PaginatedDataSource<PoolOrderCompletion> getSource() throws IOException {
+      return poolOrderCompletionService;
+    }
+
+    @Override
+    protected PoolOrderCompletionDto asDto(PoolOrderCompletion model, UriComponentsBuilder builder) {
+      return Dtos.asDto(model);
+    }
+  };
 
   protected static final Logger log = LoggerFactory.getLogger(PoolOrderRestController.class);
 
@@ -66,35 +75,11 @@ public class PoolOrderRestController extends RestController {
     return dtos;
   }
 
-  @RequestMapping(value = "/pool/{id}/completions", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/pool/{id}/dt/completions", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ObjectNode getCompletionsByPool(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
+  public DataTablesResponseDto<PoolOrderCompletionDto> getCompletionsByPool(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-
-    Collection<PoolOrderCompletion> completions = poolOrderCompletionService.getOrderCompletionForPool(id);
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode node = mapper.createObjectNode();
-    ArrayNode headings = mapper.createArrayNode();
-    for (HealthType health : LimsUtils.getUsedHealthTypes(completions)) {
-      headings.add(health.getKey());
-    }
-    node.set("headings", headings);
-    ArrayNode data = mapper.createArrayNode();
-    if (!completions.isEmpty()) {
-      for (Entry<SequencingParameters, PoolOrderCompletionGroup> entry : LimsUtils.groupCompletions(completions).values().iterator().next()
-          .entrySet()) {
-        ObjectNode completion = mapper.createObjectNode();
-        completion.put("parametersId", entry.getKey().getId());
-        completion.put("Remaining", entry.getValue().getRemaining());
-        for (HealthType health : LimsUtils.getUsedHealthTypes(completions)) {
-          completion.put(health.getKey(), entry.getValue().get(health).getNumPartitions());
-        }
-        data.add(completion);
-      }
-    }
-    node.set("completions", data);
-
-    return node;
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.pool(id));
   }
 
   @RequestMapping(value = "/poolorder/{id}", method = RequestMethod.GET, produces = { "application/json" })
@@ -118,6 +103,21 @@ public class PoolOrderRestController extends RestController {
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
+  }
+  
+  @RequestMapping(value = "/poolorder/dt/completions", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public DataTablesResponseDto<PoolOrderCompletionDto> getCompletions(UriComponentsBuilder uriBuilder, HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
+    return jQueryBackend.get(request, response, uriBuilder);
+  }
+
+  @RequestMapping(value = "/poolorder/dt/completions/active", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public DataTablesResponseDto<PoolOrderCompletionDto> getCompletionsFulfilled(UriComponentsBuilder uriBuilder, HttpServletRequest request,
+      HttpServletResponse response)
+      throws IOException {
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.fulfilled(false));
   }
 
   @RequestMapping(value = "/poolorder/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })

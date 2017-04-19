@@ -32,19 +32,17 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.JoinFormula;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -55,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
@@ -121,12 +120,9 @@ public class LibraryDilution implements Dilution, Serializable {
   @Column(name = "discarded")
   private boolean discarded;
 
-  @ManyToOne(targetEntity = BoxImpl.class, fetch = FetchType.LAZY)
-  @JoinFormula("(SELECT bp.boxId FROM BoxPosition bp WHERE bp.targetId = dilutionId AND bp.targetType = 'Dilution')")
-  private Box box;
-
-  @Formula("(SELECT bp.position FROM BoxPosition bp WHERE bp.targetId = dilutionId AND bp.targetType = 'Dilution')")
-  private String position;
+  @OneToOne(optional = true)
+  @PrimaryKeyJoinColumn
+  private DilutionBoxPosition boxPosition;
 
   /**
    * Construct a new LibraryDilution with a default empty SecurityProfile
@@ -418,12 +414,12 @@ public class LibraryDilution implements Dilution, Serializable {
 
   @Override
   public Box getBox() {
-    return box;
+    return boxPosition == null ? null : boxPosition.getBox();
   }
 
   @Override
   public String getBoxPosition() {
-    return position;
+    return boxPosition == null ? null : boxPosition.getPosition();
   }
 
   @Override

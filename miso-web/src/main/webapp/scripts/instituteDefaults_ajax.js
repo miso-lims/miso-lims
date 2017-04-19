@@ -166,7 +166,7 @@ var Subproject = Subproject || {
   referenceGenomeOptions: null,
 
   getProjects: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/project/lazy', Subproject.sortProjects);
+    Options.makeXhrRequest('GET', '/miso/rest/project', Subproject.sortProjects);
   },
 
   getReferenceGenomeOptions: function () {
@@ -209,7 +209,7 @@ var Subproject = Subproject || {
         alias = data[i].alias;
         description = data[i].description;
         projectId = data[i].parentProjectId;
-        projectName = Subproject.projectArray.filter(function(p) { return p.projectId == projectId; })[0].alias;
+        projectName = Subproject.projectArray.filter(function(p) { return p.id == projectId; })[0].alias;
         priority = data[i].priority;
         endpoint = data[i].url;
         referenceGenomeId = data[i].referenceGenomeId;
@@ -253,8 +253,8 @@ var Subproject = Subproject || {
     var select = [];
     select.push('<select id="'+ idValue +'" onchange="Subproject.selectReferenceGenome();">');
     for (var j=0;j<Subproject.projectArray.length;j++) {
-      select.push('<option value="'+ Subproject.projectArray[j].projectId +'"');
-      if (Subproject.projectArray[j].projectId == selectedProjectId) select.push(' selected=""');
+      select.push('<option value="'+ Subproject.projectArray[j].id +'"');
+      if (Subproject.projectArray[j].id == selectedProjectId) select.push(' selected=""');
       select.push('>'+ Subproject.projectArray[j].alias +'</option>');
     }
     select.push('</select>');
@@ -272,7 +272,7 @@ var Subproject = Subproject || {
 
   getProjectGenomeReferenceId: function(projectId) {
     for (var j=0;j<Subproject.projectArray.length;j++) {
-      if (Subproject.projectArray[j].projectId === parseInt(projectId)) {
+      if (Subproject.projectArray[j].id === parseInt(projectId)) {
         return Subproject.projectArray[j].referenceGenomeId;
       }
     }

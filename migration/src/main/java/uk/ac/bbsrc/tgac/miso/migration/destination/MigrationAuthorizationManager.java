@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -96,6 +97,13 @@ public class MigrationAuthorizationManager implements AuthorizationManager {
   @Override
   public void throwIfNotInternal() throws IOException, AuthorizationException {
     // auth disabled in this manager; do nothing
+  }
+
+  @Override
+  public <T, P extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered, Function<T, P> getOwner)
+      throws IOException, AuthorizationException {
+    // auth disabled in this manager; allow all access
+    return new ArrayList<>(unfiltered);
   }
 
 }
