@@ -312,7 +312,7 @@ FOR EACH ROW
       CASE WHEN NEW.health <> OLD.health THEN CONCAT('health: ', COALESCE(OLD.health, 'n/a'), ' → ', COALESCE(NEW.health, 'n/a')) END,
       CASE WHEN (NEW.completionDate IS NULL) <> (OLD.completionDate IS NULL) OR NEW.completionDate <> OLD.completionDate THEN CONCAT('completion date: ', COALESCE(OLD.completionDate, 'n/a'), ' → ', COALESCE(NEW.completionDate, 'n/a')) END,
       CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('start date: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END,
-      CASE WHEN NEW.runName <> OLD.runName AND (OLD.alias NOT LIKE 'TEMPORARY%') THEN CONCAT('run alias: ', COALESCE(OLD.runName, 'n/a'), ' → ', COALESCE(NEW.runName, 'n/a'), ' (this could be a problem -- inform your MISO administrators if you see this)') END);
+      CASE WHEN NEW.runName <> OLD.runName AND (OLD.runName NOT LIKE 'TEMPORARY%') THEN CONCAT('run alias: ', COALESCE(OLD.runName, 'n/a'), ' → ', COALESCE(NEW.runName, 'n/a'), ' (this could be a problem -- inform your MISO administrators if you see this)') END);
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) SELECT
         runId,
