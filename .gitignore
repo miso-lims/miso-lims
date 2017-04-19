@@ -18,6 +18,7 @@ sqlstore/flyway.properties
 # Test files
 core/test_file.txt
 notification-server/metrixDaemon.log
+sqlstore/src/test/resources/real-db-test.properties
 
 # Ignore Eclipse Web Standard Tools settings files.
 org.eclipse.wst.common.component

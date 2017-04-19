@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/db-test-context.xml")
+@ContextConfiguration("/h2-db-test-context.xml")
 @Transactional
 public abstract class AbstractDAOTest {
 
