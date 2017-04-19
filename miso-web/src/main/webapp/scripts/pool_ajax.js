@@ -566,7 +566,15 @@ Pool.ui = {
       Pool.ui.createDilutionDatatable(poolId, 'available', 'Pool.ui.addDilution', 'ui-icon-plusthick');
   },
 
+  inFlightChange: false,
+
   addDilution : function(poolId, dilutionId) {
+      if (Pool.ui.inFlightChange) {
+        return;
+      }
+      Pool.ui.inFlightChange = true;
+      jQuery('#includedTable').addClass('disabled');
+      jQuery('#availableTable').addClass('disabled');
       Fluxion.doAjax(
         'poolControllerHelperService',
         'addPoolableElement',
@@ -577,7 +585,10 @@ Pool.ui = {
         },
         {
           'doOnSuccess': function (json) {
+            Pool.ui.inFlightChange = false;
             jQuery('#includedTable').dataTable().fnDestroy();
+            jQuery('#includedTable').removeClass('disabled');
+            jQuery('#availableTable').removeClass('disabled');
             Pool.ui.createIncludedDilutionTable(poolId);
           }
         }
@@ -587,6 +598,12 @@ Pool.ui = {
   removeDilution : function (poolId, dilutionId) {
     var extra = (jQuery('#includedTable').dataTable().fnGetData().length == 1) ? '\n\nDeleting this item would make the pool empty.' : '';
     if (confirm("Are you sure you want to remove this dilution from this pool?" + extra)) {
+      if (Pool.ui.inFlightChange) {
+        return;
+      }
+      Pool.ui.inFlightChange = true;
+      jQuery('#includedTable').addClass('disabled');
+      jQuery('#availableTable').addClass('disabled');
       Fluxion.doAjax(
         'poolControllerHelperService',
         'removePooledElement',
@@ -597,7 +614,10 @@ Pool.ui = {
         },
         {
           'doOnSuccess': function() {
+            Pool.ui.inFlightChange = false;
             jQuery('#includedTable').dataTable().fnDestroy();
+            jQuery('#includedTable').removeClass('disabled');
+            jQuery('#availableTable').removeClass('disabled');
             Pool.ui.createIncludedDilutionTable(poolId);
           }
         }
