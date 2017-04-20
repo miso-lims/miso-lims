@@ -26,6 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -33,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 
 @Controller
 @RequestMapping("/rest/librarydilution")
@@ -66,32 +68,32 @@ public class LibraryDilutionRestController extends RestController {
     public String lastModified;
   }
 
-  private final JQueryDataTableBackend<LibraryDilution, SelectRowDto> jQueryBackendSelect = new JQueryDataTableBackend<LibraryDilution, SelectRowDto>() {
+  private final JQueryDataTableBackend<PoolableElementView, SelectRowDto> jQueryBackendSelect = new JQueryDataTableBackend<PoolableElementView, SelectRowDto>() {
 
     @Override
-    protected PaginatedDataSource<LibraryDilution> getSource() throws IOException {
-      return dilutionService;
+    protected PaginatedDataSource<PoolableElementView> getSource() throws IOException {
+      return poolableElementViewService;
     }
 
     @Override
-    protected SelectRowDto asDto(LibraryDilution dil, UriComponentsBuilder builder) {
+    protected SelectRowDto asDto(PoolableElementView dil, UriComponentsBuilder builder) {
       SelectRowDto dto = new SelectRowDto();
-      dto.id = dil.getId();
-      dto.name = dil.getName();
-      dto.concentration = dil.getConcentration();
-      dto.library = String.format("<a href='/miso/library/%d'>%s (%s)</a>", dil.getLibrary().getId(), dil.getLibrary().getAlias(),
-          dil.getLibrary().getName());
-      dto.sample = String.format("<a href='/miso/sample/%d'>%s (%s)</a>", dil.getLibrary().getSample().getId(),
-          dil.getLibrary().getSample().getAlias(), dil.getLibrary().getSample().getName());
+      dto.id = dil.getDilutionId();
+      dto.name = dil.getDilutionName();
+      dto.concentration = dil.getDilutionConcentration();
+      dto.library = String.format("<a href='/miso/library/%d'>%s (%s)</a>", dil.getLibraryId(), dil.getLibraryAlias(),
+          dil.getLibraryName());
+      dto.sample = String.format("<a href='/miso/sample/%d'>%s (%s)</a>", dil.getSampleId(),
+          dil.getSampleAlias(), dil.getSampleName());
       StringBuilder indices = new StringBuilder();
-      for (final Index index : dil.getLibrary().getIndices()) {
+      for (final Index index : dil.getIndices()) {
         indices.append(index.getPosition());
         indices.append(": ");
         indices.append(index.getLabel());
         indices.append("<br/>");
       }
       dto.indices = indices.toString();
-      dto.lowquality = dil.getLibrary().isLowQuality() ? "&#9888;" : "";
+      dto.lowquality = dil.isLowQualityLibrary() ? "&#9888;" : "";
       dto.lastModified = Dtos.dateFormatter.print(new DateTime(dil.getLastModified()));
       return dto;
     }
@@ -99,6 +101,9 @@ public class LibraryDilutionRestController extends RestController {
 
   @Autowired
   private LibraryDilutionService dilutionService;
+
+  @Autowired
+  private PoolableElementViewService poolableElementViewService;
 
   @Autowired
   private RequestManager requestManager;

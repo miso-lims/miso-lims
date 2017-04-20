@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 public class HibernateLibraryDilutionDao
     implements LibraryDilutionStore, HibernatePaginatedDataSource<LibraryDilution> {
 
+  // Make sure these match the HiberatePoolableElementViewDao
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "identificationBarcode", "library.name", "library.alias",
       "library.description" };
   private final static List<String> STANDARD_ALIASES = Arrays.asList("library");
