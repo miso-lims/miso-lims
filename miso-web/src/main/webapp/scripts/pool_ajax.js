@@ -501,12 +501,13 @@ Pool.ui = {
     })).fnSetFilteringDelay();
   },
 
-  createDilutionDatatable : function(poolId, kind, action, actionStyle) {
+  createDilutionDatatable : function(poolId, kind, action) {
     jQuery('#' + kind + 'Table').dataTable({
       "bProcessing": true,
       "bServerSide": true,
       "sAjaxSource": "/miso/rest/librarydilution/dt/pool/" + poolId + "/" + kind,
         "aoColumns": [
+          Utils.createToggleColumn("Pool.ui." + action),
           {
             "sTitle": "Dilution Name",
             "sType":"natural",
@@ -538,14 +539,6 @@ Pool.ui = {
             "sTitle": "Low Quality",
             "bSortable": false,
             "mData": "lowquality"
-          },
-          {
-            "sTitle": "Action",
-            "bSortable": false,
-            "mData": "id",
-            "mRender": function (data, type, full) {
-              return "<span onclick='" + action + "(" + poolId + ", " + data + ");' class='ui-icon ui-button " + actionStyle + "' style='cursor: pointer'></span>";
-            }
           }
         ],
         "bJQueryUI": true,
@@ -560,15 +553,20 @@ Pool.ui = {
       });
   },
   createIncludedDilutionTable: function(poolId) {
-      Pool.ui.createDilutionDatatable(poolId, 'included', 'Pool.ui.removeDilution', 'ui-icon-circle-close');
+      Pool.ui.createDilutionDatatable(poolId, 'included', 'dilutionsToRemove');
   },
   createAvailableDilutionTable: function(poolId) {
-      Pool.ui.createDilutionDatatable(poolId, 'available', 'Pool.ui.addDilution', 'ui-icon-plusthick');
+      Pool.ui.createDilutionDatatable(poolId, 'available', 'dilutionsToAdd');
   },
 
   inFlightChange: false,
+  dilutionsToAdd: [],
+  dilutionsToRemove: [],
 
-  addDilution : function(poolId, dilutionId) {
+  addDilutions : function(poolId) {
+      if (Pool.ui.dilutionsToAdd.length == 0) {
+        return;
+      }
       if (Pool.ui.inFlightChange) {
         return;
       }
@@ -577,14 +575,15 @@ Pool.ui = {
       jQuery('#availableTable').addClass('disabled');
       Fluxion.doAjax(
         'poolControllerHelperService',
-        'addPoolableElement',
+        'addDilutions',
         {
           'poolId':poolId,
-          'dilutionId':dilutionId,
+          'dilutionIds': Pool.ui.dilutionsToAdd,
           'url':ajaxurl
         },
         {
           'doOnSuccess': function (json) {
+            Pool.ui.dilutionsToAdd = [];
             Pool.ui.inFlightChange = false;
             jQuery('#includedTable').dataTable().fnDestroy();
             jQuery('#includedTable').removeClass('disabled');
@@ -595,8 +594,11 @@ Pool.ui = {
       );
   },
 
-  removeDilution : function (poolId, dilutionId) {
-    var extra = (jQuery('#includedTable').dataTable().fnGetData().length == 1) ? '\n\nDeleting this item would make the pool empty.' : '';
+  removeDilutions : function (poolId) {
+    if (Pool.ui.dilutionsToRemove.length == 0) {
+      return;
+    }
+    var extra = (jQuery('#includedTable').dataTable().fnGetData().length <= Pool.ui.dilutionsToRemove.length) ? '\n\nDeleting this item would make the pool empty.' : '';
     if (confirm("Are you sure you want to remove this dilution from this pool?" + extra)) {
       if (Pool.ui.inFlightChange) {
         return;
@@ -606,14 +608,15 @@ Pool.ui = {
       jQuery('#availableTable').addClass('disabled');
       Fluxion.doAjax(
         'poolControllerHelperService',
-        'removePooledElement',
+        'removeDilutions',
         {
           'poolId': poolId,
-          'dilutionId': dilutionId,
+          'dilutionIds': Pool.ui.dilutionsToRemove,
           'url':ajaxurl
         },
         {
           'doOnSuccess': function() {
+            Pool.ui.dilutionsToRemove = [];
             Pool.ui.inFlightChange = false;
             jQuery('#includedTable').dataTable().fnDestroy();
             jQuery('#includedTable').removeClass('disabled');
