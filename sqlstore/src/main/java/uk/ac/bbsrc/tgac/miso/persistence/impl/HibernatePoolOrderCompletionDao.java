@@ -30,6 +30,10 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
     return sessionFactory.getCurrentSession();
   }
 
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
+
   @Override
   public String getProjectColumn() {
     throw new IllegalArgumentException();
