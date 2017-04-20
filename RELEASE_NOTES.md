@@ -1,3 +1,9 @@
+# 0.2.58
+
+Changes:
+
+ * Fix join column mismatch in order completions
+
 # 0.2.57
 
 Changes:
