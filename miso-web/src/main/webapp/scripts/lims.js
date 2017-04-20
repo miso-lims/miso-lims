@@ -76,7 +76,31 @@ var Utils = Utils || {
       }
     }
     return true;
-  }
+  },
+  createToggleColumn: function(nameOfList) {
+    var list = eval(nameOfList);
+    return {
+        "sTitle": "",
+        "mData": "id",
+        "mRender": function (data, type, full) {
+          var checked = list.indexOf(data) > -1;
+
+          return "<input type=\"checkbox\" onchange=\"Utils.toggleListItem(this.checked, " + data + ", " + nameOfList + ")\"" + (checked ? " checked=\"checked\"" : "") + ">";
+        }
+    };
+  },
+
+  toggleListItem: function(state, id, list) {
+    if (state) {
+      list.push(id);
+    } else {
+      var index = list.indexOf(id);
+      if (index > -1) {
+        list.splice(index, 1);
+      }
+    }
+  },
+
 
 };
 

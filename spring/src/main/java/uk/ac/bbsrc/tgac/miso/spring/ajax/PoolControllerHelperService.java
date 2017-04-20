@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -643,20 +644,22 @@ public class PoolControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
   }
 
-  public JSONObject addPoolableElement(HttpSession session, JSONObject json) {
+  public JSONObject addDilutions(HttpSession session, JSONObject json) {
     Long poolId = json.getLong("poolId");
-    Long dilutionId = json.getLong("dilutionId");
+    JSONArray dilutionIds = json.getJSONArray("dilutionIds");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = requestManager.getPoolById(poolId);
       if (!pool.userCanWrite(user)) {
         return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
       }
-      LibraryDilution target = dilutionService.get(dilutionId);
-      if (target == null) {
-        return JSONUtils.SimpleJSONError("No such element.");
+      for (int i = 0; i < dilutionIds.size(); i++) {
+        LibraryDilution target = dilutionService.get(dilutionIds.getLong(i));
+        if (target == null) {
+          return JSONUtils.SimpleJSONError("No such element.");
+        }
+        pool.getPoolableElements().add(target);
       }
-      pool.getPoolableElements().add(target);
       pool.setLastModifier(user);
       requestManager.savePool(pool);
       return JSONUtils.SimpleJSONResponse("Pool modified.");
@@ -666,24 +669,27 @@ public class PoolControllerHelperService {
     }
   }
 
-  public JSONObject removePooledElement(HttpSession session, JSONObject json) {
+  public JSONObject removeDilutions(HttpSession session, JSONObject json) {
     Long poolId = json.getLong("poolId");
-    Long dilutionId = json.getLong("dilutionId");
+    JSONArray dilutionIds = json.getJSONArray("dilutionIds");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = requestManager.getPoolById(poolId);
       if (!pool.userCanWrite(user)) {
         return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
       }
-      Dilution target = null;
+      Set<Long> deadIds = new HashSet<>();
+      for (int i = 0; i < dilutionIds.size(); i++) {
+        deadIds.add(dilutionIds.getLong(i));
+      }
+      List<Dilution> deadDilutions = new ArrayList<>();
       for (Dilution element : pool.getPoolableElements()) {
-        if (element.getId() == dilutionId) {
-          target = element;
-          break;
+        if (deadIds.contains(element.getId())) {
+          deadDilutions.add(element);
         }
       }
-      if (target != null) {
-        pool.getPoolableElements().remove(target);
+      if (deadDilutions.size() > 0) {
+        pool.getPoolableElements().removeAll(deadDilutions);
         pool.setLastModifier(user);
         requestManager.savePool(pool);
       }

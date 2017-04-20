@@ -410,11 +410,13 @@
 </c:when>
 <c:otherwise>
   <h2>Selected element(s):</h2>
+  <button type="button" onclick="return Pool.ui.removeDilutions(${pool.id});" class="fg-button ui-state-default ui-corner-all">Remove Selected</button>
   <div id="pooledList">
     <table class="display no-border full-width" id="includedTable"></table>
   </div>
 
   <h2 class="hrule">Select poolable elements:</h2>
+  <button type="button" onclick="return Pool.ui.addDilutions(${pool.id});" class="fg-button ui-state-default ui-corner-all">Add Selected</button>
   
   <div id="elementSelectDatatableDiv">
     <table class="display no-border full-width" id="availableTable"></table>
