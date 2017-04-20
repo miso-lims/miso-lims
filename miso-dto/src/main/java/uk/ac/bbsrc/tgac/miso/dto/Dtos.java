@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -1437,23 +1436,15 @@ public class Dtos {
     dto.setParameters(asDto(from.getSequencingParameters()));
     dto.setLastUpdated(dateTimeFormatter.print(new DateTime(from.getLastUpdated())));
     dto.setRemaining(from.getRemaining());
-    setPoolOrderValue(from, HealthType.Completed, dto::setCompleted);
-    setPoolOrderValue(from, HealthType.Failed, dto::setFailed);
-    setPoolOrderValue(from, HealthType.Requested, dto::setRequested);
-    setPoolOrderValue(from, HealthType.Running, dto::setRunning);
-    setPoolOrderValue(from, HealthType.Started, dto::setStarted);
-    setPoolOrderValue(from, HealthType.Stopped, dto::setStopped);
-    setPoolOrderValue(from, HealthType.Unknown, dto::setUnknown);
+    dto.setCompleted(from.get(HealthType.Completed));
+    dto.setFailed(from.get(HealthType.Failed));
+    dto.setRequested(from.get(HealthType.Requested));
+    dto.setRunning(from.get(HealthType.Running));
+    dto.setStarted(from.get(HealthType.Started));
+    dto.setStopped(from.get(HealthType.Stopped));
+    dto.setUnknown(from.get(HealthType.Unknown));
     return dto;
 
-  }
-
-  private static void setPoolOrderValue(PoolOrderCompletion from, HealthType health, Consumer<Integer> setter) {
-    if (from.getItems().containsKey(health)) {
-      setter.accept(from.getItems().get(health));
-    } else {
-      setter.accept(0);
-    }
   }
 
   private static PlatformDto asDto(Platform from) {

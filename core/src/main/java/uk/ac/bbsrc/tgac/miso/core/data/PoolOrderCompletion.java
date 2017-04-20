@@ -72,8 +72,9 @@ public class PoolOrderCompletion implements Serializable {
   @Id
   private SequencingParameters parameters;
 
-  @ElementCollection
-  @CollectionTable(name = "OrderCompletion_Items", joinColumns = { @JoinColumn(name = "poolId"), @JoinColumn(name = "parametersId") })
+  @ElementCollection(targetClass = Integer.class)
+  @CollectionTable(name = "OrderCompletion_Items", joinColumns = { @JoinColumn(name = "poolId", referencedColumnName = "poolId"),
+      @JoinColumn(name = "parametersId", referencedColumnName = "parametersId") })
   @Column(name = "num_partitions")
   @MapKeyClass(HealthType.class)
   @MapKeyColumn(name = "health", unique = true)
@@ -85,6 +86,12 @@ public class PoolOrderCompletion implements Serializable {
 
   private int remaining;
 
+  public int get(HealthType health) {
+    if (items.containsKey(health)) {
+      return items.get(health);
+    }
+    return 0;
+  }
 
   public Map<HealthType, Integer> getItems() {
     return items;

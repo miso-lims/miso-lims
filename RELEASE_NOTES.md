@@ -9,6 +9,10 @@ Changes:
  * Improve database performance
  * Fix export functionality for sample sheets
 
+Bad:
+
+ * Pool order completions display incorrect results
+
 # 0.2.56
 
 Changes:
