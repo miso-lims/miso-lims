@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.exception.ConstraintViolationException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,7 @@ public class LibraryDilutionRestController extends RestController {
     public String indices;
     public String lowquality;
     public Long id;
+    public String lastModified;
   }
 
   private final JQueryDataTableBackend<LibraryDilution, SelectRowDto> jQueryBackendSelect = new JQueryDataTableBackend<LibraryDilution, SelectRowDto>() {
@@ -90,6 +92,7 @@ public class LibraryDilutionRestController extends RestController {
       }
       dto.indices = indices.toString();
       dto.lowquality = dil.getLibrary().isLowQuality() ? "&#9888;" : "";
+      dto.lastModified = Dtos.dateFormatter.print(new DateTime(dil.getLastModified()));
       return dto;
     }
   };
