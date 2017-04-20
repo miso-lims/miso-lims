@@ -1,3 +1,9 @@
+# 0.2.58
+
+Changes:
+
+ * Fix join column mismatch in order completions
+
 # 0.2.57
 
 Changes:
@@ -8,6 +14,10 @@ Changes:
  * Fix bug preventing items from printing
  * Improve database performance
  * Fix export functionality for sample sheets
+
+Bad:
+
+ * Pool order completions display incorrect results
 
 # 0.2.56
 
