@@ -102,8 +102,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 public class Dtos {
 
-  private static DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis();
-  private static DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
+  public static DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis();
+  public static DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
 
   public static TissueOriginDto asDto(TissueOrigin from) {
     TissueOriginDto dto = new TissueOriginDto();

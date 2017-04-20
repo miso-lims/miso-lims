@@ -536,6 +536,10 @@ Pool.ui = {
             "mData": "indices"
           },
           {
+            "sTitle": "Last Modified",
+            "mData": "lastModified"
+          },
+          {
             "sTitle": "Low Quality",
             "bSortable": false,
             "mData": "lowquality"
