@@ -497,9 +497,9 @@
         <exclusions>
           <exclusion>
             <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>            
+            <artifactId>javassist</artifactId>
           </exclusion>
-        </exclusions>        
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.hibernate.javax.persistence</groupId>
