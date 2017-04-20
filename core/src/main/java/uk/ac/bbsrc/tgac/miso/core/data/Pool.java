@@ -36,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -106,10 +107,14 @@ public interface Pool
    */
   public void setPoolableElements(Set<LibraryDilution> dilutions);
 
+  public void setPoolableElementViews(Set<PoolableElementView> views);
+
   /**
    * Returns the elements of this Pool object.
    */
   public Set<LibraryDilution> getPoolableElements();
+
+  public Set<PoolableElementView> getPoolableElementViews();
 
   /**
    * Registers an Experiment to this Pool
@@ -219,6 +224,7 @@ public interface Pool
    */
   public void setQcPassed(Boolean qcPassed);
 
+  @Override
   public Collection<ChangeLog> getChangeLog();
 
   /**
@@ -270,6 +276,7 @@ public interface Pool
 
   boolean hasDuplicateIndices();
 
+  @Override
   void setWatchGroup(Group group);
 
 }

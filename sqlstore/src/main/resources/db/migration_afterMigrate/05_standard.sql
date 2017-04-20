@@ -932,3 +932,11 @@ FROM Pool p
 JOIN BoxPosition bp
   ON bp.targetType = 'Pool'
   AND bp.targetId = p.poolId;
+
+CREATE OR REPLACE VIEW PoolableElementView
+AS SELECT d.dilutionId, d.name AS dilutionName, d.concentration AS dilutionConcentration,
+  l.lowQuality AS lowQualityLibrary, p.shortName AS projectShortName, p.alias AS projectAlias
+FROM LibraryDilution d
+JOIN Library l ON l.libraryId = d.library_libraryId
+JOIN Sample s ON s.sampleId = l.sample_sampleId
+JOIN Project p ON p.projectId = s.project_projectId;

@@ -132,6 +132,7 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StudyChangeLog</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType</value>

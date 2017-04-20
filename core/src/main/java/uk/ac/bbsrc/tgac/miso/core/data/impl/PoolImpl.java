@@ -78,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
@@ -151,9 +152,15 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @ManyToMany(targetEntity = LibraryDilution.class)
   @JoinTable(name = "Pool_Dilution", joinColumns = {
       @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
-          @JoinColumn(name = "dilution_dilutionId") })
+      @JoinColumn(name = "dilution_dilutionId") })
   @JsonBackReference
   private Set<LibraryDilution> pooledElements = new HashSet<>();
+
+  @ManyToMany(targetEntity = PoolableElementView.class)
+  @JoinTable(name = "Pool_Dilution", joinColumns = {
+      @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
+      @JoinColumn(name = "dilution_dilutionId") })
+  private Set<PoolableElementView> pooledElementViews = new HashSet<>();
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -254,7 +261,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
     if (!(obj instanceof Pool)) return false;
     Pool other = (Pool) obj;
     return new EqualsBuilder().appendSuper(super.equals(obj)).append(description, other.getDescription())
-        .append(pooledElements, other.getPoolableElements()).append(experiments, other.getExperiments())
+        .append(pooledElementViews, other.getPoolableElementViews()).append(experiments, other.getExperiments())
         .append(concentration, other.getConcentration())
         .append(identificationBarcode, other.getIdentificationBarcode()).append(readyToRun, other.getReadyToRun())
         .append(qcPassed, other.getQcPassed())
@@ -307,8 +314,8 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   @Override
   public boolean getHasLowQualityMembers() {
-    for (Dilution d : getPoolableElements()) {
-      if (d.getLibrary().isLowQuality()) {
+    for (PoolableElementView d : getPoolableElementViews()) {
+      if (d.isLowQualityLibrary()) {
         return true;
       }
     }
@@ -436,7 +443,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(pooledElements).append(experiments)
+    return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(pooledElementViews).append(experiments)
         .append(concentration).append(identificationBarcode).append(readyToRun).append(qcPassed).toHashCode();
   }
 
@@ -571,9 +578,9 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
     sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
-    if (!getPoolableElements().isEmpty()) {
+    if (!getPoolableElementViews().isEmpty()) {
       sb.append(" : ");
-      sb.append(getPoolableElements());
+      sb.append(getPoolableElementViews());
     }
     return sb.toString();
   }
@@ -596,6 +603,20 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
     changeLog.setColumnsChanged(columnsChanged);
     changeLog.setUser(user);
     return changeLog;
+  }
+
+  @Override
+  public void setPoolableElementViews(Set<PoolableElementView> views) {
+    if (views == null) {
+      this.pooledElementViews = Collections.emptySet();
+    } else {
+      this.pooledElementViews = views;
+    }
+  }
+
+  @Override
+  public Set<PoolableElementView> getPoolableElementViews() {
+    return this.pooledElementViews;
   }
 
 }
