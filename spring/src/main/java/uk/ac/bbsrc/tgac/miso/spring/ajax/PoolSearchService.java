@@ -44,8 +44,7 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -150,12 +149,12 @@ public class PoolSearchService {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
     }
 
-    List<LibraryDilution> ds = new ArrayList<>(p.getPoolableElements());
+    List<PoolableElementView> ds = new ArrayList<>(p.getPoolableElementViews());
     for (int i = 0; i < Math.min(ds.size(), 5); i++) {
-      Project proj = ds.get(i).getLibrary().getSample().getProject();
-      b.append("<span" + (ds.get(i).getLibrary().isLowQuality() ? " class='lowquality'" : "") + ">" + ds.get(i).getName() + " ("
-          + (proj.getShortName() == null ? proj.getAlias() : proj.getShortName()) + ") : " + ds.get(i).getConcentration() + " "
-          + ds.get(i).getUnits() + "</span><br/>");
+      PoolableElementView v = ds.get(i);
+      b.append("<span" + (v.isLowQualityLibrary() ? " class='lowquality'" : "") + ">" + v.getDilutionName() + " ("
+          + (v.getProjectShortName() == null ? v.getProjectAlias() : v.getProjectShortName()) + ") : " + v.getDilutionConcentration() + " "
+          + PoolableElementView.getUnits() + "</span><br/>");
     }
     if (ds.size() > 5) {
       b.append("<span>...and " + (ds.size() - 5) + " more</span><br/>");
@@ -166,7 +165,7 @@ public class PoolSearchService {
     if (exprs != null) {
       for (Experiment e : exprs) {
         b.append(
-            "<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getPoolableElements().size()
+            "<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getPoolableElementViews().size()
                 + " dilutions)</span><br/>");
       }
     }
