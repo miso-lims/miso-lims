@@ -25,8 +25,13 @@ public class DefaultPoolableElementViewService implements PoolableElementViewSer
   }
 
   @Override
-  public PoolableElementView get(Long dilutionId) {
+  public PoolableElementView get(Long dilutionId) throws IOException {
     return poolableElementViewDao.get(dilutionId);
+  }
+
+  @Override
+  public PoolableElementView getByBarcode(String barcode) throws IOException {
+    return poolableElementViewDao.getByBarcode(barcode);
   }
 
   @Override

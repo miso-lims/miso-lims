@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
 import java.util.Collections;
 
 import org.hibernate.Criteria;
@@ -36,8 +37,16 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public PoolableElementView get(Long dilutionId) {
+  public PoolableElementView get(Long dilutionId) throws IOException {
     return (PoolableElementView) currentSession().get(PoolableElementView.class, dilutionId);
+  }
+
+  @Override
+  public PoolableElementView getByBarcode(String barcode) throws IOException {
+    if (barcode == null) throw new IOException("Barcode cannot be null!");
+    Criteria criteria = currentSession().createCriteria(PoolableElementView.class);
+    criteria.add(Restrictions.eq("dilutionBarcode", barcode));
+    return (PoolableElementView) criteria.uniqueResult();
   }
 
   @Override

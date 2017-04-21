@@ -22,9 +22,9 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
@@ -63,6 +64,8 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   private ChangeLogService changeLogService;
   @Autowired
   private SecurityManager securityManager;
+  @Autowired
+  private PoolableElementViewService poolableElementViewService;
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
     this.authorizationManager = authorizationManager;
@@ -86,6 +89,10 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
 
   public void setChangeLogService(ChangeLogService changeLogService) {
     this.changeLogService = changeLogService;
+  }
+
+  public void setPoolableElementViewService(PoolableElementViewService poolableElementViewService) {
+    this.poolableElementViewService = poolableElementViewService;
   }
 
   @Override
@@ -212,13 +219,13 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       original.setQcPassed(pool.getQcPassed());
       original.setReadyToRun(pool.getReadyToRun());
 
-      Set<String> originalItems = extractDilutionNames(original.getPoolableElements());
+      Set<String> originalItems = extractDilutionNames(original.getPoolableElementViews());
 
-      Set<LibraryDilution> pooledElements = new HashSet<>();
-      for (LibraryDilution dilution : pool.getPoolableElements()) {
-        pooledElements.add(libraryDilutionStore.get(dilution.getId()));
+      Set<PoolableElementView> pooledElements = new HashSet<>();
+      for (PoolableElementView dilution : pool.getPoolableElementViews()) {
+        pooledElements.add(poolableElementViewService.get(dilution.getDilutionId()));
       }
-      original.setPoolableElements(pooledElements);
+      original.setPoolableElementViews(pooledElements);
 
       Set<String> updatedItems = extractDilutionNames(pooledElements);
 
@@ -248,10 +255,10 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     return id;
   }
 
-  private static Set<String> extractDilutionNames(Set<LibraryDilution> dilutions) {
+  private Set<String> extractDilutionNames(Set<PoolableElementView> dilutions) {
     Set<String> original = new HashSet<>();
-    for (LibraryDilution dilution : dilutions) {
-      original.add(dilution.getName());
+    for (PoolableElementView dilution : dilutions) {
+      original.add(dilution.getDilutionName());
     }
     return original;
   }
