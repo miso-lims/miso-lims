@@ -52,12 +52,12 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public void setPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
   @Override
-  public void setPoolId(Criteria criteria, long poolId) {
+  public void restrictPaginationByPoolId(Criteria criteria, long poolId) {
     criteria
         .add(Restrictions.sqlRestriction("EXISTS(SELECT * FROM Pool_Dilution WHERE pool_poolId = ? AND dilution_dilutionId = dilutionId)",
         poolId, LongType.INSTANCE));

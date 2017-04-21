@@ -60,17 +60,17 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
   }
 
   @Override
-  public void setFulfilled(Criteria criteria, boolean isFulfilled) {
+  public void restrictPaginationByFulfilled(Criteria criteria, boolean isFulfilled) {
     criteria.add(isFulfilled ? Restrictions.le("remaining", 0) : Restrictions.gt("remaining", 0));
   }
 
   @Override
-  public void setPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
     criteria.add(Restrictions.eq("pool.platformType", platformType));
   }
 
   @Override
-  public void setPoolId(Criteria criteria, long poolId) {
+  public void restrictPaginationByPoolId(Criteria criteria, long poolId) {
     criteria.add(Restrictions.eq("pool.id", poolId));
   }
 
