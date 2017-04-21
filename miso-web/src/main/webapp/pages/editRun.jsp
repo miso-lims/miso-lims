@@ -486,13 +486,11 @@
                         ${partition.pool.name}: <c:if test="${not empty partition.pool.alias}"><b>${partition.pool.alias}</b></c:if>
                       (${partition.pool.creationDate})
                     </a><br/>
-                    ${partition.pool.poolableElements.size()} dilutions
-                    <br/>
                     <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
                       <c:choose>
                         <c:when test="${not empty partition.pool.experiments}">
                           <i><c:forEach items="${partition.pool.experiments}" var="experiment">
-                            ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.poolableElements)} dilutions)<br/>
+                            ${experiment.study.project.alias} (${experiment.name})<br/>
                           </c:forEach>
                           </i>
                           <script>
