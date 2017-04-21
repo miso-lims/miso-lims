@@ -396,44 +396,6 @@
 </div>
   <br/>
 
-</c:if>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pooled_arrowclick'), 'pooled');">
-  Pooled Elements
-  <div id="pooled_arrowclick" class="toggleLeftDown"></div>
-</div>
-<div id="pooled" style="display:block">
-<h1>Pooled Elements</h1>
-<c:choose>
-<c:when test="${pool.id == 0}">
-<p>Please save the pool before adding elements.</p>
-</c:when>
-<c:otherwise>
-  <h2>Selected element(s):</h2>
-  <button type="button" onclick="return Pool.ui.removeDilutions(${pool.id});" class="fg-button ui-state-default ui-corner-all">Remove Selected</button>
-  <div id="pooledList">
-    <table class="display no-border full-width" id="includedTable"></table>
-  </div>
-
-  <h2 class="hrule">Select poolable elements:</h2>
-  <button type="button" onclick="return Pool.ui.addDilutions(${pool.id});" class="fg-button ui-state-default ui-corner-all">Add Selected</button>
-  
-  <div id="elementSelectDatatableDiv">
-    <table class="display no-border full-width" id="availableTable"></table>
-  </div>
-  
-  <script type="text/javascript">
-      jQuery(document).ready(function () {
-          Pool.ui.dilutionConcentrationUnits = '${libraryDilutionUnits}';
-          Pool.ui.createIncludedDilutionTable(${pool.id});
-          Pool.ui.createAvailableDilutionTable(${pool.id});
-      });
-  </script>
-</c:otherwise>
-</c:choose>
-</div>
-
-<c:if test="${pool.id != 0}">
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runs');">
   Runs
   <div id="runs_arrowclick" class="toggleLeftDown"></div>
@@ -473,6 +435,7 @@
         { "sTitle" : "Start Date", "mData" : "startDate" },
         { "sTitle" : "End Date", "mData" : "endDate" },
         { "sTitle" : "Type", "mData" : "platformType" },
+        { "sTitle" : "Parameters", "mData" : "parameters.name" },
         { "sTitle" : "Last Modified", "mData" : "lastUpdated" }
       ],
       "iDisplayLength": 50,
@@ -483,6 +446,42 @@
   });
 </script>
 </c:if>
+
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pooled_arrowclick'), 'pooled');">
+  Pooled Elements
+  <div id="pooled_arrowclick" class="toggleLeftDown"></div>
+</div>
+<div id="pooled" style="display:block">
+<h1>Pooled Elements</h1>
+<c:choose>
+<c:when test="${pool.id == 0}">
+<p>Please save the pool before adding elements.</p>
+</c:when>
+<c:otherwise>
+  <h2>Selected element(s):</h2>
+  <button type="button" onclick="return Pool.ui.removeDilutions(${pool.id});" class="fg-button ui-state-default ui-corner-all">Remove Selected</button>
+  <div id="pooledList">
+    <table class="display no-border full-width" id="includedTable"></table>
+  </div>
+
+  <h2 class="hrule">Select poolable elements:</h2>
+  <button type="button" onclick="return Pool.ui.addDilutions(${pool.id});" class="fg-button ui-state-default ui-corner-all">Add Selected</button>
+  
+  <div id="elementSelectDatatableDiv">
+    <table class="display no-border full-width" id="availableTable"></table>
+  </div>
+  
+  <script type="text/javascript">
+      jQuery(document).ready(function () {
+          Pool.ui.dilutionConcentrationUnits = '${libraryDilutionUnits}';
+          Pool.ui.createIncludedDilutionTable(${pool.id});
+          Pool.ui.createAvailableDilutionTable(${pool.id});
+      });
+  </script>
+</c:otherwise>
+</c:choose>
+</div>
 
 <c:if test="${not empty pool.changeLog}">
   <br/>
