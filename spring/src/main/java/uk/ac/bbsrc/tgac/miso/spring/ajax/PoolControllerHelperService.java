@@ -70,8 +70,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -81,6 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
@@ -111,6 +112,8 @@ public class PoolControllerHelperService {
   private ExperimentService experimentService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private PoolableElementViewService poolableElementViewService;
   @Autowired
   private StudyService studyService;
 
@@ -657,11 +660,11 @@ public class PoolControllerHelperService {
         return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
       }
       for (int i = 0; i < dilutionIds.size(); i++) {
-        LibraryDilution target = dilutionService.get(dilutionIds.getLong(i));
+        PoolableElementView target = poolableElementViewService.get(dilutionIds.getLong(i));
         if (target == null) {
           return JSONUtils.SimpleJSONError("No such element.");
         }
-        pool.getPoolableElements().add(target);
+        pool.getPoolableElementViews().add(target);
       }
       pool.setLastModifier(user);
       poolService.savePool(pool);
@@ -685,14 +688,14 @@ public class PoolControllerHelperService {
       for (int i = 0; i < dilutionIds.size(); i++) {
         deadIds.add(dilutionIds.getLong(i));
       }
-      List<Dilution> deadDilutions = new ArrayList<>();
-      for (Dilution element : pool.getPoolableElements()) {
-        if (deadIds.contains(element.getId())) {
+      List<PoolableElementView> deadDilutions = new ArrayList<>();
+      for (PoolableElementView element : pool.getPoolableElementViews()) {
+        if (deadIds.contains(element.getDilutionId())) {
           deadDilutions.add(element);
         }
       }
       if (deadDilutions.size() > 0) {
-        pool.getPoolableElements().removeAll(deadDilutions);
+        pool.getPoolableElementViews().removeAll(deadDilutions);
         pool.setLastModifier(user);
         poolService.savePool(pool);
       }

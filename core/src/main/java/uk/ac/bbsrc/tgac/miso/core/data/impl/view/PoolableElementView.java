@@ -25,6 +25,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 @Table(name = "PoolableElementView")
 public class PoolableElementView implements Serializable {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   private Long dilutionId;
 
