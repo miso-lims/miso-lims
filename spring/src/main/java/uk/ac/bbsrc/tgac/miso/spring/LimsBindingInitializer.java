@@ -90,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
@@ -129,6 +130,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private ReferenceGenomeService referenceGenomeService;
   @Autowired
   private KitService kitService;
+  @Autowired
+  private PoolService poolService;
 
   @Autowired
   private SequencingParametersDao sequencingParametersDao;
@@ -387,7 +390,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<Pool>(Pool.class) {
       @Override
       public Pool resolveById(long id) throws Exception {
-        return requestManager.getPoolById(id);
+        return poolService.getPoolById(id);
       }
     }.register(binder, "sequencerPartitionContainers.partitions.pool");
 

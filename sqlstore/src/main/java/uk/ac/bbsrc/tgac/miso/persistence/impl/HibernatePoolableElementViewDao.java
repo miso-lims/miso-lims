@@ -31,6 +31,15 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
     return sessionFactory.getCurrentSession();
   }
 
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public PoolableElementView get(Long dilutionId) {
+    return (PoolableElementView) currentSession().get(PoolableElementView.class, dilutionId);
+  }
+
   @Override
   public String getProjectColumn() {
     return "projectId";

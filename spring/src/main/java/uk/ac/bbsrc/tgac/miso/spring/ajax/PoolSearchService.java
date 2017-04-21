@@ -46,8 +46,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -62,8 +62,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public class PoolSearchService {
 
   protected static final Logger log = LoggerFactory.getLogger(PoolSearchService.class);
+
   @Autowired
-  private RequestManager requestManager;
+  private PoolService poolService;
 
   private abstract class PoolSearch {
     public abstract Collection<Pool> all(PlatformType type) throws IOException;
@@ -75,12 +76,12 @@ public class PoolSearchService {
 
     @Override
     public Collection<Pool> all(PlatformType type) throws IOException {
-      return requestManager.listReadyPoolsByPlatform(type);
+      return poolService.listReadyPoolsByPlatform(type);
     }
 
     @Override
     public Collection<Pool> search(PlatformType type, String query) throws IOException {
-      return requestManager.listReadyPoolsByPlatformAndSearch(type, query);
+      return poolService.listReadyPoolsByPlatformAndSearch(type, query);
     }
   }
 
@@ -88,12 +89,12 @@ public class PoolSearchService {
 
     @Override
     public Collection<Pool> all(PlatformType type) throws IOException {
-      return requestManager.listAllPoolsByPlatform(type);
+      return poolService.listAllPoolsByPlatform(type);
     }
 
     @Override
     public Collection<Pool> search(PlatformType type, String query) throws IOException {
-      return requestManager.listAllPoolsByPlatformAndSearch(type, query);
+      return poolService.listAllPoolsByPlatformAndSearch(type, query);
     }
 
   }
@@ -176,9 +177,5 @@ public class PoolSearchService {
         + p.getPlatformType().getKey() + "</div>");
     b.append("</div>");
     return b.toString();
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
   }
 }

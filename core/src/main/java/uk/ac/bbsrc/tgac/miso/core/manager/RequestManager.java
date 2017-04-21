@@ -41,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -77,12 +76,6 @@ public interface RequestManager {
 
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
 
-  public long savePool(Pool pool) throws IOException;
-
-  public long savePoolQC(PoolQC poolQC) throws IOException;
-
-  public void savePoolNote(Pool pool, Note note) throws IOException;
-
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException;
 
   public long saveStatus(Status status) throws IOException;
@@ -99,12 +92,6 @@ public interface RequestManager {
   public Partition getPartitionById(long partitionId) throws IOException;
 
   public SequencerPartitionContainer getSequencerPartitionContainerById(long containerId) throws IOException;
-
-  public Pool getPoolById(long poolId) throws IOException;
-
-  public Pool getPoolByBarcode(String barcode) throws IOException;
-
-  public PoolQC getPoolQCById(long poolQcId) throws IOException;
 
   public LibraryQC getLibraryQCById(long qcId) throws IOException;
 
@@ -235,26 +222,6 @@ public interface RequestManager {
 
   public Collection<TargetedSequencing> listAllTargetedSequencing() throws IOException;
 
-  public Collection<Pool> listAllPools() throws IOException;
-
-  public Collection<Pool> listAllPoolsBySearch(String query) throws IOException;
-
-  public Collection<Pool> listAllPoolsWithLimit(int limit) throws IOException;
-
-  public Collection<Pool> listAllPoolsByPlatform(PlatformType platformType) throws IOException;
-
-  public Collection<Pool> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
-      throws IOException;
-
-  public Collection<Pool> listReadyPoolsByPlatform(PlatformType platformType) throws IOException;
-
-  public Collection<Pool> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
-      throws IOException;
-
-  public Collection<Pool> listPoolsByProjectId(long projectId) throws IOException;
-
-  public Collection<Pool> listPoolsByLibraryId(long libraryId) throws IOException;
-
   /**
    * Obtain a list of all the Platforms
    */
@@ -326,13 +293,9 @@ public interface RequestManager {
 
   public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException;
 
-  public void deletePool(Pool pool) throws IOException;
-
   public void deleteContainer(SequencerPartitionContainer container) throws IOException;
 
   public void deleteRunNote(Run run, Long noteId) throws IOException;
-
-  public void deletePoolNote(Pool pool, Long noteId) throws IOException;
 
   public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException;
 
@@ -341,8 +304,6 @@ public interface RequestManager {
   public Map<String, Integer> getServiceRecordColumnSizes() throws IOException;
 
   public Map<String, Integer> getBoxColumnSizes() throws IOException;
-
-  public Map<String, Integer> getPoolColumnSizes() throws IOException;
 
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
 
@@ -379,9 +340,5 @@ public interface RequestManager {
   void addProjectWatcher(Project project, User watcher) throws IOException;
 
   void removeProjectWatcher(Project project, User watcher) throws IOException;
-
-  public void addPoolWatcher(Pool pool, User watcher) throws IOException;
-
-  public void removePoolWatcher(Pool pool, User watcher) throws IOException;
 
 }

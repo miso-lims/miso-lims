@@ -109,7 +109,7 @@ public class PoolRestController extends RestController {
   @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String getPoolById(@PathVariable Long poolId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    Pool p = requestManager.getPoolById(poolId);
+    Pool p = poolService.getPoolById(poolId);
     if (p == null) {
       throw new RestException("No pool found with ID: " + poolId, Status.NOT_FOUND);
     }
@@ -123,7 +123,7 @@ public class PoolRestController extends RestController {
     if (PlatformType.getKeys().contains(platform)) {
       Collection<Pool> pools = new ArrayList<>();
       PlatformType platformType = PlatformType.get(platform);
-      pools = requestManager.listAllPoolsByPlatform(platformType);
+      pools = poolService.listAllPoolsByPlatform(platformType);
       return serializePools(pools, uriBuilder);
     } else {
       throw new RestException("Request must specify a platform");

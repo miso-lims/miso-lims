@@ -75,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -92,6 +93,9 @@ public class EditRunController {
 
   @Autowired
   private ChangeLogService changeLogService;
+
+  @Autowired
+  private PoolService poolService;
 
   private RunStatsManager runStatsManager;
 
@@ -192,12 +196,12 @@ public class EditRunController {
   }
 
   public Collection<Pool> populateAvailablePools(User user) throws IOException {
-    return requestManager.listAllPools();
+    return poolService.listAllPools();
   }
 
   public Collection<Pool> populateAvailablePools(PlatformType platformType, User user) throws IOException {
     List<Pool> pools = new ArrayList<>(
-        requestManager.listAllPoolsByPlatform(platformType));
+        poolService.listAllPoolsByPlatform(platformType));
     Collections.sort(pools);
     return pools;
   }

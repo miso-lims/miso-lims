@@ -55,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
@@ -71,6 +72,8 @@ public class ExperimentWizardControllerHelperService {
   private StudyService studyService;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private PoolService poolService;
 
   public JSONObject addStudyExperiment(HttpSession session, JSONObject json) {
     StudyType studyType = null;
@@ -136,7 +139,7 @@ public class ExperimentWizardControllerHelperService {
         e.setTitle(title);
         e.setPlatform(requestManager.getPlatformById(platformId));
         if (poolId != null) {
-          e.setPool(requestManager.getPoolById(poolId));
+          e.setPool(poolService.getPoolById(poolId));
         }
         e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         experimentService.save(e);
@@ -193,7 +196,7 @@ public class ExperimentWizardControllerHelperService {
         Platform platform = requestManager.getPlatformById(platformId);
         if (platform != null) {
           PlatformType pt = platform.getPlatformType();
-          List<Pool> pools = new ArrayList<>(requestManager.listAllPoolsByPlatform(pt));
+          List<Pool> pools = new ArrayList<>(poolService.listAllPoolsByPlatform(pt));
           Collections.sort(pools);
           for (Pool p : pools) {
             a.append("<div bind='" + p.getId()

@@ -68,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
 /**
@@ -98,6 +99,9 @@ public class EditPoolController {
 
   @Autowired
   private LibraryDilutionService dilutionService;
+
+  @Autowired
+  private PoolService poolService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -141,7 +145,7 @@ public class EditPoolController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getPoolColumnSizes();
+    return poolService.getPoolColumnSizes();
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -158,7 +162,7 @@ public class EditPoolController {
         pool = new PoolImpl(user);
         model.put("title", "New Pool");
       } else {
-        pool = requestManager.getPoolById(poolId);
+        pool = poolService.getPoolById(poolId);
         model.put("title", "Pool " + poolId);
       }
 
@@ -223,7 +227,7 @@ public class EditPoolController {
     }
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     p.setLastModifier(user);
-    requestManager.savePool(p);
+    poolService.savePool(p);
     return "redirect:/miso/pool/" + p.getId();
   }
 
@@ -238,12 +242,12 @@ public class EditPoolController {
       // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
       // update them to avoid reverting the state.
       if (pool.getId() != PoolImpl.UNSAVED_ID) {
-        Pool original = requestManager.getPoolById(pool.getId());
+        Pool original = poolService.getPoolById(pool.getId());
         pool.setPoolableElements(original.getPoolableElements());
       }
 
       pool.setLastModifier(user);
-      requestManager.savePool(pool);
+      poolService.savePool(pool);
       session.setComplete();
       model.clear();
       return "redirect:/miso/pool/" + pool.getId();

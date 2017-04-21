@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDilutionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolableElementViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
@@ -59,6 +60,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleNumberPerProjectService;
@@ -101,6 +104,7 @@ public class MisoServiceManager {
   private HibernateStatusDao statusDao;
   private HibernateSequencerReferenceDao sequencerReferenceDao;
   private HibernateBoxDao boxDao;
+  private HibernatePoolableElementViewDao poolableElementViewDao;
 
   private DefaultSampleClassService sampleClassService;
   private DefaultSampleService sampleService;
@@ -111,6 +115,8 @@ public class MisoServiceManager {
   private DefaultSampleValidRelationshipService sampleValidRelationshipService;
   private DefaultReferenceGenomeService referenceGenomeService;
   private DefaultStudyService studyService;
+  private DefaultPoolableElementViewService poolableElementViewService;
+  private DefaultPoolService poolService;
 
   private PoolAlertManager poolAlertManager;
   private ProjectAlertManager projectAlertManager;
@@ -173,6 +179,7 @@ public class MisoServiceManager {
     m.setDefaultLibraryQcDao();
     m.setDefaultPlatformDao();
     m.setDefaultPoolDao();
+    m.setDefaultPoolService();
     m.setDefaultReferenceGenomeDao();
     m.setDefaultReferenceGenomeService();
     m.setDefaultProjectDao();
@@ -206,6 +213,8 @@ public class MisoServiceManager {
     m.setDefaultLibraryDesignCodeDao();
     m.setDefaultIndexDao();
     m.setDefaultSequencingParametersDao();
+    m.setDefaultPoolableElementViewDao();
+    m.setDefaultPoolableElementViewService();
 
     // sigh
     m.setDefaultRequestManager();
@@ -700,6 +709,28 @@ public class MisoServiceManager {
 
   private void updatePoolDaoDependencies() {
     if (requestManager != null) requestManager.setPoolStore(poolDao);
+  }
+
+  public DefaultPoolService getPoolService() {
+    return poolService;
+  }
+
+  public void setPoolService(DefaultPoolService service) {
+    this.poolService = service;
+    updatePoolServiceDependencies();
+  }
+
+  public void setDefaultPoolService() {
+    DefaultPoolService service = new DefaultPoolService();
+    service.setAuthorizationManager(authorizationManager);
+    service.setNamingScheme(namingScheme);
+    service.setPoolAlertManager(poolAlertManager);
+    service.setPoolStore(poolDao);
+    setPoolService(service);
+  }
+
+  private void updatePoolServiceDependencies() {
+    // no dependants
   }
 
   public HibernateExperimentDao getExperimentDao() {
@@ -1240,7 +1271,7 @@ public class MisoServiceManager {
     setLibraryDesignCodeDao(dao);
   }
 
-  public void updateLibraryDesignCodeDaoDependencies() {
+  private void updateLibraryDesignCodeDaoDependencies() {
     if (libraryService != null) libraryService.setLibraryDesignCodeDao(libraryDesignCodeDao);
   }
 
@@ -1296,7 +1327,7 @@ public class MisoServiceManager {
     setPoolAlertManager(pam);
   }
 
-  public void updatePoolAlertManagerDependencies() {
+  private void updatePoolAlertManagerDependencies() {
     if (requestManager != null) requestManager.setPoolAlertManager(poolAlertManager);
   }
 
@@ -1315,7 +1346,7 @@ public class MisoServiceManager {
     setProjectAlertManager(pam);
   }
 
-  public void updateProjectAlertManagerDependencies() {
+  private void updateProjectAlertManagerDependencies() {
     if (projectDao != null) projectDao.setProjectAlertManager(projectAlertManager);
   }
 
@@ -1334,8 +1365,46 @@ public class MisoServiceManager {
     setRunAlertManager(ram);
   }
 
-  public void updateRunAlertManagerDependencies() {
+  private void updateRunAlertManagerDependencies() {
     if (requestManager != null) requestManager.setRunAlertManager(runAlertManager);
+  }
+
+  public HibernatePoolableElementViewDao getPoolableElementViewDao() {
+    return this.poolableElementViewDao;
+  }
+
+  public void setPoolableElementViewDao(HibernatePoolableElementViewDao dao) {
+    this.poolableElementViewDao = dao;
+    updatePoolableElementViewDaoDependencies();
+  }
+
+  public void setDefaultPoolableElementViewDao() {
+    HibernatePoolableElementViewDao dao = new HibernatePoolableElementViewDao();
+    dao.setSessionFactory(sessionFactory);
+    setPoolableElementViewDao(dao);
+  }
+
+  private void updatePoolableElementViewDaoDependencies() {
+    if (poolableElementViewService != null) poolableElementViewService.setPoolableElementViewDao(poolableElementViewDao);
+  }
+
+  public DefaultPoolableElementViewService getPoolableElementViewService() {
+    return this.poolableElementViewService;
+  }
+
+  public void setPoolableElementViewService(DefaultPoolableElementViewService service) {
+    this.poolableElementViewService = service;
+    updatePoolableElementViewServiceDependencies();
+  }
+
+  public void setDefaultPoolableElementViewService() {
+    DefaultPoolableElementViewService service = new DefaultPoolableElementViewService();
+    service.setPoolableElementViewDao(poolableElementViewDao);
+    setPoolableElementViewService(service);
+  }
+
+  private void updatePoolableElementViewServiceDependencies() {
+    // no dependants
   }
 
 }

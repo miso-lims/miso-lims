@@ -78,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
@@ -102,6 +103,8 @@ public class ImportExportControllerHelperService {
   private IndexService indexService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private PoolService poolService;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -463,7 +466,7 @@ public class ImportExportControllerHelperService {
 
                 Matcher m = poolPattern.matcher(poolName);
                 if (m.matches()) {
-                  Pool existedPool = requestManager.getPoolById(Integer.valueOf(m.group(1)));
+                  Pool existedPool = poolService.getPoolById(Integer.valueOf(m.group(1)));
                   pools.put(poolName, existedPool);
                   if (jsonArrayElement.get(13) != null && !isStringEmptyOrNull(jsonArrayElement.getString(13))) {
                     existedPool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
@@ -471,7 +474,7 @@ public class ImportExportControllerHelperService {
                   if (ldi != null) {
                     existedPool.addPoolableElement(ldi);
                   }
-                  requestManager.savePool(existedPool);
+                  poolService.savePool(existedPool);
                 } else {
                   Pool pool = new PoolImpl();
                   if (!pools.containsKey(poolName)) {
@@ -489,12 +492,12 @@ public class ImportExportControllerHelperService {
                     if (ldi != null) {
                       pool.addPoolableElement(ldi);
                     }
-                    requestManager.savePool(pool);
+                    poolService.savePool(pool);
                   } else {
                     pool = pools.get(poolName);
                     if (ldi != null) {
                       pool.addPoolableElement(ldi);
-                      requestManager.savePool(pool);
+                      poolService.savePool(pool);
                     }
                   }
                 }
