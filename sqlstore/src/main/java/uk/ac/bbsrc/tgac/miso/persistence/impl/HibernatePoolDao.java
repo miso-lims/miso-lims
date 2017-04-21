@@ -302,16 +302,16 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   }
 
   @Override
-  public void setProjectId(Criteria criteria, long projectId) {
+  public void restrictPaginationByProjectId(Criteria criteria, long projectId) {
     criteria.createAlias("pooledElements", "dilution");
     criteria.createAlias("dilution.library", "library");
     criteria.createAlias("library.sample", "sample");
     criteria.createAlias("sample.project", "project");
-    HibernatePaginatedDataSource.super.setProjectId(criteria, projectId);
+    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId);
   }
 
   @Override
-  public void setPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
