@@ -544,7 +544,7 @@ FOR EACH ROW
           CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT(NEW.name, ' identificationBarcode') END,
           CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targetedSequencingId') END
         ), ''),
-        (SELECT lastModifier FROM Library WHERE libraryId = NEW.library_libraryId),
+        NEW.lastModifier,
         log_message
       );
     END IF;
@@ -556,7 +556,7 @@ FOR EACH ROW
   INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
     NEW.library_libraryId,
     '',
-    (SELECT lastModifier FROM Library WHERE libraryId = NEW.library_libraryId),
+    NEW.lastModifier,
     CONCAT('Library dilution LDI', NEW.dilutionId, ' created.'))//
 
 DROP TRIGGER IF EXISTS BeforeInsertLibrary//
