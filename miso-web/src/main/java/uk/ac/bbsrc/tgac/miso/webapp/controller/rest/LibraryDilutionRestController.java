@@ -27,13 +27,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 
 @Controller
@@ -106,7 +106,7 @@ public class LibraryDilutionRestController extends RestController {
   private PoolableElementViewService poolableElementViewService;
 
   @Autowired
-  private RequestManager requestManager;
+  private PoolService poolService;
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
@@ -158,7 +158,7 @@ public class LibraryDilutionRestController extends RestController {
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
 
-    final Pool pool = requestManager.getPoolById(poolId);
+    final Pool pool = poolService.getPoolById(poolId);
     return jQueryBackendSelect.get(request, response, null, PaginationFilter.platformType(pool.getPlatformType()));
   }
 

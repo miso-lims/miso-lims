@@ -51,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -217,34 +216,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long savePool(Pool pool) throws IOException {
-    if (writeCheck(pool)) {
-      return backingManager.savePool(pool);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Pool");
-    }
-  }
-
-  @Override
-  public long savePoolQC(PoolQC poolQC) throws IOException {
-    if (writeCheck(poolQC.getPool())) {
-      return backingManager.savePoolQC(poolQC);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Pool");
-    }
-  }
-
-  @Override
-  public void savePoolNote(Pool pool, Note note) throws IOException {
-    if (writeCheck(pool)) {
-      note.setOwner(getCurrentUser());
-      backingManager.savePoolNote(pool, note);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Pool");
-    }
-  }
-
-  @Override
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (writeCheck(container)) {
       container.setLastModifier(getCurrentUser());
@@ -265,28 +236,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     Partition o = backingManager.getPartitionById(partitionId);
     if (readCheck(o.getSequencerPartitionContainer())) return o;
     else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Partition " + partitionId);
-  }
-
-  @Override
-  public Pool getPoolById(long poolId) throws IOException {
-    Pool o = backingManager.getPoolById(poolId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + poolId);
-  }
-
-  @Override
-  public Pool getPoolByBarcode(String barcode) throws IOException {
-    Pool o = backingManager.getPoolByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + o.getId());
-  }
-
-  @Override
-  public PoolQC getPoolQCById(long qcId) throws IOException {
-    PoolQC o = backingManager.getPoolQCById(qcId);
-    if (readCheck(o.getPool())) return o;
-    else throw new AuthorizationIOException(
-        "User " + getCurrentUsername() + " cannot read parent Pool " + o.getPool().getId() + " for PoolQC " + qcId);
   }
 
   @Override
@@ -711,86 +660,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool> listAllPools() throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.listAllPools()) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Pool> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.listAllPoolsByPlatform(platformType)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Pool> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
-      throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.listAllPoolsByPlatformAndSearch(platformType, query)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Pool> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.listReadyPoolsByPlatform(platformType)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Pool> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
-      throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.listReadyPoolsByPlatformAndSearch(platformType, query)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public List<Pool> listPoolsByLibraryId(long libraryId) throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.listPoolsByLibraryId(libraryId)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
   public Collection<SequencerPartitionContainer> listAllSequencerPartitionContainers() throws IOException {
     User user = getCurrentUser();
     Collection<SequencerPartitionContainer> accessibles = new HashSet<>();
@@ -875,13 +744,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deletePool(Pool pool) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deletePool(pool);
-    }
-  }
-
-  @Override
   public void deleteContainer(SequencerPartitionContainer container) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deleteContainer(container);
@@ -892,15 +754,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deleteRunNote(Run run, Long noteId) throws IOException {
     if (getCurrentUser().isAdmin()) { // should use authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner())
       backingManager.deleteRunNote(run, noteId);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot delete this note");
-    }
-  }
-
-  @Override
-  public void deletePoolNote(Pool pool, Long noteId) throws IOException {
-    if (getCurrentUser().isAdmin()) { // should use authorizationManager.throwIfNonAdminOrMatchingOwner(note.getOwner())
-      backingManager.deletePoolNote(pool, noteId);
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot delete this note");
     }
@@ -1087,16 +940,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool> listPoolsByProjectId(long projectId) throws IOException {
-    Collection<Pool> pools = backingManager.listPoolsByProjectId(projectId);
-    Collection<Pool> accessible = new ArrayList<>();
-    for (Pool p : pools) {
-      if (p.userCanRead(getCurrentUser())) accessible.add(p);
-    }
-    return accessible;
-  }
-
-  @Override
   public Collection<Platform> listAllPlatforms() throws IOException {
     return backingManager.listAllPlatforms();
   }
@@ -1225,11 +1068,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Map<String, Integer> getPoolColumnSizes() throws IOException {
-    return backingManager.getPoolColumnSizes();
-  }
-
-  @Override
   public Map<String, Integer> getProjectColumnSizes() throws IOException {
     return backingManager.getProjectColumnSizes();
   }
@@ -1283,30 +1121,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public TargetedSequencing getTargetedSequencingById(long targetedSequencingId) throws IOException {
     return backingManager.getTargetedSequencingById(targetedSequencingId);
-  }
-
-  @Override
-  public List<Pool> listAllPoolsBySearch(String query) throws IOException {
-    User user = getCurrentUser();
-    List<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.listAllPoolsBySearch(query)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public List<Pool> listAllPoolsWithLimit(int limit) throws IOException {
-    User user = getCurrentUser();
-    List<Pool> accessibles = new ArrayList<>();
-    for (Pool pool : backingManager.listAllPoolsWithLimit(limit)) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    return accessibles;
   }
 
   @Override
@@ -1379,26 +1193,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read write to Project " + project.getId());
     } else {
       backingManager.removeProjectWatcher(project, watcher);
-    }
-  }
-
-  @Override
-  public void addPoolWatcher(Pool pool, User watcher) throws IOException {
-    if (!readCheck(pool)) {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Pool " + pool.getId());
-    } else if (!pool.userCanRead(watcher)) {
-      throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot read Pool " + pool.getId());
-    } else {
-      backingManager.addPoolWatcher(pool, watcher);
-    }
-  }
-
-  @Override
-  public void removePoolWatcher(Pool pool, User watcher) throws IOException {
-    if (!writeCheck(pool)) {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read write to Pool " + pool.getId());
-    } else {
-      backingManager.removePoolWatcher(pool, watcher);
     }
   }
 }

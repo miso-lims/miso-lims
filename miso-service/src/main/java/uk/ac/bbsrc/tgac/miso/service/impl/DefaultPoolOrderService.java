@@ -12,12 +12,12 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -32,7 +32,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
   SequencingParametersDao sequencingParametersDao;
 
   @Autowired
-  private RequestManager requestManager;
+  private PoolService poolService;
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -44,7 +44,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public Long create(PoolOrderDto poolOrderDto) throws IOException {
-    Pool pool = requestManager.getPoolById(poolOrderDto.getPoolId());
+    Pool pool = poolService.getPoolById(poolOrderDto.getPoolId());
     authorizationManager.throwIfNotWritable(pool);
     if (pool == null) {
       throw new IOException("No such pool: " + poolOrderDto.getPoolId());
@@ -61,7 +61,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public void update(PoolOrder poolOrder) throws IOException {
-    Pool owner = requestManager.getPoolById(poolOrder.getPoolId());
+    Pool owner = poolService.getPoolById(poolOrder.getPoolId());
     authorizationManager.throwIfNotWritable(owner);
     User user = authorizationManager.getCurrentUser();
     poolOrder.setCreatedBy(user);
@@ -78,14 +78,14 @@ public class DefaultPoolOrderService implements PoolOrderService {
   @Override
   public void delete(Long poolOrderId) throws IOException {
     PoolOrder poolOrder = poolOrderDao.getPoolOrder(poolOrderId);
-    Pool pool = requestManager.getPoolById(poolOrder.getPoolId());
+    Pool pool = poolService.getPoolById(poolOrder.getPoolId());
     authorizationManager.throwIfNotWritable(pool);
     if (poolOrder != null) poolOrderDao.deletePoolOrder(poolOrder);
   }
 
   @Override
   public Set<PoolOrder> getByPool(Long id) throws AuthorizationException, IOException {
-    Pool pool = requestManager.getPoolById(id);
+    Pool pool = poolService.getPoolById(id);
     authorizationManager.throwIfNotReadable(pool);
     return Sets.newHashSet(poolOrderDao.getByPool(id));
   }

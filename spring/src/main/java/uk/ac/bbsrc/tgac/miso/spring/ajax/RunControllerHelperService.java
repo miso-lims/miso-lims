@@ -75,6 +75,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
@@ -92,6 +93,8 @@ public class RunControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private PoolService poolService;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -491,10 +494,10 @@ public class RunControllerHelperService {
       PlatformType pt = json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))
           ? PlatformType.get(json.getString("platform")) : r.getPlatformType();
 
-      Pool p = requestManager.getPoolByBarcode(barcode);
+      Pool p = poolService.getPoolByBarcode(barcode);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (p == null) {
-        p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)));
+        p = poolService.getPoolByBarcode(new String(Base64.decodeBase64(barcode)));
       }
       // if pool still can't be found, return error
       if (p == null) {
@@ -523,7 +526,7 @@ public class RunControllerHelperService {
     try {
       String partition = json.getString("partition");
       Long poolId = json.getLong("poolId");
-      Pool p = requestManager.getPoolById(poolId);
+      Pool p = poolService.getPoolById(poolId);
       StringBuilder sb = new StringBuilder();
 
       Set<Project> pooledProjects = new HashSet<>();

@@ -41,9 +41,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 @Ajaxified
@@ -51,17 +51,13 @@ public class BarcodeHelperService {
   protected static final Logger log = LoggerFactory.getLogger(BarcodeHelperService.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private PoolService poolService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
   private LibraryDilutionService libraryDilutionService;
   @Autowired
   private SampleService sampleService;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
@@ -95,9 +91,9 @@ public class BarcodeHelperService {
         }
       }
 
-      for (Pool p : requestManager.listAllPools()) {
+      for (Pool p : poolService.listAllPools()) {
         if (isStringEmptyOrNull(p.getIdentificationBarcode())) {
-          requestManager.savePool(p);
+          poolService.savePool(p);
         }
       }
     } catch (IOException e) {

@@ -66,7 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -79,7 +78,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -87,7 +85,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -334,24 +331,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool> listAllPoolsBySearch(String query) throws IOException {
-    if (poolStore != null) {
-      return poolStore.listAllByCriteria(null, query, null, false);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Pool> listAllPoolsWithLimit(int limit) throws IOException {
-    if (poolStore != null) {
-      return poolStore.listAllByCriteria(null, null, limit, false);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<ProjectOverview> listAllOverviewsByProjectId(long projectId) throws IOException {
     if (projectStore != null) {
       return projectStore.listOverviewsByProjectId(projectId);
@@ -570,71 +549,6 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException(
           "One or more of sampleStore, libraryStore, or poolStore are not available. Check that they have been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Pool> listAllPools() throws IOException {
-    if (poolStore != null) {
-      return poolStore.listAll();
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Pool> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
-    if (poolStore != null) {
-      return poolStore.listAllByCriteria(platformType, null, null, false);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Pool> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query)
-      throws IOException {
-    if (poolStore != null) {
-      return poolStore.listAllByCriteria(platformType, query, null, false);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Pool> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
-    if (poolStore != null) {
-      return poolStore.listAllByCriteria(platformType, null, null, true);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Pool> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query)
-      throws IOException {
-    if (poolStore != null) {
-      return poolStore.listAllByCriteria(platformType, query, null, true);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Pool> listPoolsByProjectId(long projectId) throws IOException {
-    if (poolStore != null) {
-      return poolStore.listByProjectId(projectId);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Pool> listPoolsByLibraryId(long libraryId) throws IOException {
-    if (poolStore != null) {
-      return poolStore.listByLibraryId(libraryId);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -879,17 +793,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deletePool(Pool pool) throws IOException {
-    if (poolStore != null) {
-      if (!poolStore.remove(pool)) {
-        throw new IOException("Unable to delete Pool.");
-      }
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public void deleteContainer(SequencerPartitionContainer container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       if (!sequencerPartitionContainerStore.remove(sequencerPartitionContainerStore.get(container.getId()))) {
@@ -918,26 +821,6 @@ public class MisoRequestManager implements RequestManager {
     }
     managed.getNotes().remove(deleteNote);
     runStore.save(managed);
-  }
-
-  @Override
-  public void deletePoolNote(Pool pool, Long noteId) throws IOException {
-    if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
-      throw new IllegalArgumentException("Cannot delete an unsaved Note");
-    }
-    Pool managed = poolStore.get(pool.getId());
-    Note deleteNote = null;
-    for (Note note : managed.getNotes()) {
-      if (note.getNoteId().equals(noteId)) {
-        deleteNote = note;
-        break;
-      }
-    }
-    if (deleteNote == null) {
-      throw new IOException("Note " + noteId + " not found for Pool " + pool.getId());
-    }
-    managed.getNotes().remove(deleteNote);
-    poolStore.save(managed);
   }
 
   @Override
@@ -1245,14 +1128,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  private Set<String> extractDilutionNames(Set<LibraryDilution> dilutions) {
-    Set<String> original = new HashSet<>();
-    for (LibraryDilution dilution : dilutions) {
-      original.add(dilution.getName());
-    }
-    return original;
-  }
-
   public User getCurrentUser() throws IOException {
     Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
     if (auth == null) {
@@ -1265,99 +1140,6 @@ public class MisoRequestManager implements RequestManager {
       user.setActive(true);
     }
     return user;
-  }
-
-  @Override
-  public long savePool(Pool pool) throws IOException {
-    if (poolStore != null) {
-      if (pool.isDiscarded()) {
-        pool.setVolume(0.0);
-      }
-      pool.setLastModifier(getCurrentUser());
-
-      if (pool.getId() == PoolImpl.UNSAVED_ID) {
-        pool.setName(generateTemporaryName());
-        poolStore.save(pool);
-
-        if (autoGenerateIdBarcodes) {
-          LimsUtils.generateAndSetIdBarcode(pool);
-        }
-        try {
-          pool.setName(namingScheme.generateNameFor(pool));
-          validateNameOrThrow(pool, namingScheme);
-        } catch (MisoNamingException e) {
-          throw new IOException("Invalid name for pool", e);
-        }
-      } else {
-        Pool original = poolStore.get(pool.getId());
-        original.setAlias(pool.getAlias());
-        original.setConcentration(pool.getConcentration());
-        original.setDescription(pool.getDescription());
-        original.setIdentificationBarcode(pool.getIdentificationBarcode());
-        original.setPlatformType(pool.getPlatformType());
-        original.setQcPassed(pool.getQcPassed());
-        original.setReadyToRun(pool.getReadyToRun());
-
-        Set<String> originalItems = extractDilutionNames(original.getPoolableElements());
-
-        Set<LibraryDilution> pooledElements = new HashSet<>();
-        for (LibraryDilution dilution : pool.getPoolableElements()) {
-          pooledElements.add(libraryDilutionStore.get(dilution.getId()));
-        }
-        original.setPoolableElements(pooledElements);
-
-        Set<String> updatedItems = extractDilutionNames(pooledElements);
-
-        Set<String> added = new TreeSet<>(updatedItems);
-        added.removeAll(originalItems);
-        Set<String> removed = new TreeSet<>(originalItems);
-        removed.removeAll(updatedItems);
-
-        if (!added.isEmpty() || !removed.isEmpty()) {
-          StringBuilder message = new StringBuilder();
-          message.append("Items");
-          LimsUtils.appendSet(message, added, "added");
-          LimsUtils.appendSet(message, removed, "removed");
-
-          PoolChangeLog changeLog = new PoolChangeLog();
-          changeLog.setPool(pool);
-          changeLog.setColumnsChanged("contents");
-          changeLog.setSummary(message.toString());
-          changeLog.setTime(new Date());
-          changeLog.setUser(pool.getLastModifier());
-          changeLogStore.create(changeLog);
-        }
-        pool = original;
-      }
-      long id = poolStore.save(pool);
-      if (poolAlertManager != null) poolAlertManager.update(pool);
-      return id;
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public long savePoolQC(PoolQC poolQC) throws IOException {
-    if (poolQcStore != null) {
-      if (poolQC.getId() != PoolImpl.UNSAVED_ID) {
-        PoolQC original = getPoolQCById(poolQC.getId());
-        original.setResults(poolQC.getResults());
-        poolQC = original;
-      }
-      return poolQcStore.save(poolQC);
-    } else {
-      throw new IOException("No poolQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void savePoolNote(Pool pool, Note note) throws IOException {
-    Pool managed = poolStore.get(pool.getId());
-    note.setCreationDate(new Date());
-    note.setOwner(getCurrentUser());
-    managed.addNote(note);
-    poolStore.save(managed);
   }
 
   @Override
@@ -1394,9 +1176,9 @@ public class MisoRequestManager implements RequestManager {
           if (sourcePool == null && managedPool != null) {
             managedPartition.setPool(null);
           } else if (sourcePool != null && managedPool == null) {
-            managedPartition.setPool(getPoolById(sourcePool.getId()));
+            managedPartition.setPool(poolStore.get(sourcePool.getId()));
           } else if (sourcePool.getId() != managedPool.getId()) {
-            managedPartition.setPool(getPoolById(sourcePool.getId()));
+            managedPartition.setPool(poolStore.get(sourcePool.getId()));
           }
           break;
         }
@@ -1538,33 +1320,6 @@ public class MisoRequestManager implements RequestManager {
       return libraryQcStore.get(libraryQcId);
     } else {
       throw new IOException("No libraryQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Pool getPoolById(long poolId) throws IOException {
-    if (poolStore != null) {
-      return poolStore.get(poolId);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public PoolQC getPoolQCById(long poolQcId) throws IOException {
-    if (poolQcStore != null) {
-      return poolQcStore.get(poolQcId);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Pool getPoolByBarcode(String barcode) throws IOException {
-    if (poolStore != null) {
-      return poolStore.getByBarcode(barcode);
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1971,15 +1726,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Map<String, Integer> getPoolColumnSizes() throws IOException {
-    if (poolStore != null) {
-      return poolStore.getPoolColumnSizes();
-    } else {
-      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException {
     if (sequencerServiceRecordStore != null) {
       return sequencerServiceRecordStore.listBySequencerId(referenceId);
@@ -2156,19 +1902,6 @@ public class MisoRequestManager implements RequestManager {
   public void removeProjectWatcher(Project project, User watcher) throws IOException {
     projectStore.removeWatcher(project, watcher);
     if (projectAlertManager != null) projectAlertManager.removeWatcher(project, watcher);
-  }
-
-  @Override
-  public void addPoolWatcher(Pool pool, User watcher) throws IOException {
-    poolStore.addWatcher(pool, watcher);
-    if (poolAlertManager != null)
-      poolAlertManager.addWatcher(pool, watcher);
-  }
-
-  @Override
-  public void removePoolWatcher(Pool pool, User watcher) throws IOException {
-    poolStore.removeWatcher(pool, watcher);
-    if (poolAlertManager != null) poolAlertManager.removeWatcher(pool, watcher);
   }
 
   public void autoGenerateIdBarcode(Pool pool) {

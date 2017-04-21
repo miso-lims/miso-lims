@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
@@ -77,6 +78,8 @@ public class PoolWizardControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private PoolService poolService;
   @Autowired
   private LibraryDilutionService dilutionService;
   @Autowired
@@ -175,7 +178,7 @@ public class PoolWizardControllerHelperService {
           }
 
           pool.setLastModifier(user);
-          requestManager.savePool(pool);
+          poolService.savePool(pool);
 
           sb.append(
               "<a class='dashboardresult' href='/miso/pool/" + pool.getId()

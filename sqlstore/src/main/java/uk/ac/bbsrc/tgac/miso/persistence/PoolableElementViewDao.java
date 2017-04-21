@@ -5,4 +5,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface PoolableElementViewDao extends PaginatedDataSource<PoolableElementView> {
 
+  public PoolableElementView get(Long dilutionId);
+
 }
