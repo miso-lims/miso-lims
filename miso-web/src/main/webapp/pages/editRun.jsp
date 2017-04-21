@@ -124,7 +124,15 @@
   <c:if test="${run.id != 0}">
     <tr>
       <td>Sequencing Parameters:</td>
-      <td><miso:select id="sequencingParameters" path="sequencingParameters" items="${sequencingParameters}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="" /></td>
+      <td><miso:select id="sequencingParameters" path="sequencingParameters" items="${sequencingParameters}" itemLabel="name" itemValue="id" defaultLabel="SELECT" defaultValue="" /></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <div class="parsley-errors-list filled" id="sequencingParametersError">
+          <div class="parsley-required"></div>
+        </div>
+      </td>
     </tr>
   </c:if>
   <tr>
