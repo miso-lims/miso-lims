@@ -1309,6 +1309,14 @@ public class Dtos {
     if (from.getStatus() != null && from.getStatus().getCompletionDate() != null) {
       dto.setEndDate(getDateAsString(from.getStatus().getCompletionDate()));
     }
+    if (from.getSequencingParameters() != null) {
+      dto.setParameters(asDto(from.getSequencingParameters()));
+    } else {
+      SequencingParametersDto parametersDto = new SequencingParametersDto();
+      parametersDto.setId(-1L);
+      parametersDto.setName("(None)");
+      dto.setParameters(parametersDto);
+    }
     return dto;
   }
 
