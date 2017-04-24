@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -357,5 +358,10 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public Class<? extends Run> getRealClass() {
     return RunImpl.class;
+  }
+
+  @Override
+  public void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths) {
+    criteria.add(Restrictions.in("status.health", healths.toArray()));
   }
 }
