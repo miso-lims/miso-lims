@@ -42,6 +42,11 @@ public class DataTablesResponseDto<T> {
    */
   private List<T> aaData;
 
+  /**
+   * An error message to be communicated to the users, probably in an unhelpful way.
+   */
+  private String sError;
+
   public Long getITotalRecords() {
     return iTotalRecords;
   }
@@ -76,6 +81,14 @@ public class DataTablesResponseDto<T> {
   @JsonProperty("aaData")
   public void setAaData(List<T> aaData) {
     this.aaData = aaData;
+  }
+
+  public String getSError() {
+    return sError;
+  }
+
+  public void setSError(String sError) {
+    this.sError = sError;
   }
 
 }

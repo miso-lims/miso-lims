@@ -4,11 +4,13 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -101,23 +103,41 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   Iterable<String> listAliases();
 
   /**
+   * The property name for the modification/creation date of the object.
+   * 
+   * @param creatoion if the true, the creation; otherwise the last modification date
+   * @return the name of the property or null if the search criterion should be ignored.
+   */
+
+  public abstract String propertyForDate(Criteria item, boolean creation);
+
+  /**
    * Determine the correct Hibernate property given the user-supplied sort column.
    */
   String propertyForSortColumn(String original);
 
   /**
-   * Create a set of restrictions given the user-supplied search string.
+   * The property name for the login name of a user.
+   * 
+   * @param creator if the true, the user that created this object; otherwise the last modifier
+   * @return the name of the property or null if the search criterion should be ignored.
    */
-  Criterion searchRestrictions(String query);
+  public abstract String propertyForUserName(Criteria item, boolean creator);
+
+  @Override
+  public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, boolean creation) {
+    String property = propertyForDate(criteria, creation);
+    if (property != null) {
+      criteria.add(Restrictions.between(property, start, end));
+    }
+  }
 
   @Override
   default void restrictPaginationByFulfilled(Criteria item, boolean isFulfilled) {
-    throw new IllegalArgumentException();
   }
 
   @Override
   default void restrictPaginationByPlatformType(Criteria item, PlatformType platformType) {
-    throw new IllegalArgumentException();
   }
 
   @Override
@@ -136,4 +156,18 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
       criteria.add(searchRestrictions(query));
     }
   }
+
+  @Override
+  public default void restrictPaginationByUser(Criteria criteria, String userName, boolean creator) {
+    String property = propertyForUserName(criteria, creator);
+    if (property != null) {
+      criteria.add(Restrictions.ilike(property, userName, MatchMode.START));
+    }
+  }
+
+  /**
+   * Create a set of restrictions given the user-supplied search string.
+   */
+  Criterion searchRestrictions(String query);
+
 }

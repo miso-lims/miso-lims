@@ -86,4 +86,13 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
     return SEARCH_PROPERTIES;
   }
 
+  @Override
+  public String propertyForDate(Criteria item, boolean creation) {
+    return creation ? "created" : "lastModified";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria item, boolean creator) {
+    return creator ? "creatorName" : "lastModifier";
+  }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -37,10 +38,17 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
 
       // get requested subset of item
       Long numMatches;
+      DataTablesResponseDto<Dto> dtResponse = new DataTablesResponseDto<>();
 
       List<PaginationFilter> additionalFilters = new ArrayList<>(Arrays.asList(filters));
       if (!isStringEmptyOrNull(sSearch)) {
-        additionalFilters.add(PaginationFilter.query(sSearch));
+        StringBuilder errorBuffer = new StringBuilder();
+        additionalFilters
+            .addAll(Arrays.asList(
+                PaginationFilter.parse(sSearch, SecurityContextHolder.getContext().getAuthentication().getName(), errorBuffer::append)));
+        if (errorBuffer.length() > 0) {
+          dtResponse.setSError(errorBuffer.toString());
+        }
         numMatches = getSource().count(additionalFilters.toArray(filters));
       } else {
         numMatches = numItems;
@@ -53,7 +61,6 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
         dtos.add(asDto(model, uriBuilder));
       }
 
-      DataTablesResponseDto<Dto> dtResponse = new DataTablesResponseDto<>();
       dtResponse.setITotalRecords(numItems);
       dtResponse.setITotalDisplayRecords(numMatches);
       dtResponse.setAaData(dtos);

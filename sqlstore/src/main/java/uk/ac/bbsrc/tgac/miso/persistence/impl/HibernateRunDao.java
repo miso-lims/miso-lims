@@ -35,7 +35,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run> {
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "status");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "status", "lastModifier", "derivedInfo.creator");
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateRunDao.class);
 
@@ -342,6 +342,16 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     if ("lastUpdated".equals(original)) return "status.lastUpdated";
     return original;
 
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, boolean creation) {
+    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return creator ? "creator.loginName" : "lastModifier.loginName";
   }
 
   @Override
