@@ -35,6 +35,11 @@ public class DefaultPoolableElementViewService implements PoolableElementViewSer
   }
 
   @Override
+  public PoolableElementView getByPreMigrationId(Long preMigrationId) throws IOException {
+    return poolableElementViewDao.getByPreMigrationId(preMigrationId);
+  }
+
+  @Override
   public long count(PaginationFilter... filter) throws IOException {
     return poolableElementViewDao.count(filter);
   }

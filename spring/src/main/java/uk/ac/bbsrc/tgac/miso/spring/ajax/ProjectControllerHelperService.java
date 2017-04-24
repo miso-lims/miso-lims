@@ -597,7 +597,8 @@ public class ProjectControllerHelperService {
           if (!pools.isEmpty()) {
             sb.append("Pools: <ul>");
             for (final Pool p : pools) {
-              sb.append("<li>").append(p.getName()).append(" (").append(p.getAlias()).append(") - ").append(p.getPoolableElements().size())
+              sb.append("<li>").append(p.getName()).append(" (").append(p.getAlias()).append(") - ")
+                  .append(p.getPoolableElementViews().size())
                   .append(" dilutions<li>");
             }
             sb.append("</ul><br/>");

@@ -42,10 +42,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
@@ -133,10 +133,10 @@ public class ContainerRestController extends RestController {
           // dilutions
           sb.append("\"poolableElements\":[");
           int id = 0;
-          for (Dilution poolable : partition.getPool().getPoolableElements()) {
+          for (PoolableElementView poolable : partition.getPool().getPoolableElementViews()) {
             id++;
             sb.append(mapper.writeValueAsString(poolable));
-            if (id < partition.getPool().getPoolableElements().size()) {
+            if (id < partition.getPool().getPoolableElementViews().size()) {
               sb.append(",");
             }
 

@@ -35,10 +35,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -95,25 +93,13 @@ public interface Pool
   public void setAlias(String alias);
 
   /**
-   * Adds a library dilution to this Pool
-   * 
-   * @param poolable element of type P
-   * @throws MalformedDilutionException when the LibraryDilution added is not valid
-   */
-  public void addPoolableElement(LibraryDilution poolable) throws MalformedDilutionException;
-
-  /**
    * Sets the elements of this Pool object.
    */
-  public void setPoolableElements(Set<LibraryDilution> dilutions);
-
   public void setPoolableElementViews(Set<PoolableElementView> views);
 
   /**
    * Returns the elements of this Pool object.
    */
-  public Set<LibraryDilution> getPoolableElements();
-
   public Set<PoolableElementView> getPoolableElementViews();
 
   /**

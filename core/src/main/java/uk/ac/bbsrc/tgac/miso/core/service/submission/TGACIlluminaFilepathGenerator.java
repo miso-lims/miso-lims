@@ -38,11 +38,11 @@ import org.slf4j.LoggerFactory;
 
 import net.sourceforge.fluxion.spi.ServiceProvider;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 
@@ -67,7 +67,7 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
   }
 
   @Override
-  public Set<File> generateFilePath(Partition partition, Dilution l) throws SubmissionException {
+  public Set<File> generateFilePath(Partition partition, PoolableElementView l) throws SubmissionException {
     Pool pool = partition.getPool();
     if (pool != null) {
       if (pool.getExperiments() != null) {
@@ -77,15 +77,15 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
         if (!isStringEmptyOrNull(basePath)) {
           filePath.append(
               partition.getSequencerPartitionContainer().getLastRun().getFilePath() + "/Data/Intensities/BaseCalls/PAP/Project_"
-                  + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" + l.getLibrary().getName());
+                  + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibraryName() + "/" + l.getLibraryName());
         } else {
           filePath.append(
-              basePath + "/" + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/"
-                  + l.getLibrary().getName());
+              basePath + "/" + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibraryName() + "/"
+                  + l.getLibraryName());
         }
-        if (l.getLibrary().getIndices() != null && !l.getLibrary().getIndices().isEmpty()) {
+        if (l.getIndices() != null && !l.getIndices().isEmpty()) {
           filePath.append("_");
-          for (Index index : l.getLibrary().getIndices()) {
+          for (Index index : l.getIndices()) {
             filePath.append(index.getSequence());
           }
         }
@@ -116,11 +116,11 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
       if (experiments.isEmpty()) {
         throw new SubmissionException("Collection or experiments is empty");
       } else {
-        Collection<? extends Dilution> libraryDilutions = pool.getPoolableElements();
+        Collection<PoolableElementView> libraryDilutions = pool.getPoolableElementViews();
         if (libraryDilutions.isEmpty()) {
           throw new SubmissionException("Collection of libraryDilutions is empty");
         } else {
-          for (Dilution l : libraryDilutions) {
+          for (PoolableElementView l : libraryDilutions) {
             Set<File> files = generateFilePath(partition, l);
             filePaths.addAll(files);
           }

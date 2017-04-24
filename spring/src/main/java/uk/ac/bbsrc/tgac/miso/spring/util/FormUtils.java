@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -1024,7 +1025,7 @@ public class FormUtils {
           log.info("Added library dilution: " + ldi.toString());
         }
         if (p != null) {
-          p.addPoolableElement(ldi);
+          p.getPoolableElementViews().add(PoolableElementView.fromDilution(ldi));
           log.info("Added library dilution to pool: " + p.toString());
         }
       } catch (NumberFormatException nfe) {

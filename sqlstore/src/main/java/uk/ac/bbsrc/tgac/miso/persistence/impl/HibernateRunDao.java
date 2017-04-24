@@ -193,10 +193,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   public List<Run> listByProjectId(long projectId) throws IOException {
     Criteria idCriteria = currentSession().createCriteria(RunImpl.class, "r");
     idCriteria.createAlias("r.containers", "container").createAlias("container.partitions", "partition");
-    idCriteria.createAlias("partition.pool", "pool").createAlias("pool.pooledElements", "dilution");
-    idCriteria.createAlias("dilution.library", "library").createAlias("library.sample", "sample");
-    idCriteria.createAlias("sample.project", "project");
-    idCriteria.add(Restrictions.eq("project.id", projectId));
+    idCriteria.createAlias("partition.pool", "pool").createAlias("pool.pooledElementViews", "dilution");
+    idCriteria.add(Restrictions.eq("dilution.projectId", projectId));
     idCriteria.setProjection(Projections.distinct(Projections.property("r.id")));
     @SuppressWarnings("unchecked")
     List<Long> ids = idCriteria.list();
@@ -316,16 +314,13 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.createAlias("containers", "container");
     criteria.createAlias("container.partitions", "partition");
     criteria.createAlias("partition.pool", "pool");
-    criteria.createAlias("pool.pooledElements", "dilution");
-    criteria.createAlias("dilution.library", "library");
-    criteria.createAlias("library.sample", "sample");
-    criteria.createAlias("sample.project", "project");
+    criteria.createAlias("pool.pooledElementViews", "dilution");
     HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId);
   }
 
   @Override
   public String getProjectColumn() {
-    return "project.id";
+    return "dilution.projectId";
   }
 
   @Override
