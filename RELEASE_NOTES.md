@@ -1,3 +1,10 @@
+# 0.2.60
+
+Changes:
+
+ * improved load time of Edit Pool page
+ * improved load time of New/Edit Run page
+
 # 0.2.59
 
 Changes:

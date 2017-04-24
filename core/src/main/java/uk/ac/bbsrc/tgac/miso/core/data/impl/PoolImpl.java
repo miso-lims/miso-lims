@@ -71,7 +71,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -425,7 +424,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @Override
   public boolean hasDuplicateIndices() {
     Set<String> indices = new HashSet<>();
-    for (Dilution item : getPoolableElements()) {
+    for (PoolableElementView item : getPoolableElementViews()) {
       if (hasDuplicateIndices(indices, item)) {
         return true;
       }
@@ -433,9 +432,9 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
     return false;
   }
 
-  private boolean hasDuplicateIndices(Set<String> indices, Dilution item) {
+  private boolean hasDuplicateIndices(Set<String> indices, PoolableElementView item) {
     StringBuilder totalIndex = new StringBuilder();
-    for (Index index : item.getLibrary().getIndices()) {
+    for (Index index : item.getIndices()) {
       totalIndex.append(index.getSequence());
     }
     return !indices.add(totalIndex.toString());
@@ -458,7 +457,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   @Override
   public boolean isDeletable() {
-    return getId() != PoolImpl.UNSAVED_ID && getPoolableElements().isEmpty();
+    return getId() != PoolImpl.UNSAVED_ID && getPoolableElementViews().isEmpty();
   }
 
   @Override
