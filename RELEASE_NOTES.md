@@ -1,3 +1,16 @@
+# 0.2.59
+
+Changes:
+
+ * Added custom sequencing parameters for all platforms
+ * Moved runs table on Edit Pool page and included sequencing parameters
+ * Improved performance of pooled dilution addition/removal
+ * Fixed username associated with dilution-related changelogs
+ * Improved performance of Edit Run page
+ * Improved performance of Edit Pool page
+ * Added last modified column to pool elements table on Edit Pool page
+ * Allow bulk addition/deletion of a pool's dilutions on Edit Pool page
+
 # 0.2.58
 
 Changes:
