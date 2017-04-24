@@ -25,11 +25,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.transform.TransformerException;
@@ -55,10 +53,8 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -141,7 +137,7 @@ public class EditRunController {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
       for (SequencerPartitionContainer f : run.getSequencerPartitionContainers()) {
         for (Partition p : f.getPartitions()) {
-          if (p.getPool() != null && p.getPool().getPoolableElements().size() > 1) {
+          if (p.getPool() != null && p.getPool().getPoolableElementViews().size() > 1) {
             return true;
           }
         }
@@ -195,32 +191,6 @@ public class EditRunController {
     return false;
   }
 
-  public Collection<Pool> populateAvailablePools(User user) throws IOException {
-    return poolService.listAllPools();
-  }
-
-  public Collection<Pool> populateAvailablePools(PlatformType platformType, User user) throws IOException {
-    List<Pool> pools = new ArrayList<>(
-        poolService.listAllPoolsByPlatform(platformType));
-    Collections.sort(pools);
-    return pools;
-  }
-
-  public Collection<Experiment> populateAvailableExperiments(User user) throws IOException {
-    return experimentService.listAll();
-  }
-
-  public Collection<Experiment> populateAvailableExperiments(PlatformType platformType, User user) throws IOException {
-    List<Experiment> exps = new ArrayList<>();
-    for (Experiment e : experimentService.listAll()) {
-      if (e.getPlatform() != null && e.getPlatform().getPlatformType().equals(platformType)) {
-        exps.add(e);
-      }
-    }
-    Collections.sort(exps);
-    return exps;
-  }
-
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView newUnassignedRun(ModelMap model) throws IOException {
     // clear any existing run in the model
@@ -267,7 +237,6 @@ public class EditRunController {
       } else if (run.getId() == AbstractRun.UNSAVED_ID) {
         run = new RunImpl(user);
         model.put("title", "New Run");
-        model.put("availablePools", populateAvailablePools(user));
         model.put("multiplexed", false);
       } else {
         model.put("title", "Run " + run.getId());
