@@ -888,22 +888,22 @@ CREATE OR REPLACE VIEW OrderCompletion AS SELECT
 CREATE OR REPLACE VIEW OrderCompletion_Items AS SELECT poolId, parametersId, health, num_partitions FROM OrderCompletion_Backing;
 
 CREATE OR REPLACE VIEW SampleDerivedInfo AS
-  SELECT sampleId, MAX(changeTime) as lastModified FROM SampleChangeLog GROUP BY sampleId;
+  SELECT sampleId, MAX(changeTime) as lastModified, MIN(changeTime) as created, (SELECT userId FROM SampleChangeLog i WHERE i.sampleId = o.sampleId ORDER BY changeTime DESC LIMIT 1) AS creator FROM SampleChangeLog o GROUP BY sampleId;
   
 CREATE OR REPLACE VIEW RunDerivedInfo AS
-  SELECT runId, MAX(changeTime) as lastModified FROM RunChangeLog GROUP BY runId;
+  SELECT runId, MAX(changeTime) as lastModified, MIN(changeTime) as created, (SELECT userId FROM RunChangeLog i WHERE i.runId = o.runId ORDER BY changeTime DESC LIMIT 1) AS creator FROM RunChangeLog o GROUP BY runId;
 
 CREATE OR REPLACE VIEW ContainerDerivedInfo AS
-  SELECT containerId, MAX(changeTime) as lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId;
+  SELECT containerId, MAX(changeTime) as lastModified, MIN(changeTime) as created, (SELECT userId FROM SequencerPartitionContainerChangeLog i WHERE i.containerId = o.containerId ORDER BY changeTime DESC LIMIT 1) AS creator FROM SequencerPartitionContainerChangeLog o GROUP BY containerId;
 
 CREATE OR REPLACE VIEW PoolDerivedInfo AS
-  SELECT poolId, MAX(changeTime) as lastModified FROM PoolChangeLog GROUP BY poolId;
+  SELECT poolId, MAX(changeTime) as lastModified, MIN(changeTime) as created, (SELECT userId FROM PoolChangeLog i WHERE i.poolId = o.poolId ORDER BY changeTime DESC LIMIT 1) AS creator FROM PoolChangeLog o GROUP BY poolId;
 
 CREATE OR REPLACE VIEW LibraryDerivedInfo AS
-  SELECT libraryId, MAX(changeTime) AS lastModified FROM LibraryChangeLog GROUP BY libraryId;
+  SELECT libraryId, MAX(changeTime) AS lastModified, MIN(changeTime) as created, (SELECT userId FROM LibraryChangeLog i WHERE i.libraryId = o.libraryId ORDER BY changeTime DESC LIMIT 1) AS creator FROM LibraryChangeLog o GROUP BY libraryId;
   
 CREATE OR REPLACE VIEW BoxDerivedInfo AS
-  SELECT boxId, MAX(changeTime) AS lastModified FROM BoxChangeLog GROUP BY boxId;
+  SELECT boxId, MAX(changeTime) AS lastModified, MIN(changeTime) as created, (SELECT userId FROM BoxChangeLog i WHERE i.boxId = o.boxId ORDER BY changeTime DESC LIMIT 1) AS creator FROM BoxChangeLog o GROUP BY boxId;
 
 CREATE OR REPLACE VIEW SampleBoxPosition
 AS SELECT s.sampleId, bp.boxId, bp.position
@@ -940,6 +940,9 @@ AS SELECT
     d.concentration AS dilutionConcentration,
     d.identificationBarcode AS dilutionBarcode,
     d.lastUpdated AS lastModified,
+    d.creationDate AS created,
+    d.dilutionUserName AS creatorName,
+    (SELECT loginName FROM User WHERE userId = d.lastModifier) AS lastModifierName,
     l.libraryId AS libraryId,
     l.name AS libraryName,
     l.alias AS libraryAlias,

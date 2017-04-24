@@ -74,4 +74,14 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
     criteria.add(Restrictions.eq("pool.id", poolId));
   }
 
+  @Override
+  public String propertyForDate(Criteria criteria, boolean creation) {
+    return creation ? null : "lastUpdated";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return null;
+  }
+
 }

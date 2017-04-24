@@ -39,6 +39,9 @@ public class PoolableElementView implements Serializable {
   @Temporal(TemporalType.DATE)
   private Date lastModified;
 
+  @Temporal(TemporalType.DATE)
+  private Date created;
+
   private Long libraryId;
 
   private String libraryName;
@@ -61,6 +64,10 @@ public class PoolableElementView implements Serializable {
   private String projectShortName;
 
   private String projectAlias;
+
+  private String lastModifierName;
+
+  private String creatorName;
 
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
@@ -213,6 +220,30 @@ public class PoolableElementView implements Serializable {
 
   public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
+  }
+
+  public Date getCreated() {
+    return created;
+  }
+
+  public void setCreated(Date created) {
+    this.created = created;
+  }
+
+  public String getLastModifierName() {
+    return lastModifierName;
+  }
+
+  public void setLastModifierName(String lastModifierName) {
+    this.lastModifierName = lastModifierName;
+  }
+
+  public String getCreatorName() {
+    return creatorName;
+  }
+
+  public void setCreatorName(String creatorName) {
+    this.creatorName = creatorName;
   }
 
 }

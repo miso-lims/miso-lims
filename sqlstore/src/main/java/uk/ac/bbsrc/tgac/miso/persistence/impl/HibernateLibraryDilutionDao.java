@@ -160,4 +160,15 @@ public class HibernateLibraryDilutionDao
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
     criteria.add(Restrictions.eq("library.platformType", platformType));
   }
+
+  @Override
+  public String propertyForDate(Criteria item, boolean creation) {
+    return creation ? "creationDate" : "lastUpdated";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria item, boolean creator) {
+    return creator ? "dilutionUserName" : "derivedInfo.lastModifier.loginName";
+  }
+
 }

@@ -306,7 +306,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedData
     return DbUtils.getColumnSizes(template, "Library");
   }
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "sample");
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "sample", "lastModifier",
+      "derivedInfo.creator");
 
   @Override
   public long countLibrariesBySearch(String querystr) throws IOException {
@@ -410,6 +411,16 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedData
   @Override
   public String propertyForSortColumn(String original) {
     return "lastModified".equals(original) ? "derivedInfo.lastModified" : original;
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, boolean creation) {
+    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return creator ? "creator.loginName" : "lastModifier.loginName";
   }
 
   @Override

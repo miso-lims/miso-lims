@@ -276,7 +276,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
     return pool;
   }
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "lastModifier", "derivedInfo.creator");
 
   @Override
   public String[] getSearchProperties() {
@@ -313,6 +313,16 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   @Override
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
     criteria.add(Restrictions.eq("platformType", platformType));
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, boolean creation) {
+    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return creator ? "creator.loginName" : "lastModifier.loginName";
   }
 
   @Override

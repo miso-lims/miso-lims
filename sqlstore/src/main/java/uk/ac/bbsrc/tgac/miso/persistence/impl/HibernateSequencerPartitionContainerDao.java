@@ -149,7 +149,7 @@ public class HibernateSequencerPartitionContainerDao
     this.sessionFactory = sessionFactory;
   }
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo");
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "lastModifier", "derivedInfo.creator");
 
   @Override
   public String getProjectColumn() {
@@ -169,6 +169,16 @@ public class HibernateSequencerPartitionContainerDao
   @Override
   public String propertyForSortColumn(String original) {
     return "lastModified".equals(original) ? "derivedInfo.lastModified" : original;
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, boolean creation) {
+    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return creator ? "creator.loginName" : "lastModifier.loginName";
   }
 
   @Override
