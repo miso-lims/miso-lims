@@ -29,7 +29,7 @@
   <parent>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
     <artifactId>miso</artifactId>
-    <version>0.2.60</version>
+    <version>0.2.61-SNAPSHOT</version>
   </parent>
   <artifactId>migration</artifactId>
   
