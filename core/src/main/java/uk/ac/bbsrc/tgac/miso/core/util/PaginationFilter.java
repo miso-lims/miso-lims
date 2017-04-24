@@ -11,7 +11,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.setFulfilled(item, isFulfilled);
+        sink.restrictPaginationByFulfilled(item, isFulfilled);
       }
     };
   }
@@ -21,7 +21,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.setPlatformType(item, platformType);
+        sink.restrictPaginationByPlatformType(item, platformType);
       }
     };
   }
@@ -31,7 +31,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.setPoolId(item, poolId);
+        sink.restrictPaginationByPoolId(item, poolId);
       }
     };
   }
@@ -48,7 +48,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.setProjectId(item, projectId);
+        sink.restrictPaginationByProjectId(item, projectId);
       }
     };
   }
@@ -58,7 +58,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.setQuery(item, query);
+        sink.restrictPaginationByQuery(item, query);
       }
     };
   }

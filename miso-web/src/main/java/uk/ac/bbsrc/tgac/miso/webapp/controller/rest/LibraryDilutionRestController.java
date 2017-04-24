@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.exception.ConstraintViolationException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 
 @Controller
 @RequestMapping("/rest/librarydilution")
@@ -62,34 +65,36 @@ public class LibraryDilutionRestController extends RestController {
     public String indices;
     public String lowquality;
     public Long id;
+    public String lastModified;
   }
 
-  private final JQueryDataTableBackend<LibraryDilution, SelectRowDto> jQueryBackendSelect = new JQueryDataTableBackend<LibraryDilution, SelectRowDto>() {
+  private final JQueryDataTableBackend<PoolableElementView, SelectRowDto> jQueryBackendSelect = new JQueryDataTableBackend<PoolableElementView, SelectRowDto>() {
 
     @Override
-    protected PaginatedDataSource<LibraryDilution> getSource() throws IOException {
-      return dilutionService;
+    protected PaginatedDataSource<PoolableElementView> getSource() throws IOException {
+      return poolableElementViewService;
     }
 
     @Override
-    protected SelectRowDto asDto(LibraryDilution dil, UriComponentsBuilder builder) {
+    protected SelectRowDto asDto(PoolableElementView dil, UriComponentsBuilder builder) {
       SelectRowDto dto = new SelectRowDto();
-      dto.id = dil.getId();
-      dto.name = dil.getName();
-      dto.concentration = dil.getConcentration();
-      dto.library = String.format("<a href='/miso/library/%d'>%s (%s)</a>", dil.getLibrary().getId(), dil.getLibrary().getAlias(),
-          dil.getLibrary().getName());
-      dto.sample = String.format("<a href='/miso/sample/%d'>%s (%s)</a>", dil.getLibrary().getSample().getId(),
-          dil.getLibrary().getSample().getAlias(), dil.getLibrary().getSample().getName());
+      dto.id = dil.getDilutionId();
+      dto.name = dil.getDilutionName();
+      dto.concentration = dil.getDilutionConcentration();
+      dto.library = String.format("<a href='/miso/library/%d'>%s (%s)</a>", dil.getLibraryId(), dil.getLibraryAlias(),
+          dil.getLibraryName());
+      dto.sample = String.format("<a href='/miso/sample/%d'>%s (%s)</a>", dil.getSampleId(),
+          dil.getSampleAlias(), dil.getSampleName());
       StringBuilder indices = new StringBuilder();
-      for (final Index index : dil.getLibrary().getIndices()) {
+      for (final Index index : dil.getIndices()) {
         indices.append(index.getPosition());
         indices.append(": ");
         indices.append(index.getLabel());
         indices.append("<br/>");
       }
       dto.indices = indices.toString();
-      dto.lowquality = dil.getLibrary().isLowQuality() ? "&#9888;" : "";
+      dto.lowquality = dil.isLowQualityLibrary() ? "&#9888;" : "";
+      dto.lastModified = Dtos.dateFormatter.print(new DateTime(dil.getLastModified()));
       return dto;
     }
   };
@@ -98,7 +103,10 @@ public class LibraryDilutionRestController extends RestController {
   private LibraryDilutionService dilutionService;
 
   @Autowired
-  private RequestManager requestManager;
+  private PoolableElementViewService poolableElementViewService;
+
+  @Autowired
+  private PoolService poolService;
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
@@ -150,7 +158,7 @@ public class LibraryDilutionRestController extends RestController {
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
 
-    final Pool pool = requestManager.getPoolById(poolId);
+    final Pool pool = poolService.getPoolById(poolId);
     return jQueryBackendSelect.get(request, response, null, PaginationFilter.platformType(pool.getPlatformType()));
   }
 

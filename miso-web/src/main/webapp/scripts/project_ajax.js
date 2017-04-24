@@ -580,17 +580,7 @@ Project.ui = {
     jQuery('#sample_table').html("");
     jQuery('#sample_table').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
-        {
-          "sTitle": "",
-          "mData": "id",
-          "mRender": function (data, type, full) {
-            var checked = Project.ui.selectedSamples.indexOf(data) > -1;
-
-            return "<input type=\"checkbox\" onchange=\"Project.ui.toggleSample(this.checked, " + data + ")\"" + (checked ? " checked=\"checked\"" : "") + ">";
-          },
-          "iSortPriority": 0,
-          "bSortable": false
-        },
+        Utils.createToggleColumn("Project.ui.selectedSamples"),
         {
           "sTitle": "Sample Name",
           "mData": "id",

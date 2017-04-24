@@ -23,6 +23,7 @@ import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.PoolControllerHelperService;
 
 public class PoolControllerHelperServiceTest {
@@ -34,6 +35,8 @@ public class PoolControllerHelperServiceTest {
   private SecurityManager securityManager;
   @Mock
   private RequestManager requestManager;
+  @Mock
+  private PoolService poolService;
   @Mock
   private User user;
 
@@ -53,7 +56,7 @@ public class PoolControllerHelperServiceTest {
   public final void testChangePoolIdBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "idBarcode";
-    when(requestManager.getPoolById(anyLong())).thenReturn(pool);
+    when(poolService.getPoolById(anyLong())).thenReturn(pool);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");
     final SecurityContextImpl context = new SecurityContextImpl();
@@ -67,7 +70,7 @@ public class PoolControllerHelperServiceTest {
     final JSONObject response = poolControllerHelperService.changePoolIdBarcode(null, json);
 
     verify(pool).setIdentificationBarcode(idBarcode);
-    verify(requestManager).savePool(pool);
+    verify(poolService).savePool(pool);
 
     assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
@@ -76,7 +79,7 @@ public class PoolControllerHelperServiceTest {
   public final void testChangePoolIdBarcodeBlankBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "";
-    when(requestManager.getPoolById(anyLong())).thenReturn(pool);
+    when(poolService.getPoolById(anyLong())).thenReturn(pool);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");
     final SecurityContextImpl context = new SecurityContextImpl();
@@ -90,7 +93,7 @@ public class PoolControllerHelperServiceTest {
     JSONObject response = poolControllerHelperService.changePoolIdBarcode(null, json);
 
     verify(pool).setIdentificationBarcode(null);
-    verify(requestManager).savePool(pool);
+    verify(poolService).savePool(pool);
 
     assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
@@ -100,8 +103,8 @@ public class PoolControllerHelperServiceTest {
     final long id = 1L;
     final String idBarcode = "idBarcode";
     final IOException expected = new IOException("thrown by mock");
-    when(requestManager.getPoolById(anyLong())).thenReturn(pool);
-    when(requestManager.savePool(pool)).thenThrow(expected);
+    when(poolService.getPoolById(anyLong())).thenReturn(pool);
+    when(poolService.savePool(pool)).thenThrow(expected);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");
     final SecurityContextImpl context = new SecurityContextImpl();

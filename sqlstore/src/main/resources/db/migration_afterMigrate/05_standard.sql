@@ -544,7 +544,7 @@ FOR EACH ROW
           CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT(NEW.name, ' identificationBarcode') END,
           CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targetedSequencingId') END
         ), ''),
-        (SELECT lastModifier FROM Library WHERE libraryId = NEW.library_libraryId),
+        NEW.lastModifier,
         log_message
       );
     END IF;
@@ -556,7 +556,7 @@ FOR EACH ROW
   INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
     NEW.library_libraryId,
     '',
-    (SELECT lastModifier FROM Library WHERE libraryId = NEW.library_libraryId),
+    NEW.lastModifier,
     CONCAT('Library dilution LDI', NEW.dilutionId, ' created.'))//
 
 DROP TRIGGER IF EXISTS BeforeInsertLibrary//
@@ -932,3 +932,27 @@ FROM Pool p
 JOIN BoxPosition bp
   ON bp.targetType = 'Pool'
   AND bp.targetId = p.poolId;
+
+CREATE OR REPLACE VIEW PoolableElementView
+AS SELECT
+    d.dilutionId,
+    d.name AS dilutionName,
+    d.concentration AS dilutionConcentration,
+    d.identificationBarcode AS dilutionBarcode,
+    d.lastUpdated AS lastModified,
+    l.libraryId AS libraryId,
+    l.name AS libraryName,
+    l.alias AS libraryAlias,
+    l.description AS libraryDescription,
+    l.lowQuality AS lowQualityLibrary,
+    l.platformType AS platformType,
+    s.sampleId AS sampleId,
+    s.name AS sampleName,
+    s.alias AS sampleAlias,
+    p.projectId AS projectId,
+    p.shortName AS projectShortName,
+    p.alias AS projectAlias
+  FROM LibraryDilution d
+    JOIN Library l ON l.libraryId = d.library_libraryId
+    JOIN Sample s ON s.sampleId = l.sample_sampleId
+    JOIN Project p ON p.projectId = s.project_projectId;

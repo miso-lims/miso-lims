@@ -60,14 +60,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
 /**
@@ -97,7 +98,10 @@ public class EditPoolController {
   private ChangeLogService changeLogService;
 
   @Autowired
-  private LibraryDilutionService dilutionService;
+  private PoolableElementViewService poolableElementViewService;
+
+  @Autowired
+  private PoolService poolService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -107,8 +111,8 @@ public class EditPoolController {
     this.securityManager = securityManager;
   }
 
-  public void setDilutionService(LibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
+  public void setPoolableElementViewService(PoolableElementViewService poolableElementViewService) {
+    this.poolableElementViewService = poolableElementViewService;
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
@@ -141,7 +145,7 @@ public class EditPoolController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getPoolColumnSizes();
+    return poolService.getPoolColumnSizes();
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -158,7 +162,7 @@ public class EditPoolController {
         pool = new PoolImpl(user);
         model.put("title", "New Pool");
       } else {
-        pool = requestManager.getPoolById(poolId);
+        pool = poolService.getPoolById(poolId);
         model.put("title", "Pool " + poolId);
       }
 
@@ -212,18 +216,14 @@ public class EditPoolController {
     Pool p = (PoolImpl) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
-      LibraryDilution ld = dilutionService.getByBarcode(s);
+      PoolableElementView ld = poolableElementViewService.getByBarcode(s);
       if (ld != null) {
-        try {
-          p.addPoolableElement(ld);
-        } catch (MalformedDilutionException e) {
-          log.error("Cannot add dilution " + s + " to pool " + p.getName(), e);
-        }
+        p.getPoolableElementViews().add(ld);
       }
     }
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     p.setLastModifier(user);
-    requestManager.savePool(p);
+    poolService.savePool(p);
     return "redirect:/miso/pool/" + p.getId();
   }
 
@@ -238,12 +238,12 @@ public class EditPoolController {
       // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
       // update them to avoid reverting the state.
       if (pool.getId() != PoolImpl.UNSAVED_ID) {
-        Pool original = requestManager.getPoolById(pool.getId());
-        pool.setPoolableElements(original.getPoolableElements());
+        Pool original = poolService.getPoolById(pool.getId());
+        pool.setPoolableElementViews(original.getPoolableElementViews());
       }
 
       pool.setLastModifier(user);
-      requestManager.savePool(pool);
+      poolService.savePool(pool);
       session.setComplete();
       model.clear();
       return "redirect:/miso/pool/" + pool.getId();

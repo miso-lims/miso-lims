@@ -111,27 +111,27 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   Criterion searchRestrictions(String query);
 
   @Override
-  default void setFulfilled(Criteria item, boolean isFulfilled) {
+  default void restrictPaginationByFulfilled(Criteria item, boolean isFulfilled) {
     throw new IllegalArgumentException();
   }
 
   @Override
-  default void setPlatformType(Criteria item, PlatformType platformType) {
+  default void restrictPaginationByPlatformType(Criteria item, PlatformType platformType) {
     throw new IllegalArgumentException();
   }
 
   @Override
-  default void setPoolId(Criteria item, long poolId) {
+  default void restrictPaginationByPoolId(Criteria item, long poolId) {
     throw new IllegalArgumentException();
   }
 
   @Override
-  default void setProjectId(Criteria criteria, long projectId) {
+  default void restrictPaginationByProjectId(Criteria criteria, long projectId) {
     criteria.add(Restrictions.eq(getProjectColumn(), projectId));
   }
 
   @Override
-  default void setQuery(Criteria criteria, String query) {
+  default void restrictPaginationByQuery(Criteria criteria, String query) {
     if (!isStringBlankOrNull(query)) {
       criteria.add(searchRestrictions(query));
     }

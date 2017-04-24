@@ -122,6 +122,7 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -162,6 +163,9 @@ public class EditSampleController {
 
   @Autowired
   private ChangeLogService changeLogService;
+
+  @Autowired
+  private PoolService poolService;
 
   public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
     this.sampleOptionsController = sampleOptionsController;
@@ -295,7 +299,7 @@ public class EditSampleController {
     if (!s.getLibraries().isEmpty()) {
       Set<Pool> pools = new TreeSet<>();
       for (Library l : s.getLibraries()) {
-        List<Pool> prs = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+        List<Pool> prs = new ArrayList<>(poolService.listPoolsByLibraryId(l.getId()));
         pools.addAll(prs);
       }
       return pools;

@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
@@ -64,6 +65,9 @@ public class ExperimentWizardController {
 
   @Autowired
   private StudyService studyService;
+
+  @Autowired
+  private PoolService poolService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -88,7 +92,7 @@ public class ExperimentWizardController {
     if (experiment.getPlatform() != null) {
       PlatformType platformType = experiment.getPlatform().getPlatformType();
       ArrayList<Pool> pools = new ArrayList<>();
-      for (Pool p : requestManager.listAllPoolsByPlatform(platformType)) {
+      for (Pool p : poolService.listAllPoolsByPlatform(platformType)) {
         if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
           pools.add(p);
         }
@@ -96,7 +100,7 @@ public class ExperimentWizardController {
       }
       return pools;
     }
-    return requestManager.listAllPools();
+    return poolService.listAllPools();
   }
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)

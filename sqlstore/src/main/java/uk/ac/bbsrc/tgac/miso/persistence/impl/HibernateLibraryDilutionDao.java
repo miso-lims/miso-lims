@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 public class HibernateLibraryDilutionDao
     implements LibraryDilutionStore, HibernatePaginatedDataSource<LibraryDilution> {
 
+  // Make sure these match the HiberatePoolableElementViewDao
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "identificationBarcode", "library.name", "library.alias",
       "library.description" };
   private final static List<String> STANDARD_ALIASES = Arrays.asList("library");
@@ -143,20 +144,20 @@ public class HibernateLibraryDilutionDao
 
 
   @Override
-  public void setProjectId(Criteria criteria, long projectId) {
+  public void restrictPaginationByProjectId(Criteria criteria, long projectId) {
     criteria.createAlias("library.sample", "sample");
     criteria.createAlias("sample.project", "project");
-    HibernatePaginatedDataSource.super.setProjectId(criteria, projectId);
+    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId);
   }
 
   @Override
-  public void setPoolId(Criteria criteria, long poolId) {
+  public void restrictPaginationByPoolId(Criteria criteria, long poolId) {
     criteria.createAlias("pools", "pool");
     criteria.add(Restrictions.eq("pool.id", poolId));
   }
 
   @Override
-  public void setPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
     criteria.add(Restrictions.eq("library.platformType", platformType));
   }
 }

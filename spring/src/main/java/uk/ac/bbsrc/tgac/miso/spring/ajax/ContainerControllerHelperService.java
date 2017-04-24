@@ -71,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
@@ -89,6 +90,8 @@ public class ContainerControllerHelperService {
   private StudyService studyService;
   @Autowired
   private RunStore runStore;
+  @Autowired
+  private PoolService poolService;
 
   public void setRunStore(RunStore runStore) {
     this.runStore = runStore;
@@ -403,10 +406,10 @@ public class ContainerControllerHelperService {
     int partition = json.getInt("partition");
 
     try {
-      Pool p = requestManager.getPoolByBarcode(barcode);
+      Pool p = poolService.getPoolByBarcode(barcode);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (p == null) {
-        p = requestManager.getPoolByBarcode(new String(Base64.decodeBase64(barcode)));
+        p = poolService.getPoolByBarcode(new String(Base64.decodeBase64(barcode)));
       }
       // if pool still can't be found, return error
       if (p == null) {
@@ -429,7 +432,7 @@ public class ContainerControllerHelperService {
     try {
       String partition = json.getString("partition");
       Long poolId = json.getLong("poolId");
-      Pool p = requestManager.getPoolById(poolId);
+      Pool p = poolService.getPoolById(poolId);
       StringBuilder sb = new StringBuilder();
 
       Set<Project> pooledProjects = new HashSet<>();
@@ -554,7 +557,7 @@ public class ContainerControllerHelperService {
   public JSONObject selectStudyForPool(HttpSession session, JSONObject json) {
     try {
       Long poolId = json.getLong("poolId");
-      Pool p = requestManager.getPoolById(poolId);
+      Pool p = poolService.getPoolById(poolId);
       if (p == null) {
         throw new Exception("Could not retrieve pool: " + poolId);
       }

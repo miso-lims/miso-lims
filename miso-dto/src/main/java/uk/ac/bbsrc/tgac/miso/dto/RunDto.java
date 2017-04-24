@@ -14,6 +14,7 @@ public class RunDto {
   private String startDate;
   private String endDate;
   private String url;
+  private SequencingParametersDto parameters;
 
   public Long getId() {
     return id;
@@ -94,5 +95,13 @@ public class RunDto {
 
   public void writeUrls(URI baseUri) {
     setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/run/{id}").buildAndExpand(getId()).toUriString());
+  }
+
+  public SequencingParametersDto getParameters() {
+    return parameters;
+  }
+
+  public void setParameters(SequencingParametersDto parameters) {
+    this.parameters = parameters;
   }
 }

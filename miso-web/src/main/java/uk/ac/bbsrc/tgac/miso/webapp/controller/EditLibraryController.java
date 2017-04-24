@@ -106,6 +106,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -150,6 +151,9 @@ public class EditLibraryController {
 
   @Autowired
   private NamingScheme namingScheme;
+
+  @Autowired
+  private PoolService poolService;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -221,7 +225,7 @@ public class EditLibraryController {
 
   public List<Pool> getPoolsByLibrary(Library l) throws IOException {
     if (!l.getLibraryDilutions().isEmpty()) {
-      List<Pool> pools = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+      List<Pool> pools = new ArrayList<>(poolService.listPoolsByLibraryId(l.getId()));
       Collections.sort(pools);
       return pools;
     }

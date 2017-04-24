@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -78,6 +79,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
@@ -99,9 +102,13 @@ public class ImportExportControllerHelperService {
   @Autowired
   private LibraryDilutionService dilutionService;
   @Autowired
+  private PoolableElementViewService poolableElementViewService;
+  @Autowired
   private IndexService indexService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private PoolService poolService;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -461,17 +468,24 @@ public class ImportExportControllerHelperService {
               if (jsonArrayElement.get(12) != null && !isStringEmptyOrNull(jsonArrayElement.getString(12))) {
                 String poolName = jsonArrayElement.getString(12);
 
+                PoolableElementView ldiView = null;
+                if (ldi != null) {
+                  ldiView = poolableElementViewService.get(ldi.getId());
+                }
+
                 Matcher m = poolPattern.matcher(poolName);
+
                 if (m.matches()) {
-                  Pool existedPool = requestManager.getPoolById(Integer.valueOf(m.group(1)));
+                  Pool existedPool = poolService.getPoolById(Integer.valueOf(m.group(1)));
                   pools.put(poolName, existedPool);
                   if (jsonArrayElement.get(13) != null && !isStringEmptyOrNull(jsonArrayElement.getString(13))) {
                     existedPool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
                   }
-                  if (ldi != null) {
-                    existedPool.addPoolableElement(ldi);
+
+                  if (ldiView != null) {
+                    existedPool.getPoolableElementViews().add(ldiView);
                   }
-                  requestManager.savePool(existedPool);
+                  poolService.savePool(existedPool);
                 } else {
                   Pool pool = new PoolImpl();
                   if (!pools.containsKey(poolName)) {
@@ -486,15 +500,15 @@ public class ImportExportControllerHelperService {
                     }
                     pools.put(poolName, pool);
                     log.info("Added pool: " + poolName);
-                    if (ldi != null) {
-                      pool.addPoolableElement(ldi);
+                    if (ldiView != null) {
+                      pool.getPoolableElementViews().add(ldiView);
                     }
-                    requestManager.savePool(pool);
+                    poolService.savePool(pool);
                   } else {
                     pool = pools.get(poolName);
-                    if (ldi != null) {
-                      pool.addPoolableElement(ldi);
-                      requestManager.savePool(pool);
+                    if (ldiView != null) {
+                      pool.getPoolableElementViews().add(ldiView);
+                      poolService.savePool(pool);
                     }
                   }
                 }

@@ -4,13 +4,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public interface PaginationFilterSink<T> {
 
-  public void setFulfilled(T item, boolean isFulfilled);
+  public void restrictPaginationByFulfilled(T item, boolean isFulfilled);
 
-  public void setPlatformType(T item, PlatformType platformType);
+  public void restrictPaginationByPlatformType(T item, PlatformType platformType);
 
-  public void setPoolId(T item, long poolId);
+  public void restrictPaginationByPoolId(T item, long poolId);
 
-  public void setProjectId(T item, long projectId);
+  public void restrictPaginationByProjectId(T item, long projectId);
 
-  public void setQuery(T item, String query);
+  public void restrictPaginationByQuery(T item, String query);
 }

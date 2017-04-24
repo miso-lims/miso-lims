@@ -58,13 +58,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
@@ -78,7 +80,11 @@ public class PoolWizardControllerHelperService {
   @Autowired
   private RequestManager requestManager;
   @Autowired
+  private PoolService poolService;
+  @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private PoolableElementViewService poolableElementViewService;
   @Autowired
   private StudyService studyService;
 
@@ -118,19 +124,19 @@ public class PoolWizardControllerHelperService {
       try {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        List<LibraryDilution> dils = new ArrayList<>();
+        List<PoolableElementView> dils = new ArrayList<>();
         for (Integer id : ids) {
-          dils.add(dilutionService.get(id.longValue()));
+          dils.add(poolableElementViewService.get(id.longValue()));
         }
 
         boolean indexCollision = false;
         if (dils.size() > 1) {
-          for (Dilution d1 : dils) {
+          for (PoolableElementView d1 : dils) {
             if (d1 != null) {
-              for (Dilution d2 : dils) {
+              for (PoolableElementView d2 : dils) {
                 if (d2 != null && !d1.equals(d2)) {
-                  if (!d1.getLibrary().getIndices().isEmpty() && !d2.getLibrary().getIndices().isEmpty()) {
-                    if (d1.getLibrary().getIndices().equals(d2.getLibrary().getIndices())) {
+                  if (!d1.getIndices().isEmpty() && !d2.getIndices().isEmpty()) {
+                    if (d1.getIndices().equals(d2.getIndices())) {
                       indexCollision = true;
                     }
                   }
@@ -152,13 +158,8 @@ public class PoolWizardControllerHelperService {
           pool.setPlatformType(platformType);
           pool.setReadyToRun(true);
 
-          for (LibraryDilution d : dils) {
-            try {
-              pool.addPoolableElement(d);
-            } catch (MalformedDilutionException dle) {
-              log.error("Failed", dle);
-              return JSONUtils.SimpleJSONError("Failed: " + dle.getMessage());
-            }
+          for (PoolableElementView d : dils) {
+            pool.getPoolableElementViews().add(d);
           }
 
           for (PoolQC qc : pqcs) {
@@ -175,7 +176,7 @@ public class PoolWizardControllerHelperService {
           }
 
           pool.setLastModifier(user);
-          requestManager.savePool(pool);
+          poolService.savePool(pool);
 
           sb.append(
               "<a class='dashboardresult' href='/miso/pool/" + pool.getId()

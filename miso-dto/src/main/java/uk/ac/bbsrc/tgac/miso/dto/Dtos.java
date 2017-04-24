@@ -102,8 +102,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 public class Dtos {
 
-  private static DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis();
-  private static DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
+  public static DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis();
+  public static DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
 
   public static TissueOriginDto asDto(TissueOrigin from) {
     TissueOriginDto dto = new TissueOriginDto();
@@ -1308,6 +1308,14 @@ public class Dtos {
     }
     if (from.getStatus() != null && from.getStatus().getCompletionDate() != null) {
       dto.setEndDate(getDateAsString(from.getStatus().getCompletionDate()));
+    }
+    if (from.getSequencingParameters() != null) {
+      dto.setParameters(asDto(from.getSequencingParameters()));
+    } else {
+      SequencingParametersDto parametersDto = new SequencingParametersDto();
+      parametersDto.setId(-1L);
+      parametersDto.setName("(None)");
+      dto.setParameters(parametersDto);
     }
     return dto;
   }
