@@ -5,6 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -16,6 +17,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -170,4 +172,7 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
    */
   Criterion searchRestrictions(String query);
 
+  @Override
+  public default void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths) {
+  }
 }

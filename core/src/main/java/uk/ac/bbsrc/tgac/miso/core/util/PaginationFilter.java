@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -9,6 +10,7 @@ import org.joda.time.DateTime;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public abstract interface PaginationFilter {
@@ -32,6 +34,20 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter health(HealthType health) {
+    return health(EnumSet.of(health));
+  }
+
+  public static PaginationFilter health(EnumSet<HealthType> healths) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item) {
+        sink.restrictPaginationByHealth(item, healths);
+      }
+    };
+  }
+
   public static PaginationFilter[] parse(String request, String currentUser, Consumer<String> errorHandler) {
     return Arrays.stream(request.split("\\s+")).<PaginationFilter> map(x -> {
       if (x.contains(":")) {
@@ -47,6 +63,21 @@ public abstract interface PaginationFilter {
           case "ordered":
           case "unfulfilled":
             return fulfilled(false);
+          case "unknown":
+            return health(HealthType.Unknown);
+          case "complete":
+          case "completed":
+            return health(HealthType.Completed);
+          case "failed":
+            return health(HealthType.Failed);
+          case "started":
+            return health(HealthType.Started);
+          case "stopped":
+            return health(HealthType.Stopped);
+          case "running":
+            return health(HealthType.Running);
+          case "incomplete":
+            return health(EnumSet.of(HealthType.Running, HealthType.Started, HealthType.Stopped));
           default:
             errorHandler.accept("No filter for " + parts[1]);
             return null;
