@@ -28,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -363,5 +364,10 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths) {
     criteria.add(Restrictions.in("status.health", healths.toArray()));
+  }
+
+  @Override
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+    criteria.add(Restrictions.eq("platformType", platformType));
   }
 }
