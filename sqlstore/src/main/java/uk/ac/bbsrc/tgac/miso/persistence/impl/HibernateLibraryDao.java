@@ -428,4 +428,9 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedData
     return LibraryImpl.class;
   }
 
+  @Override
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+    criteria.add(Restrictions.eq("platformType", platformType));
+  }
+
 }
