@@ -22,10 +22,6 @@ public class DefaultIndexService implements IndexService {
     this.indexStore = indexStore;
   }
 
-  public DefaultIndexService() {
-    System.out.println(this.hashCode());
-  }
-
   @Override
   public IndexFamily getIndexFamilyByName(String name) {
     return indexStore.getIndexFamilyByName(name);

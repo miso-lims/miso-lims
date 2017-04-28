@@ -1200,4 +1200,9 @@ public class UserAuthMisoRequestManager implements RequestManager {
       backingManager.removeProjectWatcher(project, watcher);
     }
   }
+
+  @Override
+  public Collection<LibraryDesign> listLibraryDesigns() throws IOException {
+    return backingManager.listLibraryDesigns();
+  }
 }
