@@ -220,18 +220,6 @@ var Hot = {
     }
     return -1;
   },
-  
-  /**
-   * Concatenates and reduces arrays
-   */
-  concatArrays: function () {
-    // call this function with any number of col groups and it will concat and reduce them all
-    var cols = [];
-    for (var i = 0; i<arguments.length; i++) {
-      cols.push.apply(cols, arguments[i]);
-    }
-    return cols.reduce(function (a, b) { return a.concat(b); }, []);
-  },
 
   /**
    * Serial execution of an array of functions.
