@@ -56,8 +56,14 @@ public class IndexFamily implements Serializable {
   static {
     NULL.setId(0L);
     NULL.setName("No index");
-    List<Index> empty = Collections.emptyList();
-    NULL.setIndices(empty);
+    NULL.setArchived(false);
+    Index index = new Index();
+    index.setFamily(NULL);
+    index.setId(0L);
+    index.setName("No index");
+    index.setPosition(1);
+    index.setSequence("");
+    NULL.setIndices(Collections.singletonList(index));
   }
 
   private Boolean archived;

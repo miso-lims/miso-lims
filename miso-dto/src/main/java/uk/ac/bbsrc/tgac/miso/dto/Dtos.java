@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -28,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -1470,7 +1472,7 @@ public class Dtos {
 
   }
 
-  private static PlatformDto asDto(Platform from) {
+  public static PlatformDto asDto(Platform from) {
     PlatformDto dto = new PlatformDto();
     dto.setId(from.getId());
     dto.setPlatformType(from.getPlatformType().name());
@@ -1496,4 +1498,59 @@ public class Dtos {
     return dtoList;
   }
 
+  public static LibraryDesignDto asDto(LibraryDesign from) {
+    LibraryDesignDto dto = new LibraryDesignDto();
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    dto.setDesignCodeId(from.getLibraryDesignCode().getId());
+    dto.setSampleClassId(from.getSampleClass().getId());
+    dto.setSelectionId(from.getLibrarySelectionType().getId());
+    dto.setStrategyId(from.getLibraryStrategyType().getId());
+    return dto;
+  }
+
+  public static LibraryTypeDto asDto(LibraryType from) {
+    LibraryTypeDto dto = new LibraryTypeDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getDescription());
+    dto.setArchived(from.getArchived());
+    dto.setPlatform(from.getPlatformType().name());
+    return dto;
+  }
+
+  public static LibrarySelectionTypeDto asDto(LibrarySelectionType from) {
+    LibrarySelectionTypeDto dto = new LibrarySelectionTypeDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getDescription());
+    dto.setName(from.getName());
+    return dto;
+  }
+
+  public static LibraryStrategyTypeDto asDto(LibraryStrategyType from) {
+    LibraryStrategyTypeDto dto = new LibraryStrategyTypeDto();
+    dto.setId(from.getId());
+    dto.setDescription(from.getDescription());
+    dto.setName(from.getName());
+    return dto;
+  }
+
+  public static IndexDto asDto(Index from) {
+    IndexDto dto = new IndexDto();
+    dto.setId(from.getId());
+    dto.setLabel(from.getLabel());
+    dto.setName(from.getName());
+    dto.setPosition(from.getPosition());
+    dto.setSequence(from.getSequence());
+    return dto;
+  }
+
+  public static IndexFamilyDto asDto(IndexFamily from) {
+    IndexFamilyDto dto = new IndexFamilyDto();
+    dto.setId(from.getId());
+    dto.setArchived(from.getArchived());
+    dto.setIndices(from.getIndices().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    dto.setMaximumNumber(from.getMaximumNumber());
+    dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
+    return dto;
+  }
 }

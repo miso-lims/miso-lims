@@ -321,6 +321,8 @@ public interface RequestManager {
 
   public Map<String, Integer> getGroupColumnSizes() throws IOException;
 
+  public Collection<LibraryDesign> listLibraryDesigns() throws IOException;
+
   public Collection<LibraryDesign> listLibraryDesignByClass(SampleClass sampleClass) throws IOException;
 
   public Collection<LibraryDesignCode> listLibraryDesignCodes() throws IOException;

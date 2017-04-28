@@ -1891,4 +1891,9 @@ public class MisoRequestManager implements RequestManager {
     String barcode = pool.getName() + "::" + pool.getAlias();
     pool.setIdentificationBarcode(barcode);
   }
+
+  @Override
+  public Collection<LibraryDesign> listLibraryDesigns() throws IOException {
+    return libraryDesignDao.getLibraryDesigns();
+  }
 }
