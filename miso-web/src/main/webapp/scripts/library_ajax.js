@@ -382,7 +382,7 @@ Library.dilution = {
     dropdown.push('<option value="">NONE</option>');
     dropdown.push(targetedSequencingsMap.map(function (tarseq) { return '<option value="' + tarseq.targetedSequencingId + '" ' + (currentAlias == tarseq.alias ? 'selected="selected"' : '') + '>' + tarseq.alias + '</option>'; }));
     dropdown.push('</select>');
-    return Hot.concatArrays(dropdown).join('');
+    return dropdown.join('');
   }
 };
 
