@@ -90,16 +90,8 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
           @JoinColumn(name = "kitDescriptorId") })
   private Set<TargetedSequencing> targetedSequencing = new HashSet<>();
 
-  public void setChangelog(Collection<ChangeLog> changelog) {
-    this.changelog = changelog;
-  }
-
   public void setTargetedSequencing(Set<TargetedSequencing> targetedSequencing) {
     this.targetedSequencing = targetedSequencing;
-  }
-
-  public Collection<ChangeLog> getChangelog() {
-    return changelog;
   }
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -287,6 +279,10 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changelog;
+  }
+
+  public void setChangeLog(Collection<ChangeLog> changelog) {
+    this.changelog = changelog;
   }
 
   public User getLastModifier() {
