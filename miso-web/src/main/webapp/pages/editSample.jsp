@@ -421,25 +421,14 @@
         <tr>
           <td class="h">Sub-project:</td>
           <td>
-            <c:choose>
-              <c:when test="${sample.id == 0}">
-                <form:select id="subProject" path="subproject" onchange="Sample.ui.subProjectChanged()">
-                  <%-- list filtered and filled by js --%>
-                  <script type="text/javascript">
-                    jQuery(document).ready(function () {
-                      Sample.ui.filterSubProjectOptions();
-                    });
-                  </script>
-                </form:select>
-              </c:when>
-              <c:when test="${!empty sample.subproject}">
-                ${sample.subproject.alias}
-                <input type="hidden" value="${sample.subproject.id}" name="subProject" id="subProject"/>
-              </c:when>
-              <c:otherwise>
-                n/a
-              </c:otherwise>
-            </c:choose>
+            <form:select id="subProject" path="subproject" onchange="Sample.ui.subProjectChanged()">
+              <%-- list filtered and filled by js --%>
+              <script type="text/javascript">
+                jQuery(document).ready(function () {
+                  Sample.ui.filterSubProjectOptions(${empty sample.subproject ? null : sample.subproject.id});
+                });
+              </script>
+            </form:select>
           </td>
         </tr>
         <tr>

@@ -697,7 +697,8 @@ Sample.ui = {
     Sample.ui.filterSampleGroupOptions();
   },
   
-  filterSubProjectOptions: function() {
+  filterSubProjectOptions: function(setId) {
+    var selected = setId ? setId : (jQuery('#subProject').val() ? jQuery('#subProject').val() : "");
     var projectId = Sample.ui.getSelectedProjectId();
     var subProjects = Sample.options.getSubProjectsByProjectId(projectId);
     jQuery('#subProject').empty()
@@ -705,6 +706,7 @@ Sample.ui = {
     for (var i = 0, l = subProjects.length; i < l; i++) {
       jQuery('#subProject').append('<option value = "' + subProjects[i].id + '">' + subProjects[i].alias + '</option>');
     }
+    jQuery('#subProject').val(selected);
   },
   
   getSelectedProjectId: function() {
