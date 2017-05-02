@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -47,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "run" })
 public interface SequencerPartitionContainer
-    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer>, Barcodable, Locatable, ChangeLoggable
+    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer>, Barcodable, Locatable, ChangeLoggable, Serializable
 {
 
   public void setId(long id);
@@ -129,6 +130,7 @@ public interface SequencerPartitionContainer
 
   public void setLastModifier(User lastModifier);
 
+  @Override
   public Collection<ChangeLog> getChangeLog();
 
   public Date getLastModified();

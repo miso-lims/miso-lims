@@ -130,7 +130,7 @@ public abstract class AbstractProject implements Project {
   private SecurityProfile securityProfile = null;
 
   @Transient
-  private final Set<MisoListener> listeners = new HashSet<>();
+  private final transient Set<MisoListener> listeners = new HashSet<>();
 
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)

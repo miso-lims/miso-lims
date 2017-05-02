@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -15,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * 
  * A Box usually has dimensions 8 by 12. (A-H, 1-12, A01 through H12)
  */
-public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletable, ChangeLoggable {
+public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletable, ChangeLoggable, Serializable {
 
   public static final String PREFIX = "BOX";
 
@@ -217,6 +218,7 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletabl
    * 
    * @return Collection<ChangeLog> change logs.
    */
+  @Override
   public Collection<ChangeLog> getChangeLog();
 
   /**

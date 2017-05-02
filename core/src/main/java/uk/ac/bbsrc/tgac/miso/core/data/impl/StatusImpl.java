@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -65,7 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  */
 @Entity
 @Table(name = "Status")
-public class StatusImpl implements Status, Serializable {
+public class StatusImpl implements Status {
   private static final long serialVersionUID = 1L;
 
   protected static final Logger log = LoggerFactory.getLogger(StatusImpl.class);

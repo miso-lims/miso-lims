@@ -85,6 +85,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 @MappedSuperclass
 public abstract class AbstractLibrary extends AbstractBoxable implements Library {
 
+  private static final long serialVersionUID = 1L;
+
   public static final String UNITS = "nM";
 
   @Id

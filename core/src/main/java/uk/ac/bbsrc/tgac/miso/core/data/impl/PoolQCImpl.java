@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -51,7 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
  */
 @Entity
 @Table(name = "PoolQC")
-public class PoolQCImpl extends AbstractQC implements PoolQC, Serializable {
+public class PoolQCImpl extends AbstractQC implements PoolQC {
   private static final long serialVersionUID = 1L;
   private static final Logger log = LoggerFactory.getLogger(PoolQCImpl.class);
   public static final String UNITS = "nM";

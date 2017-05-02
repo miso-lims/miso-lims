@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -59,7 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
  */
 @Entity
 @Table(name = "Submission")
-public class SubmissionImpl implements Submission, Serializable {
+public class SubmissionImpl implements Submission {
 
   private static final long serialVersionUID = 1L;
 

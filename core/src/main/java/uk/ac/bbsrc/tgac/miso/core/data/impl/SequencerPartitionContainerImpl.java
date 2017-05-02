@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -70,7 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @Entity
 @Table(name = "SequencerPartitionContainer")
-public class SequencerPartitionContainerImpl implements SequencerPartitionContainer, Serializable {
+public class SequencerPartitionContainerImpl implements SequencerPartitionContainer {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;

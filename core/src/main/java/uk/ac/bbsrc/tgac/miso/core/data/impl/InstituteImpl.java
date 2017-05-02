@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -20,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 
 @Entity
 @Table(name = "Institute")
-public class InstituteImpl implements Institute, Serializable {
+public class InstituteImpl implements Institute {
 
   private static final long serialVersionUID = 1L;
 

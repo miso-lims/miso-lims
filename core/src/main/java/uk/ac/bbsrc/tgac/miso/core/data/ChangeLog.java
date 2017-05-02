@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
@@ -7,7 +8,7 @@ import com.eaglegenomics.simlims.core.User;
 /**
  * A single entry in the database-generated change log for an object.
  */
-public interface ChangeLog {
+public interface ChangeLog extends Serializable {
 
   /**
    * The id of the entity associated with the ChangeLog.

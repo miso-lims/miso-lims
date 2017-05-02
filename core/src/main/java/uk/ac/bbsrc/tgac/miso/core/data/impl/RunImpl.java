@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  */
 @Entity
 @Table(name = "Run")
-public class RunImpl extends AbstractRun implements Serializable {
+public class RunImpl extends AbstractRun {
 
   private static final long serialVersionUID = 1L;
 

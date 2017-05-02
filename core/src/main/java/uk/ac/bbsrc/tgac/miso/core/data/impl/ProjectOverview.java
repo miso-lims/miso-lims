@@ -129,7 +129,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   @Transient
   private boolean libraryPreparationComplete;
   @Transient
-  private final Set<MisoListener> listeners = new HashSet<>();
+  private final transient Set<MisoListener> listeners = new HashSet<>();
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "ProjectOverview_Note", joinColumns = {

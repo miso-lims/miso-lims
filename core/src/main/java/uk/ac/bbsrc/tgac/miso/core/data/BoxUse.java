@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,7 +11,10 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "BoxUse")
-public class BoxUse {
+public class BoxUse implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   private String alias;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
