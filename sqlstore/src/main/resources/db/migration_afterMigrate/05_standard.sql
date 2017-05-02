@@ -888,22 +888,22 @@ CREATE OR REPLACE VIEW OrderCompletion AS SELECT
 CREATE OR REPLACE VIEW OrderCompletion_Items AS SELECT poolId, parametersId, health, num_partitions FROM OrderCompletion_Backing;
 
 CREATE OR REPLACE VIEW SampleDerivedInfo AS
-  SELECT sampleId, MAX(changeTime) as lastModified FROM SampleChangeLog GROUP BY sampleId;
+  SELECT a.*, userId AS creator FROM SampleChangeLog o JOIN (SELECT sampleId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(sampleChangeLogId) AS firstId FROM SampleChangeLog GROUP BY sampleId) AS a WHERE a.sampleId = o.sampleId AND a.firstId = o.sampleChangeLogId;
   
 CREATE OR REPLACE VIEW RunDerivedInfo AS
-  SELECT runId, MAX(changeTime) as lastModified FROM RunChangeLog GROUP BY runId;
+  SELECT a.*, userId AS creator FROM RunChangeLog o JOIN (SELECT runId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(runChangeLogId) AS firstId FROM RunChangeLog GROUP BY runId) AS a WHERE a.runId = o.runId AND a.firstId = o.runChangeLogId;
 
 CREATE OR REPLACE VIEW ContainerDerivedInfo AS
-  SELECT containerId, MAX(changeTime) as lastModified FROM SequencerPartitionContainerChangeLog GROUP BY containerId;
+  SELECT a.*, userId AS creator FROM SequencerPartitionContainerChangeLog o JOIN (SELECT containerId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(containerChangeLogId) AS firstId FROM SequencerPartitionContainerChangeLog GROUP BY containerId) AS a WHERE a.containerId = o.containerId AND a.firstId = o.containerChangeLogId;
 
 CREATE OR REPLACE VIEW PoolDerivedInfo AS
-  SELECT poolId, MAX(changeTime) as lastModified FROM PoolChangeLog GROUP BY poolId;
+  SELECT a.*, userId AS creator FROM PoolChangeLog o JOIN (SELECT poolId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(poolChangeLogId) AS firstId FROM PoolChangeLog GROUP BY poolId) AS a WHERE a.poolId = o.poolId AND a.firstId = o.poolChangeLogId;
 
 CREATE OR REPLACE VIEW LibraryDerivedInfo AS
-  SELECT libraryId, MAX(changeTime) AS lastModified FROM LibraryChangeLog GROUP BY libraryId;
+  SELECT a.*, userId AS creator FROM LibraryChangeLog o JOIN (SELECT libraryId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(libraryChangeLogId) AS firstId FROM LibraryChangeLog GROUP BY libraryId) AS a WHERE a.libraryId = o.libraryId AND a.firstId = o.libraryChangeLogId;
   
 CREATE OR REPLACE VIEW BoxDerivedInfo AS
-  SELECT boxId, MAX(changeTime) AS lastModified FROM BoxChangeLog GROUP BY boxId;
+  SELECT a.*, userId AS creator FROM BoxChangeLog o JOIN (SELECT boxId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(boxChangeLogId) AS firstId FROM BoxChangeLog GROUP BY boxId) AS a WHERE a.boxId = o.boxId AND a.firstId = o.boxChangeLogId;
 
 CREATE OR REPLACE VIEW SampleBoxPosition
 AS SELECT s.sampleId, bp.boxId, bp.position
@@ -940,19 +940,35 @@ AS SELECT
     d.concentration AS dilutionConcentration,
     d.identificationBarcode AS dilutionBarcode,
     d.lastUpdated AS lastModified,
+    d.creationDate AS created,
+    d.dilutionUserName AS creatorName,
+    modUser.loginName AS lastModifierName,
+    d.preMigrationId AS preMigrationId,
     l.libraryId AS libraryId,
     l.name AS libraryName,
     l.alias AS libraryAlias,
     l.description AS libraryDescription,
+    l.identificationBarcode AS libraryBarcode,
     l.lowQuality AS lowQualityLibrary,
     l.platformType AS platformType,
+    l.dnaSize AS libraryDnaSize,
+    l.paired AS libraryPaired,
+    sel.name AS librarySelectionType,
+    strat.name AS libraryStrategyType,
     s.sampleId AS sampleId,
     s.name AS sampleName,
     s.alias AS sampleAlias,
+    s.description AS sampleDescription,
+    s.accession AS sampleAccession,
+    s.sampleType AS sampleType,
     p.projectId AS projectId,
+    p.name AS projectName,
     p.shortName AS projectShortName,
     p.alias AS projectAlias
   FROM LibraryDilution d
+    LEFT JOIN User modUser ON modUser.userId = d.lastModifier
     JOIN Library l ON l.libraryId = d.library_libraryId
     JOIN Sample s ON s.sampleId = l.sample_sampleId
-    JOIN Project p ON p.projectId = s.project_projectId;
+    JOIN Project p ON p.projectId = s.project_projectId
+    LEFT JOIN LibrarySelectionType sel ON sel.librarySelectionTypeId = l.librarySelectionType
+    LEFT JOIN LibraryStrategyType strat ON strat.libraryStrategyTypeId = l.libraryStrategyType;

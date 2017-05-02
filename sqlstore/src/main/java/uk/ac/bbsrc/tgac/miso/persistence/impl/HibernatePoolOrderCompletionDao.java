@@ -1,17 +1,20 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.persister.collection.CollectionPropertyNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderCompletionDao;
 
@@ -72,6 +75,22 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
   @Override
   public void restrictPaginationByPoolId(Criteria criteria, long poolId) {
     criteria.add(Restrictions.eq("pool.id", poolId));
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, boolean creation) {
+    return creation ? null : "lastUpdated";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return null;
+  }
+
+  @Override
+  public void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths) {
+    criteria.createCriteria("items").add(Restrictions.and(Restrictions.in(CollectionPropertyNames.COLLECTION_INDICES, healths.toArray()),
+        Restrictions.gt(CollectionPropertyNames.COLLECTION_ELEMENTS, 0)));
   }
 
 }

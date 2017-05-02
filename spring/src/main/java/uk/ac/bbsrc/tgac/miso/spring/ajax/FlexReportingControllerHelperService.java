@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.Sets;
 import com.google.json.JsonSanitizer;
 
 import net.sf.json.JSONArray;
@@ -50,7 +51,6 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
@@ -253,7 +254,7 @@ public class FlexReportingControllerHelperService {
     JSONArray jsonArray = new JSONArray();
     try {
       for (Project project : projects) {
-        Set<Library> librariesInRun = new HashSet<>();
+        Set<Long> librariesInRun = new HashSet<>();
         for (Run run : requestManager.listAllRunsByProjectId(project.getProjectId())) {
           Collection<SequencerPartitionContainer> spcs = requestManager
               .listSequencerPartitionContainersByRunId(run.getId());
@@ -263,16 +264,15 @@ public class FlexReportingControllerHelperService {
               if (spc.getPartitions().size() > 0) {
                 for (Partition spp : spc.getPartitions()) {
                   if (spp.getPool() != null) {
-                    if (spp.getPool().getPoolableElements().size() > 0) {
-                      for (Dilution dilution : spp.getPool().getPoolableElements()) {
-                        Library libraryInRun = dilution.getLibrary();
-                        if (libraryInRun.getSample().getProject().equals(requestManager.getProjectById(project.getProjectId()))) {
-                          if (librariesInRun.add(libraryInRun)) {
-
+                    if (spp.getPool().getPoolableElementViews().size() > 0) {
+                      for (PoolableElementView dilution : spp.getPool().getPoolableElementViews()) {
+                        if (dilution.getProjectId().equals(project.getProjectId())) {
+                          if (!librariesInRun.contains(dilution.getLibraryId())) {
+                            librariesInRun.add(dilution.getLibraryId());
                             jsonArray.add(
                                 JsonSanitizer.sanitize(
-                                    "[\"" + project.getName() + "\",\"" + libraryInRun.getSample().getName() + "\",\""
-                                        + libraryInRun.getName() + "\",\"" + spp.getPool().getName() + "\",\"" + run.getName() + "\",\""
+                                    "[\"" + project.getName() + "\",\"" + dilution.getSampleName() + "\",\""
+                                        + dilution.getDilutionName() + "\",\"" + spp.getPool().getName() + "\",\"" + run.getName() + "\",\""
                                         + run.getStatus().getHealth().getKey() + "\"]"));
                           }
                         }
@@ -436,7 +436,7 @@ public class FlexReportingControllerHelperService {
     JSONArray jsonArray = new JSONArray();
     try {
 
-      Set<Library> librariesInRun = new HashSet<>();
+      Set<Long> librariesInRun = new HashSet<>();
       for (Run run : runs) {
         Collection<SequencerPartitionContainer> spcs = requestManager
             .listSequencerPartitionContainersByRunId(run.getId());
@@ -446,15 +446,14 @@ public class FlexReportingControllerHelperService {
             if (spc.getPartitions().size() > 0) {
               for (Partition spp : spc.getPartitions()) {
                 if (spp.getPool() != null) {
-                  if (spp.getPool().getPoolableElements().size() > 0) {
-                    for (Dilution dilution : spp.getPool().getPoolableElements()) {
-                      Library libraryInRun = dilution.getLibrary();
-                      if (libraryInRun.getSample().getProject().equals(requestManager.getProjectById(project.getProjectId()))) {
-                        if (librariesInRun.add(libraryInRun)) {
-                          Sample sample = libraryInRun.getSample();
+                  if (spp.getPool().getPoolableElementViews().size() > 0) {
+                    for (PoolableElementView dilution : spp.getPool().getPoolableElementViews()) {
+                      if (dilution.getProjectId().equals(project.getProjectId())) {
+                        if (!librariesInRun.contains(dilution.getLibraryId())) {
+                          librariesInRun.add(dilution.getLibraryId());
 
                           StringBuilder indexInfo = new StringBuilder();
-                          for (Index index : libraryInRun.getIndices()) {
+                          for (Index index : dilution.getIndices()) {
                             indexInfo.append(index.getPosition());
                             indexInfo.append(": ");
                             indexInfo.append(index.getName());
@@ -463,13 +462,13 @@ public class FlexReportingControllerHelperService {
                           }
 
                           JSONArray row = new JSONArray();
-                          row.add(sample.getAlias());
-                          row.add(sample.getDescription());
-                          row.add(sample.getSampleType());
-                          row.add(libraryInRun.getName());
-                          row.add(dilution.getName());
+                          row.add(dilution.getSampleAlias());
+                          row.add(dilution.getSampleDescription());
+                          row.add(dilution.getSampleType());
+                          row.add(dilution.getLibraryName());
+                          row.add(dilution.getDilutionName());
                           row.add(indexInfo.toString());
-                          row.add(Integer.toString(libraryInRun.getDnaSize()));
+                          row.add(Long.toString(dilution.getLibraryDnaSize()));
                           row.add(run.getAlias());
                           row.add(spp.getPartitionNumber().toString());
                           jsonArray.add(row);
@@ -1028,26 +1027,25 @@ public class FlexReportingControllerHelperService {
               for (Partition spp : spc.getPartitions()) {
                 if (spp.getPool() != null) {
                   Pool pool = spp.getPool();
-                  if (spp.getPool().getPoolableElements().size() > 0) {
-                    Map<String, Integer> projectMap = new HashMap<>();
-                    for (Dilution dilution : spp.getPool().getPoolableElements()) {
-                      int count = projectMap.containsKey(dilution.getLibrary().getSample().getProject().getName())
-                          ? projectMap.get(dilution.getLibrary().getSample().getProject().getName()) : 0;
+                  if (spp.getPool().getPoolableElementViews().size() > 0) {
+                    Map<Long, Integer> projectMap = new HashMap<>();
+                    for (PoolableElementView dilution : spp.getPool().getPoolableElementViews()) {
+                      int count = projectMap.containsKey(dilution.getProjectId())
+                          ? projectMap.get(dilution.getProjectId()) : 0;
                       count++;
-                      projectMap.put(dilution.getLibrary().getSample().getProject().getName(), count);
+                      projectMap.put(dilution.getProjectId(), count);
                     }
-                    Map<String, Integer> projectMapDisplayed = new HashMap<>();
-                    for (Dilution dilution : spp.getPool().getPoolableElements()) {
-                      if (!projectMapDisplayed.containsKey(dilution.getLibrary().getSample().getProject().getName())) {
+                    Set<Long> projectsDisplayed = Sets.newHashSet();
+                    for (PoolableElementView dilution : spp.getPool().getPoolableElementViews()) {
+                      if (projectsDisplayed.add(dilution.getProjectId())) {
                         jsonArray.add(
                             JsonSanitizer.sanitize(
                                 "[\"" + run.getName() + "\",\"" + (run.getAlias().replace("+", "-")) + "\",\""
                                     + (run.getStatus() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "\",\""
                                     + pool.getName() + "\",\"" + spp.getPartitionNumber() + "\",\""
-                                    + dilution.getLibrary().getSample().getProject().getName() + "\",\""
-                                    + projectMap.get(dilution.getLibrary().getSample().getProject().getName()) + "\",\""
-                                    + spp.getPool().getPoolableElements().size() + "\"]"));
-                        projectMapDisplayed.put(dilution.getLibrary().getSample().getProject().getName(), 1);
+                                    + dilution.getProjectName() + "\",\""
+                                    + projectMap.get(dilution.getProjectId()) + "\",\""
+                                    + spp.getPool().getPoolableElementViews().size() + "\"]"));
                       }
                     }
                   }

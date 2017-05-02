@@ -50,6 +50,14 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
+  public PoolableElementView getByPreMigrationId(Long preMigrationId) throws IOException {
+    if (preMigrationId == null) throw new NullPointerException("preMigrationId cannot be null");
+    Criteria criteria = currentSession().createCriteria(PoolableElementView.class);
+    criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
+    return (PoolableElementView) criteria.uniqueResult();
+  }
+
+  @Override
   public String getProjectColumn() {
     return "projectId";
   }
@@ -86,4 +94,13 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
     return SEARCH_PROPERTIES;
   }
 
+  @Override
+  public String propertyForDate(Criteria item, boolean creation) {
+    return creation ? "created" : "lastModified";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria item, boolean creator) {
+    return creator ? "creatorName" : "lastModifier";
+  }
 }

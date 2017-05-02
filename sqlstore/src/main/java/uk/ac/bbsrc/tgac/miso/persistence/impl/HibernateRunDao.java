@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -35,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run> {
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "status");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "status", "lastModifier", "derivedInfo.creator");
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateRunDao.class);
 
@@ -191,10 +193,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   public List<Run> listByProjectId(long projectId) throws IOException {
     Criteria idCriteria = currentSession().createCriteria(RunImpl.class, "r");
     idCriteria.createAlias("r.containers", "container").createAlias("container.partitions", "partition");
-    idCriteria.createAlias("partition.pool", "pool").createAlias("pool.pooledElements", "dilution");
-    idCriteria.createAlias("dilution.library", "library").createAlias("library.sample", "sample");
-    idCriteria.createAlias("sample.project", "project");
-    idCriteria.add(Restrictions.eq("project.id", projectId));
+    idCriteria.createAlias("partition.pool", "pool").createAlias("pool.pooledElementViews", "dilution");
+    idCriteria.add(Restrictions.eq("dilution.projectId", projectId));
     idCriteria.setProjection(Projections.distinct(Projections.property("r.id")));
     @SuppressWarnings("unchecked")
     List<Long> ids = idCriteria.list();
@@ -314,16 +314,13 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     criteria.createAlias("containers", "container");
     criteria.createAlias("container.partitions", "partition");
     criteria.createAlias("partition.pool", "pool");
-    criteria.createAlias("pool.pooledElements", "dilution");
-    criteria.createAlias("dilution.library", "library");
-    criteria.createAlias("library.sample", "sample");
-    criteria.createAlias("sample.project", "project");
+    criteria.createAlias("pool.pooledElementViews", "dilution");
     HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId);
   }
 
   @Override
   public String getProjectColumn() {
-    return "project.id";
+    return "dilution.projectId";
   }
 
   @Override
@@ -345,7 +342,27 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
+  public String propertyForDate(Criteria criteria, boolean creation) {
+    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return creator ? "creator.loginName" : "lastModifier.loginName";
+  }
+
+  @Override
   public Class<? extends Run> getRealClass() {
     return RunImpl.class;
+  }
+
+  @Override
+  public void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths) {
+    criteria.add(Restrictions.in("status.health", healths.toArray()));
+  }
+
+  @Override
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+    criteria.add(Restrictions.eq("platformType", platformType));
   }
 }

@@ -91,6 +91,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -1200,16 +1201,39 @@ public class Dtos {
     return dto;
   }
 
+  public static DilutionDto asDto(PoolableElementView from) {
+    DilutionDto dto = new DilutionDto();
+    dto.setId(from.getDilutionId());
+    dto.setName(from.getDilutionName());
+    dto.setDilutionUserName(from.getCreatorName());
+    dto.setConcentration(from.getDilutionConcentration());
+    if (from.getCreated() != null) {
+      dto.setCreationDate(dateFormatter.print(new DateTime(from.getCreated())));
+    }
+    if (!isStringEmptyOrNull(from.getDilutionBarcode())) {
+      dto.setIdentificationBarcode(from.getDilutionBarcode());
+    }
+
+    LibraryDto ldto = new LibraryDto();
+    ldto.setId(from.getLibraryId());
+    ldto.setName(from.getLibraryName());
+    ldto.setAlias(from.getLibraryAlias());
+    ldto.setIdentificationBarcode(from.getLibraryBarcode());
+    if (from.getPlatformType() != null) {
+      ldto.setPlatformType(from.getPlatformType().getKey());
+    }
+    dto.setLibrary(ldto);
+    return dto;
+  }
+
   public static LibraryDto asMinimalDto(Library from) {
     LibraryDto dto = new LibraryDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setAlias(from.getAlias());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     if (from.getPlatformType() != null) {
       dto.setPlatformType(from.getPlatformType().getKey());
-    }
-    if (from.getIdentificationBarcode() != null) {
-      dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
     return dto;
   }
@@ -1258,7 +1282,7 @@ public class Dtos {
     }
     if (includeContents) {
       Set<DilutionDto> pooledElements = new HashSet<>();
-      for (Dilution ld : from.getPoolableElements()) {
+      for (PoolableElementView ld : from.getPoolableElementViews()) {
         if (ld != null) {
           pooledElements.add(asDto(ld));
         }

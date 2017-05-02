@@ -294,6 +294,7 @@ public class MisoServiceManager {
     if (referenceGenomeService != null) referenceGenomeService.setAuthorizationManager(authorizationManager);
     if (studyService != null) studyService.setAuthorizationManager(authorizationManager);
     if (dilutionService != null) dilutionService.setAuthorizationManager(authorizationManager);
+    if (poolService != null) poolService.setAuthorizationManager(authorizationManager);
   }
 
   public MisoRequestManager getRequestManager() {
@@ -722,10 +723,12 @@ public class MisoServiceManager {
 
   public void setDefaultPoolService() {
     DefaultPoolService service = new DefaultPoolService();
+    service.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
     service.setAuthorizationManager(authorizationManager);
     service.setNamingScheme(namingScheme);
     service.setPoolAlertManager(poolAlertManager);
     service.setPoolStore(poolDao);
+    service.setPoolableElementViewService(poolableElementViewService);
     setPoolService(service);
   }
 
@@ -1404,7 +1407,7 @@ public class MisoServiceManager {
   }
 
   private void updatePoolableElementViewServiceDependencies() {
-    // no dependants
+    if (poolService != null) poolService.setPoolableElementViewService(poolableElementViewService);
   }
 
 }

@@ -307,7 +307,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
     return (Sample) criteria.uniqueResult();
   }
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "lastModifier", "derivedInfo.creator");
 
   @Override
   public String getProjectColumn() {
@@ -327,6 +327,16 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
   @Override
   public Class<? extends Sample> getRealClass() {
     return SampleImpl.class;
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, boolean creation) {
+    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return creator ? "creator.loginName" : "lastModifier.loginName";
   }
 
 }

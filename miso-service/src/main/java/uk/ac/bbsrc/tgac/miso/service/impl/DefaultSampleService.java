@@ -609,7 +609,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
         qcPassed = managedQcStatus == null ? null : managedQcStatus.getStatus();
       }
       dTarget.setQcPassed(qcPassed);
-
+      dTarget.setSubproject(dSource.getSubproject());
       if (isIdentitySample(target)) {
         Identity iTarget = (Identity) target;
         Identity iSource = (Identity) source;
@@ -619,10 +619,10 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
         iTarget.setExternalName(iSource.getExternalName());
       }
       if (isTissueSample(target)) {
-        applyChanges((SampleTissue) target, (SampleTissue) source);
+        applyTissueChanges((SampleTissue) target, (SampleTissue) source);
       }
       if (isTissueProcessingSample(target)) {
-        applyChanges((SampleTissueProcessing) target, (SampleTissueProcessing) source);
+        applyTissueProcessingChanges((SampleTissueProcessing) target, (SampleTissueProcessing) source);
       }
       if (isAliquotSample(target)) {
         SampleAliquot saTarget = (SampleAliquot) target;
@@ -640,7 +640,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
   }
 
-  public void applyChanges(SampleTissue target, SampleTissue source) {
+  private void applyTissueChanges(SampleTissue target, SampleTissue source) {
     target.setPassageNumber(source.getPassageNumber());
     target.setTimesReceived(source.getTimesReceived());
     target.setTubeNumber(source.getTubeNumber());
@@ -648,7 +648,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     target.setRegion(source.getRegion());
   }
 
-  public void applyChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
+  private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
     source = deproxify(source);
     if (source instanceof SampleCVSlide) {
       ((SampleCVSlide) target).setSlides(((SampleCVSlide) source).getSlides());

@@ -28,8 +28,8 @@ import java.util.Set;
 
 import net.sourceforge.fluxion.spi.Spi;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 
@@ -49,7 +49,7 @@ public interface FilePathGenerator {
    * @return Object response
    * @throws uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException
    */
-  public Set<File> generateFilePath(Partition partition, Dilution dilution) throws SubmissionException;
+  public Set<File> generateFilePath(Partition partition, PoolableElementView dilution) throws SubmissionException;
 
   public Set<File> generateFilePaths(Partition partition) throws SubmissionException;
 

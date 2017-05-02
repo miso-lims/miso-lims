@@ -49,6 +49,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.common.collect.Sets;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -56,19 +57,17 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -528,49 +527,39 @@ public class RunControllerHelperService {
       Long poolId = json.getLong("poolId");
       Pool p = poolService.getPoolById(poolId);
       StringBuilder sb = new StringBuilder();
-
-      Set<Project> pooledProjects = new HashSet<>();
-
-      if (p.getExperiments().size() != 0) {
-        // check if each poolable has been in a study for this pool already
-        Collection<LibraryDilution> ds = p.getPoolableElements();
-        for (LibraryDilution d : ds) {
-          pooledProjects.add(d.getLibrary().getSample().getProject());
-        }
-
-        for (Experiment poolExp : p.getExperiments()) {
-          Project expProject = poolExp.getStudy().getProject();
-          if (pooledProjects.contains(expProject)) {
-            pooledProjects.remove(expProject);
-          }
-        }
-      } else {
-        for (LibraryDilution d : p.getPoolableElements()) {
-          pooledProjects.add(d.getLibrary().getSample().getProject());
-        }
-      }
       sb.append("<div style='float:left; clear:both'>");
-      for (Project project : pooledProjects) {
-        sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-        sb.append((isStringEmptyOrNull(project.getShortName()) ? project.getAlias() : project.getShortName()));
-        sb.append(": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
-            + partition + "_" + project.getProjectId() + "'>");
-        Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
-        if (studies.isEmpty()) {
-          return JSONUtils.SimpleJSONError("No studies available on project " + project.getName()
-              + ". At least one study must be available for each project associated with this Pool.");
-        } else {
-          for (Study s : studies) {
-            sb.append("<option value='" + s.getId() + "'>" + s.getName() + " - " + s.getAlias() + " (" + s.getStudyType().getName()
-                + ")</option>");
-          }
-        }
-        sb.append("</select>");
-        sb.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Run.container.selectStudy('"
-            + partition + "', " + p.getId() + "," + project.getProjectId()
-            + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
-        sb.append("</div><br/>");
+
+      Set<Long> skipProjects = Sets.newHashSet();
+
+      for (Experiment poolExp : p.getExperiments()) {
+        skipProjects.add(poolExp.getStudy().getProject().getId());
       }
+
+      for (PoolableElementView d : p.getPoolableElementViews()) {
+        if (!skipProjects.contains(d.getProjectId())) {
+          skipProjects.add(d.getProjectId());
+          sb.append("<div id='studySelectDiv" + partition + "_" + d.getProjectId() + "'>");
+          sb.append((isStringEmptyOrNull(d.getProjectShortName()) ? d.getProjectAlias() : d.getProjectShortName()));
+          sb.append(": <select name='poolStudies" + partition + "_" + d.getProjectId() + "' id='poolStudies"
+              + partition + "_" + d.getProjectId() + "'>");
+          Collection<Study> studies = studyService.listByProjectId(d.getProjectId());
+          if (studies.isEmpty()) {
+            return JSONUtils.SimpleJSONError("No studies available on project " + d.getProjectId()
+                + ". At least one study must be available for each project associated with this Pool.");
+          } else {
+            for (Study s : studies) {
+              sb.append("<option value='" + s.getId() + "'>" + s.getName() + " - " + s.getAlias() + " (" + s.getStudyType().getName()
+                  + ")</option>");
+            }
+          }
+          sb.append("</select>");
+          sb.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Run.container.selectStudy('"
+              + partition + "', " + p.getId() + "," + d.getProjectId()
+              + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+          sb.append("</div><br/>");
+        }
+      }
+
       sb.append("</div>");
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
@@ -587,44 +576,46 @@ public class RunControllerHelperService {
           "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + LimsUtils.getDateAsString(p.getCreationDate()) + ")</b><br/>");
 
-      Collection<LibraryDilution> ds = p.getPoolableElements();
-      for (LibraryDilution d : ds) {
-        b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
+      Collection<PoolableElementView> ds = p.getPoolableElementViews();
+      for (PoolableElementView d : ds) {
+        b.append("<span>" + d.getDilutionName() + " (" + d.getProjectAlias() + ")</span><br/>");
       }
 
       b.append("<br/><i>");
       Collection<Experiment> exprs = p.getExperiments();
       for (Experiment e : exprs) {
-        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getPoolableElements().size()
+        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getPoolableElementViews().size()
             + " dilutions)</span><br/>");
       }
       b.append("</i>");
 
       if (p.getExperiments().size() == 0) {
-        Set<Project> pooledProjects = new HashSet<>();
-        for (Dilution d : ds) {
-          pooledProjects.add(d.getLibrary().getSample().getProject());
-        }
-
         b.append("<div style='float:left; clear:both'>");
-        for (Project project : pooledProjects) {
-          b.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-          b.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
-              + partition + "_" + project.getProjectId() + "'>");
-          Collection<Study> studies = studyService.listByProjectId(project.getProjectId());
-          if (studies.isEmpty()) {
-            throw new Exception("No studies available on project " + project.getName()
-                + ". At least one study must be available for each project associated with this Pool. Double click to add a different pool");
-          } else {
-            for (Study s : studies) {
-              b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType().getName()
-                  + ")</option>");
+        Set<Long> pooledProjects = new HashSet<>();
+
+        for (PoolableElementView d : ds) {
+          if (!pooledProjects.contains(d.getProjectId())) {
+            pooledProjects.add(d.getProjectId());
+            b.append("<div id='studySelectDiv" + partition + "_" + d.getProjectId() + "'>");
+            b.append(d.getProjectAlias() + ": <select name='poolStudies" + partition + "_" + d.getProjectId() + "' id='poolStudies"
+                + partition + "_" + d.getProjectId() + "'>");
+            Collection<Study> studies = studyService.listByProjectId(d.getProjectId());
+            if (studies.isEmpty()) {
+              throw new Exception(
+                  "No studies available on project "
+                      + d.getProjectId()
+                      + ". At least one study must be available for each project associated with this Pool. Double click to add a different pool");
+            } else {
+              for (Study s : studies) {
+                b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType().getName()
+                    + ")</option>");
+              }
             }
+            b.append("</select>");
+            b.append("<input type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + ","
+                + d.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+            b.append("</div><br/>");
           }
-          b.append("</select>");
-          b.append("<input type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + ","
-              + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
-          b.append("</div><br/>");
         }
       }
       b.append("</div>");

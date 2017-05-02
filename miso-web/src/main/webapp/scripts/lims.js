@@ -79,26 +79,83 @@ var Utils = Utils || {
   },
   createToggleColumn: function(nameOfList) {
     var list = eval(nameOfList);
+    var className = nameOfList.replace(/\./g, '');
+    Utils.registerShiftPressedListener(window); // Used to detect range selection
     return {
         "sTitle": "",
         "mData": "id",
+        "include": true,
         "mRender": function (data, type, full) {
           var checked = list.indexOf(data) > -1;
 
-          return "<input type=\"checkbox\" onchange=\"Utils.toggleListItem(this.checked, " + data + ", " + nameOfList + ")\"" + (checked ? " checked=\"checked\"" : "") + ">";
+          return "<input id=\"" + data + "_" + className + "\" class=\"" + className + " bulkCheckbox\" elementId=\"" + data + "\" type=\"checkbox\" onchange=\"Utils.toggleListRange(this.checked, " + data + ", " + nameOfList + ", '" + className + "')\"" + (checked ? " checked=\"checked\"" : "") + ">";
         }
     };
   },
 
+  toggleListRange: function(state, id, list, className) {
+	if(!window.shiftKey) {
+		window.shiftKey=false;
+		if(state) {
+		   list.lastSingleSelect = id + "_" + className; // Record last click for range selection
+		}
+		Utils.toggleListItem(state, id, list);
+	} else {
+		var currentShiftSelect = id + "_" + className;
+		var checkboxes = [];
+		jQuery("input." + className ).each(function(){ checkboxes.push(jQuery(this));});
+		
+		function selectRange(selectIndex, shiftIndex) {			
+		    var minSelectIndex = Math.min(selectIndex, shiftIndex);
+		    var maxSelectIndex = Math.max(selectIndex, shiftIndex);
+			checkboxes.forEach(function(element, index) {
+				var elementId = Number(element.attr('elementid'));
+				if(index >= minSelectIndex && index <= maxSelectIndex) {
+					// mark
+					element.prop('checked', true);
+					Utils.toggleListItem(true, elementId, list);
+				} 
+			});
+		}
+				
+		function getArrayIndex(elementId) {
+			return checkboxes.findIndex(function(item){ 
+				return item.attr('id') === elementId;
+				});
+		}
+		
+		var selectIndex = getArrayIndex(list.lastSingleSelect);
+		if(selectIndex === -1) {
+			list.lastSingleSelect = 0;
+		}
+		var shiftIndex = getArrayIndex(currentShiftSelect);
+		
+		selectRange(selectIndex, shiftIndex);
+	}
+  },
+  
   toggleListItem: function(state, id, list) {
     if (state) {
-      list.push(id);
+       var index = list.indexOf(id);
+       if (index === -1) {
+         list.push(id);
+       }
     } else {
       var index = list.indexOf(id);
       if (index > -1) {
         list.splice(index, 1);
       }
     }
+  },
+  
+  registerShiftPressedListener: function (list) {
+	  list.shiftKey = false; 
+	  jQuery(document).ready(function () {
+		  jQuery(document).off("keydown keyup");
+		  jQuery(document).on("keydown keyup", function (e) {
+			  list.shiftKey = e.shiftKey;
+		  });
+	  });
   },
 
 

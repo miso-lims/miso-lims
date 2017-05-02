@@ -76,12 +76,12 @@ import net.sf.json.JSONArray;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
@@ -246,30 +246,30 @@ public class ERASubmissionManager implements SubmissionManager {
       Element sampleDescriptor = xml.getOwnerDocument().createElementNS(null, "SAMPLE_DESCRIPTOR");
       sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
 
-      Library relevantLibrary = null;
+      PoolableElementView relevantLibrary = null;
 
       if (experiment.getPool() != null) {
-        if (experiment.getPool().getPoolableElements().size() > 1) {
+        if (experiment.getPool().getPoolableElementViews().size() > 1) {
           // multiplexed pool
           Element xmlPool = xml.getOwnerDocument().createElementNS(null, "POOL");
           sampleDescriptor.appendChild(xmlPool);
 
-          for (Dilution dilution : experiment.getPool().getPoolableElements()) {
-            relevantLibrary = dilution.getLibrary();
+          for (PoolableElementView dilution : experiment.getPool().getPoolableElementViews()) {
+            relevantLibrary = dilution;
             Element xmlMember = xml.getOwnerDocument().createElementNS(null, "MEMBER");
-            xmlMember.setAttribute("member_name", dilution.getName());
+            xmlMember.setAttribute("member_name", dilution.getDilutionName());
             xmlMember.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
-            xmlMember.setAttribute("refname", relevantLibrary.getSample().getAlias());
-            if (!isStringEmptyOrNull(relevantLibrary.getSample().getAccession())) {
-              sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
+            xmlMember.setAttribute("refname", dilution.getSampleAlias());
+            if (!isStringEmptyOrNull(dilution.getSampleAccession())) {
+              sampleDescriptor.setAttribute("accession", dilution.getSampleAccession());
             }
             xmlPool.appendChild(xmlMember);
 
             Element xmlReadLabel = xml.getOwnerDocument().createElementNS(null, "READ_LABEL");
-            if (!relevantLibrary.getIndices().isEmpty()) {
+            if (!dilution.getIndices().isEmpty()) {
               StringBuilder tsb = new StringBuilder();
               StringBuilder vsb = new StringBuilder();
-              for (Index index : relevantLibrary.getIndices()) {
+              for (Index index : dilution.getIndices()) {
                 tsb.append(index.getSequence());
                 vsb.append(index.getName());
               }
@@ -279,12 +279,12 @@ public class ERASubmissionManager implements SubmissionManager {
             xmlMember.appendChild(xmlReadLabel);
           }
         } else {
-          for (Dilution dilution : experiment.getPool().getPoolableElements()) {
-            relevantLibrary = dilution.getLibrary();
-            sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
+          for (PoolableElementView dilution : experiment.getPool().getPoolableElementViews()) {
+            relevantLibrary = dilution;
+            sampleDescriptor.setAttribute("refname", dilution.getSampleAlias());
             sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
-            if (!isStringEmptyOrNull(relevantLibrary.getSample().getAccession())) {
-              sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
+            if (!isStringEmptyOrNull(dilution.getSampleAccession())) {
+              sampleDescriptor.setAttribute("accession", dilution.getSampleAccession());
             }
           }
         }
@@ -305,29 +305,29 @@ public class ERASubmissionManager implements SubmissionManager {
 
       Element libraryStrategy = xml.getOwnerDocument().createElementNS(null, "LIBRARY_STRATEGY");
       if (relevantLibrary != null) {
-        libraryStrategy.setTextContent(relevantLibrary.getLibraryStrategyType().getName());
+        libraryStrategy.setTextContent(relevantLibrary.getLibraryStrategyType());
       }
       libraryDescriptor.appendChild(libraryStrategy);
 
       Element librarySource = xml.getOwnerDocument().createElementNS(null, "LIBRARY_SOURCE");
       if (relevantLibrary != null) {
-        librarySource.setTextContent(relevantLibrary.getSample().getSampleType());
+        librarySource.setTextContent(relevantLibrary.getSampleType());
       }
       libraryDescriptor.appendChild(librarySource);
 
       Element librarySelection = xml.getOwnerDocument().createElementNS(null, "LIBRARY_SELECTION");
       if (relevantLibrary != null) {
-        librarySelection.setTextContent(relevantLibrary.getLibrarySelectionType().getName());
+        librarySelection.setTextContent(relevantLibrary.getLibrarySelectionType());
       }
       libraryDescriptor.appendChild(librarySelection);
 
       Element libraryLayout = xml.getOwnerDocument().createElementNS(null, "LIBRARY_LAYOUT");
       Element layout;
       if (relevantLibrary != null) {
-        if (relevantLibrary.getPaired()) {
+        if (relevantLibrary.isLibraryPaired()) {
           layout = xml.getOwnerDocument().createElementNS(null, "PAIRED");
-          if (relevantLibrary.getDnaSize() != null) {
-            layout.setAttribute("NOMINAL_LENGTH", relevantLibrary.getDnaSize().toString());
+          if (relevantLibrary.getLibraryDnaSize() != null) {
+            layout.setAttribute("NOMINAL_LENGTH", relevantLibrary.getLibraryDnaSize().toString());
           } else {
             layout.setAttribute("NOMINAL_LENGTH", "0");
           }
@@ -340,7 +340,7 @@ public class ERASubmissionManager implements SubmissionManager {
 
       Element poolingStrategy = xml.getOwnerDocument().createElementNS(null, "POOLING_STRATEGY");
       if (experiment.getPool() != null) {
-        if (experiment.getPool().getPoolableElements().size() > 1) {
+        if (experiment.getPool().getPoolableElementViews().size() > 1) {
           poolingStrategy.setTextContent("multiplexed libraries");
         } else {
           poolingStrategy.setTextContent("none");
@@ -513,7 +513,7 @@ public class ERASubmissionManager implements SubmissionManager {
 
       Element dataBlock = xml.getOwnerDocument().createElementNS(null, "DATA_BLOCK");
       dataBlock.setAttribute("sector", Integer.toString(entry.getValue().getPartitionNumber()));
-      if (entry.getValue().getPool().getPoolableElements().size() > 1) {
+      if (entry.getValue().getPool().getPoolableElementViews().size() > 1) {
         // multiplexed
         dataBlock.setAttribute("member_name", entry.getKey().getName());
       }

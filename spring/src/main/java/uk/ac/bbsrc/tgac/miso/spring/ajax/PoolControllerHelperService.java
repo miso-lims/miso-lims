@@ -501,7 +501,7 @@ public class PoolControllerHelperService {
           }
 
           sb.append("<i>");
-          sb.append("<span>" + s.getProject().getAlias() + " (" + e.getName() + ": " + p.getPoolableElements().size()
+          sb.append("<span>" + s.getProject().getAlias() + " (" + e.getName() + ": " + p.getPoolableElementViews().size()
               + " dilutions)</span><br/>");
           sb.append("</i>");
 
@@ -524,17 +524,10 @@ public class PoolControllerHelperService {
       for (Pool pool : poolService.listAllPools()) {
 
         StringBuilder b = new StringBuilder();
-        Collection<? extends Dilution> dls = pool.getPoolableElements();
-        if (dls.size() > 0) {
-          int sum = 0;
-          for (Dilution ld : dls) {
-            if (ld.getLibrary().getDnaSize() != null) {
-              sum += ld.getLibrary().getDnaSize();
-            }
-          }
-          b.append(Math.round(sum / dls.size()) + " bp");
+        Integer avg = calculateAverageInsertSize(pool);
+        if (avg != null) {
+          b.append(avg + " bp");
         }
-        j.put(pool.getId(), b.toString());
       }
       return j;
     } catch (IOException e) {
@@ -549,15 +542,9 @@ public class PoolControllerHelperService {
       Long poolId = json.getLong("poolId");
       Pool pool = poolService.getPoolById(poolId);
       StringBuilder b = new StringBuilder();
-      Collection<? extends Dilution> dls = pool.getPoolableElements();
-      if (dls.size() > 0) {
-        int sum = 0;
-        for (Dilution ld : dls) {
-          if (ld.getLibrary().getDnaSize() != null) {
-            sum += ld.getLibrary().getDnaSize();
-          }
-        }
-        b.append(Math.round(sum / dls.size()) + " bp");
+      Integer avg = calculateAverageInsertSize(pool);
+      if (avg != null) {
+        b.append(avg + " bp");
       }
       j.put("response", b.toString());
       return j;
@@ -565,6 +552,18 @@ public class PoolControllerHelperService {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
+  }
+
+  private Integer calculateAverageInsertSize(Pool pool) {
+    Collection<PoolableElementView> dls = pool.getPoolableElementViews();
+    if (dls.isEmpty()) return null;
+    long sum = 0;
+    for (PoolableElementView ld : dls) {
+      if (ld.getLibraryDnaSize() != null) {
+        sum += ld.getLibraryDnaSize();
+      }
+    }
+    return Math.round(sum / dls.size());
   }
 
   public JSONObject checkConcentrationByPoolId(HttpSession session, JSONObject json) {

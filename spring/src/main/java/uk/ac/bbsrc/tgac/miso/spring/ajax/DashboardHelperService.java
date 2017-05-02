@@ -331,7 +331,10 @@ public class DashboardHelperService {
       List<LibraryDilution> libraryDilutions;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        libraryDilutions = new ArrayList<>(dilutionService.list(0, 0, false, "id", PaginationFilter.query(searchStr)));
+        libraryDilutions = new ArrayList<>(dilutionService.list(0, 0, false, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
       } else {
         libraryDilutions = new ArrayList<>(dilutionService.list(0, 50, false, "id"));
       }

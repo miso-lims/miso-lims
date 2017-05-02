@@ -23,12 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util
@@ -59,18 +59,16 @@ public class RunProcessingUtils {
     }
 
     for (Partition l : f.getPartitions()) {
-      int count = 0;
       Pool p = l.getPool();
       if (p != null) {
-        for (Dilution ld : p.getPoolableElements()) {
-          count++;
+        for (PoolableElementView ld : p.getPoolableElementViews()) {
           sb.append(f.getIdentificationBarcode()).append(",").append(l.getPartitionNumber()).append(",").append(f.getId()).append("_")
-              .append(ld.getLibrary().getName()).append("_").append(ld.getName()).append(",")
-              .append(ld.getLibrary().getSample().getAlias().replaceAll("\\s", "")).append(",");
+              .append(ld.getLibraryName()).append("_").append(ld.getDilutionName()).append(",")
+              .append(ld.getSampleAlias().replaceAll("\\s", "")).append(",");
 
-          if (ld.getLibrary().getIndices() != null && !ld.getLibrary().getIndices().isEmpty()) {
+          if (ld.getIndices() != null && !ld.getIndices().isEmpty()) {
             boolean first = true;
-            for (Index index : ld.getLibrary().getIndices()) {
+            for (Index index : ld.getIndices()) {
               sb.append(index.getSequence());
               if (first) {
                 first = false;
@@ -83,10 +81,10 @@ public class RunProcessingUtils {
             sb.append(",");
           }
 
-          sb.append(ld.getLibrary().getDescription()).append(",").append("N").append(",").append("NA").append(",").append(userName);
+          sb.append(ld.getLibraryDescription()).append(",").append("N").append(",").append("NA").append(",").append(userName);
 
           if (newCasava) {
-            sb.append(",").append(ld.getLibrary().getSample().getProject().getAlias().replaceAll("\\s", "")).append("\n");
+            sb.append(",").append(ld.getProjectAlias().replaceAll("\\s", "")).append("\n");
           } else {
             sb.append("\n");
           }

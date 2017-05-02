@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 
 @Repository
@@ -149,7 +150,7 @@ public class HibernateSequencerPartitionContainerDao
     this.sessionFactory = sessionFactory;
   }
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo");
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "lastModifier", "derivedInfo.creator", "platform");
 
   @Override
   public String getProjectColumn() {
@@ -172,8 +173,23 @@ public class HibernateSequencerPartitionContainerDao
   }
 
   @Override
+  public String propertyForDate(Criteria criteria, boolean creation) {
+    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return creator ? "creator.loginName" : "lastModifier.loginName";
+  }
+
+  @Override
   public Class<? extends SequencerPartitionContainer> getRealClass() {
     return SequencerPartitionContainerImpl.class;
+  }
+
+  @Override
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+    criteria.add(Restrictions.eq("platform.platformType", platformType));
   }
 
 }

@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -48,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -195,11 +195,10 @@ public class ExternalRestController extends RestController {
               if (spc.getPartitions().size() > 0) {
                 for (Partition spp : spc.getPartitions()) {
                   if (spp.getPool() != null) {
-                    if (spp.getPool().getPoolableElements().size() > 0) {
-                      for (Dilution dilution : spp.getPool().getPoolableElements()) {
-                        Sample sample = dilution.getLibrary().getSample();
-                        if (sample.getProject().equals(p)) {
-                          runSamples.add(sample.getAlias());
+                    if (spp.getPool().getPoolableElementViews().size() > 0) {
+                      for (PoolableElementView dilution : spp.getPool().getPoolableElementViews()) {
+                        if (dilution.getProjectId().equals(p.getId())) {
+                          runSamples.add(dilution.getSampleAlias());
                         }
                       }
                     }

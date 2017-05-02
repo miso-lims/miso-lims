@@ -38,13 +38,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.tgac.statsdb.exception.ConsumerException;
 import uk.ac.tgac.statsdb.run.ReportTable;
@@ -153,10 +152,9 @@ public class RunStatsManager {
           map.remove(RunProperty.barcode);
           if (part.getPool() != null) {
             Pool pool = part.getPool();
-            for (Dilution d : pool.getPoolableElements()) {
-              Library l = d.getLibrary();
-              if (!l.getIndices().isEmpty()) {
-                for (Index index : l.getIndices()) {
+            for (PoolableElementView d : pool.getPoolableElementViews()) {
+              if (!d.getIndices().isEmpty()) {
+                for (Index index : d.getIndices()) {
                   map.remove(RunProperty.barcode);
                   try {
                     map.put(RunProperty.barcode, index.getSequence());
@@ -210,10 +208,9 @@ public class RunStatsManager {
         if (part.getPartitionNumber() == laneNumber) {
           if (part.getPool() != null) {
             Pool pool = part.getPool();
-            for (Dilution d : pool.getPoolableElements()) {
-              Library l = d.getLibrary();
-              if (!l.getIndices().isEmpty()) {
-                for (Index index : l.getIndices()) {
+            for (PoolableElementView d : pool.getPoolableElementViews()) {
+              if (!d.getIndices().isEmpty()) {
+                for (Index index : d.getIndices()) {
                   map.remove(RunProperty.barcode);
                   try {
                     map.put(RunProperty.barcode, index.getSequence());

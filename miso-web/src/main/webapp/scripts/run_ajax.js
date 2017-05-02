@@ -70,6 +70,12 @@ var Run = Run || {
     jQuery('#sequencerReference').attr('data-parsley-error-message', 'You must select a Sequencer.');
     jQuery('#sequencerReference').attr('data-parsley-errors-container', '#sequencerReferenceError');
 
+    jQuery('#sequencingParameters').attr('class', 'form-control');
+    jQuery('#sequencingParameters').attr('required', 'true');
+    jQuery('#sequencingParameters').attr('data-parsley-min', '1');
+    jQuery('#sequencingParameters').attr('data-parsley-error-message', 'You must select the sequencing parameters.');
+    jQuery('#sequencingParameters').attr('data-parsley-errors-container', '#sequencingParametersError');
+
     // Run path input field validation
     jQuery('#filePath').attr('class', 'form-control');
     jQuery('#filePath').attr('data-parsley-required', 'true');
