@@ -208,7 +208,7 @@ public class ExperimentWizardControllerHelperService {
             }
             a.append(">");
             a.append("<span style='float:left'>");
-            a.append("<b>" + p.getName() + "</b> <i>" + p.getPoolableElements().size() + " dilution(s)</i>");
+            a.append("<b>" + p.getName() + "</b> <i>" + p.getPoolableElementViews().size() + " dilution(s)</i>");
             a.append("</span>");
             a.append("<span class='pType' style='float: right; font-size: 24px; font-weight: bold; color:#BBBBBB'>"
                 + p.getPlatformType().getKey() + "</span>");

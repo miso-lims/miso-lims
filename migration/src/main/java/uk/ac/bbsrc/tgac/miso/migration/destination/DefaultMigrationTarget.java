@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +27,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -583,22 +581,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info("Migrating pools...");
     for (Pool pool : pools) {
       setPoolModifiedDetails(pool);
-      pool.setId(savePool(pool));
+      pool.setId(serviceManager.getPoolService().savePool(pool));
       log.debug("Saved pool " + pool.getAlias());
     }
     log.info(pools.size() + " pools migrated.");
-  }
-
-  private Long savePool(Pool pool) throws IOException {
-    Set<PoolableElementView> views = Sets.newHashSet();
-    for (LibraryDilution ldi : pool.getPoolableElements()) {
-      PoolableElementView view = serviceManager.getPoolableElementViewService().get(ldi.getId());
-      if (view == null) {
-        throw new IllegalStateException("Pooled dilution not saved");
-      }
-      views.add(view);
-    }
-    return serviceManager.getPoolService().savePool(pool);
   }
 
   private void setPoolModifiedDetails(Pool pool) throws IOException {
@@ -687,11 +673,11 @@ public class DefaultMigrationTarget implements MigrationTarget {
    */
   private void mergePools(Pool fromPool, Pool toPool) throws IOException {
     if (fromPool.getId() == PoolImpl.UNSAVED_ID) {
-      Collection<LibraryDilution> fromPoolables = fromPool.getPoolableElements();
-      Collection<LibraryDilution> toPoolables = toPool.getPoolableElements();
+      Collection<PoolableElementView> fromPoolables = fromPool.getPoolableElementViews();
+      Collection<PoolableElementView> toPoolables = toPool.getPoolableElementViews();
       toPoolables.addAll(fromPoolables);
       setPoolModifiedDetails(toPool);
-      savePool(toPool);
+      serviceManager.getPoolService().savePool(toPool);
       for (Note note : fromPool.getNotes()) {
         serviceManager.getPoolService().savePoolNote(toPool, note);
       }

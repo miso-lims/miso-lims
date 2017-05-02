@@ -17,24 +17,30 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
 @Table(name = "PoolableElementView")
-public class PoolableElementView implements Serializable {
+public class PoolableElementView implements Serializable, Comparable<PoolableElementView> {
 
   private static final long serialVersionUID = 1L;
 
   @Id
-  private Long dilutionId;
+  private long dilutionId = LibraryDilution.UNSAVED_ID;
 
   private String dilutionName;
 
   private Double dilutionConcentration;
 
   private String dilutionBarcode;
+
+  private Long preMigrationId;
 
   @Temporal(TemporalType.DATE)
   private Date lastModified;
@@ -50,8 +56,18 @@ public class PoolableElementView implements Serializable {
 
   private String libraryDescription;
 
+  private String libraryBarcode;
+
+  private Long libraryDnaSize;
+
+  private boolean libraryPaired;
+
   @Column(nullable = false)
   private boolean lowQualityLibrary = false;
+
+  private String librarySelectionType;
+
+  private String libraryStrategyType;
 
   private Long sampleId;
 
@@ -59,7 +75,15 @@ public class PoolableElementView implements Serializable {
 
   private String sampleAlias;
 
+  private String sampleDescription;
+
+  private String sampleAccession;
+
+  private String sampleType;
+
   private Long projectId;
+
+  private String projectName;
 
   private String projectShortName;
 
@@ -76,17 +100,72 @@ public class PoolableElementView implements Serializable {
   @JoinTable(name = "Library_Index", joinColumns = {
       @JoinColumn(name = "library_libraryId", nullable = false, referencedColumnName = "libraryId") }, inverseJoinColumns = {
           @JoinColumn(name = "index_indexId", nullable = false) })
-  private final List<Index> indices = new ArrayList<>();
+  private List<Index> indices = new ArrayList<>();
+
+  public static PoolableElementView fromDilution(Dilution dilution) {
+    PoolableElementView v = new PoolableElementView();
+    v.setDilutionBarcode(dilution.getIdentificationBarcode());
+    v.setDilutionConcentration(dilution.getConcentration());
+    v.setDilutionId(dilution.getId());
+    v.setDilutionName(dilution.getName());
+    v.setLastModified(dilution.getLastModified());
+    v.setPreMigrationId(dilution.getPreMigrationId());
+    
+    Library lib = dilution.getLibrary();
+    if (lib != null) {
+      v.setIndices(lib.getIndices());
+      v.setLibraryAlias(lib.getAlias());
+      v.setLibraryBarcode(lib.getIdentificationBarcode());
+      v.setLibraryDescription(lib.getDescription());
+      if (lib.getDnaSize() != null) {
+        v.setLibraryDnaSize(lib.getDnaSize().longValue());
+      }
+      v.setLibraryId(lib.getId());
+      v.setLibraryName(lib.getName());
+      v.setLibraryPaired(lib.getPaired());
+      if (lib.getLibrarySelectionType() != null) {
+        v.setLibrarySelectionType(lib.getLibrarySelectionType().getName());
+      }
+      if (lib.getLibraryStrategyType() != null) {
+        v.setLibraryStrategyType(lib.getLibraryStrategyType().getName());
+      }
+      v.setLowQualityLibrary(lib.isLowQuality());
+      v.setPlatformType(lib.getPlatformType());
+      
+      Sample sam = lib.getSample();
+      if (sam != null) {
+        v.setSampleAccession(sam.getAccession());
+        v.setSampleAlias(sam.getAlias());
+        v.setSampleDescription(sam.getDescription());
+        v.setSampleId(sam.getId());
+        v.setSampleName(sam.getName());
+        v.setSampleType(sam.getSampleType());
+        
+        Project proj = sam.getProject();
+        if (proj != null) {
+          v.setProjectAlias(proj.getAlias());
+          v.setProjectId(proj.getId());
+          v.setProjectName(proj.getName());
+          v.setProjectShortName(proj.getShortName());
+        }
+      }
+    }
+    return v;
+  }
 
   public List<Index> getIndices() {
     return indices;
   }
 
-  public Long getDilutionId() {
+  public void setIndices(List<Index> indices) {
+    this.indices = indices;
+  }
+
+  public long getDilutionId() {
     return dilutionId;
   }
 
-  public void setDilutionId(Long dilutionId) {
+  public void setDilutionId(long dilutionId) {
     this.dilutionId = dilutionId;
   }
 
@@ -104,14 +183,6 @@ public class PoolableElementView implements Serializable {
 
   public void setDilutionConcentration(Double dilutionConcentration) {
     this.dilutionConcentration = dilutionConcentration;
-  }
-
-  public boolean isLowQualityLibrary() {
-    return lowQualityLibrary;
-  }
-
-  public void setLowQualityLibrary(boolean lowQualityLibrary) {
-    this.lowQualityLibrary = lowQualityLibrary;
   }
 
   public String getProjectShortName() {
@@ -142,12 +213,28 @@ public class PoolableElementView implements Serializable {
     this.projectId = projectId;
   }
 
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
   public String getDilutionBarcode() {
     return dilutionBarcode;
   }
 
   public void setDilutionBarcode(String dilutionBarcode) {
     this.dilutionBarcode = dilutionBarcode;
+  }
+
+  public Long getPreMigrationId() {
+    return preMigrationId;
+  }
+
+  public void setPreMigrationId(Long preMigrationId) {
+    this.preMigrationId = preMigrationId;
   }
 
   public Long getLibraryId() {
@@ -174,6 +261,62 @@ public class PoolableElementView implements Serializable {
     this.libraryAlias = libraryAlias;
   }
 
+  public String getLibraryDescription() {
+    return libraryDescription;
+  }
+
+  public void setLibraryDescription(String libraryDescription) {
+    this.libraryDescription = libraryDescription;
+  }
+
+  public String getLibraryBarcode() {
+    return libraryBarcode;
+  }
+
+  public void setLibraryBarcode(String libraryBarcode) {
+    this.libraryBarcode = libraryBarcode;
+  }
+
+  public Long getLibraryDnaSize() {
+    return libraryDnaSize;
+  }
+
+  public void setLibraryDnaSize(Long libraryDnaSize) {
+    this.libraryDnaSize = libraryDnaSize;
+  }
+
+  public boolean isLibraryPaired() {
+    return libraryPaired;
+  }
+
+  public void setLibraryPaired(boolean libraryPaired) {
+    this.libraryPaired = libraryPaired;
+  }
+
+  public boolean isLowQualityLibrary() {
+    return lowQualityLibrary;
+  }
+
+  public void setLowQualityLibrary(boolean lowQualityLibrary) {
+    this.lowQualityLibrary = lowQualityLibrary;
+  }
+
+  public String getLibrarySelectionType() {
+    return librarySelectionType;
+  }
+
+  public void setLibrarySelectionType(String librarySelectionType) {
+    this.librarySelectionType = librarySelectionType;
+  }
+
+  public String getLibraryStrategyType() {
+    return libraryStrategyType;
+  }
+
+  public void setLibraryStrategyType(String libraryStrategyType) {
+    this.libraryStrategyType = libraryStrategyType;
+  }
+
   public Long getSampleId() {
     return sampleId;
   }
@@ -198,12 +341,28 @@ public class PoolableElementView implements Serializable {
     this.sampleAlias = sampleAlias;
   }
 
-  public String getLibraryDescription() {
-    return libraryDescription;
+  public String getSampleDescription() {
+    return sampleDescription;
   }
 
-  public void setLibraryDescription(String libraryDescription) {
-    this.libraryDescription = libraryDescription;
+  public void setSampleDescription(String sampleDescription) {
+    this.sampleDescription = sampleDescription;
+  }
+
+  public String getSampleAccession() {
+    return sampleAccession;
+  }
+
+  public void setSampleAccession(String sampleAccession) {
+    this.sampleAccession = sampleAccession;
+  }
+
+  public String getSampleType() {
+    return sampleType;
+  }
+
+  public void setSampleType(String sampleType) {
+    this.sampleType = sampleType;
   }
 
   public Date getLastModified() {
@@ -244,6 +403,14 @@ public class PoolableElementView implements Serializable {
 
   public void setCreatorName(String creatorName) {
     this.creatorName = creatorName;
+  }
+
+  @Override
+  public int compareTo(PoolableElementView o) {
+    PoolableElementView t = o;
+    if (getDilutionId() < t.getDilutionId()) return -1;
+    if (getDilutionId() > t.getDilutionId()) return 1;
+    return 0;
   }
 
 }

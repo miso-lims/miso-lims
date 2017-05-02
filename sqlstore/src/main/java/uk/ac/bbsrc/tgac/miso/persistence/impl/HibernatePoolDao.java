@@ -187,11 +187,8 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   @Override
   public List<Pool> listByProjectId(long projectId) throws IOException {
     Criteria idCriteria = currentSession().createCriteria(PoolImpl.class, "p");
-    idCriteria.createAlias("p.pooledElements", "dilution");
-    idCriteria.createAlias("dilution.library", "library");
-    idCriteria.createAlias("library.sample", "sample");
-    idCriteria.createAlias("sample.project", "project");
-    idCriteria.add(Restrictions.eq("project.id", projectId));
+    idCriteria.createAlias("p.pooledElementViews", "dilution");
+    idCriteria.add(Restrictions.eq("dilution.projectId", projectId));
     idCriteria.setProjection(Projections.distinct(Projections.property("p.id")));
     @SuppressWarnings("unchecked")
     List<Long> ids = idCriteria.list();
@@ -285,7 +282,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
 
   @Override
   public String getProjectColumn() {
-    return "project.id";
+    return "dilution.projectId";
   }
 
   @Override
@@ -303,10 +300,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
 
   @Override
   public void restrictPaginationByProjectId(Criteria criteria, long projectId) {
-    criteria.createAlias("pooledElements", "dilution");
-    criteria.createAlias("dilution.library", "library");
-    criteria.createAlias("library.sample", "sample");
-    criteria.createAlias("sample.project", "project");
+    criteria.createAlias("pooledElementViews", "dilution");
     HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId);
   }
 

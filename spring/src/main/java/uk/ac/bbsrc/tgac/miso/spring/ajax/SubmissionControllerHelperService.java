@@ -61,8 +61,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -455,7 +455,7 @@ public class SubmissionControllerHelperService {
 
                     // creates HTML for list of library dilutions and corresponding datafiles.
                     // gets all the dilutions in that partition's pool.
-                    List<LibraryDilution> poolables = new ArrayList<>(part.getPool().getPoolableElements());
+                    List<PoolableElementView> poolables = new ArrayList<>(part.getPool().getPoolableElementViews());
                     Collections.sort(poolables);
 
                     FilePathGenerator fpg = filePathGeneratorResolverService.getFilePathGenerator(r.getPlatformType());
@@ -467,13 +467,14 @@ public class SubmissionControllerHelperService {
 
                     sb.append("<ul>");
 
-                    for (Dilution d : poolables) {
-                      sb.append("<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId()
+                    for (PoolableElementView d : poolables) {
+                      sb.append("<li><input type='checkbox'  name='DIL_" + d.getDilutionId() + "' id='DIL" + d.getDilutionId() + "_PAR"
+                          + part.getId()
                           + "' value='PAR_" + part.getId() + "' ");
 
                       if (sub != null && sub.getDilutions().containsValue(part)) {
                         // checks dilution checkboxes if dilution is in the submission
-                        for (Dilution bla : part.getPool().getPoolableElements()) {
+                        for (PoolableElementView bla : part.getPool().getPoolableElementViews()) {
                           if (sub.getDilutions().containsKey(bla)) {
                             sb.append(" checked='checked' ");
                             break;
@@ -481,20 +482,18 @@ public class SubmissionControllerHelperService {
                         }
                       }
 
-                      if (d instanceof Dilution) {
-                        sb.append(
-                            ">" + partitionContainer.getId() + "_" + d.getLibrary().getName() + "_" + d.getName() + ": ");
-                        sb.append("<ul>");
-                        try {
-                          for (File f : fpg.generateFilePath(part, d)) {
-                            sb.append("<li>" + f.getName() + "</li>");
-                          }
-                        } catch (SubmissionException e1) {
-                          log.error("Failed to generate path for data file in submission: ", e1);
-                          return JSONUtils.SimpleJSONError("Failed to populate project for submission");
+                      sb.append(
+                          ">" + partitionContainer.getId() + "_" + d.getLibraryName() + "_" + d.getDilutionName() + ": ");
+                      sb.append("<ul>");
+                      try {
+                        for (File f : fpg.generateFilePath(part, d)) {
+                          sb.append("<li>" + f.getName() + "</li>");
                         }
-                        sb.append("</ul>");
+                      } catch (SubmissionException e1) {
+                        log.error("Failed to generate path for data file in submission: ", e1);
+                        return JSONUtils.SimpleJSONError("Failed to populate project for submission");
                       }
+                      sb.append("</ul>");
 
                       sb.append("</li>");
                     }

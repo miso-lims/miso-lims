@@ -65,7 +65,6 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
@@ -82,7 +81,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
@@ -148,13 +146,6 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
 
-  @ManyToMany(targetEntity = LibraryDilution.class)
-  @JoinTable(name = "Pool_Dilution", joinColumns = {
-      @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
-      @JoinColumn(name = "dilution_dilutionId") })
-  @JsonBackReference
-  private Set<LibraryDilution> pooledElements = new HashSet<>();
-
   @ManyToMany(targetEntity = PoolableElementView.class)
   @JoinTable(name = "Pool_Dilution", joinColumns = {
       @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
@@ -218,11 +209,6 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @Override
   public void addNote(Note note) {
     this.notes.add(note);
-  }
-
-  @Override
-  public void addPoolableElement(LibraryDilution dilution) throws MalformedDilutionException {
-    pooledElements.add(dilution);
   }
 
   @Override
@@ -369,11 +355,6 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @Override
   public PlatformType getPlatformType() {
     return platformType;
-  }
-
-  @Override
-  public Set<LibraryDilution> getPoolableElements() {
-    return this.pooledElements;
   }
 
   @Override
@@ -525,17 +506,6 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
   @Override
   public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
-  }
-
-  @Override
-  public void setPoolableElements(Set<LibraryDilution> dilutions) {
-    if (dilutions == null) {
-      if (this.pooledElements == null) {
-        this.pooledElements = Collections.emptySet();
-      }
-    } else {
-      this.pooledElements = dilutions;
-    }
   }
 
   @Override

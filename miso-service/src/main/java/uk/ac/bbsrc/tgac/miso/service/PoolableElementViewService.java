@@ -11,4 +11,6 @@ public interface PoolableElementViewService extends PaginatedDataSource<Poolable
 
   public PoolableElementView getByBarcode(String barcode) throws IOException;
 
+  public PoolableElementView getByPreMigrationId(Long preMigrationId) throws IOException;
+
 }

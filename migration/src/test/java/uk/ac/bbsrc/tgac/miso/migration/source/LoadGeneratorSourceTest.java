@@ -43,8 +43,8 @@ public class LoadGeneratorSourceTest {
     assertNotNull(data.getPools());
     assertEquals(100, data.getPools().size());
     Pool p = data.getPools().iterator().next();
-    assertNotNull(p.getPoolableElements());
-    assertEquals(5, p.getPoolableElements().size());
+    assertNotNull(p.getPoolableElementViews());
+    assertEquals(5, p.getPoolableElementViews().size());
 
     assertNotNull(data.getRuns());
     assertEquals(100, data.getRuns().size());

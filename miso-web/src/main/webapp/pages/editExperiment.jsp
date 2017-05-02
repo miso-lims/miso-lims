@@ -213,7 +213,7 @@
                    onMouseOut="this.className='dashboard'" class="dashboard"
                    ondblclick="Experiment.pool.experimentSelectPool(this);">
                       <span style="float:left">
-                        <b>${p.name}</b> (${fn:length(p.poolableElements)} dilutions)
+                        <b>${p.name}</b> (${fn:length(p.poolableElementViews)} dilutions)
                       </span>
                 <span class='pType'
                       style='float: right; font-size: 24px; font-weight: bold; color:#BBBBBB'>${p.platformType.key}</span>
@@ -237,8 +237,8 @@
                     href='<c:url value="/miso/pool/${experiment.pool.id}"/>'>${experiment.pool.name}</a><br/>
                 <b>Dilutions:</b><br/>
                 <i>
-                  <c:forEach items="${experiment.pool.poolableElements}" var="dil">
-                    ${dil.library.alias} (${dil.library.name})<br/>
+                  <c:forEach items="${experiment.pool.poolableElementViews}" var="dil">
+                    ${dil.libraryAlias} (${dil.libraryName})<br/>
                   </c:forEach>
                 </i>
                 </span>
@@ -262,7 +262,7 @@
   <a href='javascript:void(0);' class="add"
      onclick="Experiment.kit.showLibraryKitDialog(${experiment.id},
      <c:choose>
-     <c:when test="${fn:length(experiment.pool.poolableElements) > 1}">
+     <c:when test="${fn:length(experiment.pool.poolableElementViews) > 1}">
          true
      </c:when>
      <c:otherwise>

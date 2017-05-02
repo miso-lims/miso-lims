@@ -50,6 +50,14 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
+  public PoolableElementView getByPreMigrationId(Long preMigrationId) throws IOException {
+    if (preMigrationId == null) throw new NullPointerException("preMigrationId cannot be null");
+    Criteria criteria = currentSession().createCriteria(PoolableElementView.class);
+    criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
+    return (PoolableElementView) criteria.uniqueResult();
+  }
+
+  @Override
   public String getProjectColumn() {
     return "projectId";
   }

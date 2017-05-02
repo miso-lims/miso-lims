@@ -185,9 +185,9 @@ public class PoolWizardControllerHelperService {
           sb.append("Pool Name: <b>" + pool.getName() + "</b><br/>");
           sb.append("Platform Type: <b>" + pool.getPlatformType().name() + "</b><br/>");
           sb.append("Dilutions: <ul class='bullets'>");
-          for (Dilution dl : pool.getPoolableElements()) {
+          for (PoolableElementView dl : pool.getPoolableElementViews()) {
             sb.append(
-                "<li>" + dl.getName() + " (<a href='/miso/library/" + dl.getLibrary().getId() + "'>" + dl.getLibrary().getAlias()
+                "<li>" + dl.getDilutionName() + " (<a href='/miso/library/" + dl.getLibraryId() + "'>" + dl.getLibraryAlias()
                     + "</a>)</li>");
           }
           sb.append("</ul>");

@@ -46,13 +46,12 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 import uk.ac.bbsrc.tgac.miso.integration.AnalysisQueryService;
@@ -130,11 +129,10 @@ public class AnalysisController {
         laneValue = String.valueOf(f.getPartitions().size());
         Pool p = f.getPartitionAt(1).getPool();
         if (p != null) {
-          if (!p.getPoolableElements().isEmpty()) {
-            Dilution d = p.getPoolableElements().iterator().next();
-            Library l = d.getLibrary();
-            if ("RNA-Seq".equals(l.getLibraryStrategyType().getName())) naType = "rna";
-            for (Index index : l.getIndices()) {
+          if (!p.getPoolableElementViews().isEmpty()) {
+            PoolableElementView d = p.getPoolableElementViews().iterator().next();
+            if ("RNA-Seq".equals(d.getLibraryStrategyType())) naType = "rna";
+            for (Index index : d.getIndices()) {
               indexValue = Integer.toString(index.getSequence().length());
             }
           }
