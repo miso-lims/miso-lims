@@ -1100,6 +1100,7 @@ Sample.ui = {
       alert("No samples scanned");
     }
   },
+  toAdd: [],
 
   createListingSamplesTable: function () {
     if (Sample.detailedSample && Sample.sampleClasses === undefined) {
@@ -1111,15 +1112,7 @@ Sample.ui = {
     jQuery('#listingSamplesTable').html('');
     jQuery('#listingSamplesTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
-        {
-          "sTitle": "",
-          "mData": "id",
-          "mRender": function (data, type, full) {
-            return "<input type=\"checkbox\" value=\"" + data + "\" class=\"bulkCheckbox\" id=\"bulk_" + data + "\">"
-          },
-          "bSortable": false,
-          "iSortPriority": 0
-        },
+    	Utils.createToggleColumn("Sample.ui.toAdd"),
         {
           "sTitle": "Sample Name",
           "mData": "id",
@@ -1289,9 +1282,7 @@ Sample.ui = {
    * Returns an array of selected IDs
    */
   getSelectedIds: function () {
-    return [].slice.call(document.getElementsByClassName('bulkCheckbox'))
-             .filter(function (input) { return input.checked; })
-             .map(function (input) { return parseInt(input.value); });
+	  return Sample.ui.toAdd;
   },
   
   /**

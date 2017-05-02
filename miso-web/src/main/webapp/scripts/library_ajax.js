@@ -1063,21 +1063,13 @@ Library.ui = {
       );
     }
   },
+  toAdd: [],
 
   createListingLibrariesTable: function (projectId) {
     jQuery('#listingLibrariesTable').html("");
     jQuery('#listingLibrariesTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
-        {
-          "sTitle": "",
-          "mData": "id",
-          "mRender": function (data, type, full) {
-            return "<input type=\"checkbox\" value=\"" + data + "\" class=\"bulkCheckbox\" id=\"bulk_" + data + "\">"
-          },
-          "include": !projectId,
-          "iSortPriority": 0,
-          "bSortable": false
-        },
+    	Utils.createToggleColumn("Library.ui.toAdd"),
         {
           "sTitle": "Library Name",
           "mData": "id",
@@ -1299,9 +1291,7 @@ Library.ui = {
   
   // get array of selected IDs
   getSelectedIds: function () {
-    return [].slice.call(document.getElementsByClassName('bulkCheckbox'))
-             .filter(function (input) { return input.checked; })
-             .map(function (input) { return parseInt(input.value); });
+	  return Library.ui.toAdd;
   },
   
   updateSelectedItems: function () {
