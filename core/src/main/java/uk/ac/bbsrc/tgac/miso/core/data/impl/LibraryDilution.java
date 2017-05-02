@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
@@ -67,7 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @Entity
 @Table(name = "LibraryDilution")
-public class LibraryDilution implements Dilution, Serializable {
+public class LibraryDilution implements Dilution {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;

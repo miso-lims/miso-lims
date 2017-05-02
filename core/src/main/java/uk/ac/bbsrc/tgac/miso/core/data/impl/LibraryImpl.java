@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -52,7 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 @Entity
 @Table(name = "Library")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class LibraryImpl extends AbstractLibrary implements Serializable {
+public class LibraryImpl extends AbstractLibrary {
 
   private static final long serialVersionUID = 1L;
 

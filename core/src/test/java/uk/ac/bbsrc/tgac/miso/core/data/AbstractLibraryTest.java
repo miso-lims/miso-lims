@@ -26,6 +26,8 @@ public class AbstractLibraryTest {
   public void setUp() throws Exception {
     al = new AbstractLibrary() {
 
+      private static final long serialVersionUID = 1L;
+
       @Override
       public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
         return null;

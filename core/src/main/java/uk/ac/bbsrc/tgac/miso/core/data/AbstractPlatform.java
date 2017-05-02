@@ -41,6 +41,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @MappedSuperclass
 public abstract class AbstractPlatform implements Platform {
+
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
   @Enumerated(EnumType.STRING)

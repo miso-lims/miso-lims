@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -29,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 
 @Entity
 @Table(name = "SequencingParameters")
-public class SequencingParametersImpl implements SequencingParameters, Serializable {
+public class SequencingParametersImpl implements SequencingParameters {
 
   private static final long serialVersionUID = 1L;
 
@@ -59,7 +58,7 @@ public class SequencingParametersImpl implements SequencingParameters, Serializa
   private Date lastUpdated;
 
   @Transient
-  private XPathExpression expression;
+  private transient XPathExpression expression;
 
   @ManyToOne(targetEntity = PlatformImpl.class)
   @JoinColumn(name = "platformId")

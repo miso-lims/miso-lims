@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
@@ -58,7 +59,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "dilutions" })
 public interface Pool
-    extends SecurableByProfile, Comparable<Pool>, Barcodable, Watchable, Deletable, Alertable, Boxable, Nameable, ChangeLoggable {
+    extends SecurableByProfile, Comparable<Pool>, Barcodable, Watchable, Deletable, Alertable, Boxable, Nameable, ChangeLoggable,
+    Serializable {
 
   /**
    * Sets the ID of this Pool object.

@@ -24,6 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -38,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface PoolQC extends QC {
+public interface PoolQC extends QC, Serializable {
   /**
    * Returns the pool of this PoolQC object.
    * 

@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -68,7 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @Entity
 @Table(name = "Experiment")
-public class ExperimentImpl implements Experiment, Serializable {
+public class ExperimentImpl implements Experiment {
 
   private static final long serialVersionUID = 1L;
 

@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
@@ -43,7 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface Kit extends Comparable<Kit>, Barcodable, Locatable {
+public interface Kit extends Comparable<Kit>, Barcodable, Locatable, Serializable {
   public void setId(long id);
 
   /**

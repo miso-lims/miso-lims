@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
@@ -53,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeName("sample")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument", "children", "parent" })
 public interface Sample
-    extends SecurableByProfile, Locatable, Reportable, Comparable<Sample>, Deletable, Boxable, ChangeLoggable, Aliasable {
+    extends SecurableByProfile, Locatable, Reportable, Comparable<Sample>, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;

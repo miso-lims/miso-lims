@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -20,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 
 @Entity
 @Table(name = "TissueType")
-public class TissueTypeImpl implements TissueType, Serializable {
+public class TissueTypeImpl implements TissueType {
 
   private static final long serialVersionUID = 1L;
 

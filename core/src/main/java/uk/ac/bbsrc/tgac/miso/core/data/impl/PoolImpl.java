@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -94,7 +93,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @Entity
 @Table(name = "Pool")
-public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
+public class PoolImpl extends AbstractBoxable implements Pool {
   private static final int CONCENTRATION_LENGTH = 17;
   public static final String CONCENTRATION_UNITS = "nM";
   private static final int DESCRIPTION_LENGTH = 255;
@@ -132,7 +131,7 @@ public class PoolImpl extends AbstractBoxable implements Pool, Serializable {
 
   // listeners
   @Transient
-  private final Set<MisoListener> listeners = new HashSet<>();
+  private final transient Set<MisoListener> listeners = new HashSet<>();
 
   @Column(length = NAME_LENGTH)
   private String name;

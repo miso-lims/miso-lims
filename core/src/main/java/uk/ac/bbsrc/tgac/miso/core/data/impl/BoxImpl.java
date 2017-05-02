@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 @Entity
 @Table(name = "Box")
-public class BoxImpl extends AbstractBox implements Serializable {
+public class BoxImpl extends AbstractBox {
 
   private static final long serialVersionUID = 1L;
 

@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.xml.xpath.XPathExpressionException;
@@ -8,7 +9,7 @@ import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface SequencingParameters extends Comparable<SequencingParameters> {
+public interface SequencingParameters extends Comparable<SequencingParameters>, Serializable {
 
   public User getCreatedBy();
 

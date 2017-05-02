@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
@@ -45,7 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Dilution extends SecurableByProfile, Barcodable, Comparable<Dilution>, Deletable, Nameable, Boxable {
+public interface Dilution extends SecurableByProfile, Barcodable, Comparable<Dilution>, Deletable, Nameable, Boxable, Serializable {
 
   /**
    * Method setName sets the name of this Dilution object.

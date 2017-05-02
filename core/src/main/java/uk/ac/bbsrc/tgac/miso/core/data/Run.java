@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -52,7 +53,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
 public interface Run
-    extends SecurableByProfile, Comparable<Run>, Reportable<Run>, Watchable, Deletable, Nameable, Alertable, ChangeLoggable, Aliasable {
+    extends SecurableByProfile, Comparable<Run>, Reportable<Run>, Watchable, Deletable, Nameable, Alertable, ChangeLoggable, Aliasable,
+    Serializable {
   /** Field PREFIX */
   public static final String PREFIX = "RUN";
 

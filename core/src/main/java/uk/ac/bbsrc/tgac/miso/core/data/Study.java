@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import com.eaglegenomics.simlims.core.User;
@@ -45,7 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Study extends SecurableByProfile, Comparable<Study>, Deletable, Nameable, ChangeLoggable, Aliasable {
+public interface Study extends SecurableByProfile, Comparable<Study>, Deletable, Nameable, ChangeLoggable, Aliasable, Serializable {
 
   /** Field PREFIX */
   public static final String PREFIX = "STU";
@@ -163,6 +164,7 @@ public interface Study extends SecurableByProfile, Comparable<Study>, Deletable,
    */
   public void setExperiments(Collection<Experiment> experiments);
 
+  @Override
   public Collection<ChangeLog> getChangeLog();
 
   /**

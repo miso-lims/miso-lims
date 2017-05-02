@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -41,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface RunQC extends QC {
+public interface RunQC extends QC, Serializable {
   /**
    * Returns the run of this RunQC object.
    * 

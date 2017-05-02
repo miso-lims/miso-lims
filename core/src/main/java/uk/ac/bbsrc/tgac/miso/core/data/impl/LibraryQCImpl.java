@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -47,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.QC;
  */
 @Entity
 @Table(name = "LibraryQC")
-public class LibraryQCImpl extends AbstractQC implements LibraryQC, Serializable {
+public class LibraryQCImpl extends AbstractQC implements LibraryQC {
 
   private static final long serialVersionUID = 1L;
   public static final String UNITS = "nM";

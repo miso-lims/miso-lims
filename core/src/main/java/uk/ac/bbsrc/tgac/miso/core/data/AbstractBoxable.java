@@ -12,6 +12,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 @MappedSuperclass
 public abstract class AbstractBoxable implements Boxable {
 
+  private static final long serialVersionUID = 1L;
+
   @Column(name = "discarded")
   private boolean discarded;
   @Column(nullable = true)

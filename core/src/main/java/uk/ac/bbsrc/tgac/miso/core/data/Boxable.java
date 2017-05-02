@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 @JsonSubTypes({ @JsonSubTypes.Type(value = SampleImpl.class, name = "SampleImpl"),
     @JsonSubTypes.Type(value = LibraryImpl.class, name = "LibraryImpl"), @JsonSubTypes.Type(value = PoolImpl.class, name = "PoolImpl") })
 
-public interface Boxable extends Nameable, Barcodable {
+public interface Boxable extends Nameable, Barcodable, Serializable {
   /**
    * Returns the alias of this Sample object.
    *

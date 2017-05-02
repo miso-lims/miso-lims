@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -60,7 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 @JsonIgnoreProperties({ "securityProfile", "container" })
 @Entity
 @Table(name = "_Partition")
-public class PartitionImpl implements Partition, Serializable {
+public class PartitionImpl implements Partition {
 
   public static final Long UNSAVED_ID = 0L;
   private static final long serialVersionUID = 1L;
