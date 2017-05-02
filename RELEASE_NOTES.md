@@ -1,3 +1,16 @@
+# 0.2.61
+
+Changes:
+
+ * Improved load time of Sample and Library list pages
+ * Allow editing (single) sample subproject
+ * Added multi-select
+ * Force sequencing parameters to be selected
+ * Allow filtering libraries, containers, and runs by platform
+ * Allow filtering runs and order by health
+ * Change to structure query search
+
+
 # 0.2.60
 
 Changes:
