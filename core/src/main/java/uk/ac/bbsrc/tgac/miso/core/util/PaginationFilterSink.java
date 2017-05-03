@@ -13,6 +13,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByHealth(T item, EnumSet<HealthType> healths);
 
+  public void restrictPaginationByIndex(T item, String index);
+
   public void restrictPaginationByPlatformType(T item, PlatformType platformType);
 
   public void restrictPaginationByPoolId(T item, long poolId);

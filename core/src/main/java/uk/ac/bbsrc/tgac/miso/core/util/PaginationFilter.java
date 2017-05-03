@@ -52,6 +52,16 @@ public abstract interface PaginationFilter {
     return health(EnumSet.of(health));
   }
 
+  public static PaginationFilter index(String index) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item) {
+        sink.restrictPaginationByIndex(item, index);
+      }
+    };
+  }
+
   public static PaginationFilter[] parse(String request, String currentUser, Consumer<String> errorHandler) {
     return Arrays.stream(request.split("\\s+")).<PaginationFilter> map(x -> {
       if (x.contains(":")) {
@@ -116,6 +126,8 @@ public abstract interface PaginationFilter {
             errorHandler.accept("Invalid platform: " + parts[1]);
             return null;
           }
+        case "index":
+          return index(parts[1]);
         }
       }
       return query(x);

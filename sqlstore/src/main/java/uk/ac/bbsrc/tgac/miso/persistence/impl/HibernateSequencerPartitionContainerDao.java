@@ -200,4 +200,12 @@ public class HibernateSequencerPartitionContainerDao
     criteria.add(Restrictions.eq("platform.platformType", platformType));
   }
 
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index) {
+    criteria.createAlias("partitions", "partitions");
+    criteria.createAlias("partitions.pool", "pool");
+    criteria.createAlias("pool.pooledElementViews", "dilutionForIndex");
+    criteria.createAlias("dilutionForIndex.indices", "indices");
+    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
 }

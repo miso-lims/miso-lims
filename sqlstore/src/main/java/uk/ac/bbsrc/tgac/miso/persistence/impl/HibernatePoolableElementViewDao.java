@@ -111,4 +111,10 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   public String propertyForUserName(Criteria item, boolean creator) {
     return creator ? "creatorName" : "lastModifier";
   }
+
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index) {
+    criteria.createAlias("indices", "indices");
+    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
 }

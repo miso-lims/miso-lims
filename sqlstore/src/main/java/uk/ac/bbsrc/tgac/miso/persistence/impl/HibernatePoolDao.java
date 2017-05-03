@@ -332,4 +332,10 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
     return PoolImpl.class;
   }
 
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index) {
+    criteria.createAlias("pooledElementViews", "dilutionForIndex");
+    criteria.createAlias("dilutionForIndex.indices", "indices");
+    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
 }

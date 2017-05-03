@@ -189,4 +189,9 @@ public class HibernateLibraryDilutionDao
     return creator ? "dilutionUserName" : "derivedInfo.lastModifier.loginName";
   }
 
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index) {
+    criteria.createAlias("library.indices", "indices");
+    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
 }
