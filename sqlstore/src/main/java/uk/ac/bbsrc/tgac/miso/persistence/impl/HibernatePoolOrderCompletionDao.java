@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderCompletionDao;
 
 @Transactional(rollbackFor = Exception.class)
@@ -78,8 +79,13 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, boolean creation) {
-    return creation ? null : "lastUpdated";
+  public String propertyForDate(Criteria criteria, DateType type) {
+    switch (type) {
+    case UPDATE:
+      return "lastUpdated";
+    default:
+      return null;
+    }
   }
 
   @Override

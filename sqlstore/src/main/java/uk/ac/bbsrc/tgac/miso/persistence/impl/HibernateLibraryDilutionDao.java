@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -153,7 +154,6 @@ public class HibernateLibraryDilutionDao
     return SEARCH_PROPERTIES;
   }
 
-
   @Override
   public void restrictPaginationByProjectId(Criteria criteria, long projectId) {
     criteria.createAlias("library.sample", "sample");
@@ -173,8 +173,15 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public String propertyForDate(Criteria item, boolean creation) {
-    return creation ? "creationDate" : "lastUpdated";
+  public String propertyForDate(Criteria item, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "creationDate";
+    case UPDATE:
+      return "lastUpdated";
+    default:
+      return null;
+    }
   }
 
   @Override

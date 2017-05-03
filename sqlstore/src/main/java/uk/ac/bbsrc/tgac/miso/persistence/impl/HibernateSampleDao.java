@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -341,8 +342,17 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, boolean creation) {
-    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  public String propertyForDate(Criteria criteria, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "derivedInfo.created";
+    case UPDATE:
+      return "derivedInfo.lastModified";
+    case RECEIVE:
+      return "receivedDate";
+    default:
+      return null;
+    }
   }
 
   @Override

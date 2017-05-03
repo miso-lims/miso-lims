@@ -18,12 +18,12 @@ public abstract interface PaginationFilter {
   public final static List<AgoMatcher> AGO_MATCHERS = Arrays.asList(new AgoMatcher("h(|ours?)", 3600),
       new AgoMatcher("d(|ays?)", 3600 * 24));
 
-  public static PaginationFilter date(Date start, Date end, boolean creation) {
+  public static PaginationFilter date(Date start, Date end, DateType type) {
     return new PaginationFilter() {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByDate(item, start, end, creation);
+        sink.restrictPaginationByDate(item, start, end, type);
       }
     };
   }
@@ -88,14 +88,19 @@ public abstract interface PaginationFilter {
           }
         case "created":
         case "createdon":
-          return parseDate(parts[1], true);
+          return parseDate(parts[1], DateType.CREATE);
         case "changed":
         case "modified":
         case "updated":
         case "changedon":
         case "modifiedon":
         case "updatedon":
-          return parseDate(parts[1], false);
+          return parseDate(parts[1], DateType.UPDATE);
+        case "received":
+        case "recieved":
+        case "receivedon":
+        case "recievedon":
+          return parseDate(parts[1], DateType.RECEIVE);
         case "createdby":
         case "creator":
         case "creater":
@@ -117,7 +122,7 @@ public abstract interface PaginationFilter {
     }).filter(Objects::nonNull).toArray(PaginationFilter[]::new);
   }
 
-  static PaginationFilter parseDate(String text, boolean creation) {
+  static PaginationFilter parseDate(String text, DateType type) {
     DateTime start;
     DateTime end;
     switch (text.toLowerCase()) {
@@ -162,7 +167,7 @@ public abstract interface PaginationFilter {
         }
       }
     }
-    return date(start.toDate(), end.toDate(), creation);
+    return date(start.toDate(), end.toDate(), type);
   }
 
   static PaginationFilter parseUser(String username, String currentUser, boolean creator) {

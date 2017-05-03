@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolableElementViewDao;
 
 @Transactional(rollbackFor = Exception.class)
@@ -86,7 +87,7 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   public void restrictPaginationByPoolId(Criteria criteria, long poolId) {
     criteria
         .add(Restrictions.sqlRestriction("EXISTS(SELECT * FROM Pool_Dilution WHERE pool_poolId = ? AND dilution_dilutionId = dilutionId)",
-        poolId, LongType.INSTANCE));
+            poolId, LongType.INSTANCE));
   }
 
   @Override
@@ -95,8 +96,15 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public String propertyForDate(Criteria item, boolean creation) {
-    return creation ? "created" : "lastModified";
+  public String propertyForDate(Criteria item, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "created";
+    case UPDATE:
+      return "lastModified";
+    default:
+      return null;
+    }
   }
 
   @Override
