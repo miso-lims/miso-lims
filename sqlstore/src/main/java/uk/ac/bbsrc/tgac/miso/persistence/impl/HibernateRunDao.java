@@ -373,4 +373,14 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
+
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index) {
+    criteria.createAlias("containers", "containers");
+    criteria.createAlias("containers.partitions", "partitions");
+    criteria.createAlias("partitions.pool", "pool");
+    criteria.createAlias("pool.pooledElementViews", "dilutionForIndex");
+    criteria.createAlias("dilutionForIndex.indices", "indices");
+    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
 }

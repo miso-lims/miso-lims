@@ -139,6 +139,15 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   }
 
   @Override
+  public default void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths) {
+  }
+
+  @Override
+  public default void restrictPaginationByIndex(Criteria criteria, String index) {
+
+  }
+
+  @Override
   default void restrictPaginationByPlatformType(Criteria item, PlatformType platformType) {
   }
 
@@ -171,8 +180,4 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
    * Create a set of restrictions given the user-supplied search string.
    */
   Criterion searchRestrictions(String query);
-
-  @Override
-  public default void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths) {
-  }
 }

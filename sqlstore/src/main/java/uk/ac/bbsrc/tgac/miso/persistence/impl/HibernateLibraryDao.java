@@ -14,6 +14,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -441,4 +442,14 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedData
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index) {
+    criteria.createAlias("indices", "indices");
+    restrictPaginationByIndices(criteria, index);
+  }
+
+  public static void restrictPaginationByIndices(Criteria criteria, String index) {
+    criteria.add(Restrictions.or(Restrictions.ilike("indices.name", index, MatchMode.ANYWHERE),
+        Restrictions.ilike("indices.sequence", index, MatchMode.EXACT)));
+  }
 }
