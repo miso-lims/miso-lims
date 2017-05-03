@@ -3,14 +3,19 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -20,9 +25,9 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 
 public abstract class JQueryDataTableBackend<Model, Dto> {
 
-  protected abstract Dto asDto(Model model, UriComponentsBuilder builder);
+  private static final Logger log = LoggerFactory.getLogger(JQueryDataTableBackend.class);
 
-  protected abstract PaginatedDataSource<Model> getSource() throws IOException;
+  protected abstract Dto asDto(Model model, UriComponentsBuilder builder);
 
   public DataTablesResponseDto<Dto> get(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder, PaginationFilter... filters) throws IOException {
@@ -41,19 +46,27 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
       DataTablesResponseDto<Dto> dtResponse = new DataTablesResponseDto<>();
 
       List<PaginationFilter> additionalFilters = new ArrayList<>(Arrays.asList(filters));
+      StringWriter errorBuffer = new StringWriter();
+      Consumer<String> errorHandler = message -> {
+        if (errorBuffer.getBuffer().length() > 0) {
+          errorBuffer.append("<br/>");
+        }
+        try {
+          StringEscapeUtils.escapeHtml(errorBuffer, message);
+        } catch (IOException e) {
+          log.error("Failed to write to string writer.", e);
+        }
+      };
       if (!isStringEmptyOrNull(sSearch)) {
-        StringBuilder errorBuffer = new StringBuilder();
         additionalFilters
             .addAll(Arrays.asList(
-                PaginationFilter.parse(sSearch, SecurityContextHolder.getContext().getAuthentication().getName(), errorBuffer::append)));
-        if (errorBuffer.length() > 0) {
-          dtResponse.setSError(errorBuffer.toString());
-        }
+                PaginationFilter.parse(sSearch, SecurityContextHolder.getContext().getAuthentication().getName(), errorHandler)));
         numMatches = getSource().count(additionalFilters.toArray(filters));
       } else {
         numMatches = numItems;
       }
-      Collection<Model> models = getSource().list(iDisplayStart, iDisplayLength, "asc".equalsIgnoreCase(sSortDir), sortCol,
+      Collection<Model> models = getSource().list(errorHandler, iDisplayStart, iDisplayLength, "asc".equalsIgnoreCase(sSortDir),
+          sortCol,
           additionalFilters.toArray(filters));
 
       List<Dto> dtos = new ArrayList<>();
@@ -65,9 +78,16 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
       dtResponse.setITotalDisplayRecords(numMatches);
       dtResponse.setAaData(dtos);
       dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
+      String errorMessage = errorBuffer.toString();
+      if (errorMessage.length() > 0) {
+        // TODO: This makes it to the front end where it is promptly ignored. Make them get displayed somewhere.
+        dtResponse.setSError(errorMessage);
+      }
       return dtResponse;
     } else {
       throw new RestException("Request must specify DataTables parameters.");
     }
   }
+
+  protected abstract PaginatedDataSource<Model> getSource() throws IOException;
 }

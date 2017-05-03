@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service.security;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,8 +18,8 @@ public interface AuthorizedPaginatedDataSource<T extends SecurableByProfile>
     extends PaginatedDataSource<T> {
 
   @Override
-  public default long count(PaginationFilter... filter) throws IOException {
-    return getBackingPaginationSource().count(filter);
+  public default long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return getBackingPaginationSource().count(errorHandler, filter);
   }
 
   abstract AuthorizationManager getAuthorizationManager();
@@ -27,8 +28,10 @@ public interface AuthorizedPaginatedDataSource<T extends SecurableByProfile>
   abstract PaginatedDataSource<T> getBackingPaginationSource();
 
   @Override
-  public default List<T> list(int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter) throws IOException {
-    return getAuthorizationManager().filterUnreadable(getBackingPaginationSource().list(offset, limit, sortDir, sortCol, filter));
+  public default List<T> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter) throws IOException {
+    return getAuthorizationManager()
+        .filterUnreadable(getBackingPaginationSource().list(errorHandler, offset, limit, sortDir, sortCol, filter));
   }
 
 }

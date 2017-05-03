@@ -22,8 +22,8 @@ public abstract interface PaginationFilter {
     return new PaginationFilter() {
 
       @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByDate(item, start, end, type);
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByDate(item, start, end, type, errorHandler);
       }
     };
   }
@@ -32,8 +32,8 @@ public abstract interface PaginationFilter {
     return new PaginationFilter() {
 
       @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByFulfilled(item, isFulfilled);
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByFulfilled(item, isFulfilled, errorHandler);
       }
     };
   }
@@ -42,8 +42,8 @@ public abstract interface PaginationFilter {
     return new PaginationFilter() {
 
       @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByHealth(item, healths);
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByHealth(item, healths, errorHandler);
       }
     };
   }
@@ -56,8 +56,8 @@ public abstract interface PaginationFilter {
     return new PaginationFilter() {
 
       @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByIndex(item, index);
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByIndex(item, index, errorHandler);
       }
     };
   }
@@ -195,8 +195,8 @@ public abstract interface PaginationFilter {
     return new PaginationFilter() {
 
       @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByPlatformType(item, platformType);
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByPlatformType(item, platformType, errorHandler);
       }
     };
   }
@@ -205,8 +205,8 @@ public abstract interface PaginationFilter {
     return new PaginationFilter() {
 
       @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByPoolId(item, poolId);
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByPoolId(item, poolId, errorHandler);
       }
     };
   }
@@ -222,8 +222,8 @@ public abstract interface PaginationFilter {
     return new PaginationFilter() {
 
       @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByProjectId(item, projectId);
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByProjectId(item, projectId, errorHandler);
       }
     };
   }
@@ -232,8 +232,8 @@ public abstract interface PaginationFilter {
     return new PaginationFilter() {
 
       @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByQuery(item, query);
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByQuery(item, query, errorHandler);
       }
     };
   }
@@ -242,8 +242,8 @@ public abstract interface PaginationFilter {
     return new PaginationFilter() {
 
       @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByClass(item, name);
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByClass(item, name, errorHandler);
       }
     };
   }
@@ -252,12 +252,12 @@ public abstract interface PaginationFilter {
     return new PaginationFilter() {
 
       @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item) {
-        sink.restrictPaginationByUser(item, loginName, creator);
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByUser(item, loginName, creator, errorHandler);
       }
     };
   }
 
-  public abstract <T> void apply(PaginationFilterSink<T> sink, T item);
+  public abstract <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler);
 
 }

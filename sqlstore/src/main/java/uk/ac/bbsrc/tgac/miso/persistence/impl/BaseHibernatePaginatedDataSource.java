@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -31,10 +32,10 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilterSink;
 public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource<T>, PaginationFilterSink<Criteria> {
 
   @Override
-  public default long count(PaginationFilter... filters) throws IOException {
+  public default long count(Consumer<String> errorHandler, PaginationFilter... filters) throws IOException {
     Criteria criteria = createPaginationCriteria();
     for (PaginationFilter filter : filters) {
-      filter.apply(this, criteria);
+      filter.apply(this, criteria, errorHandler);
     }
     criteria.setProjection(Projections.countDistinct("id"));
     return ((Long) criteria.uniqueResult()).intValue();
@@ -51,6 +52,7 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   }
 
   Session currentSession();
+  public String getFriendlyName();
 
   /**
    * Get the property name of the project to which the item is connected.
@@ -62,7 +64,8 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   Class<? extends T> getRealClass();
 
   @Override
-  public default List<T> list(int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filters)
+  public default List<T> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filters)
       throws IOException {
 
     if (offset < 0 || limit < 0) throw new IOException("Limit and Offset must not be less than zero");
@@ -73,7 +76,7 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
     idCriteria.addOrder(order);
 
     for (PaginationFilter filter : filters) {
-      filter.apply(this, idCriteria);
+      filter.apply(this, idCriteria, errorHandler);
     }
 
     idCriteria.setFirstResult(offset);
@@ -127,11 +130,12 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   public abstract String propertyForUserName(Criteria item, boolean creator);
 
   @Override
-  public default void restrictPaginationByClass(Criteria criteria, String name) {
+  public default void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " is exempt from class strugle.");
   }
 
   @Override
-  public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type) {
+  public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
     String property = propertyForDate(criteria, type);
     if (property != null) {
       criteria.add(Restrictions.between(property, start, end));
@@ -139,44 +143,49 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   }
 
   @Override
-  default void restrictPaginationByFulfilled(Criteria item, boolean isFulfilled) {
+  default void restrictPaginationByFulfilled(Criteria item, boolean isFulfilled, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " has no fulfillment (nor existential dread).");
   }
 
   @Override
-  public default void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths) {
+  public default void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " has no health information.");
   }
 
   @Override
-  public default void restrictPaginationByIndex(Criteria criteria, String index) {
-
+  public default void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " has no indices.");
   }
 
   @Override
-  default void restrictPaginationByPlatformType(Criteria item, PlatformType platformType) {
+  default void restrictPaginationByPlatformType(Criteria item, PlatformType platformType, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " is not platform-specific.");
   }
 
   @Override
-  default void restrictPaginationByPoolId(Criteria item, long poolId) {
-    throw new IllegalArgumentException();
+  default void restrictPaginationByPoolId(Criteria item, long poolId, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be filtered by pool.");
   }
 
   @Override
-  default void restrictPaginationByProjectId(Criteria criteria, long projectId) {
+  default void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq(getProjectColumn(), projectId));
   }
 
   @Override
-  default void restrictPaginationByQuery(Criteria criteria, String query) {
+  default void restrictPaginationByQuery(Criteria criteria, String query, Consumer<String> errorHandler) {
     if (!isStringBlankOrNull(query)) {
       criteria.add(searchRestrictions(query));
     }
   }
 
   @Override
-  public default void restrictPaginationByUser(Criteria criteria, String userName, boolean creator) {
+  public default void restrictPaginationByUser(Criteria criteria, String userName, boolean creator, Consumer<String> errorHandler) {
     String property = propertyForUserName(criteria, creator);
     if (property != null) {
       criteria.add(Restrictions.ilike(property, userName, MatchMode.START));
+    } else {
+      errorHandler.accept(getFriendlyName() + " has no " + (creator ? "creator" : "modifier") + ".");
     }
   }
 
