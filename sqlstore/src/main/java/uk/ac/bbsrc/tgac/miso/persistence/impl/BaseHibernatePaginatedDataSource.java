@@ -127,6 +127,10 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   public abstract String propertyForUserName(Criteria item, boolean creator);
 
   @Override
+  public default void restrictPaginationByClass(Criteria criteria, String name) {
+  }
+
+  @Override
   public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type) {
     String property = propertyForDate(criteria, type);
     if (property != null) {

@@ -7,6 +7,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public interface PaginationFilterSink<T> {
+
+  public void restrictPaginationByClass(T item, String name);
+
   public void restrictPaginationByDate(T item, Date start, Date end, DateType type);
 
   public void restrictPaginationByFulfilled(T item, boolean isFulfilled);

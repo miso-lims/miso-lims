@@ -128,6 +128,8 @@ public abstract interface PaginationFilter {
           }
         case "index":
           return index(parts[1]);
+        case "class":
+          return sampleClass(parts[1]);
         }
       }
       return query(x);
@@ -232,6 +234,16 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item) {
         sink.restrictPaginationByQuery(item, query);
+      }
+    };
+  }
+
+  public static PaginationFilter sampleClass(String name) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item) {
+        sink.restrictPaginationByClass(item, name);
       }
     };
   }
