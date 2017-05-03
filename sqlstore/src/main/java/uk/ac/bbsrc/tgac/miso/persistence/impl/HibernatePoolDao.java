@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -300,13 +301,13 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   }
 
   @Override
-  public void restrictPaginationByProjectId(Criteria criteria, long projectId) {
+  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
     criteria.createAlias("pooledElementViews", "dilution");
-    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId);
+    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
@@ -333,9 +334,15 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index) {
+  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
     criteria.createAlias("pooledElementViews", "dilutionForIndex");
     criteria.createAlias("dilutionForIndex.indices", "indices");
     HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
   }
+
+  @Override
+  public String getFriendlyName() {
+    return "Pool";
+  }
+
 }

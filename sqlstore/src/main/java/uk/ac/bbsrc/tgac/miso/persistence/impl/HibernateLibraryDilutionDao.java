@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -155,20 +156,20 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public void restrictPaginationByProjectId(Criteria criteria, long projectId) {
+  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
     criteria.createAlias("library.sample", "sample");
     criteria.createAlias("sample.project", "project");
-    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId);
+    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
   @Override
-  public void restrictPaginationByPoolId(Criteria criteria, long poolId) {
+  public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
     criteria.createAlias("pools", "pool");
     criteria.add(Restrictions.eq("pool.id", poolId));
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("library.platformType", platformType));
   }
 
@@ -190,8 +191,13 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index) {
+  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
     criteria.createAlias("library.indices", "indices");
     HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Dilution";
   }
 }

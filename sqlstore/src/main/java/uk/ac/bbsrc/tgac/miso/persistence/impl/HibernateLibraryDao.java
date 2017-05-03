@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -438,12 +439,12 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedData
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index) {
+  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
     criteria.createAlias("indices", "indices");
     restrictPaginationByIndices(criteria, index);
   }
@@ -451,5 +452,10 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedData
   public static void restrictPaginationByIndices(Criteria criteria, String index) {
     criteria.add(Restrictions.or(Restrictions.ilike("indices.name", index, MatchMode.ANYWHERE),
         Restrictions.ilike("indices.sequence", index, MatchMode.EXACT)));
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Library";
   }
 }

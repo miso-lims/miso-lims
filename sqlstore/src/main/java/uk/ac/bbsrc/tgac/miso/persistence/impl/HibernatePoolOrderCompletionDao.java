@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -64,17 +65,17 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
   }
 
   @Override
-  public void restrictPaginationByFulfilled(Criteria criteria, boolean isFulfilled) {
+  public void restrictPaginationByFulfilled(Criteria criteria, boolean isFulfilled, Consumer<String> errorHandler) {
     criteria.add(isFulfilled ? Restrictions.le("remaining", 0) : Restrictions.gt("remaining", 0));
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("pool.platformType", platformType));
   }
 
   @Override
-  public void restrictPaginationByPoolId(Criteria criteria, long poolId) {
+  public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("pool.id", poolId));
   }
 
@@ -94,15 +95,20 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
   }
 
   @Override
-  public void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths) {
+  public void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths, Consumer<String> errorHandler) {
     criteria.createCriteria("items").add(Restrictions.and(Restrictions.in(CollectionPropertyNames.COLLECTION_INDICES, healths.toArray()),
         Restrictions.gt(CollectionPropertyNames.COLLECTION_ELEMENTS, 0)));
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String index) {
+  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
     criteria.createAlias("pool.pooledElementViews", "dilutionForIndex");
     criteria.createAlias("dilutionForIndex.indices", "indices");
     HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Pool";
   }
 }

@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -361,9 +362,14 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
   }
 
   @Override
-  public void restrictPaginationByClass(Criteria criteria, String name) {
+  public void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
     criteria.createAlias("sampleClass", "sampleClass");
     criteria.add(Restrictions.or(Restrictions.ilike("sampleClass.alias", name, MatchMode.ANYWHERE),
         Restrictions.ilike("sampleClass.sampleCategory", name, MatchMode.START)));
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Sample";
   }
 }
