@@ -360,4 +360,10 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
     return creator ? "creator.loginName" : "lastModifier.loginName";
   }
 
+  @Override
+  public void restrictPaginationByClass(Criteria criteria, String name) {
+    criteria.createAlias("sampleClass", "sampleClass");
+    criteria.add(Restrictions.or(Restrictions.ilike("sampleClass.alias", name, MatchMode.ANYWHERE),
+        Restrictions.ilike("sampleClass.sampleCategory", name, MatchMode.START)));
+  }
 }
