@@ -22,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -173,8 +174,15 @@ public class HibernateSequencerPartitionContainerDao
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, boolean creation) {
-    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  public String propertyForDate(Criteria criteria, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "derivedInfo.created";
+    case UPDATE:
+      return "derivedInfo.lastModified";
+    default:
+      return null;
+    }
   }
 
   @Override

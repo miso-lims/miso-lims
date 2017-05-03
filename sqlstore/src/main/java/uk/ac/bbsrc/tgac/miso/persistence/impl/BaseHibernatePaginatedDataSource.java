@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilterSink;
@@ -107,11 +108,10 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   /**
    * The property name for the modification/creation date of the object.
    * 
-   * @param creatoion if the true, the creation; otherwise the last modification date
    * @return the name of the property or null if the search criterion should be ignored.
    */
 
-  public abstract String propertyForDate(Criteria item, boolean creation);
+  public abstract String propertyForDate(Criteria item, DateType type);
 
   /**
    * Determine the correct Hibernate property given the user-supplied sort column.
@@ -127,8 +127,8 @@ public interface BaseHibernatePaginatedDataSource<T> extends PaginatedDataSource
   public abstract String propertyForUserName(Criteria item, boolean creator);
 
   @Override
-  public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, boolean creation) {
-    String property = propertyForDate(criteria, creation);
+  public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type) {
+    String property = propertyForDate(criteria, type);
     if (property != null) {
       criteria.add(Restrictions.between(property, start, end));
     }

@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
@@ -414,8 +415,15 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedData
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, boolean creation) {
-    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  public String propertyForDate(Criteria criteria, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "derivedInfo.created";
+    case UPDATE:
+      return "derivedInfo.lastModified";
+    default:
+      return null;
+    }
   }
 
   @Override

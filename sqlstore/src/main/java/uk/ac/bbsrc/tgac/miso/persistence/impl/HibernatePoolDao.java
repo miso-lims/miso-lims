@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
@@ -310,8 +311,15 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, boolean creation) {
-    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  public String propertyForDate(Criteria criteria, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "derivedInfo.created";
+    case UPDATE:
+      return "derivedInfo.lastModified";
+    default:
+      return null;
+    }
   }
 
   @Override
