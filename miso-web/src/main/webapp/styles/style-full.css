@@ -1939,3 +1939,11 @@ button.disabled {
 .no-border {
   border: 0;
 }
+
+.handsontable td.nonStandardAlias {
+  background-color: #FFFFCC;
+}
+
+.handsontable td.nonStandardAlias.htInvalid {
+  background-color: #F5E5DA !important;
+}

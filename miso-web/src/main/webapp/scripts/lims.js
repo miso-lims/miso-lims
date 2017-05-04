@@ -347,7 +347,15 @@ Utils.validation = {
   clean_input_field: function (field) {
     var oldval = field.val();
     field.val(oldval.trim(oldval));
-  }
+  },
+  isEmpty: function (value) {
+    return value === undefined || value === null || value === '';
+  },
+  
+  hasNoSpecialChars: function (value) {
+    var regex = new RegExp(Utils.validation.sanitizeRegex);
+    return regex.test(value);
+  },
 };
 
 Utils.page = {
@@ -457,4 +465,84 @@ Utils.alert = {
 };
 
 
+Utils.array = {
+  /**
+   * Gets item's alias
+   */
+  getAlias: function (obj) {
+    if (obj.alias) return obj.alias;
+  },
 
+  getId: function (obj) {
+    return obj.id;
+  },
+
+  getName: function (obj) {
+    if (obj.name) return obj.name;
+  },
+
+  /**
+   * Gets values for a given key
+   */
+  getValues: function (key, objArr) {
+    return objArr.map(function (obj) { return obj[key]; });
+  },
+
+  /**
+   * Sorts by a given property
+   */
+  sortByProperty: function (array, propertyName) {
+    return array.sort(function (a, b) {
+      return a[propertyName] > b[propertyName] ? 1 : ((b[propertyName] > a[propertyName]) ? -1 : 0);
+    });
+  },
+
+  findFirstOrNull: function (predicate, referenceCollection) {
+    var results = referenceCollection.filter(predicate);
+    return results.length > 0 ? results[0] : null;
+  },
+  maybeGetProperty: function(obj, propertyName) {
+    return obj ? obj[propertyName] : null;
+  },
+  aliasPredicate: function (alias) {
+    return function (item) {
+      return item.alias == alias;
+    };
+  },
+  idPredicate: function (id) {
+    return function (item) {
+      return item.id == id;
+    };
+  },
+  namePredicate: function (name) {
+    return function (item) {
+      return item.name == name;
+    };
+  },
+  descriptionPredicate: function (description) {
+    return function (item) {
+      return item.description == description;
+    }
+  },
+  /**
+   * Gets the object from a given id and collection
+   */
+  getObjById: function (id, referenceCollection) {
+    return Utils.array.findFirstOrNull(Utils.array.idPredicate(id), referenceCollection);
+  },
+  /**
+   * Gets the id of an object from a given alias and collection
+   */
+  getIdFromAlias: function (alias, referenceCollection) {
+    return Utils.array.maybeGetProperty(
+      Utils.array.findFirstOrNull(Utils.array.aliasPredicate(alias), referenceCollection),
+      'id');
+  },
+
+  /**
+   * Gets the alias of an object from a given id and collection
+   */
+  getAliasFromId: function (id, referenceCollection) {
+    return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(id), referenceCollection), 'alias');
+  },
+};

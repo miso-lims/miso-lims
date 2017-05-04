@@ -585,7 +585,6 @@ public class MisoServiceManager {
   }
 
   private void updateLibraryDaoDependencies() {
-    if (libraryDesignDao != null) libraryDesignDao.setLibraryDao(libraryDao);
     if (libraryService != null) libraryService.setLibraryDao(libraryDao);
     if (dilutionService != null) dilutionService.setLibraryDao(libraryDao);
     if (requestManager != null) requestManager.setLibraryStore(libraryDao);
@@ -1250,7 +1249,6 @@ public class MisoServiceManager {
   public void setDefaultLibraryDesignDao() {
     HibernateLibraryDesignDao dao = new HibernateLibraryDesignDao();
     dao.setSessionFactory(sessionFactory);
-    dao.setLibraryDao(libraryDao);
     setLibraryDesignDao(dao);
   }
 

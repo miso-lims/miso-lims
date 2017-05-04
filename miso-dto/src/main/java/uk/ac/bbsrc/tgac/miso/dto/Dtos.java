@@ -1049,11 +1049,19 @@ public class Dtos {
     }
     if (!from.getIndices().isEmpty()) {
       dto.setIndexFamilyName(from.getIndices().get(0).getFamily().getName());
-      dto.setIndex1Id(from.getIndices().get(0).getId());
-      dto.setIndex1Label(from.getIndices().get(0).getLabel());
-      if (from.getIndices().size() > 1) {
-        dto.setIndex2Id(from.getIndices().get(1).getId());
-        dto.setIndex2Label(from.getIndices().get(1).getLabel());
+      for (Index index : from.getIndices()) {
+        switch (index.getPosition()) {
+        case 1:
+          dto.setIndex1Id(index.getId());
+          dto.setIndex1Label(index.getLabel());
+          break;
+        case 2:
+          dto.setIndex2Id(index.getId());
+          dto.setIndex2Label(index.getLabel());
+          break;
+        default:
+          throw new IllegalArgumentException("Index at position " + index.getPosition());
+        }
       }
     }
     dto.setVolume(from.getVolume());
