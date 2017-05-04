@@ -25,6 +25,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 @Table(name = "SampleClass", uniqueConstraints = @UniqueConstraint(columnNames = { "alias", "sampleCategory" }))
 public class SampleClassImpl implements SampleClass {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long sampleClassId;

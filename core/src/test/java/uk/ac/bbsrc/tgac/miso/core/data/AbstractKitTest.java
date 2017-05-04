@@ -17,6 +17,7 @@ public class AbstractKitTest {
      * A basic unit test to exercise the class. Mainly for cobertura coverage.
      */
     final KitImpl kit = new KitImpl() {
+      private static final long serialVersionUID = 1L;
     };
     assertNotNull(kit);
   }

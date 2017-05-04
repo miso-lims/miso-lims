@@ -15,6 +15,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 @Synchronize("Sample")
 public class SampleBoxPosition extends AbstractBoxPosition {
 
+  private static final long serialVersionUID = 1L;
+
   @Id
   private Long sampleId;
 

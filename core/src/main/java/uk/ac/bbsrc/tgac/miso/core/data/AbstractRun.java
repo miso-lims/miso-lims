@@ -82,6 +82,9 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @MappedSuperclass
 public abstract class AbstractRun implements Run {
+
+  private static final long serialVersionUID = 1L;
+
   private static final Logger log = LoggerFactory.getLogger(AbstractRun.class);
 
   public static final Long UNSAVED_ID = 0L;
@@ -128,7 +131,7 @@ public abstract class AbstractRun implements Run {
   private SequencerReference sequencerReference;
 
   @Transient
-  private final Set<MisoListener> listeners = new HashSet<>();
+  private final transient Set<MisoListener> listeners = new HashSet<>();
 
   @ManyToMany(targetEntity = UserImpl.class)
   @Fetch(FetchMode.SUBSELECT)

@@ -48,7 +48,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 public class DetailedSampleBuilder
     implements DetailedSample, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing, SampleCVSlide, SampleLCMTube, Identity {
 
-  @SuppressWarnings("unused")
   private static final long serialVersionUID = 1L;
 
   private static final List<String> CATEGORY_ORDER = Arrays.asList(Identity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,

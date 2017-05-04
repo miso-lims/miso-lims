@@ -1,7 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 
-public interface ReferenceGenome {
+public interface ReferenceGenome extends Serializable {
 
   Long getId();
 

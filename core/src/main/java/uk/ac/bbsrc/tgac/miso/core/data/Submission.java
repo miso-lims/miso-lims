@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Submission extends Nameable, Comparable<Submission> {
+public interface Submission extends Nameable, Comparable<Submission>, Serializable {
 
   public static final Long UNSAVED_ID = 0L;
 

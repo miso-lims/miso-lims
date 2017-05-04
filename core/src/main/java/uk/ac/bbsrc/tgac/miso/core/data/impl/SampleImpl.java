@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -49,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 @Entity
 @Table(name = "Sample")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class SampleImpl extends AbstractSample implements Serializable {
+public class SampleImpl extends AbstractSample {
 
   private static final long serialVersionUID = 1L;
 

@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -14,6 +15,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public abstract interface PaginationFilter {
+  public final static List<AgoMatcher> AGO_MATCHERS = Arrays.asList(new AgoMatcher("h(|ours?)", 3600),
+      new AgoMatcher("d(|ays?)", 3600 * 24));
+
   public static PaginationFilter date(Date start, Date end, boolean creation) {
     return new PaginationFilter() {
 
@@ -34,10 +38,6 @@ public abstract interface PaginationFilter {
     };
   }
 
-  public static PaginationFilter health(HealthType health) {
-    return health(EnumSet.of(health));
-  }
-
   public static PaginationFilter health(EnumSet<HealthType> healths) {
     return new PaginationFilter() {
 
@@ -46,6 +46,10 @@ public abstract interface PaginationFilter {
         sink.restrictPaginationByHealth(item, healths);
       }
     };
+  }
+
+  public static PaginationFilter health(HealthType health) {
+    return health(EnumSet.of(health));
   }
 
   public static PaginationFilter[] parse(String request, String currentUser, Consumer<String> errorHandler) {
@@ -141,14 +145,22 @@ public abstract interface PaginationFilter {
       start = end.withDayOfWeek(1);
       break;
     default:
-      try {
-        DateTime d = DateTime.parse(text);
-        start = d.withTimeAtStartOfDay();
-        end = d.withTimeAtStartOfDay().plusDays(1);
-      } catch (IllegalArgumentException e) {
-        return null;
+      int ago = 0;
+      for (int i = 0; i < AGO_MATCHERS.size() && ago == 0; i++) {
+        ago = AGO_MATCHERS.get(i).secondsAgoIfmatches(text);
       }
-
+      if (ago > 0) {
+        end = new DateTime();
+        start = end.minusSeconds(ago);
+      } else {
+        try {
+          DateTime d = DateTime.parse(text);
+          start = d.withTimeAtStartOfDay();
+          end = d.withTimeAtStartOfDay().plusDays(1);
+        } catch (IllegalArgumentException e) {
+          return null;
+        }
+      }
     }
     return date(start.toDate(), end.toDate(), creation);
   }

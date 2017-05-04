@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -57,7 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  */
 @Entity
 @Table(name = "RunQC")
-public class RunQCImpl extends AbstractQC implements RunQC, Serializable {
+public class RunQCImpl extends AbstractQC implements RunQC {
 
   private static final long serialVersionUID = 1L;
   private static final Logger log = LoggerFactory.getLogger(RunQCImpl.class);

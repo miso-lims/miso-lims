@@ -75,6 +75,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @MappedSuperclass
 public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
+  private static final long serialVersionUID = 1L;
+
   protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
   public static final Long UNSAVED_ID = 0L;
 

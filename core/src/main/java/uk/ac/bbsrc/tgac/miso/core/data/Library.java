@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -58,7 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeName("library")
 @JsonIgnoreProperties({ "securityProfile" })
 public interface Library
-    extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable, ChangeLoggable, Aliasable {
+    extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;

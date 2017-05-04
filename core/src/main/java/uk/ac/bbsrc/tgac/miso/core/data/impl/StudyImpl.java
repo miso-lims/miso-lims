@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -64,7 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @Entity
 @Table(name = "Study")
-public class StudyImpl implements Study, Serializable {
+public class StudyImpl implements Study {
   public static final Long UNSAVED_ID = 0L;
 
   private static final long serialVersionUID = 1L;
@@ -83,7 +82,7 @@ public class StudyImpl implements Study, Serializable {
   private long studyId = StudyImpl.UNSAVED_ID;
 
   @Transient
-  public Document submissionDocument;
+  public transient Document submissionDocument;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")

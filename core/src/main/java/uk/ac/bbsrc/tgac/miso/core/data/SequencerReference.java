@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.net.UnknownHostException;
 import java.util.Date;
 
@@ -40,7 +41,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface SequencerReference extends Nameable, Deletable {
+public interface SequencerReference extends Nameable, Deletable, Serializable {
   /**
    * Sets the id of this SequencerReference object.
    * 

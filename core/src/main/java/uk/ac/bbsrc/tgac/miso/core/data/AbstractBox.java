@@ -27,6 +27,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 @MappedSuperclass
 public abstract class AbstractBox implements Box {
 
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
   @ManyToOne(cascade = CascadeType.PERSIST)

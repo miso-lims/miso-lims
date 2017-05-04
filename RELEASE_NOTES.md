@@ -1,3 +1,10 @@
+# 0.2.62
+
+Changes:
+
+ * Serialization fixes to prevent periodic inability to login
+ * Allow searches to operate on “ago” ranges
+
 # 0.2.61
 
 Changes:

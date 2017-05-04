@@ -1,10 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface SampleClass {
+public interface SampleClass extends Serializable {
 
   Long getId();
 

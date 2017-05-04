@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 
 @Entity
 @Table(name = "ReferenceGenome")
-public class ReferenceGenomeImpl implements ReferenceGenome, Serializable {
+public class ReferenceGenomeImpl implements ReferenceGenome {
 
   private static final long serialVersionUID = 1L;
 

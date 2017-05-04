@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
@@ -42,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface Status extends Securable {
+public interface Status extends Securable, Serializable {
   /**
    * Returns the statusId of this Status object.
    * 
