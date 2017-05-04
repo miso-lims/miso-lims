@@ -21,12 +21,6 @@
   ~ **********************************************************************
   --%>
 
-<%--
-  Created by IntelliJ IDEA.
-  User: davey
-  Date: 15-Feb-2010
-  Time: 15:09:06
---%>
 <%@ include file="../header.jsp" %>
 <link href="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.css'/>" rel="stylesheet" type="text/css" />
 <script src="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.js'/>" type="text/javascript"></script>
@@ -42,8 +36,9 @@
 <div id="contentcolumn">
 
   <h1>
-    ${method} Libraries
-    <button id="saveLibraries" class="fg-button ui-state-default ui-corner-all">Save</button>
+    ${title}
+    <img id="ajaxLoader" src="/styles/images/ajax-loader.gif" class="fg-button hidden"/>
+    <button id="save" class="fg-button ui-state-default ui-corner-all">Save</button>
   </h1>
 
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
@@ -61,7 +56,7 @@
   <br/>
   <br/>
 
- <div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
+ <div id="HOTbulkForm">
    <div id="nonStandardAliasNote" class="table-note hidden">
       <p>Aliases highlighted in yellow are non-standard, and any value you give them will be saved.</p>
     </div>
@@ -79,57 +74,15 @@
        <p id="errorMessages"></p>
      </div>
 
+   <div id="bulkactions"></div>
    <div id="hotContainer"></div>
 
  </div>
 
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      Library.hot.librariesJSON = ${librariesJSON};
-      Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
-
-      if (Hot.detailedSample) {
-        Library.hot.librariesJSON = Hot.sortByProperty(Library.hot.librariesJSON, 'parentSampleAlias');
-      }
-      
-	  Library.hot.hideCols = ${hideCols};
-
-      Hot.dropdownRef = ${referenceDataJSON};
-      Hot.dropdownRef.platformTypes = ${platformTypes};
-      Hot.dropdownRef.indices = ${indices};
-      Hot.dropdownRef.indexFamilies = {};
-      Hot.saveButton = document.getElementById('saveLibraries');
-      Library.hot.propagateOrEdit = "${method}";
-      Library.designs = ${libraryDesignsJSON};
-      Hot.dropdownRef.libraryDesignCodes = ${libraryDesignCodesJSON};
-      Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
-      Library.hot.getLibraryTypeAliasLists();
-
-      Library.hot.makeBulkCreateTable = function () {
-        Library.hot.librariesJSON = Library.hot.prepLibrariesForPropagate(Library.hot.librariesJSON);
-        Library.hot.makeHOT(Library.hot.librariesJSON);
-      };
-
-      Library.hot.makeBulkUpdateTable = function () {
-        Library.hot.librariesJSON = Library.hot.prepLibrariesForEdit(Library.hot.librariesJSON);
-        Library.hot.makeHOT(Library.hot.librariesJSON);
-
-        // source for index family column depends on mandatory platform
-        var datalen = Hot.startData.length;
-        for (var i = 0; i < datalen; i++) {
-          Library.hot.updateIndexFamilyCellsSources(i, Hot.startData[i].platformType);
-          Library.hot.updateIndexCellsSources(i, Hot.startData[i].platformType, Hot.startData[i].indexFamilyName);
-        }
-      };
-
-      // get SampleOptions and make the appropriate table
-      Hot.saveButton.addEventListener('click', Library.hot.saveData, true);
-
-      if (Library.hot.propagateOrEdit == 'Propagate') {
-        Hot.fetchSampleOptions(Library.hot.makeBulkCreateTable);
-      } else {
-        Hot.fetchSampleOptions(Library.hot.makeBulkUpdateTable);
-      }
+      var target = ${targetType};
+      target.requestConfiguration(${config}, function(config) { HotUtils.makeTable(target, ${create}, ${input}, config); });
     });
   </script>
 

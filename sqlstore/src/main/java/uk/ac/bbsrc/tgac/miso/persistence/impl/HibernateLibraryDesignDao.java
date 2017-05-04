@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 
 /**
  * This is the Hibernate DAO for LibraryDesigns and serves as the bridge between Hibernate and the existing SqlStore persistence layers.
@@ -45,54 +44,27 @@ public class HibernateLibraryDesignDao implements LibraryDesignDao {
     this.sessionFactory = sessionFactory;
   }
 
-  @Autowired
-  private LibraryStore libraryDao;
-
-  public void setLibraryDao(LibraryStore libraryDao) {
-    this.libraryDao = libraryDao;
-  }
-
   @Override
   public List<LibraryDesign> getLibraryDesignByClass(SampleClass sampleClass) throws IOException {
     if (sampleClass == null) return Collections.emptyList();
-    Query query = currentSession().createQuery("from LibraryDesign where sampleClass.sampleClassId = :sampleClass");
-    query.setLong("sampleClass", sampleClass.getId());
+    Criteria criteria = currentSession().createCriteria(LibraryDesign.class);
+    criteria.createAlias("sampleClass", "sampleClass");
+    criteria.add(Restrictions.eq("sampleClass.id", sampleClass.getId()));
     @SuppressWarnings("unchecked")
-    List<LibraryDesign> rules = query.list();
-    fetchSqlStore(rules);
+    List<LibraryDesign> rules = criteria.list();
     return rules;
   }
 
   @Override
   public LibraryDesign getLibraryDesign(Long id) throws IOException {
     LibraryDesign libraryDesign = (LibraryDesign) currentSession().get(LibraryDesign.class, id);
-    fetchSqlStore(libraryDesign);
     return libraryDesign;
   }
 
   @Override
   public List<LibraryDesign> getLibraryDesigns() throws IOException {
-    Query query = currentSession().createQuery("from LibraryDesign");
     @SuppressWarnings("unchecked")
-    List<LibraryDesign> libraryDesigns = query.list();
-    fetchSqlStore(libraryDesigns);
-    return libraryDesigns;
-  }
-
-  private LibraryDesign fetchSqlStore(LibraryDesign libraryDesign) throws IOException {
-    if (libraryDesign != null && libraryDesign.getLibrarySelectionType().getId() != null) {
-      libraryDesign.setLibrarySelectionType(libraryDao.getLibrarySelectionTypeById(libraryDesign.getLibrarySelectionType().getId()));
-    }
-    if (libraryDesign != null && libraryDesign.getLibraryStrategyType().getId() != null) {
-      libraryDesign.setLibraryStrategyType(libraryDao.getLibraryStrategyTypeById(libraryDesign.getLibraryStrategyType().getId()));
-    }
-    return libraryDesign;
-  }
-
-  private Collection<LibraryDesign> fetchSqlStore(Collection<LibraryDesign> libraryDesigns) throws IOException {
-    for (LibraryDesign libraryDesign : libraryDesigns) {
-      fetchSqlStore(libraryDesign);
-    }
+    List<LibraryDesign> libraryDesigns = currentSession().createCriteria(LibraryDesign.class).list();
     return libraryDesigns;
   }
 

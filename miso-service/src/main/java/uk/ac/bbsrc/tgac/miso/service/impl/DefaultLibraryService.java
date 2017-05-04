@@ -460,7 +460,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     }
     List<Index> managedIndices = new ArrayList<>();
     for (Index index : library.getIndices()) {
-      if (index != null) {
+      if (index != null && index.getId() != Index.UNSAVED_ID) {
         Index managedIndex = indexDao.getIndexById(index.getId());
         if (managedIndex != null) managedIndices.add(managedIndex);
       }

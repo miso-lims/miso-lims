@@ -29,7 +29,7 @@ public class LibraryDto implements WritableUrls {
   private String libraryTypeAlias;
   private String locationBarcode;
   private String locationLabel;
-  private Boolean lowQuality;
+  private boolean lowQuality;
   private String name;
   private Boolean paired;
   private String parentSampleAlias;

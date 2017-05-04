@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
@@ -106,6 +107,9 @@ public class MenuController implements ServletContextAware {
 
   @Autowired
   private SampleGroupService sampleGroupService;
+
+  @Autowired
+  private NamingScheme namingScheme;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
@@ -231,6 +235,8 @@ public class MenuController implements ServletContextAware {
     ObjectNode node = mapper.createObjectNode();
     node.put("isDetailedSample", isDetailedSampleEnabled());
     node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
+    node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
+    node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
 
     final Iterable<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 

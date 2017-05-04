@@ -55,14 +55,14 @@ public class IndexFamily implements Serializable {
 
   static {
     NULL.setId(0L);
-    NULL.setName("No index");
+    NULL.setName("No indices");
     NULL.setArchived(false);
     Index index = new Index();
     index.setFamily(NULL);
     index.setId(0L);
     index.setName("No index");
     index.setPosition(1);
-    index.setSequence("");
+    index.setSequence(null);
     NULL.setIndices(Collections.singletonList(index));
   }
 
