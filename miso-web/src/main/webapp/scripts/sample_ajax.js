@@ -1107,10 +1107,72 @@ Sample.ui = {
     }
   },
   toAdd: [],
+  standardColumns: [
+    {
+      "sTitle": "Sample Name",
+      "mData": "id",
+      "mRender": function (data, type, full) {
+        return "<a href=\"/miso/sample/" + data + "\">" + full.name + "</a>";
+      },
+      "iSortPriority": 1
+    },
+    {
+      "sTitle": "Alias",
+      "mData": "alias",
+      "mRender": function (data, type, full) {
+        return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
+      },
+      "iSortPriority": 1
+    },
+    (Constants.isDetailedSample ? {
+      "sTitle": "Sample Class",
+      "mData": "sampleClassId",
+      "mRender": function (data, type, full) {
+        return Hot.getAliasFromId(data, Constants.sampleClasses) || "Plain";
+      },
+      "bVisible": "true",
+      "bSortable": false,
+      "iSortPriority": 0
+    } : null),
+    {
+      "sTitle": "Type",
+      "mData": "sampleType",
+      "iSortPriority": 0
+    },
+    {
+      "sTitle": "QC Passed",
+      "mData": "qcPassed",
+      "mRender": function (data, type, full) {
+        // data is returned as "true", "false", or "null"
+        return (data != null ? (data ? "True" : "False") : "Unknown");
+      },
+      "iSortPriority": 0
+    },
+    {
+      "sTitle": "Location",
+      "mData": "locationLabel",
+      "bSortable": false,
+      "mRender": function (data, type, full) {
+        return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+      },
+      "iSortPriority": 0
+    },
+    {
+      "sTitle": "Last Updated",
+      "mData": "lastModified",
+      "bVisible": (Constants.isDetailedSample ? "true" : "false"),
+      "iSortPriority": 2
+    },
+    {
+      "sTitle": "Barcode",
+      "mData": "identificationBarcode",
+      "bVisible": false,
+      "iSortPriority": 0
+    }
+  ].filter(function (x) { return x; }),
 
   createListingSamplesTable: function () {
     if (Sample.detailedSample && Sample.sampleClasses === undefined) {
-      Sample.ui.getSampleClasses();
       Sample.ui.getSampleValidRelationships();
     }
     jQuery('#listingSamplesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
@@ -1119,68 +1181,7 @@ Sample.ui = {
     jQuery('#listingSamplesTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
     	Utils.createToggleColumn("Sample.ui.toAdd"),
-        {
-          "sTitle": "Sample Name",
-          "mData": "id",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/sample/" + data + "\">" + full.name + "</a>";
-          },
-          "iSortPriority": 1
-        },
-        {
-          "sTitle": "Alias",
-          "mData": "alias",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
-          },
-          "iSortPriority": 1
-        },
-        (Sample.detailedSample ? {
-          "sTitle": "Sample Class",
-          "mData": "sampleClassId",
-          "mRender": function (data, type, full) {
-            return Hot.getAliasFromId(data, Sample.sampleClasses) || "Plain";
-          },
-          "bVisible": "true",
-          "bSortable": false,
-          "iSortPriority": 0
-        } : null),
-        {
-          "sTitle": "Type",
-          "mData": "sampleType",
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "QC Passed",
-          "mData": "qcPassed",
-          "mRender": function (data, type, full) {
-            // data is returned as "true", "false", or "null"
-            return (data != null ? (data ? "True" : "False") : "Unknown");
-          },
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Location",
-          "mData": "locationLabel",
-          "bSortable": false,
-          "mRender": function (data, type, full) {
-            return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
-          },
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Last Updated",
-          "mData": "lastModified",
-          "bVisible": (Sample.detailedSample ? "true" : "false"),
-          "iSortPriority": 2
-        },
-        {
-          "sTitle": "Barcode",
-          "mData": "identificationBarcode",
-          "bVisible": false,
-          "iSortPriority": 0
-        }
-      ].filter(function (x) { return x; }),
+      ].concat(Sample.ui.standardColumns),
       "bJQueryUI": true,
       "bAutoWidth": false,
       "iDisplayLength": 25,

@@ -741,6 +741,15 @@ public class EditSampleController {
         model.put("poolSampleMap", poolSampleMap);
         model.put("samplePools", pools);
         model.put("sampleRuns", getRunsBySamplePools(pools));
+        List<SampleDto> relations = new ArrayList<>();
+        if (LimsUtils.isDetailedSample(sample)) {
+          DetailedSample detailed = (DetailedSample) sample;
+          for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
+            relations.add(0, Dtos.asDto(LimsUtils.deproxify(parent)));
+          }
+          addChildren(relations, detailed.getChildren());
+        }
+        model.put("sampleRelations", mapper.writeValueAsString(relations));
       }
 
       if (sample != null && !sample.userCanWrite(user)) {
@@ -762,6 +771,13 @@ public class EditSampleController {
         log.debug("Failed to show sample", ex);
       }
       throw ex;
+    }
+  }
+
+  private void addChildren(List<SampleDto> relations, Set<DetailedSample> children) {
+    for (DetailedSample child : children) {
+      relations.add(Dtos.asDto(LimsUtils.deproxify(child)));
+      addChildren(relations, child.getChildren());
     }
   }
 

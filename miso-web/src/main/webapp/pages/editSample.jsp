@@ -963,6 +963,28 @@
   </script>
   </c:if>
 
+  <c:if test="${detailedSample}">
+    <br/>
+    <h1>Relationships</h1>
+
+    <div style="clear:both">
+      <table class="list" id="relations_table">
+      </table>
+      <script type="text/javascript">
+        jQuery(document).ready(function () {
+          jQuery('#relations_table').dataTable({
+            "aoColumns": Sample.ui.standardColumns,
+            "aaData": ${sampleRelations},
+            "iDisplayLength": 50,
+            "bJQueryUI": true,
+            "bRetrieve": true
+          });
+        });
+      </script>
+    </div>
+  </c:if>
+
+
   <c:if test="${not empty samplePools}">
     <br/>
     <h1>${fn:length(samplePools)} Pool<c:if test="${fn:length(samplePools) ne 1}">s</c:if></h1>
