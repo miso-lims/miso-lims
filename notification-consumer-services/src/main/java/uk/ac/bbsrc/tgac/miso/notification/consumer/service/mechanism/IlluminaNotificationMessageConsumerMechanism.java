@@ -168,7 +168,6 @@ public class IlluminaNotificationMessageConsumerMechanism
               ((RunImpl) r).illuminaRunConfig(xml, null);
               is = r.getStatus();
               is.setHealth(ht);
-              r.getStatus().setHealth(ht);
             }
 
             if (run.has(IlluminaTransformer.JSON_FULL_PATH)) {
@@ -238,7 +237,8 @@ public class IlluminaNotificationMessageConsumerMechanism
             }
 
             if (r.getStatus() != null) {
-              if (!r.getStatus().getHealth().equals(HealthType.Failed) && !r.getStatus().getHealth().equals(HealthType.Completed)) {
+              if (r.getStatus().getHealth() != HealthType.Failed && r.getStatus().getHealth() != HealthType.Completed
+                  && ht != HealthType.Unknown) {
                 r.getStatus().setHealth(ht);
               }
 
