@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -488,7 +489,7 @@ public class SampleControllerHelperService {
   }
 
   public JSONObject changeSampleIdBarcode(HttpSession session, JSONObject json) {
-    Long sampleId = json.getLong("sampleId");
+    long sampleId = json.getLong("sampleId");
     String idBarcode = json.getString("identificationBarcode");
 
     try {
@@ -496,10 +497,12 @@ public class SampleControllerHelperService {
         // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
         idBarcode = null;
       } else {
-        List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
-        if (!previouslyBarcodedItems.isEmpty()
-            && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == sampleId)) {
-          Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
+        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays.asList(idBarcode)));
+        if (!previouslyBarcodedItems.isEmpty() && (
+            (previouslyBarcodedItems.size() != 1
+                || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.SAMPLE
+                || previouslyBarcodedItems.get(0).getId().getTargetId() != sampleId))) {
+          BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
           String error = String.format(
               "Could not change sample identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
               idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());

@@ -123,9 +123,6 @@ public class EditBoxController {
       // add all BoxSizes
       model.put("boxSizes", requestManager.listAllBoxSizes());
 
-      // add all box contents
-      model.put("boxables", box.getBoxables());
-
       // add JSON
       ObjectMapper mapper = new ObjectMapper();
       model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(box)));

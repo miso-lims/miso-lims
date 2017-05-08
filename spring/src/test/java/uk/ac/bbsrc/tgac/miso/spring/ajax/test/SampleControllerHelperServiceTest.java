@@ -22,8 +22,8 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -69,7 +69,7 @@ public class SampleControllerHelperServiceTest {
     json.put("sampleId", id);
     json.put("identificationBarcode", idBarcode);
 
-    Mockito.when(requestManager.getBoxablesFromBarcodeList(Matchers.anyListOf(String.class))).thenReturn(new HashSet<Boxable>());
+    Mockito.when(requestManager.getBoxableViewsFromBarcodeList(Matchers.anyListOf(String.class))).thenReturn(new HashSet<BoxableView>());
 
     final JSONObject response = sampleControllerHelperService.changeSampleIdBarcode(null, json);
 

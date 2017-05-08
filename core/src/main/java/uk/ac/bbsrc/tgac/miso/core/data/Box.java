@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -69,18 +70,17 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletabl
   /**
    * Returns the Map representing the Boxables (Samples, Libraries, Pools) of this Box object.
    * 
-   * @return Map<String, Boxable> items
+   * @return items
    */
-  public Map<String, Boxable> getBoxables();
+  public Map<String, BoxableView> getBoxables();
 
   /**
    * Sets the Map of BoxItems of this Box object.
    * 
-   * @param Map
-   *          <String, Boxable> items
+   * @param items
    * @throws InvalidBoxPositionException
    */
-  public void setBoxables(Map<String, Boxable> items);
+  public void setBoxables(Map<String, BoxableView> items);
 
   /**
    * Adds a BoxItem to the Box object at the given position.
@@ -93,7 +93,7 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletabl
    *           if the given position is not in the correct format IndexOutOfBoundsException if the given Row letter or column value is too
    *           big for the Box
    */
-  public void setBoxable(String position, Boxable item);
+  public void setBoxable(String position, BoxableView item);
 
   /**
    * Returns the Boxable at position given.
@@ -105,7 +105,7 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletabl
    *           if the given position is not in the correct format IndexOutOfBoundsException if the given Row letter or column value is too
    *           big for the Box
    */
-  public Boxable getBoxable(String position);
+  public BoxableView getBoxable(String position);
 
   /**
    * Removes a Boxable item from the given position
@@ -146,7 +146,8 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletabl
    * 
    * @return true/false if position is taken by another Boxable item or not
    * @throws IllegalArgumentException
-   *           if the given position is not in the correct format IndexOutOfBoundsException if the given Row letter or column value is too
+   *           if the given position is not in the correct format
+   * @throws IndexOutOfBoundsException if the given Row letter or column value is too
    *           big for the Box
    */
   public boolean isFreePosition(String position);
@@ -155,25 +156,8 @@ public interface Box extends SecurableByProfile, Barcodable, Locatable, Deletabl
    * Returns whether or not the given String is a valid position or not
    * 
    * @return validity of the position string
-   * @throws IllegalArgumentException
-   *           if the given position is not in the correct format IndexOutOfBoundsException if the given Row letter or column value is too
-   *           big for the Box
    */
   public boolean isValidPosition(String position);
-
-  /**
-   * Returns whether or not the given Boxable item exists in the Box
-   * 
-   * @return existence of boxable in Box
-   */
-  public boolean boxableExists(Boxable boxable);
-
-  /**
-   * Get the Boxable items in 2-D array form
-   * 
-   * @return 2D Boxable array
-   */
-  public Boxable[][] get2DArray();
 
   /**
    * Returns the BoxUse for this Box item.

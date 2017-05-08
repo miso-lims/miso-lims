@@ -1,8 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 
 /**
  * Utility class to provide helpful functions for Box-related methods in MISO
@@ -157,16 +156,24 @@ public class BoxUtils {
     return letter;
   }
 
-  public static String makeLocationLabel(Boxable b) {
-    if (b.isDiscarded()) {
+  public static String makeLocationLabel(BoxableView boxable) {
+    return makeLocationLabel(boxable.isDiscarded(), boxable.getLocationBarcode(), boxable.getBoxAlias(), boxable.getBoxPosition(),
+        boxable.getBoxLocationBarcode());
+  }
+
+  public static String makeLocationLabel(Boxable boxable) {
+    return makeLocationLabel(boxable.isDiscarded(), boxable.getLocationBarcode(), boxable.getBox().getAlias(), boxable.getBoxPosition(),
+        boxable.getBox().getLocationBarcode());
+  }
+
+  public static String makeLocationLabel(boolean discarded, String locationBarcode, String boxAlias, String position,
+      String boxLocationBarcode) {
+    if (discarded) {
       return "EMPTY";
-    } else if (b.getBox() != null && !isStringEmptyOrNull(b.getBox().getAlias()) && !isStringEmptyOrNull(b.getBoxPosition())
-        && !isStringEmptyOrNull(b.getBox().getLocationBarcode())) {
-      return b.getBox().getAlias() + " - " + b.getBoxPosition() + " (" + b.getBox().getLocationBarcode() + ")";
-    } else if (b.getBox() != null && !isStringEmptyOrNull(b.getBox().getAlias()) && !isStringEmptyOrNull(b.getBoxPosition())) {
-      return b.getBox().getAlias() + " - " + b.getBoxPosition();
-    } else if (!isStringEmptyOrNull(b.getLocationBarcode())) {
-      return b.getLocationBarcode();
+    } else if (boxAlias != null && position != null) {
+      return boxAlias + " - " + position + (boxLocationBarcode == null ? "" : " (" + boxLocationBarcode + ")");
+    } else if (locationBarcode != null) {
+      return locationBarcode;
     } else {
       return "Unknown";
     }

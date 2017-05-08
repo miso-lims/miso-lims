@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 
 import org.junit.Before;
@@ -21,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 
 import com.eaglegenomics.simlims.core.User;
@@ -41,6 +39,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
@@ -180,9 +180,9 @@ public class BoxControllerHelperServiceTest {
   @Test
   public void testSaveBoxContents() throws Exception {
     // mock lookups
-    Sample sample = makeSample();
-    Library library = makeLibrary();
-    when(requestManager.getBoxablesFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample, library));
+    BoxableView sample = makeSampleView();
+    BoxableView library = makeLibraryView();
+    when(requestManager.getBoxableViewsFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample, library));
 
     // do not add sample/library to box. Testing verifies that this gets done by saveBoxContents by parsing the JSON
     Box box = makeEmptyBox();
@@ -223,8 +223,8 @@ public class BoxControllerHelperServiceTest {
     Box box = makeEmptyBox();
     when(requestManager.getBoxById(box.getId())).thenReturn(box);
 
-    Sample sample = makeSample();
-    when(requestManager.getBoxablesFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample));
+    BoxableView sample = makeSampleView();
+    when(requestManager.getBoxableViewByBarcode(Mockito.any())).thenReturn(sample);
 
     JSONObject json = new JSONObject();
     json.put("boxId", box.getId());
@@ -232,9 +232,9 @@ public class BoxControllerHelperServiceTest {
     json.put("barcode", sample.getIdentificationBarcode());
 
     JSONObject response = boxControllerHelperService.updateOneItem(null, json);
+    assertFalse(response.has("error"));
     assertTrue(response.has("boxJSON"));
     assertTrue(response.has("addedToBox"));
-    assertFalse(response.has("error"));
 
     ArgumentCaptor<Box> saveBox = ArgumentCaptor.forClass(Box.class);
     verify(requestManager).saveBox(saveBox.capture());
@@ -244,7 +244,7 @@ public class BoxControllerHelperServiceTest {
   @Test
   public void testRemoveTubeFromBox() throws Exception {
     Box box = makeEmptyBox();
-    Sample sample = makeSample();
+    BoxableView sample = makeSampleView();
     box.setBoxable("A01", sample);
     when(requestManager.getBoxById(box.getId())).thenReturn(box);
 
@@ -266,7 +266,7 @@ public class BoxControllerHelperServiceTest {
   @Test
   public void testEmptySingleTube() throws Exception {
     Box box = makeEmptyBox();
-    Sample sample = makeSample();
+    BoxableView sample = makeSampleView();
     box.setBoxable("A01", sample);
     when(requestManager.getBoxById(box.getId())).thenReturn(box);
 
@@ -300,32 +300,9 @@ public class BoxControllerHelperServiceTest {
   }
 
   @Test
-  public void testGetBoxableByBarcodeNone() throws Exception {
-    when(requestManager.getBoxablesFromBarcodeList(Mockito.any())).thenReturn(Collections.emptyList());
-    assertNull(boxControllerHelperService.getBoxableByBarcode("BARCODE"));
-  }
-
-  @Test
-  public void testGetBoxableByBarcodeSingle() throws Exception {
-    Sample sample = makeSample();
-    when(requestManager.getBoxablesFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample));
-    assertEquals(sample, boxControllerHelperService.getBoxableByBarcode(sample.getIdentificationBarcode()));
-  }
-
-  @Test
-  public void testGetBoxableByBarcodeMultiple() throws Exception {
-    Sample sample = makeSample();
-    Library library = makeLibrary();
-    when(requestManager.getBoxablesFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample, library));
-
-    exception.expect(DuplicateKeyException.class);
-    boxControllerHelperService.getBoxableByBarcode(sample.getIdentificationBarcode());
-  }
-
-  @Test
   public void testLookupBoxableByBarcode() throws Exception {
-    Sample sample = makeSample();
-    when(requestManager.getBoxablesFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample));
+    BoxableView sample = makeSampleView();
+    when(requestManager.getBoxableViewByBarcode(Mockito.any())).thenReturn(sample);
 
     JSONObject json = new JSONObject();
     json.put("barcode", sample.getIdentificationBarcode());
@@ -339,9 +316,9 @@ public class BoxControllerHelperServiceTest {
 
   @Test
   public void testLookupBoxableByBarcodeTrashed() throws Exception {
-    Sample sample = makeSample();
+    BoxableView sample = makeSampleView();
     sample.setDiscarded(true);
-    when(requestManager.getBoxablesFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample));
+    when(requestManager.getBoxableViewByBarcode(Mockito.any())).thenReturn(sample);
 
     JSONObject json = new JSONObject();
     json.put("barcode", sample.getIdentificationBarcode());
@@ -381,9 +358,9 @@ public class BoxControllerHelperServiceTest {
   @Test
   public void testEmptyEntireBox() throws Exception {
     Box box = makeEmptyBox();
-    Sample sample = makeSample();
+    BoxableView sample = makeSampleView();
     box.setBoxable("A01", sample);
-    Library library = makeLibrary();
+    BoxableView library = makeLibraryView();
     box.setBoxable("A02", library);
     assertEquals(2, box.getTubeCount());
     assertFalse(sample.isDiscarded());
@@ -405,24 +382,45 @@ public class BoxControllerHelperServiceTest {
     // box DAO is responsible for actually emptying and removing the tubes
   }
 
-  private Sample makeSample() {
+  private static Sample makeSample() {
     Sample sample = new SampleImpl();
     sample.setId(1L);
     sample.setAlias("sample");
     sample.setIdentificationBarcode("1111");
     sample.setDiscarded(false);
-    Box box = makeEmptyBox();
-    box.setBoxable("A10", sample);
     return sample;
   }
 
-  private Library makeLibrary() {
+  private static BoxableView makeSampleView() {
+    return makeBoxable(makeSample());
+  }
+
+  private static Library makeLibrary() {
     Library library = new LibraryImpl();
     library.setId(1L);
     library.setAlias("library");
     library.setIdentificationBarcode("2222");
     library.setDiscarded(false);
     return library;
+  }
+
+  private static BoxableView makeLibraryView() {
+    return makeBoxable(makeLibrary());
+  }
+
+  private static BoxableView makeBoxable(Boxable boxable) {
+    BoxableView v = new BoxableView();
+    BoxableId id = new BoxableId();
+    id.setTargetId(boxable.getId());
+    id.setTargetType(boxable.getEntityType());
+    v.setId(id);
+    v.setName(boxable.getName());
+    v.setAlias(boxable.getAlias());
+    v.setIdentificationBarcode(boxable.getIdentificationBarcode());
+    v.setLocationBarcode(boxable.getLocationBarcode());
+    v.setVolume(boxable.getVolume());
+    v.setDiscarded(boxable.isDiscarded());
+    return v;
   }
 
   private Box makeEmptyBox() {
