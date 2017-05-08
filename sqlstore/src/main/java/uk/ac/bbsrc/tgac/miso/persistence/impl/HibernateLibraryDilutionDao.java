@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 
 @Repository
@@ -32,9 +33,16 @@ public class HibernateLibraryDilutionDao
   @Autowired
   private SessionFactory sessionFactory;
 
+  @Autowired
+  private BoxStore boxStore;
+
   @Override
   public Session currentSession() {
     return getSessionFactory().getCurrentSession();
+  }
+
+  public void setBoxStore(BoxStore boxStore) {
+    this.boxStore = boxStore;
   }
 
   @Override
@@ -43,6 +51,9 @@ public class HibernateLibraryDilutionDao
     if (dilution.getId() == LibraryDilution.UNSAVED_ID) {
       id = (long) currentSession().save(dilution);
     } else {
+      if (dilution.isDiscarded()) {
+        boxStore.removeBoxableFromBox(dilution);
+      }
       currentSession().update(dilution);
       id = dilution.getId();
     }

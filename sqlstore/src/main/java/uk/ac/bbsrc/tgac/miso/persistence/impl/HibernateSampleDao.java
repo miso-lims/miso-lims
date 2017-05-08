@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
+import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -52,7 +53,14 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
   private SessionFactory sessionFactory;
 
   @Autowired
+  private BoxStore boxStore;
+
+  @Autowired
   private JdbcTemplate template;
+
+  public void setBoxStore(BoxStore boxStore) {
+    this.boxStore = boxStore;
+  }
 
   @Override
   public Long addSample(final Sample sample) throws IOException {
@@ -260,6 +268,9 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
 
   @Override
   public void update(Sample sample) throws IOException {
+    if (sample.isDiscarded()) {
+      boxStore.removeBoxableFromBox(sample);
+    }
     currentSession().update(sample);
   }
 
