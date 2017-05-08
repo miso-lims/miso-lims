@@ -45,13 +45,13 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxDao;
 
 public class HibernateBoxDaoTest extends AbstractDAOTest {
 
@@ -174,11 +174,14 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
 
   @Test
   public void testRemoveBoxableFromBox() throws Exception {
+    Sample s = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 15L);
     Box box = dao.get(1);
-    Boxable item = box.getBoxables().values().iterator().next();
+    BoxableView item = box.getBoxable("A01");
     assertNotNull(item);
+    assertEquals(EntityType.SAMPLE, item.getId().getTargetType());
+    assertEquals(s.getId(), item.getId().getTargetId());
 
-    dao.removeBoxableFromBox(item);
+    dao.removeBoxableFromBox(s);
     Box again = dao.get(1);
     assertFalse(again.getBoxables().containsValue(item));
   }
@@ -220,10 +223,61 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testAnyMetaDef() throws Exception {
-    Box box = dao.get(1L);
-    box.getBoxables();
-    assertTrue(box.getBoxable("A01") instanceof Identity);
-    assertTrue(box.getBoxable("B02") instanceof SampleTissue);
+  public void testMoveWithinBox() throws Exception {
+    // Note: move is a two-step process
+    // 1. remove from previous position and save the box
+    // 2. add to new position and save the box
+    long boxId = 1L;
+    String fromPos = "A01";
+    String toPos = "A02";
+
+    Box box = dao.get(boxId);
+    BoxableView boxable = box.getBoxable(fromPos);
+    assertNotNull(boxable);
+
+    box.removeBoxable(fromPos);
+    dao.save(box);
+
+    box.setBoxable(toPos, boxable);
+    dao.save(box);
+
+    Box again = dao.get(boxId);
+    assertNull(again.getBoxable(fromPos));
+    assertNotNull(again.getBoxable(toPos));
   }
+
+  @Test
+  public void testMoveFromOtherBox() throws Exception {
+    // Note: move is a two-step process
+    // 1. remove from previous position and save the box
+    // 2. add to new position and save the box
+    long fromBoxId = 1L;
+    String fromPos = "A01";
+    long toBoxId = 2L;
+    String toPos = "A01";
+
+    Box fromBox = dao.get(fromBoxId);
+    assertNotNull(fromBox);
+    assertNotNull(fromBox.getBoxable(fromPos));
+    BoxableView boxable = fromBox.getBoxable(fromPos);
+    assertNotNull(boxable);
+
+    fromBox.removeBoxable(fromPos);
+    dao.save(fromBox);
+
+    Box toBox = dao.get(toBoxId);
+    assertNotNull(toBox);
+    assertNull(toBox.getBoxable(toPos));
+    toBox.setBoxable(toPos, boxable);
+    dao.save(toBox);
+
+    Box saved = dao.get(toBoxId);
+    assertNotNull(saved);
+    assertNotNull(saved.getBoxable(toPos));
+
+    Box original = dao.get(fromBoxId);
+    assertNotNull(original);
+    assertNull(original.getBoxable(fromPos));
+  }
+
 }

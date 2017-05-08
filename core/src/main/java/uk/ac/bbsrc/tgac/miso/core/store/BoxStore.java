@@ -2,12 +2,15 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 
 /**
  * This interface defines a DAO for storing Boxes
@@ -68,10 +71,18 @@ public interface BoxStore extends Store<Box>, Remover<Box> {
   
   void removeBoxableFromBox(Boxable boxable) throws IOException;
 
+  void removeBoxableFromBox(BoxableView boxable) throws IOException;
+
   /**
    * @return a map containing all column names and max lengths from the Box table
    * @throws IOException
    */
   public Map<String, Integer> getBoxColumnSizes() throws IOException;
+
+  public BoxableView getBoxableView(BoxableId id) throws IOException;
+
+  public BoxableView getBoxableViewByBarcode(String barcode) throws IOException;
+
+  public List<BoxableView> getBoxableViewsByBarcodeList(Collection<String> barcodes) throws IOException;
 
 }

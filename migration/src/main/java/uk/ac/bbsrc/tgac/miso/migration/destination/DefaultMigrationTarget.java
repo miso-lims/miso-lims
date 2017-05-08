@@ -30,7 +30,6 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
@@ -52,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
@@ -710,7 +710,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private void mergeBox(Box from, Box to) throws IOException {
     log.debug("Merging box " + from.getAlias() + " with existing box");
     assertBoxPropertiesMatch(from, to);
-    for (Entry<String, Boxable> entry : from.getBoxables().entrySet()) {
+    for (Entry<String, BoxableView> entry : from.getBoxables().entrySet()) {
       if (entry.getValue() != null) {
         if (to.getBoxable(entry.getKey()) != null) {
           throw new IllegalStateException(String.format("Box %s position %s is already filled", to.getAlias(), entry.getKey()));

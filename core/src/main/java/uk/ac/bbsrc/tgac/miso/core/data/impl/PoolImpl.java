@@ -193,6 +193,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
+  public EntityType getEntityType() {
+    return EntityType.POOL;
+  }
+
+  @Override
   public void addExperiment(Experiment experiment) throws MalformedExperimentException {
     if (experiment != null) {
       experiments.add(experiment);

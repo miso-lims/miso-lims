@@ -24,6 +24,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -53,7 +55,7 @@ public class HibernateBoxDao implements BoxStore {
 
   @Override
   public void discardAllTubes(Box box) throws IOException {
-    List<Boxable> originalContents = new ArrayList<>(box.getBoxables().values());
+    List<BoxableView> originalContents = new ArrayList<>(box.getBoxables().values());
     try {
       box.removeAllBoxables();
       save(box);
@@ -62,19 +64,35 @@ public class HibernateBoxDao implements BoxStore {
       throw new IOException("Error discarding box: " + e.getMessage());
     }
 
-    for (Boxable boxable : originalContents) {
+    for (BoxableView boxable : originalContents) {
       boxable.setDiscarded(true);
-      currentSession().save(boxable);
+      updateBoxable(boxable);
     }
   }
 
   @Override
   public void discardSingleTube(Box box, String position) throws IOException {
-    Boxable target = box.getBoxable(position);
+    BoxableView target = box.getBoxable(position);
     target.setDiscarded(true);
     box.removeBoxable(position);
     save(box);
-    currentSession().save(target);
+    updateBoxable(target);
+  }
+
+  private void updateBoxable(BoxableView view) throws IOException {
+    Boxable boxable = getBoxable(view);
+    applyChanges(view, boxable);
+    currentSession().update(boxable);
+  }
+
+  private Boxable getBoxable(BoxableView view) throws IOException {
+    Class<?> clazz = view.getId().getTargetType().getPersistClass();
+    return (Boxable) currentSession().get(clazz, view.getId().getTargetId());
+  }
+
+  private void applyChanges(BoxableView from, Boxable to) {
+    to.setDiscarded(from.isDiscarded());
+    to.setVolume(from.getVolume());
   }
 
   @Override
@@ -172,8 +190,23 @@ public class HibernateBoxDao implements BoxStore {
 
   @Override
   public void removeBoxableFromBox(Boxable boxable) throws IOException {
-    Box box = get(boxable.getBox().getId());
-    box.removeBoxable(boxable.getBoxPosition());
+    if (boxable.getBox() == null) {
+      return;
+    }
+    removeBoxableFromBox(boxable.getBox().getId(), boxable.getBoxPosition());
+  }
+
+  @Override
+  public void removeBoxableFromBox(BoxableView boxable) throws IOException {
+    removeBoxableFromBox(boxable.getBoxId(), boxable.getBoxPosition());
+  }
+
+  private void removeBoxableFromBox(Long boxId, String position) throws IOException {
+    if (boxId == null) {
+      return;
+    }
+    Box box = get(boxId);
+    box.removeBoxable(position);
     currentSession().save(box);
   }
 
@@ -183,9 +216,30 @@ public class HibernateBoxDao implements BoxStore {
       return (long) currentSession().save(box);
     } else {
       currentSession().update(box);
-      currentSession().flush(); // This is required to make it possible to move items with in a box without creating constraint violations
       return box.getId();
     }
+  }
+
+  @Override
+  public BoxableView getBoxableView(BoxableId id) throws IOException {
+    return (BoxableView) currentSession().get(BoxableView.class, id);
+  }
+
+  @Override
+  public BoxableView getBoxableViewByBarcode(String barcode) throws IOException {
+    Criteria criteria = currentSession().createCriteria(BoxableView.class);
+    criteria.add(Restrictions.eq("identificationBarcode", barcode));
+    BoxableView result = (BoxableView) criteria.uniqueResult();
+    return result;
+  }
+
+  @Override
+  public List<BoxableView> getBoxableViewsByBarcodeList(Collection<String> barcodes) throws IOException {
+    Criteria criteria = currentSession().createCriteria(BoxableView.class);
+    criteria.add(Restrictions.in("identificationBarcode", barcodes));
+    @SuppressWarnings("unchecked")
+    List<BoxableView> results = criteria.list();
+    return results;
   }
 
   public void setJdbcTemplate(JdbcTemplate template) {
