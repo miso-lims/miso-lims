@@ -200,8 +200,11 @@ var Sample = Sample || {
       var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
       // assign sample class alias based on whether text or dropdown menu are present
       var sampleClassAlias = '';
-      if (jQuery('#sampleClassAlias')) sampleClassAlias = jQuery('#samplClassAlias');
-      if (jQuery('#sampleClass').children(':selected').text()) sampleClassAlias = jQuery('#sampleClass').children(':selected').text();
+      if (jQuery('#sampleClass').is('select')) {
+        sampleClassAlias = jQuery('#sampleClass option:selected').text();
+      } else {
+        sampleClassAlias = jQuery('#sampleClassAlias').text();
+      }
       switch (sampleCategory) {
       case 'Tissue Processing':
         switch (sampleClassAlias) {
@@ -221,8 +224,9 @@ var Sample = Sample || {
           jQuery('#thickness').attr('data-parsley-type', 'number');
           break;
         case 'LCM Tube':
-          jQuery('#cutsConsumed').attr('class', 'form-control');
-          jQuery('#cutsConsumed').attr('data-parsley-type', 'digits');
+          jQuery('#slidesConsumed').attr('class', 'form-control');
+          jQuery('#slidesConsumed').attr('data-parsley-type', 'digits');
+          jQuery('#slidesConsumed').attr('data-parsley-required', 'true');
           break;
         }
         break;

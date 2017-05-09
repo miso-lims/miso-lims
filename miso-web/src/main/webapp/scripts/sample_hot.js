@@ -661,8 +661,11 @@ Sample.hot = {
     } else if (action == 'update') {
       startProgression = endProgression;
     } else {
-      // Start at the category *after* our source type.
-      startProgression = progression.indexOf(sourceSampleCategory) + 1;
+      // Start at the category *after* our source type, unless source and target category are the same.
+      startProgression = endProgression;
+      if (progression.indexOf(targetSampleCategory) > progression.indexOf(sourceSampleCategory)) {
+        startProgression += 1;
+      }
     }
     // Now, mark all the appropriate column groups active
     for (i = startProgression; i <= endProgression && i != -1; i++) {
