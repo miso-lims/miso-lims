@@ -9,11 +9,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -36,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
@@ -414,8 +417,15 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedData
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, boolean creation) {
-    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  public String propertyForDate(Criteria criteria, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "derivedInfo.created";
+    case UPDATE:
+      return "derivedInfo.lastModified";
+    default:
+      return null;
+    }
   }
 
   @Override
@@ -429,8 +439,23 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedData
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
+    criteria.createAlias("indices", "indices");
+    restrictPaginationByIndices(criteria, index);
+  }
+
+  public static void restrictPaginationByIndices(Criteria criteria, String index) {
+    criteria.add(Restrictions.or(Restrictions.ilike("indices.name", index, MatchMode.ANYWHERE),
+        Restrictions.ilike("indices.sequence", index, MatchMode.EXACT)));
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Library";
+  }
 }

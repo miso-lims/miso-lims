@@ -71,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -405,10 +406,12 @@ public class PoolControllerHelperService {
         // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
         idBarcode = null;
       } else {
-        List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
-        if (!previouslyBarcodedItems.isEmpty()
-            && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == poolId)) {
-          Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
+        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays.asList(idBarcode)));
+        if (!previouslyBarcodedItems.isEmpty() && (
+            (previouslyBarcodedItems.size() != 1
+                || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.POOL
+                || previouslyBarcodedItems.get(0).getId().getTargetId() != poolId))) {
+          BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
           String error = String.format(
               "Could not change pool identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
               idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());

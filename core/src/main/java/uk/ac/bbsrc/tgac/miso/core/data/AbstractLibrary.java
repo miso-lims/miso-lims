@@ -181,6 +181,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private Integer dnaSize;
 
   @Override
+  public EntityType getEntityType() {
+    return EntityType.LIBRARY;
+  }
+
+  @Override
   public Box getBox() {
     return boxPosition == null ? null : boxPosition.getBox();
   }

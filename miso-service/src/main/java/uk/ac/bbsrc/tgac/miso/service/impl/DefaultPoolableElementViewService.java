@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,14 +41,15 @@ public class DefaultPoolableElementViewService implements PoolableElementViewSer
   }
 
   @Override
-  public long count(PaginationFilter... filter) throws IOException {
-    return poolableElementViewDao.count(filter);
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return poolableElementViewDao.count(errorHandler, filter);
   }
 
   @Override
-  public List<PoolableElementView> list(int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public List<PoolableElementView> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter)
       throws IOException {
-    return poolableElementViewDao.list(offset, limit, sortDir, sortCol, filter);
+    return poolableElementViewDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
 }

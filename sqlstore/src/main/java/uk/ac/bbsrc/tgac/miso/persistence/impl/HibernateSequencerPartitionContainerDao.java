@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -22,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -173,8 +175,15 @@ public class HibernateSequencerPartitionContainerDao
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, boolean creation) {
-    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  public String propertyForDate(Criteria criteria, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "derivedInfo.created";
+    case UPDATE:
+      return "derivedInfo.lastModified";
+    default:
+      return null;
+    }
   }
 
   @Override
@@ -188,8 +197,21 @@ public class HibernateSequencerPartitionContainerDao
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platform.platformType", platformType));
   }
 
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
+    criteria.createAlias("partitions", "partitions");
+    criteria.createAlias("partitions.pool", "pool");
+    criteria.createAlias("pool.pooledElementViews", "dilutionForIndex");
+    criteria.createAlias("dilutionForIndex.indices", "indices");
+    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Container";
+  }
 }

@@ -137,6 +137,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private SampleBoxPosition boxPosition;
 
   @Override
+  public EntityType getEntityType() {
+    return EntityType.SAMPLE;
+  }
+
+  @Override
   public Box getBox() {
     return boxPosition == null ? null : boxPosition.getBox();
   }

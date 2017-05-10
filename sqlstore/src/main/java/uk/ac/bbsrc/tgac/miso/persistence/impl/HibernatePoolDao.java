@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -31,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
@@ -299,19 +301,26 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   }
 
   @Override
-  public void restrictPaginationByProjectId(Criteria criteria, long projectId) {
+  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
     criteria.createAlias("pooledElementViews", "dilution");
-    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId);
+    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, boolean creation) {
-    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  public String propertyForDate(Criteria criteria, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "derivedInfo.created";
+    case UPDATE:
+      return "derivedInfo.lastModified";
+    default:
+      return null;
+    }
   }
 
   @Override
@@ -322,6 +331,18 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   @Override
   public Class<? extends Pool> getRealClass() {
     return PoolImpl.class;
+  }
+
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
+    criteria.createAlias("pooledElementViews", "dilutionForIndex");
+    criteria.createAlias("dilutionForIndex.indices", "indices");
+    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Pool";
   }
 
 }

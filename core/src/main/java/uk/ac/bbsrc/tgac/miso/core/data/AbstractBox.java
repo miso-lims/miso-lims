@@ -201,4 +201,9 @@ public abstract class AbstractBox implements Box {
     return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
+  @Override
+  public String getLabelText() {
+    return getAlias();
+  }
+
 }

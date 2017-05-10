@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -31,6 +32,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
+import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -52,7 +55,14 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
   private SessionFactory sessionFactory;
 
   @Autowired
+  private BoxStore boxStore;
+
+  @Autowired
   private JdbcTemplate template;
+
+  public void setBoxStore(BoxStore boxStore) {
+    this.boxStore = boxStore;
+  }
 
   @Override
   public Long addSample(final Sample sample) throws IOException {
@@ -260,6 +270,9 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
 
   @Override
   public void update(Sample sample) throws IOException {
+    if (sample.isDiscarded()) {
+      boxStore.removeBoxableFromBox(sample);
+    }
     currentSession().update(sample);
   }
 
@@ -330,8 +343,17 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, boolean creation) {
-    return creation ? "derivedInfo.created" : "derivedInfo.lastModified";
+  public String propertyForDate(Criteria criteria, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "derivedInfo.created";
+    case UPDATE:
+      return "derivedInfo.lastModified";
+    case RECEIVE:
+      return "receivedDate";
+    default:
+      return null;
+    }
   }
 
   @Override
@@ -339,4 +361,15 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
     return creator ? "creator.loginName" : "lastModifier.loginName";
   }
 
+  @Override
+  public void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
+    criteria.createAlias("sampleClass", "sampleClass");
+    criteria.add(Restrictions.or(Restrictions.ilike("sampleClass.alias", name, MatchMode.ANYWHERE),
+        Restrictions.ilike("sampleClass.sampleCategory", name, MatchMode.START)));
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Sample";
+  }
 }

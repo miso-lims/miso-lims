@@ -143,6 +143,11 @@ public class LibraryDilution implements Dilution {
   }
 
   @Override
+  public EntityType getEntityType() {
+    return EntityType.DILUTION;
+  }
+
+  @Override
   public Library getLibrary() {
     return library;
   }
