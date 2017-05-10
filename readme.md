@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/TGAC/miso-lims.svg?branch=develop)](https://travis-ci.org/TGAC/miso-lims)
+
 # MISO: An open source LIMS for small-to-large scale sequencing centres
 
 &copy; 2016. [Earlham Institute](http://earlham.ac.uk/), Norwich, UK, [Ontario Institute for Cancer Research](http://oicr.on.ca), Toronto, Canada
