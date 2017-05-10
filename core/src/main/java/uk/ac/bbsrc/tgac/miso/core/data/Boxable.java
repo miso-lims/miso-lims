@@ -7,9 +7,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * This interface simply describes an object that can be placed into a box. i.e. Sample, Library
@@ -19,8 +21,27 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = SampleImpl.class, name = "SampleImpl"),
     @JsonSubTypes.Type(value = LibraryImpl.class, name = "LibraryImpl"), @JsonSubTypes.Type(value = PoolImpl.class, name = "PoolImpl") })
+public interface Boxable extends Nameable, Barcodable, SecurableByProfile, Serializable {
 
-public interface Boxable extends Nameable, Barcodable, Serializable {
+  public static enum EntityType {
+    SAMPLE(SampleImpl.class),
+    LIBRARY(LibraryImpl.class),
+    DILUTION(LibraryDilution.class),
+    POOL(PoolImpl.class);
+
+    private final Class<? extends Boxable> persistClass;
+
+    private EntityType(Class<? extends Boxable> persistClass) {
+      this.persistClass = persistClass;
+    }
+
+    public Class<? extends Boxable> getPersistClass() {
+      return persistClass;
+    }
+  }
+
+  public EntityType getEntityType();
+
   /**
    * Returns the alias of this Sample object.
    *

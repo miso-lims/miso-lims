@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,14 +25,15 @@ public class DefaultPoolOrderCompletionService implements PoolOrderCompletionSer
   private AuthorizationManager authorizationManager;
 
   @Override
-  public long count(PaginationFilter... filter) throws IOException {
-    return poolOrderCompletionDao.count(filter);
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return poolOrderCompletionDao.count(errorHandler, filter);
   }
 
   @Override
-  public List<PoolOrderCompletion> list(int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public List<PoolOrderCompletion> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter)
       throws IOException {
-    return authorizationManager.filterUnreadable(poolOrderCompletionDao.list(offset, limit, sortDir, sortCol, filter),
+    return authorizationManager.filterUnreadable(poolOrderCompletionDao.list(errorHandler, offset, limit, sortDir, sortCol, filter),
         x -> x.getPool());
   }
 

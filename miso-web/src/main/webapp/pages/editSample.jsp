@@ -419,7 +419,7 @@
               </c:when>
               <c:otherwise>
                 <input type="hidden" id="sampleClass" value="${sample.sampleClass.id}"/>
-                ${sample.sampleClass.alias}
+                <span id="sampleClassAlias">${sample.sampleClass.alias}</span>
               </c:otherwise>
             </c:choose>
           </td>

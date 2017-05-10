@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -17,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -32,9 +35,16 @@ public class HibernateLibraryDilutionDao
   @Autowired
   private SessionFactory sessionFactory;
 
+  @Autowired
+  private BoxStore boxStore;
+
   @Override
   public Session currentSession() {
     return getSessionFactory().getCurrentSession();
+  }
+
+  public void setBoxStore(BoxStore boxStore) {
+    this.boxStore = boxStore;
   }
 
   @Override
@@ -43,6 +53,9 @@ public class HibernateLibraryDilutionDao
     if (dilution.getId() == LibraryDilution.UNSAVED_ID) {
       id = (long) currentSession().save(dilution);
     } else {
+      if (dilution.isDiscarded()) {
+        boxStore.removeBoxableFromBox(dilution);
+      }
       currentSession().update(dilution);
       id = dilution.getId();
     }
@@ -142,28 +155,34 @@ public class HibernateLibraryDilutionDao
     return SEARCH_PROPERTIES;
   }
 
-
   @Override
-  public void restrictPaginationByProjectId(Criteria criteria, long projectId) {
+  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
     criteria.createAlias("library.sample", "sample");
     criteria.createAlias("sample.project", "project");
-    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId);
+    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
   @Override
-  public void restrictPaginationByPoolId(Criteria criteria, long poolId) {
+  public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
     criteria.createAlias("pools", "pool");
     criteria.add(Restrictions.eq("pool.id", poolId));
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("library.platformType", platformType));
   }
 
   @Override
-  public String propertyForDate(Criteria item, boolean creation) {
-    return creation ? "creationDate" : "lastUpdated";
+  public String propertyForDate(Criteria item, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "creationDate";
+    case UPDATE:
+      return "lastUpdated";
+    default:
+      return null;
+    }
   }
 
   @Override
@@ -171,4 +190,14 @@ public class HibernateLibraryDilutionDao
     return creator ? "dilutionUserName" : "derivedInfo.lastModifier.loginName";
   }
 
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
+    criteria.createAlias("library.indices", "indices");
+    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Dilution";
+  }
 }

@@ -1,32 +1,29 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.MapKeyClass;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.AnyMetaDef;
-import org.hibernate.annotations.ManyToAny;
-import org.hibernate.annotations.MetaValue;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 @Entity
@@ -38,35 +35,22 @@ public class BoxImpl extends AbstractBox {
   protected static final Logger log = LoggerFactory.getLogger(BoxImpl.class);
 
   // The contents of the Box
-  @ManyToAny(metaColumn = @Column(name = "targetType"), fetch = FetchType.LAZY)
+  @OneToMany(targetEntity = BoxableView.class, fetch = FetchType.EAGER)
   @MapKeyColumn(name = "position", unique = true)
-  @MapKeyClass(String.class)
   @JoinTable(name = "BoxPosition", joinColumns = { @JoinColumn(name = "boxId") }, inverseJoinColumns = {
-      @JoinColumn(name = "targetId") })
-  @AnyMetaDef(idType = "long", metaType = "string", metaValues = {
-      @MetaValue(targetEntity = LibraryImpl.class, value = "Library"),
-      @MetaValue(targetEntity = DetailedLibraryImpl.class, value = "LibraryDetailed"),
-      @MetaValue(targetEntity = PoolImpl.class, value = "Pool"),
-      @MetaValue(targetEntity = SampleImpl.class, value = "Sample"),
-      @MetaValue(targetEntity = SampleAliquotImpl.class, value = "SampleAliquot"),
-      @MetaValue(targetEntity = IdentityImpl.class, value = "SampleIdentity"),
-      @MetaValue(targetEntity = SampleStockImpl.class, value = "SampleStock"),
-      @MetaValue(targetEntity = SampleTissueImpl.class, value = "SampleTissue"),
-      @MetaValue(targetEntity = SampleTissueProcessingImpl.class, value = "SampleProcessing"),
-      @MetaValue(targetEntity = SampleCVSlideImpl.class, value = "SampleCV"),
-      @MetaValue(targetEntity = SampleLCMTubeImpl.class, value = "SampleLCM"),
-      @MetaValue(targetEntity = LibraryDilution.class, value = "Dilution"),
-  })
-  private Map<String, Boxable> boxableItems = new HashMap<>();
+      @JoinColumn(name = "targetType", referencedColumnName = "targetType"),
+      @JoinColumn(name = "targetId", referencedColumnName = "targetId") })
+  @Fetch(FetchMode.SUBSELECT)
+  private Map<String, BoxableView> boxableViews = new HashMap<>();
 
-  /*
+  /**
    * Construct new Box with defaults, and an empty SecurityProfile
    */
   public BoxImpl() {
     setSecurityProfile(new SecurityProfile());
   }
 
-  /*
+  /**
    * Construct new Box using Security Profile owned by a given User
    * 
    * @param User user
@@ -77,7 +61,8 @@ public class BoxImpl extends AbstractBox {
 
   @Override
   public boolean isFreePosition(String position) {
-    if (boxableItems.get(position) == null) return true;
+    validate(position);
+    if (boxableViews.get(position) == null) return true;
     return false;
   }
 
@@ -92,7 +77,8 @@ public class BoxImpl extends AbstractBox {
 
   private void validate(String position) {
     if (!position.matches("[A-Z][0-9][0-9]")) throw new IllegalArgumentException("Position must match [A-Z][0-9][0-9]");
-    if (BoxUtils.fromRowChar(position.charAt(0)) >= getSize().getRows()) throw new IndexOutOfBoundsException("Row letter too large!");
+    if (BoxUtils.fromRowChar(position.charAt(0)) >= getSize().getRows())
+      throw new IndexOutOfBoundsException("Row letter too large!" + position);
     int col = BoxUtils.tryParseInt(position.substring(1, 3));
     if (col <= 0 || col > getSize().getColumns()) throw new IndexOutOfBoundsException("Column value too large!");
   }
@@ -109,62 +95,52 @@ public class BoxImpl extends AbstractBox {
   
   @Override
   public int getTubeCount() {
-    return boxableItems.size();
+    return boxableViews.size();
   }
 
   @Override
-  public String getLabelText() {
-    // TODO Auto-generated method stub
-    return null;
+  public void setBoxables(Map<String, BoxableView> items) {
+    this.boxableViews = items;
   }
 
   @Override
-  public void setBoxables(Map<String, Boxable> items) {
-    this.boxableItems = items;
+  public Map<String, BoxableView> getBoxables() {
+    return boxableViews;
   }
 
   @Override
-  public Map<String, Boxable> getBoxables() {
-    return boxableItems;
-  }
-
-  @Override
-  public boolean boxableExists(Boxable boxable) {
-    return boxableItems.values().contains(boxable);
-  }
-
-  @Override
-  public void setBoxable(String position, Boxable item) {
+  public void setBoxable(String position, BoxableView item) {
     validate(position);
-    boxableItems.put(position, item);
+
+    // if already in this box, remove from previous position first
+    String oldPosition = null;
+    for (Map.Entry<String, BoxableView> entry : boxableViews.entrySet()) {
+      if (entry.getValue().getId().equals(item.getId())) {
+        oldPosition = entry.getKey();
+        break;
+      }
+    }
+    if (oldPosition != null) {
+      boxableViews.remove(oldPosition);
+    }
+    boxableViews.put(position, item);
   }
 
   @Override
-  public Boxable getBoxable(String position) {
+  public BoxableView getBoxable(String position) {
     validate(position);
-    return boxableItems.get(position);
+    return boxableViews.get(position);
   }
 
   @Override
   public void removeBoxable(String position) {
     validate(position);
-    boxableItems.remove(position);
+    boxableViews.remove(position);
   }
 
   @Override
   public void removeAllBoxables() {
-    boxableItems.clear();
-  }
-
-  @Override
-  public Boxable[][] get2DArray() {
-    Boxable[][] arr = new Boxable[getSize().getRows()][getSize().getColumns()];
-    for (int i = 0; i < getSize().getRows(); i++) {
-      for (int j = 0; j < getSize().getColumns(); j++) {
-        arr[i][j] = boxableItems.get(BoxUtils.getPositionString(i, j));
-      }
-    }
-    return arr;
+    boxableViews.clear();
   }
 
   @Override
@@ -174,12 +150,11 @@ public class BoxImpl extends AbstractBox {
   
   @Override
   public String toString() {
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
-    } catch (IOException ex) {
-      return "";
-    }
+    return new ToStringBuilder(this)
+        .append("id", getId())
+        .append("name", getName())
+        .append("alias", getAlias())
+        .toString();
   }
 
   @Override

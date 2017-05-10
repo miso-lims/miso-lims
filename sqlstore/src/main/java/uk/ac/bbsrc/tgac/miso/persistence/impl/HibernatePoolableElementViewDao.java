@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolableElementViewDao;
 
 @Transactional(rollbackFor = Exception.class)
@@ -78,15 +80,15 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType) {
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platformType", platformType));
   }
 
   @Override
-  public void restrictPaginationByPoolId(Criteria criteria, long poolId) {
+  public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
     criteria
         .add(Restrictions.sqlRestriction("EXISTS(SELECT * FROM Pool_Dilution WHERE pool_poolId = ? AND dilution_dilutionId = dilutionId)",
-        poolId, LongType.INSTANCE));
+            poolId, LongType.INSTANCE));
   }
 
   @Override
@@ -95,12 +97,30 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
-  public String propertyForDate(Criteria item, boolean creation) {
-    return creation ? "created" : "lastModified";
+  public String propertyForDate(Criteria item, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "created";
+    case UPDATE:
+      return "lastModified";
+    default:
+      return null;
+    }
   }
 
   @Override
   public String propertyForUserName(Criteria item, boolean creator) {
     return creator ? "creatorName" : "lastModifier";
+  }
+
+  @Override
+  public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
+    criteria.createAlias("indices", "indices");
+    HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Dilution";
   }
 }

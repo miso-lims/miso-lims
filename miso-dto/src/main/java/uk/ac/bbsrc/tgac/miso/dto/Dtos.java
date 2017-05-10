@@ -22,7 +22,6 @@ import org.joda.time.format.ISODateTimeFormat;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -91,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -1138,28 +1138,26 @@ public class Dtos {
       dto.setScannable(from.getSize().getScannable());
     }
     if (from.getBoxables() != null) {
-      dto.setItems(asBoxablesDtos(from.getBoxables()));
+      dto.setItems(asBoxablesDtos(from.getBoxables(), from));
     }
     return dto;
   }
 
-  public static List<BoxableDto> asBoxablesDtos(Map<String, Boxable> boxables) {
+  private static List<BoxableDto> asBoxablesDtos(Map<String, BoxableView> boxables, Box box) {
     List<BoxableDto> items = new ArrayList<>();
-    for (Entry<String, Boxable> entry : boxables.entrySet()) {
+    for (Entry<String, BoxableView> entry : boxables.entrySet()) {
       items.add(asDto(entry.getValue()));
     }
     return items;
   }
 
-  public static BoxableDto asDto(Boxable from) {
+  public static BoxableDto asDto(BoxableView from) {
     BoxableDto dto = new BoxableDto();
-    dto.setId(from.getId());
+    dto.setId(from.getId().getTargetId());
     dto.setAlias(from.getAlias());
-    if (from.getBox() != null) {
-      dto.setBoxAlias(from.getBox().getAlias());
-      dto.setBoxPosition(BoxUtils.makeLocationLabel(from));
-      dto.setCoordinates(from.getBoxPosition());
-    }
+    dto.setBoxAlias(from.getBoxAlias());
+    dto.setBoxPosition(BoxUtils.makeLocationLabel(from));
+    dto.setCoordinates(from.getBoxPosition());
     dto.setDiscarded(from.isDiscarded());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setName(from.getName());
@@ -1173,13 +1171,6 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
-    return to;
-  }
-
-  public static Boxable to(BoxableDto item, Boxable to) {
-    to.setAlias(item.getAlias());
-    to.setVolume(item.getVolume());
-    to.setDiscarded(item.getDiscarded());
     return to;
   }
 

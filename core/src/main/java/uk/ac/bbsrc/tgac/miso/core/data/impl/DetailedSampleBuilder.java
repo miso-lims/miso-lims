@@ -924,4 +924,9 @@ public class DetailedSampleBuilder
     return changeLog;
   }
 
+  @Override
+  public EntityType getEntityType() {
+    throw new UnsupportedOperationException("Temporary builder object should not be consumed as a Boxable");
+  }
+
 }

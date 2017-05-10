@@ -80,6 +80,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -330,10 +331,12 @@ public class LibraryControllerHelperService {
         // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
         idBarcode = null;
       } else {
-        List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
-        if (!previouslyBarcodedItems.isEmpty()
-            && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0).getId() == libraryId)) {
-          Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
+        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays.asList(idBarcode)));
+        if (!previouslyBarcodedItems.isEmpty() && (
+            (previouslyBarcodedItems.size() != 1
+                || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.LIBRARY
+                || previouslyBarcodedItems.get(0).getId().getTargetId() != libraryId))) {
+          BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
           String error = String.format(
               "Could not change library identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
               idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
@@ -899,11 +902,13 @@ public class LibraryControllerHelperService {
             // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
             idBarcode = null;
           } else {
-            List<Boxable> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxablesFromBarcodeList(Arrays.asList(idBarcode)));
-            if (!previouslyBarcodedItems.isEmpty()
-                && !(previouslyBarcodedItems.size() == 1 && previouslyBarcodedItems.get(0) instanceof LibraryDilution
-                    && previouslyBarcodedItems.get(0).getId() == dilutionId)) {
-              Boxable previouslyBarcodedItem = previouslyBarcodedItems.get(0);
+            List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays
+                .asList(idBarcode)));
+            if (!previouslyBarcodedItems.isEmpty() && (
+                (previouslyBarcodedItems.size() != 1
+                    || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.DILUTION
+                    || previouslyBarcodedItems.get(0).getId().getTargetId() != dilutionId))) {
+              BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
               String error = String.format(
                   "Could not change dilution identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
                   idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());

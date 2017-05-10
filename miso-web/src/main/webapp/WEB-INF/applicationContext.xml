@@ -54,7 +54,6 @@
   <import resource="integration-config.xml" />
 
   <import resource="event-config.xml" />
-  <import resource="logging-config.xml" />
 
   <import resource="miso-config.xml" />
 

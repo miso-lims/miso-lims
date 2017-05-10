@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
@@ -57,8 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -77,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -86,6 +83,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
@@ -538,18 +537,8 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Boxable> getBoxablesFromBarcodeList(Collection<String> barcodeList) throws IOException {
-    List<Boxable> boxables = new ArrayList<>();
-    if (sampleStore != null && libraryStore != null) {
-      boxables.addAll(sampleStore.getByBarcodeList(barcodeList));
-      boxables.addAll(libraryStore.getByBarcodeList(barcodeList));
-      boxables.addAll(poolStore.getByBarcodeList(barcodeList));
-      boxables.addAll(libraryDilutionStore.getByBarcodeList(barcodeList));
-      return boxables;
-    } else {
-      throw new IOException(
-          "One or more of sampleStore, libraryStore, or poolStore are not available. Check that they have been declared in the Spring config.");
-    }
+  public Collection<BoxableView> getBoxableViewsFromBarcodeList(Collection<String> barcodeList) throws IOException {
+    return boxStore.getBoxableViewsByBarcodeList(barcodeList);
   }
 
   @Override
@@ -1485,116 +1474,111 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public BoxableView getBoxableViewByBarcode(String barcode) throws IOException {
+    return boxStore.getBoxableViewByBarcode(barcode);
+  }
+
+  @Override
   public long saveBox(Box box) throws IOException {
-    if (boxStore != null) {
-      if (box.getId() == AbstractBox.UNSAVED_ID) {
-        try {
-          box.setName(generateTemporaryName());
-          box.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(box.getSecurityProfile())));
-          boxStore.save(box);
-
-          if (autoGenerateIdBarcodes) {
-            box.setIdentificationBarcode(box.getName() + "::" + box.getAlias());
-          }
-          box.setName(namingScheme.generateNameFor(box));
-          validateNameOrThrow(box, namingScheme);
-          return boxStore.save(box);
-        } catch (MisoNamingException e) {
-          throw new IOException("Invalid name for box", e);
-        }
-      } else {
-        Box original = boxStore.get(box.getId());
-        original.setAlias(box.getAlias());
-        original.setDescription(box.getDescription());
-        original.setIdentificationBarcode(box.getIdentificationBarcode());
-        original.setSize(boxStore.getSizeById(box.getSize().getId()));
-        original.setUse(boxStore.getUseById(box.getUse().getId()));
-        StringBuilder message = new StringBuilder();
-
-        Map<String, Boxable> contents = new HashMap<>();
-        Set<String> newNames = new HashSet<>();
-        boolean relocationFlush = false;
-        for (Map.Entry<String, Boxable> entry : box.getBoxables().entrySet()) {
-          Boxable item;
-          if (entry.getValue() instanceof Pool) {
-            item = poolStore.get(entry.getValue().getId());
-          } else if (entry.getValue() instanceof Sample) {
-            item = sampleStore.get(entry.getValue().getId());
-          } else if (entry.getValue() instanceof Library) {
-            item = libraryStore.get(entry.getValue().getId());
-          } else if (entry.getValue() instanceof LibraryDilution) {
-            item = libraryDilutionStore.get(entry.getValue().getId());
-          } else {
-            throw new IllegalArgumentException("Unknown boxable: " + entry.getValue().getClass().getName());
-          }
-          if (item.getBox() != null && item.getBox().getId() != box.getId()) {
-            Box theftBox = item.getBox();
-            BoxChangeLog theftChangeLog = new BoxChangeLog();
-            theftChangeLog.setBox(theftBox);
-            theftChangeLog.setTime(new Date());
-            theftChangeLog.setColumnsChanged("contents");
-            theftChangeLog.setUser(getCurrentUser());
-            theftChangeLog.setSummary(
-                "Moved " + item.getAlias() + " (" + item.getName() + ") to " + original.getAlias() + " (" + original.getName() + ")");
-            theftBox.removeBoxable(item.getBoxPosition());
-            changeLogStore.create(theftChangeLog);
-            boxStore.save(theftBox);
-
-            if (message.length() > 0) {
-              message.append("\n");
-            }
-            message.append("Moved " + item.getAlias()).append(" (").append(item.getName()).append(") from ");
-            message.append(theftBox.getAlias()).append(" (").append(theftBox.getName()).append(") to ").append(entry.getKey());
-          } else if (item.getBox() != null && item.getBox().getId() == box.getId() && !item.getBoxPosition().equals(entry.getKey())) {
-            if (message.length() > 0) {
-              message.append("\n");
-            }
-            message.append("Relocated ").append(item.getAlias()).append(" (").append(item.getName()).append(") from ");
-            message.append(item.getBoxPosition()).append(" to ").append(entry.getKey());
-            original.removeBoxable(item.getBoxPosition());
-            relocationFlush = true;
-          }
-          if (item.getBox() == null) {
-            message.append("Added ").append(item.getAlias()).append(" (").append(item.getName()).append(") to ").append(entry.getKey());
-          }
-          newNames.add(item.getName());
-          contents.put(entry.getKey(), item);
-        }
-        boolean removedAny = false;
-        for (Boxable oldItem : original.getBoxables().values()) {
-          if (!newNames.contains(oldItem.getName())) {
-            if (removedAny) {
-              message.append(", ");
-            } else {
-              if (message.length() > 0) {
-                message.append("\n");
-              }
-              message.append("Removed: ");
-              removedAny = true;
-            }
-            message.append(oldItem.getAlias()).append(" (").append(oldItem.getName()).append(")");
-          }
-        }
-        if (relocationFlush) {
-          // Because of constraints, we have to flush the original object having removed all the items that we intend to relocate in the
-          // same box.
-          boxStore.save(original);
-        }
-        original.setBoxables(contents);
-        if (message.length() > 0) {
-          BoxChangeLog changeLog = new BoxChangeLog();
-          changeLog.setBox(original);
-          changeLog.setTime(new Date());
-          changeLog.setColumnsChanged("contents");
-          changeLog.setUser(getCurrentUser());
-          changeLog.setSummary(message.toString());
-          changeLogStore.create(changeLog);
-        }
-        return boxStore.save(box);
-      }
+    if (box.getId() == AbstractBox.UNSAVED_ID) {
+      return saveNewBox(box);
     } else {
-      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
+      Box original = boxStore.get(box.getId());
+      applyChanges(box, original);
+      StringBuilder message = new StringBuilder();
+
+      // Process additions/moves
+      Set<BoxableId> handled = Sets.newHashSet();
+      for (Map.Entry<String, BoxableView> entry : box.getBoxables().entrySet()) {
+        BoxableView previousOccupant = original.getBoxable(entry.getKey());
+        BoxableView newOccupant = entry.getValue();
+        handled.add(newOccupant.getId());
+
+        if (previousOccupant != null && newOccupant.getId().equals(previousOccupant.getId())) {
+          // Unchanged
+          continue;
+        }
+        if (message.length() > 0) {
+          message.append("\n");
+        }
+        
+        BoxableView oldOccupant = boxStore.getBoxableView(newOccupant.getId());
+        if (oldOccupant.getBoxId() != null) {
+          if (oldOccupant.getBoxId().longValue() == box.getId()) {
+            // Moved within same box
+            message.append(String.format("Relocated %s (%s) from %s to %s", oldOccupant.getAlias(), oldOccupant.getName(),
+                oldOccupant.getBoxPosition(), entry.getKey()));
+          } else {
+            // Moved from a different box
+            message.append(String.format("Moved %s (%s) from %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(),
+                oldOccupant.getBoxAlias(), oldOccupant.getBoxName(), entry.getKey()));
+
+            Box oldHome = boxStore.get(oldOccupant.getBoxId());
+            String oldHomeMessage = String.format("Moved %s (%s) to %s (%s)", oldOccupant.getAlias(), oldOccupant.getName(),
+                original.getAlias(), original.getName());
+            addBoxContentsChangeLog(oldHome, oldHomeMessage);
+          }
+          boxStore.removeBoxableFromBox(oldOccupant);
+        } else {
+          message.append(String.format("Added %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(), entry.getKey()));
+        }
+      }
+
+      // Process removals
+      for (Map.Entry<String, BoxableView> entry : original.getBoxables().entrySet()) {
+        if (box.getBoxables().keySet().contains(entry.getKey()) || handled.contains(entry.getValue().getId())) {
+          // Already handled. Only checking for removals at this point
+          continue;
+        }
+        if (message.length() > 0) {
+          message.append("\n");
+        }
+        BoxableView oldItem = entry.getValue();
+        message.append(String.format("Removed %s (%s)", oldItem.getAlias(), oldItem.getName()));
+      }
+
+      original.setBoxables(box.getBoxables());
+
+      if (message.length() > 0) {
+        addBoxContentsChangeLog(original, message.toString());
+      }
+      long savedId = boxStore.save(box);
+      return savedId;
     }
+  }
+
+  private void addBoxContentsChangeLog(Box box, String message) throws IOException {
+    BoxChangeLog changeLog = new BoxChangeLog();
+    changeLog.setBox(box);
+    changeLog.setTime(new Date());
+    changeLog.setColumnsChanged("contents");
+    changeLog.setUser(getCurrentUser());
+    changeLog.setSummary(message);
+    changeLogStore.create(changeLog);
+  }
+
+  private long saveNewBox(Box box) throws IOException {
+    try {
+      box.setName(generateTemporaryName());
+      box.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(box.getSecurityProfile())));
+      boxStore.save(box);
+
+      if (autoGenerateIdBarcodes) {
+        box.setIdentificationBarcode(box.getName() + "::" + box.getAlias());
+      }
+      box.setName(namingScheme.generateNameFor(box));
+      validateNameOrThrow(box, namingScheme);
+      return boxStore.save(box);
+    } catch (MisoNamingException e) {
+      throw new IOException("Invalid name for box", e);
+    }
+  }
+
+  private void applyChanges(Box from, Box to) throws IOException {
+    to.setAlias(from.getAlias());
+    to.setDescription(from.getDescription());
+    to.setIdentificationBarcode(from.getIdentificationBarcode());
+    to.setUse(boxStore.getUseById(from.getUse().getId()));
   }
 
   @Override
