@@ -1,3 +1,12 @@
+# 0.2.63
+
+Changes:
+
+ * Ignore unknown health types sent by notification server
+ * Allow searching based on sample class, library indices, and received date
+ * Remove discarded samples and dilutions from boxes
+ * Improve box performance
+
 # 0.2.62
 
 Changes:
