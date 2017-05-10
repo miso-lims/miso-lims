@@ -6,7 +6,10 @@ addons:
       - oracle-java8-installer
   sonarqube:
     organization: "TGAC:miso-lims:develop" # the key of the org you chose at step #3
-    token: SONAR_TOKEN
+    token: 
+      - SONAR_TOKEN
+    branches: 
+      - sonarqube
 
 jdk:
   - oraclejdk8
