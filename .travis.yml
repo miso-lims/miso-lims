@@ -4,3 +4,5 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
+jdk:
+  - oraclejdk8
