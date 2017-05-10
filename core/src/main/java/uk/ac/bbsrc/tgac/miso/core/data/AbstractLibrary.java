@@ -441,6 +441,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return lowQuality;
   }
 
+  @Override
+  public Long getPreMigrationId() {
+    return null;
+  }
+
   @CoverageIgnore
   @Override
   public boolean isDeletable() {

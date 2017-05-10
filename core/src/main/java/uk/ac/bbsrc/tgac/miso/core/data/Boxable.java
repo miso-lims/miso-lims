@@ -95,4 +95,6 @@ public interface Boxable extends Nameable, Barcodable, SecurableByProfile, Seria
    */
   public void setVolume(Double volume);
 
+  public Long getPreMigrationId();
+
 }
