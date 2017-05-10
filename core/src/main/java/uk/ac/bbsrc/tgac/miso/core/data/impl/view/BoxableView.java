@@ -12,6 +12,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 
 @Entity
@@ -88,6 +90,28 @@ public class BoxableView implements Serializable {
   private String boxAlias;
   private String boxPosition;
   private String boxLocationBarcode;
+  private Long preMigrationId;
+
+  public static BoxableView fromBoxable(Boxable boxable) {
+    BoxableView v = new BoxableView();
+    v.setId(new BoxableId(boxable.getEntityType(), boxable.getId()));
+    v.setName(boxable.getName());
+    v.setAlias(boxable.getAlias());
+    v.setIdentificationBarcode(boxable.getIdentificationBarcode());
+    v.setLocationBarcode(boxable.getLocationBarcode());
+    v.setVolume(boxable.getVolume());
+    v.setDiscarded(boxable.isDiscarded());
+    Box box = boxable.getBox();
+    if (box != null) {
+      v.setBoxId(box.getId());
+      v.setBoxName(box.getName());
+      v.setBoxAlias(box.getAlias());
+      v.setBoxPosition(boxable.getBoxPosition());
+      v.setBoxLocationBarcode(box.getLocationBarcode());
+    }
+    v.setPreMigrationId(boxable.getPreMigrationId());
+    return v;
+  }
 
   public BoxableId getId() {
     return id;
@@ -183,6 +207,14 @@ public class BoxableView implements Serializable {
 
   public void setBoxLocationBarcode(String boxLocationBarcode) {
     this.boxLocationBarcode = boxLocationBarcode;
+  }
+
+  public Long getPreMigrationId() {
+    return preMigrationId;
+  }
+
+  public void setPreMigrationId(Long preMigrationId) {
+    this.preMigrationId = preMigrationId;
   }
 
 }

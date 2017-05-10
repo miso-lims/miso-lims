@@ -83,6 +83,8 @@ public interface BoxStore extends Store<Box>, Remover<Box> {
 
   public BoxableView getBoxableViewByBarcode(String barcode) throws IOException;
 
+  public BoxableView getBoxableViewByPreMigrationId(Long preMigrationId) throws IOException;
+
   public List<BoxableView> getBoxableViewsByBarcodeList(Collection<String> barcodes) throws IOException;
 
 }

@@ -528,6 +528,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
+  public Long getPreMigrationId() {
+    return null;
+  }
+
+  @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
   }

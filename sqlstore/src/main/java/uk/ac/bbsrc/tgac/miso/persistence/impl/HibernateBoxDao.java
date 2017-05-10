@@ -217,7 +217,9 @@ public class HibernateBoxDao implements BoxStore {
     if (box.getId() == AbstractBox.UNSAVED_ID) {
       return (long) currentSession().save(box);
     } else {
-      currentSession().update(box);
+      // Merge required to allow temporary eviction during update in DefaultMigrationTarget
+      Box persisted = (Box) currentSession().merge(box);
+      currentSession().update(persisted);
       return box.getId();
     }
   }
@@ -241,6 +243,14 @@ public class HibernateBoxDao implements BoxStore {
     @SuppressWarnings("unchecked")
     List<BoxableView> results = criteria.list();
     return results;
+  }
+
+  @Override
+  public BoxableView getBoxableViewByPreMigrationId(Long preMigrationId) throws IOException {
+    Criteria criteria = currentSession().createCriteria(BoxableView.class);
+    criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
+    BoxableView result = (BoxableView) criteria.uniqueResult();
+    return result;
   }
 
   public void setJdbcTemplate(JdbcTemplate template) {

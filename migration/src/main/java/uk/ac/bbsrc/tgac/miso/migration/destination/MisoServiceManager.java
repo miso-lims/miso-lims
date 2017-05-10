@@ -508,6 +508,7 @@ public class MisoServiceManager {
     HibernateSampleDao dao = new HibernateSampleDao();
     dao.setSessionFactory(sessionFactory);
     dao.setJdbcTemplate(jdbcTemplate);
+    dao.setBoxStore(boxDao);
     setSampleDao(dao);
   }
 
@@ -641,6 +642,7 @@ public class MisoServiceManager {
   public void setDefaultDilutionDao() {
     HibernateLibraryDilutionDao dao = new HibernateLibraryDilutionDao();
     dao.setSessionFactory(sessionFactory);
+    dao.setBoxStore(boxDao);
     setDilutionDao(dao);
   }
 
@@ -929,6 +931,10 @@ public class MisoServiceManager {
   private void updateBoxDaoDependencies() {
     if (poolDao != null) poolDao.setBoxStore(boxDao);
     if (requestManager != null) requestManager.setBoxStore(boxDao);
+    if (sampleDao != null) sampleDao.setBoxStore(boxDao);
+    if (libraryDao != null) libraryDao.setBoxDao(boxDao);
+    if (dilutionDao != null) dilutionDao.setBoxStore(boxDao);
+    if (poolDao != null) poolDao.setBoxStore(boxDao);
   }
 
   public DefaultLabService getLabService() {

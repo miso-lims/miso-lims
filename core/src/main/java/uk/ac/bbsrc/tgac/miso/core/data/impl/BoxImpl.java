@@ -113,15 +113,17 @@ public class BoxImpl extends AbstractBox {
     validate(position);
 
     // if already in this box, remove from previous position first
-    String oldPosition = null;
-    for (Map.Entry<String, BoxableView> entry : boxableViews.entrySet()) {
-      if (entry.getValue().getId().equals(item.getId())) {
-        oldPosition = entry.getKey();
-        break;
+    if (item.getId().getTargetId() != 0L) {
+      String oldPosition = null;
+      for (Map.Entry<String, BoxableView> entry : boxableViews.entrySet()) {
+        if (entry.getValue().getId().equals(item.getId())) {
+          oldPosition = entry.getKey();
+          break;
+        }
       }
-    }
-    if (oldPosition != null) {
-      boxableViews.remove(oldPosition);
+      if (oldPosition != null) {
+        boxableViews.remove(oldPosition);
+      }
     }
     boxableViews.put(position, item);
   }
