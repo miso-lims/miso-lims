@@ -4,5 +4,13 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
+  sonarqube:
+    organization: "TGAC:miso-lims:develop" # the key of the org you chose at step #3
+    token: SONAR_TOKEN
+
 jdk:
   - oraclejdk8
+
+script:
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarQube analysis
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
