@@ -29,8 +29,8 @@
   <artifactId>miso</artifactId>
   <version>0.2.63-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>MISO Framework</name>
-  <url>http://www.tgac.ac.uk/miso</url>
+  <name>MISO LIMS</name>
+  <url>http://tgac.github.io/miso-lims/</url>
   <!-- Licensing -->
   <licenses>
     <license>
@@ -48,32 +48,19 @@
       <organization>EI</organization>
       <organizationUrl>http://www.earlham.ac.uk/davey-group</organizationUrl>
       <roles>
-        <role>administrator</role>
-        <role>Developer</role>
+        <role>Administrator</role>
       </roles>
       <timezone>0</timezone>
     </developer>
     <developer>
-      <id>frankie13</id>
-      <name>Christopher Salt</name>
-      <email>christopher.salt@earlham.ac.uk</email>
-      <organization>EI</organization>
-      <organizationUrl>http://www.earlham.ac.uk/davey-group</organizationUrl>
-      <roles>
-        <role>administrator</role>
-        <role>Developer</role>
-      </roles>
-      <timezone>0</timezone>
-      <properties />
-    </developer>
-    <developer>
-      <id>mtaschuk</id>
+      <id>morgantaschuk</id>
       <name>Morgan Taschuk</name>
       <email>morgan.taschuk@oicr.on.ca</email>
       <organization>OICR</organization>
       <organizationUrl>https://labs.oicr.on.ca/genome-sequence-informatics</organizationUrl>
       <roles>
-        <role>project contact</role>
+        <role>Project contact</role>
+        <role>Administrator</role>
       </roles>
       <timezone>-5</timezone>
       <properties />
@@ -152,8 +139,8 @@
   </scm>
   <!-- Bug Tracker -->
   <issueManagement>
-    <system>jira</system>
-    <url>http://jira.tgac.bbsrc.ac.uk/browse/MISO</url>
+    <system>Github</system>
+    <url>https://github.com/TGAC/miso-lims/issues</url>
   </issueManagement>
   <!-- Maven repository deploy -->
   <distributionManagement>
