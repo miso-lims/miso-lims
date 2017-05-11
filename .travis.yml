@@ -9,6 +9,8 @@ addons:
     organization: "miso-lims"
     token: 
       secure: "lKIV0Lkw5x+ZDeaSHk1ruAbAnR8yOdU0LRGmLFsXye86u0nMtWhhoDQtaEL4CEgARfkuv9cPAe1OhtkxR/ZTU4yZsuMcDEm1w1MuAw7wR9D+MfKf0LFRT1Px6wZQxXoEPd30Tv0oyR+cex2yi03DfAjeHFgWqUrO3ZaQb7N0F7I="
+    github_token:
+      secure: "Z/xG9AOBYu3geIRTGcSPcPLuiCtXHPoSSSIPsuK/Kr45JoM1p4KssoeulAwSDY+1gcYIfqF8nEowjnlhcH6LdFRuLYV5iHW2YPl1tHEBCuAHonpfWNWf4piMO+OxtjCTcOvNmj8x4hYP7FS+0QeiZ+AJYjPrlrg2Y1SzZZVbiB4="
     branches: 
       - sonarqube
       - develop
