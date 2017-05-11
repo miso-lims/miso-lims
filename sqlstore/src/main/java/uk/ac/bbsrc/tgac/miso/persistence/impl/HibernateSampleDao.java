@@ -15,6 +15,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -26,11 +27,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -47,9 +50,11 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  */
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, BaseHibernatePaginatedDataSource<Sample> {
+public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, HibernatePaginatedDataSource<Sample> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
+
+  private final static String[] SEARCH_PROPERTIES = new String[] { "alias", "identificationBarcode", "name" };
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -223,26 +228,33 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
     return records;
   }
 
-  /**
-   * Create a Hibernate criterion to search for all the properties our users want to search.
-   *
-   * @param querystr
-   * @return
-   */
   @Override
-  public Criterion searchRestrictions(String querystr) {
-    Criterion search = DbUtils.searchRestrictions(querystr, "alias", "identificationBarcode", "name");
+  public void restrictPaginationByExternalName(Criteria criteria, String name, Consumer<String> errorHandler) {
+    // TODO: this should extends to the children of the entity with this external name (including libraries and dilutions)
+    String query = DbUtils.convertStringToSearchQuery(name);
+    Disjunction or = Restrictions.disjunction();
+    or.add(externalNameCheck(IdentityImpl.class, "externalName", query));
+    or.add(externalNameCheck(SampleTissueImpl.class, "externalInstituteIdentifier", query));
+    criteria.add(or);
+  }
 
-    String str = DbUtils.convertStringToSearchQuery(querystr);
-    Criterion classCheck = Restrictions.and(Restrictions.eq("class", IdentityImpl.class),
-        Restrictions.ilike("externalName", str, MatchMode.ANYWHERE));
-    return Restrictions.or(search, classCheck);
+  private Criterion externalNameCheck(Class<? extends DetailedSample> clazz, String property, String query) {
+    return Restrictions.and(Restrictions.eq("class", clazz),
+        Restrictions.ilike(property, query, MatchMode.ANYWHERE));
+  }
+
+  @Override
+  public void restrictPaginationByInstitute(Criteria criteria, String name, Consumer<String> errorHandler) {
+    // TODO: this should extends to the children of the entity with this lab (including libraries and dilutions)
+    criteria.createAlias("lab", "lab");
+    criteria.createAlias("lab.institute", "institute");
+    criteria.add(DbUtils.searchRestrictions(name, "lab.alias", "institute.alias"));
   }
 
   @Override
   public Collection<Sample> listBySearch(String querystr) throws IOException {
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(searchRestrictions(querystr));
+    criteria.add(DbUtils.searchRestrictions(querystr, SEARCH_PROPERTIES));
     @SuppressWarnings("unchecked")
     List<Sample> records = criteria.list();
     return records;
@@ -372,4 +384,10 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Ba
   public String getFriendlyName() {
     return "Sample";
   }
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
 }
