@@ -1,8 +1,21 @@
 language: java
 sudo: false
+install: true
 addons:
   apt:
     packages:
       - oracle-java8-installer
+  sonarqube:
+    organization: "miso-lims"
+    token: 
+      secure: "lKIV0Lkw5x+ZDeaSHk1ruAbAnR8yOdU0LRGmLFsXye86u0nMtWhhoDQtaEL4CEgARfkuv9cPAe1OhtkxR/ZTU4yZsuMcDEm1w1MuAw7wR9D+MfKf0LFRT1Px6wZQxXoEPd30Tv0oyR+cex2yi03DfAjeHFgWqUrO3ZaQb7N0F7I="
+    branches: 
+      - sonarqube
+      - develop
+
 jdk:
   - oraclejdk8
+
+script:
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarQube analysis
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
