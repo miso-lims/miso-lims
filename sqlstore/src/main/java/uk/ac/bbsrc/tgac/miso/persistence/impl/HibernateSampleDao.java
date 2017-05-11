@@ -50,7 +50,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  */
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, HibernatePaginatedDataSource<Sample> {
+public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, HibernatePaginatedBoxableSource<Sample> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 

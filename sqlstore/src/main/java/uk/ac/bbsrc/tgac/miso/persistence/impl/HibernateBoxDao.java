@@ -33,6 +33,8 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Repository
 public class HibernateBoxDao implements BoxStore {
 
+  public static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode", "locationBarcode" };
+
   private static final Logger log = LoggerFactory.getLogger(HibernateBoxDao.class);
 
   private static String TABLE_NAME = "Box";

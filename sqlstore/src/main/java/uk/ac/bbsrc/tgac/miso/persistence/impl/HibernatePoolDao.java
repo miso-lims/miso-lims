@@ -37,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource<Pool> {
+public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSource<Pool> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernatePoolDao.class);
 
@@ -303,7 +303,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedDataSource
   @Override
   public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
     criteria.createAlias("pooledElementViews", "dilution");
-    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
+    HibernatePaginatedBoxableSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
   @Override

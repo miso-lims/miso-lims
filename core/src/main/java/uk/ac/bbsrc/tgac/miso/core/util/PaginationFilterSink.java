@@ -9,6 +9,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public interface PaginationFilterSink<T> {
 
+  public void restrictPaginationByBox(T item, String name, Consumer<String> errorHandler);
+
   public void restrictPaginationByClass(T item, String name, Consumer<String> errorHandler);
 
   public void restrictPaginationByDate(T item, Date start, Date end, DateType type, Consumer<String> errorHandler);

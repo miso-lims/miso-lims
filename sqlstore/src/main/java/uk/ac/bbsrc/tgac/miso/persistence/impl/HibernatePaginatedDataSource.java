@@ -171,6 +171,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be boxed.");
+  }
+
+  @Override
   default void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " is not platform-specific.");
   }
