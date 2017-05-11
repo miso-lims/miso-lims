@@ -499,9 +499,9 @@ public class SampleControllerHelperService {
       } else {
         List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty() && (
-            (previouslyBarcodedItems.size() != 1
+            previouslyBarcodedItems.size() != 1
                 || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.SAMPLE
-                || previouslyBarcodedItems.get(0).getId().getTargetId() != sampleId))) {
+                || previouslyBarcodedItems.get(0).getId().getTargetId() != sampleId)) {
           BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
           String error = String.format(
               "Could not change sample identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",

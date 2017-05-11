@@ -85,7 +85,7 @@ public class HibernateBoxDao implements BoxStore {
     currentSession().update(boxable);
   }
 
-  private Boxable getBoxable(BoxableView view) throws IOException {
+  private Boxable getBoxable(BoxableView view) {
     Class<?> clazz = view.getId().getTargetType().getPersistClass();
     return (Boxable) currentSession().get(clazz, view.getId().getTargetId());
   }
@@ -229,8 +229,7 @@ public class HibernateBoxDao implements BoxStore {
   public BoxableView getBoxableViewByBarcode(String barcode) throws IOException {
     Criteria criteria = currentSession().createCriteria(BoxableView.class);
     criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    BoxableView result = (BoxableView) criteria.uniqueResult();
-    return result;
+    return (BoxableView) criteria.uniqueResult();
   }
 
   @Override
