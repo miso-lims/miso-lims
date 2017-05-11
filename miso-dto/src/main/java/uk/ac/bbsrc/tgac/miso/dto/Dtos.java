@@ -1138,12 +1138,12 @@ public class Dtos {
       dto.setScannable(from.getSize().getScannable());
     }
     if (from.getBoxables() != null) {
-      dto.setItems(asBoxablesDtos(from.getBoxables(), from));
+      dto.setItems(asBoxablesDtos(from.getBoxables()));
     }
     return dto;
   }
 
-  private static List<BoxableDto> asBoxablesDtos(Map<String, BoxableView> boxables, Box box) {
+  private static List<BoxableDto> asBoxablesDtos(Map<String, BoxableView> boxables) {
     List<BoxableDto> items = new ArrayList<>();
     for (Entry<String, BoxableView> entry : boxables.entrySet()) {
       items.add(asDto(entry.getValue()));

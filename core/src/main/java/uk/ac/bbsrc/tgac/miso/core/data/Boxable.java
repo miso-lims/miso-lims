@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
     @JsonSubTypes.Type(value = LibraryImpl.class, name = "LibraryImpl"), @JsonSubTypes.Type(value = PoolImpl.class, name = "PoolImpl") })
 public interface Boxable extends Nameable, Barcodable, SecurableByProfile, Serializable {
 
-  public static enum EntityType {
+  public enum EntityType {
     SAMPLE(SampleImpl.class),
     LIBRARY(LibraryImpl.class),
     DILUTION(LibraryDilution.class),

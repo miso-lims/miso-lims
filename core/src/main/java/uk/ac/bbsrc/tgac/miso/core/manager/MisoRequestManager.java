@@ -1542,8 +1542,7 @@ public class MisoRequestManager implements RequestManager {
       if (message.length() > 0) {
         addBoxContentsChangeLog(original, message.toString());
       }
-      long savedId = boxStore.save(box);
-      return savedId;
+      return boxStore.save(box);
     }
   }
 

@@ -16,7 +16,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 
 @Entity
 @Table(name = "BoxableView")
-public class BoxableView {
+public class BoxableView implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   @Embeddable
   public static class BoxableId implements Serializable {
