@@ -715,4 +715,12 @@ public class LimsUtils {
     }
     return from;
   }
+
+  public static String[] prefix(String prefix, String... suffixes) {
+    String[] results = new String[suffixes.length];
+    for (int i = 0; i < suffixes.length; i++) {
+      results[i] = prefix + suffixes[i];
+    }
+    return results;
+  }
 }

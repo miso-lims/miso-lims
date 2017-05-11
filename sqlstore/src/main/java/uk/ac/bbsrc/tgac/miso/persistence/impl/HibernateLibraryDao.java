@@ -43,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedDataSource<Library> {
+public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxableSource<Library> {
 
   private interface AdjacencySelector {
     Criterion generateCriterion(String associationPath, Long libraryId);
