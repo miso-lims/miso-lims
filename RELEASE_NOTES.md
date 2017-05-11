@@ -1,3 +1,9 @@
+# 0.2.64
+
+Changes:
+
+ * Fixed null pointer exception
+
 # 0.2.63
 
 Changes:
@@ -6,6 +12,10 @@ Changes:
  * Allow searching based on sample class, library indices, and received date
  * Remove discarded samples and dilutions from boxes
  * Improve box performance
+
+Bad:
+
+ * Some pages do not load due to null pointer exception
 
 # 0.2.62
 

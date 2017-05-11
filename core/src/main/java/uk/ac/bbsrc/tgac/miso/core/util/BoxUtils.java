@@ -162,8 +162,11 @@ public class BoxUtils {
   }
 
   public static String makeLocationLabel(Boxable boxable) {
-    return makeLocationLabel(boxable.isDiscarded(), boxable.getLocationBarcode(), boxable.getBox().getAlias(), boxable.getBoxPosition(),
-        boxable.getBox().getLocationBarcode());
+    return makeLocationLabel(boxable.isDiscarded(),
+        boxable.getLocationBarcode(),
+        boxable.getBox() == null ? null : boxable.getBox().getAlias(),
+        boxable.getBoxPosition(),
+        boxable.getBox() == null ? null : boxable.getBox().getLocationBarcode());
   }
 
   public static String makeLocationLabel(boolean discarded, String locationBarcode, String boxAlias, String position,
