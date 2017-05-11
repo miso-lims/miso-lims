@@ -8,6 +8,7 @@ test_file.txt
 .classpath
 .project
 .idea
+/*.jar
 
 # Maven build directory.
 target/
