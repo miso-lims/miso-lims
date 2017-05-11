@@ -28,6 +28,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter external(String name) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByExternalName(item, name, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter fulfilled(final boolean isFulfilled) {
     return new PaginationFilter() {
 
@@ -58,6 +68,16 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationByIndex(item, index, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter institute(String name) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByInstitute(item, name, errorHandler);
       }
     };
   }
@@ -130,6 +150,13 @@ public abstract interface PaginationFilter {
           return index(parts[1]);
         case "class":
           return sampleClass(parts[1]);
+        case "external":
+        case "ext":
+        case "extern":
+          return external(parts[1]);
+        case "institute":
+        case "inst":
+          return institute(parts[1]);
         }
       }
       return query(x);
