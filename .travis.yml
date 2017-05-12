@@ -21,9 +21,10 @@ jdk:
   - oraclejdk8
 
 script:
-  - mvn clean install sonar:sonar
+#  - mvn clean install sonar:sonar
 #  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
 #  - sonar-scanner
+  - bash sonar.sh
 
 
 cache:

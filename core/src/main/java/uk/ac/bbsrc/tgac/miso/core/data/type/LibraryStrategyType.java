@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -41,8 +43,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "LibraryStrategyType")
-public class LibraryStrategyType implements Comparable<LibraryStrategyType> {
+public class LibraryStrategyType implements Comparable<LibraryStrategyType>, Serializable {
 
+  private static final long serialVersionUID = 1L;
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
