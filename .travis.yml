@@ -18,14 +18,15 @@ addons:
 #      - develop
 # build all branches (by default only builds master)
       - /.*/
+      - test_sonar_fail
 
 jdk:
   - oraclejdk8
 
 script:
-  # the following command line builds the project, runs the tests with coverage and then execute the SonarQube analysis
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
-  - sonar-scanner
+  - mvn clean install sonar:sonar
+#  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+#  - sonar-scanner
 
 
 cache:
