@@ -1,6 +1,9 @@
 language: java
 sudo: false
-install: true
+#install: true
+# only clone back 3 commits of the repository
+git:
+  depth: 3
 addons:
   apt:
     packages:
@@ -12,7 +15,9 @@ addons:
     github_token:
       secure: "Z/xG9AOBYu3geIRTGcSPcPLuiCtXHPoSSSIPsuK/Kr45JoM1p4KssoeulAwSDY+1gcYIfqF8nEowjnlhcH6LdFRuLYV5iHW2YPl1tHEBCuAHonpfWNWf4piMO+OxtjCTcOvNmj8x4hYP7FS+0QeiZ+AJYjPrlrg2Y1SzZZVbiB4="
     branches: 
-      - develop
+#      - develop
+# build all branches (by default only builds master)
+      - /.*/
 
 jdk:
   - oraclejdk8
@@ -21,3 +26,8 @@ script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarQube analysis
   - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
   - sonar-scanner
+
+
+cache:
+  directories:
+  - $HOME/.m2
