@@ -4,7 +4,7 @@ echo "IT WORKED OK"
 
 if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
   echo "Running sonar scanner in change preview mode"
-
+  export SONARQUBE_SKIPPED=false
   sonar-scanner \
     -Dsonar.analysis.mode=preview \
     -Dsonar.profile=Java \
