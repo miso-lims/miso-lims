@@ -15,9 +15,6 @@ addons:
     github_token:
       secure: "Z/xG9AOBYu3geIRTGcSPcPLuiCtXHPoSSSIPsuK/Kr45JoM1p4KssoeulAwSDY+1gcYIfqF8nEowjnlhcH6LdFRuLYV5iHW2YPl1tHEBCuAHonpfWNWf4piMO+OxtjCTcOvNmj8x4hYP7FS+0QeiZ+AJYjPrlrg2Y1SzZZVbiB4="
     branches: 
-#      - develop
-# build all branches (by default only builds master)
-      - /.*/
       - test_sonar_fail
 
 jdk:
