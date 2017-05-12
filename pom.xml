@@ -906,7 +906,7 @@
       <id>Atlassian Maven Repository</id>
       <url>https://maven.atlassian.com/public</url>
     </pluginRepository>
-    <pluginRepository>
+<!--    <pluginRepository>
       <releases>
         <updatePolicy>daily</updatePolicy>
         <checksumPolicy>warn</checksumPolicy>
@@ -917,7 +917,7 @@
       </snapshots>
       <id>unto.net</id>
       <url>http://repository.unto.net/maven/</url>
-    </pluginRepository>
+    </pluginRepository>-->
   </pluginRepositories>
   <!-- Required Build Plugins -->
   <build>

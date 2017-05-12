@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
-import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -42,8 +41,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "QCType")
-public class QcType implements Comparable<QcType>, Serializable {
-  private static final long serialVersionUID = 1L;
+public class QcType implements Comparable<QcType> {
 
   public static final Long UNSAVED_ID = 0L;
 
