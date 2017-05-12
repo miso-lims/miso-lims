@@ -1,8 +1,18 @@
+# 0.2.65
+
+Changes:
+
+ * Fix bug causing instance to lock
+
 # 0.2.64
 
 Changes:
 
  * Fixed null pointer exception
+
+Bad:
+
+ * Instance can lock due to serialisation error
 
 # 0.2.63
 

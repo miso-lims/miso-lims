@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.org/TGAC/miso-lims.svg?branch=develop)](https://travis-ci.org/TGAC/miso-lims)
+[![Build Status](https://travis-ci.org/TGAC/miso-lims.svg?branch=develop)](https://travis-ci.org/TGAC/miso-lims) [![Quality Gate](https://sonarqube.com/api/badges/gate?key=uk.ac.bbsrc.tgac.miso:miso:sonarqube)](https://sonarqube.com/dashboard?id=uk.ac.bbsrc.tgac.miso%3Amiso%3Asonarqube)
 
 # MISO: An open source LIMS for small-to-large scale sequencing centres
 
-&copy; 2016. [Earlham Institute](http://earlham.ac.uk/), Norwich, UK, [Ontario Institute for Cancer Research](http://oicr.on.ca), Toronto, Canada
+&copy; 2017. [Earlham Institute](http://earlham.ac.uk/), Norwich, UK, [Ontario Institute for Cancer Research](http://oicr.on.ca), Toronto, Canada
 
 > MISO project contacts: [Robert Davey](robert.davey@earlham.ac.uk), [Morgan Taschuk](morgan.taschuk@oicr.on.ca)
 >
@@ -86,9 +86,6 @@ is no rollback procedure, so a full database backup should be taken before
 migration.
 
 Installation and configuration details can be found in the [MISO maintainer guide](docs/_posts/2016-01-11-admin-manual.md).
-
-## Demo Version
-This needs to be done.
 
 ## Contact and Community
 

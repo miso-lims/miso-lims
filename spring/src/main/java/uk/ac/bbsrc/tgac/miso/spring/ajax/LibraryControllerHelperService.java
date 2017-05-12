@@ -333,9 +333,9 @@ public class LibraryControllerHelperService {
       } else {
         List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty() && (
-            (previouslyBarcodedItems.size() != 1
+            previouslyBarcodedItems.size() != 1
                 || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.LIBRARY
-                || previouslyBarcodedItems.get(0).getId().getTargetId() != libraryId))) {
+                || previouslyBarcodedItems.get(0).getId().getTargetId() != libraryId)) {
           BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
           String error = String.format(
               "Could not change library identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
@@ -905,9 +905,9 @@ public class LibraryControllerHelperService {
             List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays
                 .asList(idBarcode)));
             if (!previouslyBarcodedItems.isEmpty() && (
-                (previouslyBarcodedItems.size() != 1
+                previouslyBarcodedItems.size() != 1
                     || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.DILUTION
-                    || previouslyBarcodedItems.get(0).getId().getTargetId() != dilutionId))) {
+                    || previouslyBarcodedItems.get(0).getId().getTargetId() != dilutionId)) {
               BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
               String error = String.format(
                   "Could not change dilution identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
