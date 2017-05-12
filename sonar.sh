@@ -13,4 +13,5 @@ if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
     -Dsonar.github.pullRequest=$TRAVIS_PULL_REQUEST \
     -Dsonar.github.oauth=$SONAR_GITHUB_TOKEN \
     -Dsonar.github.repository=$TRAVIS_REPO_SLUG
+    -Dsonar.branch=$TRAVIS_BRANCH
 fi
