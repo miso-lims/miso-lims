@@ -15,7 +15,7 @@ addons:
     github_token:
       secure: "Z/xG9AOBYu3geIRTGcSPcPLuiCtXHPoSSSIPsuK/Kr45JoM1p4KssoeulAwSDY+1gcYIfqF8nEowjnlhcH6LdFRuLYV5iHW2YPl1tHEBCuAHonpfWNWf4piMO+OxtjCTcOvNmj8x4hYP7FS+0QeiZ+AJYjPrlrg2Y1SzZZVbiB4="
     branches: 
-      - $TRAVIS_BRANCH
+      - $TRAVIS_PULL_REQUEST_BRANCH
 
 jdk:
   - oraclejdk8
