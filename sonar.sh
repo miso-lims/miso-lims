@@ -6,7 +6,6 @@ if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
   echo "Running sonar scanner in change preview mode"
 
   sonar-scanner \
-#    -Dsonar.host.url=$SONAR_URL \
     -Dsonar.analysis.mode=preview \
     -Dsonar.profile=Java \
     -Dsonar.projectVersion=$PACKAGE_VERSION \
