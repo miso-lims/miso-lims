@@ -23,10 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasStockParent;
-
 import java.io.IOException;
-import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -48,10 +45,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
@@ -79,21 +73,11 @@ public class SampleClassController extends RestController {
       throw new RestException("No sample class found with ID: " + id, Status.UNAUTHORIZED);
     } else {
       SampleClassDto dto = Dtos.asDto(sampleClass);
-      dto = writeUrls(dto, uriBuilder);
+      dto.writeUrls(uriBuilder);
       return dto;
     }
   }
 
-  private static SampleClassDto writeUrls(SampleClassDto sampleClassDto, UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    sampleClassDto.setUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}").buildAndExpand(sampleClassDto.getId()).toUriString());
-    sampleClassDto.setCreatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleClassDto.getCreatedById()).toUriString());
-    sampleClassDto.setUpdatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleClassDto.getUpdatedById()).toUriString());
-    return sampleClassDto;
-  }
 
   @RequestMapping(value = "/sampleclasses", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
@@ -102,13 +86,8 @@ public class SampleClassController extends RestController {
     Set<SampleClass> sampleClasss = sampleClassService.getAll();
     Set<SampleClassDto> sampleClassDtos = Dtos.asSampleClassDtos(sampleClasss);
     for (SampleClassDto sampleClassDto : sampleClassDtos) {
-      sampleClassDto = writeUrls(sampleClassDto, uriBuilder);
-      if (sampleClassDto.getSampleCategory().equals(SampleTissue.CATEGORY_NAME)
-          || sampleClassDto.getSampleCategory().equals(SampleStock.CATEGORY_NAME)
-          || sampleClassDto.getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)
-              && hasStockParent(sampleClassDto.getId(), relationships)) {
-        sampleClassDto.setCanCreateNew(true);
-      }
+      sampleClassDto.writeUrls(uriBuilder);
+      sampleClassDto.setCanCreateNew(relationships);
     }
     return sampleClassDtos;
   }

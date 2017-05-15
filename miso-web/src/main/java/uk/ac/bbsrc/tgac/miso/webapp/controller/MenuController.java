@@ -56,10 +56,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
@@ -217,6 +219,8 @@ public class MenuController implements ServletContextAware {
     node.put("isDetailedSample", isDetailedSampleEnabled());
     node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
 
+    final Iterable<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
+
     createArray(mapper, baseUri, node, "libraryDesigns", requestManager.listLibraryDesigns(), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryTypes", libraryService.listLibraryTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "librarySelections", libraryService.listLibrarySelectionTypes(), Dtos::asDto);
@@ -224,8 +228,12 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "libraryDesignCodes", requestManager.listLibraryDesignCodes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "platforms", requestManager.listAllPlatforms(), Dtos::asDto);
     createArray(mapper, baseUri, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "sampleValidRelationships", sampleValidRelationshipService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "sampleClasses", sampleClassService.getAll(), model -> {
+      SampleClassDto dto = Dtos.asDto(model);
+      dto.setCanCreateNew(relationships);
+      return dto;
+    });
+    createArray(mapper, baseUri, node, "sampleValidRelationships", relationships, Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

@@ -615,7 +615,7 @@ public class LimsUtils {
     return library instanceof DetailedLibrary;
   }
 
-  public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) throws IOException {
+  public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) {
     for (SampleValidRelationship relationship : relationships) {
       if (!relationship.getArchived() && relationship.getChild().getId() == id
           && relationship.getParent().getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
