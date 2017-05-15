@@ -332,8 +332,6 @@
   <c:if test="${detailedSample}">
 
     <script type="text/javascript">
-      Sample.options.all = ${sampleOptions};
-
       <c:if test="${sample.id == 0}">
         jQuery(document).ready(function () {
           Sample.ui.sampleClassChanged();
@@ -555,10 +553,10 @@
         </div>
       </c:if>
 
-      <c:if test="${sampleCategory eq 'Tissue Processing'}">
+      <c:if test="${sampleCategory eq 'Tissue Processing' or sampleCategory eq 'new'}">
         <br/>
         <c:choose>
-        <c:when test="${sampleClass eq 'CV Slide'}">
+        <c:when test="${sampleClass eq 'CV Slide' or sampleCategory eq 'new'}">
         <div id="cvSlideTable">
           <h2>Tissue Processing</h2>
           <table class="in">
@@ -581,7 +579,7 @@
           </table>
         </div>
         </c:when>
-        <c:when test="${sampleClass eq 'LCM Tube'}">
+        <c:when test="${sampleClass eq 'LCM Tube' or sampleCategory eq 'new'}">
         <div id="lcmTubeTable">
           <h2>Tissue Processing</h2>
           <table class="in">

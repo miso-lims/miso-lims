@@ -1,16 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasStockParent;
-
 import java.net.URI;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SampleClassDto implements WritableUrls {
@@ -131,13 +123,6 @@ public class SampleClassDto implements WritableUrls {
 
   public void setCanCreateNew(boolean canCreateNew) {
     this.canCreateNew = canCreateNew;
-  }
-
-  public void setCanCreateNew(Iterable<SampleValidRelationship> relationships) {
-    setCanCreateNew((getSampleCategory().equals(SampleTissue.CATEGORY_NAME)
-        || getSampleCategory().equals(SampleStock.CATEGORY_NAME)
-        || getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)
-            && hasStockParent(getId(), relationships)));
   }
 
   @Override

@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -82,20 +81,9 @@ public class SubprojectController extends RestController {
       throw new RestException("No subproject found with ID: " + id, Status.NOT_FOUND);
     } else {
       SubprojectDto dto = Dtos.asDto(subproject);
-      dto = writeUrls(dto, uriBuilder);
+      dto.writeUrls(uriBuilder);
       return dto;
     }
-  }
-
-  private static SubprojectDto writeUrls(SubprojectDto subprojectDto, UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    subprojectDto
-        .setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/subproject/{id}").buildAndExpand(subprojectDto.getId()).toUriString());
-    subprojectDto.setCreatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(subprojectDto.getCreatedById()).toUriString());
-    subprojectDto.setUpdatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(subprojectDto.getUpdatedById()).toUriString());
-    return subprojectDto;
   }
 
   @RequestMapping(value = "/subprojects", method = RequestMethod.GET, produces = { "application/json" })
@@ -104,7 +92,7 @@ public class SubprojectController extends RestController {
     Set<Subproject> subprojects = subprojectService.getAll();
     Set<SubprojectDto> subprojectDtos = Dtos.asSubprojectDtos(subprojects);
     for (SubprojectDto subprojectDto : subprojectDtos) {
-      subprojectDto = writeUrls(subprojectDto, uriBuilder);
+      subprojectDto.writeUrls(uriBuilder);
     }
     return subprojectDtos;
   }

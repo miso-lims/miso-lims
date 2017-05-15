@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -70,20 +69,9 @@ public class DetailedQcStatusController extends RestController {
       throw new RestException("No detailed QC status found with ID: " + id, Status.NOT_FOUND);
     } else {
       DetailedQcStatusDto dto = Dtos.asDto(detailedQcStatus);
-      dto = writeUrls(dto, uriBuilder);
+      dto.writeUrls(uriBuilder);
       return dto;
     }
-  }
-
-  private static DetailedQcStatusDto writeUrls(DetailedQcStatusDto detailedQcStatusDto, UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    detailedQcStatusDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/detailedqcstatus/{id}")
-        .buildAndExpand(detailedQcStatusDto.getId()).toUriString());
-    detailedQcStatusDto.setCreatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(detailedQcStatusDto.getCreatedById()).toUriString());
-    detailedQcStatusDto.setUpdatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(detailedQcStatusDto.getUpdatedById()).toUriString());
-    return detailedQcStatusDto;
   }
 
   @RequestMapping(value = "/detailedqcstatuses", method = RequestMethod.GET, produces = { "application/json" })
@@ -92,7 +80,7 @@ public class DetailedQcStatusController extends RestController {
     Set<DetailedQcStatus> detailedQcStatuses = detailedQcStatusService.getAll();
     Set<DetailedQcStatusDto> detailedQcStatusDtos = Dtos.asDetailedQcStatusDtos(detailedQcStatuses);
     for (DetailedQcStatusDto detailedQcStatusDto : detailedQcStatusDtos) {
-      detailedQcStatusDto = writeUrls(detailedQcStatusDto, uriBuilder);
+      detailedQcStatusDto.writeUrls(uriBuilder);
     }
     return detailedQcStatusDtos;
   }

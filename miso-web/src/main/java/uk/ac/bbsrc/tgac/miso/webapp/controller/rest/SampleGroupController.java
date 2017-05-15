@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -70,20 +69,9 @@ public class SampleGroupController extends RestController {
       throw new RestException("No sample group found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleGroupDto dto = Dtos.asDto(sampleGroup);
-      dto = writeUrls(dto, uriBuilder);
+      dto.writeUrls(uriBuilder);
       return dto;
     }
-  }
-
-  private static SampleGroupDto writeUrls(SampleGroupDto sampleGroupDto, UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    sampleGroupDto
-        .setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplegroup/{id}").buildAndExpand(sampleGroupDto.getId()).toUriString());
-    sampleGroupDto.setCreatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleGroupDto.getCreatedById()).toUriString());
-    sampleGroupDto.setUpdatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleGroupDto.getUpdatedById()).toUriString());
-    return sampleGroupDto;
   }
 
   @RequestMapping(value = "/samplegroups", method = RequestMethod.GET, produces = { "application/json" })
@@ -92,7 +80,7 @@ public class SampleGroupController extends RestController {
     Set<SampleGroupId> sampleGroups = sampleGroupService.getAll();
     Set<SampleGroupDto> sampleGroupDtos = Dtos.asSampleGroupDtos(sampleGroups);
     for (SampleGroupDto sampleGroupDto : sampleGroupDtos) {
-      sampleGroupDto = writeUrls(sampleGroupDto, uriBuilder);
+      sampleGroupDto.writeUrls(uriBuilder);
     }
     return sampleGroupDtos;
   }
