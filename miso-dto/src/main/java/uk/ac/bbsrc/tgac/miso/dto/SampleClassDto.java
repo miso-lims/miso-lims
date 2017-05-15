@@ -1,9 +1,19 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasStockParent;
+
+import java.net.URI;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SampleClassDto {
+public class SampleClassDto implements WritableUrls {
 
   private Long id;
   private String url;
@@ -121,6 +131,20 @@ public class SampleClassDto {
 
   public void setCanCreateNew(boolean canCreateNew) {
     this.canCreateNew = canCreateNew;
+  }
+
+  public void setCanCreateNew(Iterable<SampleValidRelationship> relationships) {
+    setCanCreateNew((getSampleCategory().equals(SampleTissue.CATEGORY_NAME)
+        || getSampleCategory().equals(SampleStock.CATEGORY_NAME)
+        || getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)
+            && hasStockParent(getId(), relationships)));
+  }
+
+  @Override
+  public void writeUrls(URI baseUri) {
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getId()));
+    setCreatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getCreatedById()));
+    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
   }
 
   @Override
