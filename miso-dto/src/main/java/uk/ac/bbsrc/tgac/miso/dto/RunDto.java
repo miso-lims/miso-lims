@@ -2,9 +2,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
-public class RunDto {
+public class RunDto implements WritableUrls {
   private Long id;
   private String name;
   private String alias;
@@ -80,13 +78,9 @@ public class RunDto {
     this.url = url;
   }
 
-  public void writeUrls(UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    writeUrls(baseUri);
-  }
-
+  @Override
   public void writeUrls(URI baseUri) {
-    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/run/{id}").buildAndExpand(getId()).toUriString());
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/run/{id}", getId()));
   }
 
   public SequencingParametersDto getParameters() {

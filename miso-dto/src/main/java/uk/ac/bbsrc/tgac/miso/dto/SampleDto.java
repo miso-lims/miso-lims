@@ -3,8 +3,6 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -29,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
     @JsonSubTypes.Type(value = SampleLCMTubeDto.class, name = SampleLCMTube.SAMPLE_CLASS_NAME),
     @JsonSubTypes.Type(value = SampleDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
-public class SampleDto {
+public class SampleDto implements WritableUrls {
 
   private Long id;
   private String url;
@@ -244,19 +242,14 @@ public class SampleDto {
     this.qcs = qcs;
   }
 
-  public void writeUrls(UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    writeUrls(baseUri);
-  }
-
+  @Override
   public void writeUrls(URI baseUri) {
-    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}").buildAndExpand(getId()).toUriString());
-    setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(getUpdatedById()).toUriString());
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/tree/sample/{id}", getId()));
+    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
     if (getRootSampleClassId() != null) {
-      setRootSampleClassUrl(
-          UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}").buildAndExpand(getRootSampleClassId()).toUriString());
+      setRootSampleClassUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getRootSampleClassId()));
     }
-    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(getId()).toUriString());
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/sample/{id}", getId()));
   }
 
 }

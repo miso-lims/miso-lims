@@ -3,8 +3,6 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -16,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
     @JsonSubTypes.Type(value = DetailedLibraryDto.class, name = "Detailed"),
     @JsonSubTypes.Type(value = LibraryDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
-public class LibraryDto {
+public class LibraryDto implements WritableUrls {
 
   private String alias;
   private Double concentration;
@@ -301,13 +299,9 @@ public class LibraryDto {
     this.dnaSize = dnaSize;
   }
 
+  @Override
   public void writeUrls(URI baseUri) {
-    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/library/{id}").buildAndExpand(getId()).toUriString());
-  }
-
-  public void writeUrls(UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    writeUrls(baseUri);
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/library/{id}", getId()));
   }
 
   public Double getQcQubit() {
