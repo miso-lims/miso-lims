@@ -542,7 +542,7 @@
       <c:if test="${sampleCategory eq 'Tissue Processing' or sampleCategory eq 'new'}">
         <br/>
         <c:choose>
-        <c:when test="${sampleClass eq 'CV Slide' or sampleCategory eq 'new'}">
+        <c:when test="${sampleClass eq 'Slide' or sampleCategory eq 'new'}">
         <div id="cvSlideTable">
           <h2>Tissue Processing</h2>
           <table class="in">
@@ -561,6 +561,12 @@
             <tr>
               <td class="h">Thickness (&#181;m):</td>
               <td><form:input id="thickness" path="thickness"/></td>
+            </tr>
+            <tr>
+              <td class="h">Stain:</td>
+              <td>
+               <miso:select id="stain" path="stain" items="${stains}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue=""/>
+              </td>
             </tr>
           </table>
         </div>

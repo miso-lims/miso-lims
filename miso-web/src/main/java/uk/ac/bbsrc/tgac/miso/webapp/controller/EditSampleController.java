@@ -89,6 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -127,6 +128,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
@@ -143,6 +145,7 @@ public class EditSampleController {
 
   @Autowired
   private SecurityManager securityManager;
+
   @Autowired
   private RequestManager requestManager;
 
@@ -151,18 +154,27 @@ public class EditSampleController {
 
   @Autowired
   private SampleOptionsController sampleOptionsController;
+
   @Autowired
   private SampleService sampleService;
+
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
+
   @Autowired
   private ExperimentService experimentService;
+
   @Autowired
   private ChangeLogService changeLogService;
+
   @Autowired
   private PoolService poolService;
+
   @Autowired
   private RunService runService;
+
+  @Autowired
+  private StainService stainService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -266,6 +278,11 @@ public class EditSampleController {
   @ModelAttribute("sampleOptions")
   public String getSampleOptions(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
     return mapper.writeValueAsString(sampleOptionsController.getSampleOptions(uriBuilder, response));
+  }
+
+  @ModelAttribute("stains")
+  public List<Stain> populateStains() {
+    return stainService.list();
   }
 
   @ModelAttribute("qcTypes")

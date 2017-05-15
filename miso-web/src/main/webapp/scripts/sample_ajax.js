@@ -213,7 +213,7 @@ var Sample = Sample || {
       switch (sampleCategory) {
       case 'Tissue Processing':
         switch (sampleClassAlias) {
-        case 'CV Slide':
+        case 'Slide':
           // Cuts validation
           jQuery('#cuts').attr('class', 'form-control');
           jQuery('#cuts').attr('data-parsley-type', 'digits');
@@ -1347,13 +1347,12 @@ Sample.ui = {
         var classes = Sample.ui.getSampleClassesForSelected().map(function (sc) {
           return sc.alias;
         });
-        if (Sample.ui.getUniqueValues(classes).length > 1 && (classes.indexOf("LCM Tube") != -1 || classes.indexOf("CV Slide") != -1)) {
+        if (Sample.ui.getUniqueValues(classes).length > 1 && (classes.indexOf("LCM Tube") != -1 || classes.indexOf("Slide") != -1)) {
           // An ugly check which indicates that more than two Tissue Processing classes have been requested,
-          // and they include LCM Tubes or CV Slides (each of which requires a specific set of columns) plus something else.
-          // (Though it should be fine to edit Curls and H E Slides together, as they have no data specific to this class.
+          // and they include LCM Tubes or Slides (each of which requires a specific set of columns) plus something else.
           // In other words, the selected items require more than one set of columns.
           jQuery('#errors').html("Tissue Processing sample classes cannot be mixed -- you can only edit LCM Tubes with other "
-              + "LCM Tubes, or CV Slides with other CV Slides. You cannot edit LCM Tubes and CV Slides together.");
+              + "LCM Tubes, or Slides with other Slides. You cannot edit LCM Tubes and Slides together.");
           jQuery('#errors').css('display', 'block');
           return false;
         }
