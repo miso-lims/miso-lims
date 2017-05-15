@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-public interface SampleCVSlide extends SampleTissueProcessing {
+public interface SampleSlide extends SampleTissueProcessing {
 
-  public static final String SAMPLE_CLASS_NAME = "CV Slide";
+  public static final String SAMPLE_CLASS_NAME = "Slide";
 
   Integer getSlides();
 
@@ -17,5 +17,9 @@ public interface SampleCVSlide extends SampleTissueProcessing {
   Integer getThickness();
 
   void setThickness(Integer thickness);
+
+  Stain getStain();
+
+  void setStain(Stain stain);
 
 }

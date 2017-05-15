@@ -31,14 +31,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
@@ -63,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
@@ -102,6 +104,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   private SecurityManager securityManager;
   @Autowired
   private LabService labService;
+  @Autowired
+  private StainService stainService;
+
   @Autowired
   private NamingScheme namingScheme;
 
@@ -498,6 +503,16 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       if (sai.getSubproject() != null && sai.getSubproject().getId() != null) {
         sai.setSubproject(subProjectDao.getSubproject(sai.getSubproject().getId()));
       }
+      if (isTissueProcessingSample(sai) && sai instanceof SampleSlide) {
+        Stain originalStain = ((SampleSlide) sai).getStain();
+        Stain stain;
+        if (originalStain == null) {
+          stain = null;
+        } else {
+          stain = stainService.get(originalStain.getId());
+        }
+        ((SampleSlide) sai).setStain(stain);
+      }
       if (isAliquotSample(sai)) {
         SampleAliquot sa = (SampleAliquot) sai;
         if (sa.getSamplePurpose() != null && sa.getSamplePurpose().getId() != null) {
@@ -638,10 +653,11 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
     source = deproxify(source);
-    if (source instanceof SampleCVSlide) {
-      ((SampleCVSlide) target).setSlides(((SampleCVSlide) source).getSlides());
-      ((SampleCVSlide) target).setDiscards(((SampleCVSlide) source).getDiscards());
-      ((SampleCVSlide) target).setThickness(((SampleCVSlide) source).getThickness());
+    if (source instanceof SampleSlide) {
+      ((SampleSlide) target).setSlides(((SampleSlide) source).getSlides());
+      ((SampleSlide) target).setDiscards(((SampleSlide) source).getDiscards());
+      ((SampleSlide) target).setThickness(((SampleSlide) source).getThickness());
+      ((SampleSlide) target).setStain(((SampleSlide) source).getStain());
     } else if (source instanceof SampleLCMTube) {
       ((SampleLCMTube) target).setSlidesConsumed(((SampleLCMTube) source).getSlidesConsumed());
     }

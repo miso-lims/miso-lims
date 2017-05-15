@@ -27,14 +27,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -46,7 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class DetailedSampleBuilder
-    implements DetailedSample, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing, SampleCVSlide, SampleLCMTube, Identity {
+    implements DetailedSample, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing, SampleSlide, SampleLCMTube, Identity {
 
   private static final long serialVersionUID = 1L;
 
@@ -116,10 +117,11 @@ public class DetailedSampleBuilder
   private Boolean dnaseTreated;
 
   // TissueProcessingSample attributes
-  // CV Slide
+  // Slide
   private Integer slides;
   private Integer discards;
   private Integer thickness;
+  private Stain stain;
   // LCM Tube
   private Integer slidesConsumed;
 
@@ -786,12 +788,13 @@ public class DetailedSampleBuilder
       sample = buildTissue();
       break;
     case SampleTissueProcessing.CATEGORY_NAME:
-      if (sampleClass.getAlias().equals(SampleCVSlide.SAMPLE_CLASS_NAME)) {
-        SampleCVSlide cvSlide = new SampleCVSlideImpl();
-        cvSlide.setSlides(slides);
-        cvSlide.setDiscards(discards);
-        cvSlide.setThickness(thickness);
-        sample = cvSlide;
+      if (sampleClass.getAlias().equals(SampleSlide.SAMPLE_CLASS_NAME)) {
+        SampleSlide slide = new SampleSlideImpl();
+        slide.setSlides(slides);
+        slide.setDiscards(discards);
+        slide.setThickness(thickness);
+        slide.setStain(stain);
+        sample = slide;
       } else if (sampleClass.getAlias().equals(SampleLCMTube.SAMPLE_CLASS_NAME)) {
         SampleLCMTube lcmTube = new SampleLCMTubeImpl();
         lcmTube.setSlidesConsumed(slidesConsumed);
@@ -926,6 +929,16 @@ public class DetailedSampleBuilder
   @Override
   public EntityType getEntityType() {
     throw new UnsupportedOperationException("Temporary builder object should not be consumed as a Boxable");
+  }
+
+  @Override
+  public Stain getStain() {
+    return stain;
+  }
+
+  @Override
+  public void setStain(Stain stain) {
+    this.stain = stain;
   }
 
 }

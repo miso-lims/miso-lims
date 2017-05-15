@@ -71,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -94,6 +95,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
@@ -139,6 +141,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private KitService kitService;
   @Autowired
   private PoolService poolService;
+ @Autowired
+  private StainService stainService;
   @Autowired
   private RunService runService;
   @Autowired
@@ -592,6 +596,13 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
         return tissueOriginService.get(id);
       }
 
+    }.register(binder);
+    new BindingConverterById<Stain>(Stain.class) {
+
+      @Override
+      public Stain resolveById(long id) throws Exception {
+        return stainService.get(id);
+      }
     }.register(binder);
   }
 

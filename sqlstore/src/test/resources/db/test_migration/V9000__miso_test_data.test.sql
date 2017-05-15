@@ -569,6 +569,7 @@ DELETE FROM `Run_Note`;
 DELETE FROM `Pool_Note`;
 
 -- DetailedSample and DetailedLibrary values
+DELETE FROM `SampleClass`;
 INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
 (2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
