@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
+import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -58,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -187,41 +190,46 @@ public class MenuController implements ServletContextAware {
     this.servletContext = servletContext;
   }
 
-  private static <Model, Dto> void createArray(ObjectMapper mapper, ObjectNode node, String name, Iterable<Model> items,
+  private static <Model, Dto> void createArray(ObjectMapper mapper, URI baseUri, ObjectNode node, String name, Iterable<Model> items,
       Function<Model, Dto> asDto) {
     ArrayNode array = node.putArray(name);
     for (Model item : items) {
-      JsonNode itemNode = mapper.valueToTree(asDto.apply(item));
+      Dto dto = asDto.apply(item);
+      if (dto instanceof WritableUrls) {
+        ((WritableUrls) dto).writeUrls(baseUri);
+      }
+      JsonNode itemNode = mapper.valueToTree(dto);
       array.add(itemNode);
     }
   }
 
   @RequestMapping(path = "/constants.js")
   @ResponseBody
-  public String constantsScript(HttpServletResponse response) throws IOException {
+  public String constantsScript(HttpServletResponse response, final UriComponentsBuilder uriBuilder) throws IOException {
     response.setContentType("application/javascript");
     // Use a cached copy and only update every
     if (constantsJs != null && (System.currentTimeMillis() - constantsJsTime) < 15 * 60 * 1000) {
       return constantsJs;
     }
+    URI baseUri = uriBuilder.build().toUri();
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode node = mapper.createObjectNode();
     node.put("isDetailedSample", isDetailedSampleEnabled());
     node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
 
-    createArray(mapper, node, "libraryDesigns", requestManager.listLibraryDesigns(), Dtos::asDto);
-    createArray(mapper, node, "libraryTypes", libraryService.listLibraryTypes(), Dtos::asDto);
-    createArray(mapper, node, "librarySelections", libraryService.listLibrarySelectionTypes(), Dtos::asDto);
-    createArray(mapper, node, "libraryStrategies", libraryService.listLibraryStrategyTypes(), Dtos::asDto);
-    createArray(mapper, node, "libraryDesignCodes", requestManager.listLibraryDesignCodes(), Dtos::asDto);
-    createArray(mapper, node, "platforms", requestManager.listAllPlatforms(),Dtos::asDto);
-    createArray(mapper, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
-    createArray(mapper, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
-    createArray(mapper, node, "sampleValidRelationships", sampleValidRelationshipService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "libraryDesigns", requestManager.listLibraryDesigns(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "libraryTypes", libraryService.listLibraryTypes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "librarySelections", libraryService.listLibrarySelectionTypes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "libraryStrategies", libraryService.listLibraryStrategyTypes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "libraryDesignCodes", requestManager.listLibraryDesignCodes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "platforms", requestManager.listAllPlatforms(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "sampleValidRelationships", sampleValidRelationshipService.getAll(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);
-    createArray(mapper, node, "indexFamilies", indexFamilies, Dtos::asDto);
+    createArray(mapper, baseUri, node, "indexFamilies", indexFamilies, Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");
     Collection<PlatformType> activePlatformTypes = requestManager.listActivePlatformTypes();

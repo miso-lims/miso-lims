@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SampleValidRelationshipDto {
+public class SampleValidRelationshipDto implements WritableUrls {
 
   private Long id;
   private String url;
@@ -121,6 +123,15 @@ public class SampleValidRelationshipDto {
 
   public void setArchived(Boolean archived) {
     this.archived = archived;
+  }
+
+  @Override
+  public void writeUrls(URI baseUri) {
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/samplevalidrelationship/{id}", getId()));
+    setCreatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getCreatedById()));
+    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
+    setParentUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getParentId()));
+    setChildUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getChildId()));
   }
 
 }

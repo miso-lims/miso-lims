@@ -2,8 +2,6 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -185,23 +183,21 @@ public class DetailedSampleDto extends SampleDto {
   @Override
   public void writeUrls(URI baseUri) {
     super.writeUrls(baseUri);
-    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(getId()).toUriString());
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/sample/{id}", getId()));
     if (getSampleClassId() != null) {
-      setSampleClassUrl(
-          UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}").buildAndExpand(getSampleClassId()).toUriString());
+      setSampleClassUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getSampleClassId()));
     }
     if (getDetailedQcStatusId() != null) {
-      setDetailedQcStatusUrl(
-          UriComponentsBuilder.fromUri(baseUri).path("/rest/detailedqcstatus/{id}").buildAndExpand(getDetailedQcStatusId()).toUriString());
+      setDetailedQcStatusUrl(WritableUrls.buildUriPath(baseUri, "/rest/detailedqcstatus/{id}", getDetailedQcStatusId()));
     }
     if (getSubprojectId() != null) {
-      setSubprojectUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/subproject/{id}").buildAndExpand(getSubprojectId()).toUriString());
+      setSubprojectUrl(WritableUrls.buildUriPath(baseUri, "/rest/subproject/{id}", getSubprojectId()));
     }
     if (getPrepKitId() != null) {
-      setPrepKitUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/kitdescriptor/{id}").buildAndExpand(getPrepKitId()).toUriString());
+      setPrepKitUrl(WritableUrls.buildUriPath(baseUri, "/rest/kitdescriptor/{id}", getPrepKitId()));
     }
     if (getParentId() != null) {
-      setParentUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(getParentId()).toUriString());
+      setParentUrl(WritableUrls.buildUriPath(baseUri, "/rest/sample/{id}", getParentId()));
     }
   }
 

@@ -3,12 +3,10 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.net.URI;
 import java.util.Set;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class PoolDto {
+public class PoolDto implements WritableUrls {
 
   private Long id;
   private String url;
@@ -150,16 +148,12 @@ public class PoolDto {
     this.url = url;
   }
 
+  @Override
   public void writeUrls(URI baseUri) {
-    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/pool/{id}").buildAndExpand(getId()).toUriString());
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/pool/{id}", getId()));
     for (DilutionDto ldto : getPooledElements()) {
       ldto.setLibraryUrl(
-          UriComponentsBuilder.fromUri(baseUri).path("/rest/library/{id}").buildAndExpand(ldto.getLibrary().getId()).toUriString());
+          WritableUrls.buildUriPath(baseUri, "/rest/library/{id}", ldto.getLibrary().getId()));
     }
-  }
-
-  public void writeUrls(UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    writeUrls(baseUri);
   }
 }
