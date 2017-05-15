@@ -64,10 +64,13 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
+import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
+import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -89,10 +92,17 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private SampleClassService sampleClassService;
   @Autowired
-  private SampleValidRelationshipService sampleValidRelationshipService;
+  private DetailedQcStatusService detailedQcStatusService;
 
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private SampleValidRelationshipService sampleValidRelationshipService;
+  @Autowired
+  private SubprojectService subprojectService;
+
+  @Autowired
+  private SampleGroupService sampleGroupService;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
@@ -230,10 +240,13 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleClasses", sampleClassService.getAll(), model -> {
       SampleClassDto dto = Dtos.asDto(model);
-      dto.setCanCreateNew(relationships);
+      dto.setCanCreateNew(model.canCreateNew(relationships));
       return dto;
     });
     createArray(mapper, baseUri, node, "sampleValidRelationships", relationships, Dtos::asDto);
+    createArray(mapper, baseUri, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "subprojects", subprojectService.getAll(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

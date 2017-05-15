@@ -51,7 +51,7 @@ public class DetailedSampleBuilder
   private static final long serialVersionUID = 1L;
 
   private static final List<String> CATEGORY_ORDER = Arrays.asList(Identity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
-      SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
+      SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
 
   // Sample attributes
   private long sampleId = AbstractSample.UNSAVED_ID;
@@ -534,7 +534,7 @@ public class DetailedSampleBuilder
 
   @Override
   public Integer getSlidesRemaining() {
-    throw new UnsupportedOperationException("Method not implemented on builder");
+    return null;
   }
 
   @Override
@@ -653,7 +653,6 @@ public class DetailedSampleBuilder
   public boolean isDeletable() {
     return false;
   }
-
 
   @Override
   public Box getBox() {
@@ -787,13 +786,13 @@ public class DetailedSampleBuilder
       sample = buildTissue();
       break;
     case SampleTissueProcessing.CATEGORY_NAME:
-      if (sampleClass.getAlias() == SampleCVSlide.SAMPLE_CLASS_NAME) {
+      if (sampleClass.getAlias().equals(SampleCVSlide.SAMPLE_CLASS_NAME)) {
         SampleCVSlide cvSlide = new SampleCVSlideImpl();
         cvSlide.setSlides(slides);
         cvSlide.setDiscards(discards);
         cvSlide.setThickness(thickness);
         sample = cvSlide;
-      } else if (sampleClass.getAlias() == SampleLCMTube.SAMPLE_CLASS_NAME) {
+      } else if (sampleClass.getAlias().equals(SampleLCMTube.SAMPLE_CLASS_NAME)) {
         SampleLCMTube lcmTube = new SampleLCMTubeImpl();
         lcmTube.setSlidesConsumed(slidesConsumed);
         sample = lcmTube;
@@ -837,7 +836,7 @@ public class DetailedSampleBuilder
         tissue.setSampleClass(tissueClass);
         parent = tissue;
       }
-      if (categoryIndex > 2 && stockClass != null) {
+      if (categoryIndex > 3 && stockClass != null) {
         SampleStock stock = buildStock();
         stock.setParent(parent);
         stock.setSampleClass(stockClass);

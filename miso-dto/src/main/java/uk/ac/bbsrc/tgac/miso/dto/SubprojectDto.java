@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SubprojectDto {
+public class SubprojectDto implements WritableUrls {
 
   private Long id;
   private String url;
@@ -138,5 +140,12 @@ public class SubprojectDto {
 
   public void setReferenceGenomeId(Long referenceGenomeId) {
     this.referenceGenomeId = referenceGenomeId;
+  }
+
+  @Override
+  public void writeUrls(URI baseUri) {
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/subproject/{id}", getId()));
+    setCreatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getCreatedById()));
+    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
   }
 }

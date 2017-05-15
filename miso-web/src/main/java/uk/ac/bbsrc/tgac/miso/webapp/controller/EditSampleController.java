@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
@@ -412,26 +412,20 @@ public class EditSampleController {
   private void populateSampleClasses(ModelMap model) throws IOException {
     List<SampleClass> sampleClasses = new ArrayList<>();
     List<SampleClass> tissueClasses = new ArrayList<>();
-    List<SampleClass> stockClasses = new ArrayList<>();
     Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
     // Can only create Tissues, Stocks, and Aliquots from this page, so remove other classes
     for (SampleClass sc : sampleClassService.getAll()) {
       if (SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory())) {
         tissueClasses.add(sc);
-        sampleClasses.add(sc);
-      } else if (SampleStock.CATEGORY_NAME.equals(sc.getSampleCategory())) {
-        stockClasses.add(sc);
-        sampleClasses.add(sc);
-      } else if (SampleAliquot.CATEGORY_NAME.equals(sc.getSampleCategory()) && hasStockParent(sc.getId(), relationships)) {
+      }
+      if (sc.canCreateNew(relationships)) {
         sampleClasses.add(sc);
       }
     }
     Collections.sort(sampleClasses, SAMPLECLASS_CATEGORY_ALIAS);
     Collections.sort(tissueClasses, SAMPLECLASS_CATEGORY_ALIAS);
-    Collections.sort(stockClasses, SAMPLECLASS_CATEGORY_ALIAS);
     model.put("sampleClasses", sampleClasses);
     model.put("tissueClasses", tissueClasses);
-    model.put("stockClasses", stockClasses);
   }
 
   @Autowired

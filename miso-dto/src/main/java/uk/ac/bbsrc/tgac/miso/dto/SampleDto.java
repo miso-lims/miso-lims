@@ -249,7 +249,6 @@ public class SampleDto implements WritableUrls {
     if (getRootSampleClassId() != null) {
       setRootSampleClassUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getRootSampleClassId()));
     }
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/sample/{id}", getId()));
   }
 
 }

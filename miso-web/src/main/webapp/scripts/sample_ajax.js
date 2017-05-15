@@ -642,28 +642,26 @@ Sample.barcode = {
 
 Sample.options = {
   
-  all: null,
-  
   getSampleGroupsBySubProjectId: function(subProjectId) {
-    return Sample.options.all.sampleGroupsDtos.filter(function (sampleGroup) {
+    return Constants.sampleGroups.filter(function (sampleGroup) {
       return sampleGroup.subprojectId == subProjectId;
     });
   },
   
   getSampleGroupsByProjectId: function(projectId) {
-    return Sample.options.all.sampleGroupsDtos.filter(function (sampleGroup) {
+    return Constants.sampleGroups.filter(function (sampleGroup) {
       return sampleGroup.projectId == projectId && !sampleGroup.subprojectId;
     });
   },
   
   getSubProjectsByProjectId: function(projectId) {
-    return Sample.options.all.subprojectsDtos.filter(function (subProject) {
+    return Constants.subprojects.filter(function (subProject) {
       return subProject.parentProjectId == projectId;
     });
   },
   
   getSampleCategoryByClassId: function(sampleClassId) {
-    var results = Sample.options.all.sampleClassesDtos.filter(function (sampleClass) {
+    var results = Constants.sampleClasses.filter(function (sampleClass) {
       return sampleClass.id == sampleClassId;
     });
     return results.length > 0 ? results[0].sampleCategory : null;
@@ -725,12 +723,31 @@ Sample.ui = {
    * Update display when user selects different sample classes during new sample receipt
    */
   sampleClassChanged: function() {
-    var selectedId = jQuery('#sampleClass option:selected').val();
-    var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
-    jQuery('#sampleCategory').val(sampleCategory);
-    switch (sampleCategory) {
+    var sampleClassId = parseInt(jQuery('#sampleClass option:selected').val());
+    var sampleClass = Constants.sampleClasses.filter(function (sampleClass) {
+      return sampleClass.id == sampleClassId;
+    })[0];
+    if (!sampleClass) {
+      Sample.ui.setUpForTissue();
+      return;
+    }
+    jQuery('#sampleCategory').val(sampleClass.sampleCategory);
+    switch (sampleClass.sampleCategory) {
     case 'Aliquot':
       Sample.ui.setUpForAliquot();
+      break;
+    case 'Tissue Processing':
+      Sample.ui.setUpForProcessing();
+      if (sampleClass.alias == 'LCM Tube') {
+        jQuery('#lcmTubeTable').show();
+      } else {
+        jQuery('#lcmTubeTable').hide();
+      }
+      if (sampleClass.alias == 'CV Slide') {
+        jQuery('#cvSlideTable').show();
+      } else {
+        jQuery('#cvSlideTable').hide();
+      }
       break;
     case 'Stock':
       Sample.ui.setUpForStock();
@@ -750,7 +767,7 @@ Sample.ui = {
     
     // find the selected detailedQcStatus
     var dqcsId = jQuery('#detailedQcStatus option:selected').val();
-    var selectedDQCS = Hot.findFirstOrNull(Hot.idPredicate(dqcsId), Sample.options.all.detailedQcStatusesDtos);
+    var selectedDQCS = Hot.findFirstOrNull(Hot.idPredicate(dqcsId), Constants.detailedQcStatuses);
     if (selectedDQCS !== null && selectedDQCS.noteRequired) {
       jQuery('#qcStatusNote').show();
     }  else {
@@ -767,12 +784,21 @@ Sample.ui = {
     });
     jQuery('#detailedSampleAliquot').hide();
     jQuery('#detailedSampleStock').hide();
+    jQuery('#cvSlideTable').hide();
+    jQuery('#lcmTubeTable').hide();
     jQuery('#tissueClassRow').hide();
     jQuery('#stockClassRow').hide();
     jQuery('#tissueClass').val('');
     jQuery('#detailedSampleTissue').show();
   },
   
+  setUpForProcessing: function() {
+    jQuery('#tissueClassRow').show();
+    jQuery('#stockClassRow').hide();
+    jQuery('#detailedSampleStock').hide();
+    jQuery('#detailedSampleAliquot').hide();
+  },
+
   setUpForAliquot: function() {
     jQuery('#detailedSampleStock').find(':input').each(function() {
       jQuery(this).val('');
@@ -782,6 +808,7 @@ Sample.ui = {
     jQuery('#detailedSampleStock').show();
     jQuery('#detailedSampleAliquot').show();
   },
+
    setUpForStock: function() {
     jQuery('#detailedSampleAliquot').find(':input').each(function() {
       jQuery(this).val('');
@@ -790,6 +817,8 @@ Sample.ui = {
     jQuery('#stockClassRow').hide();
     jQuery('#detailedSampleStock').show();
     jQuery('#detailedSampleAliquot').hide();
+    jQuery('#cvSlideTable').hide();
+    jQuery('#lcmTubeTable').hide();
   },
   
   editSampleIdBarcode: function (span, id) {

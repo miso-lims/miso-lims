@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasStockParent;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -50,4 +52,12 @@ public interface SampleClass extends Serializable {
   Boolean getDNAseTreatable();
 
   void setDNAseTreatable(Boolean treatable);
+
+  default boolean canCreateNew(Iterable<SampleValidRelationship> relationships) {
+    return (getSampleCategory().equals(SampleTissue.CATEGORY_NAME)
+        || getSampleCategory().equals(SampleTissueProcessing.CATEGORY_NAME)
+        || getSampleCategory().equals(SampleStock.CATEGORY_NAME)
+        || getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)
+            && hasStockParent(getId(), relationships));
+  }
 }
