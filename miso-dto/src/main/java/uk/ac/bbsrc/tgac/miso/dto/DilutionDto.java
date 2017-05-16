@@ -1,8 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-public class DilutionDto {
+public class DilutionDto implements WritableUrls {
 
   private Long id;
   private String name;
@@ -95,6 +97,13 @@ public class DilutionDto {
 
   public void setLibraryUrl(String libraryUrl) {
     this.libraryUrl = libraryUrl;
+  }
+
+  @Override
+  public void writeUrls(URI baseUri) {
+    if (library != null) {
+      library.writeUrls(baseUri);
+    }
   }
 
 }

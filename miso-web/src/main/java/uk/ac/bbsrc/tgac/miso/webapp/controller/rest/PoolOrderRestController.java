@@ -50,7 +50,7 @@ public class PoolOrderRestController extends RestController {
     }
 
     @Override
-    protected PoolOrderCompletionDto asDto(PoolOrderCompletion model, UriComponentsBuilder builder) {
+    protected PoolOrderCompletionDto asDto(PoolOrderCompletion model) {
       return Dtos.asDto(model);
     }
   };

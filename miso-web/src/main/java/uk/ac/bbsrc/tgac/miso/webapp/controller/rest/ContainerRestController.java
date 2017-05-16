@@ -75,10 +75,8 @@ public class ContainerRestController extends RestController {
   private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto>() {
 
     @Override
-    protected ContainerDto asDto(SequencerPartitionContainer model, UriComponentsBuilder builder) {
-      ContainerDto dto = Dtos.asDto(model);
-      dto.writeUrls(builder);
-      return dto;
+    protected ContainerDto asDto(SequencerPartitionContainer model) {
+      return Dtos.asDto(model);
     }
 
     @Override

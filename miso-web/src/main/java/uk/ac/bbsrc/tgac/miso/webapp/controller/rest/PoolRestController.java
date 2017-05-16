@@ -74,10 +74,8 @@ public class PoolRestController extends RestController {
   private final JQueryDataTableBackend<Pool, PoolDto> jQueryBackend = new JQueryDataTableBackend<Pool, PoolDto>() {
 
     @Override
-    protected PoolDto asDto(Pool model, UriComponentsBuilder builder) {
-      PoolDto dto = Dtos.asDto(model, false);
-      dto.writeUrls(builder);
-      return dto;
+    protected PoolDto asDto(Pool model) {
+      return Dtos.asDto(model, false);
     }
 
     @Override
