@@ -50,7 +50,6 @@ import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -63,7 +62,6 @@ import com.google.common.collect.Maps;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
@@ -81,8 +79,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -93,7 +89,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -484,48 +479,6 @@ public class LibraryControllerHelperService {
     } else {
       return JSONUtils.SimpleJSONError("No libraries specified");
     }
-  }
-
-  public JSONObject changePlatformName(HttpSession session, JSONObject json) {
-    // For whatever reason, Fluxion doesn't autowire this class correctly, so, we do it again.
-    if (indexStore == null) {
-      ApplicationContext ctxt = ApplicationContextProvider.getApplicationContext();
-      ctxt.getAutowireCapableBeanFactory().autowireBean(this);
-    }
-    try {
-      if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
-        String platform = json.getString("platform");
-        long originalLibraryTypeId = json.has("originalLibraryTypeId") ? json.getLong("originalLibraryTypeId") : 0L;
-
-        JSONObject result = new JSONObject();
-
-        StringBuilder libsb = new StringBuilder();
-        List<LibraryType> types = new ArrayList<>();
-        for (LibraryType type : libraryService.listLibraryTypesByPlatform(PlatformType.get(platform))) {
-          if (!type.getArchived() || type.getId() == originalLibraryTypeId) {
-            types.add(type);
-          }
-        }
-        Collections.sort(types);
-        for (LibraryType s : types) {
-          libsb.append("<option value='" + s.getId() + "'>" + s.getDescription() + "</option>");
-        }
-        result.put("libraryTypes", libsb.toString());
-
-        JSONArray families = new JSONArray();
-        JsonConfig config = new JsonConfig();
-        config.setExcludes(new String[] { "family" });
-        families.add(IndexFamily.NULL);
-        families.addAll(indexStore.getIndexFamiliesByPlatform(PlatformType.get(platform)), config);
-        result.put("indexFamilies", families);
-
-        return result;
-      }
-    } catch (IOException e) {
-      log.error("Failed to retrieve library types given platform type: ", e);
-      return JSONUtils.SimpleJSONError("Failed to retrieve library types given platform type: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONError("Cannot resolve LibraryType from selected Platform");
   }
 
   public JSONObject getIndicesForFamily(HttpSession session, JSONObject json) {
