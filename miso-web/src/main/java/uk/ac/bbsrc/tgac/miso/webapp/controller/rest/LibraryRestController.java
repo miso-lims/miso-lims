@@ -75,10 +75,8 @@ public class LibraryRestController extends RestController {
 
   private final JQueryDataTableBackend<Library, LibraryDto> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto>() {
     @Override
-    protected LibraryDto asDto(Library model, UriComponentsBuilder builder) {
-      LibraryDto dto = Dtos.asDto(model);
-      dto.writeUrls(builder);
-      return dto;
+    protected LibraryDto asDto(Library model) {
+      return Dtos.asDto(model);
     }
 
     @Override

@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,12 +23,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
+import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 
 public abstract class JQueryDataTableBackend<Model, Dto> {
 
   private static final Logger log = LoggerFactory.getLogger(JQueryDataTableBackend.class);
 
-  protected abstract Dto asDto(Model model, UriComponentsBuilder builder);
+  protected abstract Dto asDto(Model model);
 
   public DataTablesResponseDto<Dto> get(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder, PaginationFilter... filters) throws IOException {
@@ -69,9 +71,14 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
           sortCol,
           additionalFilters.toArray(filters));
 
+      URI uri = uriBuilder.build().toUri();
       List<Dto> dtos = new ArrayList<>();
       for (Model model : models) {
-        dtos.add(asDto(model, uriBuilder));
+        Dto dto = asDto(model);
+        if (dto instanceof WritableUrls) {
+          ((WritableUrls) dto).writeUrls(uri);
+        }
+        dtos.add(dto);
       }
 
       dtResponse.setITotalRecords(numItems);
