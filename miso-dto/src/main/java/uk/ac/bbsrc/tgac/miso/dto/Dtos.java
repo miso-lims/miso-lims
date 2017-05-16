@@ -1548,6 +1548,7 @@ public class Dtos {
   public static IndexFamilyDto asDto(IndexFamily from) {
     IndexFamilyDto dto = new IndexFamilyDto();
     dto.setId(from.getId());
+    dto.setName(from.getName());
     dto.setArchived(from.getArchived());
     dto.setIndices(from.getIndices().stream().map(Dtos::asDto).collect(Collectors.toList()));
     dto.setMaximumNumber(from.getMaximumNumber());
