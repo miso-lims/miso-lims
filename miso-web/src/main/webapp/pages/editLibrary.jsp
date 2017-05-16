@@ -384,7 +384,6 @@
 </table>
 <script type="text/javascript">
     Library = Library || {};
-    Library.indexFamilies = ${indexFamiliesJSON};
     Library.setOriginalIndices = function() {
       Library.lastIndexPosition = 0;
       jQuery('#indicesDiv').empty();
@@ -1346,7 +1345,6 @@ function submitBulkLibraries() {
 </div>
 
 <script type="text/javascript">
-  Library.designs = ${libraryDesignsJSON};
   jQuery(document).ready(function () {
     Library.ui.changeDesign(<c:out value="${library.libraryType.id}" default="0"/>, function() {
       Library.setOriginalIndices();

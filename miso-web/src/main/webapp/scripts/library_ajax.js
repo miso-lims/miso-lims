@@ -726,38 +726,35 @@ Library.barcode = {
 
 Library.ui = {
   changePlatformType: function (originalLibraryTypeId, callback) {
-    var self = this;
-    var platform = jQuery('#platformTypes').val();
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'changePlatformName',
-      {
-        'originalLibraryTypeId': originalLibraryTypeId,
-        'platform': platform,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          Library.ui.processPlatformChange(json);
-          if (callback) {
-            callback();
-          }
-        }
-      }
-    );
-  },
+    var platformTypeKey = jQuery('#platformTypes').val();
+    var platformType = Constants.platformTypes.filter(function(pt) { return pt.key == platformTypeKey; })[0];
 
-  processPlatformChange: function (json) {
-    jQuery('#libraryTypes').html(json.libraryTypes);
-    Library.indexFamilies = json.indexFamilies;
-    var box = jQuery('#indexFamily').empty()[0];
-    for (var i = 0; i < Library.indexFamilies.length; i++) {
+    var indexFamilySelect = jQuery('#indexFamily').empty()[0];
+    Constants.indexFamilies.filter(function(family) { return !family.platformType || family.platformType == platformType.name; }).sort(function(a, b) {
+      if (a.id == b.id) return 0;
+      if (a.id == 0) return -1;
+      if (b.id == 0) return 1;
+      return a.name.localeCompare(b.name);
+    }).map(function(family) {
       var option = document.createElement("option");
-      option.value = Library.indexFamilies[i].id;
-      option.text = Library.indexFamilies[i].name;
-      box.appendChild(option);
-    }
+      option.value = family.id;
+      option.text = family.name;
+      return option;
+    }).forEach(function(o) { indexFamilySelect.appendChild(o); });
+
+    var libraryTypesSelect = jQuery('#libraryTypes').empty()[0];
+    Constants.libraryTypes.filter(function(type) { return type.platform == platformType.name && (!type.archived || type.id == originalLibraryTypeId); }).sort(function(a, b) {
+      return a.alias.localeCompare(b.alias);
+    }).map(function(type) {
+      var option = document.createElement("option");
+      option.value = type.id;
+      option.text = type.alias;
+      return option;
+    }).forEach(function(o) { libraryTypesSelect.appendChild(o); });
     Library.ui.updateIndices();
+    if (callback) {
+      callback();
+    }
   },
 
   updateIndices: function () {
@@ -793,7 +790,7 @@ Library.ui = {
     }
     var container = document.getElementById('indicesDiv');
     // If this index family requires fewer indices than previously selected, we need to null them out in the form input or Spring will create an array with a mix of new and old indices.
-    var biggestMax = Library.ui.maxOfArray(Library.indexFamilies.map(Library.ui.maxIndexPositionInFamily));
+    var biggestMax = Library.ui.maxOfArray(Constants.indexFamilies.map(Library.ui.maxIndexPositionInFamily));
     for (var j = Library.lastIndexPosition; j < biggestMax; j++) {
        var nullInput = document.createElement("input");
        nullInput.type = "hidden";
@@ -805,7 +802,7 @@ Library.ui = {
 
   getCurrentIndexFamily: function() {
     var familyId = jQuery('#indexFamily').val();
-    var families = Library.indexFamilies.filter(function(family) { return family.id == familyId; });
+    var families = Constants.indexFamilies.filter(function(family) { return family.id == familyId; });
     if (families.length == 0) {
       return { id : 0, indices :  [] };
     } else {
@@ -1368,14 +1365,14 @@ Library.ui = {
       if (code) { code.disabled = false; }
       if (typeof callback == 'function') callback();
     } else {
-      var matchedDesigns = Library.designs.filter(function (rule) { return rule.id == designSelect.value; });
+      var matchedDesigns = Constants.libraryDesigns.filter(function (rule) { return rule.id == designSelect.value; });
       if (matchedDesigns.length == 1) {
-        selection.value = matchedDesigns[0].librarySelectionType.id;
+        selection.value = matchedDesigns[0].selectionId;
         selection.disabled = true;
-        strategy.value = matchedDesigns[0].libraryStrategyType.id;
+        strategy.value = matchedDesigns[0].strategyId;
         strategy.disabled = true;
         if (code) {
-          code.value = matchedDesigns[0].libraryDesignCode.id;
+          code.value = matchedDesigns[0].designCodeId;
           code.disabled = true;
         }
       }

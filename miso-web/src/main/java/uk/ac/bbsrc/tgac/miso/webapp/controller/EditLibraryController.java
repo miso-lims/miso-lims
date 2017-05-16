@@ -108,7 +108,6 @@ import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -361,13 +360,12 @@ public class EditLibraryController {
 
   public void populateAvailableIndexFamilies(Library library, ModelMap model) throws IOException {
     if (library.getPlatformType() == null || isStringEmptyOrNull(library.getPlatformType().getKey())) {
-      model.put("indexFamiliesJSON", "[]");
       model.put("indexFamilies", Collections.singleton(INDEX_FAMILY_NEEDS_PLATFORM));
     } else {
-      List<IndexFamily> visbileFamilies = new ArrayList<>();
-      visbileFamilies.add(IndexFamily.NULL);
-      visbileFamilies.addAll(indexService.getIndexFamiliesByPlatform(library.getPlatformType()));
-      MisoWebUtils.populateListAndJson(model, "indexFamilies", visbileFamilies, "family");
+      List<IndexFamily> visibleFamilies = new ArrayList<>();
+      visibleFamilies.add(IndexFamily.NULL);
+      visibleFamilies.addAll(indexService.getIndexFamiliesByPlatform(library.getPlatformType()));
+      model.put("indexFamilies", visibleFamilies);
     }
   }
 
@@ -404,11 +402,11 @@ public class EditLibraryController {
   }
 
   private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
-    MisoWebUtils.populateListAndJson(model, "libraryDesigns", requestManager.listLibraryDesignByClass(sampleClass), "sampleClass");
+    model.put("libraryDesigns", requestManager.listLibraryDesignByClass(sampleClass));
   }
 
   private void populateDesignCodes(ModelMap model) throws IOException {
-    MisoWebUtils.populateListAndJson(model, "libraryDesignCodes", requestManager.listLibraryDesignCodes());
+    model.put("libraryDesignCodes", requestManager.listLibraryDesignCodes());
   }
 
   /**

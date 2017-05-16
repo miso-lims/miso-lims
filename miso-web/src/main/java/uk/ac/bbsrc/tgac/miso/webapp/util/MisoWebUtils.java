@@ -25,16 +25,11 @@ package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ui.ModelMap;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JsonConfig;
 
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -98,17 +93,5 @@ public class MisoWebUtils {
       }
     }
     return checks;
-  }
-
-  /**
-   * Adds a list of items to the model and creates another element with those same items, converted to JSON.
-   */
-  public static <T> void populateListAndJson(ModelMap model, String modelAttributeName, Collection<T> items, String... exclusions) {
-    JSONArray array = new JSONArray();
-    JsonConfig config = new JsonConfig();
-    config.setExcludes(exclusions);
-    array.addAll(items, config);
-    model.put(modelAttributeName + "JSON", array.toString());
-    model.put(modelAttributeName, items);
   }
 }
