@@ -780,9 +780,9 @@ Library.ui = {
   createIndexNextBox: function() {
     var family = Library.ui.getCurrentIndexFamily();
     var max = Library.ui.maxIndexPositionInFamily(family);
-    if (Library.lastIndexPosition < max) {
+    if (Library.lastIndexPosition < max - 1) {
       Library.ui.createIndexSelect(max, null);
-    } else {
+    } else if (Library.lastIndexPosition == 0) {
       var container = jQuery('#indicesDiv');
       if (container.children().length == 0) {
         container.text("No indices available.");
