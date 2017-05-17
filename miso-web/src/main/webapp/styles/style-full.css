@@ -1061,10 +1061,6 @@ div.flashinfo {
     border: 2px solid;
 }
 
-table td.headertable {
-    cursor: pointer;
-}
-
 td.headertable #instanceName {
     font: Helvetica;
     padding: 0 30px;

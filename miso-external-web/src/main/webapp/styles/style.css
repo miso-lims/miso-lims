@@ -1014,10 +1014,6 @@ div.flashinfo {
     border: 2px solid;
 }
 
-table td.headertable {
-    cursor: pointer;
-}
-
 .bubbleInfo {
     position: relative;
     top: 0px;
