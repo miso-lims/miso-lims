@@ -371,9 +371,13 @@
   <td><form:checkbox id="discarded" path="discarded"/></td>
 </tr>
 <tr>
-  <td class="h">Location:</td>
+  <td class="h"><label for="locationBarcode">Location:</label></td>
+  <td><form:input id="locationBarcode" path="locationBarcode"/></td>
+</tr>
+<tr>
+  <td class="h">Box Location:</td>
   <td>
-    <c:if test="${!empty library.box.locationBarcode}">${ library.box.locationBarcode},</c:if>
+    <c:if test="${!empty library.box.locationBarcode}">${library.box.locationBarcode},</c:if>
     <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.box.id}"/>'>${library.box.alias}, ${library.boxPosition}</a></c:if>
   </td>
 </tr>

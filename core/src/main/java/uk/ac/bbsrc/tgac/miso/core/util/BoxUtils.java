@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 
@@ -174,7 +176,9 @@ public class BoxUtils {
     if (discarded) {
       return "EMPTY";
     } else if (boxAlias != null && position != null) {
-      return boxAlias + " - " + position + (boxLocationBarcode == null ? "" : " (" + boxLocationBarcode + ")");
+      return (isStringEmptyOrNull(locationBarcode) ? "" : locationBarcode + ", ")
+          + boxAlias + " - " + position
+          + (isStringEmptyOrNull(boxLocationBarcode) ? "" : " (" + boxLocationBarcode + ")");
     } else if (locationBarcode != null) {
       return locationBarcode;
     } else {
