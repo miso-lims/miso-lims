@@ -43,7 +43,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   default Criteria createPaginationCriteria() throws IOException {
-    Criteria criteria = currentSession().createCriteria(getRealClass());
+    final Criteria backingCriteria = currentSession().createCriteria(getRealClass());
+    Criteria criteria = new AliasTrackingCriteria(backingCriteria);
     for (String alias : listAliases()) {
       String[] parts = alias.split("\\.");
       criteria.createAlias(alias, parts[parts.length - 1]);
@@ -133,6 +134,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public abstract String propertyForUserName(Criteria criteria, boolean creator);
 
   @Override
+  default void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be boxed.");
+  }
+
+  @Override
   public default void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " is exempt from class strugle.");
   }
@@ -168,11 +174,6 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   default void restrictPaginationByInstitute(Criteria criteria, String name, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " has no institute associated with it.");
-  }
-
-  @Override
-  default void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be boxed.");
   }
 
   @Override
