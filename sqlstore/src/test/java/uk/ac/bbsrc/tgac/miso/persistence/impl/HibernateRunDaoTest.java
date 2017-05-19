@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -53,21 +52,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
-import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
@@ -95,15 +88,13 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
   @Mock
   private HibernateChangeLogDao changeLogDAO;
-  @Mock
-  private StatusStore statusDao;
+
 
   @InjectMocks
   private HibernateRunDao dao;
 
   private final User emptyUser = new UserImpl();
   private final SequencerReference emptySR = new SequencerReferenceImpl();
-  private final Status emptyStatus = new StatusImpl();
 
   @Before
   public void setup() throws IOException {
@@ -115,12 +106,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
     emptySR.setId(1L);
     when(sequencerReferenceDAO.get(Matchers.anyLong())).thenReturn(emptySR);
-    emptyStatus.setHealth(HealthType.Unknown);
-    emptyStatus.setInstrumentName("srName");
-    emptyStatus.setRunAlias("runName");
-    emptyStatus.setLastUpdated(new Date());
-    emptyStatus.setStartDate(new Date());
-    when(statusDao.get(Matchers.anyLong())).thenReturn(emptyStatus);
   }
 
   @Test
@@ -300,16 +285,14 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
 
   @Test
   public void testRemove() throws IOException, MisoNamingException {
-    Run run = new RunImpl();
+    Run run = new Run();
     String runName = "RUN111";
     run.setName(runName);
     run.setAlias("RunAlias");
     run.setDescription("Run Description");
     run.setPairedEnd(true);
-    run.setPlatformType(PlatformType.ILLUMINA);
     run.setSequencerReference(emptySR);
     run.setLastModifier(emptyUser);
-    run.setStatus(emptyStatus);
 
     long runId = dao.save(run);
     Run insertedRun = dao.get(runId);
@@ -403,18 +386,14 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     User user = new UserImpl();
     user.setUserId(1L);
 
-    Run run = new RunImpl();
+    Run run = new Run();
     run.setSecurityProfile(profile);
     run.setAlias(alias);
     run.setDescription("description");
-    run.setPlatformRunId(1234);
     run.setPairedEnd(true);
-    run.setCycles(250);
     run.setFilePath("/somewhere/someplace/");
-    run.setPlatformType(PlatformType.ILLUMINA);
     run.setSequencerReference(sequencer);
     run.setLastModifier(user);
-    run.setStatus(emptyStatus);
     return run;
   }
 

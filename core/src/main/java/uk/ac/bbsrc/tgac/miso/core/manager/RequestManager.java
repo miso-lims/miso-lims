@@ -49,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -77,8 +76,6 @@ public interface RequestManager {
   public long saveSampleQC(SampleQC sampleQC) throws IOException;
 
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException;
-
-  public long saveStatus(Status status) throws IOException;
 
   public long saveSubmission(Submission submission) throws IOException;
 
@@ -114,10 +111,6 @@ public interface RequestManager {
   public Sample getSampleByBarcode(String barcode) throws IOException;
 
   public SampleQC getSampleQCById(long sampleQcId) throws IOException;
-
-  public Status getStatusById(long statusId) throws IOException;
-
-  public Status getStatusByRunName(String runName) throws IOException;
 
   public Submission getSubmissionById(long submissionId) throws IOException;
 
@@ -270,10 +263,6 @@ public interface RequestManager {
   public Collection<QcType> listAllPoolQcTypes() throws IOException;
 
   public Collection<QcType> listAllRunQcTypes() throws IOException;
-
-  public Collection<Status> listAllStatus() throws IOException;
-
-  public Collection<Status> listAllStatusBySequencerName(String sequencerName) throws IOException;
 
   public void discardSingleTube(Box box, String position) throws IOException;
 

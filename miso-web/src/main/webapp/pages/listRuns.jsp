@@ -35,10 +35,20 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>
-      <span id="totalCount">Runs
-      </span>
-    </h1>
+    <h1>Runs</h1>
+    <ul class="sddm">
+      <li>
+        <a onmouseover="mopen('addrunmenu')" onmouseout="mclosetime()">Add Run
+          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+        </a>
+        <div id="addrunmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()" style="visibility: hidden;">
+          <c:forEach items="${platformTypes}" var="pt">
+            <a href="/miso/run/new/${pt.name()}">Add ${pt.key}</a>
+          </c:forEach>
+        </div>
+       </li>
+    </ul>
+
     <table class="display no-border" id="listingRunsTable">
     </table>
     

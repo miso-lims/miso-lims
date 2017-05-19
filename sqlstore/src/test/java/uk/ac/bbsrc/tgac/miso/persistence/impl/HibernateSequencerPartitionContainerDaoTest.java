@@ -49,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
@@ -150,7 +149,7 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     spc.setPlatform(platform);
     Mockito.when(platform.getId()).thenReturn(1L);
     spc.setLastModifier(emptyUser);
-    Run run = Mockito.mock(RunImpl.class);
+    Run run = Mockito.mock(Run.class);
     Mockito.when(run.getId()).thenReturn(1L);
     spc.setIdentificationBarcode("ABCDEFXX");
 

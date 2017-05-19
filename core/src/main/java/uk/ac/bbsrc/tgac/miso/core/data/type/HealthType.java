@@ -36,8 +36,13 @@ import java.util.Map;
  * @since 0.0.2
  */
 public enum HealthType {
-  Unknown("Unknown", 0, true), Completed("Completed", -1, true), Failed("Failed", 0, true), Started("Started", -1, true), Stopped("Stopped",
-      -1, true), Running("Running", -1, true), Requested("Requested", 1, false);
+  Unknown("Unknown", 0, true, false), //
+  Completed("Completed", -1, true, true), //
+  Failed("Failed", 0, true, true), //
+  Started("Started", -1, true, false), //
+  Stopped("Stopped", -1, true, true), //
+  Running("Running", -1, true, false), //
+  Requested("Requested", 1, false, false);
 
   public static final Comparator<HealthType> COMPARATOR = new Comparator<HealthType>() {
     @Override
@@ -50,7 +55,7 @@ public enum HealthType {
   /**
    * Field lookup
    */
-  private static final Map<String, HealthType> lookup = new HashMap<String, HealthType>();
+  private static final Map<String, HealthType> lookup = new HashMap<>();
 
   static {
     for (HealthType s : EnumSet.allOf(HealthType.class))
@@ -74,7 +79,7 @@ public enum HealthType {
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
+    ArrayList<String> keys = new ArrayList<>();
     for (HealthType h : HealthType.values()) {
       keys.add(h.getKey());
     }
@@ -88,16 +93,19 @@ public enum HealthType {
 
   private final boolean allowedFromSequencer;
 
+  private final boolean isDone;
+
   /**
    * Constructs a HealthType based on a given key
    * 
    * @param key
    *          of type String
    */
-  HealthType(String key, int multiplier, boolean allowedFromSequencer) {
+  HealthType(String key, int multiplier, boolean allowedFromSequencer, boolean isDone) {
     this.key = key;
     this.multiplier = multiplier;
     this.allowedFromSequencer = allowedFromSequencer;
+    this.isDone = isDone;
   }
 
   /**
@@ -121,4 +129,9 @@ public enum HealthType {
   public boolean isAllowedFromSequencer() {
     return allowedFromSequencer;
   }
+
+  public boolean isDone() {
+    return isDone;
+  }
+
 }

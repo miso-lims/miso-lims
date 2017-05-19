@@ -50,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityProfileDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
@@ -101,7 +100,6 @@ public class MisoServiceManager {
   private HibernateRunDao runDao;
   private HibernateRunQcDao runQcDao;
   private HibernateSequencerPartitionContainerDao sequencerPartitionContainerDao;
-  private HibernateStatusDao statusDao;
   private HibernateSequencerReferenceDao sequencerReferenceDao;
   private HibernateBoxDao boxDao;
   private HibernatePoolableElementViewDao poolableElementViewDao;
@@ -201,7 +199,6 @@ public class MisoServiceManager {
     m.setDefaultSecurityStore();
     m.setDefaultSequencerPartitionContainerDao();
     m.setDefaultSequencerReferenceDao();
-    m.setDefaultStatusDao();
     m.setDefaultStudyDao();
     m.setDefaultStudyService();
     m.setDefaultSubprojectDao();
@@ -872,25 +869,6 @@ public class MisoServiceManager {
 
   private void updateSequencerPartitionContainerDaoDependencies() {
     if (requestManager != null) requestManager.setSequencerPartitionContainerStore(getSequencerPartitionContainerDao());
-  }
-
-  public HibernateStatusDao getStatusDao() {
-    return statusDao;
-  }
-
-  public void setStatusDao(HibernateStatusDao statusDao) {
-    this.statusDao = statusDao;
-    updateStatusDaoDependencies();
-  }
-
-  public void setDefaultStatusDao() {
-    HibernateStatusDao dao = new HibernateStatusDao();
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setSessionFactory(sessionFactory);
-    setStatusDao(dao);
-  }
-
-  private void updateStatusDaoDependencies() {
   }
 
   public HibernateSequencerReferenceDao getSequencerReferenceDao() {

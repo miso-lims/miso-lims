@@ -9,7 +9,7 @@ public class RunDto {
   private String name;
   private String alias;
   private String status;
-  private String lastUpdated;
+  private String lastModified;
   private String platformType;
   private String startDate;
   private String endDate;
@@ -46,14 +46,6 @@ public class RunDto {
 
   public void setStatus(String status) {
     this.status = status;
-  }
-
-  public String getLastUpdated() {
-    return lastUpdated;
-  }
-
-  public void setLastUpdated(String lastUpdated) {
-    this.lastUpdated = lastUpdated;
   }
 
   public String getPlatformType() {
@@ -104,4 +96,13 @@ public class RunDto {
   public void setParameters(SequencingParametersDto parameters) {
     this.parameters = parameters;
   }
+
+  public String getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(String lastModified) {
+    this.lastModified = lastModified;
+  }
+
 }

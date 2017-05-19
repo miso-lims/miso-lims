@@ -625,8 +625,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
       if (run == null) {
         run = newRun;
 
-        // slated for demolition
-        run.getStatus().setLastUpdated(timeStamp);
       } else {
         updateRun(newRun, run);
       }
@@ -643,11 +641,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private void updateRun(Run from, Run to) throws IOException {
     log.debug("Updating run " + to.getId());
-    to.getStatus().setCompletionDate(from.getStatus().getCompletionDate());
-    to.getStatus().setHealth(from.getStatus().getHealth());
+    to.setCompletionDate(from.getCompletionDate());
+    to.setHealth(from.getHealth());
 
-    // slated for demolition
-    to.getStatus().setLastUpdated(timeStamp);
 
     if (to.getSequencerPartitionContainers().size() != 1) {
       throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",

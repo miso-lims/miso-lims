@@ -1305,26 +1305,27 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setAlias(from.getAlias());
-    if (from.getStatus() != null && from.getStatus().getHealth() != null) {
-      dto.setStatus(from.getStatus().getHealth().getKey());
+    if (from.getHealth() != null) {
+      dto.setStatus(from.getHealth().getKey());
     } else {
       dto.setStatus("");
     }
     if (from.getLastUpdated() != null) {
-      dto.setLastUpdated(getDateAsString(from.getLastUpdated()));
+      dto.setLastModified(getDateAsString(from.getLastUpdated()));
+
     }
-    if (from.getPlatformType() != null) {
-      dto.setPlatformType(from.getPlatformType().getKey());
+    if (from.getSequencerReference() != null) {
+      dto.setPlatformType(from.getSequencerReference().getPlatform().getPlatformType().getKey());
     } else {
       dto.setPlatformType("");
     }
-    if (from.getStatus() != null && from.getStatus().getStartDate() != null) {
-      dto.setStartDate(getDateAsString(from.getStatus().getStartDate()));
+    if (from.getStartDate() != null) {
+      dto.setStartDate(getDateAsString(from.getStartDate()));
     } else {
       dto.setStartDate("");
     }
-    if (from.getStatus() != null && from.getStatus().getCompletionDate() != null) {
-      dto.setEndDate(getDateAsString(from.getStatus().getCompletionDate()));
+    if (from.getCompletionDate() != null) {
+      dto.setEndDate(getDateAsString(from.getCompletionDate()));
     }
     if (from.getSequencingParameters() != null) {
       dto.setParameters(asDto(from.getSequencingParameters()));

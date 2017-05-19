@@ -432,7 +432,7 @@ public class ReportsUtils {
         sb.append("<h1>Run Information</h1><br/><div class='report'>");
         sb.append("<b>Run Name: </b> " + run.getName());
         sb.append("<br/><br/>");
-        sb.append("<b>Platform: </b> " + run.getPlatformType().getKey());
+        sb.append("<b>Platform: </b> " + run.getSequencerReference().getPlatform().getPlatformType().getKey());
         sb.append("<br/><br/>");
         sb.append("<b>Sequencer: </b> " + run.getSequencerReference().getName());
         sb.append("<br/><br/>");
@@ -446,7 +446,7 @@ public class ReportsUtils {
         }
         sb.append("<b>Pair End: </b> " + run.getPairedEnd().toString());
         sb.append("<br/><br/>");
-        sb.append("<b>Status: </b> " + run.getStatus().getHealth().getKey());
+        sb.append("<b>Status: </b> " + run.getHealth().getKey());
         sb.append("<br/><br/>");
 
       }
@@ -468,7 +468,7 @@ public class ReportsUtils {
           Run run = (Run) reportable;
           sb.append("<tr><td>" + run.getName());
           sb.append("</td>");
-          sb.append("<td> " + run.getPlatformType().getKey());
+          sb.append("<td> " + run.getSequencerReference().getPlatform().getPlatformType().getKey());
           sb.append("</td>");
           sb.append("<td> " + run.getSequencerReference().getName());
           sb.append("</td>");
@@ -482,17 +482,18 @@ public class ReportsUtils {
           }
           sb.append("<td> " + run.getPairedEnd().toString());
           sb.append("</td>");
-          sb.append("<td> " + run.getStatus().getHealth().getKey());
+          sb.append("<td> " + run.getHealth().getKey());
           sb.append("</td></tr>");
 
-          int statuscount = statusMap.containsKey(run.getStatus().getHealth().getKey())
-              ? statusMap.get(run.getStatus().getHealth().getKey()) : 0;
+          int statuscount = statusMap.containsKey(run.getHealth().getKey())
+              ? statusMap.get(run.getHealth().getKey()) : 0;
           statuscount++;
-          statusMap.put(run.getStatus().getHealth().getKey(), statuscount);
+          statusMap.put(run.getHealth().getKey(), statuscount);
 
-          int platformcount = platformMap.containsKey(run.getPlatformType().getKey()) ? platformMap.get(run.getPlatformType().getKey()) : 0;
+          int platformcount = platformMap.containsKey(run.getSequencerReference().getPlatform().getPlatformType().getKey())
+              ? platformMap.get(run.getSequencerReference().getPlatform().getPlatformType().getKey()) : 0;
           platformcount++;
-          platformMap.put(run.getPlatformType().getKey(), platformcount);
+          platformMap.put(run.getSequencerReference().getPlatform().getPlatformType().getKey(), platformcount);
         }
         sb.append("    </tbody>\n" + "</table>");
         Integer unknown = statusMap.containsKey("Unknown") ? statusMap.get("Unknown") : 0;

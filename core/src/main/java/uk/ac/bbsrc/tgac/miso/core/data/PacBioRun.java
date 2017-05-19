@@ -21,42 +21,60 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio;
+package uk.ac.bbsrc.tgac.miso.core.data;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import java.util.Date;
 
-/**
- * uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio
- * <p/>
- * 
- * @author Rob Davey
- * @since 0.1.6
- */
-public class PacBioStatus extends StatusImpl {
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import com.eaglegenomics.simlims.core.User;
+
+
+@Entity
+@Table(name = "RunPacBio")
+public class PacBioRun extends Run {
   private static final long serialVersionUID = 1L;
-  String metadata = null;
 
-  public PacBioStatus() {
-    setHealth(HealthType.Unknown);
+  private Long movieDuration;
+
+  private String wellName;
+
+  @Temporal(TemporalType.DATE)
+  private Date creationDate;
+
+  public PacBioRun(User user) {
+    super(user);
   }
 
-  public PacBioStatus(String metadata) {
-    this.metadata = metadata;
+  public PacBioRun() {
+    super();
   }
 
-  public void parseMetaData(String metadata) {
+  public String getWellName() {
+    return wellName;
   }
 
-  @Override
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append(super.toString());
-    if (metadata != null) {
-      sb.append(" : ");
-      sb.append(metadata);
-    }
-    return sb.toString();
+  public Date getCreationDate() {
+    return creationDate;
   }
+
+  public void setWellName(String wellName) {
+    this.wellName = wellName;
+  }
+
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
+  }
+
+  public Long getMovieDuration() {
+    return movieDuration;
+  }
+
+  public void setMovieDuration(Long movieDuration) {
+    this.movieDuration = movieDuration;
+  }
+
 }

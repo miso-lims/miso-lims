@@ -86,7 +86,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   private String identificationBarcode;
   private String locationBarcode;
 
-  @ManyToMany(targetEntity = RunImpl.class, mappedBy = "containers")
+  @ManyToMany(targetEntity = Run.class, mappedBy = "containers")
   @BatchSize(size = 10)
   private Collection<Run> runs = null;
 
@@ -230,13 +230,13 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     for (Run thisRun : getRuns()) {
       if (lastRun == null) {
         lastRun = thisRun;
-      } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() == null) {
+      } else if (lastRun.getStartDate() == null && thisRun.getStartDate() == null) {
         if (thisRun.getLastUpdated().after(lastRun.getLastUpdated())) lastRun = thisRun;
-      } else if (lastRun.getStatus().getStartDate() == null && thisRun.getStatus().getStartDate() != null) {
+      } else if (lastRun.getStartDate() == null && thisRun.getStartDate() != null) {
         lastRun = thisRun;
-      } else if (lastRun.getStatus().getStartDate() != null && thisRun.getStatus().getStartDate() == null) {
+      } else if (lastRun.getStartDate() != null && thisRun.getStartDate() == null) {
         continue;
-      } else if (thisRun.getStatus().getStartDate().after(lastRun.getStatus().getStartDate())) {
+      } else if (thisRun.getStartDate().after(lastRun.getStartDate())) {
         lastRun = thisRun;
       }
     }

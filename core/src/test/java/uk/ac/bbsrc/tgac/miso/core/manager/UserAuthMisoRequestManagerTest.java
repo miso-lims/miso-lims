@@ -41,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -107,8 +106,6 @@ public class UserAuthMisoRequestManagerTest {
   private Dilution dilution;
   @Mock
   private ProjectOverview projectOverview;
-  @Mock
-  private Status status;
   @Mock
   private Project project1;
   @Mock
@@ -796,40 +793,6 @@ public class UserAuthMisoRequestManagerTest {
 
     verify(backingManager).getSampleQCById(id);
   }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getStatusByRunName(java.lang.String)} .
-   */
-  @Test
-  public void testGetStatusByRunName() throws IOException {
-    String runName = "runName";
-    when(backingManager.getRunByAlias(runName)).thenReturn(run);
-    when(run.userCanRead(any(User.class))).thenReturn(true);
-    when(backingManager.getStatusByRunName(runName)).thenReturn(status);
-
-    assertEquals(status, userAuthMisoRequestManager.getStatusByRunName(runName));
-
-    verify(backingManager).getStatusByRunName(runName);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getStatusByRunName(java.lang.String)} .
-   */
-  @Test
-  public void testGetStatusByRunNameThrows() throws IOException {
-    String runName = "runName";
-    when(backingManager.getRunByAlias(runName)).thenReturn(run);
-    when(run.userCanRead(any(User.class))).thenReturn(false);
-    when(backingManager.getStatusByRunName(runName)).thenReturn(status);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read parent Run 0 for Status");
-
-    userAuthMisoRequestManager.getStatusByRunName(runName);
-
-    verify(backingManager).getStatusByRunName(runName);
-  }
-
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSubmissionById(long)} .

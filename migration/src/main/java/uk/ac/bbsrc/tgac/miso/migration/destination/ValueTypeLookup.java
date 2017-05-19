@@ -992,9 +992,6 @@ public class ValueTypeLookup {
     Platform platform = sequencer.getPlatform();
     PlatformType platformType = platform.getPlatformType();
     run.setSequencerReference(sequencer);
-    if (run.getPlatformType() == null) {
-      run.setPlatformType(platformType);
-    }
     if (run.getSequencerPartitionContainers() != null) {
       for (SequencerPartitionContainer flowcell : run.getSequencerPartitionContainers()) {
         if (flowcell.getPlatform() == null) flowcell.setPlatform(platform);
