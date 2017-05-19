@@ -1172,9 +1172,6 @@ Sample.ui = {
   ].filter(function (x) { return x; }),
 
   createListingSamplesTable: function () {
-    if (Sample.detailedSample && Sample.sampleClasses === undefined) {
-      Sample.ui.getSampleValidRelationships();
-    }
     jQuery('#listingSamplesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
 
     jQuery('#listingSamplesTable').html('');
@@ -1429,7 +1426,7 @@ Sample.ui = {
     var selectedSampleClasses = jQuery('#listingSamplesTable').dataTable().fnGetData().filter(function (row) {
       return selectedIds.indexOf(row.id) != -1;
     }).map(function (dtRow) {
-      return Sample.sampleClasses.filter(function (sc) {
+      return Constants.sampleClasses.filter(function (sc) {
         return sc.id == dtRow.sampleClassId;
       });
     });
@@ -1490,9 +1487,9 @@ Sample.ui = {
    * Returns an array of sample classes that correspond to given sample class IDs (of parent samples)
    */
   getChildSampleClasses: function (sampleClasses) {
-    return Sample.sampleClasses.filter(function (childClass) {
+    return Constants.sampleClasses.filter(function (childClass) {
       return sampleClasses.every(function(parentClass) {
-        return Sample.validRelationships.some(function (svr) {
+        return Constants.sampleValidRelationships.some(function (svr) {
           return svr.parentId == parentClass.id && svr.childId == childClass.id && !svr.archived;
         });
       });
@@ -1512,29 +1509,6 @@ Sample.ui = {
       }
     }
     return uniques;
-  },
-
-  /**
-   * AJAX fetch of sample classes
-   */
-  getSampleClasses: function () {
-    jQuery.get('/miso/rest/sampleclasses',
-      function (json) { 
-        Sample.sampleClasses = json; 
-      }
-    );
-  },
-
-  /**
-   * AJAX fetch of sample valid relationships
-   */
-  getSampleValidRelationships: function () {
-    jQuery.get(
-     '/miso/rest/samplevalidrelationships',
-      function (json) { 
-        Sample.validRelationships = json; 
-      }
-    );
   },
   
   // TODO: add library propagation rule-checking here

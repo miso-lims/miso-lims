@@ -48,6 +48,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -61,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
+import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -81,6 +83,8 @@ public class MenuController implements ServletContextAware {
   private IndexService indexService;
   @Autowired
   private SampleClassService sampleClassService;
+  @Autowired
+  private SampleValidRelationshipService sampleValidRelationshipService;
 
   @Autowired
   private LibraryService libraryService;
@@ -187,7 +191,8 @@ public class MenuController implements ServletContextAware {
       Function<Model, Dto> asDto) {
     ArrayNode array = node.putArray(name);
     for (Model item : items) {
-      array.add(mapper.valueToTree(asDto.apply(item)));
+      JsonNode itemNode = mapper.valueToTree(asDto.apply(item));
+      array.add(itemNode);
     }
   }
 
@@ -212,6 +217,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, node, "platforms", requestManager.listAllPlatforms(),Dtos::asDto);
     createArray(mapper, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
     createArray(mapper, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
+    createArray(mapper, node, "sampleValidRelationships", sampleValidRelationshipService.getAll(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);
