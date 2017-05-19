@@ -101,6 +101,7 @@ var Library = Library || {
       
       jQuery('#libraryDesignCodes').attr('class', 'form-control');
       jQuery('#libraryDesignCodes').attr('data-parsley-required', 'true');
+      jQuery('#libraryDesignCodes').attr('data-parsley-min', 1);
     }
 
     jQuery('#library-form').parsley();
