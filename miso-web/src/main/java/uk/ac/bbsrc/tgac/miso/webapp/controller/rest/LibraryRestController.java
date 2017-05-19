@@ -125,7 +125,7 @@ public class LibraryRestController extends RestController {
     Long id = null;
     try {
       Library library = Dtos.to(libraryDto);
-      libraryService.create(library);
+      id = libraryService.create(library);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating library. ", e);
       RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
