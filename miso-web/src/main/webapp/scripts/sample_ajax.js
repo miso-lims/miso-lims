@@ -1106,7 +1106,7 @@ Sample.ui = {
       alert("No samples scanned");
     }
   },
-  toAdd: [],
+  selectedSampleIds: [],
   standardColumns: [
     {
       "sTitle": "Sample Name",
@@ -1177,7 +1177,7 @@ Sample.ui = {
     jQuery('#listingSamplesTable').html('');
     jQuery('#listingSamplesTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
-    	Utils.createToggleColumn("Sample.ui.toAdd"),
+    	Utils.createToggleColumn("Sample.ui.selectedSampleIds"),
       ].concat(Sample.ui.standardColumns),
       "bJQueryUI": true,
       "bAutoWidth": false,
@@ -1237,16 +1237,14 @@ Sample.ui = {
    */
   checkAll: function (el) {
     Sample.ui.resetBulkDropdown();
-    var checkboxes = document.getElementsByClassName('bulkCheckbox');
-    if (el.checked) {
-      for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = true;
+    Sample.ui.selectedSampleIds = [];
+    jQuery('.bulkCheckbox').each(function() {
+      this.checked = el.checked;
+      if (this.checked) {
+        var elementId = Number(jQuery(this).attr('elementid'));
+        Sample.ui.selectedSampleIds.push(elementId);
       }
-    } else {
-      for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = false;
-      }
-    }
+    });
   },
   
   resetBulkDropdown: function() {
@@ -1294,7 +1292,7 @@ Sample.ui = {
    * Returns an array of selected IDs
    */
   getSelectedIds: function () {
-	  return Sample.ui.toAdd;
+	  return Sample.ui.selectedSampleIds;
   },
   
   /**
