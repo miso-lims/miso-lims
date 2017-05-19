@@ -1204,8 +1204,8 @@ Sample.ui = {
       "fnDrawCallback": function (oSettings) {
         jQuery('#listingSamplesTable').removeClass('disabled');
         jQuery('#listingSamplesTable_paginate').find('.fg-button').removeClass('fg-button');
-        jQuery("input[class='bulkCheckbox']").on('click', function () {
-          Sample.ui.checkForPropagate(document.getElementById('dropdownActions'));
+        jQuery('.bulkCheckbox').on('click', function () {
+          Sample.ui.resetBulkDropdown();
         });
       }
     })).fnSetFilteringDelay();
@@ -1236,6 +1236,7 @@ Sample.ui = {
    * Check all boxes to select all samples.
    */
   checkAll: function (el) {
+    Sample.ui.resetBulkDropdown();
     var checkboxes = document.getElementsByClassName('bulkCheckbox');
     if (el.checked) {
       for (var i = 0; i < checkboxes.length; i++) {
@@ -1246,6 +1247,13 @@ Sample.ui = {
         checkboxes[i].checked = false;
       }
     }
+  },
+  
+  resetBulkDropdown: function() {
+    jQuery('#dropdownActions').val('');
+    jQuery('#classDropdown').hide();
+    jQuery('#errors').css('display', 'none');
+    jQuery('#errors').html('');
   },
   
   /**
