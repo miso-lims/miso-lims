@@ -7,11 +7,14 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
@@ -21,7 +24,6 @@ import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.BoxableDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
@@ -121,9 +124,6 @@ public class BoxControllerHelperService {
       } catch (IOException e) {
         log.debug("Error getting boxable by barcode", e);
         return JSONUtils.SimpleJSONError("Error looking up barcode " + json.getString("barcode") + ": " + e.getMessage());
-      } catch (DuplicateKeyException k) {
-        log.debug("Multiple items with same barcode", k);
-        return JSONUtils.SimpleJSONError(k.getMessage());
       }
 
       if (boxable == null) {
@@ -189,29 +189,38 @@ public class BoxControllerHelperService {
    * @return JSON message indicating success or error
    */
   public JSONObject saveBoxContents(HttpSession session, JSONObject json) {
-    if (!json.has("boxJSON")) {
-      return JSONUtils.SimpleJSONError("Invalid box given");
+    if (!json.has("boxId")) {
+      return JSONUtils.SimpleJSONError("Cannot find box.");
     }
-    JSONObject boxJson = json.getJSONObject("boxJSON");
-
-    Box box = null;
-    long boxId = boxJson.getLong("id");
+    if (!json.has("items")) {
+      return JSONUtils.SimpleJSONError("Cannot find items.");
+    }
+    Box box;
+    long boxId = json.getLong("boxId");
     try {
       box = requestManager.getBoxById(boxId);
-      if (box == null) throw new IOException("Box not found");
+      if (box == null)
+        return JSONUtils.SimpleJSONError("Cannot find box.");
     } catch (IOException e) {
       log.debug("Error getting box with ID " + boxId, e);
       return JSONUtils.SimpleJSONError("Error looking up this box: " + e.getMessage());
     }
 
+    JSONArray array = json.getJSONArray("items");
+    Map<String, String> positionToBarcode = new HashMap<>();
+    for (int i = 0; i < array.size(); i++) {
+      JSONObject item = array.getJSONObject(i);
+      positionToBarcode.put(item.getString("coordinates"), item.getString("identificationBarcode"));
+    }
+
     try {
-      Map<String, BoxableView> newBoxables = loadBoxables(boxJson);
-      box.setBoxables(newBoxables);
+      Map<String, BoxableView> barcodesToBoxables = requestManager.getBoxableViewsFromBarcodeList(positionToBarcode.values()).stream()
+          .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
+      box.setBoxables(positionToBarcode.entrySet().stream()
+          .collect(Collectors.toMap(Map.Entry::getKey, entry -> barcodesToBoxables.get(entry.getValue()))));
     } catch (IOException e) {
       log.debug("Error getting boxable", e);
       return JSONUtils.SimpleJSONError("Error finding item: " + e.getMessage());
-    } catch (DuplicateKeyException k) {
-      return JSONUtils.SimpleJSONError("Multiple items have this barcode: " + k.getMessage());
     }
 
     try {
@@ -224,13 +233,12 @@ public class BoxControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Box was successfully saved");
   }
 
-  private Map<String, BoxableView> loadBoxables(JSONObject boxJson) throws DuplicateKeyException, IOException {
-    JSONObject boxablesJson = boxJson.getJSONObject("boxables");
+  private Map<String, BoxableView> loadBoxables(JSONObject boxJson) throws IOException {
+    JSONArray boxablesJson = boxJson.getJSONArray("boxables");
     Map<String, String> barcodeToPosition = new HashMap<>();
-    for (Object attr : boxablesJson.entrySet()) {
-      @SuppressWarnings("unchecked")
-      Map.Entry<String, ?> entry = (Map.Entry<String, ?>) attr;
-      barcodeToPosition.put(((JSONObject) entry.getValue()).getString("identificationBarcode"), entry.getKey());
+    for (int i = 0; i < boxablesJson.size(); i++) {
+      JSONObject entry = boxablesJson.getJSONObject(i);
+      barcodeToPosition.put(entry.getString("identificationBarcode"), entry.getString("coordinates"));
     }
 
     Map<String, BoxableView> map = new HashMap<>();
@@ -314,8 +322,6 @@ public class BoxControllerHelperService {
     } catch (IOException e) {
       log.debug("Error getting boxable", e);
       return JSONUtils.SimpleJSONError("Error finding item with barcode " + barcode + ": " + e.getMessage());
-    } catch (DuplicateKeyException k) {
-      return JSONUtils.SimpleJSONError("Multiple items have this barcode: " + k.getMessage());
     }
 
     if (boxable == null) return JSONUtils.SimpleJSONError("Could not find sample, library or pool with barcode " + barcode
@@ -676,6 +682,61 @@ public class BoxControllerHelperService {
     }
   }
 
+  private static boolean hasRealBarcode(BoxScan scan, String position) {
+    return !position.equals(scan.getNoTubeLabel()) && !position.equals(scan.getNoReadLabel());
+  }
+
+  public static class ErrorMessage {
+    private String coordinates;
+    private String message;
+
+    public String getCoordinates() {
+      return coordinates;
+    }
+
+    public void setCoordinates(String coordinates) {
+      this.coordinates = coordinates;
+    }
+
+    public String getMessage() {
+      return message;
+    }
+
+    public void setMessage(String message) {
+      this.message = message;
+    }
+  }
+
+  public static class DiffMessage {
+    private BoxableDto original;
+    private BoxableDto modified;
+    private String action;
+
+    public BoxableDto getOriginal() {
+      return original;
+    }
+
+    public void setOriginal(BoxableDto original) {
+      this.original = original;
+    }
+
+    public BoxableDto getModified() {
+      return modified;
+    }
+
+    public void setModified(BoxableDto modified) {
+      this.modified = modified;
+    }
+
+    public String getAction() {
+      return action;
+    }
+
+    public void setAction(String action) {
+      this.action = action;
+    }
+  }
+
   /**
    * Gets the Box Scanner scan results (map of box positions and barcodes) and returns a serialized box object containing the Boxable item
    * linked with each barcode at each position indicated by the scan results. Any errors are returned with a message containing the type of
@@ -690,148 +751,107 @@ public class BoxControllerHelperService {
    * @return
    */
   public JSONObject getBoxScan(HttpSession session, JSONObject json) {
-    if (json.has("boxId")) {
-      JSONObject scanResults = new JSONObject();
-      JSONObject boxables = new JSONObject();
-      JSONObject errors = new JSONObject();
-      JSONArray errorPositions = new JSONArray();
-      JSONArray successPositions = new JSONArray();
-      ArrayList<String> barcodeList = new ArrayList<>();
-
-      // get scan
-      try {
-        BoxScan scan = boxScanner.getScan();
-        if (scan == null) {
-          return JSONUtils.SimpleJSONError("The scanner did not detect a box!");
-        }
-
-        String noTube = scan.getNoTubeLabel();
-        String barcodePlaceholder = "UnknownBarcode";
-
-        // create a map of found positions and a list of barcodes to search for
-        Map<String, String> mapPositionsAndBarcodes = scan.getBarcodesMap();
-        for (Map.Entry<String, String> entry : mapPositionsAndBarcodes.entrySet()) {
-          if (!entry.getValue().equals(noTube)) {
-            barcodeList.add(entry.getValue());
-            boxables.put(entry.getKey(), barcodePlaceholder);
-          }
-        }
-
-        // exits early if read errors are present
-        if (scan.hasReadErrors()) {
-          for (String position : scan.getReadErrorPositions()) {
-            errorPositions.add(position);
-          }
-          @SuppressWarnings("unchecked")
-          Iterator<String> positions = boxables.keys();
-          while (positions.hasNext()) {
-            String position = positions.next();
-            successPositions.add(position);
-          }
-          errors.put("message",
-              "The scanner can not read some positions. Please remove or fix and then rescan: " + errorPositions.join(", "));
-          errors.put("errorPositions", errorPositions);
-          errors.put("successPositions", successPositions);
-          errors.put("type", "Read Error");
-          scanResults.put("errors", errors);
-          return scanResults;
-        }
-
-        // get boxables from db according to their barcodes
-        Collection<BoxableView> barcodedBoxables = requestManager.getBoxableViewsFromBarcodeList(barcodeList);
-
-        // check that there are not more returned results than requested results. There is a later check for too few.
-        if (barcodedBoxables.size() > barcodeList.size()) {
-          String warning = "Several items have the same barcodes. Please move to new barcoded tubes and then retry: ";
-          Map<String, BoxableView> barcodesWithBoxables = new HashMap<>();
-          JSONArray duplicatedBarcodes = new JSONArray();
-          for (BoxableView boxable : barcodedBoxables) {
-            String currentBarcode = boxable.getIdentificationBarcode();
-            if (barcodesWithBoxables.containsKey(currentBarcode)) {
-              warning += boxable.getName() + " (" + boxable.getAlias() + "). ";
-              duplicatedBarcodes.add(currentBarcode);
-            } else {
-              barcodesWithBoxables.put(currentBarcode, boxable);
-            }
-          }
-
-          for (int i = 0; i < duplicatedBarcodes.size(); i++) {
-            for (Map.Entry<String, String> entry : mapPositionsAndBarcodes.entrySet()) {
-              if (entry.getValue().equals(duplicatedBarcodes.getJSONArray(i))) {
-                errorPositions.add(entry.getKey());
-                break;
-              } else {
-                successPositions.add(entry.getKey());
-              }
-            }
-          }
-
-          errors.put("message", warning);
-          errors.put("errorPositions", errorPositions);
-          errors.put("successPositions", successPositions);
-          errors.put("type", "Duplicated Barcode");
-          scanResults.put("errors", errors);
-          return scanResults; // exit early as at least two items have the same barcode
-        }
-
-        Box box;
-        try {
-          box = requestManager.getBoxById(json.getLong("boxId"));
-        } catch (IOException e) {
-          log.debug("Error: ", e);
-          return JSONUtils.SimpleJSONError("Cannot get the Box: " + e.getMessage());
-        }
-
-        box.removeAllBoxables();
-
-        // match barcodedBoxables with their position in the scan and add to boxableItems
-        for (Map.Entry<String, String> entry : mapPositionsAndBarcodes.entrySet()) {
-          // use only positions where there was a barcode in the scan
-          if (!entry.getValue().equals(noTube)) {
-            String barcodeToMatch = entry.getValue();
-            for (BoxableView boxable : barcodedBoxables) {
-              String currentBarcode = boxable.getIdentificationBarcode();
-              if (barcodeToMatch.equals(currentBarcode)) {
-                box.setBoxable(entry.getKey(), boxable);
-                boxables.put(entry.getKey(), "Found");
-                break;
-              }
-            }
-          }
-        }
-
-        // return an error if some barcodes were not found in database
-        @SuppressWarnings("unchecked")
-        Iterator<String> positions = boxables.keys();
-        while (positions.hasNext()) {
-          String position = positions.next();
-          if (boxables.get(position).equals(barcodePlaceholder)) { // will otherwise be "Found"
-            errorPositions.add(position);
-          } else {
-            successPositions.add(position);
-          }
-        }
-        if (errorPositions.size() > 0) {
-          errors.put("message", "The box scanner has found some unknown tubes. "
-              + "Please assiociate these barcodes with samples/libraries/pools before retrying: " + errorPositions.join(", "));
-          errors.put("errorPositions", errorPositions);
-          errors.put("successPositions", successPositions);
-          errors.put("type", "Unknown Barcode");
-          scanResults.put("errors", errors);
-          return scanResults;
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        scanResults.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
-      } catch (IntegrationException e) {
-        log.info(e.getMessage());
-        return JSONUtils.SimpleJSONError("Error scanning box: " + e.getMessage());
-      } catch (IOException e) {
-        e.printStackTrace();
+    if (!json.has("boxId")) {
+      return JSONUtils.SimpleJSONError("Cannot find box.");
+    }
+    // get scan
+    try {
+      BoxScan scan = boxScanner.getScan();
+      if (scan == null) {
+        return JSONUtils.SimpleJSONError("The scanner did not detect a box!");
       }
+
+      Map<String, String> barcodesByPosition = scan.getBarcodesMap();
+      // Extract the valid barcodes and build a barcode to item map
+      Set<String> validBarcodes = barcodesByPosition.values().stream()
+          .filter(position -> hasRealBarcode(scan, position)).collect(Collectors.toSet());
+      Map<String, BoxableView> boxablesByBarcode = requestManager.getBoxableViewsFromBarcodeList(validBarcodes).stream()
+          .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
+
+      // For all the valid barcodes, build a list of DTOs with the updated positions
+      List<BoxableDto> items = barcodesByPosition.entrySet().stream()
+          .filter(entry -> hasRealBarcode(scan, entry.getKey()) && boxablesByBarcode.containsKey(entry.getValue()))
+          .map(entry -> {
+            BoxableDto dto = Dtos.asDto(boxablesByBarcode.get(entry.getValue()));
+            dto.setCoordinates(entry.getKey());
+            return dto;
+          }).collect(Collectors.toList());
+
+      // Collect all the errors
+      List<ErrorMessage> errors = new ArrayList<>();
+
+      // If there's a barcode that wasn't found in the DB, create an error.
+      barcodesByPosition.entrySet().stream()
+          .filter(entry -> hasRealBarcode(scan, entry.getKey()) && !boxablesByBarcode.containsKey(entry.getValue())).map(entry -> {
+            ErrorMessage dto = new ErrorMessage();
+            dto.setCoordinates(entry.getKey());
+            dto.setMessage("Barcode " + entry.getValue() + " not found.");
+            return dto;
+          }).forEachOrdered(errors::add);
+      // If there was a read error, produce an error.
+      scan.getReadErrorPositions().stream().map(position -> {
+        ErrorMessage dto = new ErrorMessage();
+        dto.setCoordinates(position);
+        dto.setMessage("Cannot read tube.");
+        return dto;
+      }).forEachOrdered(errors::add);
+
+      long totalBarcodes = barcodesByPosition.values().stream().filter(position -> hasRealBarcode(scan, position)).count();
+      if (validBarcodes.size() != totalBarcodes) {
+        ErrorMessage dto = new ErrorMessage();
+        dto.message = "Duplicate barcodes detected!";
+        errors.add(dto);
+      }
+
+      // Build the diffs for this box
+      List<DiffMessage> diffs = new ArrayList<>();
+      Box box;
+      try {
+        box = requestManager.getBoxById(json.getLong("boxId"));
+      } catch (IOException e) {
+        log.debug("Error: ", e);
+        return JSONUtils.SimpleJSONError("Cannot get the Box: " + e.getMessage());
+      }
+      if (box.getSize().getRows() != scan.getRowCount() || box.getSize().getColumns() != scan.getColumnCount())
+        return JSONUtils.SimpleJSONError(String.format("Box is %d×%d, but scanner detected %d×%d.", box.getSize().getRows(),
+            box.getSize().getColumns(), scan.getRowCount(), scan.getColumnCount()));
+
+      box.getSize().positionStream().map(position -> {
+        BoxableView originalItem = box.getBoxables().containsKey(position) ? box.getBoxables().get(position) : null;
+        BoxableView newItem = barcodesByPosition.containsKey(position) && boxablesByBarcode.containsKey(barcodesByPosition.get(position))
+            ? boxablesByBarcode.get(barcodesByPosition.get(position)) : null;
+        if (originalItem != null && newItem != null &&
+            !newItem.getIdentificationBarcode().equals(originalItem.getIdentificationBarcode())) {
+          DiffMessage dto = new DiffMessage();
+          dto.action = "changed";
+          dto.modified = Dtos.asDto(newItem);
+          dto.original = Dtos.asDto(originalItem);
+          return dto;
+        } else if (originalItem != null && newItem == null) {
+          DiffMessage dto = new DiffMessage();
+          dto.action = "removed";
+          dto.original = Dtos.asDto(originalItem);
+          return dto;
+        } else if (originalItem == null && newItem != null) {
+          DiffMessage dto = new DiffMessage();
+          dto.action = "added";
+          dto.modified = Dtos.asDto(newItem);
+          return dto;
+        } else {
+          return null;
+        }
+      }).filter(Objects::nonNull);
+
+      JSONObject scanResults = new JSONObject();
+      scanResults.put("items", items);
+      scanResults.put("errors", errors);
+      scanResults.put("diffs", diffs);
+      scanResults.put("rows", scan.getRowCount());
+      scanResults.put("cols", scan.getColumnCount());
       return scanResults;
-    } else {
-      return JSONUtils.SimpleJSONError("Cannot find box");
+    } catch (IntegrationException | IOException e) {
+      log.info(e.getMessage());
+      return JSONUtils.SimpleJSONError("Error scanning box: " + e.getMessage());
     }
   }
 
