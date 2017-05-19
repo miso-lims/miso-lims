@@ -1,6 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,6 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 
 @Entity
 @Table(name = "BoxSize")
@@ -72,5 +76,9 @@ public class BoxSize implements Serializable {
    */
   public void setScannable(boolean scannable) {
     this.scannable = scannable;
+  }
+
+  public Stream<String> positionStream() {
+    return IntStream.range(0, rows * columns).mapToObj(x -> BoxUtils.getPositionString(x / columns, x % columns));
   }
 }

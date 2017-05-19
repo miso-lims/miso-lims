@@ -76,7 +76,8 @@ public class BoxImpl extends AbstractBox {
   }
 
   private void validate(String position) {
-    if (!position.matches("[A-Z][0-9][0-9]")) throw new IllegalArgumentException("Position must match [A-Z][0-9][0-9]");
+    if (!position.matches("[A-Z][0-9][0-9]"))
+      throw new IllegalArgumentException("Position " + position + " does not match [A-Z][0-9][0-9]");
     if (BoxUtils.fromRowChar(position.charAt(0)) >= getSize().getRows())
       throw new IndexOutOfBoundsException("Row letter too large!" + position);
     int col = BoxUtils.tryParseInt(position.substring(1, 3));
