@@ -88,7 +88,9 @@ var Utils = Utils || {
         "mRender": function (data, type, full) {
           var checked = list.indexOf(data) > -1;
 
-          return "<input id=\"" + data + "_" + className + "\" class=\"" + className + " bulkCheckbox\" elementId=\"" + data + "\" type=\"checkbox\" onchange=\"Utils.toggleListRange(this.checked, " + data + ", " + nameOfList + ", '" + className + "')\"" + (checked ? " checked=\"checked\"" : "") + ">";
+          return "<input id=\"" + data + "_" + className + "\" class=\"" + className + " bulkCheckbox\" elementId=\"" + data
+              + "\" type=\"checkbox\" onchange=\"Utils.toggleListRange(this.checked, " + data + ", " + nameOfList + ", '" + className
+              + "')\"" + (checked ? " checked=\"checked\"" : "") + ">";
         }
     };
   },
