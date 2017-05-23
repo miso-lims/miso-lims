@@ -176,6 +176,11 @@ var Sample = Sample || {
       jQuery('#externalInstituteIdentifier').attr('data-parsley-maxlength', '255');
       jQuery('#externalInstituteIdentifier').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
       
+      // Region validation
+      jQuery('#region').attr('class', 'form-control');
+      jQuery('#region').attr('data-parsley-maxlength', '255');
+      jQuery('#region').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      
       // PassageNumber validation
       jQuery('#passageNumber').attr('class', 'form-control');
       jQuery('#passageNumber').attr('data-parsley-type', 'integer');
@@ -233,11 +238,6 @@ var Sample = Sample || {
       case 'Stock':
         // fall-though to aliquot case (identical restrictions)
       case 'Aliquot':
-        // Region validation
-        jQuery('#region').attr('class', 'form-control');
-        jQuery('#region').attr('data-parsley-maxlength', '255');
-        jQuery('#region').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-        
         // TissueClass validation
         jQuery('#tissueClass').attr('class', 'form-control');
         jQuery('#tissueClass').attr('data-parsley-required', 'true');

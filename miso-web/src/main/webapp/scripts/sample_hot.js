@@ -407,11 +407,11 @@ Sample.hot = {
               Sample.hot.dqcsNoteIndex = Hot.getColIndex('detailedQcStatusNote');
               if (qcpd === null || !qcpd.noteRequired) {
                 Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'readOnly', true);
-                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'validator', Hot.permitEmpty);
+                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'validator', null);
                 Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'renderer', Hot.alwaysValidRenderer);
               } else {
                 Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'readOnly', false);
-                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'validator', Hot.requiredText);
+                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'validator', Hot.requiredTextNoSpecialChars);
                 Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'renderer', Hot.requiredTextRenderer);
               }
           }
@@ -678,11 +678,13 @@ Sample.hot = {
       {
         header: 'Sample Alias',
         data: 'alias',
+        validator: Hot.optionalTextNoSpecialChars,
         include: true
       },
       {
         header: 'Description',
         data: 'description',
+        validator: Hot.optionalTextNoSpecialChars,
         include: true
       },
       {
@@ -701,6 +703,7 @@ Sample.hot = {
       {
         header: 'Matrix Barcode',
         data: 'identificationBarcode',
+        validator: Hot.optionalTextNoSpecialChars,
         include: !Hot.autoGenerateIdBarcodes
       },
       {
@@ -718,7 +721,7 @@ Sample.hot = {
         header: 'Sci. Name',
         data: 'scientificName',
         source: Sample.hot.sciName,
-        validator: Hot.requiredText,
+        validator: Hot.requiredTextNoSpecialChars,
         renderer: Hot.requiredTextRenderer,
         extraneous: true,
         include: true
@@ -751,7 +754,7 @@ Sample.hot = {
       {
         header: 'External Name',
         data: 'externalName',
-        validator: Hot.noSpecialChars,
+        validator: Hot.requiredTextNoSpecialChars,
         renderer: Hot.requiredTextRenderer,
         include: show['Identity']
       },
@@ -779,13 +782,13 @@ Sample.hot = {
       {
         header: 'Group ID',
         data: 'groupId',
-        validator: validateAlphanumeric,
+        validator: Hot.optionalTextAlphanumeric,
         include: isDetailed
       },
       {
         header: 'Group Desc.',
         data: 'groupDescription',
-        validator: Hot.permitEmpty,
+        validator: Hot.optionalTextNoSpecialChars,
         include: isDetailed
       },
 
@@ -852,6 +855,7 @@ Sample.hot = {
       {
         header: 'Ext. Inst. Identifier',
         data: 'externalInstituteIdentifier',
+        validator: Hot.optionalTextNoSpecialChars,
         include: show['Tissue']
       },
       {
@@ -866,7 +870,7 @@ Sample.hot = {
       {
         header: 'Region',
         data: 'region',
-        validator: Hot.permitEmpty,
+        validator: Hot.optionalTextNoSpecialChars,
         include: show['Tissue']
       },
 
@@ -979,7 +983,6 @@ Sample.hot = {
         header: 'QC Note',
         data: 'detailedQcStatusNote',
         readOnly: true,
-        validator: Hot.permitEmpty,
         include: isDetailed
       },
 
@@ -1018,11 +1021,6 @@ Sample.hot = {
 
     function validatePosReqdNumber (value, callback) {
       return callback(Handsontable.helper.isNumeric(value) && value >= 0);
-    }
-
-    function validateAlphanumeric (value, callback) {
-      var alphanumRegex = /^[-\w]+$/;
-      return callback(value === '' || value === null || alphanumRegex.test(value));
     }
   },
   

@@ -275,7 +275,7 @@ Library.hot = {
       {
         header: 'Library Alias',
         data: 'alias',
-        validator: Hot.requiredText,
+        validator: Hot.requiredTextNoSpecialChars,
         renderer: Hot.requiredTextRenderer,
         include: !(Library.hot.hideCols.indexOf("libraryAlias") > -1)
       },
@@ -288,12 +288,14 @@ Library.hot = {
       {
         header: 'Matrix Barcode',
         data: 'identificationBarcode',
+        validator: Hot.optionalTextNoSpecialChars,
         type: 'text',
         include: !Hot.autoGenerateIdBarcodes
       },
       {
         header: 'Description',
         data: 'description',
+        validator: Hot.optionalTextNoSpecialChars,
         include: !(Library.hot.hideCols.indexOf("description") > -1)
       },
       {
