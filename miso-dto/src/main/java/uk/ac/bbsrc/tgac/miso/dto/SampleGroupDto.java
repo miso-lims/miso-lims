@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SampleGroupDto {
+public class SampleGroupDto implements WritableUrls {
 
   private Long id;
   private String url;
@@ -138,5 +140,13 @@ public class SampleGroupDto {
         + subprojectId + ", subprojectUrl=" + subprojectUrl + ", groupId=" + groupId + ", description=" + description + ", createdById="
         + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" + creationDate + ", updatedById=" + updatedById
         + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
+  }
+
+  @Override
+  public void writeUrls(URI baseUri) {
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/samplegroup/{id}", getId()));
+    setCreatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getCreatedById()));
+    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
+
   }
 }

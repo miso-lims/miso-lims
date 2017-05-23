@@ -317,7 +317,11 @@
       <td><form:checkbox id="discarded" path="discarded"/></td>
     </tr>
     <tr>
-      <td class="h">Location:</td>
+      <td class="h"><label for="locationBarcode">Location:</label></td>
+      <td><form:input id="locationBarcode" path="locationBarcode"/></td>
+    </tr>
+    <tr>
+      <td class="h">Box Location:</td>
       <td>
         <c:if test="${!empty sample.box.locationBarcode}">${sample.box.locationBarcode},</c:if>
         <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.box.id}"/>'>${sample.box.alias}, ${sample.boxPosition}</a></c:if>
@@ -328,8 +332,6 @@
   <c:if test="${detailedSample}">
 
     <script type="text/javascript">
-      Sample.options.all = ${sampleOptions};
-
       <c:if test="${sample.id == 0}">
         jQuery(document).ready(function () {
           Sample.ui.sampleClassChanged();
@@ -557,10 +559,10 @@
         </div>
       </c:if>
 
-      <c:if test="${sampleCategory eq 'Tissue Processing'}">
+      <c:if test="${sampleCategory eq 'Tissue Processing' or sampleCategory eq 'new'}">
         <br/>
         <c:choose>
-        <c:when test="${sampleClass eq 'CV Slide'}">
+        <c:when test="${sampleClass eq 'CV Slide' or sampleCategory eq 'new'}">
         <div id="cvSlideTable">
           <h2>Tissue Processing</h2>
           <table class="in">
@@ -583,7 +585,7 @@
           </table>
         </div>
         </c:when>
-        <c:when test="${sampleClass eq 'LCM Tube'}">
+        <c:when test="${sampleClass eq 'LCM Tube' or sampleCategory eq 'new'}">
         <div id="lcmTubeTable">
           <h2>Tissue Processing</h2>
           <table class="in">
@@ -969,6 +971,28 @@
   </script>
   </c:if>
 
+  <c:if test="${detailedSample}">
+    <br/>
+    <h1>Relationships</h1>
+
+    <div style="clear:both">
+      <table class="list" id="relations_table">
+      </table>
+      <script type="text/javascript">
+        jQuery(document).ready(function () {
+          jQuery('#relations_table').dataTable({
+            "aoColumns": Sample.ui.standardColumns,
+            "aaData": ${sampleRelations},
+            "iDisplayLength": 50,
+            "bJQueryUI": true,
+            "bRetrieve": true
+          });
+        });
+      </script>
+    </div>
+  </c:if>
+
+
   <c:if test="${not empty samplePools}">
     <br/>
     <h1>${fn:length(samplePools)} Pool<c:if test="${fn:length(samplePools) ne 1}">s</c:if></h1>
@@ -1089,7 +1113,7 @@
               </c:if>
             </c:forEach>
           </td>
-          <td>${run.status.health}</td>
+          <td>${run.health}</td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
               <span class="ui-icon ui-icon-trash"></span>

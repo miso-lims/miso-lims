@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DetailedQcStatusDto {
+public class DetailedQcStatusDto implements WritableUrls {
 
   private Long id;
   private String url;
@@ -103,6 +105,13 @@ public class DetailedQcStatusDto {
 
   public void setNoteRequired(boolean noteRequired) {
     this.noteRequired = noteRequired;
+  }
+
+  @Override
+  public void writeUrls(URI baseUri) {
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/detailedqcstatus/{id}", getId()));
+    setCreatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getCreatedById()));
+    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
   }
 
 }

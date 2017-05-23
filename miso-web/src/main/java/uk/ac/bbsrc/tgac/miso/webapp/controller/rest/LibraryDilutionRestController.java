@@ -43,12 +43,8 @@ public class LibraryDilutionRestController extends RestController {
 
   private final JQueryDataTableBackend<LibraryDilution, DilutionDto> jQueryBackend = new JQueryDataTableBackend<LibraryDilution, DilutionDto>() {
     @Override
-    protected DilutionDto asDto(LibraryDilution model, UriComponentsBuilder builder) {
-      DilutionDto dto = Dtos.asDto(model);
-      if (dto.getLibrary() != null) {
-        dto.getLibrary().writeUrls(builder);
-      }
-      return dto;
+    protected DilutionDto asDto(LibraryDilution model) {
+      return Dtos.asDto(model);
     }
 
     @Override
@@ -76,7 +72,7 @@ public class LibraryDilutionRestController extends RestController {
     }
 
     @Override
-    protected SelectRowDto asDto(PoolableElementView dil, UriComponentsBuilder builder) {
+    protected SelectRowDto asDto(PoolableElementView dil) {
       SelectRowDto dto = new SelectRowDto();
       dto.id = dil.getDilutionId();
       dto.name = dil.getDilutionName();

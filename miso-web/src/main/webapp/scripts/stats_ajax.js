@@ -30,8 +30,8 @@ var Stats = Stats || {
       {'doOnSuccess':
         function(json) {
           if (json.progress) {
-            jQuery('input[name=status\\.health][value=' + json.progress + ']').prop('checked', true);
-          }
+              jQuery('input[name=health][value=' + json.progress + ']').prop('checked', true);
+         }
           if (json.response) {
             console.log(json.response);
           }

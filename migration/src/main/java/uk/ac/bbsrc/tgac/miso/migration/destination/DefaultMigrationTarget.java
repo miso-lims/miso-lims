@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +28,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -53,8 +55,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
+import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 
 public class DefaultMigrationTarget implements MigrationTarget {
 
@@ -152,6 +156,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
     Collection<Run> runs = data.getRuns();
     for (Run run : runs) {
       valueTypeLookup.resolveAll(run);
+    }
+    for (Pool pool : pools) {
+      resolvePoolables(pool);
     }
     if (mergeRunPools) mergeExistingPartialPools(runs, pools);
     savePools(pools);
@@ -587,6 +594,19 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info(pools.size() + " pools migrated.");
   }
 
+  private void resolvePoolables(Pool pool) throws IOException {
+    PoolableElementViewService svc = serviceManager.getPoolableElementViewService();
+    Set<PoolableElementView> set = Sets.newHashSet();
+    for (PoolableElementView ldi : pool.getPoolableElementViews()) {
+      PoolableElementView resolved = svc.getByPreMigrationId(ldi.getPreMigrationId());
+      if (resolved == null) {
+        throw new IllegalArgumentException("No PoolableElement found with preMigrationId " + ldi.getPreMigrationId());
+      }
+      set.add(resolved);
+    }
+    pool.setPoolableElementViews(set);
+  }
+
   private void setPoolModifiedDetails(Pool pool) throws IOException {
     if (pool.getId() == PoolImpl.UNSAVED_ID) pool.setCreationDate(timeStamp);
     pool.setLastModifier(migrationUser);
@@ -605,8 +625,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
       if (run == null) {
         run = newRun;
 
-        // slated for demolition
-        run.getStatus().setLastUpdated(timeStamp);
       } else {
         updateRun(newRun, run);
       }
@@ -623,11 +641,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private void updateRun(Run from, Run to) throws IOException {
     log.debug("Updating run " + to.getId());
-    to.getStatus().setCompletionDate(from.getStatus().getCompletionDate());
-    to.getStatus().setHealth(from.getStatus().getHealth());
+    to.setCompletionDate(from.getCompletionDate());
+    to.setHealth(from.getHealth());
 
-    // slated for demolition
-    to.getStatus().setLastUpdated(timeStamp);
 
     if (to.getSequencerPartitionContainers().size() != 1) {
       throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",
@@ -689,6 +705,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
   public void saveBoxes(final Collection<Box> boxes) throws IOException {
     log.info("Migrating boxes...");
     for (Box newBox : boxes) {
+      resolveBoxables(newBox);
       Box box = serviceManager.getRequestManager().getBoxByAlias(newBox.getAlias());
       if (box == null) {
         saveBox(newBox);
@@ -697,6 +714,21 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
     }
     log.info(boxes.size() + " boxes migrated.");
+  }
+
+  private void resolveBoxables(Box box) throws IOException {
+    BoxStore boxStore = serviceManager.getBoxDao();
+    // Resolve boxables linked by preMigrationId
+    for (String pos : box.getBoxables().keySet()) {
+      BoxableView boxable = box.getBoxables().get(pos);
+      if (boxable.getId().getTargetId() == 0L && boxable.getPreMigrationId() != null) {
+        BoxableView saved = boxStore.getBoxableViewByPreMigrationId(boxable.getPreMigrationId());
+        if (saved == null) {
+          throw new IllegalArgumentException("No boxable found with preMigrationId " + boxable.getPreMigrationId());
+        }
+        box.setBoxable(pos, saved);
+      }
+    }
   }
 
   private void saveBox(Box box) throws IOException {
@@ -710,6 +742,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private void mergeBox(Box from, Box to) throws IOException {
     log.debug("Merging box " + from.getAlias() + " with existing box");
     assertBoxPropertiesMatch(from, to);
+    // Because we're already inside the session at this point, the original object must be evicted
+    // to allow changes to be observed and changeLogged in the Service/RequestManager layer
+    sessionFactory.getCurrentSession().evict(to);
     for (Entry<String, BoxableView> entry : from.getBoxables().entrySet()) {
       if (entry.getValue() != null) {
         if (to.getBoxable(entry.getKey()) != null) {

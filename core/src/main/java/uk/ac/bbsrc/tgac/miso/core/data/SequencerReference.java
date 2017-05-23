@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -161,4 +162,8 @@ public interface SequencerReference extends Nameable, Deletable, Serializable {
    */
   public Date getLastServicedDate();
   
+  Set<Run> getRuns();
+
+  void setRuns(Set<Run> runs);
+
 }

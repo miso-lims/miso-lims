@@ -50,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityProfileDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
@@ -101,7 +100,6 @@ public class MisoServiceManager {
   private HibernateRunDao runDao;
   private HibernateRunQcDao runQcDao;
   private HibernateSequencerPartitionContainerDao sequencerPartitionContainerDao;
-  private HibernateStatusDao statusDao;
   private HibernateSequencerReferenceDao sequencerReferenceDao;
   private HibernateBoxDao boxDao;
   private HibernatePoolableElementViewDao poolableElementViewDao;
@@ -201,7 +199,6 @@ public class MisoServiceManager {
     m.setDefaultSecurityStore();
     m.setDefaultSequencerPartitionContainerDao();
     m.setDefaultSequencerReferenceDao();
-    m.setDefaultStatusDao();
     m.setDefaultStudyDao();
     m.setDefaultStudyService();
     m.setDefaultSubprojectDao();
@@ -508,6 +505,7 @@ public class MisoServiceManager {
     HibernateSampleDao dao = new HibernateSampleDao();
     dao.setSessionFactory(sessionFactory);
     dao.setJdbcTemplate(jdbcTemplate);
+    dao.setBoxStore(boxDao);
     setSampleDao(dao);
   }
 
@@ -641,6 +639,7 @@ public class MisoServiceManager {
   public void setDefaultDilutionDao() {
     HibernateLibraryDilutionDao dao = new HibernateLibraryDilutionDao();
     dao.setSessionFactory(sessionFactory);
+    dao.setBoxStore(boxDao);
     setDilutionDao(dao);
   }
 
@@ -872,25 +871,6 @@ public class MisoServiceManager {
     if (requestManager != null) requestManager.setSequencerPartitionContainerStore(getSequencerPartitionContainerDao());
   }
 
-  public HibernateStatusDao getStatusDao() {
-    return statusDao;
-  }
-
-  public void setStatusDao(HibernateStatusDao statusDao) {
-    this.statusDao = statusDao;
-    updateStatusDaoDependencies();
-  }
-
-  public void setDefaultStatusDao() {
-    HibernateStatusDao dao = new HibernateStatusDao();
-    dao.setJdbcTemplate(jdbcTemplate);
-    dao.setSessionFactory(sessionFactory);
-    setStatusDao(dao);
-  }
-
-  private void updateStatusDaoDependencies() {
-  }
-
   public HibernateSequencerReferenceDao getSequencerReferenceDao() {
     return sequencerReferenceDao;
   }
@@ -929,6 +909,10 @@ public class MisoServiceManager {
   private void updateBoxDaoDependencies() {
     if (poolDao != null) poolDao.setBoxStore(boxDao);
     if (requestManager != null) requestManager.setBoxStore(boxDao);
+    if (sampleDao != null) sampleDao.setBoxStore(boxDao);
+    if (libraryDao != null) libraryDao.setBoxDao(boxDao);
+    if (dilutionDao != null) dilutionDao.setBoxStore(boxDao);
+    if (poolDao != null) poolDao.setBoxStore(boxDao);
   }
 
   public DefaultLabService getLabService() {

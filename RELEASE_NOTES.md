@@ -1,3 +1,17 @@
+# 0.2.66
+
+Changes:
+
+ * Fixed display of institute names on bulk Edit Samples page
+ * Allow saving a box that has scan errors
+ * Allow tissue processing samples to be created directly
+ * Fixed caching issues which caused a browser hard refresh to be needed occasionally
+ * Fixed selection of samples via 'Select All'
+ * Added Sample and Library location field in addition to displaying boxLocation
+ * Added relations table to Edit Sample page
+ * Allow searching items by box name, box alias, barcode, institute, and external name
+ * Other misc. bug fixes
+
 # 0.2.65
 
 Changes:

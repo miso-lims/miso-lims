@@ -615,7 +615,7 @@ public class LimsUtils {
     return library instanceof DetailedLibrary;
   }
 
-  public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) throws IOException {
+  public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) {
     for (SampleValidRelationship relationship : relationships) {
       if (!relationship.getArchived() && relationship.getChild().getId() == id
           && relationship.getParent().getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
@@ -714,5 +714,13 @@ public class LimsUtils {
       from = (T) proxy.getHibernateLazyInitializer().getImplementation();
     }
     return from;
+  }
+
+  public static String[] prefix(String prefix, String... suffixes) {
+    String[] results = new String[suffixes.length];
+    for (int i = 0; i < suffixes.length; i++) {
+      results[i] = prefix + suffixes[i];
+    }
+    return results;
   }
 }

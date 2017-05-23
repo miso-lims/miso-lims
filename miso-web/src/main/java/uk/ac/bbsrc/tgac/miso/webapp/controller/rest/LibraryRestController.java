@@ -75,10 +75,8 @@ public class LibraryRestController extends RestController {
 
   private final JQueryDataTableBackend<Library, LibraryDto> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto>() {
     @Override
-    protected LibraryDto asDto(Library model, UriComponentsBuilder builder) {
-      LibraryDto dto = Dtos.asDto(model);
-      dto.writeUrls(builder);
-      return dto;
+    protected LibraryDto asDto(Library model) {
+      return Dtos.asDto(model);
     }
 
     @Override
@@ -125,7 +123,7 @@ public class LibraryRestController extends RestController {
     Long id = null;
     try {
       Library library = Dtos.to(libraryDto);
-      libraryService.create(library);
+      id = libraryService.create(library);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating library. ", e);
       RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);

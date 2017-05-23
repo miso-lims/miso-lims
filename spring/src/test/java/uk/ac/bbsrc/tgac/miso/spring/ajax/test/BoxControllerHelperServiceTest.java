@@ -130,20 +130,17 @@ public class BoxControllerHelperServiceTest {
   @Test
   public final void testGetBoxScanWithReadErrorsReturnsError() throws Exception {
     final long id = 1L;
-    final JSONObject error = new JSONObject();
-    final JSONObject errorComponents = new JSONObject();
-    errorComponents.put("errorPositions", "[]");
-    errorComponents.put("successPositions", "[]");
-    errorComponents.put("message", "The scanner can not read some positions. Please remove or fix and then rescan: ");
-    errorComponents.put("type", "Read Error");
-    error.put("errors", errorComponents);
 
+    Box box = makeEmptyBox();
+    when(scan.getRowCount()).thenReturn(box.getSize().getRows());
+    when(scan.getColumnCount()).thenReturn(box.getSize().getColumns());
     when(boxScanner.getScan()).thenReturn(scan);
-    when(scan.hasReadErrors()).thenReturn(true);
+    when(scan.getReadErrorPositions()).thenReturn(Arrays.asList("A01"));
+    when(requestManager.getBoxById(1L)).thenReturn(box);
 
     JSONObject json = new JSONObject();
     json.put("boxId", id);
-    assertEquals(error, boxControllerHelperService.getBoxScan(null, json));
+    assertTrue(boxControllerHelperService.getBoxScan(null, json).getJSONArray("errors").size() > 0);
   }
 
   @Test
@@ -189,25 +186,21 @@ public class BoxControllerHelperServiceTest {
     when(requestManager.getBoxById(box.getId())).thenReturn(box);
 
     // Create JSON:
-    // {"boxJSON":{
-    //   "id":1,
-    //   "boxables":{
-    //     "A01":{"identificationBarcode":"1111"},
-    //     "A02":{"identificationBarcode":"2222"}
-    //   }
-    // }}
+    // {"boxId":1,
+    // "items":[ { "coordinates": "A01", "identificationBarcode":"1111"}, { "coordinates": "A02", "identificationBarcode":"2222"} ]
+    // }
     JSONObject json = new JSONObject();
-    JSONObject boxJson = new JSONObject();
-    JSONObject boxablesJson = new JSONObject();
+    JSONArray boxablesJson = new JSONArray();
     JSONObject boxable1Json = new JSONObject();
     boxable1Json.put("identificationBarcode", sample.getIdentificationBarcode());
-    boxablesJson.put("A01", boxable1Json);
+    boxable1Json.put("coordinates", "A01");
+    boxablesJson.add(boxable1Json);
     JSONObject boxable2Json = new JSONObject();
     boxable2Json.put("identificationBarcode", library.getIdentificationBarcode());
-    boxablesJson.put("A02", boxable2Json);
-    boxJson.put("boxables", boxablesJson);
-    boxJson.put("id", box.getId());
-    json.put("boxJSON", boxJson);
+    boxable2Json.put("coordinates", "A02");
+    boxablesJson.add(boxable2Json);
+    json.put("items", boxablesJson);
+    json.put("boxId", box.getId());
 
     JSONObject response = boxControllerHelperService.saveBoxContents(null, json);
     assertTrue(response.has("response"));

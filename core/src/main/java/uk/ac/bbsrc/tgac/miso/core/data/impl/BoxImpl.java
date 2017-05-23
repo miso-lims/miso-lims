@@ -76,7 +76,8 @@ public class BoxImpl extends AbstractBox {
   }
 
   private void validate(String position) {
-    if (!position.matches("[A-Z][0-9][0-9]")) throw new IllegalArgumentException("Position must match [A-Z][0-9][0-9]");
+    if (!position.matches("[A-Z][0-9][0-9]"))
+      throw new IllegalArgumentException("Position " + position + " does not match [A-Z][0-9][0-9]");
     if (BoxUtils.fromRowChar(position.charAt(0)) >= getSize().getRows())
       throw new IndexOutOfBoundsException("Row letter too large!" + position);
     int col = BoxUtils.tryParseInt(position.substring(1, 3));
@@ -113,15 +114,17 @@ public class BoxImpl extends AbstractBox {
     validate(position);
 
     // if already in this box, remove from previous position first
-    String oldPosition = null;
-    for (Map.Entry<String, BoxableView> entry : boxableViews.entrySet()) {
-      if (entry.getValue().getId().equals(item.getId())) {
-        oldPosition = entry.getKey();
-        break;
+    if (item.getId().getTargetId() != 0L) {
+      String oldPosition = null;
+      for (Map.Entry<String, BoxableView> entry : boxableViews.entrySet()) {
+        if (entry.getValue().getId().equals(item.getId())) {
+          oldPosition = entry.getKey();
+          break;
+        }
       }
-    }
-    if (oldPosition != null) {
-      boxableViews.remove(oldPosition);
+      if (oldPosition != null) {
+        boxableViews.remove(oldPosition);
+      }
     }
     boxableViews.put(position, item);
   }

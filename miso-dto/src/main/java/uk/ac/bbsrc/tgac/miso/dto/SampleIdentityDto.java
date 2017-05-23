@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.net.URI;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -13,11 +11,6 @@ public class SampleIdentityDto extends DetailedSampleDto {
 
   private String externalName;
   private String donorSex;
-
-  @Override
-  public void writeUrls(URI baseUri) {
-    super.writeUrls(baseUri);
-  }
 
   public String getExternalName() {
     return externalName;

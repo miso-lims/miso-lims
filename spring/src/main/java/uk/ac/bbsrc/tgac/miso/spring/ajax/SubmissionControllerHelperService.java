@@ -458,10 +458,12 @@ public class SubmissionControllerHelperService {
                     List<PoolableElementView> poolables = new ArrayList<>(part.getPool().getPoolableElementViews());
                     Collections.sort(poolables);
 
-                    FilePathGenerator fpg = filePathGeneratorResolverService.getFilePathGenerator(r.getPlatformType());
+                    FilePathGenerator fpg = filePathGeneratorResolverService
+                        .getFilePathGenerator(r.getSequencerReference().getPlatform().getPlatformType());
                     if (fpg == null) {
                       log.warn(
-                          "No file path generator found for '" + r.getPlatformType().getKey() + "'. Falling back to fake path generator.");
+                          "No file path generator found for '" + r.getSequencerReference().getPlatform().getPlatformType().getKey()
+                              + "'. Falling back to fake path generator.");
                       fpg = new FakeFilepathGenerator();
                     }
 

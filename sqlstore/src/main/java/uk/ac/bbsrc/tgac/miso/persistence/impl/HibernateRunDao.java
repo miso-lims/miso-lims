@@ -25,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
@@ -39,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run> {
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "status", "lastModifier", "derivedInfo.creator");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "lastModifier", "derivedInfo.creator");
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateRunDao.class);
 
@@ -62,7 +60,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public long save(Run run) throws IOException {
     long id;
-    if (run.getId() == AbstractRun.UNSAVED_ID) {
+    if (run.getId() == Run.UNSAVED_ID) {
       currentSession().save(run);
     } else {
       currentSession().update(run);
@@ -73,7 +71,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public Run get(long id) throws IOException {
-    Run run = (Run) currentSession().get(RunImpl.class, id);
+    Run run = (Run) currentSession().get(Run.class, id);
     return withWatcherGroup(run);
   }
 
@@ -96,7 +94,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
 
@@ -105,7 +103,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
   }
 
@@ -128,10 +126,10 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     // show up
     currentSession().flush();
 
-    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
-    criteria.createAlias("r.containers", "spc").createAlias("r.status", "status");
+    Criteria criteria = currentSession().createCriteria(Run.class, "r");
+    criteria.createAlias("r.containers", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
-    criteria.addOrder(Order.desc("status.startDate"));
+    criteria.addOrder(Order.desc("startDate"));
     criteria.setMaxResults(1);
     return withWatcherGroup((Run) criteria.uniqueResult());
   }
@@ -142,7 +140,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     // show up
     currentSession().flush();
 
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.createAlias("containers", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
     criteria.addOrder(Order.desc("id"));
@@ -152,7 +150,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listBySearch(String query) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(DbUtils.searchRestrictions(query, SEARCH_PROPERTIES));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
@@ -161,14 +159,14 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public Run getByAlias(String alias) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(Restrictions.eq("alias", alias));
     return withWatcherGroup((Run) criteria.uniqueResult());
   }
 
   @Override
   public List<Run> listByPoolId(long poolId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.createAlias("containers", "spc").createAlias("spc.partitions", "partition");
     criteria.createAlias("partition.pool", "pool");
     criteria.add(Restrictions.eq("pool.id", poolId));
@@ -183,7 +181,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     // show up
     currentSession().flush();
 
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.createAlias("containers", "spc");
     criteria.add(Restrictions.eq("spc.id", containerId));
     @SuppressWarnings("unchecked")
@@ -193,7 +191,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listByProjectId(long projectId) throws IOException {
-    Criteria idCriteria = currentSession().createCriteria(RunImpl.class, "r");
+    Criteria idCriteria = currentSession().createCriteria(Run.class, "r");
     idCriteria.createAlias("r.containers", "container").createAlias("container.partitions", "partition");
     idCriteria.createAlias("partition.pool", "pool").createAlias("pool.pooledElementViews", "dilution");
     idCriteria.add(Restrictions.eq("dilution.projectId", projectId));
@@ -203,7 +201,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(Restrictions.in("id", ids));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
@@ -212,7 +210,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listByPlatformId(long platformId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
+    Criteria criteria = currentSession().createCriteria(Run.class, "r");
     criteria.createAlias("r.sequencerReference", "sr");
     criteria.add(Restrictions.eq("sr.platform.id", platformId));
     @SuppressWarnings("unchecked")
@@ -222,9 +220,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listByStatus(String health) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class, "r");
-    criteria.createAlias("r.status", "status");
-    criteria.add(Restrictions.eq("status.health", HealthType.get(health)));
+    Criteria criteria = currentSession().createCriteria(Run.class, "r");
+    criteria.add(Restrictions.eq("health", HealthType.get(health)));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
@@ -232,7 +229,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listBySequencerId(long sequencerReferenceId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(Restrictions.eq("sequencerReference.id", sequencerReferenceId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
@@ -241,7 +238,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listAllWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.addOrder(Order.desc("id"));
     criteria.setMaxResults((int) limit);
     @SuppressWarnings("unchecked")
@@ -265,13 +262,13 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public long countRuns() throws IOException {
-    long c = (Long) currentSession().createCriteria(RunImpl.class).setProjection(Projections.rowCount()).uniqueResult();
+    long c = (Long) currentSession().createCriteria(Run.class).setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
   }
 
   @Override
   public long countBySearch(String querystr) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunImpl.class);
+    Criteria criteria = currentSession().createCriteria(Run.class);
     criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
     long c = (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
@@ -338,7 +335,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public String propertyForSortColumn(String original) {
     if ("lastModified".equals(original)) return "derivedInfo.lastModified";
-    if ("lastUpdated".equals(original)) return "status.lastUpdated";
+    if ("lastUpdated".equals(original)) return "lastUpdated";
     return original;
 
   }
@@ -362,12 +359,12 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public Class<? extends Run> getRealClass() {
-    return RunImpl.class;
+    return Run.class;
   }
 
   @Override
   public void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.in("status.health", healths.toArray()));
+    criteria.add(Restrictions.in("health", healths.toArray()));
   }
 
   @Override

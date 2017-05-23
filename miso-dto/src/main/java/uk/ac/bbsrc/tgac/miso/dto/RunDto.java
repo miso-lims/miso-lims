@@ -2,14 +2,12 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
-public class RunDto {
+public class RunDto implements WritableUrls {
   private Long id;
   private String name;
   private String alias;
   private String status;
-  private String lastUpdated;
+  private String lastModified;
   private String platformType;
   private String startDate;
   private String endDate;
@@ -48,14 +46,6 @@ public class RunDto {
     this.status = status;
   }
 
-  public String getLastUpdated() {
-    return lastUpdated;
-  }
-
-  public void setLastUpdated(String lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
-
   public String getPlatformType() {
     return platformType;
   }
@@ -88,13 +78,9 @@ public class RunDto {
     this.url = url;
   }
 
-  public void writeUrls(UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    writeUrls(baseUri);
-  }
-
+  @Override
   public void writeUrls(URI baseUri) {
-    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/run/{id}").buildAndExpand(getId()).toUriString());
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/run/{id}", getId()));
   }
 
   public SequencingParametersDto getParameters() {
@@ -104,4 +90,13 @@ public class RunDto {
   public void setParameters(SequencingParametersDto parameters) {
     this.parameters = parameters;
   }
+
+  public String getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(String lastModified) {
+    this.lastModified = lastModified;
+  }
+
 }

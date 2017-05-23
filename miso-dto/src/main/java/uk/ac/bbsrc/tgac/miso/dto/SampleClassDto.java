@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.net.URI;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SampleClassDto {
+public class SampleClassDto implements WritableUrls {
 
   private Long id;
   private String url;
@@ -121,6 +123,13 @@ public class SampleClassDto {
 
   public void setCanCreateNew(boolean canCreateNew) {
     this.canCreateNew = canCreateNew;
+  }
+
+  @Override
+  public void writeUrls(URI baseUri) {
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getId()));
+    setCreatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getCreatedById()));
+    setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
   }
 
   @Override

@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateLibraryDilutionDao
-    implements LibraryDilutionStore, HibernatePaginatedDataSource<LibraryDilution> {
+    implements LibraryDilutionStore, HibernatePaginatedBoxableSource<LibraryDilution> {
 
   // Make sure these match the HiberatePoolableElementViewDao
   private final static String[] SEARCH_PROPERTIES = new String[] { "name", "identificationBarcode", "library.name", "library.alias",
@@ -159,7 +159,7 @@ public class HibernateLibraryDilutionDao
   public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
     criteria.createAlias("library.sample", "sample");
     criteria.createAlias("sample.project", "project");
-    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
+    HibernatePaginatedBoxableSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
   }
 
   @Override

@@ -216,4 +216,11 @@
 		<dynamic-attributes>true</dynamic-attributes>
 	</tag>
 
+    <function>
+        <name>instanceOf</name>
+        <function-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TagUtils</function-class>
+        <function-signature>boolean instanceOf(java.lang.Object, java.lang.String)</function-signature>
+    </function>
+
+
 </taglib>

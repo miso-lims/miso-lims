@@ -483,122 +483,44 @@ Box.ScanDialog = function() {
   return self;
 };
 
-Box.ScanErrors = function() {
-  var self = new BoxVisual();
-
-  self.show = function(opts) {
-    self.scan = opts.scan;
-    self.size = opts.size;
-    self.data = opts.data;
-
-    jQuery('#dialogInfoAbove').html('<h1 class="warning">Scan Failed!</h1>'+
-                                    '<p>'+self.scan.errors.message +
-                                    '<br>Read error positions:</p><br>');
-    jQuery('#dialogInfoBelow').html('');
-    jQuery('#dialogDialog').dialog({
-      autoOpen: false,
-      width: Box.dialogWidth,
-      modal: true,
-      resizable: false,
-      position: [jQuery(window).width()/2 - Box.dialogWidth/2, 50],
-      buttons: {
-        "Rescan": function () {
-          Box.initScan();
-        },
-        "Cancel": function () {
-          jQuery('#dialogDialog').dialog('close');
-        }
-      }
-    });
-    self.create({
-      div: '#dialogVisual',
-      size: {
-        rows: self.size.rows,
-        cols: self.size.cols
-      },
-      data: self.data
-    });
-    jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
-    jQuery('#dialogDialog').dialog('open');
-  };
-
-  self.getBoxItem = function(row, col) {
-    var pos = Box.utils.getPositionString(row, col);
-    var img = '/styles/images/tube_error.png';
-    if (self.scan.errors.type == 'Unknown Barcode') {
-      img = '/styles/images/tube_duplicate_barcode_error.png';
-    } 
-
-    if (jQuery.inArray(pos, self.scan.errors.errorPositions) !== -1) {
-      return new BoxItem({
-        row: row,
-        col: col,
-        selected: self.selected,
-        title: 'Read Error',
-        selectedImg: img,
-        unselectedImg: img,
-        onClick: function() {}
-      });
-    } else if (jQuery.inArray(pos, self.scan.errors.successPositions) !== -1) {
-      return new BoxItem({
-        row: row,
-        col: col,
-        selected: self.selected,
-        title: 'Successful Read',
-        selectedImg: '/styles/images/tube_full.png',
-        unselectedImg: '/styles/images/tube_full.png',
-        onClick: function() {}
-      });
-    } else {
-      return new BoxItem({
-        row: row,
-        col: col,
-        selected: self.selected,
-        title: 'No Tube',
-        selectedImg: '/styles/images/tube_empty_selected.png',
-        unselectedImg: '/styles/images/tube_empty.png',
-        onClick: function() {}
-      });
-    }
-  };
-
-  self.getBoxPosition = function(row, col, tCell) {
-    return new BoxPosition({
-      row: row,
-      col: col,
-      cell: tCell,
-      boxItem: self.getBoxItem(row, col)
-    });
-  };
-  return self;
-};
-
 Box.ScanDiff = function() {
   var self = new BoxVisual();
 
-  self.show = function(opts) {
-    self.scan = opts.scan;
-    self.size = opts.size;
-    self.data = opts.data;
+  self.show = function(results) {
+    self.results = results;
 
-    var diff = Box.utils.getDiff(self.data, self.scan.items, self.rows, self.cols);
-    self.changed = diff.positions;
+    var diffs = results.diffs.map(function(d) {
+      switch (d.action) {
+        case 'added':
+          return '<li style="color:green;"><b>+</b> ' + d.modified.name + ' added to the box at position ' + d.coordinates + '</li>';
+        case 'removed':
+          return '<li style="color:red;"><b>-</b> ' + d.original.name + ' removed from ' + d.coordinates + '</li>';
+        case 'changed':
+          return '<li style="color:orange;"><b>!</b> ' + d.original.name + ' replaced by ' + d.modified.name + ' at ' + d.coordinates + '</li>';
+        default:
+          return '<li><b>?</b> Unknown change at ' + (d.coordinates || 'unknown position') + '</li>';
+      }
+    });
 
-    jQuery('#dialogInfoAbove').html("<h1>Scan Success! </h1>"+
-     "<p>The following changes will be applied on save:</p><br>");
-    jQuery('#dialogInfoBelow').html('<ul style="list-style-type: none;overflow:hidden; overflow-y:scroll;height:125px;">'+diff.html.join('')+'</ul>');
+    var message = (results.errors.length == 0 ? "<h1>Scan Success! </h1>" : '<h1 class="warning">Scan Failed!</h1>') +
+        results.errors.map(function(err) { return "<p>Position " + err.coordinates + ": " + err.message + "</p>"; }).join("") +
+        (diffs.length == 0 ? "" : "<p>Box has changed. See below.</p>");
+
+    jQuery('#dialogInfoAbove').html(message);
+    jQuery('#dialogInfoBelow').html("<ul style=\"list-style-type: none;overflow:hidden; overflow-y:scroll;height:125px;\">" + diffs.join("") + '</ul>');
 
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
       width: Box.dialogWidth,
       modal: true,
       resizable: false,
-      position: [jQuery(window).width()/2 - Box.dialogWidth/2, 50],
+      position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
       buttons: {
         "Save": function() {
-          Box.boxJSON.items = self.scan.items;
-          Box.saveContents();
-          jQuery('#dialogDialog').dialog('close');
+          if (results.errors.length == 0 || confirm("Do you want to save changes even though there are scanning errors?")) {
+            Box.saveContents(self.results.items);
+            jQuery('#dialogDialog').dialog('close');
+          }
         },
         "Rescan": function() {
           Box.initScan();
@@ -611,10 +533,10 @@ Box.ScanDiff = function() {
     self.create({
       div: '#dialogVisual',
       size: {
-        rows: self.rows,
-        cols: self.cols
+        rows: Box.boxJSON.rows,
+        cols: Box.boxJSON.cols
       },
-      data: self.scan.items
+      data: self.results.items
     });
     jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
     jQuery('#dialogDialog').dialog('open');
@@ -622,45 +544,37 @@ Box.ScanDiff = function() {
 
   self.getBoxItem = function(row, col) {
     var pos = Box.utils.getPositionString(row, col);
-    var boxables;
-    var sel, unsel;
+    var sel, unsel, title;
 
-    boxables = self.data.filter(function(item) { return item.coordinates == pos; });
-    if (boxables.length > 0) {
-      sel = jQuery.inArray(pos, self.changed) !== -1 ?
-            '/styles/images/tube_full_selected_changed.png' :
-            '/styles/images/tube_full_selected.png';
-
-      unsel = jQuery.inArray(pos, self.changed) !== -1 ?
-            '/styles/images/tube_full_changed.png' :
-            '/styles/images/tube_full.png';
-      return new BoxItem({
-        row: row,
-        col: col,
-        selected: self.selected,
-        title: boxables[0].alias,
-        selectedImg: sel,
-        unselectedImg: unsel,
-        onClick: function() {}
-      });
+    var boxables = self.results.items.filter(function(item) { return item.coordinates == pos; });
+    var diffs = self.results.diffs.filter(function(item) { return item.coordinates == pos; });
+    var errors = self.results.errors.filter(function(item) { return item.coordinates == pos; });
+    if (errors.length > 0) {
+      title = errors[0].message;
+      sel = '/styles/images/tube_error.png';
+      unsel = '/styles/images/tube_error.png';
+    } else if (diffs.length > 0) {
+      title = (diffs[0].modified ? diffs[0].modified.alias : 'Empty') + " (Previously " + (diffs[0].original ? diffs[0].original.alias : 'Empty') + ")";
+      sel = diffs[0].modified ? '/styles/images/tube_full_selected_changed.png' : '/styles/images/tube_empty_selected_changed.png';
+      unsel = diffs[0].modified ? '/styles/images/tube_full_changed.png' : '/styles/images/tube_empty_changed.png';
+    } else if (boxables.length > 0) {
+      title = boxables[0].alias;
+      sel = '/styles/images/tube_full_selected.png';
+      unsel = '/styles/images/tube_full.png';
     } else {
-      sel = jQuery.inArray(pos, self.changed) !== -1 ?
-            '/styles/images/tube_empty_selected_changed.png' :
-            '/styles/images/tube_empty_selected.png';
-
-      unsel = jQuery.inArray(pos, self.changed) !== -1 ?
-            '/styles/images/tube_empty_changed.png' :
-            '/styles/images/tube_empty.png';
-      return new BoxItem({
-        row: row,
-        col: col,
-        selected: self.selected,
-        title: '',
-        selectedImg: sel,
-        unselectedImg: unsel,
-        onClick: function() {}
-      });
+      title = 'Empty';
+      sel = '/styles/images/tube_empty_selected.png';
+      unsel = '/styles/images/tube_empty.png';
     }
+    return new BoxItem({
+      row: row,
+      col: col,
+      selected: self.selected,
+      title: title,
+      selectedImg: sel,
+      unselectedImg: unsel,
+      onClick: function() {}
+    });
   };
 
   self.getBoxPosition = function(row, col, tCell) {
@@ -768,30 +682,6 @@ Box.utils = {
   findItemPos: function(name, boxables) {
     var matches = boxables.filter(function(item) { return item.name == name; });
     return matches.length == 1 ? mathces[0] : null;
-  },
-
-  // Return an array of changed positions as well as an HTML list representing the diff
-  getDiff: function(oldBoxables, newBoxables) {
-    var diff = [];
-    var changed = [];
-	oldBoxables.forEach(function(oldItem) {
-      var newItems = newBoxables.filter(function(item) { item.name == oldItem.name; });
-      if (newItems.length == 0) {
-        diff.push('<li style="color:red;"><b>-</b> '+oldItem.name+': removed from the box</li>');
-        changed.push(oldpos);
-      } else if (newItems[0].coordinates != oldItem.coordinates) {
-          diff.push('<li style="color:orange;"><b>!</b> '+oldItem.name+': moved ('+oldItem.coordinates+'->'+newItems[0].coordinates+')</li>');
-          changed.push(oldItem.coordinates);
-          changed.push(newItems[0].coordinates);
-      }
-    });
-    newItems.forEach(function(newItem) {
-      if (oldBoxables.some(function(item) { item.name == newItem.name; })) {
-        diff.push('<li style="color:green;"><b>+</b> '+newItem.name+': added to the box at position '+newItem.coordinates+'</li>');
-        changed.push(pos);
-      }
-    });
-    return {'html': diff, 'positions': changed};
   }
 };
 

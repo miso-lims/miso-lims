@@ -23,8 +23,7 @@
 -->
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:jee="http://www.springframework.org/schema/jee"
-  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:jee="http://www.springframework.org/schema/jee" xmlns:context="http://www.springframework.org/schema/context"
   xsi:schemaLocation="http://www.springframework.org/schema/beans 
                       http://www.springframework.org/schema/beans/spring-beans.xsd
                       http://www.springframework.org/schema/tx 
@@ -55,23 +54,22 @@
     </property>
   </bean>
 
-  <tx:annotation-driven/>
-  <bean id="jpaDialect"
-        class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+  <tx:annotation-driven />
+  <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
   <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
-  
+
   <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory" />
-    <property name="dataSource" ref="dataSource"/>
+    <property name="dataSource" ref="dataSource" />
   </bean>
-  
-  <bean id="timeShiftInterceptor" class = "uk.ac.bbsrc.tgac.miso.persistence.impl.util.TimeShiftingInterceptor">
+
+  <bean id="timeShiftInterceptor" class="uk.ac.bbsrc.tgac.miso.persistence.impl.util.TimeShiftingInterceptor">
     <!-- Defaults to UTC/UTC, which will not make any adjustments -->
     <constructor-arg name="dbZone" value="${miso.timeCorrection.dbZone:UTC}" />
     <constructor-arg name="uiZone" value="${miso.timeCorrection.uiZone:UTC}" />
   </bean>
-  
-  <context:component-scan base-package="uk.ac.bbsrc.tgac.miso.persistence" /> 
+
+  <context:component-scan base-package="uk.ac.bbsrc.tgac.miso.persistence" />
 
   <jee:jndi-lookup id="dataSource" jndi-name="/jdbc/MISODB" resource-ref="true" />
 

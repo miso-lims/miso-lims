@@ -46,11 +46,11 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
 
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
@@ -120,7 +120,7 @@ public class AnalysisController {
 
       map.put("instrument-id", run.getSequencerReference().getName());
 
-      SequencerPartitionContainer f = ((RunImpl) run).getSequencerPartitionContainers().get(0);
+      SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(0);
       String laneValue = "8";
       String naType = "dna";
       String indexValue = "6";
@@ -144,9 +144,9 @@ public class AnalysisController {
       String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
       if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
         // append the base mask property for miseq runs
-        String basesMask = "y" + run.getCycles() + ",i" + indexValue;
+        String basesMask = "y" + ((IlluminaRun) run).getNumCycles() + ",i" + indexValue;
         if (run.getPairedEnd()) {
-          basesMask += ",y" + run.getCycles();
+          basesMask += ",y" + ((IlluminaRun) run).getNumCycles();
         }
         map.put("use-bases-mask", basesMask);
       }

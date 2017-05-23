@@ -22,6 +22,7 @@
   --%>
 
 <%@ page import="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" %>
+<%@ page import="uk.ac.bbsrc.tgac.miso.Version" %>
 <!DOCTYPE html>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -80,7 +81,8 @@
 
   <!-- concatenated MISO stylesheets and scripts -->
   <link rel="stylesheet" href="<c:url value='/styles/style.css'/>" type="text/css">
-  <script type="text/javascript" src="<c:url value='/scripts/header_script.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/miso/constants.js'/>?ts=<fmt:formatNumber value="${timestamp.time / 60000}" maxFractionDigits="0" groupingUsed="false" />"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/header_script.js'/>?version=<%=Version.VERSION%>"></script>
 
 
   <link rel="shortcut icon" href="<c:url value='/styles/images/favicon.ico'/>" type="image/x-icon"/>
@@ -98,14 +100,14 @@
 <body>
 <table class="full-width no-border">
   <tr>
-    <td class="headertable" align="left" onclick="window.location.href='<c:url value='/'/>'">
-      <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo"
-           border="0" id="misologo"/>
+    <td class="headertable" align="left">
+      <a href='<c:url value='/'/>'>
+        <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo" border="0" id="misologo"/>
+      </a>
        <span id="instanceName">${initParam['miso.name']}</span>
     </td>
-    <td class="headertable" align="right" onclick="window.location.href='<c:url value='/'/>'">
-      <img src="<c:url value='/styles/images/brand_logo.png'/>" alt="Brand Logo" name="logo"
-           border="0" id="brandlogo"/>
+    <td class="headertable" align="right">
+      <img src="<c:url value='/styles/images/brand_logo.png'/>" alt="Brand Logo" name="logo" border="0" id="brandlogo"/>
     </td>
   </tr>
 </table>

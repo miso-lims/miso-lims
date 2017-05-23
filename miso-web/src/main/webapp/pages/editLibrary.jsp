@@ -371,16 +371,19 @@
   <td><form:checkbox id="discarded" path="discarded"/></td>
 </tr>
 <tr>
-  <td class="h">Location:</td>
+  <td class="h"><label for="locationBarcode">Location:</label></td>
+  <td><form:input id="locationBarcode" path="locationBarcode"/></td>
+</tr>
+<tr>
+  <td class="h">Box Location:</td>
   <td>
-    <c:if test="${!empty library.box.locationBarcode}">${ library.box.locationBarcode},</c:if>
+    <c:if test="${!empty library.box.locationBarcode}">${library.box.locationBarcode},</c:if>
     <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.box.id}"/>'>${library.box.alias}, ${library.boxPosition}</a></c:if>
   </td>
 </tr>
 </table>
 <script type="text/javascript">
     Library = Library || {};
-    Library.indexFamilies = ${indexFamiliesJSON};
     Library.setOriginalIndices = function() {
       Library.lastIndexPosition = 0;
       jQuery('#indicesDiv').empty();
@@ -812,7 +815,7 @@
               </c:if>
             </c:forEach>
           </td>
-          <td>${run.status.health}</td>
+          <td>${run.health}</td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
               <span class="ui-icon ui-icon-trash"></span>
@@ -1352,7 +1355,6 @@ function submitBulkLibraries() {
 </div>
 
 <script type="text/javascript">
-  Library.designs = ${libraryDesignsJSON};
   jQuery(document).ready(function () {
     Library.ui.changeDesign(<c:out value="${library.libraryType.id}" default="0"/>, function() {
       Library.setOriginalIndices();

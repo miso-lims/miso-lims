@@ -326,9 +326,9 @@
           <c:forEach items="${sequencerRuns}" var="run">
             <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
               <td><a href='<c:url value="/miso/run/${run.id}"/>'>${run.alias}</a></td>
-              <td>${run.status.health.key}</td>
-              <td>${run.status.startDate}</td>
-              <td>${run.status.completionDate}</td>
+              <td>${run.health.key}</td>
+              <td>${run.startDate}</td>
+              <td>${run.completionDate}</td>
             </tr>
           </c:forEach>
         </tbody>

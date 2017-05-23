@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 /**
@@ -72,4 +73,10 @@ public class ListRunsController {
   public ModelAndView listRuns() throws Exception {
     return new ModelAndView("/pages/listRuns.jsp");
   }
+
+  @ModelAttribute("platformTypes")
+  public PlatformType[] populatePlatformTypes() {
+    return PlatformType.values();
+  }
+
 }

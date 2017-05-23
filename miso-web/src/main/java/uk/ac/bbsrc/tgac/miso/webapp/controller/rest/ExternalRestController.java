@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -185,7 +186,7 @@ public class ExternalRestController extends RestController {
       int ri = 0;
       for (Run run : runs) {
         ri++;
-        if (!run.getStatus().getHealth().getKey().equals("Failed")) {
+        if (run.getHealth() != HealthType.Failed) {
           ArrayList<String> runSamples = new ArrayList<>();
           Collection<SequencerPartitionContainer> spcs = requestManager
               .listSequencerPartitionContainersByRunId(run.getId());
@@ -212,15 +213,16 @@ public class ExternalRestController extends RestController {
           sb.append("'name':'" + run.getName() + "'");
           sb.append(",");
           sb.append("'status':'"
-              + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "'");
+              + (run.getHealth() != null ? run.getHealth().getKey() : "") + "'");
           sb.append(",");
           sb.append("'startDate':'"
-              + (run.getStatus() != null && run.getStatus().getStartDate() != null ? run.getStatus().getStartDate().toString() : "") + "'");
+              + (run.getStartDate() != null ? run.getStartDate().toString() : "") + "'");
           sb.append(",");
-          sb.append("'completionDate':'" + (run.getStatus() != null && run.getStatus().getCompletionDate() != null
-              ? run.getStatus().getCompletionDate().toString() : "") + "'");
+          sb.append("'completionDate':'" + (run.getCompletionDate() != null
+              ? run.getCompletionDate().toString() : "") + "'");
           sb.append(",");
-          sb.append("'platformType':'" + (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "'");
+          sb.append("'platformType':'" + (run.getSequencerReference().getPlatform().getPlatformType() != null
+              ? run.getSequencerReference().getPlatform().getPlatformType().getKey() : "") + "'");
           sb.append(",");
           sb.append("'samples':[");
           if (runSamples.size() > 0) {

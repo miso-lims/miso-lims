@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -70,25 +69,9 @@ public class SampleValidRelationshipController extends RestController {
       throw new RestException("No sample valid relationship found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleValidRelationshipDto dto = Dtos.asDto(sampleValidRelationship);
-      dto = writeUrls(dto, uriBuilder);
+      dto.writeUrls(uriBuilder);
       return dto;
     }
-  }
-
-  private static SampleValidRelationshipDto writeUrls(SampleValidRelationshipDto sampleValidRelationshipDto,
-      UriComponentsBuilder uriBuilder) {
-    URI baseUri = uriBuilder.build().toUri();
-    sampleValidRelationshipDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplevalidrelationship/{id}")
-        .buildAndExpand(sampleValidRelationshipDto.getId()).toUriString());
-    sampleValidRelationshipDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
-        .buildAndExpand(sampleValidRelationshipDto.getCreatedById()).toUriString());
-    sampleValidRelationshipDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
-        .buildAndExpand(sampleValidRelationshipDto.getUpdatedById()).toUriString());
-    sampleValidRelationshipDto.setParentUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}")
-        .buildAndExpand(sampleValidRelationshipDto.getParentId()).toUriString());
-    sampleValidRelationshipDto.setChildUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}")
-        .buildAndExpand(sampleValidRelationshipDto.getChildId()).toUriString());
-    return sampleValidRelationshipDto;
   }
 
   @RequestMapping(value = "/samplevalidrelationships", method = RequestMethod.GET, produces = { "application/json" })
@@ -98,7 +81,7 @@ public class SampleValidRelationshipController extends RestController {
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
     Set<SampleValidRelationshipDto> sampleValidRelationshipDtos = Dtos.asSampleValidRelationshipDtos(sampleValidRelationships);
     for (SampleValidRelationshipDto sampleValidRelationshipDto : sampleValidRelationshipDtos) {
-      sampleValidRelationshipDto = writeUrls(sampleValidRelationshipDto, uriBuilder);
+      sampleValidRelationshipDto.writeUrls(uriBuilder);
     }
     return sampleValidRelationshipDtos;
   }

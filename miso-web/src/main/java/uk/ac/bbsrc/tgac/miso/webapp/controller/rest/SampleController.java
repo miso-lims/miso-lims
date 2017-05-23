@@ -84,10 +84,8 @@ public class SampleController extends RestController {
   private final JQueryDataTableBackend<Sample, SampleDto> jQueryBackend = new JQueryDataTableBackend<Sample, SampleDto>() {
 
     @Override
-    protected SampleDto asDto(Sample model, UriComponentsBuilder builder) {
-      SampleDto dto = Dtos.asMinimalDto(model);
-      dto.writeUrls(builder);
-      return dto;
+    protected SampleDto asDto(Sample model) {
+      return Dtos.asMinimalDto(model);
     }
 
     @Override

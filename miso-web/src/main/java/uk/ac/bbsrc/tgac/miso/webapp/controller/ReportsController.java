@@ -65,7 +65,6 @@ import com.lowagie.text.Document;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -230,7 +229,7 @@ public class ReportsController {
     String format = PDF;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = runId == AbstractRun.UNSAVED_ID ? null : requestManager.getRunById(runId);
+      Run run = runId == Run.UNSAVED_ID ? null : requestManager.getRunById(runId);
       if (run != null) {
         if (!run.userCanRead(user)) {
           throw new SecurityException("Permission denied.");

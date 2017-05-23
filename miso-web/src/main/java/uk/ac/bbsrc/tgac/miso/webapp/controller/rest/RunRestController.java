@@ -81,10 +81,8 @@ public class RunRestController extends RestController {
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<Run, RunDto>() {
 
     @Override
-    protected RunDto asDto(Run model, UriComponentsBuilder builder) {
-      RunDto dto = Dtos.asDto(model);
-      dto.writeUrls(builder);
-      return dto;
+    protected RunDto asDto(Run model) {
+      return Dtos.asDto(model);
     }
 
     @Override

@@ -40,12 +40,14 @@ var Box = Box || {
   },
 
   // Saves entire box (stored in Box.boxJSON)
-  saveContents: function() {
+  saveContents: function(items) {
+    Box.boxJSON.items = items;
     Fluxion.doAjax(
       'boxControllerHelperService',
       'saveBoxContents',
       {
-        'boxJSON': Box.boxJSON,
+        'boxId': Box.boxJSON.id,
+        'items': items,
         'url': ajaxurl
       },
       {
@@ -197,30 +199,7 @@ Box.scan = {
       {
         'doOnSuccess': function(json) {
           jQuery('#magnify').stop();
-          var scan = json;
-
-          if (scan.hasOwnProperty("errors")) {
-            console.log("scan JSON from AJAX call has read errors");
-            var scanErrors = Box.ScanErrors();
-            scanErrors.show({
-                scan: scan,
-              size: {
-                rows: Box.boxJSON.rows,
-                cols: Box.boxJSON.cols
-              },
-              data: Box.boxJSON.items
-            });
-          } else {
-            console.log("scan JSON from AJAX call was successful");
-            Box.scanDiff.show({
-              scan: scan.boxJSON,
-              size: {
-                rows: Box.boxJSON.rows,
-                cols: Box.boxJSON.cols
-              },
-              data: Box.boxJSON.items
-            });
-          }
+          Box.scanDiff.show(json);
         },
         'doOnError': function(json) {
           jQuery('#magnify').stop();

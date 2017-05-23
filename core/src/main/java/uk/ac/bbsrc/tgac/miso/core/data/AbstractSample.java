@@ -333,6 +333,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
+  public Long getPreMigrationId() {
+    return null;
+  }
+
+  @Override
   public boolean isDeletable() {
     return getId() != AbstractSample.UNSAVED_ID && getLibraries().isEmpty() && getNotes().isEmpty() && getSampleQCs().isEmpty();
   }

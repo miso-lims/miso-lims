@@ -105,15 +105,14 @@
 <body>
 <table class="full-width no-border">
     <tr>
-        <td class="headertable" align="left" onclick="window.location.href='<c:url value='/miso/external/'/>'">
-            <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo"
-                 border="0" id="misologo"/>
-        </td>
-        <td class="headertable" align="right" onclick="window.location.href='<c:url value='/miso/external/'/>'">
-            <img src="<c:url value='/styles/images/brand_logo.png'/>" alt="Brand Logo" name="logo"
-                 border="0" id="brandlogo" />
-
-        </td>
+      <td class="headertable" align="left">
+        <a href='<c:url value='/'/>'>
+          <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo" border="0" id="misologo"/>
+        </a>
+      </td>
+      <td class="headertable" align="right">
+          <img src="<c:url value='/styles/images/brand_logo.png'/>" alt="Brand Logo" name="logo" border="0" id="brandlogo" />
+      </td>
     </tr>
 </table>
 

@@ -55,6 +55,36 @@ var Run = Run || {
     jQuery('#description').attr('class', 'form-control');
     jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    
+    jQuery('#wellName').attr('class', 'form-control');
+    jQuery('#wellName').attr('data-parsley-maxlength', '255');
+    jQuery('#wellName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    jQuery('#movieDuration').attr('class', 'form-control');
+    jQuery('#movieDuration').attr('data-parsley-maxlength', '10');
+    jQuery('#movieDuration').attr('data-parsley-type', 'number');
+
+    jQuery('#numCycles').attr('class', 'form-control');
+    jQuery('#numCycles').attr('data-parsley-maxlength', '10');
+    jQuery('#numCycles').attr('data-parsley-type', 'number');
+
+    jQuery('#callCycle').attr('class', 'form-control');
+    jQuery('#callCycle').attr('data-parsley-maxlength', '10');
+    jQuery('#callCycle').attr('data-parsley-type', 'number');
+
+    jQuery('#imgCycle').attr('class', 'form-control');
+    jQuery('#imgCycle').attr('data-parsley-maxlength', '10');
+    jQuery('#imgCycle').attr('data-parsley-type', 'number');
+
+    jQuery('#scoreCycles').attr('class', 'form-control');
+    jQuery('#scoreCycles').attr('data-parsley-maxlength', '10');
+    jQuery('#scoreCycles').attr('data-parsley-type', 'number');
+
+    jQuery('#cycles').attr('class', 'form-control');
+    jQuery('#cycles').attr('data-parsley-maxlength', '10');
+    jQuery('#cycles').attr('data-parsley-type', 'number');
+
+ 
 
     // Radio button validation: ensure a platform is selected
     jQuery('#platformType').attr('class', 'form-control');
@@ -310,24 +340,7 @@ Run.qc = {
 };
 
 Run.ui = {
-  changePlatformType: function (form, runId) {
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'changePlatformType',
-      {
-        'platformtype': form.value,
-        'run_cId': jQuery('input[name=run_cId]').val(),
-        'runId': runId,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#sequencerReferenceSelect').html(json.sequencers);
-          Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
-        }
-      }
-    );
-  },
+
 
   populateRunOptions: function (form, runId) {
     if (form.value !== 0) {
@@ -399,8 +412,8 @@ Run.ui = {
           "iSortPriority": 0
         },
         {
-          "sTitle": "Last Updated",
-          "mData": "lastUpdated",
+            "sTitle": "Last Modified",
+            "mData": "lastModified",
           "iSortPriority": 2,
           "bVisible": (Sample.detailedSample ? "true" : "false")
         }
@@ -433,7 +446,7 @@ Run.ui = {
   createListingRunsTableMain: function () {
     Run.ui.createListingRunsTable(null);
     jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/run/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Run</button>");
+
   },
 
   showRunNoteDialog: function (runId) {

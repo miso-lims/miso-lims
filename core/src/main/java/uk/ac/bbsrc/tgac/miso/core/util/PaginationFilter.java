@@ -18,12 +18,32 @@ public abstract interface PaginationFilter {
   public final static List<AgoMatcher> AGO_MATCHERS = Arrays.asList(new AgoMatcher("h(|ours?)", 3600),
       new AgoMatcher("d(|ays?)", 3600 * 24));
 
+  public static PaginationFilter box(String name) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByBox(item, name, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter date(Date start, Date end, DateType type) {
     return new PaginationFilter() {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationByDate(item, start, end, type, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter external(String name) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByExternalName(item, name, errorHandler);
       }
     };
   }
@@ -62,6 +82,15 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter institute(String name) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByInstitute(item, name, errorHandler);
+      }
+    };
+  }
   public static PaginationFilter[] parse(String request, String currentUser, Consumer<String> errorHandler) {
     return Arrays.stream(request.split("\\s+")).<PaginationFilter> map(x -> {
       if (x.contains(":")) {
@@ -130,6 +159,15 @@ public abstract interface PaginationFilter {
           return index(parts[1]);
         case "class":
           return sampleClass(parts[1]);
+        case "external":
+        case "ext":
+        case "extern":
+          return external(parts[1]);
+        case "institute":
+        case "inst":
+          return institute(parts[1]);
+        case "box":
+          return box(parts[1]);
         }
       }
       return query(x);

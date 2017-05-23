@@ -61,7 +61,7 @@ public class RunQCImpl extends AbstractQC implements RunQC {
   private static final long serialVersionUID = 1L;
   private static final Logger log = LoggerFactory.getLogger(RunQCImpl.class);
 
-  @ManyToOne(targetEntity = RunImpl.class)
+  @ManyToOne(targetEntity = Run.class)
   @JoinColumn(name = "run_runId")
   private Run run;
   private String information;

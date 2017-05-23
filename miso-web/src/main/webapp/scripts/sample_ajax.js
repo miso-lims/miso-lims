@@ -642,28 +642,26 @@ Sample.barcode = {
 
 Sample.options = {
   
-  all: null,
-  
   getSampleGroupsBySubProjectId: function(subProjectId) {
-    return Sample.options.all.sampleGroupsDtos.filter(function (sampleGroup) {
+    return Constants.sampleGroups.filter(function (sampleGroup) {
       return sampleGroup.subprojectId == subProjectId;
     });
   },
   
   getSampleGroupsByProjectId: function(projectId) {
-    return Sample.options.all.sampleGroupsDtos.filter(function (sampleGroup) {
+    return Constants.sampleGroups.filter(function (sampleGroup) {
       return sampleGroup.projectId == projectId && !sampleGroup.subprojectId;
     });
   },
   
   getSubProjectsByProjectId: function(projectId) {
-    return Sample.options.all.subprojectsDtos.filter(function (subProject) {
+    return Constants.subprojects.filter(function (subProject) {
       return subProject.parentProjectId == projectId;
     });
   },
   
   getSampleCategoryByClassId: function(sampleClassId) {
-    var results = Sample.options.all.sampleClassesDtos.filter(function (sampleClass) {
+    var results = Constants.sampleClasses.filter(function (sampleClass) {
       return sampleClass.id == sampleClassId;
     });
     return results.length > 0 ? results[0].sampleCategory : null;
@@ -725,12 +723,31 @@ Sample.ui = {
    * Update display when user selects different sample classes during new sample receipt
    */
   sampleClassChanged: function() {
-    var selectedId = jQuery('#sampleClass option:selected').val();
-    var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
-    jQuery('#sampleCategory').val(sampleCategory);
-    switch (sampleCategory) {
+    var sampleClassId = parseInt(jQuery('#sampleClass option:selected').val());
+    var sampleClass = Constants.sampleClasses.filter(function (sampleClass) {
+      return sampleClass.id == sampleClassId;
+    })[0];
+    if (!sampleClass) {
+      Sample.ui.setUpForTissue();
+      return;
+    }
+    jQuery('#sampleCategory').val(sampleClass.sampleCategory);
+    switch (sampleClass.sampleCategory) {
     case 'Aliquot':
       Sample.ui.setUpForAliquot();
+      break;
+    case 'Tissue Processing':
+      Sample.ui.setUpForProcessing();
+      if (sampleClass.alias == 'LCM Tube') {
+        jQuery('#lcmTubeTable').show();
+      } else {
+        jQuery('#lcmTubeTable').hide();
+      }
+      if (sampleClass.alias == 'CV Slide') {
+        jQuery('#cvSlideTable').show();
+      } else {
+        jQuery('#cvSlideTable').hide();
+      }
       break;
     case 'Stock':
       Sample.ui.setUpForStock();
@@ -750,7 +767,7 @@ Sample.ui = {
     
     // find the selected detailedQcStatus
     var dqcsId = jQuery('#detailedQcStatus option:selected').val();
-    var selectedDQCS = Hot.findFirstOrNull(Hot.idPredicate(dqcsId), Sample.options.all.detailedQcStatusesDtos);
+    var selectedDQCS = Hot.findFirstOrNull(Hot.idPredicate(dqcsId), Constants.detailedQcStatuses);
     if (selectedDQCS !== null && selectedDQCS.noteRequired) {
       jQuery('#qcStatusNote').show();
     }  else {
@@ -767,12 +784,21 @@ Sample.ui = {
     });
     jQuery('#detailedSampleAliquot').hide();
     jQuery('#detailedSampleStock').hide();
+    jQuery('#cvSlideTable').hide();
+    jQuery('#lcmTubeTable').hide();
     jQuery('#tissueClassRow').hide();
     jQuery('#stockClassRow').hide();
     jQuery('#tissueClass').val('');
     jQuery('#detailedSampleTissue').show();
   },
   
+  setUpForProcessing: function() {
+    jQuery('#tissueClassRow').show();
+    jQuery('#stockClassRow').hide();
+    jQuery('#detailedSampleStock').hide();
+    jQuery('#detailedSampleAliquot').hide();
+  },
+
   setUpForAliquot: function() {
     jQuery('#detailedSampleStock').find(':input').each(function() {
       jQuery(this).val('');
@@ -782,6 +808,7 @@ Sample.ui = {
     jQuery('#detailedSampleStock').show();
     jQuery('#detailedSampleAliquot').show();
   },
+
    setUpForStock: function() {
     jQuery('#detailedSampleAliquot').find(':input').each(function() {
       jQuery(this).val('');
@@ -790,6 +817,8 @@ Sample.ui = {
     jQuery('#stockClassRow').hide();
     jQuery('#detailedSampleStock').show();
     jQuery('#detailedSampleAliquot').hide();
+    jQuery('#cvSlideTable').hide();
+    jQuery('#lcmTubeTable').hide();
   },
   
   editSampleIdBarcode: function (span, id) {
@@ -1106,81 +1135,79 @@ Sample.ui = {
       alert("No samples scanned");
     }
   },
-  toAdd: [],
+  selectedSampleIds: [],
+  standardColumns: [
+    {
+      "sTitle": "Sample Name",
+      "mData": "id",
+      "mRender": function (data, type, full) {
+        return "<a href=\"/miso/sample/" + data + "\">" + full.name + "</a>";
+      },
+      "iSortPriority": 1
+    },
+    {
+      "sTitle": "Alias",
+      "mData": "alias",
+      "mRender": function (data, type, full) {
+        return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
+      },
+      "iSortPriority": 1
+    },
+    (Constants.isDetailedSample ? {
+      "sTitle": "Sample Class",
+      "mData": "sampleClassId",
+      "mRender": function (data, type, full) {
+        return Hot.getAliasFromId(data, Constants.sampleClasses) || "Plain";
+      },
+      "bVisible": "true",
+      "bSortable": false,
+      "iSortPriority": 0
+    } : null),
+    {
+      "sTitle": "Type",
+      "mData": "sampleType",
+      "iSortPriority": 0
+    },
+    {
+      "sTitle": "QC Passed",
+      "mData": "qcPassed",
+      "mRender": function (data, type, full) {
+        // data is returned as "true", "false", or "null"
+        return (data != null ? (data ? "True" : "False") : "Unknown");
+      },
+      "iSortPriority": 0
+    },
+    {
+      "sTitle": "Location",
+      "mData": "locationLabel",
+      "bSortable": false,
+      "mRender": function (data, type, full) {
+        return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+      },
+      "iSortPriority": 0
+    },
+    {
+      "sTitle": "Last Updated",
+      "mData": "lastModified",
+      "bVisible": (Constants.isDetailedSample ? "true" : "false"),
+      "iSortPriority": 2
+    },
+    {
+      "sTitle": "Barcode",
+      "mData": "identificationBarcode",
+      "bVisible": false,
+      "iSortPriority": 0
+    }
+  ].filter(function (x) { return x; }),
 
   createListingSamplesTable: function () {
-    if (Sample.detailedSample && Sample.sampleClasses === undefined) {
-      Sample.ui.getSampleClasses();
-      Sample.ui.getSampleValidRelationships();
-    }
     jQuery('#listingSamplesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
 
     jQuery('#listingSamplesTable').html('');
     jQuery('#listingSamplesTable').dataTable(Utils.setSortFromPriority({
       "aoColumns": [
-    	Utils.createToggleColumn("Sample.ui.toAdd"),
-        {
-          "sTitle": "Sample Name",
-          "mData": "id",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/sample/" + data + "\">" + full.name + "</a>";
-          },
-          "iSortPriority": 1
-        },
-        {
-          "sTitle": "Alias",
-          "mData": "alias",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
-          },
-          "iSortPriority": 1
-        },
-        (Sample.detailedSample ? {
-          "sTitle": "Sample Class",
-          "mData": "sampleClassId",
-          "mRender": function (data, type, full) {
-            return Hot.getAliasFromId(data, Sample.sampleClasses) || "Plain";
-          },
-          "bVisible": "true",
-          "bSortable": false,
-          "iSortPriority": 0
-        } : null),
-        {
-          "sTitle": "Type",
-          "mData": "sampleType",
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "QC Passed",
-          "mData": "qcPassed",
-          "mRender": function (data, type, full) {
-            // data is returned as "true", "false", or "null"
-            return (data != null ? (data ? "True" : "False") : "Unknown");
-          },
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Location",
-          "mData": "locationLabel",
-          "bSortable": false,
-          "mRender": function (data, type, full) {
-            return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
-          },
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Last Updated",
-          "mData": "lastModified",
-          "bVisible": (Sample.detailedSample ? "true" : "false"),
-          "iSortPriority": 2
-        },
-        {
-          "sTitle": "Barcode",
-          "mData": "identificationBarcode",
-          "bVisible": false,
-          "iSortPriority": 0
-        }
-      ].filter(function (x) { return x; }),
+    	Utils.createToggleColumn("Sample.ui.selectedSampleIds"),
+      ].concat(Sample.ui.standardColumns),
       "bJQueryUI": true,
       "bAutoWidth": false,
       "iDisplayLength": 25,
@@ -1206,8 +1233,8 @@ Sample.ui = {
       "fnDrawCallback": function (oSettings) {
         jQuery('#listingSamplesTable').removeClass('disabled');
         jQuery('#listingSamplesTable_paginate').find('.fg-button').removeClass('fg-button');
-        jQuery("input[class='bulkCheckbox']").on('click', function () {
-          Sample.ui.checkForPropagate(document.getElementById('dropdownActions'));
+        jQuery('.bulkCheckbox').on('click', function () {
+          Sample.ui.resetBulkDropdown();
         });
       }
     })).fnSetFilteringDelay();
@@ -1238,16 +1265,22 @@ Sample.ui = {
    * Check all boxes to select all samples.
    */
   checkAll: function (el) {
-    var checkboxes = document.getElementsByClassName('bulkCheckbox');
-    if (el.checked) {
-      for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = true;
+    Sample.ui.resetBulkDropdown();
+    Sample.ui.selectedSampleIds = [];
+    jQuery('.bulkCheckbox').each(function() {
+      this.checked = el.checked;
+      if (this.checked) {
+        var elementId = Number(jQuery(this).attr('elementid'));
+        Sample.ui.selectedSampleIds.push(elementId);
       }
-    } else {
-      for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = false;
-      }
-    }
+    });
+  },
+  
+  resetBulkDropdown: function() {
+    jQuery('#dropdownActions').val('');
+    jQuery('#classDropdown').hide();
+    jQuery('#errors').css('display', 'none');
+    jQuery('#errors').html('');
   },
   
   /**
@@ -1288,7 +1321,7 @@ Sample.ui = {
    * Returns an array of selected IDs
    */
   getSelectedIds: function () {
-	  return Sample.ui.toAdd;
+	  return Sample.ui.selectedSampleIds;
   },
   
   /**
@@ -1428,7 +1461,7 @@ Sample.ui = {
     var selectedSampleClasses = jQuery('#listingSamplesTable').dataTable().fnGetData().filter(function (row) {
       return selectedIds.indexOf(row.id) != -1;
     }).map(function (dtRow) {
-      return Sample.sampleClasses.filter(function (sc) {
+      return Constants.sampleClasses.filter(function (sc) {
         return sc.id == dtRow.sampleClassId;
       });
     });
@@ -1489,9 +1522,9 @@ Sample.ui = {
    * Returns an array of sample classes that correspond to given sample class IDs (of parent samples)
    */
   getChildSampleClasses: function (sampleClasses) {
-    return Sample.sampleClasses.filter(function (childClass) {
+    return Constants.sampleClasses.filter(function (childClass) {
       return sampleClasses.every(function(parentClass) {
-        return Sample.validRelationships.some(function (svr) {
+        return Constants.sampleValidRelationships.some(function (svr) {
           return svr.parentId == parentClass.id && svr.childId == childClass.id && !svr.archived;
         });
       });
@@ -1511,29 +1544,6 @@ Sample.ui = {
       }
     }
     return uniques;
-  },
-
-  /**
-   * AJAX fetch of sample classes
-   */
-  getSampleClasses: function () {
-    jQuery.get('/miso/rest/sampleclasses',
-      function (json) { 
-        Sample.sampleClasses = json; 
-      }
-    );
-  },
-
-  /**
-   * AJAX fetch of sample valid relationships
-   */
-  getSampleValidRelationships: function () {
-    jQuery.get(
-     '/miso/rest/samplevalidrelationships',
-      function (json) { 
-        Sample.validRelationships = json; 
-      }
-    );
   },
   
   // TODO: add library propagation rule-checking here
