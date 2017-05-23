@@ -104,28 +104,52 @@ var Hot = {
    * Custom validator for fields that must contain data
    */
   requiredText: function (value, callback) {
-    return callback(value != undefined && value != null && value != '' && value.length > 0);
+    return callback(!Hot.isEmpty(value));
   },
 
   /**
    * Custom validator for fields that may remain empty
    */
   permitEmpty: function (value, callback) {
-    return callback(value === undefined || value === null || value === '' || value.length > 0);
+    return callback(true);
   },
   
   /**
    * Custom validator for required numeric fields
    */
   requiredNumber: function (value, callback) {
-    return callback(value != undefined && value != null && value != '' && Handsontable.helper.isNumeric(value));
+    return callback(!Hot.isEmpty(value) && Handsontable.helper.isNumeric(value));
+  },
+  
+  /**
+   * Custom validator for text fields that fails on empty or extra-special characters
+   */
+  requiredTextNoSpecialChars: function (value, callback) {
+    return callback(!Hot.isEmpty(value) && Hot.hasNoSpecialChars(value));
   },
   
   /**
    * Custom validator for text fields that fails on extra-special characters
    */
-  noSpecialChars: function (value, callback) {
-    return callback(!/[;'"\\]+/g.test(value) && value != undefined && value != null && value != '' && value.length > 0);
+  optionalTextNoSpecialChars: function (value, callback) {
+    return callback(Hot.isEmpty(value) || Hot.hasNoSpecialChars(value));
+  },
+  
+  /**
+   * Custom validator for alphanumeric text fields
+   */
+  optionalTextAlphanumeric: function (value, callback) {
+    var regex = new RegExp(Utils.validation.alphanumRegex);;
+    return callback(Hot.isEmpty(value) || regex.test(value));
+  },
+  
+  isEmpty: function (value) {
+    return value === undefined || value === null || value === '';
+  },
+  
+  hasNoSpecialChars: function (value) {
+    var regex = new RegExp(Utils.validation.sanitizeRegex);
+    return regex.test(value);
   },
 
   /**
