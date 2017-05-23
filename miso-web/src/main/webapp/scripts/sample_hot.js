@@ -50,11 +50,8 @@ Sample.hot = {
           if (sam.tissueMaterialId) {
             sam.tissueMaterialAlias = Hot.getAliasFromId(sam.tissueMaterialId, Hot.sampleOptions.tissueMaterialsDtos);
           }
-  		    sam.tissueOriginLabel = Hot.sampleOptions.tissueOriginsDtos.filter(function (tod) { return tod.id == sam.tissueOriginId; })[0].label;
-  		    sam.tissueTypeLabel = Hot.sampleOptions.tissueTypesDtos.filter(function (ttd) { return ttd.id == sam.tissueTypeId; })[0].label;
-  		    if (sam.labId) {
-  		      sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
-  		    }
+		  sam.tissueOriginLabel = Hot.sampleOptions.tissueOriginsDtos.filter(function (tod) { return tod.id == sam.tissueOriginId; })[0].label;
+		  sam.tissueTypeLabel = Hot.sampleOptions.tissueTypesDtos.filter(function (ttd) { return ttd.id == sam.tissueTypeId; })[0].label;
         }
         if (Sample.hot.getCategoryFromClassId(sam.sampleClassId) == 'Aliquot') {
           if (sam.samplePurposeId) {

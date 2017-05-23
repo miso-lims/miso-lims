@@ -733,6 +733,7 @@ public class Dtos {
     LabDto dto = new LabDto();
     dto.setId(from.getId());
     dto.setInstituteId(from.getInstitute().getId());
+    dto.setInstituteAlias(from.getInstitute().getAlias());
     dto.setAlias(from.getAlias());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
