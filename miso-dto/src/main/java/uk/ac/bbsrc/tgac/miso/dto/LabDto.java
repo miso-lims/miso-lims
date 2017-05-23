@@ -9,6 +9,7 @@ public class LabDto {
   private String url;
   private Long instituteId;
   private String instituteUrl;
+  private String instituteAlias;
   private String alias;
   private Long createdById;
   private String createdByUrl;
@@ -49,6 +50,14 @@ public class LabDto {
     this.instituteUrl = instituteUrl;
   }
   
+  public String getInstituteAlias() {
+    return instituteAlias;
+  }
+
+  public void setInstituteAlias(String instituteAlias) {
+    this.instituteAlias = instituteAlias;
+  }
+
   public String getAlias() {
     return alias;
   }
