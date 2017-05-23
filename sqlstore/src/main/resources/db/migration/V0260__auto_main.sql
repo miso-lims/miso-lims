@@ -1,3 +1,5 @@
+-- run_refactor
+
 CREATE TABLE RunPacBio(
   runId bigint(20) NOT NULL,
   movieDuration bigint(20),
@@ -51,3 +53,5 @@ ALTER TABLE Run DROP COLUMN imgCycle;
 ALTER TABLE Run DROP COLUMN numCycles;
 ALTER TABLE Run DROP COLUMN scoreCycle;
 DROP TABLE Status;
+
+
