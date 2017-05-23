@@ -1,3 +1,5 @@
+-- collapse_tissues
+-- StartNoTest
 -- StartNoTest
 INSERT INTO SampleClass(alias, sampleCategory, suffix, createdBy, creationDate, updatedBy, lastUpdated, dnaseTreatable)
   VALUES ('Tissue', 'Tissue', NULL, (SELECT userId FROM User WHERE loginName = 'admin'), CURRENT_TIMESTAMP, (SELECT userId FROM User WHERE loginName = 'admin'), CURRENT_TIMESTAMP, FALSE);
@@ -20,3 +22,5 @@ DELETE FROM SampleValidRelationship WHERE parentId IN (SELECT sampleClassId FROM
 
 DELETE FROM SampleClass WHERE sampleCategory = 'Tissue' AND sampleClassId != @tissueId;
 -- EndNoTest
+-- EndNoTest
+
