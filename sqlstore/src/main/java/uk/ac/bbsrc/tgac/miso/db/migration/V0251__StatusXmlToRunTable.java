@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.xml.xpath.XPath;
@@ -25,7 +27,9 @@ import org.xml.sax.InputSource;
  * Run table and the four values from the xml file are copied to the four new columns. The xml filed in the Status table is then deleted.
  *
  */
-public class V0168__StatusXmlToRunTable implements JdbcMigration {
+public class V0251__StatusXmlToRunTable implements JdbcMigration {
+
+  private static final Logger logger = Logger.getLogger(V0251__StatusXmlToRunTable.class.getName());
 
   @Override
   public void migrate(Connection connection) throws Exception {
@@ -39,8 +43,9 @@ public class V0168__StatusXmlToRunTable implements JdbcMigration {
 
   private Map<String, String> getStatusXml(Connection connection) throws SQLException {
     Map<String, String> result = new HashMap<>();
-    PreparedStatement getStatusXml = connection.prepareStatement("SELECT s.runName, s.xml FROM Status AS s WHERE s.xml IS NOT NULL");
-    ResultSet rs = getStatusXml.executeQuery();
+    PreparedStatement statement = connection.prepareStatement("SELECT s.runName, s.xml FROM Status AS s WHERE s.xml IS NOT NULL");
+    logger.log(Level.INFO, String.format("Get status xml: '%s'", statement.toString()));
+    ResultSet rs = statement.executeQuery();
     try {
       while (rs.next()) {
         String key = rs.getString("runName");
@@ -48,7 +53,7 @@ public class V0168__StatusXmlToRunTable implements JdbcMigration {
         result.put(key, value);
       }
     } finally {
-      getStatusXml.close();
+      statement.close();
       rs.close();
     }
     return result;
@@ -63,6 +68,7 @@ public class V0168__StatusXmlToRunTable implements JdbcMigration {
     for (String sql : newColumnSql) {
       PreparedStatement statement = connection.prepareStatement(sql);
       try {
+        logger.log(Level.INFO, String.format("Adding column to run: '%s'", statement.toString()));
         statement.execute();
       } finally {
         statement.close();
@@ -81,6 +87,7 @@ public class V0168__StatusXmlToRunTable implements JdbcMigration {
           statement.setInt(3, e.getValue().getScoreCycle());
           statement.setInt(4, e.getValue().getCallCycle());
           statement.setString(5, e.getKey());
+          logger.log(Level.INFO, String.format("Updating status columns: '%s'", statement.toString()));
           statement.execute();
         } catch (SQLException error) {
           throw new RuntimeException(error.getMessage(), error);
@@ -94,6 +101,7 @@ public class V0168__StatusXmlToRunTable implements JdbcMigration {
   private void deleteXmlColumnFromStatus(Connection connection) throws SQLException {
     PreparedStatement statement = connection.prepareStatement("ALTER TABLE Status DROP COLUMN xml;");
     try {
+      logger.log(Level.INFO, String.format("Dropping xml column: '%s'", statement.toString()));
       statement.execute();
     } finally {
       statement.close();
@@ -130,6 +138,9 @@ public class V0168__StatusXmlToRunTable implements JdbcMigration {
         imgCycle = imgCyclesTemp;
         scoreCycle = scoreCycleTemp;
         callCycle = callCycleTemp;
+        logger.log(Level.INFO,
+            String.format("Read values from xml: numCycles=%d imgCycle=%d scoreCycle=%d, callCycle=%d", numCycles, imgCycle, scoreCycle,
+            callCycle));
       }
     }
 
