@@ -29,7 +29,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.67-oicr-SNAPSHOT</version>
+    <version>0.2.67-oicr</version>
   </parent>
   <artifactId>notification-server</artifactId>
   <packaging>jar</packaging>
