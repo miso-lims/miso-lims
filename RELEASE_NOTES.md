@@ -1,3 +1,9 @@
+# 0.2.67
+
+Changes:
+
+ * Bug fix
+
 # 0.2.66
 
 Changes:
