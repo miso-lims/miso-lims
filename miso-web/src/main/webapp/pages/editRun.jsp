@@ -358,7 +358,7 @@
         </c:forEach>
       </div>
     </c:if>
-    <div id="addRunNoteDialog" title="Create new Note"></div>
+    <div id="addRunNoteDialog" title="Add Container"></div>
   </div>
   <br/>
 </c:if>

@@ -135,7 +135,7 @@
 	      });
 	    </script>
     </c:if>
-    <div id="changeBoxIdBarcodeDialog" title="Change Box Location"></div>
+    <div id="changeBoxLocationBarcodeDialog" title="Change Box Location"></div>
   </div>
   <div id="printServiceSelectDialog" title="Select a Printer"></div>
 </div>
