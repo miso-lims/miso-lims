@@ -29,7 +29,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.67-SNAPSHOT</version>
+    <version>0.2.67</version>
   </parent>
   <artifactId>demo-notification-client</artifactId>
   <packaging>jar</packaging>
