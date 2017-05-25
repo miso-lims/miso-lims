@@ -647,6 +647,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     target.setTubeNumber(source.getTubeNumber());
     target.setExternalInstituteIdentifier(source.getExternalInstituteIdentifier());
     target.setRegion(source.getRegion());
+    target.setTissueMaterial(source.getTissueMaterial());
+    target.setTissueOrigin(source.getTissueOrigin());
+    target.setTissueType(source.getTissueType());
   }
 
   private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source) {

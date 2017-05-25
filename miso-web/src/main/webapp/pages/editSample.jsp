@@ -468,29 +468,15 @@
             <tr>
               <td class="h">Tissue Origin:*</td>
               <td>
-                <c:choose>
-                  <c:when test="${sample.id == 0}">
-                    <miso:select id="tissueOrigin" path="tissueOrigin" items="${tissueOrigins}" itemLabel="itemLabel"
-                        itemValue="id" defaultLabel="SELECT" defaultValue=""/>
-                  </c:when>
-                  <c:otherwise>
-                    ${sample.tissueOrigin.description}
-                  </c:otherwise>
-                </c:choose>
+                 <miso:select id="tissueOrigin" path="tissueOrigin" items="${tissueOrigins}" itemLabel="itemLabel"
+                     itemValue="id" defaultLabel="SELECT" defaultValue=""/>
               </td>
             </tr>
             <tr>
               <td class="h">Tissue Type:*</td>
               <td>
-                <c:choose>
-                  <c:when test="${sample.id == 0}">
-                    <miso:select id="tissueType" path="tissueType" items="${tissueTypes}" itemLabel="itemLabel"
-                        itemValue="id" defaultLabel="SELECT" defaultValue=""/>
-                  </c:when>
-                  <c:otherwise>
-                    ${sample.tissueType.description}
-                  </c:otherwise>
-                </c:choose>
+                 <miso:select id="tissueType" path="tissueType" items="${tissueTypes}" itemLabel="itemLabel"
+                     itemValue="id" defaultLabel="SELECT" defaultValue=""/>
               </td>
             </tr>
             <tr>
