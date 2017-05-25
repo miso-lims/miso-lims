@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -43,9 +41,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "LibrarySelectionType")
-public class LibrarySelectionType implements Comparable<LibrarySelectionType>, Serializable {
-
-  private static final long serialVersionUID = 1L;
+public class LibrarySelectionType implements Comparable<LibrarySelectionType> {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
