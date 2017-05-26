@@ -37,6 +37,7 @@ public class SampleDto implements WritableUrls {
   private String description;
   // Skipped security profile
   private String identificationBarcode;
+  private String locationBarcode;
   private String locationLabel;
   private Long boxId;
   private String sampleType;
@@ -102,6 +103,14 @@ public class SampleDto implements WritableUrls {
   @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  public String getLocationBarcode() {
+    return locationBarcode;
+  }
+
+  public void setLocationBarcode(String locationBarcode) {
+    this.locationBarcode = locationBarcode;
   }
 
   public String getLocationLabel() {
