@@ -1118,6 +1118,9 @@ Sample.hot = {
       if (obj.receivedDate && obj.receivedDate.length) {
         sample.receivedDate = obj.receivedDate;
       }
+      if (obj.locationBarcode && obj.locationBarcode.length) {
+        sample.locationBarcode = obj.locationBarcode;
+      }
 
       // if it's a plain sample, return now.
       if (!Hot.detailedSample) {
@@ -1146,6 +1149,14 @@ Sample.hot = {
       }
       sample.type = Sample.hot.getCategoryFromClassId(sample.sampleClassId);
 
+      if (obj.subprojectId && !obj.subprojectAlias) {
+        sample.subprojectId = obj.subprojectId;
+      } else if (obj.subprojectAlias){
+        sample.subprojectId = Hot.getIdFromAlias(obj.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
+      } else if (document.getElementById('subprojectSelect') && document.getElementById('subprojectSelect').value > 0) {
+        sample.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
+      }
+      
       // if it's an identity, return now.
       if (obj.sampleClassAlias == 'Identity') return sample;
 
@@ -1176,13 +1187,6 @@ Sample.hot = {
       }
       
       // add optional attributes
-      if (obj.subprojectId && !obj.subprojectAlias) {
-        sample.subprojectId = obj.subprojectId;
-      } else if (obj.subprojectAlias){
-        sample.subprojectId = Hot.getIdFromAlias(obj.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
-      } else if (document.getElementById('subprojectSelect') && document.getElementById('subprojectSelect').value > 0) {
-        sample.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
-      }
       if (obj.prepKitAlias && obj.prepKitAlias.length) {
         sample.prepKitId = Hot.getIdFromAlias(obj.prepKitAlias, Sample.hot.kitDescriptorsDtos);
       }

@@ -27,6 +27,7 @@ public class LibraryDto implements WritableUrls {
   private Long libraryStrategyTypeId;
   private Long libraryTypeId;
   private String libraryTypeAlias;
+  private String locationBarcode;
   private String locationLabel;
   private Boolean lowQuality;
   private String name;
@@ -112,6 +113,14 @@ public class LibraryDto implements WritableUrls {
 
   public String getLibraryTypeAlias() {
     return libraryTypeAlias;
+  }
+
+  public String getLocationBarcode() {
+    return locationBarcode;
+  }
+
+  public void setLocationBarcode(String locationBarcode) {
+    this.locationBarcode = locationBarcode;
   }
 
   public Long getLibraryTypeId() {
