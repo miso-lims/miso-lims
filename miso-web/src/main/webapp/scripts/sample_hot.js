@@ -504,8 +504,7 @@ Sample.hot = {
       'sampleClassAlias': sampleClassAlias,
       'parentTissueSampleClassId': rootSampleClassId,
       'strStatus': sampleCategory === 'Stock' ? 'Not Submitted' : null,
-      'scientificName': Sample.hot.sciName,
-      'detailedQcStatusDescription': 'Not Ready'
+      'scientificName': Sample.hot.sciName
     };
   },
 
