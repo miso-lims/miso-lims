@@ -972,6 +972,7 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getDetailedQcStatuses(),
+        renderer: Hot.requiredAutocompleteRenderer,
         include: isDetailed
       },
       {
