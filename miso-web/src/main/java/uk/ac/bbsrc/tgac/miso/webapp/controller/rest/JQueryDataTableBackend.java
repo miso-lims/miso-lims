@@ -71,11 +71,14 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
           sortCol,
           additionalFilters.toArray(filters));
 
-      URI uri = uriBuilder.build().toUri();
+      URI uri = null;
+      if (uriBuilder != null) {
+        uri = uriBuilder.build().toUri();
+      }
       List<Dto> dtos = new ArrayList<>();
       for (Model model : models) {
         Dto dto = asDto(model);
-        if (dto instanceof WritableUrls) {
+        if (dto instanceof WritableUrls && uri != null) {
           ((WritableUrls) dto).writeUrls(uri);
         }
         dtos.add(dto);
