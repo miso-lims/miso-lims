@@ -307,6 +307,7 @@ Library.hot = {
         trimDropdown: false,
         validator: Hot.requiredText,
         source: Library.hot.getDesignCodes(),
+        renderer: Hot.requiredAutocompleteRenderer,
         include: detailedBool
       },
       {

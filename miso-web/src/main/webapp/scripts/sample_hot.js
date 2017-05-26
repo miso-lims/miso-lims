@@ -504,8 +504,7 @@ Sample.hot = {
       'sampleClassAlias': sampleClassAlias,
       'parentTissueSampleClassId': rootSampleClassId,
       'strStatus': sampleCategory === 'Stock' ? 'Not Submitted' : null,
-      'scientificName': Sample.hot.sciName,
-      'detailedQcStatusDescription': 'Not Ready'
+      'scientificName': Sample.hot.sciName
     };
   },
 
@@ -973,6 +972,7 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getDetailedQcStatuses(),
+        renderer: Hot.requiredAutocompleteRenderer,
         include: isDetailed
       },
       {
@@ -1170,6 +1170,9 @@ Sample.hot = {
       }
       if (obj.tissueMaterialAlias && obj.tissueMaterialAlias.length) {
         sample.tissueMaterialId = Hot.getIdFromAlias(obj.tissueMaterialAlias, Hot.sampleOptions.tissueMaterialsDtos);
+      }
+      if (obj.region && obj.region.length) {
+        sample.region = obj.region;
       }
       
       // add optional attributes
