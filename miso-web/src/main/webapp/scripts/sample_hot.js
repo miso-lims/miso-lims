@@ -658,8 +658,9 @@ Sample.hot = {
     } else if (action == 'update') {
       startProgression = endProgression;
     } else {
-      // Start at the category *after* our source type, unless source and target category are the same.
-      startProgression = endProgression;
+      startProgression = progression.indexOf(sourceSampleCategory);
+      // Increment to display columns of next category in progression unless source and target category are the same (happens during
+      // editing or propagation within a category).
       if (progression.indexOf(targetSampleCategory) > progression.indexOf(sourceSampleCategory)) {
         startProgression += 1;
       }
@@ -668,9 +669,7 @@ Sample.hot = {
     for (i = startProgression; i <= endProgression && i != -1; i++) {
       show[progression[i]] = true;
     }
-  	// If we aren't starting or finished with a tissue processing, hide those
-  	// columns since we don't really want to show tissue processing unless the
-  	// user specifically requested it.
+  	// If we aren't starting or finished with a tissue processing, hide those columns.
   	if (sourceSampleCategory != 'Tissue Processing' && targetSampleCategory != 'Tissue Processing') {
       show['Tissue Processing'] = false;
     }
