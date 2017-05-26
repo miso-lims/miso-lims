@@ -1171,6 +1171,9 @@ Sample.hot = {
       if (obj.tissueMaterialAlias && obj.tissueMaterialAlias.length) {
         sample.tissueMaterialId = Hot.getIdFromAlias(obj.tissueMaterialAlias, Hot.sampleOptions.tissueMaterialsDtos);
       }
+      if (obj.region && obj.region.length) {
+        sample.region = obj.region;
+      }
       
       // add optional attributes
       if (obj.subprojectId && !obj.subprojectAlias) {

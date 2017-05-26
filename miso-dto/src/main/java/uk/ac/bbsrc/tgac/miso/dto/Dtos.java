@@ -800,6 +800,11 @@ public class Dtos {
       tissueMaterial.setId(from.getTissueMaterialId());
       to.setTissueMaterial(tissueMaterial);
     }
+    if (from.getLabId() != null) {
+      Lab lab = new LabImpl();
+      lab.setId(from.getLabId());
+      to.setLab(lab);
+    }
     return to;
   }
 
