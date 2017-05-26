@@ -512,8 +512,7 @@ Run.ui = {
 
   addContainerByBarcode: function (runId) {
     jQuery('#addContainerDialog')
-      .html("<form><p>Adding a container now will lose any unsaved changes to the run information above!</p>" +
-            "<p>If there are no unsaved changes or you wish to continue anyway, enter the container's barcode below.</p>" +
+      .html("<form><p>Adding a container will lose any unsaved changes!</p>" +
             "<fieldset class='dialog'>" +
             "<label for='containerBarcode'></label>" +
             "<input type='text' name='containerBarcode' id='containerBarcode' class='text ui-widget-content ui-corner-all' />" +
