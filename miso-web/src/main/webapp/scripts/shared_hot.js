@@ -416,23 +416,27 @@ var Hot = {
     if (xhr.status >= 500 || responseText.detail == undefined) {
       Hot.messages.failed.push("<b>Row " + (rowIndex + 1) + ": Something went terribly wrong. Please file a ticket with a screenshot or "
           + "copy-paste of the data that you were trying to save.</b>");
+    }
+    var allColumnData = Hot.getValues('data', Hot.colConf);
+    var column, columnIndex;
+    if (responseText.data && responseText.data.constraintName) {
+      // if a column's constraint was violated, extract it here
+      column = responseText.data.constraintName;
+      columnIndex = allColumnData.indexOf(column);
+    }
+    console.log(rowIndex, columnIndex);
+    if (rowIndex !== undefined && columnIndex !== -1 && columnIndex !== undefined) {
+      Hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
+    }
+    // process error message if it was a SQL violation, and add any errors to the messages array
+    var reUserMessage = /could not execute .*?: (.*)/;
+    var extraCVEMessage = /(.*)ConstraintViolationException: (.*)/;
+    var errorMessage1 = responseText.detail.replace(reUserMessage, "$1");
+    var finalErrorMessage = errorMessage1.replace(extraCVEMessage, "$2");
+    if (xhr.status >= 500) {
+      // replace the generic "something went terribly wrong" message with the known and detailed exception message
+      Hot.messages.failed[Hot.messages.failed.length-1] = "Row " + (rowIndex + 1) + ": " + finalErrorMessage;
     } else {
-      var allColumnData = Hot.getValues('data', Hot.colConf);
-      var column, columnIndex;
-      if (responseText.data && responseText.data.constraintName) {
-        // if a column's constraint was violated, extract it here
-        column = responseText.data.constraintName;
-        columnIndex = allColumnData.indexOf(column);
-      }
-      console.log(rowIndex, columnIndex);
-      if (rowIndex !== undefined && columnIndex !== -1 && columnIndex !== undefined) {
-        Hot.hotTable.setCellMeta(rowIndex, columnIndex, 'valid', false);
-      }
-      // process error message if it was a SQL violation, and add any errors to the messages array
-      var reUserMessage = /could not execute .*?: (.*)/;
-      var extraCVEMessage = /(.*)ConstraintViolationException: (.*)/;
-      var errorMessage1 = responseText.detail.replace(reUserMessage, "$1");
-      var finalErrorMessage = errorMessage1.replace(extraCVEMessage, "$2");
       Hot.messages.failed.push("Row "+ (rowIndex + 1) +": "+ finalErrorMessage);
     }
     Hot.addSuccessesAndErrors();
