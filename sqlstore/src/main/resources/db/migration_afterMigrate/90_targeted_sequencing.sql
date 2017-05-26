@@ -71,6 +71,7 @@ CALL addTargetedSequencing('xGen Lockdown AML','GSLE Legacy','Kapa Hyper Prep Pl
 CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5', 'Human all exon V5', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
 CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5 + UTRs', 'Human all exon V5 + UTRs', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
 CALL addTargetedSequencing('Agilent SureSelect Human All Exon V6', 'Human all exon V6', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
+CALL addTargetedSequencing('Agilent SureSelect Human All Exon V6', 'Human all exon V6', 'QXT', 0);
 CALL addTargetedSequencing('Agilent SureSelect Human All Exon V6 Cosmic', 'Human all exon V6 Cosmic', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
 
 CALL addTargetedSequencing('Agilent HaloPlex AML', 'Residual Disease Monitoring', 'HALO', 0);
