@@ -73,6 +73,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -92,6 +94,8 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
+import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
@@ -131,6 +135,11 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private KitService kitService;
   @Autowired
   private PoolService poolService;
+
+  @Autowired
+  private TissueTypeService tissueTypeService;
+  @Autowired
+  private TissueOriginService tissueOriginService;
 
   @Autowired
   private SequencingParametersDao sequencingParametersDao;
@@ -560,6 +569,22 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       @Override
       public BoxSize resolveById(long id) throws Exception {
         return sqlBoxDAO.getSizeById(id);
+      }
+
+    }.register(binder);
+    new BindingConverterById<TissueType>(TissueType.class) {
+
+      @Override
+      public TissueType resolveById(long id) throws Exception {
+        return tissueTypeService.get(id);
+      }
+
+    }.register(binder);
+    new BindingConverterById<TissueOrigin>(TissueOrigin.class) {
+
+      @Override
+      public TissueOrigin resolveById(long id) throws Exception {
+        return tissueOriginService.get(id);
       }
 
     }.register(binder);

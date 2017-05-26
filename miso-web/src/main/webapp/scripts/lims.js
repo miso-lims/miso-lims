@@ -80,7 +80,6 @@ var Utils = Utils || {
   createToggleColumn: function(nameOfList) {
     var list = eval(nameOfList);
     var className = nameOfList.replace(/\./g, '');
-    Utils.registerShiftPressedListener(window); // Used to detect range selection
     return {
         "sTitle": "",
         "mData": "id",
@@ -89,15 +88,14 @@ var Utils = Utils || {
           var checked = list.indexOf(data) > -1;
 
           return "<input id=\"" + data + "_" + className + "\" class=\"" + className + " bulkCheckbox\" elementId=\"" + data
-              + "\" type=\"checkbox\" onchange=\"Utils.toggleListRange(this.checked, " + data + ", " + nameOfList + ", '" + className
+              + "\" type=\"checkbox\" onclick=\"Utils.toggleListRange(this.checked, event, " + data + ", " + nameOfList + ", '" + className
               + "')\"" + (checked ? " checked=\"checked\"" : "") + ">";
         }
     };
   },
 
-  toggleListRange: function(state, id, list, className) {
-	if(!window.shiftKey) {
-		window.shiftKey=false;
+  toggleListRange: function(state, ev, id, list, className) {
+	if(!ev.shiftKey) {
 		if(state) {
 		   list.lastSingleSelect = id + "_" + className; // Record last click for range selection
 		}
@@ -149,17 +147,6 @@ var Utils = Utils || {
       }
     }
   },
-  
-  registerShiftPressedListener: function (list) {
-	  list.shiftKey = false; 
-	  jQuery(document).ready(function () {
-		  jQuery(document).off("keydown keyup");
-		  jQuery(document).on("keydown keyup", function (e) {
-			  list.shiftKey = e.shiftKey;
-		  });
-	  });
-  },
-
 
 };
 

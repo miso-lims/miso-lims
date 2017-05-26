@@ -63,6 +63,11 @@ Library.hot = {
       }
       if (!lib.index1Label) lib.index1Label = '';
       if (!lib.index2Label) lib.index2Label = '';
+      
+      if (lib.qcPassed === true) lib.qcPassed = 'True';
+      else if (lib.qcPassed === false) lib.qcPassed = 'False';
+      else lib.qcPassed = 'Unknown';
+      
       return lib;
     });
   },
@@ -307,6 +312,7 @@ Library.hot = {
         trimDropdown: false,
         validator: Hot.requiredText,
         source: Library.hot.getDesignCodes(),
+        renderer: Hot.requiredAutocompleteRenderer,
         include: detailedBool
       },
       {
@@ -389,7 +395,7 @@ Library.hot = {
         data: 'qcPassed',
         type: 'dropdown',
         trimDropdown: false,
-        source: ['unknown', 'true', 'false'],
+        source: ['Unknown', 'True', 'False'],
         include: true
       },
       {
@@ -679,6 +685,9 @@ Library.hot = {
       if (obj.qcQPcr) {
         lib.qcQPcr = obj.qcQPcr;
       }
+      if (obj.locationBarcode && obj.locationBarcode.length) {
+        lib.locationBarcode = obj.locationBarcode;
+      }
 
       if (Hot.detailedSample) {
         lib.type = 'Detailed';
@@ -702,13 +711,12 @@ Library.hot = {
         lib.type = 'Plain';
       }
 
-      if (obj.qcPassed === 'true') {
+      if (obj.qcPassed === 'True') {
         lib.qcPassed = true;
-      } else if (obj.qcPassed === 'false') {
+      } else if (obj.qcPassed === 'False') {
         lib.qcPassed = false;
       }
 
-      // TODO: add qcCols
     } catch (e) {
       console.log(e);
       return null;

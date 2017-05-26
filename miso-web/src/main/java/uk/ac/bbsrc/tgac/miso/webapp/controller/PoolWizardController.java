@@ -65,11 +65,6 @@ public class PoolWizardController {
     this.requestManager = requestManager;
   }
 
-  @ModelAttribute("studyTypes")
-  public Collection<StudyType> populateStudyTypes() throws IOException {
-    return studyService.listTypes();
-  }
-
   @ModelAttribute("platformNames")
   public Collection<String> populatePlatformNames() throws IOException {
     List<String> types = new ArrayList<>(PlatformType.platformTypeNames(requestManager.listActivePlatformTypes()));

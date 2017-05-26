@@ -35,11 +35,11 @@ public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue
   @JoinColumn(name = "tissueMaterialId")
   private TissueMaterial tissueMaterial;
 
-  @OneToOne(targetEntity = TissueOriginImpl.class)
+  @OneToOne(targetEntity = TissueOriginImpl.class, optional = false)
   @JoinColumn(name = "tissueOriginId")
   private TissueOrigin tissueOrigin;
 
-  @OneToOne(targetEntity = TissueTypeImpl.class)
+  @OneToOne(targetEntity = TissueTypeImpl.class, optional = false)
   @JoinColumn(name = "tissueTypeId")
   private TissueType tissueType;
 

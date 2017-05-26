@@ -37,7 +37,8 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run> {
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "lastModifier", "derivedInfo.creator");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "lastModifier", "derivedInfo.creator",
+      "sequencerReference", "sequencerReference.platform");
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateRunDao.class);
 
@@ -335,7 +336,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public String propertyForSortColumn(String original) {
     if ("lastModified".equals(original)) return "derivedInfo.lastModified";
-    if ("lastUpdated".equals(original)) return "lastUpdated";
+    if ("platformType".equals(original)) return "platform.platformType";
     return original;
 
   }
@@ -369,7 +370,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("platformType", platformType));
+    criteria.add(Restrictions.eq("platform.platformType", platformType));
   }
 
   @Override

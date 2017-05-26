@@ -60,7 +60,7 @@
           <tbody>
           <tr>
             <td>Study Type:</td>
-            <td><miso:select id="studyType" path="studyType" items="${studyTypes}" itemLabel="name" itemValue="id" /></td>
+            <td><select id="studyType" name="studyType">${studyTypes}</select></td>
           </tr>
           <tr>
             <td>Study Description:</td>

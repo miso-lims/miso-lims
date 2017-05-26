@@ -504,8 +504,7 @@ Sample.hot = {
       'sampleClassAlias': sampleClassAlias,
       'parentTissueSampleClassId': rootSampleClassId,
       'strStatus': sampleCategory === 'Stock' ? 'Not Submitted' : null,
-      'scientificName': Sample.hot.sciName,
-      'detailedQcStatusDescription': 'Not Ready'
+      'scientificName': Sample.hot.sciName
     };
   },
 
@@ -658,8 +657,9 @@ Sample.hot = {
     } else if (action == 'update') {
       startProgression = endProgression;
     } else {
-      // Start at the category *after* our source type, unless source and target category are the same.
-      startProgression = endProgression;
+      startProgression = progression.indexOf(sourceSampleCategory);
+      // Increment to display columns of next category in progression unless source and target category are the same (happens during
+      // editing or propagation within a category).
       if (progression.indexOf(targetSampleCategory) > progression.indexOf(sourceSampleCategory)) {
         startProgression += 1;
       }
@@ -668,9 +668,7 @@ Sample.hot = {
     for (i = startProgression; i <= endProgression && i != -1; i++) {
       show[progression[i]] = true;
     }
-  	// If we aren't starting or finished with a tissue processing, hide those
-  	// columns since we don't really want to show tissue processing unless the
-  	// user specifically requested it.
+  	// If we aren't starting or finished with a tissue processing, hide those columns.
   	if (sourceSampleCategory != 'Tissue Processing' && targetSampleCategory != 'Tissue Processing') {
       show['Tissue Processing'] = false;
     }
@@ -974,6 +972,7 @@ Sample.hot = {
         type: 'dropdown',
         trimDropdown: false,
         source: Sample.hot.getDetailedQcStatuses(),
+        renderer: Hot.requiredAutocompleteRenderer,
         include: isDetailed
       },
       {
@@ -1119,6 +1118,9 @@ Sample.hot = {
       if (obj.receivedDate && obj.receivedDate.length) {
         sample.receivedDate = obj.receivedDate;
       }
+      if (obj.locationBarcode && obj.locationBarcode.length) {
+        sample.locationBarcode = obj.locationBarcode;
+      }
 
       // if it's a plain sample, return now.
       if (!Hot.detailedSample) {
@@ -1147,6 +1149,14 @@ Sample.hot = {
       }
       sample.type = Sample.hot.getCategoryFromClassId(sample.sampleClassId);
 
+      if (obj.subprojectId && !obj.subprojectAlias) {
+        sample.subprojectId = obj.subprojectId;
+      } else if (obj.subprojectAlias){
+        sample.subprojectId = Hot.getIdFromAlias(obj.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
+      } else if (document.getElementById('subprojectSelect') && document.getElementById('subprojectSelect').value > 0) {
+        sample.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
+      }
+      
       // if it's an identity, return now.
       if (obj.sampleClassAlias == 'Identity') return sample;
 
@@ -1172,15 +1182,11 @@ Sample.hot = {
       if (obj.tissueMaterialAlias && obj.tissueMaterialAlias.length) {
         sample.tissueMaterialId = Hot.getIdFromAlias(obj.tissueMaterialAlias, Hot.sampleOptions.tissueMaterialsDtos);
       }
+      if (obj.region && obj.region.length) {
+        sample.region = obj.region;
+      }
       
       // add optional attributes
-      if (obj.subprojectId && !obj.subprojectAlias) {
-        sample.subprojectId = obj.subprojectId;
-      } else if (obj.subprojectAlias){
-        sample.subprojectId = Hot.getIdFromAlias(obj.subprojectAlias, Hot.sampleOptions.subprojectsDtos);
-      } else if (document.getElementById('subprojectSelect') && document.getElementById('subprojectSelect').value > 0) {
-        sample.subprojectId = parseInt(document.getElementById('subprojectSelect').value);
-      }
       if (obj.prepKitAlias && obj.prepKitAlias.length) {
         sample.prepKitId = Hot.getIdFromAlias(obj.prepKitAlias, Sample.hot.kitDescriptorsDtos);
       }

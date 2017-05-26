@@ -276,6 +276,7 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
+    dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     dto.setSampleType(from.getSampleType());
@@ -602,8 +603,8 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       to.setIdentificationBarcode(from.getIdentificationBarcode());
     }
-    if (!isStringEmptyOrNull(from.getLocationLabel())) {
-      to.setLocationBarcode(from.getLocationLabel());
+    if (!isStringEmptyOrNull(from.getLocationBarcode())) {
+      to.setLocationBarcode(from.getLocationBarcode());
     }
     to.setSampleType(from.getSampleType());
     if (from.getReceivedDate() != null) {
@@ -799,6 +800,11 @@ public class Dtos {
       TissueMaterial tissueMaterial = new TissueMaterialImpl();
       tissueMaterial.setId(from.getTissueMaterialId());
       to.setTissueMaterial(tissueMaterial);
+    }
+    if (from.getLabId() != null) {
+      Lab lab = new LabImpl();
+      lab.setId(from.getLabId());
+      to.setLab(lab);
     }
     return to;
   }
@@ -1049,6 +1055,7 @@ public class Dtos {
     if (from.getLibraryQCs() != null && !from.getLibraryQCs().isEmpty()) {
       dto.setQcs(asLibraryQcDtos(from.getLibraryQCs()));
     }
+    dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     return dto;
@@ -1114,6 +1121,7 @@ public class Dtos {
     }
     to.setVolume(from.getVolume());
     to.setDnaSize(from.getDnaSize());
+    to.setLocationBarcode(from.getLocationBarcode());
 
     if (from.getQcs() != null && !from.getQcs().isEmpty()) {
       for (LibraryQcDto qcDto : from.getQcs()) {
