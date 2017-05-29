@@ -18,7 +18,6 @@ public class DetailedSampleDto extends SampleDto {
   private String detailedQcStatusNote;
   private Long subprojectId;
   private String subprojectUrl;
-  private Long prepKitId;
   private String prepKitUrl;
   private String groupId;
   private String groupDescription;
@@ -108,14 +107,6 @@ public class DetailedSampleDto extends SampleDto {
     this.sampleClassUrl = sampleClassUrl;
   }
 
-  public Long getPrepKitId() {
-    return prepKitId;
-  }
-
-  public void setPrepKitId(Long prepKitId) {
-    this.prepKitId = prepKitId;
-  }
-
   public String getPrepKitUrl() {
     return prepKitUrl;
   }
@@ -192,9 +183,6 @@ public class DetailedSampleDto extends SampleDto {
     }
     if (getSubprojectId() != null) {
       setSubprojectUrl(WritableUrls.buildUriPath(baseUri, "/rest/subproject/{id}", getSubprojectId()));
-    }
-    if (getPrepKitId() != null) {
-      setPrepKitUrl(WritableUrls.buildUriPath(baseUri, "/rest/kitdescriptor/{id}", getPrepKitId()));
     }
     if (getParentId() != null) {
       setParentUrl(WritableUrls.buildUriPath(baseUri, "/rest/sample/{id}", getParentId()));
