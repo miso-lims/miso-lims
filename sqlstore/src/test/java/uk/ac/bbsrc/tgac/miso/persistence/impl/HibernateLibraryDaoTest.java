@@ -331,7 +331,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   @Test
   public void testListAllLibrarySelectionTypes() throws Exception {
     List<LibrarySelectionType> librarySelectionTypes = dao.listAllLibrarySelectionTypes();
-    assertTrue(librarySelectionTypes.size() > 0);
+    assertEquals(2, librarySelectionTypes.size());
   }
 
   @Test
