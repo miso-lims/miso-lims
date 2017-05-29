@@ -275,7 +275,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   @Test
   public void testGetLibraryTypeByDescriptionAndPlatform() throws Exception {
     LibraryType libraryTypeByDescriptionAndPlatform = dao.getLibraryTypeByDescriptionAndPlatform("8kbp Paired End", PlatformType.LS454);
-    assertEquals(Long.valueOf(8), libraryTypeByDescriptionAndPlatform.getId());
+    assertEquals(Long.valueOf(4), libraryTypeByDescriptionAndPlatform.getId());
     assertEquals(PlatformType.LS454, libraryTypeByDescriptionAndPlatform.getPlatformType());
     assertEquals("8kbp Paired End", libraryTypeByDescriptionAndPlatform.getDescription());
   }
@@ -324,20 +324,20 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   @Test
   public void testListAllLibraryTypes() throws Exception {
     List<LibraryType> libraryTypes = dao.listAllLibraryTypes();
-    assertEquals(18, libraryTypes.size());
+    assertEquals(10, libraryTypes.size());
 
   }
 
   @Test
   public void testListAllLibrarySelectionTypes() throws Exception {
     List<LibrarySelectionType> librarySelectionTypes = dao.listAllLibrarySelectionTypes();
-    assertEquals(25, librarySelectionTypes.size());
+    assertEquals(2, librarySelectionTypes.size());
   }
 
   @Test
   public void testListAllLibraryStrategyTypes() throws Exception {
     List<LibraryStrategyType> libraryStrategyTypes = dao.listAllLibraryStrategyTypes();
-    assertEquals(20, libraryStrategyTypes.size());
+    assertEquals(3, libraryStrategyTypes.size());
   }
 
 }
