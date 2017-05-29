@@ -38,7 +38,6 @@ Sample.hot = {
         if (sam.tissueOriginId) sam.tissueOriginLabel = Hot.sampleOptions.tissueOriginsDtos.filter(function (tod) { return tod.id == sam.tissueOriginId; })[0].label;
         if (sam.tissueTypeId) sam.tissueTypeLabel = Hot.sampleOptions.tissueTypesDtos.filter(function (ttd) { return ttd.id == sam.tissueTypeId; })[0].label;
         if (sam.labId) sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
-        if (sam.prepKitId) sam.prepKitAlias = Hot.getAliasFromId(sam.prepKitId, Hot.sampleOptions.kitDescriptorsDtos);
         if (sam.subprojectId) sam.subprojectAlias = Hot.getAliasFromId(sam.subprojectId, Hot.sampleOptions.subprojectsDtos);
         if (sam.detailedQcStatusId) {
           sam.detailedQcStatusDescription = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(sam.detailedQcStatusId), Hot.sampleOptions.detailedQcStatusesDtos), 'description');
@@ -461,8 +460,6 @@ Sample.hot = {
     subprojectAlias: null,
     labId: null,
     labComposite: null,
-    prepKitId: null,
-    prepKitAlias: null,
     concentration: null,
     detailedQcStatusId: null,
     detailedQcStatusDescription: null,
@@ -601,15 +598,6 @@ Sample.hot = {
    */
   getLabs: function () {
     return Hot.sortByProperty(Hot.sampleOptions.labsDtos,'alias').map(function (lab) { return lab.alias +' - '+ lab.instituteAlias; });
-  },
-
-  /**
-   * Gets array of kit descriptor names(detailed sample only)
-   */
-  getKitDescriptors: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.kitDescriptorsDtos, 'manufacturer')
-      .filter(function (kit) { return kit.kitType == 'Extraction'; })
-      .map(function (kit) { return kit.name; });
   },
   
   /**
@@ -921,17 +909,6 @@ Sample.hot = {
         source: [ 'true', 'false' ],
         include: show['Stock'] && sampleClass.dnaseTreatable
       },
-      
-      // Aliquot columns
-      {
-        header: 'Kit',
-        data: 'prepKitAlias',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getKitDescriptors(),
-        validator: Hot.permitEmpty,
-        include: show['Aliquot']
-      },
 
       // QC columns
       {
@@ -985,7 +962,6 @@ Sample.hot = {
         readOnly: true,
         include: isDetailed
       },
-
 
       // Aliquot columns
       {
@@ -1185,9 +1161,6 @@ Sample.hot = {
       }
       
       // add optional attributes
-      if (obj.prepKitAlias && obj.prepKitAlias.length) {
-        sample.prepKitId = Hot.getIdFromAlias(obj.prepKitAlias, Sample.hot.kitDescriptorsDtos);
-      }
       if (obj.parentId) {
         sample.parentId = obj.parentId;
       } else if (obj.parentTissueSampleClassAlias) {
