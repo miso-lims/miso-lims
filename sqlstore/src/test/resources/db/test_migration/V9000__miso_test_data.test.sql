@@ -221,6 +221,30 @@ VALUES (1, 1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:47'),
 (18, 16, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:19'),
 (19, 17, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:21');
 
+DELETE FROM `LibraryType`;
+INSERT INTO LibraryType (`libraryTypeId`,`description`,`platformType`,`archived`)
+VALUES (1,'Paired End','ILLUMINA', 0),
+(2, 'cDNA','PACBIO',0),
+(3,'mRNA Seq','ILLUMINA',0),
+(4,'8kbp Paired End','LS454',0),
+(5,'Rapid Shotgun','LS454',0),
+(6,'Small RNA','SOLID',1),
+(7,'Whole Transcriptome','SOLID',1),
+(8,'SAGE','SOLID',1),
+(9,'Long Mate Pair','SOLID',1),
+(10,'Fragment','SOLID',1);
+
+DELETE FROM `LibrarySelectionType`;
+INSERT INTO `LibrarySelectionType` (`librarySelectionTypeId`,`name`,`description`)
+VALUES (1,'RT-PCR','Source material was selected by reverse transcription PCR'),
+(10,'ChIP','Chromatin Immunoprecipitation');
+
+DELETE FROM `LibraryStrategyType`;
+INSERT INTO `LibraryStrategyType` (`libraryStrategyTypeId`,`name`,`description`)
+VALUES (1,'WGS','Whole genome shotgun'),
+(12,'EST','Single pass sequencing of cDNA templates'),
+(14,'CTS','Concatenated Tag Sequencing');
+
 DELETE FROM `Library`;
 INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `securityProfile_profileId`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`)
 VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,'true',1),
