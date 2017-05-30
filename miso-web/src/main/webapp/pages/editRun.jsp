@@ -303,7 +303,7 @@
     </div>
   </c:if>
 
-  <c:if test="${run.health.key ne 'Failed' and run.health.key ne 'Stopped' and metrixEnabled and miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
+  <c:if test="${run.health.key ne 'Stopped' and metrixEnabled and miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>
