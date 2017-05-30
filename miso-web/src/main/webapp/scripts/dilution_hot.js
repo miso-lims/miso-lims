@@ -121,6 +121,7 @@ var Dilution = {
         {
           header: 'Matrix Barcode',
           data: 'identificationBarcode',
+          validator: Hot.optionalTextNoSpecialChars,
           readOnly: (Hot.autoGenerateIdBarcodes ? true : false),
           include: true
         },
