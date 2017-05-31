@@ -708,7 +708,7 @@ Project.overview = {
             "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
             "<br/>" +
             "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />" +
             "</fieldset></form>");
 
     jQuery('#addProjectOverviewNoteDialog').dialog({
@@ -717,8 +717,12 @@ Project.overview = {
       resizable: false,
       buttons: {
         "Add Note": function () {
-          self.addProjectOverviewNote(overviewId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
-          jQuery(this).dialog('close');
+          if (jQuery('#notetext').val().length > 0) {
+            self.addProjectOverviewNote(overviewId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            jQuery(this).dialog('close');
+          } else {
+            jQuery('#notetext').focus();
+          }
         },
         "Cancel": function () {
           jQuery(this).dialog('close');
