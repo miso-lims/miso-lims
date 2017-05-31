@@ -385,8 +385,7 @@ Run.ui = {
           "mRender": function (data, type, full) {
             return (data ? data : "");
           },
-          "iSortPriority": 0,
-          "bSortable": false // status, start date and end date are pulled via status dao, not via run dao
+          "iSortPriority": 0
         },
         {
           "sTitle": "Start Date",
@@ -394,8 +393,7 @@ Run.ui = {
           "mRender": function (data, type, full) {
             return (data ? data : "");
           },
-          "iSortPriority": 0,
-          "bSortable": false
+          "iSortPriority": 2
         },
         {
           "sTitle": "End Date",
@@ -403,8 +401,7 @@ Run.ui = {
           "mRender": function (data, type, full) {
             return (data ? data : "");
           },
-          "iSortPriority": 0,
-          "bSortable": false
+          "iSortPriority": 0
         },
         {
           "sTitle": "Type",
@@ -412,9 +409,9 @@ Run.ui = {
           "iSortPriority": 0
         },
         {
-            "sTitle": "Last Modified",
-            "mData": "lastModified",
-          "iSortPriority": 2,
+          "sTitle": "Last Modified",
+          "mData": "lastModified",
+          "iSortPriority": 0,
           "bVisible": (Sample.detailedSample ? "true" : "false")
         }
       ],

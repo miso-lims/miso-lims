@@ -337,6 +337,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   public String propertyForSortColumn(String original) {
     if ("lastModified".equals(original)) return "derivedInfo.lastModified";
     if ("platformType".equals(original)) return "platform.platformType";
+    if ("status".equals(original)) return "health";
+    if ("endDate".equals(original)) return "completionDate";
     return original;
 
   }
