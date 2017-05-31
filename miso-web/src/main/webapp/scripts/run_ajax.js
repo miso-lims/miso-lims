@@ -385,8 +385,7 @@ Run.ui = {
           "mRender": function (data, type, full) {
             return (data ? data : "");
           },
-          "iSortPriority": 0,
-          "bSortable": false // status, start date and end date are pulled via status dao, not via run dao
+          "iSortPriority": 0
         },
         {
           "sTitle": "Start Date",
@@ -394,8 +393,7 @@ Run.ui = {
           "mRender": function (data, type, full) {
             return (data ? data : "");
           },
-          "iSortPriority": 0,
-          "bSortable": false
+          "iSortPriority": 2
         },
         {
           "sTitle": "End Date",
@@ -403,8 +401,7 @@ Run.ui = {
           "mRender": function (data, type, full) {
             return (data ? data : "");
           },
-          "iSortPriority": 0,
-          "bSortable": false
+          "iSortPriority": 0
         },
         {
           "sTitle": "Type",
@@ -412,9 +409,9 @@ Run.ui = {
           "iSortPriority": 0
         },
         {
-            "sTitle": "Last Modified",
-            "mData": "lastModified",
-          "iSortPriority": 2,
+          "sTitle": "Last Modified",
+          "mData": "lastModified",
+          "iSortPriority": 0,
           "bVisible": (Sample.detailedSample ? "true" : "false")
         }
       ],
@@ -458,7 +455,7 @@ Run.ui = {
             "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
             "<br/>" +
             "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />" +
             "</fieldset></form>");
 
     jQuery('#addRunNoteDialog').dialog({
@@ -467,8 +464,12 @@ Run.ui = {
       resizable: false,
       buttons: {
         "Add Note": function () {
-          self.addRunNote(runId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
-          jQuery(this).dialog('close');
+          if (jQuery('#notetext').val().length > 0) {
+            self.addRunNote(runId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            jQuery(this).dialog('close');
+          } else {
+            jQuery('#notetext').focus();
+          }
         },
         "Cancel": function () {
           jQuery(this).dialog('close');

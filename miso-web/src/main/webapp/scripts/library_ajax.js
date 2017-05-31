@@ -1010,7 +1010,7 @@ Library.ui = {
             "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
             "<br/>" +
             "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />" +
             "</fieldset></form>");
 
     jQuery('#addLibraryNoteDialog').dialog({
@@ -1019,8 +1019,12 @@ Library.ui = {
       resizable: false,
       buttons: {
         "Add Note": function () {
-          self.addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
-          jQuery(this).dialog('close');
+          if (jQuery('#notetext').val().length > 0) {
+            self.addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            jQuery(this).dialog('close');
+          } else {
+            jQuery('#notetext').focus();
+          }
         },
         "Cancel": function () {
           jQuery(this).dialog('close');
@@ -1262,17 +1266,13 @@ Library.ui = {
     })).fnSetFilteringDelay();
   },
 
+  /**
+   * Check all boxes to select all libraries on the page.
+   */
   checkAll: function (el) {
-    var checkboxes = document.getElementsByClassName('bulkCheckbox');
-    if (el.checked) {
-      for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = true;
-      }
-    } else {
-      for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = false;
-      }
-    }
+    jQuery('.bulkCheckbox').each(function() {
+      this.checked = el.checked;
+    })
   },
   
   handleBulkAction: function () {
@@ -1289,6 +1289,12 @@ Library.ui = {
   
   // get array of selected IDs
   getSelectedIds: function () {
+    jQuery('.bulkCheckbox').each(function() {
+      if (this.checked) {
+        var elementId = Number(jQuery(this).attr('elementid'));
+        Library.ui.toAdd.push(elementId);
+      }
+    });
 	  return Library.ui.toAdd;
   },
   

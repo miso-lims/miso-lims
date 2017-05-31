@@ -63,7 +63,7 @@
         <role>Administrator</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>tdebat</id>
@@ -75,7 +75,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>amasella</id>
@@ -87,7 +87,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>dcooke</id>
@@ -99,7 +99,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>harmstrong</id>
@@ -111,7 +111,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
   <modules>
@@ -135,7 +135,7 @@
     <connection>scm:git:https://www.github.com/oicr-gsi/miso-lims</connection>
     <developerConnection>scm:git:git@github.com:oicr-gsi/miso-lims</developerConnection>
     <url>http://www.github.com/oicr-gsi/miso-lims</url>
-    <tag>v0.2.58</tag>
+    <tag>v0.2.69</tag>
   </scm>
   <!-- Bug Tracker -->
   <issueManagement>

@@ -181,7 +181,7 @@
     </td>
   </tr>
   <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.PacBioRun')}">
-    <c:if test="${pacBioDashboardUrl != null}">
+    <c:if test="${pacBioDashboardUrl != null && run.id != 0}">
       <tr>
         <td>PacBio Dashboard:</td>
         <td><span id="pbDashLink"></span></td>
@@ -193,7 +193,7 @@
       </tr>
     </c:if>
     <tr>
-      <td>Movie Duration:</td>
+      <td>Movie Duration (minutes):</td>
       <td><form:input path="movieDuration" class="validateable"/></td>
     </tr>
     <tr>
@@ -303,7 +303,7 @@
     </div>
   </c:if>
 
-  <c:if test="${not empty run.metrics}">
+  <c:if test="${run.health.key ne 'Stopped' and metrixEnabled and miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>
@@ -314,7 +314,7 @@
   </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      Stats.getInterOpMetrics('${run.alias}', '${run.metrics}');
+      Stats.getInterOpMetrics('${run.alias}', 'Illumina');
     });
   </script>
   </c:if>

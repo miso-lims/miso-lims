@@ -38,7 +38,7 @@ import com.eaglegenomics.simlims.core.User;
 public class PacBioRun extends Run {
   private static final long serialVersionUID = 1L;
 
-  private Long movieDuration;
+  private Integer movieDuration;
 
   private String wellName;
 
@@ -69,11 +69,11 @@ public class PacBioRun extends Run {
     this.creationDate = creationDate;
   }
 
-  public Long getMovieDuration() {
+  public Integer getMovieDuration() {
     return movieDuration;
   }
 
-  public void setMovieDuration(Long movieDuration) {
+  public void setMovieDuration(Integer movieDuration) {
     this.movieDuration = movieDuration;
   }
 

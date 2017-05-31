@@ -38,7 +38,6 @@ Sample.hot = {
         if (sam.tissueOriginId) sam.tissueOriginLabel = Hot.sampleOptions.tissueOriginsDtos.filter(function (tod) { return tod.id == sam.tissueOriginId; })[0].label;
         if (sam.tissueTypeId) sam.tissueTypeLabel = Hot.sampleOptions.tissueTypesDtos.filter(function (ttd) { return ttd.id == sam.tissueTypeId; })[0].label;
         if (sam.labId) sam.labComposite = Sample.hot.getLabCompositeFromId(sam.labId, Hot.sampleOptions.labsDtos);
-        if (sam.prepKitId) sam.prepKitAlias = Hot.getAliasFromId(sam.prepKitId, Hot.sampleOptions.kitDescriptorsDtos);
         if (sam.subprojectId) sam.subprojectAlias = Hot.getAliasFromId(sam.subprojectId, Hot.sampleOptions.subprojectsDtos);
         if (sam.detailedQcStatusId) {
           sam.detailedQcStatusDescription = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(sam.detailedQcStatusId), Hot.sampleOptions.detailedQcStatusesDtos), 'description');
@@ -407,11 +406,11 @@ Sample.hot = {
               Sample.hot.dqcsNoteIndex = Hot.getColIndex('detailedQcStatusNote');
               if (qcpd === null || !qcpd.noteRequired) {
                 Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'readOnly', true);
-                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'validator', Hot.permitEmpty);
+                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'validator', null);
                 Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'renderer', Hot.alwaysValidRenderer);
               } else {
                 Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'readOnly', false);
-                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'validator', Hot.requiredText);
+                Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'validator', Hot.requiredTextNoSpecialChars);
                 Hot.hotTable.setCellMeta(row, Sample.hot.dqcsNoteIndex, 'renderer', Hot.requiredTextRenderer);
               }
           }
@@ -461,8 +460,6 @@ Sample.hot = {
     subprojectAlias: null,
     labId: null,
     labComposite: null,
-    prepKitId: null,
-    prepKitAlias: null,
     concentration: null,
     detailedQcStatusId: null,
     detailedQcStatusDescription: null,
@@ -602,15 +599,6 @@ Sample.hot = {
   getLabs: function () {
     return Hot.sortByProperty(Hot.sampleOptions.labsDtos,'alias').map(function (lab) { return lab.alias +' - '+ lab.instituteAlias; });
   },
-
-  /**
-   * Gets array of kit descriptor names(detailed sample only)
-   */
-  getKitDescriptors: function () {
-    return Hot.sortByProperty(Hot.sampleOptions.kitDescriptorsDtos, 'manufacturer')
-      .filter(function (kit) { return kit.kitType == 'Extraction'; })
-      .map(function (kit) { return kit.name; });
-  },
   
   /**
    * Checks if the first sample in the sample being created/updated is an RNA sample
@@ -678,11 +666,13 @@ Sample.hot = {
       {
         header: 'Sample Alias',
         data: 'alias',
+        validator: Hot.optionalTextNoSpecialChars,
         include: true
       },
       {
         header: 'Description',
         data: 'description',
+        validator: Hot.optionalTextNoSpecialChars,
         include: true
       },
       {
@@ -701,6 +691,7 @@ Sample.hot = {
       {
         header: 'Matrix Barcode',
         data: 'identificationBarcode',
+        validator: Hot.optionalTextNoSpecialChars,
         include: !Hot.autoGenerateIdBarcodes
       },
       {
@@ -718,7 +709,7 @@ Sample.hot = {
         header: 'Sci. Name',
         data: 'scientificName',
         source: Sample.hot.sciName,
-        validator: Hot.requiredText,
+        validator: Hot.requiredTextNoSpecialChars,
         renderer: Hot.requiredTextRenderer,
         extraneous: true,
         include: true
@@ -751,7 +742,7 @@ Sample.hot = {
       {
         header: 'External Name',
         data: 'externalName',
-        validator: Hot.noSpecialChars,
+        validator: Hot.requiredTextNoSpecialChars,
         renderer: Hot.requiredTextRenderer,
         include: show['Identity']
       },
@@ -779,13 +770,13 @@ Sample.hot = {
       {
         header: 'Group ID',
         data: 'groupId',
-        validator: validateAlphanumeric,
+        validator: Hot.optionalTextAlphanumeric,
         include: isDetailed
       },
       {
         header: 'Group Desc.',
         data: 'groupDescription',
-        validator: Hot.permitEmpty,
+        validator: Hot.optionalTextNoSpecialChars,
         include: isDetailed
       },
 
@@ -852,6 +843,7 @@ Sample.hot = {
       {
         header: 'Ext. Inst. Identifier',
         data: 'externalInstituteIdentifier',
+        validator: Hot.optionalTextNoSpecialChars,
         include: show['Tissue']
       },
       {
@@ -866,7 +858,7 @@ Sample.hot = {
       {
         header: 'Region',
         data: 'region',
-        validator: Hot.permitEmpty,
+        validator: Hot.optionalTextNoSpecialChars,
         include: show['Tissue']
       },
 
@@ -916,17 +908,6 @@ Sample.hot = {
         trimDropdown: false,
         source: [ 'true', 'false' ],
         include: show['Stock'] && sampleClass.dnaseTreatable
-      },
-      
-      // Aliquot columns
-      {
-        header: 'Kit',
-        data: 'prepKitAlias',
-        type: 'dropdown',
-        trimDropdown: false,
-        source: Sample.hot.getKitDescriptors(),
-        validator: Hot.permitEmpty,
-        include: show['Aliquot']
       },
 
       // QC columns
@@ -979,10 +960,8 @@ Sample.hot = {
         header: 'QC Note',
         data: 'detailedQcStatusNote',
         readOnly: true,
-        validator: Hot.permitEmpty,
         include: isDetailed
       },
-
 
       // Aliquot columns
       {
@@ -1018,11 +997,6 @@ Sample.hot = {
 
     function validatePosReqdNumber (value, callback) {
       return callback(Handsontable.helper.isNumeric(value) && value >= 0);
-    }
-
-    function validateAlphanumeric (value, callback) {
-      var alphanumRegex = /^[-\w]+$/;
-      return callback(value === '' || value === null || alphanumRegex.test(value));
     }
   },
   
@@ -1187,9 +1161,6 @@ Sample.hot = {
       }
       
       // add optional attributes
-      if (obj.prepKitAlias && obj.prepKitAlias.length) {
-        sample.prepKitId = Hot.getIdFromAlias(obj.prepKitAlias, Sample.hot.kitDescriptorsDtos);
-      }
       if (obj.parentId) {
         sample.parentId = obj.parentId;
       } else if (obj.parentTissueSampleClassAlias) {

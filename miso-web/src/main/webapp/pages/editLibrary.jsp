@@ -300,7 +300,7 @@
                   or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
       <td>Library Selection Type:</td>
       <td>
-        <form:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
+        <miso:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
                      itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" />
       </td>
     </c:when>
@@ -319,7 +319,7 @@
               or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_TECH')}">
       <td>Library Strategy Type:</td>
       <td>
-        <form:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
+        <miso:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
                      itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="-1" />
       </td>
     </c:when>

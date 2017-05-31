@@ -1,3 +1,17 @@
+# 0.2.69
+
+Changes:
+
+ * Sort Runs by Start Date
+ * Improve Notes GUI
+ * Sanitize bulk dilution input
+ * Removed unused kit field from bulk Sample form
+ * Improved string validation/sanitization for Sample and Library fields
+ * Fix error when creating new PacBio run
+ * Fix Interop Metrics display
+ * Add PacBio library types and library selections
+ * Other misc. bug fixes
+
 # 0.2.68
 
 Changes:
