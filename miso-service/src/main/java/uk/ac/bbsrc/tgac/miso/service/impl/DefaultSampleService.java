@@ -26,7 +26,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -256,6 +255,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   private Sample save(Sample sample, boolean validateAliasUniqueness) throws IOException {
     if (sample.isDiscarded()) {
       sample.setVolume(0.0);
+    }
+    if (sample instanceof DetailedSample && ((DetailedSample) sample).getDetailedQcStatus() != null) {
+      ((DetailedSample) sample).setQcPassed(((DetailedSample) sample).getDetailedQcStatus().getStatus());
     }
     try {
       Long newId = sample.getId();
@@ -602,16 +604,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       dTarget.setGroupId(dSource.getGroupId());
       dTarget.setConcentration(dSource.getConcentration());
 
-      Boolean qcPassed;
       dTarget.setDetailedQcStatus(dSource.getDetailedQcStatus());
       dTarget.setDetailedQcStatusNote(dSource.getDetailedQcStatusNote());
-      if (dSource.getDetailedQcStatus() == null) {
-        qcPassed = null;
-      } else {
-        DetailedQcStatus managedQcStatus = detailedQcStatusDao.getDetailedQcStatus(dSource.getDetailedQcStatus().getId());
-        qcPassed = managedQcStatus == null ? null : managedQcStatus.getStatus();
-      }
-      dTarget.setQcPassed(qcPassed);
+      dTarget.setQcPassed(dSource.getQcPassed());
       dTarget.setSubproject(dSource.getSubproject());
       if (isIdentitySample(target)) {
         Identity iTarget = (Identity) target;
