@@ -571,7 +571,8 @@ DELETE FROM `Pool_Note`;
 -- DetailedSample and DetailedLibrary values
 INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
-(2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
+(2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
+(3,'Stock','Stock',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00');
 
 DELETE FROM `LibraryDesignCode`;
 INSERT INTO `LibraryDesignCode`(`code`,`description`) 
@@ -582,10 +583,10 @@ INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `library
 VALUES (1, 'DESIGN1', 1, 1, 1, 1), 
 (2, 'DESIGN2', 2, 1, 1, 1);
 
-INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`)
-VALUES (15,1,0,NULL),
-(16,2,0,15),
-(17,2,0,15);
+INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`)
+VALUES (15,1,0,NULL,NULL),
+(16,2,0,15,1),
+(17,2,0,15,2);
 
 DELETE FROM `Identity`;
 INSERT INTO `Identity` (`sampleId`, `externalName`,`donorSex`)
