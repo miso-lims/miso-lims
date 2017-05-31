@@ -245,6 +245,7 @@ Box.DialogVisual = function(scan) {
     jQuery('#dialogInfoBelow').html(opts.infobelow);
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
+      title: 'Scan',
       width: Box.dialogWidth,
       modal: true,
       resizable: false,
@@ -412,6 +413,7 @@ Box.ScanDialog = function() {
     self.animateMag();
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
+      title: 'Scan',
       width: Box.dialogWidth,
       height: Box.dialogHeight,
       modal: true,
@@ -464,6 +466,7 @@ Box.ScanDialog = function() {
     jQuery('#dialogVisual').html('');
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
+      title: 'Scan',
       width: Box.dialogWidth,
       modal: true,
       height: "auto",
@@ -511,6 +514,7 @@ Box.ScanDiff = function() {
 
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
+      title: 'Scan Results',
       width: Box.dialogWidth,
       modal: true,
       resizable: false,
@@ -599,6 +603,7 @@ Box.PrepareScannerDialog = function() {
                                      '<img class="center" src="/styles/images/ajax-loader.gif"/>');   
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
+      title: 'Scan',
       width: Box.dialogWidth,
       height: "auto",
       modal: true,
@@ -617,6 +622,7 @@ Box.PrepareScannerDialog = function() {
                                     'and remove the box before retrying.</p>');
     jQuery('#dialogDialog').dialog({
       autoOpen: true,
+      title: 'Scan',
       width: Box.dialogWidth,
       height: "auto",
       modal: true,

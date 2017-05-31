@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -34,10 +36,12 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.BoxableDto;
@@ -233,22 +237,62 @@ public class BoxControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Box was successfully saved");
   }
 
-  private Map<String, BoxableView> loadBoxables(JSONObject boxJson) throws IOException {
-    JSONArray boxablesJson = boxJson.getJSONArray("boxables");
-    Map<String, String> barcodeToPosition = new HashMap<>();
-    for (int i = 0; i < boxablesJson.size(); i++) {
-      JSONObject entry = boxablesJson.getJSONObject(i);
-      barcodeToPosition.put(entry.getString("identificationBarcode"), entry.getString("coordinates"));
+  private static final Map<String, Function<BoxSize, BiFunction<Integer, Integer, String>>> SUFFIXES = ImmutableMap
+      .<String, Function<BoxSize, BiFunction<Integer, Integer, String>>> builder().put("standard", size -> BoxUtils::getPositionString)
+      .put("numeric", size -> (row, column) -> String.format("%03d", row * size.getColumns() + column)).build();
+
+  public JSONObject recreateBoxFromPrefix(HttpSession session, JSONObject json) {
+    if (!json.has("boxId")) {
+      return JSONUtils.SimpleJSONError("Cannot find box.");
+    }
+    if (!json.has("prefix")) {
+      return JSONUtils.SimpleJSONError("Cannot find prefix.");
+    }
+    if (!json.has("suffix")) {
+      return JSONUtils.SimpleJSONError("Cannot find suffix.");
+    }
+    Box box;
+    long boxId = json.getLong("boxId");
+    try {
+      box = requestManager.getBoxById(boxId);
+      if (box == null)
+        return JSONUtils.SimpleJSONError("Cannot find box.");
+    } catch (IOException e) {
+      log.debug("Error getting box with ID " + boxId, e);
+      return JSONUtils.SimpleJSONError("Error looking up this box: " + e.getMessage());
     }
 
-    Map<String, BoxableView> map = new HashMap<>();
-    for (BoxableView boxable : requestManager.getBoxableViewsFromBarcodeList(barcodeToPosition.keySet())) {
-      map.put(barcodeToPosition.get(boxable.getIdentificationBarcode()), boxable);
+    String prefix = json.getString("prefix");
+    String suffix = json.getString("suffix");
+    if (!SUFFIXES.containsKey(suffix)) {
+      return JSONUtils.SimpleJSONError("Invalid suffix.");
     }
-    if (map.size() != barcodeToPosition.size()) {
-      throw new IOException("No boxable found with supplied barcode.");
+    BiFunction<Integer, Integer, String> suffixGenerator = SUFFIXES.get(suffix).apply(box.getSize());
+    Map<String, String> positionToBarcode = new HashMap<>();
+    for (int row = 0; row < box.getSize().getRows(); row++) {
+      for (int column = 0; column < box.getSize().getColumns(); column++) {
+        positionToBarcode.put(BoxUtils.getPositionString(row, column), prefix + suffixGenerator.apply(row, column));
+      }
     }
-    return map;
+    try {
+      Map<String, BoxableView> barcodesToBoxables = requestManager.getBoxableViewsFromBarcodeList(positionToBarcode.values()).stream()
+          .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
+      box.setBoxables(positionToBarcode.entrySet().stream().filter(entry -> barcodesToBoxables.containsKey(entry.getValue()))
+          .collect(Collectors.toMap(Map.Entry::getKey,
+              entry -> barcodesToBoxables.get(entry.getValue()))));
+    } catch (IOException e) {
+      log.debug("Error getting boxable", e);
+      return JSONUtils.SimpleJSONError("Error finding item: " + e.getMessage());
+    }
+
+    try {
+      requestManager.saveBox(box);
+    } catch (IOException e) {
+      log.debug("Error saving box", e);
+      return JSONUtils.SimpleJSONError("Error saving box contents: " + e.getMessage());
+    }
+
+    return JSONUtils.SimpleJSONResponse("Box was successfully saved");
   }
 
   /**
