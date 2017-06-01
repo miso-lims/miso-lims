@@ -75,4 +75,5 @@ CALL addTargetedSequencing('Agilent SureSelect Human All Exon V6 Cosmic', 'Human
 
 CALL addTargetedSequencing('Agilent HaloPlex AML', 'Residual Disease Monitoring', 'HALO', 0);
 CALL addTargetedSequencing('BLS_targets', 'Combination of HNSC 1-2 and OID44498_hg19_170223 human capture kits for Bratman Lab Sequencing', 'KAPA Hyper Prep and IDT xGen', 0);
+call addTargetedSequencing('SureSelect Clinical Research Exome (Cat#: 5190-7338)', 'GSLE Legacy', 'Agilent SureSelect XT Clinical Research', 0);
 -- EndNoTest
