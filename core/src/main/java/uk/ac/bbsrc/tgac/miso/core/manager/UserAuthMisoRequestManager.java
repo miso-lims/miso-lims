@@ -53,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -206,15 +205,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveSampleQC(SampleQC sampleQC) throws IOException {
-    if (writeCheck(sampleQC.getSample())) {
-      return backingManager.saveSampleQC(sampleQC);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to the parent Sample ");
-    }
-  }
-
-  @Override
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (writeCheck(container)) {
       container.setLastModifier(getCurrentUser());
@@ -296,20 +286,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (readCheck(o.getRun())) return o;
     else throw new AuthorizationIOException(
         "User " + getCurrentUsername() + " cannot read parent Run " + o.getRun().getId() + " for RunQC " + runQcId);
-  }
-
-  @Override
-  public Sample getSampleById(long sampleId) throws IOException {
-    Sample o = backingManager.getSampleById(sampleId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + sampleId);
-  }
-
-  @Override
-  public Sample getSampleByBarcode(String barcode) throws IOException {
-    Sample o = backingManager.getSampleByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + o.getId());
   }
 
   @Override
@@ -540,94 +516,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Sample> listAllSamples() throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listAllSamples()) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listAllSamplesWithLimit(limit)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesByReceivedDate(long limit) throws IOException {
-    User user = getCurrentUser();
-    List<Sample> samples = new ArrayList<>(backingManager.listAllSamplesByReceivedDate(limit));
-
-    for (int i = 0; i < samples.size(); i++) {
-      if (!samples.get(i).userCanRead(user)) {
-        samples.remove(i);
-      }
-    }
-    return samples;
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesBySearch(String query) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listAllSamplesBySearch(query)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesByProjectId(long projectId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listAllSamplesByProjectId(projectId)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> listSamplesByAlias(String alias) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listSamplesByAlias(alias)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> getSamplesByIdList(List<Long> idList) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.getSamplesByIdList(idList)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      } else {
-        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + sample.getId() + " "
-            + sample.getAlias() + "(" + sample.getName() + ")");
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<SampleQC> listAllSampleQCsBySampleId(long sampleId) throws IOException {
     User user = getCurrentUser();
     Collection<SampleQC> accessibles = new HashSet<>();
@@ -684,15 +572,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     return accessibles;
   }
 
-  /* deletes */
-
-  @Override
-  public void deleteSample(Sample sample) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteSample(sample);
-    }
-  }
-
   @Override
   public void deleteRun(Run run) throws IOException {
     if (getCurrentUser().isAdmin()) {
@@ -704,13 +583,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   public void deleteRunQC(RunQC runQc) throws IOException {
     if (getCurrentUser().isAdmin()) {
       backingManager.deleteRunQC(runQc);
-    }
-  }
-
-  @Override
-  public void deleteSampleQC(SampleQC sampleQc) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteSampleQC(sampleQc);
     }
   }
 
@@ -913,11 +785,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<String> listAllSampleTypes() throws IOException {
-    return backingManager.listAllSampleTypes();
-  }
-
-  @Override
   public Collection<Platform> listAllPlatforms() throws IOException {
     return backingManager.listAllPlatforms();
   }
@@ -1048,11 +915,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Map<String, Integer> getRunColumnSizes() throws IOException {
     return backingManager.getRunColumnSizes();
-  }
-
-  @Override
-  public Map<String, Integer> getSampleColumnSizes() throws IOException {
-    return backingManager.getSampleColumnSizes();
   }
 
   @Override

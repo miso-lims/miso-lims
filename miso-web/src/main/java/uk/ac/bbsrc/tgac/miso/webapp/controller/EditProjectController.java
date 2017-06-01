@@ -206,7 +206,7 @@ public class EditProjectController {
   public @ResponseBody JSONObject graphRest(@PathVariable Long projectId) throws IOException {
     JSONObject j = new JSONObject();
     try {
-      Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
+      Collection<Sample> samples = sampleService.listByProjectId(projectId);
       Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
       Collection<Study> studies = studyService.listByProjectId(projectId);
 

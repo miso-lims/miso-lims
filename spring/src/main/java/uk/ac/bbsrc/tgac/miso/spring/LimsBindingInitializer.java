@@ -93,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
@@ -125,6 +126,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private ExperimentService experimentService;
   @Autowired
   private IndexService indexService;
+  @Autowired
+  private SampleService sampleService;
   @Autowired
   private StudyService studyService;
   @Autowired
@@ -383,7 +386,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<Sample>(Sample.class) {
       @Override
       public Sample resolveById(long id) throws Exception {
-        return requestManager.getSampleById(id);
+        return sampleService.get(id);
       }
     }.register(binder, "sample").register(binder, Set.class, "samples");
 
@@ -596,5 +599,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 }

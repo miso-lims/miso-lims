@@ -69,7 +69,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -440,78 +439,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Sample> listAllSamples() throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.listAll();
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.listAllWithLimit(limit);
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesByReceivedDate(long limit) throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.listAllByReceivedDate(limit);
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesBySearch(String query) throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.listBySearch(query);
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesByProjectId(long projectId) throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.listByProjectId(projectId);
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Sample> listSamplesByAlias(String alias) throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.listByAlias(alias);
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Sample> getSamplesByIdList(List<Long> idList) throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.getByIdList(idList);
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<String> listAllSampleTypes() throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.listAllSampleTypes();
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<SampleQC> listAllSampleQCsBySampleId(long sampleId) throws IOException {
     if (sampleQcStore != null) {
       return sampleQcStore.listBySampleId(sampleId);
@@ -677,19 +604,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  // DELETES
-
-  @Override
-  public void deleteSample(Sample sample) throws IOException {
-    if (sampleStore != null) {
-      if (!sampleStore.remove(sample)) {
-        throw new IOException("Unable to delete Sample. Make sure the sample has no child entitites.");
-      }
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
   @Override
   public void deleteRun(Run run) throws IOException {
     if (runStore != null) {
@@ -706,17 +620,6 @@ public class MisoRequestManager implements RequestManager {
     if (runQcStore != null) {
       if (!runQcStore.remove(runQC)) {
         throw new IOException("Unable to delete RunQC.");
-      }
-    } else {
-      throw new IOException("No sampleQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void deleteSampleQC(SampleQC sampleQc) throws IOException {
-    if (sampleQcStore != null) {
-      if (!sampleQcStore.remove(sampleQc)) {
-        throw new IOException("Unable to delete SampleQC.");
       }
     } else {
       throw new IOException("No sampleQcStore available. Check that it has been declared in the Spring config.");
@@ -1094,15 +997,6 @@ public class MisoRequestManager implements RequestManager {
     runStore.save(managed);
   }
 
-  @Override
-  public long saveSampleQC(SampleQC sampleQc) throws IOException {
-    if (sampleQcStore != null) {
-      return sampleQcStore.save(sampleQc);
-    } else {
-      throw new IOException("No sampleQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
   public User getCurrentUser() throws IOException {
     Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
     if (auth == null) {
@@ -1243,24 +1137,6 @@ public class MisoRequestManager implements RequestManager {
       return runQcStore.get(runQcId);
     } else {
       throw new IOException("No runQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Sample getSampleById(long sampleId) throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.get(sampleId);
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Sample getSampleByBarcode(String barcode) throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.getByBarcode(barcode);
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1693,15 +1569,6 @@ public class MisoRequestManager implements RequestManager {
       return runStore.getRunColumnSizes();
     } else {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Map<String, Integer> getSampleColumnSizes() throws IOException {
-    if (sampleStore != null) {
-      return sampleStore.getSampleColumnSizes();
-    } else {
-      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
     }
   }
 

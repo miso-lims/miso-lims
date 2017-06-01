@@ -744,7 +744,7 @@ public class EditLibraryController {
           sampleClass = detailed.getSampleClass();
         }
 
-        List<Sample> projectSamples = new ArrayList<>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
+        List<Sample> projectSamples = new ArrayList<>(sampleService.listByProjectId(sample.getProject().getProjectId()));
         Collections.sort(projectSamples, new AliasComparator<>());
         model.put("projectSamples", projectSamples);
 
@@ -811,7 +811,7 @@ public class EditLibraryController {
       List<LibraryDto> libraryDtos = new ArrayList<>();
       SampleClass sampleClass = null;
       boolean hasPlain = false;
-      for (Sample sample : requestManager.getSamplesByIdList(idList)) {
+      for (Sample sample : sampleService.listByIdList(idList)) {
         if (sample instanceof DetailedSample) {
           DetailedSample detailed = (DetailedSample) sample;
           if (sampleClass == null) {

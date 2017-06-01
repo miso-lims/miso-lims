@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 
@@ -70,6 +71,8 @@ public class ProjectD3GraphController {
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private SampleService sampleService;
+  @Autowired
   private StudyService studyService;
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
@@ -82,7 +85,7 @@ public class ProjectD3GraphController {
       projectJSON.put("show", "PROJECT");
       projectJSON.put("description", p.getAlias());
       JSONArray projectChildrenArray = new JSONArray();
-      Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
+      Collection<Sample> samples = sampleService.listByProjectId(p.getProjectId());
       Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
       Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
 
@@ -218,8 +221,20 @@ public class ProjectD3GraphController {
     }
   }
 
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  public void setStudyService(StudyService studyService) {
+    this.studyService = studyService;
   }
 
 }

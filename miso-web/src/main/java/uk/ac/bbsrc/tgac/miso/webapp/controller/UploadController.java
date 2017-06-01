@@ -281,7 +281,7 @@ public class UploadController {
     String sampleId = request.getParameter("sampleId");
     if (sampleId == null) {
       throw new IOException("Cannot upload file - sampleId parameter missing or null");
-    } else if (requestManager.getSampleById(Long.valueOf(sampleId)) == null) {
+    } else if (sampleService.get(Long.valueOf(sampleId)) == null) {
       throw new IOException("Cannot upload file - sample does not exist");
     }
 

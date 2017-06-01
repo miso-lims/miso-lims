@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -72,8 +71,6 @@ public interface RequestManager {
   public long saveRunQC(RunQC runQC) throws IOException;
 
   public void saveRunNote(Run run, Note note) throws IOException;
-
-  public long saveSampleQC(SampleQC sampleQC) throws IOException;
 
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException;
 
@@ -105,10 +102,6 @@ public interface RequestManager {
   public Run getRunByAlias(String alias) throws IOException;
 
   public RunQC getRunQCById(long runQcId) throws IOException;
-
-  public Sample getSampleById(long sampleId) throws IOException;
-
-  public Sample getSampleByBarcode(String barcode) throws IOException;
 
   public SampleQC getSampleQCById(long sampleQcId) throws IOException;
 
@@ -190,25 +183,6 @@ public interface RequestManager {
 
   public Collection<SequencerPartitionContainer> listAllSequencerPartitionContainers() throws IOException;
 
-  public Collection<Sample> listAllSamples() throws IOException;
-
-  public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException;
-
-  public Collection<Sample> listAllSamplesByReceivedDate(long limit) throws IOException;
-
-  public Collection<Sample> listAllSamplesBySearch(String query) throws IOException;
-
-  public Collection<Sample> listAllSamplesByProjectId(long projectId) throws IOException;
-
-  public Collection<Sample> listSamplesByAlias(String alias) throws IOException;
-
-  /**
-   * throws AuthorizationIOException if user cannot read one of the requested samples
-   */
-  public Collection<Sample> getSamplesByIdList(List<Long> idList) throws IOException;
-
-  public Collection<String> listAllSampleTypes() throws IOException;
-
   public Collection<SampleQC> listAllSampleQCsBySampleId(long sampleId) throws IOException;
 
   public Collection<LibraryQC> listAllLibraryQCsByLibraryId(long libraryId) throws IOException;
@@ -270,13 +244,9 @@ public interface RequestManager {
 
   // DELETES
 
-  public void deleteSample(Sample sample) throws IOException;
-
   public void deleteRun(Run run) throws IOException;
 
   public void deleteRunQC(RunQC runQc) throws IOException;
-
-  public void deleteSampleQC(SampleQC sampleQc) throws IOException;
 
   public void deleteLibraryQC(LibraryQC libraryQc) throws IOException;
 
@@ -299,8 +269,6 @@ public interface RequestManager {
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
 
   public Map<String, Integer> getRunColumnSizes() throws IOException;
-
-  public Map<String, Integer> getSampleColumnSizes() throws IOException;
 
   public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException;
 

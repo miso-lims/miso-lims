@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
@@ -67,9 +68,15 @@ public class ExternalRestController extends RestController {
 
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private SampleService sampleService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   @RequestMapping(value = "projects", method = RequestMethod.GET, produces="application/json")
@@ -146,7 +153,7 @@ public class ExternalRestController extends RestController {
     sb.append(",");
 
     sb.append("'samples':[");
-    Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
+    Collection<Sample> samples = sampleService.listByProjectId(projectId);
     if (samples.size() > 0) {
       int si = 0;
       for (Sample sample : samples) {

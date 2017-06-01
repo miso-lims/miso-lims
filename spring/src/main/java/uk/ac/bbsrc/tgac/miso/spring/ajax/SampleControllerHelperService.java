@@ -92,17 +92,15 @@ import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAss
 @Ajaxified
 public class SampleControllerHelperService {
   public static final class SampleBarcodeAssister implements BarcodePrintAssister<Sample> {
-    private final RequestManager requestManager;
     private final SampleService sampleService;
 
-    public SampleBarcodeAssister(RequestManager requestManager, SampleService sampleService) {
-      this.requestManager = requestManager;
+    public SampleBarcodeAssister(SampleService sampleService) {
       this.sampleService = sampleService;
     }
 
     @Override
     public Iterable<Sample> fetchAll(long projectId) throws IOException {
-      return requestManager.listAllSamplesByProjectId(projectId);
+      return sampleService.listByProjectId(projectId);
     }
 
     @Override
@@ -240,7 +238,7 @@ public class SampleControllerHelperService {
         newQc.setQcType(requestManager.getSampleQcTypeById(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
         sample.addQc(newQc);
-        requestManager.saveSampleQC(newQc);
+        sampleService.addQc(sample, newQc);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th></tr>");
@@ -281,7 +279,8 @@ public class SampleControllerHelperService {
         Long qcId = Long.parseLong(json.getString("qcId"));
         SampleQC sampleQc = requestManager.getSampleQCById(qcId);
         sampleQc.setResults(Double.parseDouble(json.getString("result")));
-        requestManager.saveSampleQC(sampleQc);
+        Sample sample = sampleQc.getSample();
+        sampleService.addQc(sample, sampleQc);
         return JSONUtils.SimpleJSONResponse("OK");
       }
     } catch (Exception e) {
@@ -457,7 +456,7 @@ public class SampleControllerHelperService {
   }
 
   public JSONObject printSampleBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new SampleBarcodeAssister(requestManager, sampleService));
+    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new SampleBarcodeAssister(sampleService));
   }
 
   public JSONObject changeSampleLocation(HttpSession session, JSONObject json) {

@@ -142,7 +142,6 @@ public class EditSampleController {
 
   @Autowired
   private SecurityManager securityManager;
-
   @Autowired
   private RequestManager requestManager;
 
@@ -151,32 +150,79 @@ public class EditSampleController {
 
   @Autowired
   private SampleOptionsController sampleOptionsController;
-
   @Autowired
   private SampleService sampleService;
-
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
-
   @Autowired
   private ExperimentService experimentService;
-
   @Autowired
   private ChangeLogService changeLogService;
-
   @Autowired
   private PoolService poolService;
 
-  public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
-    this.sampleOptionsController = sampleOptionsController;
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
   }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
+  public void setNamingScheme(NamingScheme namingScheme) {
+    this.namingScheme = namingScheme;
+  }
+
+  public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
+    this.sampleOptionsController = sampleOptionsController;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  public void setSampleValidRelationshipService(SampleValidRelationshipService sampleValidRelationshipService) {
+    this.sampleValidRelationshipService = sampleValidRelationshipService;
+  }
+
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
+  public void setChangeLogService(ChangeLogService changeLogService) {
+    this.changeLogService = changeLogService;
+  }
+
+  public void setPoolService(PoolService poolService) {
+    this.poolService = poolService;
+  }
+
+  public void setSampleClassService(SampleClassService sampleClassService) {
+    this.sampleClassService = sampleClassService;
+  }
+
+  public void setTissueOriginService(TissueOriginService tissueOriginService) {
+    this.tissueOriginService = tissueOriginService;
+  }
+
+  public void setTissueTypeService(TissueTypeService tissueTypeService) {
+    this.tissueTypeService = tissueTypeService;
+  }
+
+  public void setDetailedQcStatusService(DetailedQcStatusService detailedQcStatusService) {
+    this.detailedQcStatusService = detailedQcStatusService;
+  }
+
+  public void setLabService(LabService labService) {
+    this.labService = labService;
+  }
+
+  public void setSamplePurposeService(SamplePurposeService samplePurposeService) {
+    this.samplePurposeService = samplePurposeService;
+  }
+
+  public void setTissueMaterialService(TissueMaterialService tissueMaterialService) {
+    this.tissueMaterialService = tissueMaterialService;
   }
 
   @ModelAttribute("aliasGenerationEnabled")
@@ -321,13 +367,13 @@ public class EditSampleController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getSampleColumnSizes();
+    return sampleService.getSampleColumnSizes();
   }
 
   @ModelAttribute("sampleTypesString")
   public String sampleTypesString() throws IOException {
     List<String> types = new ArrayList<>();
-    List<String> sampleTypes = new ArrayList<>(requestManager.listAllSampleTypes());
+    List<String> sampleTypes = new ArrayList<>(sampleService.listSampleTypes());
     Collections.sort(sampleTypes);
     for (String s : sampleTypes) {
       types.add("\"" + s + "\"" + ":" + "\"" + s + "\"");
@@ -365,7 +411,7 @@ public class EditSampleController {
   @ModelAttribute("referenceDataJSON")
   public JSONObject referenceDataJsonString() throws IOException {
     final JSONObject hot = new JSONObject();
-    final List<String> sampleTypes = new ArrayList<>(requestManager.listAllSampleTypes());
+    final List<String> sampleTypes = new ArrayList<>(sampleService.listSampleTypes());
     final List<String> strStatuses = new ArrayList<>();
     final List<String> donorSexes = new ArrayList<>();
     final List<QcTypeDto> qcTypes = new ArrayList<>(Dtos.asQcTypeDtos(sampleService.listSampleQcTypes()));
@@ -667,7 +713,7 @@ public class EditSampleController {
 
   @RequestMapping(value = "/rest/{sampleId}", method = RequestMethod.GET)
   public @ResponseBody Sample jsonRest(@PathVariable Long sampleId) throws IOException {
-    return requestManager.getSampleById(sampleId);
+    return sampleService.get(sampleId);
   }
 
   @RequestMapping(value = "/{sampleId}", method = RequestMethod.GET)
@@ -703,7 +749,7 @@ public class EditSampleController {
           model.put("accessibleProjects", populateProjects(null));
         }
       } else {
-        sample = requestManager.getSampleById(sampleId);
+        sample = sampleService.get(sampleId);
         if (sample == null) throw new SecurityException("No such sample.");
         model.put("sampleCategory", detailedSample ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
         if (detailedSample) {
@@ -752,7 +798,7 @@ public class EditSampleController {
 
       model.put("formObj", sample);
       model.put("sample", sample);
-      model.put("sampleTypes", requestManager.listAllSampleTypes());
+      model.put("sampleTypes", sampleService.listSampleTypes());
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
@@ -789,7 +835,7 @@ public class EditSampleController {
       List<Long> idList = getIdsFromString(sampleIds);
       ObjectMapper mapper = new ObjectMapper();
       List<SampleDto> samplesDtos = new ArrayList<>();
-      for (Sample sample : requestManager.getSamplesByIdList(idList)) {
+      for (Sample sample : sampleService.listByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
       model.put("title", "Bulk Edit Samples");
@@ -816,7 +862,7 @@ public class EditSampleController {
       List<Long> idList = getIdsFromString(sampleIds);
       ObjectMapper mapper = new ObjectMapper();
       List<SampleDto> samplesDtos = new ArrayList<>();
-      for (Sample sample : requestManager.getSamplesByIdList(idList)) {
+      for (Sample sample : sampleService.listByIdList(idList)) {
         samplesDtos.add(Dtos.asDto(sample));
       }
       model.put("title", "Bulk Create Samples");

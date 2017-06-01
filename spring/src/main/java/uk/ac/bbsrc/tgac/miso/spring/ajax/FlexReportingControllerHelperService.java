@@ -69,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 /**
@@ -90,10 +91,16 @@ public class FlexReportingControllerHelperService {
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private SampleService sampleService;
+  @Autowired
   private StudyService studyService;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   public String flexHTMLTemplate(String content) {
@@ -493,7 +500,7 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject jsonObject = new JSONObject();
       StringBuilder a = new StringBuilder();
-      for (String sampleType : requestManager.listAllSampleTypes()) {
+      for (String sampleType : sampleService.listSampleTypes()) {
         a.append("<option value=\"" + sampleType + "\">" + sampleType + "</option>");
       }
       jsonObject.put("type", "<option value=\"all\">all</option>" + a.toString());
@@ -525,9 +532,9 @@ public class FlexReportingControllerHelperService {
     try {
       Collection<Sample> samples = null;
       if (!isStringEmptyOrNull(searchStr)) {
-        samples = requestManager.listAllSamplesBySearch(searchStr);
+        samples = sampleService.listBySearch(searchStr);
       } else {
-        samples = requestManager.listAllSamples();
+        samples = sampleService.getAll();
       }
       for (Sample sample : samples) {
         String sampleQC = "unknown";
@@ -575,7 +582,7 @@ public class FlexReportingControllerHelperService {
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("name").equals("sampleIds")) {
-          Sample s = requestManager.getSampleById(j.getLong("value"));
+          Sample s = sampleService.get(j.getLong("value"));
           if (s != null) {
             samples.add(s);
 
@@ -592,7 +599,7 @@ public class FlexReportingControllerHelperService {
       Integer totalQcFailed = 0;
       Integer totalQcUnknown = 0;
 
-      for (String sampleType : requestManager.listAllSampleTypes()) {
+      for (String sampleType : sampleService.listSampleTypes()) {
         Integer no = typeMap.containsKey(sampleType) ? typeMap.get(sampleType) : 0;
         if (no > 0) {
           graphArray.add(JSONObject.fromObject("{'name': '" + sampleType + "','y':" + no + "}"));
@@ -1072,7 +1079,7 @@ public class FlexReportingControllerHelperService {
       projectJSON.put("name", p.getName());
       projectJSON.put("description", p.getAlias());
       JSONArray projectChildrenArray = new JSONArray();
-      Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
+      Collection<Sample> samples = sampleService.listByProjectId(p.getProjectId());
       Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
       Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
 

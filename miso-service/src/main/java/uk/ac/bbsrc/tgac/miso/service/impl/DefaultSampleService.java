@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -673,6 +674,39 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   @Override
+  public Collection<Sample> listWithLimit(long limit) throws IOException {
+    Collection<Sample> samples = sampleDao.listAllWithLimit(limit);
+    return authorizationManager.filterUnreadable(samples);
+  }
+
+  @Override
+  public Collection<Sample> listBySearch(String query) throws IOException {
+    Collection<Sample> samples = sampleDao.listBySearch(query);
+    return authorizationManager.filterUnreadable(samples);
+  }
+
+  @Override
+  public Collection<Sample> listByReceivedDate(long limit) throws IOException {
+    Collection<Sample> samples = sampleDao.listAllByReceivedDate(limit);
+    return authorizationManager.filterUnreadable(samples);
+  }
+
+  @Override
+  public Collection<Sample> listByProjectId(long projectId) throws IOException {
+    Collection<Sample> samples = sampleDao.listByProjectId(projectId);
+    return authorizationManager.filterUnreadable(samples);
+  }
+
+  @Override
+  public Collection<Sample> listByIdList(List<Long> idList) throws IOException {
+    Collection<Sample> samples = sampleDao.getByIdList(idList);
+    for (Sample sample : samples) {
+      authorizationManager.throwIfNotReadable(sample);
+    }
+    return samples;
+  }
+
+  @Override
   public void delete(Long sampleId) throws IOException {
     authorizationManager.throwIfNonAdmin();
     Sample sample = get(sampleId);
@@ -795,6 +829,16 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   @Override
   public Collection<QcType> listSampleQcTypes() throws IOException {
     return sampleQcDao.listAllSampleQcTypes();
+  }
+
+  @Override
+  public Collection<String> listSampleTypes() throws IOException {
+    return sampleDao.listAllSampleTypes();
+  }
+
+  @Override
+  public Map<String, Integer> getSampleColumnSizes() throws IOException {
+    return sampleDao.getSampleColumnSizes();
   }
 
   @Override

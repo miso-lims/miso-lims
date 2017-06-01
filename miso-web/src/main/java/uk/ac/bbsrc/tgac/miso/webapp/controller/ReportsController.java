@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.itext.ITextProjectDecorator;
 import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @RequestMapping("/reports")
@@ -102,6 +103,13 @@ public class ReportsController {
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
+  }
+
+  @Autowired
+  private SampleService sampleService;
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   @RequestMapping(value = "/project/{projectId}")
@@ -181,7 +189,7 @@ public class ReportsController {
     String format = PDF;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Sample sample = sampleId == AbstractSample.UNSAVED_ID ? null : requestManager.getSampleById(sampleId);
+      Sample sample = sampleId == AbstractSample.UNSAVED_ID ? null : sampleService.get(sampleId);
       if (sample != null) {
         if (!sample.userCanRead(user)) {
           throw new SecurityException("Permission denied.");

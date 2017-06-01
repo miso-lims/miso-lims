@@ -70,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
@@ -97,6 +98,8 @@ public class DashboardHelperService {
   private LibraryService libraryService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private SampleService sampleService;
   @Autowired
   private StudyService studyService;
   @Autowired
@@ -404,12 +407,12 @@ public class DashboardHelperService {
       List<Sample> samples;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        samples = new ArrayList<>(requestManager.listAllSamplesBySearch(searchStr));
+        samples = new ArrayList<>(sampleService.listBySearch(searchStr));
         if (samples.isEmpty()) {
-          samples = new ArrayList<>(requestManager.listAllSamplesBySearch(new String(Base64.decodeBase64(searchStr))));
+          samples = new ArrayList<>(sampleService.listBySearch(new String(Base64.decodeBase64(searchStr))));
         }
       } else {
-        samples = new ArrayList<>(requestManager.listAllSamplesWithLimit(50));
+        samples = new ArrayList<>(sampleService.listWithLimit(50));
       }
 
       if (samples.size() > 0) {
@@ -555,7 +558,7 @@ public class DashboardHelperService {
   public JSONObject showLatestReceivedSamples(HttpSession session, JSONObject json) {
     try {
       StringBuilder b = new StringBuilder();
-      Collection<Sample> samples = requestManager.listAllSamplesByReceivedDate(100);
+      Collection<Sample> samples = sampleService.listByReceivedDate(100);
 
       Set<Long> uniqueProjects = new HashSet<>();
 
@@ -592,6 +595,10 @@ public class DashboardHelperService {
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   public void setExperimentService(ExperimentService experimentService) {

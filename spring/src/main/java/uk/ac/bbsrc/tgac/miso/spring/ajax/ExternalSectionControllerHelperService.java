@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
  * Created by IntelliJ IDEA. User: bianx Date: 02/11/11 Time: 15:59 To change this template use File | Settings | File Templates.
@@ -60,9 +61,15 @@ public class ExternalSectionControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(DashboardHelperService.class);
   @Autowired
   private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
+  @Autowired
+  private SampleService sampleService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   public JSONObject listProjects(HttpSession session, JSONObject json) {
@@ -181,7 +188,7 @@ public class ExternalSectionControllerHelperService {
               + "          </ol></div>\n" + "          <p style=\"clear:both\"/>");
         }
       }
-      Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
+      Collection<Sample> samples = sampleService.listByProjectId(projectId);
       if (samples.size() > 0) {
         int sampleQCPassed = 0;
         for (Sample sample : samples) {
@@ -213,7 +220,7 @@ public class ExternalSectionControllerHelperService {
       Long projectId = json.getLong("projectId");
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
-      for (Sample sample : requestManager.listAllSamplesByProjectId(projectId)) {
+      for (Sample sample : sampleService.listByProjectId(projectId)) {
         String sampleQubit = "not available";
         if (requestManager.listAllSampleQCsBySampleId(sample.getId()).size() > 0) {
           ArrayList<SampleQC> sampleQcList = new ArrayList<>(requestManager.listAllSampleQCsBySampleId(sample.getId()));
