@@ -886,12 +886,12 @@ DELIMITER ;
 
 DROP VIEW IF EXISTS CompletedPartitions;
 CREATE OR REPLACE VIEW RunPartitionsByHealth AS
-  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS num_partitions, health AS health, (SELECT MAX(changeTime) FROM RunChangeLog WHERE RunChangeLog.runId = Run.runId) as lastUpdated
+  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS num_partitions, health AS health, MAX((SELECT MAX(changeTime) FROM RunChangeLog WHERE RunChangeLog.runId = Run.runId)) as lastUpdated
     FROM Run JOIN Run_SequencerPartitionContainer ON Run.runId = Run_SequencerPartitionContainer.Run_runId
      JOIN SequencerPartitionContainer_Partition ON Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId
      JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
     WHERE sequencingParameters_parametersId IS NOT NULL AND pool_poolId IS NOT NULL
-    GROUP BY pool_poolId, sequencingParameters_parametersId, health, lastUpdated;;
+    GROUP BY pool_poolId, sequencingParameters_parametersId, health;
 
 CREATE OR REPLACE VIEW DesiredPartitions AS
   SELECT poolId, parametersId, SUM(partitions) AS num_partitions, MAX(lastUpdated) as lastUpdated
