@@ -125,7 +125,7 @@
           </td>
         </tr>
         <tr>
-          <td class="h">Sequencer Shutdown Time:</td>
+          <td class="h">Instrument Shutdown Time:</td>
           <td>
             <form:input path="shutdownTime" id="shutdownTime" placeholder="DD/MM/YYYY HH:mm"/>
             <script type="text/javascript">
@@ -134,7 +134,7 @@
           </td>
         </tr>
         <tr>
-          <td class="h">Sequencer Restored Time:</td>
+          <td class="h">Instrument Restored Time:</td>
           <td>
             <form:input path="restoredTime" id="restoredTime" placeholder="DD/MM/YYYY HH:mm"/>
             <script type="text/javascript">
