@@ -683,10 +683,18 @@ DROP TRIGGER IF EXISTS PartitionChange//
 CREATE TRIGGER PartitionChange BEFORE UPDATE ON _Partition
 FOR EACH ROW
   BEGIN
-    DECLARE log_message varchar(500) CHARACTER SET utf8;
-    SET log_message = CONCAT_WS(', ',
-    CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId THEN CONCAT('pool changed in partition ', OLD.partitionNumber, ': ', COALESCE((SELECT name FROM Pool WHERE poolId = OLD.pool_poolId), 'n/a'), ' → ', COALESCE((SELECT name FROM Pool WHERE poolId = NEW.pool_poolId), 'n/a')) END);
-    IF log_message IS NOT NULL AND log_message <> '' THEN
+    DECLARE container_log_message varchar(500) CHARACTER SET utf8;
+    DECLARE pool_old_log_message varchar(500) CHARACTER SET utf8;
+    DECLARE pool_new_log_message varchar(500) CHARACTER SET utf8;
+    SET container_log_message = CONCAT_WS(', ',
+      CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId THEN CONCAT('pool changed in partition ', OLD.partitionNumber, ': ', COALESCE((SELECT name FROM Pool WHERE poolId = OLD.pool_poolId), 'n/a'), ' → ', COALESCE((SELECT name FROM Pool WHERE poolId = NEW.pool_poolId), 'n/a')) END);
+    SET pool_old_log_message = CONCAT_WS(', ',
+      CASE WHEN (OLD.pool_poolId IS NULL) THEN '' END,
+      CASE WHEN OLD.pool_poolId <> NEW.pool_poolId THEN CONCAT('Removed from container ', COALESCE((SELECT spc.identificationBarcode FROM SequencerPartitionContainer spc JOIN SequencerPartitionContainer_Partition sp ON spc.containerId = sp.container_containerId WHERE sp.partitions_partitionId = NEW.partitionId), 'unknown')) END);
+    SET pool_new_log_message = CONCAT_WS(', ',
+      CASE WHEN (NEW.pool_poolId IS NULL) THEN '' END,
+      CASE WHEN OLD.pool_poolId <> NEW.pool_poolId THEN CONCAT('Added to container ', COALESCE((SELECT spc.identificationBarcode FROM SequencerPartitionContainer spc JOIN SequencerPartitionContainer_Partition sp ON spc.containerId = sp.container_containerId WHERE sp.partitions_partitionId = NEW.partitionId), 'unknown')) END);
+    IF container_log_message IS NOT NULL AND container_log_message <> '' THEN
       INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message) VALUES (
         (SELECT spcp.container_containerId FROM SequencerPartitionContainer_Partition spcp
          WHERE spcp.partitions_partitionId = OLD.partitionId),
@@ -695,7 +703,27 @@ FOR EACH ROW
          (SELECT spc.lastModifier FROM SequencerPartitionContainer spc
            JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
          WHERE spcp.partitions_partitionId = OLD.partitionId),
-         log_message
+         container_log_message
+      );
+    END IF;
+    IF pool_old_log_message IS NOT NULL AND pool_old_log_message <> '' THEN
+      INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
+        OLD.poolId,
+        'container',
+        (SELECT spc.lastModifier FROM SequencerPartitionContainer spc
+           JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
+         WHERE spcp.partitions_partitionId = OLD.partitionId),
+         pool_old_log_message
+      );
+    END IF;
+    IF pool_new_log_message IS NOT NULL AND pool_new_log_message <> '' THEN
+      INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
+        NEW.poolId,
+        'container',
+        (SELECT spc.lastModifier FROM SequencerPartitionContainer spc
+           JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
+         WHERE spcp.partitions_partitionId = OLD.partitionId),
+         pool_new_log_message
       );
     END IF;
   END //

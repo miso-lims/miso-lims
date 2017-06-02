@@ -145,7 +145,6 @@ public class EditSequencerPartitionContainerController {
           pool.setLastModifier(user);
         }
       }
-      container.setLastModifier(user);
       long containerId = requestManager.saveSequencerPartitionContainer(container);
       session.setComplete();
       model.clear();

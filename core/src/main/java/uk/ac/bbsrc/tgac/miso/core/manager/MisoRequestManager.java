@@ -861,10 +861,12 @@ public class MisoRequestManager implements RequestManager {
       if (container.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
         container.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(container.getSecurityProfile())));
         container.setPlatform(platformStore.get(container.getPlatform().getId()));
+        container.setLastModifier(securityStore.getUserById(getCurrentUser().getUserId()));
         return sequencerPartitionContainerStore.save(container);
       } else {
         SequencerPartitionContainer managed = getSequencerPartitionContainerById(container.getId());
         updateContainer(container, managed);
+        managed.setLastModifier(securityStore.getUserById(getCurrentUser().getUserId()));
         return sequencerPartitionContainerStore.save(managed);
       }
     } else {
