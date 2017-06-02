@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * Created by IntelliJ IDEA. User: bianx Date: 02/11/11 Time: 15:59 To change this template use File | Settings | File Templates.
@@ -62,10 +63,16 @@ public class ExternalSectionControllerHelperService {
   @Autowired
   private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
   @Autowired
+  private RunService runService;
+  @Autowired
   private SampleService sampleService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   public void setSampleService(SampleService sampleService) {
@@ -246,7 +253,7 @@ public class ExternalSectionControllerHelperService {
       Long projectId = json.getLong("projectId");
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
-      for (Run run : requestManager.listAllRunsByProjectId(projectId)) {
+      for (Run run : runService.listByProjectId(projectId)) {
         if (run.getHealth() != HealthType.Failed) {
 
           StringBuilder sb = new StringBuilder();

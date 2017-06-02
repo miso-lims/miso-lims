@@ -40,7 +40,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 
 /**
@@ -53,12 +53,12 @@ public class RunD3CalendarController {
   protected static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private RunService runService;
 
   @RequestMapping(method = RequestMethod.GET)
   public @ResponseBody JSONArray graphd3Rest() throws IOException {
     try {
-      Collection<Run> runs = requestManager.listAllRuns();
+      Collection<Run> runs = runService.list();
       JSONArray runsArray = new JSONArray();
       for (Run r : runs) {
         runsArray.add(JSONObject.fromObject(
@@ -75,5 +75,9 @@ public class RunD3CalendarController {
       runsArray.add(JSONObject.fromObject("{'Error':" + e + "}"));
       return runsArray;
     }
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 }

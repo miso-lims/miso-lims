@@ -70,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -96,12 +97,12 @@ public class EditPoolController {
 
   @Autowired
   private ChangeLogService changeLogService;
-
   @Autowired
   private PoolableElementViewService poolableElementViewService;
-
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private RunService runService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -113,6 +114,10 @@ public class EditPoolController {
 
   public void setPoolableElementViewService(PoolableElementViewService poolableElementViewService) {
     this.poolableElementViewService = poolableElementViewService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
@@ -182,7 +187,7 @@ public class EditPoolController {
 
       ObjectMapper mapper = new ObjectMapper();
       model.put("runsJSON", mapper.writeValueAsString(
-          poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(requestManager.getRunsByPool(pool))));
+          poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId))));
 
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {

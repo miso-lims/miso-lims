@@ -75,8 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -205,13 +203,9 @@ public class Run
     this.notes.add(note);
   }
 
-  public void addQc(RunQC runQC) throws MalformedRunQcException {
+  public void addQc(RunQC runQC) {
     this.runQCs.add(runQC);
-    try {
-      runQC.setRun(this);
-    } catch (MalformedRunException e) {
-      log.error("set run QC", e);
-    }
+    runQC.setRun(this);
     fireRunQcAddedEvent();
   }
 

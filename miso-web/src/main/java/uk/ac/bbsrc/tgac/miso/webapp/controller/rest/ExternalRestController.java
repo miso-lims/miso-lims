@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
@@ -69,10 +70,16 @@ public class ExternalRestController extends RestController {
   @Autowired
   private RequestManager requestManager;
   @Autowired
+  private RunService runService;
+  @Autowired
   private SampleService sampleService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   public void setSampleService(SampleService sampleService) {
@@ -188,7 +195,7 @@ public class ExternalRestController extends RestController {
     sb.append(",");
 
     sb.append("'runs':[");
-    Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
+    Collection<Run> runs = runService.listByProjectId(projectId);
     if (runs.size() > 0) {
       int ri = 0;
       for (Run run : runs) {

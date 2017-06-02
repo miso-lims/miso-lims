@@ -30,7 +30,6 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -58,8 +57,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   private NamingScheme namingScheme;
   @Autowired
   private PoolAlertManager poolAlertManager;
-  @Autowired
-  private LibraryDilutionStore libraryDilutionStore;
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
@@ -329,7 +326,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   public void addPoolWatcher(Pool pool, User watcher) throws IOException {
     User managedWatcher = securityManager.getUserById(watcher.getUserId());
     Pool managedPool = poolStore.get(pool.getId());
-    authorizationManager.throwIfNotReadable(pool);
+    authorizationManager.throwIfNotReadable(managedPool);
     if (!managedPool.userCanRead(managedWatcher)) {
       throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot see this pool.");
     }

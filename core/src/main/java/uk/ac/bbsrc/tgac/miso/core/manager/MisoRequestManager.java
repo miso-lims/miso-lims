@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,7 +88,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -331,105 +329,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Run> listAllRuns() throws IOException {
-    if (runStore != null) {
-      return runStore.listAll();
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Run> listAllRunsWithLimit(long limit) throws IOException {
-    if (runStore != null) {
-      return runStore.listAllWithLimit(limit);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Run> listAllRunsBySearch(String query) throws IOException {
-    if (runStore != null) {
-      return runStore.listBySearch(query);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Run> listAllRunsByProjectId(long projectId) throws IOException {
-    if (runStore != null) {
-      return runStore.listByProjectId(projectId);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Run> listRunsByPoolId(long poolId) throws IOException {
-    if (runStore != null) {
-      return runStore.listByPoolId(poolId);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Run> listRunsBySequencerPartitionContainerId(long containerId) throws IOException {
-    if (runStore != null) {
-      return runStore.listBySequencerPartitionContainerId(containerId);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Run> listAllLS454Runs() throws IOException {
-    if (runStore != null) {
-      Collection<Run> accessibleRuns = new HashSet<>();
-      for (Run run : runStore.listAll()) {
-        if (run.getSequencerReference().getPlatform().getPlatformType() == PlatformType.LS454) {
-          accessibleRuns.add(run);
-        }
-      }
-      return accessibleRuns;
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Run> listAllIlluminaRuns() throws IOException {
-    if (runStore != null) {
-      Collection<Run> accessibleRuns = new HashSet<>();
-      for (Run run : runStore.listAll()) {
-        if (run.getSequencerReference().getPlatform().getPlatformType() == PlatformType.ILLUMINA) {
-          accessibleRuns.add(run);
-        }
-      }
-      return accessibleRuns;
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Run> listAllSolidRuns() throws IOException {
-    if (runStore != null) {
-      Collection<Run> accessibleRuns = new HashSet<>();
-      for (Run run : runStore.listAll()) {
-        if (run.getSequencerReference().getPlatform().getPlatformType() == PlatformType.SOLID) {
-          accessibleRuns.add(run);
-        }
-      }
-      return accessibleRuns;
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<RunQC> listAllRunQCsByRunId(long runId) throws IOException {
     if (runQcStore != null) {
       return runQcStore.listByRunId(runId);
@@ -551,15 +450,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
-    if (runStore != null) {
-      return runStore.listBySequencerId(sequencerReferenceId);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<SequencerReference> listAllSequencerReferences() throws IOException {
     if (sequencerReferenceStore != null) {
       return sequencerReferenceStore.listAll();
@@ -601,28 +491,6 @@ public class MisoRequestManager implements RequestManager {
       return runQcStore.listAllRunQcTypes();
     } else {
       throw new IOException("No runQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void deleteRun(Run run) throws IOException {
-    if (runStore != null) {
-      if (!runStore.remove(run)) {
-        throw new IOException("Unable to delete Run. Make sure the run has no child entitites.");
-      }
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void deleteRunQC(RunQC runQC) throws IOException {
-    if (runQcStore != null) {
-      if (!runQcStore.remove(runQC)) {
-        throw new IOException("Unable to delete RunQC.");
-      }
-    } else {
-      throw new IOException("No sampleQcStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -890,7 +758,7 @@ public class MisoRequestManager implements RequestManager {
           throw new IOException("Cannot save Run - issue with generating name");
         }
       } else {
-        Run managed = getRunById(run.getId());
+        Run managed = runStore.get(run.getId());
         log.info("update run: " + managed);
         managed.setLastModifier(getCurrentUser());
         managed.setAlias(run.getAlias());
@@ -902,11 +770,7 @@ public class MisoRequestManager implements RequestManager {
         managed.setCompletionDate(run.getCompletionDate());
         for (RunQC runQc : run.getRunQCs()) {
           if (!managed.getRunQCs().contains(runQc)) {
-            try {
-              managed.addQc(runQc);
-            } catch (MalformedRunQcException e) {
-              log.error("malformed runQC: ", e);
-            }
+            managed.addQc(runQc);
           }
         }
         Set<String> originalContainers = Barcodable.extractLabels(managed.getSequencerPartitionContainers());
@@ -977,26 +841,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @Override
-  public long saveRunQC(RunQC runQC) throws IOException {
-    if (runQcStore != null) {
-      Long runQcId = runQcStore.save(runQC);
-      if (runAlertManager != null) runAlertManager.update(runQC.getRun());
-      return runQcId;
-    } else {
-      throw new IOException("No runQcStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void saveRunNote(Run run, Note note) throws IOException {
-    Run managed = runStore.get(run.getId());
-    note.setCreationDate(new Date());
-    note.setOwner(getCurrentUser());
-    managed.addNote(note);
-    runStore.save(managed);
-  }
-
   public User getCurrentUser() throws IOException {
     Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
     if (auth == null) {
@@ -1028,7 +872,8 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  private void updateContainer(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException {
+  @Override
+  public void updateContainer(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException {
     managed.setIdentificationBarcode(source.getIdentificationBarcode());
     managed.setLocationBarcode(source.getLocationBarcode());
     managed.setValidationBarcode(source.getValidationBarcode());
@@ -1054,7 +899,6 @@ public class MisoRequestManager implements RequestManager {
       }
     }
   }
-
 
   @Override
   public long saveSubmission(Submission submission) throws IOException {
@@ -1110,15 +954,6 @@ public class MisoRequestManager implements RequestManager {
       return projectStore.getProjectOverviewById(overviewId);
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Run getRunById(long runId) throws IOException {
-    if (runStore != null) {
-      return runStore.get(runId);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1564,15 +1399,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Map<String, Integer> getRunColumnSizes() throws IOException {
-    if (runStore != null) {
-      return runStore.getRunColumnSizes();
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException {
     if (sequencerReferenceStore != null) {
       return sequencerReferenceStore.getSequencerReferenceColumnSizes();
@@ -1637,33 +1463,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Long countRuns() throws IOException {
-    if (runStore != null) {
-      return runStore.countRuns();
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Long countRunsBySearch(String querystr) throws IOException {
-    if (runStore != null) {
-      return runStore.countBySearch(querystr);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Run getLatestRunBySequencerPartitionContainerId(Long containerId) throws IOException {
-    if (runStore != null) {
-      return runStore.getLatestRunIdRunBySequencerPartitionContainerId(containerId);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Long countContainers() throws IOException {
     if (sequencerPartitionContainerStore != null) {
       return Long.valueOf(sequencerPartitionContainerStore.count());
@@ -1672,26 +1471,9 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  @Override
-  public List<Run> getRunsByPool(Pool pool) throws IOException {
-    return runStore.listByPoolId(pool.getId());
-  }
-
   public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
     ValidationResult val = namingScheme.validateName(object.getName());
     if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
-  }
-
-  @Override
-  public void addRunWatcher(Run run, User watcher) throws IOException {
-    runStore.addWatcher(run, watcher);
-    if (runAlertManager != null) runAlertManager.addWatcher(run, watcher);
-  }
-
-  @Override
-  public void removeRunWatcher(Run run, User watcher) throws IOException {
-    runStore.removeWatcher(run, watcher);
-    if (runAlertManager != null) runAlertManager.addWatcher(run, watcher);
   }
 
   @Override

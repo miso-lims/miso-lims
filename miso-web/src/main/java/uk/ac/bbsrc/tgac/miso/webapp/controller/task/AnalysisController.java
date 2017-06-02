@@ -52,10 +52,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 import uk.ac.bbsrc.tgac.miso.integration.AnalysisQueryService;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -74,7 +74,7 @@ public class AnalysisController {
   private SecurityManager securityManager;
 
   @Autowired
-  private RequestManager requestManager;
+  private RunService runService;
 
   @Autowired
   private AnalysisQueryService queryService;
@@ -91,8 +91,8 @@ public class AnalysisController {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   @RequestMapping(value = "/analysis", method = RequestMethod.GET)
@@ -102,7 +102,7 @@ public class AnalysisController {
 
   @RequestMapping(value = "/analysis/new/run/{runId}", method = RequestMethod.GET)
   public ModelAndView runTask(@PathVariable long runId, ModelMap model) throws IOException, IntegrationException {
-    Run run = requestManager.getRunById(runId);
+    Run run = runService.get(runId);
     if (run == null) {
       throw new SecurityException("No such Run.");
     } else {

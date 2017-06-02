@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -39,7 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -64,13 +62,11 @@ public interface RequestManager {
 
   public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException;
 
+  /** TODO: delete after refactoring NotificationConsumerMechanisms. Use runService.saveRuns() instead */
   public long saveRun(Run run) throws IOException;
 
+  /** TODO: delete after refactoring NotificationConsumerMechanisms. Use runService.saveRuns() instead */
   public void saveRuns(Collection<Run> runs) throws IOException;
-
-  public long saveRunQC(RunQC runQC) throws IOException;
-
-  public void saveRunNote(Run run, Note note) throws IOException;
 
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException;
 
@@ -97,8 +93,7 @@ public interface RequestManager {
 
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException;
 
-  public Run getRunById(long runId) throws IOException;
-
+  /** TODO: delete after refactoring NotificationConsumerMechanisms. Use runService.getByAlias() instead */
   public Run getRunByAlias(String alias) throws IOException;
 
   public RunQC getRunQCById(long runQcId) throws IOException;
@@ -155,24 +150,6 @@ public interface RequestManager {
 
   public Collection<Box> listAllBoxesWithLimit(long limit) throws IOException;
 
-  public Collection<Run> listAllRuns() throws IOException;
-
-  public Collection<Run> listAllRunsWithLimit(long limit) throws IOException;
-
-  public Collection<Run> listAllRunsBySearch(String query) throws IOException;
-
-  public Collection<Run> listAllRunsByProjectId(long projectId) throws IOException;
-
-  public Collection<Run> listRunsByPoolId(long poolId) throws IOException;
-
-  public Collection<Run> listRunsBySequencerPartitionContainerId(long containerId) throws IOException;
-
-  public Collection<Run> listAllLS454Runs() throws IOException;
-
-  public Collection<Run> listAllIlluminaRuns() throws IOException;
-
-  public Collection<Run> listAllSolidRuns() throws IOException;
-
   public Collection<RunQC> listAllRunQCsByRunId(long runId) throws IOException;
 
   public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByRunId(long runId)
@@ -215,8 +192,6 @@ public interface RequestManager {
 
   public Collection<Submission> listAllSubmissions() throws IOException;
 
-  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException;
-
   /**
    * Obtain a list of Boxables by supplied identificationBarcode list
    */
@@ -244,10 +219,6 @@ public interface RequestManager {
 
   // DELETES
 
-  public void deleteRun(Run run) throws IOException;
-
-  public void deleteRunQC(RunQC runQc) throws IOException;
-
   public void deleteLibraryQC(LibraryQC libraryQc) throws IOException;
 
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
@@ -268,8 +239,6 @@ public interface RequestManager {
 
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
 
-  public Map<String, Integer> getRunColumnSizes() throws IOException;
-
   public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException;
 
   public Map<String, Integer> getSubmissionColumnSizes() throws IOException;
@@ -284,22 +253,12 @@ public interface RequestManager {
 
   public Collection<LibraryDesignCode> listLibraryDesignCodes() throws IOException;
 
-  public Long countRuns() throws IOException;
-
-  public Long countRunsBySearch(String querystr) throws IOException;
-
-  public Run getLatestRunBySequencerPartitionContainerId(Long containerId) throws IOException;
-
   public Long countContainers() throws IOException;
-
-  public List<Run> getRunsByPool(Pool pool) throws IOException;
-
-  public void addRunWatcher(Run run, User watcher) throws IOException;
-
-  public void removeRunWatcher(Run run, User watcher) throws IOException;
 
   void addProjectWatcher(Project project, User watcher) throws IOException;
 
   void removeProjectWatcher(Project project, User watcher) throws IOException;
+
+  void updateContainer(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException;
 
 }

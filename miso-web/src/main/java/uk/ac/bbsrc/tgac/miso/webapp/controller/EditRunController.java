@@ -62,9 +62,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
-import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 @Controller
 @RequestMapping("/run")
@@ -74,23 +73,16 @@ public class EditRunController {
 
   @Autowired
   private SecurityManager securityManager;
-
   @Autowired
   private RequestManager requestManager;
-
   @Autowired
   private ChangeLogService changeLogService;
-
   @Autowired
-  private PoolService poolService;
+  private RunService runService;
 
   private RunStatsManager runStatsManager;
-
   @Autowired
   private SequencingParametersService sequencingParametersService;
-
-  @Autowired
-  private ExperimentService experimentService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -100,13 +92,17 @@ public class EditRunController {
     this.securityManager = securityManager;
   }
 
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
   public void setRunStatsManager(RunStatsManager runStatsManager) {
     this.runStatsManager = runStatsManager;
   }
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getRunColumnSizes();
+    return runService.getRunColumnSizes();
   }
 
   @ModelAttribute("platformTypes")
@@ -194,7 +190,7 @@ public class EditRunController {
 
   @RequestMapping(value = "/rest/{runId}", method = RequestMethod.GET)
   public @ResponseBody Run jsonRest(@PathVariable Long runId) throws IOException {
-    return requestManager.getRunById(runId);
+    return runService.get(runId);
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
@@ -204,7 +200,7 @@ public class EditRunController {
 
   @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
-    Run run = requestManager.getRunById(runId);
+    Run run = runService.get(runId);
 
 
     return setupForm(run, run.getSequencerReference().getPlatform().getPlatformType(), model);
@@ -213,7 +209,7 @@ public class EditRunController {
 
   @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable String runAlias, ModelMap model) throws IOException {
-    Run run = requestManager.getRunByAlias(runAlias);
+    Run run = runService.getRunByAlias(runAlias);
     return setupForm(run, run.getSequencerReference().getPlatform().getPlatformType(), model);
 
   }

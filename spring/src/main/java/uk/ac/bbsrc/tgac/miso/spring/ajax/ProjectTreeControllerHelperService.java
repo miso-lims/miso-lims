@@ -49,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -68,6 +69,8 @@ public class ProjectTreeControllerHelperService {
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private RunService runService;
+  @Autowired
   private SampleService sampleService;
   @Autowired
   private StudyService studyService;
@@ -82,6 +85,10 @@ public class ProjectTreeControllerHelperService {
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   public void setSampleService(SampleService sampleService) {
@@ -104,7 +111,7 @@ public class ProjectTreeControllerHelperService {
         projectJSON.put("id", p.getProjectId());
         projectJSON.put("description", p.getAlias());
         Collection<Sample> samples = sampleService.listByProjectId(p.getProjectId());
-        Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
+        Collection<Run> runs = runService.listByProjectId(p.getProjectId());
         Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
         int subs = samples.size() + runs.size() + studies.size();
         projectJSON.put("subs", subs);
@@ -133,7 +140,7 @@ public class ProjectTreeControllerHelperService {
 
       JSONArray childArray = new JSONArray();
 
-      Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
+      Collection<Run> runs = runService.listByProjectId(projectId);
       if (runs.size() > 0) {
         JSONObject child = new JSONObject();
         child.put("name", "RUN");
@@ -183,7 +190,7 @@ public class ProjectTreeControllerHelperService {
 
       JSONArray runsArray = new JSONArray();
 
-      Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
+      Collection<Run> runs = runService.listByProjectId(projectId);
 
       JSONObject miso = new JSONObject();
       for (Run run : runs) {

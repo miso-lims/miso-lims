@@ -31,8 +31,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
-
 /**
  * A QC that is specifically carried out on a given {@link uk.ac.bbsrc.tgac.miso.core.data.Run}
  * 
@@ -55,11 +53,9 @@ public interface RunQC extends QC, Serializable {
    * Sets the run of this RunQC object.
    * 
    * @param run
-   *          Run.
-   * @throws uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException
-   *           when the Run being set is not valid
+   *          Run
    */
-  public void setRun(Run run) throws MalformedRunException;
+  public void setRun(Run run);
 
   /**
    * Get a free text description about the QC carried out

@@ -130,6 +130,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ui.SampleOptionsController;
 
 @Controller
@@ -160,6 +161,8 @@ public class EditSampleController {
   private ChangeLogService changeLogService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private RunService runService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -223,6 +226,14 @@ public class EditSampleController {
 
   public void setTissueMaterialService(TissueMaterialService tissueMaterialService) {
     this.tissueMaterialService = tissueMaterialService;
+  }
+
+  public RunService getRunService() {
+    return runService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   @ModelAttribute("aliasGenerationEnabled")
@@ -357,7 +368,7 @@ public class EditSampleController {
     if (!pools.isEmpty()) {
       Set<Run> runs = new TreeSet<>();
       for (Pool pool : pools) {
-        Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
+        Collection<Run> prs = runService.listByPoolId(pool.getId());
         runs.addAll(prs);
       }
       return runs;

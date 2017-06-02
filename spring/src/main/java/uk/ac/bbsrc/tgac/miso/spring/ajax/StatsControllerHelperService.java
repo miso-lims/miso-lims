@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.integration.NotificationQueryService;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -58,6 +59,8 @@ public class StatsControllerHelperService {
   private RequestManager requestManager;
 
   private RunStatsManager runStatsManager;
+  @Autowired
+  private RunService runService;
 
   @Autowired
   private NotificationQueryService notificationQueryService;
@@ -78,7 +81,7 @@ public class StatsControllerHelperService {
     if (runStatsManager != null) {
       Long runId = json.getLong("runId");
       try {
-        Run run = requestManager.getRunById(runId);
+        Run run = runService.get(runId);
         return runStatsManager.getSummaryStatsForRun(run);
       } catch (IOException e) {
         log.error("cannot retrieve run", e);
@@ -97,7 +100,7 @@ public class StatsControllerHelperService {
       Long runId = json.getLong("runId");
       Integer partitionNumber = json.getInt("partitionNumber");
       try {
-        Run run = requestManager.getRunById(runId);
+        Run run = runService.get(runId);
         return runStatsManager.getSummaryStatsForLane(run, partitionNumber);
       } catch (IOException e) {
         log.error("cannot retrieve run", e);
@@ -115,7 +118,7 @@ public class StatsControllerHelperService {
     Long runId = json.getLong("runId");
     Integer lane = json.getInt("lane");
     try {
-      Run run = requestManager.getRunById(runId);
+      Run run = runService.get(runId);
       JSONObject resultJson = runStatsManager.getPerPositionBaseSequenceQualityForLane(run, lane);
       return resultJson;
     } catch (IOException e) {
@@ -153,7 +156,7 @@ public class StatsControllerHelperService {
   public JSONObject updateRunProgress(HttpSession session, JSONObject json) {
     String runAlias = json.getString("runAlias");
     try {
-      Run run = requestManager.getRunByAlias(runAlias);
+      Run run = runService.getRunByAlias(runAlias);
       if (run != null && run.getHealth() == HealthType.Unknown) {
         String platformType = json.getString("platformType").toLowerCase();
         JSONObject response = notificationQueryService.getRunProgress(runAlias, platformType);

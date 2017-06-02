@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
 /**
@@ -98,6 +99,8 @@ public class DashboardHelperService {
   private LibraryService libraryService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private RunService runService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -303,9 +306,9 @@ public class DashboardHelperService {
       List<Run> runs;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        runs = new ArrayList<>(requestManager.listAllRunsBySearch(searchStr));
+        runs = new ArrayList<>(runService.listBySearch(searchStr));
       } else {
-        runs = new ArrayList<>(requestManager.listAllRunsWithLimit(50));
+        runs = new ArrayList<>(runService.listWithLimit(50));
       }
 
       if (runs.size() > 0) {
@@ -607,5 +610,9 @@ public class DashboardHelperService {
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 }

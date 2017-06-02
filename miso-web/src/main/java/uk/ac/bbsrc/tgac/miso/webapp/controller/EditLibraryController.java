@@ -108,6 +108,7 @@ import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -141,16 +142,14 @@ public class EditLibraryController {
   private LibraryService libraryService;
   @Autowired
   private SampleService sampleService;
-
   @Autowired
   private ChangeLogService changeLogService;
-
   @Autowired
   private KitService kitService;
-
   @Autowired
   private NamingScheme namingScheme;
-
+  @Autowired
+  private RunService runService;
   @Autowired
   private PoolService poolService;
 
@@ -184,6 +183,10 @@ public class EditLibraryController {
 
   public void setKitService(KitService kitService) {
     this.kitService = kitService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   @Value("${miso.notification.interop.enabled}")
@@ -234,7 +237,7 @@ public class EditLibraryController {
   public Set<Run> getRunsByLibraryPools(List<Pool> pools) throws IOException {
     Set<Run> runs = new TreeSet<>();
     for (Pool pool : pools) {
-      Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
+      Collection<Run> prs = runService.listByPoolId(pool.getId());
       runs.addAll(prs);
     }
     return runs;

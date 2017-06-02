@@ -68,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
@@ -100,6 +101,8 @@ public class ProjectControllerHelperService {
   private LibraryDilutionService dilutionService;
   @Autowired
   private SampleService sampleService;
+  @Autowired
+  private RunService runService;
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
@@ -135,6 +138,10 @@ public class ProjectControllerHelperService {
 
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   public JSONObject validateProjectShortName(HttpSession session, JSONObject json) {
@@ -454,7 +461,7 @@ public class ProjectControllerHelperService {
 
   private String checkRuns(Long projectId) throws IOException {
     int pass = 0;
-    final Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
+    final Collection<Run> runs = runService.listByProjectId(projectId);
     if (runs.size() > 0) {
       for (final Run run : runs) {
         if (run.getHealth() == HealthType.Completed) {

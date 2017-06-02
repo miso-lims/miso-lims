@@ -74,49 +74,34 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Autowired
   private SampleDao sampleDao;
-
   @Autowired
   private AuthorizationManager authorizationManager;
-
   @Autowired
   private SampleClassDao sampleClassDao;
-
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
-
   @Autowired
   private SampleNumberPerProjectService sampleNumberPerProjectService;
-
   @Autowired
   private ProjectStore projectStore;
-
   @Autowired
   private TissueOriginDao tissueOriginDao;
-
   @Autowired
   private TissueTypeDao tissueTypeDao;
-
   @Autowired
   private DetailedQcStatusDao detailedQcStatusDao;
-
   @Autowired
   private SubprojectDao subProjectDao;
-
   @Autowired
   private SamplePurposeDao samplePurposeDao;
-
   @Autowired
   private TissueMaterialDao tissueMaterialDao;
-
   @Autowired
   private SampleQcStore sampleQcDao;
-
   @Autowired
   private SecurityManager securityManager;
-
   @Autowired
   private LabService labService;
-
   @Autowired
   private NamingScheme namingScheme;
 

@@ -83,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 @Controller
 @RequestMapping("/project")
@@ -101,7 +102,8 @@ public class EditProjectController {
 
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
-
+  @Autowired
+  private RunService runService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -139,6 +141,10 @@ public class EditProjectController {
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   @InitBinder
@@ -207,7 +213,7 @@ public class EditProjectController {
     JSONObject j = new JSONObject();
     try {
       Collection<Sample> samples = sampleService.listByProjectId(projectId);
-      Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
+      Collection<Run> runs = runService.listByProjectId(projectId);
       Collection<Study> studies = studyService.listByProjectId(projectId);
 
       JSONObject runsJSON = new JSONObject();
