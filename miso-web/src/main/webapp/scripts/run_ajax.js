@@ -84,7 +84,25 @@ var Run = Run || {
     jQuery('#cycles').attr('data-parsley-maxlength', '10');
     jQuery('#cycles').attr('data-parsley-type', 'number');
 
- 
+    if (!document.getElementById('startDate').disabled) {
+       jQuery('#startDate').attr('class', 'form-control');
+       jQuery('#startDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+       jQuery('#startDate').attr('data-date-format', 'DD/MM/YYYY');
+       jQuery('#startDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+       jQuery('#startDate').attr('required', 'true');
+    } else {
+       jQuery('#startDate').removeAttr('required');
+    }
+
+    if (!document.getElementById('completionDate').disabled) {
+        jQuery('#completionDate').attr('class', 'form-control');
+        jQuery('#completionDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+        jQuery('#completionDate').attr('data-date-format', 'DD/MM/YYYY');
+        jQuery('#completionDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+        jQuery('#completionDate').attr('required',  'true');
+    } else {
+        jQuery('#completionDate').removeAttr('required');
+    }
 
     // Radio button validation: ensure a platform is selected
     jQuery('#platformType').attr('class', 'form-control');
@@ -175,22 +193,20 @@ var Run = Run || {
     return ok;
   },
   
-  checkForCompletionDate: function () {
-    var statusVal = jQuery('input[name=status\\.health]:checked').val();
-    if (!Utils.validation.isNullCheck(statusVal)) {
-      if (statusVal === "Failed" || statusVal === "Stopped") {
-        alert("You are manually setting a run to Stopped or Failed. Please remember to enter a Completion Date!");
-        if (jQuery("#completionDate input").length === 0) {
-          jQuery("#completionDate").html("<input type='text' name='status.completionDate' id='status.completionDate' value='" + jQuery('#completionDate').html() + "'>");
-          Utils.ui.addDatePicker("status\\.completionDate");
-        }
-      }
-      else {
-        if (jQuery("#status\\.completionDate").length > 0) {
-          jQuery("#completionDate").html(jQuery("#status\\.completionDate").val());
-        }
-      }
+  checkForCompletionDate: function (showDialog) {
+    var statusVal = jQuery('input[name=health]:checked').val();
+    if (Utils.validation.isNullCheck(statusVal)) {
+        return;
     }
+    var completionDate = document.getElementById("completionDate");
+    if (!completionDate) {
+        return;
+    }
+    var allowModification = (statusVal === "Failed" || statusVal === "Completed");
+    if (allowModification && showDialog) {
+        alert("Please remember to enter a Completion Date!");
+    }
+    completionDate.disabled = !allowModification;
   },
 
   makePacBioUrl: function (pbDashboardUrl, runName, startString, instrumentName) {
