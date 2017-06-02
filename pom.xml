@@ -124,6 +124,7 @@
     <module>sqlstore</module>
     <module>miso-dto</module>
     <module>notification-server</module>
+    <module>runscanner</module>
     <module>runstats-client</module>
     <module>notification-consumer-services</module>
     <module>miso-external-web</module>
@@ -684,6 +685,11 @@
       <dependency>
         <groupId>uk.ac.bbsrc.tgac.miso</groupId>
         <artifactId>notification-consumer-services</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>runscanner</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
