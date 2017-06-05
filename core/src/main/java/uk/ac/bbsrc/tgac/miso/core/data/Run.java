@@ -144,9 +144,6 @@ public class Run
           @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
 
-  @Column(nullable = false)
-  private Boolean pairedEnd;
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long runId = UNSAVED_ID;
@@ -371,10 +368,6 @@ public class Run
     return notes;
   }
 
-  public Boolean getPairedEnd() {
-    return pairedEnd;
-  }
-
   public Collection<RunQC> getRunQCs() {
     return runQCs;
   }
@@ -504,10 +497,6 @@ public class Run
 
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
-  }
-
-  public void setPairedEnd(Boolean pairedEnd) {
-    this.pairedEnd = pairedEnd;
   }
 
   public void setQCs(Collection<RunQC> qcs) {

@@ -290,7 +290,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     run.setName(runName);
     run.setAlias("RunAlias");
     run.setDescription("Run Description");
-    run.setPairedEnd(true);
     run.setSequencerReference(emptySR);
     run.setLastModifier(emptyUser);
 
@@ -389,7 +388,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     run.setSecurityProfile(profile);
     run.setAlias(alias);
     run.setDescription("description");
-    run.setPairedEnd(true);
     run.setFilePath("/somewhere/someplace/");
     run.setSequencerReference(sequencer);
     run.setLastModifier(user);

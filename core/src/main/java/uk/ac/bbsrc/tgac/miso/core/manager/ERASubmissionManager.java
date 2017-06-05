@@ -75,12 +75,15 @@ import net.sf.json.JSONArray;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -534,7 +537,15 @@ public class ERASubmissionManager implements SubmissionManager {
         file.appendChild(readLabel);
         files.appendChild(file);
 
-        if (r.getPairedEnd()) {
+        boolean pairedEnd = false;
+        if (r instanceof IlluminaRun) {
+          pairedEnd = ((IlluminaRun) r).getPairedEnd();
+        } else if (r instanceof SolidRun) {
+          pairedEnd = ((SolidRun) r).getPairedEnd();
+        } else if (r instanceof LS454Run) {
+          pairedEnd = ((LS454Run) r).getPairedEnd();
+        }
+        if (pairedEnd) {
           Element file2 = xml.getOwnerDocument().createElementNS(null, "FILE");
           file2.setAttribute("filename",
               r.getAlias() + "/" + "00" + entry.getValue().getPartitionNumber() + "/" + entry.getKey().getName() + "_R2.fastq.gz");

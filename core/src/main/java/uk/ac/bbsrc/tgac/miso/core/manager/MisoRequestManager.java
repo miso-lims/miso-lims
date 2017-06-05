@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
@@ -763,7 +764,6 @@ public class MisoRequestManager implements RequestManager {
         managed.setLastModifier(getCurrentUser());
         managed.setAlias(run.getAlias());
         managed.setDescription(run.getDescription());
-        managed.setPairedEnd(run.getPairedEnd());
         managed.setFilePath(run.getFilePath());
         managed.setHealth(run.getHealth());
         managed.setStartDate(run.getStartDate());
@@ -791,16 +791,20 @@ public class MisoRequestManager implements RequestManager {
           managedIllumina.setImgCycle(runIllumina.getImgCycle());
           managedIllumina.setNumCycles(runIllumina.getNumCycles());
           managedIllumina.setScoreCycle(runIllumina.getScoreCycle());
+          managedIllumina.setPairedEnd(runIllumina.getPairedEnd());
         } else if (managed instanceof PacBioRun) {
           PacBioRun managedPacBio = (PacBioRun) managed;
           PacBioRun runPacBio = (PacBioRun) run;
-          managedPacBio.setCreationDate(runPacBio.getCreationDate());
           managedPacBio.setMovieDuration(runPacBio.getMovieDuration());
-          managedPacBio.setWellName(runPacBio.getWellName());
         } else if (managed instanceof LS454Run) {
           LS454Run managedLS454 = (LS454Run) managed;
           LS454Run runLS454 = (LS454Run) run;
           managedLS454.setCycles(runLS454.getCycles());
+          managedLS454.setPairedEnd(runLS454.getPairedEnd());
+        } else if (managed instanceof SolidRun) {
+          SolidRun managedSolid = (SolidRun) managed;
+          SolidRun runSolid = (SolidRun) run;
+          managedSolid.setPairedEnd(runSolid.getPairedEnd());
         }
 
         Set<String> added = new TreeSet<>(updatedContainers);

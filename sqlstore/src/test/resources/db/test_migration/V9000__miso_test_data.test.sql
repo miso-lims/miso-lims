@@ -446,11 +446,11 @@ DELETE FROM `RunIllumina`;
 DELETE FROM `RunPacBio`;
 DELETE FROM `RunLS454`;
 DELETE FROM `Run`;
-INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `pairedEnd`, `filePath`, `securityProfile_profileId`, `alias`, `sequencerReference_sequencerReferenceId`, `lastModifier`, `health`, `completionDate`) 
-VALUES (1,'RUN1','BC0JHTACXX',NULL,1,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX',12,'120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31'),
-(2,'RUN2','AD0VJ9ACXX',NULL,1,'/.mounts/labs/prod/archive/h1179/120404_h1179_0072_AD0VJ9ACXX',13,'120404_h1179_0072_AD0VJ9ACXX',1,1,'Failed','2012-04-04'),
-(3,'RUN3','BC075RACXX',NULL,1,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX',14,'120412_h1179_0073_BC075RACXX',1,1,'Completed','2012-04-20'),
-(4,'RUN4','AC0KY7ACXX',NULL,1,'/.mounts/labs/prod/archive/h1179/120314_h1179_0068_AC0KY7ACXX',15,'120314_h1179_0068_AC0KY7ACXX',1,1,'Completed','2012-03-23');
+INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `filePath`, `securityProfile_profileId`, `alias`, `sequencerReference_sequencerReferenceId`, `lastModifier`, `health`, `completionDate`) 
+VALUES (1,'RUN1','BC0JHTACXX',NULL,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX',12,'120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31'),
+(2,'RUN2','AD0VJ9ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120404_h1179_0072_AD0VJ9ACXX',13,'120404_h1179_0072_AD0VJ9ACXX',1,1,'Failed','2012-04-04'),
+(3,'RUN3','BC075RACXX',NULL,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX',14,'120412_h1179_0073_BC075RACXX',1,1,'Completed','2012-04-20'),
+(4,'RUN4','AC0KY7ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120314_h1179_0068_AC0KY7ACXX',15,'120314_h1179_0068_AC0KY7ACXX',1,1,'Completed','2012-03-23');
 INSERT INTO RunIllumina(runId) VALUES (1), (2), (3), (4);
 
 INSERT INTO `RunChangeLog`(`runId`, `columnsChanged`, `userId`, `message`, `changeTime`)

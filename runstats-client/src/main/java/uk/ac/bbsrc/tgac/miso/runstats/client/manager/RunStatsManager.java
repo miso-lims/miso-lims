@@ -38,11 +38,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.tgac.statsdb.exception.ConsumerException;
@@ -241,8 +244,9 @@ public class RunStatsManager {
 
   public JSONObject getPerPositionBaseSequenceQualityForLane(Run run, int laneNumber) throws RunStatsException {
     D3PlotConsumer d3p = new D3PlotConsumer(reportsDecorator);
+
     try {
-      return d3p.getPerPositionBaseSequenceQualityForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
+      return d3p.getPerPositionBaseSequenceQualityForLane(run.getAlias(), getPairedEnd(run), laneNumber);
     } catch (ConsumerException e) {
       log.error("cannot generate D3 plot JSON for run " + run.getAlias(), e);
       throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
@@ -252,10 +256,22 @@ public class RunStatsManager {
   public JSONObject getPerPositionBaseContentForLane(Run run, int laneNumber) throws RunStatsException {
     D3PlotConsumer d3p = new D3PlotConsumer(reportsDecorator);
     try {
-      return d3p.getPerPositionBaseContentForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
+      return d3p.getPerPositionBaseContentForLane(run.getAlias(), getPairedEnd(run), laneNumber);
     } catch (ConsumerException e) {
       log.error("cannot generate D3 plot JSON for run " + run.getAlias(), e);
       throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
     }
+  }
+
+  private boolean getPairedEnd(Run run) {
+    boolean pairedEnd = false;
+    if (run instanceof IlluminaRun) {
+      pairedEnd = ((IlluminaRun) run).getPairedEnd();
+    } else if (run instanceof SolidRun) {
+      pairedEnd = ((SolidRun) run).getPairedEnd();
+    } else if (run instanceof LS454Run) {
+      pairedEnd = ((LS454Run) run).getPairedEnd();
+    }
+    return pairedEnd;
   }
 }
