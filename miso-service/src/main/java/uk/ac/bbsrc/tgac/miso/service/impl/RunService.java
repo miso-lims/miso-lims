@@ -84,4 +84,8 @@ public interface RunService extends PaginatedDataSource<Run> {
 
   void saveRuns(Collection<Run> runs) throws IOException;
 
+  QcType getRunQcType(long qcTypeId) throws IOException;
+
+  QcType getRunQcTypeByName(String qcTypeName) throws IOException;
+
 }

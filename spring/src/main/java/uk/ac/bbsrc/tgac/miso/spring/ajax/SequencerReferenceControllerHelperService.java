@@ -48,7 +48,8 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -64,11 +65,13 @@ public class SequencerReferenceControllerHelperService {
   @Autowired
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
+  private PlatformService platformService;
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
 
   public JSONObject listPlatforms(HttpSession session, JSONObject json) {
     try {
-      Collection<Platform> ps = requestManager.listAllPlatforms();
+      Collection<Platform> ps = platformService.list();
       StringBuilder sb = new StringBuilder();
       for (Platform p : ps) {
         sb.append("<option value=" + p.getId() + ">" + p.getNameAndModel() + "</option>");
@@ -82,7 +85,7 @@ public class SequencerReferenceControllerHelperService {
 
   public JSONObject listSequencers(HttpSession session, JSONObject json) {
     try {
-      Collection<SequencerReference> sr = requestManager.listAllSequencerReferences();
+      Collection<SequencerReference> sr = sequencerReferenceService.list();
       JSONObject sequencers = new JSONObject();
       JSONArray sequencers_list = new JSONArray();
       for (SequencerReference s : sr) {
@@ -123,10 +126,10 @@ public class SequencerReferenceControllerHelperService {
       if (json.has("server") && !isStringEmptyOrNull(json.getString("server"))) {
         InetAddress i = InetAddress.getByName(json.getString("server"));
         String name = json.getString("name");
-        Platform p = requestManager.getPlatformById(json.getInt("platform"));
+        Platform p = platformService.get(json.getInt("platform"));
         SequencerReference sr = new SequencerReferenceImpl(name, i.getHostAddress(), p);
         log.info(sr.toString());
-        requestManager.saveSequencerReference(sr);
+        sequencerReferenceService.create(sr);
         return JSONUtils.SimpleJSONResponse("Saved successfully");
       }
     } catch (Exception e) {
@@ -149,7 +152,7 @@ public class SequencerReferenceControllerHelperService {
       if (json.has("refId")) {
         Long refId = json.getLong("refId");
         try {
-          requestManager.deleteSequencerReference(requestManager.getSequencerReferenceById(refId));
+          sequencerReferenceService.delete(refId);
           return JSONUtils.SimpleJSONResponse("Sequencer deleted");
         } catch (IOException e) {
           log.error("cannot delete sequencer reference", e);
@@ -163,10 +166,6 @@ public class SequencerReferenceControllerHelperService {
     }
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -176,7 +175,7 @@ public class SequencerReferenceControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-      for (SequencerReference sequencer : requestManager.listAllSequencerReferences()) {
+      for (SequencerReference sequencer : sequencerReferenceService.list()) {
         JSONArray inner = new JSONArray();
         inner.add(TableHelper.hyperLinkify("/miso/sequencer/" + sequencer.getId(), sequencer.getName()));
         inner.add(sequencer.getPlatform().getPlatformType().getKey());

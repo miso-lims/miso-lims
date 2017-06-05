@@ -542,7 +542,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private Pool findExistingPool(Pool pool) throws IOException {
     if (pool.getIdentificationBarcode() != null) {
-      Pool poolByBarcode = serviceManager.getPoolService().getPoolByBarcode(pool.getIdentificationBarcode());
+      Pool poolByBarcode = serviceManager.getPoolService().getByBarcode(pool.getIdentificationBarcode());
       if (poolByBarcode != null) {
         if (poolByBarcode.getAlias().equals(pool.getAlias())) {
           return poolByBarcode;
@@ -554,7 +554,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         }
       }
     }
-    Collection<Pool> matches = serviceManager.getPoolService().listAllPoolsBySearch(pool.getAlias());
+    Collection<Pool> matches = serviceManager.getPoolService().listBySearch(pool.getAlias());
 
     // filter by alias
     List<Pool> aliasMatches = Lists.newArrayList();
@@ -588,7 +588,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info("Migrating pools...");
     for (Pool pool : pools) {
       setPoolModifiedDetails(pool);
-      pool.setId(serviceManager.getPoolService().savePool(pool));
+      pool.setId(serviceManager.getPoolService().save(pool));
       log.debug("Saved pool " + pool.getAlias());
     }
     log.info(pools.size() + " pools migrated.");
@@ -693,9 +693,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
       Collection<PoolableElementView> toPoolables = toPool.getPoolableElementViews();
       toPoolables.addAll(fromPoolables);
       setPoolModifiedDetails(toPool);
-      serviceManager.getPoolService().savePool(toPool);
+      serviceManager.getPoolService().save(toPool);
       for (Note note : fromPool.getNotes()) {
-        serviceManager.getPoolService().savePoolNote(toPool, note);
+        serviceManager.getPoolService().saveNote(toPool, note);
       }
       log.debug(String.format("Merged new pool %s with existing pool '%s'", fromPool.getAlias(), toPool.getAlias()));
     }

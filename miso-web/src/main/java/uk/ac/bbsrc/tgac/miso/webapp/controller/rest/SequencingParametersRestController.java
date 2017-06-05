@@ -24,9 +24,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 
 @Controller
@@ -36,7 +36,7 @@ public class SequencingParametersRestController extends RestController {
   @Autowired
   private SequencingParametersService sequencingParametersService;
   @Autowired
-  private RequestManager requestManager;
+  private PlatformService platformService;
 
   @RequestMapping(value = "/sequencingparameters/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
@@ -65,7 +65,7 @@ public class SequencingParametersRestController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createSequencingParameters(@RequestBody SequencingParametersDto sequencingParamtersDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
-    Platform platform = requestManager.getPlatformById(sequencingParamtersDto.getPlatform().getId());
+    Platform platform = platformService.get(sequencingParamtersDto.getPlatform().getId());
     if (platform == null) {
       throw new RestException("No platform found with ID: " + sequencingParamtersDto.getPlatform().getId(), Status.BAD_REQUEST);
     }

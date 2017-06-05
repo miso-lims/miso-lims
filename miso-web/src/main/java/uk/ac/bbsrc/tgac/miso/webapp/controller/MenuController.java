@@ -60,7 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -69,12 +68,16 @@ import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
+import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -88,8 +91,6 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
-  @Autowired
   private KitService kitService;
   @Autowired
   private IndexService indexService;
@@ -99,16 +100,22 @@ public class MenuController implements ServletContextAware {
   private DetailedQcStatusService detailedQcStatusService;
   @Autowired
   private StainService stainService;
-
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private LibraryDesignService libraryDesignService;
+  @Autowired
+  private LibraryDesignCodeService libraryDesignCodeService;
+  @Autowired
+  private PlatformService platformService;
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
   private SubprojectService subprojectService;
-
   @Autowired
   private SampleGroupService sampleGroupService;
+  @Autowired
+  private TargetedSequencingService targetedSequencingService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -244,12 +251,12 @@ public class MenuController implements ServletContextAware {
 
     final Iterable<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 
-    createArray(mapper, baseUri, node, "libraryDesigns", requestManager.listLibraryDesigns(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "libraryDesigns", libraryDesignService.list(), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryTypes", libraryService.listLibraryTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "librarySelections", libraryService.listLibrarySelectionTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryStrategies", libraryService.listLibraryStrategyTypes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "libraryDesignCodes", requestManager.listLibraryDesignCodes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "platforms", requestManager.listAllPlatforms(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "libraryDesignCodes", libraryDesignCodeService.list(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "platforms", platformService.list(), Dtos::asDto);
     createArray(mapper, baseUri, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleClasses", sampleClassService.getAll(), model -> {
       SampleClassDto dto = Dtos.asDto(model);
@@ -261,14 +268,14 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "subprojects", subprojectService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "stains", stainService.list(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "targetedSequencings", requestManager.listAllTargetedSequencing(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);
     createArray(mapper, baseUri, node, "indexFamilies", indexFamilies, Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");
-    Collection<PlatformType> activePlatformTypes = requestManager.listActivePlatformTypes();
+    Collection<PlatformType> activePlatformTypes = platformService.listActivePlatformTypes();
     for (PlatformType platformType : PlatformType.values()) {
       ObjectNode dto = platformTypes.addObject();
       dto.put("name", platformType.name());

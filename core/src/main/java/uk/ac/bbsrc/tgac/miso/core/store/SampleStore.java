@@ -40,17 +40,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 public interface SampleStore extends Store<Sample>, Remover<Sample>, PaginatedDataSource<Sample> {
 
   /**
-   * List all Samples that match a search criteria
-   * 
-   * @param query
-   *          of type String
-   * @return Collection<Sample>
-   * @throws IOException
-   *           when
-   */
-  Collection<Sample> listBySearch(String query) throws IOException;
-
-  /**
    * Retrieve a Sample from an underlying data store given a Sample ID barcode
    * <p/>
    * This method intends to retrieve objects in an 'ignorant' fashion, i.e.

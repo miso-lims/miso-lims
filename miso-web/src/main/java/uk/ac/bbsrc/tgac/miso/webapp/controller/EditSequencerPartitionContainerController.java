@@ -52,8 +52,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 @Controller
@@ -66,19 +67,24 @@ public class EditSequencerPartitionContainerController {
   private SecurityManager securityManager;
 
   @Autowired
-  private RequestManager requestManager;
-
-  @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private ContainerService containerService;
+  @Autowired
+  private PlatformService platformService;
   @Autowired
   private RunService runService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  public void setContainerService(ContainerService containerService) {
+    this.containerService = containerService;
+  }
+
+  public void setPlatformService(PlatformService platformService) {
+    this.platformService = platformService;
   }
 
   public void setRunService(RunService runService) {
@@ -97,7 +103,7 @@ public class EditSequencerPartitionContainerController {
 
   @ModelAttribute("platforms")
   public Collection<Platform> populatePlatforms() throws IOException {
-    return requestManager.listAllPlatforms();
+    return platformService.list();
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -114,7 +120,7 @@ public class EditSequencerPartitionContainerController {
         container = new SequencerPartitionContainerImpl(user);
         model.put("title", "New Container");
       } else {
-        container = requestManager.getSequencerPartitionContainerById(containerId);
+        container = containerService.get(containerId);
         model.put("title", container.getPlatform().getPlatformType().getContainerName() + " " + containerId);
       }
 
@@ -145,7 +151,7 @@ public class EditSequencerPartitionContainerController {
           pool.setLastModifier(user);
         }
       }
-      long containerId = requestManager.saveSequencerPartitionContainer(container);
+      long containerId = containerService.create(container);
       session.setComplete();
       model.clear();
       return "redirect:/miso/container/" + containerId;

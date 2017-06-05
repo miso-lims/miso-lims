@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
@@ -63,12 +64,18 @@ public class ExternalSectionControllerHelperService {
   @Autowired
   private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
   @Autowired
+  private ContainerService containerService;
+  @Autowired
   private RunService runService;
   @Autowired
   private SampleService sampleService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setContainerService(ContainerService containerService) {
+    this.containerService = containerService;
   }
 
   public void setRunService(RunService runService) {
@@ -229,8 +236,8 @@ public class ExternalSectionControllerHelperService {
       JSONArray jsonArray = new JSONArray();
       for (Sample sample : sampleService.listByProjectId(projectId)) {
         String sampleQubit = "not available";
-        if (requestManager.listAllSampleQCsBySampleId(sample.getId()).size() > 0) {
-          ArrayList<SampleQC> sampleQcList = new ArrayList<>(requestManager.listAllSampleQCsBySampleId(sample.getId()));
+        if (sampleService.listSampleQCsBySampleId(sample.getId()).size() > 0) {
+          ArrayList<SampleQC> sampleQcList = new ArrayList<>(sampleService.listSampleQCsBySampleId(sample.getId()));
           SampleQC lastQc = sampleQcList.get(sampleQcList.size() - 1);
           sampleQubit = (lastQc.getResults() != null ? lastQc.getResults().toString() + " ng/µl" : "not available");
         }
@@ -257,8 +264,7 @@ public class ExternalSectionControllerHelperService {
         if (run.getHealth() != HealthType.Failed) {
 
           StringBuilder sb = new StringBuilder();
-          Collection<SequencerPartitionContainer> spcs = requestManager
-              .listSequencerPartitionContainersByRunId(run.getId());
+          Collection<SequencerPartitionContainer> spcs = containerService.listByRunId(run.getId());
           if (spcs.size() > 0) {
             sb.append("<ul>");
             for (SequencerPartitionContainer spc : spcs) {

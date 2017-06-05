@@ -29,12 +29,12 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
-import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 public class DefaultExperimentServiceTest {
@@ -47,17 +47,17 @@ public class DefaultExperimentServiceTest {
   @Mock
   private ExperimentStore experimentStore;
   @Mock
-  private PlatformStore platformStore;
+  private PlatformService platformService;
   @Mock
-  private PoolStore poolStore;
+  private PoolService poolService;
   @Mock
-  private StudyStore studyStore;
+  private StudyService studyService;
   @Mock
   private SecurityStore securityStore;
   @Mock
   private SecurityProfileStore securityProfileStore;
   @Mock
-  private KitStore kitStore;
+  private KitService kitService;
   @Mock
   private AuthorizationManager authorizationManager;
   @Mock
@@ -95,9 +95,9 @@ public class DefaultExperimentServiceTest {
     }).when(authorizationManager).throwIfNotWritable(any(SecurableByProfile.class));
 
     when(experimentStore.save(experiment)).thenReturn(expectedReturn);
-    when(platformStore.get(experiment.getPlatform().getId())).thenReturn(experiment.getPlatform());
-    when(poolStore.get(experiment.getPool().getId())).thenReturn(experiment.getPool());
-    when(studyStore.get(experiment.getStudy().getId())).thenReturn(experiment.getStudy());
+    when(platformService.get(experiment.getPlatform().getId())).thenReturn(experiment.getPlatform());
+    when(poolService.get(experiment.getPool().getId())).thenReturn(experiment.getPool());
+    when(studyService.get(experiment.getStudy().getId())).thenReturn(experiment.getStudy());
     when(securityProfileStore.get(experiment.getSecurityProfile().getProfileId())).thenReturn(experiment.getSecurityProfile());
 
     assertEquals(expectedReturn, sut.save(experiment));

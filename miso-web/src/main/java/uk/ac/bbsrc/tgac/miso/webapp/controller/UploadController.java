@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService;
 
@@ -86,6 +87,8 @@ public class UploadController {
   private IndexService tagBarcodeService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -316,7 +319,7 @@ public class UploadController {
     String recordId = request.getParameter("serviceRecordId");
     if (recordId == null) {
       throw new IOException("Cannot upload file - serviceRecordId parameter missing or null");
-    } else if (requestManager.getSequencerServiceRecordById(Long.valueOf(recordId)) == null) {
+    } else if (sequencerReferenceService.getServiceRecord(Long.valueOf(recordId)) == null) {
       throw new IOException("Cannot upload file - service record does not exist");
     }
 

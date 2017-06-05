@@ -93,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
@@ -193,6 +194,8 @@ public class LibraryControllerHelperService {
   private LibraryDilutionService dilutionService;
   @Autowired
   private KitService kitService;
+  @Autowired
+  private TargetedSequencingService targetedSequencingService;
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -550,7 +553,7 @@ public class LibraryControllerHelperService {
 
   public JSONArray getTargetedSequencingTypes() throws IOException {
     Collection<TargetedSequencing> targetedSequencings = getNonArchivedTargetedSequencing(
-        requestManager.listAllTargetedSequencing());
+        targetedSequencingService.list());
     JSONArray fullTargetedSequencingCollection = new JSONArray();
 
     for (TargetedSequencing targetedSequencing : targetedSequencings) {
@@ -604,7 +607,7 @@ public class LibraryControllerHelperService {
         Library library = libraryService.get(libraryId);
         LibraryQC newQc = new LibraryQCImpl();
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
-        newQc.setQcType(requestManager.getLibraryQcTypeById(json.getLong("qcType")));
+        newQc.setQcType(libraryService.getLibraryQcType(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
         libraryService.addQc(library, newQc);
 
@@ -693,7 +696,7 @@ public class LibraryControllerHelperService {
         if (json.has("targetedSequencing")) {
           Long libraryDilutionTargetedSequencingId = Long.parseLong(json.getString("targetedSequencing"));
           if (libraryDilutionTargetedSequencingId > 0) {
-            TargetedSequencing targetedSequencing = requestManager.getTargetedSequencingById(libraryDilutionTargetedSequencingId);
+            TargetedSequencing targetedSequencing = targetedSequencingService.get(libraryDilutionTargetedSequencingId);
             newDilution.setTargetedSequencing(targetedSequencing);
           }
         }
@@ -803,7 +806,7 @@ public class LibraryControllerHelperService {
           if (isStringEmptyOrNull(json.getString("targetedSequencing"))) {
             dilution.setTargetedSequencing(null);
           } else {
-            dilution.setTargetedSequencing(requestManager.getTargetedSequencingById(json.getLong("targetedSequencing")));
+            dilution.setTargetedSequencing(targetedSequencingService.get(json.getLong("targetedSequencing")));
           }
         }
         if (json.has("idBarcode")) {
@@ -844,7 +847,7 @@ public class LibraryControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       Long qcId = Long.parseLong(json.getString("qcId"));
-      LibraryQC libraryQc = requestManager.getLibraryQCById(qcId);
+      LibraryQC libraryQc = libraryService.getLibraryQC(qcId);
       Long libraryId = Long.parseLong(json.getString("libraryId"));
 
       response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "'/>");
@@ -861,7 +864,7 @@ public class LibraryControllerHelperService {
     try {
       if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
         Long qcId = Long.parseLong(json.getString("qcId"));
-        LibraryQC libraryQc = requestManager.getLibraryQCById(qcId);
+        LibraryQC libraryQc = libraryService.getLibraryQC(qcId);
 
         libraryQc.setResults(Double.parseDouble(json.getString("result")));
         libraryService.addQc(libraryService.get(libraryQc.getLibrary().getId()), libraryQc);

@@ -35,7 +35,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +107,7 @@ public class DashboardHelperService {
   @Autowired
   private PoolService poolService;
 
+
   public JSONObject checkUser(HttpSession session, JSONObject json) {
     String username = json.getString("username");
     if (isStringEmptyOrNull(username)) {
@@ -172,6 +172,22 @@ public class DashboardHelperService {
     return JSONUtils.SimpleJSONError("Please supply a valid username to check");
   }
 
+  private StringBuilder generateDashboardCell(StringBuilder b, String misoClass, Long id, String name, String alias,
+      String... aliasAlternative) {
+    b.append("<a class=\"dashboardresult\" href=\"/miso/" + misoClass + "/" + id
+        + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+    b.append("Name: <b>" + name + "</b><br/>");
+    if (aliasAlternative == null || aliasAlternative.length == 0) {
+      b.append("Alias");
+    } else {
+      b.append((isStringEmptyOrNull(aliasAlternative[0]) ? "Alias"
+          : aliasAlternative[0]));
+    }
+    b.append(": <b>" + alias + "</b><br/>");
+    b.append("</div></a>");
+    return b;
+  }
+
   public JSONObject searchProject(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
     try {
@@ -187,11 +203,7 @@ public class DashboardHelperService {
         Collections.sort(projects);
         Collections.reverse(projects);
         for (Project p : projects) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + p.getProjectId()
-              + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + p.getName() + "</b><br/>");
-          b.append("Alias: <b>" + p.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "project", p.getProjectId(), p.getName(), p.getAlias());
         }
       } else {
         b.append("No matches");
@@ -207,25 +219,20 @@ public class DashboardHelperService {
   public JSONObject searchPool(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
     try {
-      List<Pool> pools;
-      StringBuilder b = new StringBuilder();
+      Collection<Pool> pools;
       if (!isStringEmptyOrNull(searchStr)) {
-
-        pools = new ArrayList<>(poolService.listAllPoolsBySearch(searchStr));
+        pools = new ArrayList<>(poolService.list(0, 0, false, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
       } else {
-        pools = new ArrayList<>(poolService.listAllPoolsWithLimit(50));
+        pools = new ArrayList<>(poolService.list(0, 50, false, "id"));
       }
 
+      StringBuilder b = new StringBuilder();
       if (pools.size() > 0) {
-        Collections.sort(pools);
-        Collections.reverse(pools);
         for (Pool p : pools) {
-          // yuck-o
-          b.append("<a class=\"dashboardresult\" href=\"/miso/pool/" + p.getId()
-              + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + p.getName() + "</b><br/>");
-          b.append("Alias: <b>" + p.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "pool", p.getId(), p.getName(), p.getAlias());
         }
       } else {
         b.append("No matches");
@@ -253,11 +260,7 @@ public class DashboardHelperService {
         Collections.sort(studies);
         Collections.reverse(studies);
         for (Study s : studies) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/study/" + s.getId()
-              + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + s.getName() + "</b><br/>");
-          b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "study", s.getId(), s.getName(), s.getAlias());
         }
       } else {
         b.append("No matches");
@@ -284,11 +287,7 @@ public class DashboardHelperService {
         Collections.sort(experiments);
         Collections.reverse(experiments);
         for (Experiment e : experiments) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/experiment/" + e.getId()
-              + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + e.getName() + "</b><br/>");
-          b.append("Alias: <b>" + e.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "experiment", e.getId(), e.getName(), e.getAlias());
         }
       } else {
         b.append("No matches");
@@ -303,23 +302,20 @@ public class DashboardHelperService {
   public JSONObject searchRun(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
     try {
-      List<Run> runs;
-      StringBuilder b = new StringBuilder();
+      Collection<Run> runs;
       if (!isStringEmptyOrNull(searchStr)) {
-        runs = new ArrayList<>(runService.listBySearch(searchStr));
+        runs = new ArrayList<>(runService.list(0, 0, false, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
       } else {
-        runs = new ArrayList<>(runService.listWithLimit(50));
+        runs = new ArrayList<>(runService.list(0, 50, false, "id"));
       }
 
+      StringBuilder b = new StringBuilder();
       if (runs.size() > 0) {
-        Collections.sort(runs);
-        Collections.reverse(runs);
         for (Run r : runs) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/run/" + r.getId()
-              + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + r.getName() + "</b><br/>");
-          b.append("Alias: <b>" + r.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "run", r.getId(), r.getName(), r.getAlias());
         }
       } else {
         b.append("No matches");
@@ -334,28 +330,23 @@ public class DashboardHelperService {
   public JSONObject searchLibraryDilution(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
     try {
-      List<LibraryDilution> libraryDilutions;
-      StringBuilder b = new StringBuilder();
+      Collection<LibraryDilution> dilutions;
       if (!isStringEmptyOrNull(searchStr)) {
-        libraryDilutions = new ArrayList<>(dilutionService.list(0, 0, false, "id",
+        dilutions = new ArrayList<>(dilutionService.list(0, 0, false, "id",
             PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
               // Discard errors
             })));
       } else {
-        libraryDilutions = new ArrayList<>(dilutionService.list(0, 50, false, "id"));
+        dilutions = new ArrayList<>(dilutionService.list(0, 50, false, "id"));
       }
 
-      if (libraryDilutions.size() > 0) {
-        Collections.sort(libraryDilutions);
-        Collections.reverse(libraryDilutions);
-        for (LibraryDilution ld : libraryDilutions) {
+      StringBuilder b = new StringBuilder();
+      if (dilutions.size() > 0) {
+        for (LibraryDilution ld : dilutions) {
           if (ld != null) {
             if (ld.getLibrary() != null) {
-              b.append("<a class=\"dashboardresult\" href=\"/miso/library/" + ld.getLibrary().getId()
-                  + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-              b.append("Name: <b>" + ld.getName() + "</b><br/>");
-              b.append("From Library: <b>" + ld.getLibrary().getAlias() + "(" + ld.getLibrary().getName() + ")</b><br/>");
-              b.append("</div></a>");
+              String libraryAliasAndName = ld.getLibrary().getAlias() + " (" + ld.getLibrary().getName() + ")";
+              generateDashboardCell(b, "library", ld.getLibrary().getId(), ld.getName(), libraryAliasAndName, "From Library");
             }
           }
         }
@@ -371,28 +362,22 @@ public class DashboardHelperService {
 
   public JSONObject searchLibrary(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
+
     try {
-      List<Library> libraries;
-      StringBuilder b = new StringBuilder();
+      Collection<Library> libraries;
       if (!isStringEmptyOrNull(searchStr)) {
-        libraries = new ArrayList<>(libraryService.listBySearch(searchStr));
-        if (libraries.isEmpty()) {
-          // Base64-encoded string, most likely a barcode image beeped in. decode and search
-          libraries = new ArrayList<>(libraryService.listBySearch(new String(Base64.decodeBase64(searchStr))));
-        }
+        libraries = new ArrayList<>(libraryService.list(0, 0, false, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
       } else {
-        libraries = new ArrayList<>(libraryService.listWithLimit(50));
+        libraries = new ArrayList<>(libraryService.list(0, 50, false, "id"));
       }
 
+      StringBuilder b = new StringBuilder();
       if (libraries.size() > 0) {
-        Collections.sort(libraries);
-        Collections.reverse(libraries);
         for (Library l : libraries) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/library/" + l.getId()
-              + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + l.getName() + "</b><br/>");
-          b.append("Alias: <b>" + l.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "library", l.getId(), l.getName(), l.getAlias());
         }
       } else {
         b.append("No matches");
@@ -404,33 +389,28 @@ public class DashboardHelperService {
     }
   }
 
-  public JSONObject searchSample(HttpSession session, JSONObject json) {
+  public JSONObject searchSample(HttpSession session, JSONObject json) throws IOException {
     String searchStr = json.getString("str");
     try {
-      List<Sample> samples;
-      StringBuilder b = new StringBuilder();
+      Collection<Sample> samples;
       if (!isStringEmptyOrNull(searchStr)) {
-        samples = new ArrayList<>(sampleService.listBySearch(searchStr));
-        if (samples.isEmpty()) {
-          samples = new ArrayList<>(sampleService.listBySearch(new String(Base64.decodeBase64(searchStr))));
-        }
+        samples = new ArrayList<>(sampleService.list(0, 0, false, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
       } else {
-        samples = new ArrayList<>(sampleService.listWithLimit(50));
+        samples = new ArrayList<>(sampleService.list(0, 50, false, "id"));
       }
 
+      StringBuilder b = new StringBuilder();
       if (samples.size() > 0) {
-        Collections.sort(samples);
-        Collections.reverse(samples);
         for (Sample s : samples) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/sample/" + s.getId()
-              + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + s.getName() + "</b><br/>");
-          b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "sample", s.getId(), s.getName(), s.getAlias());
         }
       } else {
         b.append("No matches");
       }
+
       return JSONUtils.JSONObjectResponse("html", b.toString());
     } catch (IOException e) {
       log.debug("Failed", e);
@@ -441,8 +421,7 @@ public class DashboardHelperService {
   public JSONObject checkAlerts(HttpSession session, JSONObject json) {
     JSONObject response = new JSONObject();
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!alertService.listUnreadByUserId(user.getUserId()).isEmpty()) {
+      if (!alertService.listUnreadForCurrentUser().isEmpty()) {
         response.put("newAlerts", true);
       }
     } catch (IOException e) {
@@ -461,7 +440,7 @@ public class DashboardHelperService {
       if (json.has("showReadAlerts") && json.getBoolean("showReadAlerts")) {
         alerts = new ArrayList<>(alertService.listByUserId(user.getUserId()));
       } else {
-        alerts = new ArrayList<>(alertService.listUnreadByUserId(user.getUserId()));
+        alerts = new ArrayList<>(alertService.listUnreadForCurrentUser());
       }
       Collections.sort(alerts);
       for (Alert a : alerts) {
@@ -541,8 +520,7 @@ public class DashboardHelperService {
   public JSONObject setAllAlertsAsRead(HttpSession session, JSONObject json) {
 
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      List<Alert> alerts = new ArrayList<>(alertService.listUnreadByUserId(user.getUserId()));
+      List<Alert> alerts = new ArrayList<>(alertService.listUnreadForCurrentUser());
       for (Alert a : alerts) {
         try {
           a.setAlertRead(true);

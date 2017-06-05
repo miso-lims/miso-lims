@@ -89,12 +89,12 @@ public class PoolSearchService {
 
     @Override
     public Collection<Pool> all(PlatformType type) throws IOException {
-      return poolService.listAllPoolsByPlatform(type);
+      return poolService.listByPlatform(type);
     }
 
     @Override
     public Collection<Pool> search(PlatformType type, String query) throws IOException {
-      return poolService.listAllPoolsByPlatformAndSearch(type, query);
+      return poolService.listByPlatformAndSearch(type, query);
     }
 
   }

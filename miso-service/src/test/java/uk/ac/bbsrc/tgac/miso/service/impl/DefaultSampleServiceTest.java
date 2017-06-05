@@ -46,12 +46,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
@@ -60,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
+import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -79,7 +78,7 @@ public class DefaultSampleServiceTest {
   private HibernateProjectDao projectDAO;
 
   @Mock
-  private SampleClassDao sampleClassDao;
+  private SampleClassService sampleClassService;
 
   @Mock
   private SampleValidRelationshipService sampleValidRelationshipService;
@@ -101,9 +100,6 @@ public class DefaultSampleServiceTest {
 
   @Mock
   private SubprojectDao subProjectDao;
-
-  @Mock
-  private KitStore kitStore;
 
   @Mock
   private SecurityStore securityStore;
@@ -291,7 +287,8 @@ public class DefaultSampleServiceTest {
     SampleTissue sample = new SampleTissueImpl();
     sample.setSampleClass(new SampleClassImpl());
     sample.getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
-    Mockito.when(sampleClassDao.listByCategory(Mockito.eq(Identity.CATEGORY_NAME))).thenReturn(Lists.newArrayList(sample.getSampleClass()));
+    Mockito.when(sampleClassService.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
+        .thenReturn(Lists.newArrayList(sample.getSampleClass()));
     exception.expect(IllegalArgumentException.class);
     sut.create(sample);
   }
@@ -369,7 +366,7 @@ public class DefaultSampleServiceTest {
   @Test
   public void testCreateDetailedSampleNoTissueOrIdentity() throws Exception {
     Identity identity = makeUnsavedParentIdentity();
-    Mockito.when(sampleClassDao.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
+    Mockito.when(sampleClassService.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
         .thenReturn(Lists.newArrayList(identity.getSampleClass()));
     SampleTissue tissue = makeUnsavedParentTissue();
 
@@ -556,7 +553,8 @@ public class DefaultSampleServiceTest {
   private Identity makeParentIdentityWithLookup() throws IOException {
     Identity sample = makeUnsavedParentIdentity();
     Mockito.when(sampleDao.getSample(sample.getId())).thenReturn(sample);
-    Mockito.when(sampleClassDao.listByCategory(Mockito.eq(Identity.CATEGORY_NAME))).thenReturn(Lists.newArrayList(sample.getSampleClass()));
+    Mockito.when(sampleClassService.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
+        .thenReturn(Lists.newArrayList(sample.getSampleClass()));
     return sample;
   }
 
@@ -573,20 +571,20 @@ public class DefaultSampleServiceTest {
     return sample;
   }
 
-  private SampleTissue makeUnsavedChildTissue() {
+  private SampleTissue makeUnsavedChildTissue() throws IOException {
     SampleTissue sample = makeUnsavedParentTissue();
     sample.setSampleType("type");
     sample.setScientificName("scientific");
     return sample;
   }
 
-  private SampleTissue makeUnsavedParentTissue() {
+  private SampleTissue makeUnsavedParentTissue() throws IOException {
     SampleTissue sample = new SampleTissueImpl();
     sample.setSampleClass(new SampleClassImpl());
     sample.getSampleClass().setId(10L);
     sample.getSampleClass().setAlias("tissue");
     sample.getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
-    Mockito.when(sampleClassDao.getSampleClass(sample.getSampleClass().getId())).thenReturn(sample.getSampleClass());
+    Mockito.when(sampleClassService.get(sample.getSampleClass().getId())).thenReturn(sample.getSampleClass());
     return sample;
   }
 
@@ -599,7 +597,7 @@ public class DefaultSampleServiceTest {
     sample.getSampleClass().setId(30L);
     sample.getSampleClass().setAlias("analyte");
     sample.getSampleClass().setSampleCategory(SampleStock.CATEGORY_NAME);
-    Mockito.when(sampleClassDao.getSampleClass(sample.getSampleClass().getId())).thenReturn(sample.getSampleClass());
+    Mockito.when(sampleClassService.get(sample.getSampleClass().getId())).thenReturn(sample.getSampleClass());
     mockShellProjectWithRealLookup(sample);
     return sample;
   }

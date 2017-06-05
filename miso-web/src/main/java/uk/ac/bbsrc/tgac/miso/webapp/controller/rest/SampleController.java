@@ -111,7 +111,7 @@ public class SampleController extends RestController {
   @RequestMapping(value = "/samples", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public List<SampleDto> getSamples(UriComponentsBuilder uriBuilder) throws IOException {
-    List<Sample> samples = sampleService.getAll();
+    List<Sample> samples = sampleService.list();
     // return all samples
     List<SampleDto> sampleDtos = Dtos.asSampleDtos(samples, true);
     for (SampleDto sampleDto : sampleDtos) {

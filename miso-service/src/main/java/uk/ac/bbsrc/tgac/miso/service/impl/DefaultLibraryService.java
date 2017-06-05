@@ -42,19 +42,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
@@ -73,19 +73,19 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
-  private LibraryDesignDao libraryDesignDao;
+  private LibraryDesignService libraryDesignService;
   @Autowired
-  private LibraryDesignCodeDao libraryDesignCodeDao;
+  private LibraryDesignCodeService libraryDesignCodeService;
   @Autowired
   private LibraryQcStore libraryQcDao;
   @Autowired
-  private IndexStore indexDao;
+  private IndexService indexService;
   @Autowired
-  private SampleDao sampleDao;
+  private SampleService sampleService;
   @Autowired
-  private KitStore kitDescriptorDao;
+  private KitService kitService;
   @Autowired
-  private ChangeLogStore changeLogDao;
+  private ChangeLogService changeLogService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -149,7 +149,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     loadChildEntities(library);
     setChangeDetails(library);
     if (library.getSecurityProfile() == null) {
-      library.inheritPermissions(sampleDao.get(library.getSample().getId()));
+      library.inheritPermissions(sampleService.get(library.getSample().getId()));
     }
     authorizationManager.throwIfNotWritable(library);
     validateParentOrThrow(library);
@@ -399,6 +399,23 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     libraryDao.save(managed);
   }
 
+  @Override
+  public QcType getLibraryQcType(long qcTypeId) throws IOException {
+    return libraryQcDao.getLibraryQcTypeById(qcTypeId);
+  }
+
+  @Override
+  public QcType getLibraryQcTypeByName(String qcTypeName) throws IOException {
+    return libraryQcDao.getLibraryQcTypeByName(qcTypeName);
+  }
+
+  @Override
+  public LibraryQC getLibraryQC(long qcId) throws IOException {
+    LibraryQC qc = libraryQcDao.get(qcId);
+    authorizationManager.throwIfNotReadable(qc.getLibrary());
+    return qc;
+  }
+
   /**
    * Turns indices into strings for easier comparison and changelog message concatentation.
    * 
@@ -444,7 +461,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       changeLog.setSummary(message.toString());
       changeLog.setTime(new Date());
       changeLog.setUser(authorizationManager.getCurrentUser());
-      changeLogDao.create(changeLog);
+      changeLogService.create(changeLog);
     }
   }
 
@@ -460,7 +477,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
    */
   private void loadChildEntities(Library library) throws IOException {
     if (library.getSample() != null) {
-      library.setSample(sampleDao.get(library.getSample().getId()));
+      library.setSample(sampleService.get(library.getSample().getId()));
     }
     if (library.getLibraryType() != null) {
       library.setLibraryType(getLibraryTypeById(library.getLibraryType().getId()));
@@ -474,7 +491,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     List<Index> managedIndices = new ArrayList<>();
     for (Index index : library.getIndices()) {
       if (index != null && index.getId() != Index.UNSAVED_ID) {
-        Index managedIndex = indexDao.getIndexById(index.getId());
+        Index managedIndex = indexService.getIndexById(index.getId());
         if (managedIndex != null) managedIndices.add(managedIndex);
       }
     }
@@ -485,13 +502,13 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     if (isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;
       if (lai.getKitDescriptor() != null) {
-        lai.setKitDescriptor(kitDescriptorDao.getKitDescriptorById(lai.getKitDescriptor().getId()));
+        lai.setKitDescriptor(kitService.getKitDescriptorById(lai.getKitDescriptor().getId()));
       }
       if (lai.getLibraryDesignCode() != null) {
-        lai.setLibraryDesignCode(libraryDesignCodeDao.getLibraryDesignCode(lai.getLibraryDesignCode().getId()));
+        lai.setLibraryDesignCode(libraryDesignCodeService.get(lai.getLibraryDesignCode().getId()));
       }
       if (lai.getLibraryDesign() != null) {
-        LibraryDesign design = libraryDesignDao.getLibraryDesign(lai.getLibraryDesign().getId());
+        LibraryDesign design = libraryDesignService.get(lai.getLibraryDesign().getId());
         lai.setLibraryDesign(design);
         lai.setLibrarySelectionType(design.getLibrarySelectionType());
         lai.setLibraryStrategyType(design.getLibraryStrategyType());
@@ -630,32 +647,32 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     this.namingScheme = namingScheme;
   }
 
-  public void setLibraryDesignDao(LibraryDesignDao libraryDesignDao) {
-    this.libraryDesignDao = libraryDesignDao;
+  public void setLibraryDesignService(LibraryDesignService libraryDesignService) {
+    this.libraryDesignService = libraryDesignService;
   }
 
-  public void setLibraryDesignCodeDao(LibraryDesignCodeDao libraryDesignCodeDao) {
-    this.libraryDesignCodeDao = libraryDesignCodeDao;
+  public void setLibraryDesignCodeService(LibraryDesignCodeService libraryDesignCodeService) {
+    this.libraryDesignCodeService = libraryDesignCodeService;
   }
 
   public void setLibraryQcDao(LibraryQcStore libraryQcStore) {
     this.libraryQcDao = libraryQcStore;
   }
 
-  public void setIndexDao(IndexStore indexDao) {
-    this.indexDao = indexDao;
+  public void setIndexService(IndexService indexService) {
+    this.indexService = indexService;
   }
 
-  public void setSampleDao(SampleDao sampleDao) {
-    this.sampleDao = sampleDao;
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
-  public void setKitDao(KitStore kitDescriptorDao) {
-    this.kitDescriptorDao = kitDescriptorDao;
+  public void setKitService(KitService kitService) {
+    this.kitService = kitService;
   }
 
-  public void setChangeLogDao(ChangeLogStore changeLogDao) {
-    this.changeLogDao = changeLogDao;
+  public void setChangeLogService(ChangeLogService changeLogService) {
+    this.changeLogService = changeLogService;
   }
 
   public void setAutoGenerateIdBarcodes(Boolean autoGenerateIdBarcodes) {

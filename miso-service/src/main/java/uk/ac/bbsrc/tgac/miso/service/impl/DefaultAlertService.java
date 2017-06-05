@@ -62,6 +62,11 @@ public class DefaultAlertService implements AlertService {
   }
 
   @Override
+  public Collection<Alert> listUnreadForCurrentUser() throws IOException {
+    return alertStore.listUnreadByUserId(authorizationManager.getCurrentUser().getUserId());
+  }
+
+  @Override
   public long save(Alert alert) throws IOException {
     loadChildEntities(alert);
     if (alert.getAlertId() != DefaultAlert.UNSAVED_ID) {

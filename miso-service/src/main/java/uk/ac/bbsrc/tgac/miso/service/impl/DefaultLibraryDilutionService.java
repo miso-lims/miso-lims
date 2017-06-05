@@ -19,10 +19,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.TargetedSequencingStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
@@ -40,9 +40,9 @@ public class DefaultLibraryDilutionService
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
-  private LibraryStore libraryDao;
+  private LibraryService libraryService;
   @Autowired
-  private TargetedSequencingStore targetedSequencingDao;
+  private TargetedSequencingService targetedSequencingService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -87,7 +87,7 @@ public class DefaultLibraryDilutionService
     loadChildEntities(dilution);
     dilution.setDilutionCreator(authorizationManager.getCurrentUsername());
     if (dilution.getSecurityProfile() == null) {
-      dilution.inheritPermissions(libraryDao.get(dilution.getLibrary().getId()));
+      dilution.inheritPermissions(libraryService.get(dilution.getLibrary().getId()));
     }
     authorizationManager.throwIfNotWritable(dilution);
     
@@ -150,10 +150,10 @@ public class DefaultLibraryDilutionService
    */
   private void loadChildEntities(LibraryDilution dilution) throws IOException {
     if (dilution.getLibrary() != null) {
-      dilution.setLibrary(libraryDao.get(dilution.getLibrary().getId()));
+      dilution.setLibrary(libraryService.get(dilution.getLibrary().getId()));
     }
     if (dilution.getTargetedSequencing() != null) {
-      dilution.setTargetedSequencing(targetedSequencingDao.get(dilution.getTargetedSequencing().getId()));
+      dilution.setTargetedSequencing(targetedSequencingService.get(dilution.getTargetedSequencing().getId()));
     }
   }
 
@@ -183,16 +183,16 @@ public class DefaultLibraryDilutionService
     this.namingScheme = namingScheme;
   }
 
-  public void setTargetedSequencingDao(TargetedSequencingStore targetedSequencingDao) {
-    this.targetedSequencingDao = targetedSequencingDao;
+  public void setTargetedSequencingService(TargetedSequencingService targetedSequencingService) {
+    this.targetedSequencingService = targetedSequencingService;
   }
 
   public void setAutoGenerateIdBarcodes(Boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
   }
 
-  public void setLibraryDao(LibraryStore libraryDao) {
-    this.libraryDao = libraryDao;
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
   }
 
   @Override
