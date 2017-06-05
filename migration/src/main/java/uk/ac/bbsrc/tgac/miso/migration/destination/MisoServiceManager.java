@@ -313,6 +313,7 @@ public class MisoServiceManager {
   public void setDefaultRequestManager() {
     MisoRequestManager rm = new MisoRequestManager();
     // Set stores for entities which need names generated before creation and can't be saved via services.
+    rm.setPlatformStore(platformDao);
     rm.setProjectStore(projectDao);
     rm.setPoolStore(poolDao);
     rm.setRunStore(runDao);

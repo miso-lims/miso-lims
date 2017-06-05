@@ -380,8 +380,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   }
 
   private Run makeRun(String alias) {
-    SecurityProfile profile = new SecurityProfile();
-    profile.setProfileId(3L);
+    SecurityProfile profile = (SecurityProfile) sessionFactory.getCurrentSession().get(SecurityProfile.class, 3L);
     SequencerReference sequencer = emptySR;
     User user = new UserImpl();
     user.setUserId(1L);
