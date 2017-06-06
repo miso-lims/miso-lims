@@ -904,8 +904,6 @@
         <c:if test="${not empty sample.libraries}">
           <a href='javascript:void(0);' onclick='bulkLibraryQcTable();' class="add">Bulk QC these
             Libraries</a>
-          <a href='javascript:void(0);' onclick='bulkLibraryDilutionTable();' class="add">Bulk Add Library
-            Dilutions</a>
         </c:if>
       </div>
     </li>
@@ -1317,120 +1315,6 @@ function bulkLibraryQcTable() {
   });
 }
 
-function bulkLibraryDilutionTable() {
-  if (!jQuery('#library_table').hasClass("display")) {
-    //destroy current table and recreate
-    jQuery('#library_table').dataTable().fnDestroy();
-    //bug fix to reset table width
-    jQuery('#library_table').removeAttr("style");
-
-    jQuery('#library_table').addClass("display");
-
-    //remove edit header and column
-    jQuery('#library_table tr:first th:eq(4)').remove();
-    jQuery('#library_table tr:first th:eq(3)').remove();
-
-    var dilutionheaders = ['rowsel',
-                           'name',
-                           'alias',
-                           'libraryType',
-                           'dilutionDate',
-                           'results'];
-
-    jQuery('#library_table').find("tr").each(function () {
-      jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-      jQuery(this).find("td:eq(4)").remove();
-      jQuery(this).find("td:eq(3)").remove();
-    });
-
-    //headers
-    jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>Dilution Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>Concentration (${libraryDilutionUnits})</th>");
-
-    //columns
-    jQuery("#library_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
-    jQuery("#library_table tr:gt(0)").append("<td class='dateSelect'></td>");
-    jQuery("#library_table tr:gt(0)").append("<td class='defaultEditable'></td>");
-
-    var datatable = jQuery('#library_table').dataTable({
-      "aoColumnDefs": [
-        {
-          "bUseRendered": false,
-          "aTargets": [ 0 ]
-        }
-      ],
-      "bPaginate": false,
-      "bInfo": false,
-      "bJQueryUI": true,
-      "bAutoWidth": true,
-      "bSort": false,
-      "bFilter": false,
-      "sDom": '<<"toolbar">f>r<t>ip>'
-    });
-
-    jQuery('#library_table').find("tr:gt(0)").each(function () {
-      for (var i = 0; i < this.cells.length; i++) {
-        jQuery(this.cells[i]).attr("name", dilutionheaders[i]);
-      }
-    });
-
-    jQuery('#library_table .rowSelect').click(function () {
-      if (jQuery(this).parent().hasClass('row_selected'))
-        jQuery(this).parent().removeClass('row_selected');
-      else
-        jQuery(this).parent().addClass('row_selected');
-    });
-
-    jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("div.toolbar").html("<button id=\"bulkLibraryDilutionButton\" onclick=\"Sample.library.saveBulkLibraryDilutions();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save Dilutions</span></button>");
-
-    jQuery('#library_table .defaultEditable').editable(function (value, settings) {
-      return value;
-    },
-    {
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      },
-      onblur: 'submit',
-      placeholder: '',
-      height: '14px'
-    });
-
-    jQuery("#library_table .dateSelect").editable(function (value, settings) {
-      return value;
-    },
-    {
-      type: 'datepicker',
-      width: '100px',
-      onblur: 'submit',
-      placeholder: '',
-      style: 'inherit',
-      datepicker: {
-        dateFormat: 'dd/mm/yy',
-        showButtonPanel: true,
-        maxDate: 0
-      },
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      }
-    });
-  }
-}
 </script>
 </c:if>
 
