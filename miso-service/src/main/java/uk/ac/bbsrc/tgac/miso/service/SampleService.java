@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -51,5 +52,26 @@ public interface SampleService extends PaginatedDataSource<Sample> {
   public void deleteQc(Sample sample, Long qcId) throws IOException;
 
   Collection<QcType> listSampleQcTypes() throws IOException;
+
+  Collection<Sample> listWithLimit(long limit) throws IOException;
+
+  Collection<Sample> listBySearch(String query) throws IOException;
+
+  Collection<Sample> listByReceivedDate(long limit) throws IOException;
+
+  Collection<Sample> listByProjectId(long projectId) throws IOException;
+
+  /**
+   * Throws AuthorizationException if user cannot read one of the requested samples
+   * 
+   * @param idList
+   * @return
+   * @throws IOException
+   */
+  Collection<Sample> listByIdList(List<Long> idList) throws IOException;
+
+  Collection<String> listSampleTypes() throws IOException;
+
+  Map<String, Integer> getSampleColumnSizes() throws IOException;
 
 }

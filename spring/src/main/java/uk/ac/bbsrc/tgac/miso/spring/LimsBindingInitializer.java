@@ -93,9 +93,11 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
@@ -126,6 +128,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   @Autowired
   private IndexService indexService;
   @Autowired
+  private SampleService sampleService;
+  @Autowired
   private StudyService studyService;
   @Autowired
   private LibraryService libraryService;
@@ -135,7 +139,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private KitService kitService;
   @Autowired
   private PoolService poolService;
-
+  @Autowired
+  private RunService runService;
   @Autowired
   private TissueTypeService tissueTypeService;
   @Autowired
@@ -383,14 +388,14 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<Sample>(Sample.class) {
       @Override
       public Sample resolveById(long id) throws Exception {
-        return requestManager.getSampleById(id);
+        return sampleService.get(id);
       }
     }.register(binder, "sample").register(binder, Set.class, "samples");
 
     new BindingConverterById<Run>(Run.class) {
       @Override
       public Run resolveById(long id) throws Exception {
-        return requestManager.getRunById(id);
+        return runService.get(id);
       }
 
     }.register(binder).register(binder, Set.class, "runs");
@@ -596,5 +601,13 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 }

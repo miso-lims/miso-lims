@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -91,11 +90,7 @@ public class RunQCImpl extends AbstractQC implements RunQC {
    */
   public RunQCImpl(Run run, User user) {
     if (run.userCanRead(user)) {
-      try {
-        setRun(run);
-      } catch (MalformedRunException e) {
-        log.error("constructor", e);
-      }
+      setRun(run);
     }
   }
 
@@ -105,7 +100,7 @@ public class RunQCImpl extends AbstractQC implements RunQC {
   }
 
   @Override
-  public void setRun(Run run) throws MalformedRunException {
+  public void setRun(Run run) {
     this.run = run;
   }
 

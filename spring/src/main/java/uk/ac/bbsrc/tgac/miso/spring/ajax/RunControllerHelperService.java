@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -74,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -92,6 +92,8 @@ public class RunControllerHelperService {
   private RequestManager requestManager;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private RunService runService;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -115,7 +117,7 @@ public class RunControllerHelperService {
         // edit existing run
         Map<String, Object> responseMap = new HashMap<>();
         runId = Long.parseLong(json.getString("runId"));
-        Run storedRun = requestManager.getRunById(runId);
+        Run storedRun = runService.get(runId);
         String storedPlatformType = storedRun.getSequencerReference().getPlatform().getPlatformType().getKey();
 
         PlatformType newPt = PlatformType.get(newRuntype);
@@ -233,7 +235,7 @@ public class RunControllerHelperService {
   public JSONObject getRunQCTypes(HttpSession session, JSONObject json) {
     try {
       StringBuilder sb = new StringBuilder();
-      Collection<QcType> types = requestManager.listAllRunQcTypes();
+      Collection<QcType> types = runService.listRunQcTypes();
       for (QcType s : types) {
         sb.append("<option value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
@@ -251,7 +253,7 @@ public class RunControllerHelperService {
       StringBuilder sb = new StringBuilder();
       if (json.has("runId") && !isStringEmptyOrNull(json.getString("runId"))) {
         Long runId = Long.parseLong(json.getString("runId"));
-        Run r = requestManager.getRunById(runId);
+        Run r = runService.get(runId);
 
         for (SequencerPartitionContainer f : r.getSequencerPartitionContainers()) {
           sb.append("<table class='containerSummary'><tr>");
@@ -283,7 +285,7 @@ public class RunControllerHelperService {
       }
       if (json.has("runId") && !isStringEmptyOrNull(json.getString("runId"))) {
         Long runId = Long.parseLong(json.getString("runId"));
-        Run run = requestManager.getRunById(runId);
+        Run run = runService.get(runId);
 
         List<String> processSelections = new ArrayList<>();
         List<Partition> partitionSelections = new ArrayList<>();
@@ -345,7 +347,7 @@ public class RunControllerHelperService {
           sb.append("</tr>");
         }
 
-        requestManager.saveRunQC(newQc);
+        runService.addQc(run, newQc);
 
         return JSONUtils.SimpleJSONResponse(sb.toString());
       }
@@ -362,7 +364,7 @@ public class RunControllerHelperService {
       return JSONUtils.SimpleJSONError("Please supply a barcode to lookup.");
     }
     try {
-      Run run = requestManager.getRunById(runId);
+      Run run = runService.get(runId);
       String barcode = json.getString("barcode");
       Collection<SequencerPartitionContainer> containers = requestManager
           .listSequencerPartitionContainersByBarcode(barcode);
@@ -388,7 +390,7 @@ public class RunControllerHelperService {
 
   public JSONObject generateIlluminaDemultiplexCSV(HttpSession session, JSONObject json) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Run r = requestManager.getRunById(json.getLong("runId"));
+    Run r = runService.get(json.getLong("runId"));
     SequencerPartitionContainer f = requestManager.getSequencerPartitionContainerById(json.getLong("containerId"));
     if (r != null && f != null) {
       String casavaVersion = "1.8.2";
@@ -413,20 +415,14 @@ public class RunControllerHelperService {
     String text = json.getString("text");
 
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = requestManager.getRunById(runId);
+      Run run = runService.get(runId);
       Note note = new Note();
 
       internalOnly = internalOnly.equals("on") ? "true" : "false";
 
       note.setInternalOnly(Boolean.parseBoolean(internalOnly));
       note.setText(text);
-      note.setOwner(user);
-      note.setCreationDate(new Date());
-      run.getNotes().add(note);
-      requestManager.saveRunNote(run, note);
-      run.setLastModifier(user);
-      requestManager.saveRun(run);
+      runService.addNote(run, note);
     } catch (IOException e) {
       log.error("add run note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -440,8 +436,8 @@ public class RunControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
-      Run run = requestManager.getRunById(runId);
-      requestManager.deleteRunNote(run, noteId);
+      Run run = runService.get(runId);
+      runService.deleteNote(run, noteId);
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("delete run note", e);
@@ -453,9 +449,9 @@ public class RunControllerHelperService {
     Long runId = json.getLong("runId");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = requestManager.getRunById(runId);
+      Run run = runService.get(runId);
       if (!run.getWatchers().contains(user)) {
-        requestManager.addRunWatcher(run, user);
+        runService.addRunWatcher(run, user);
       }
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
@@ -468,9 +464,9 @@ public class RunControllerHelperService {
     Long runId = json.getLong("runId");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = requestManager.getRunById(runId);
+      Run run = runService.get(runId);
       if (run.getWatchers().contains(user)) {
-        requestManager.removeRunWatcher(run, user);
+        runService.removeRunWatcher(run, user);
       }
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
@@ -644,7 +640,7 @@ public class RunControllerHelperService {
       if (json.has("runId")) {
         Long runId = json.getLong("runId");
         try {
-          requestManager.deleteRun(requestManager.getRunById(runId));
+          runService.delete(runId);
           return JSONUtils.SimpleJSONResponse("Run deleted");
         } catch (IOException e) {
           log.error("delete run", e);
@@ -662,7 +658,7 @@ public class RunControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
-      for (Run run : requestManager.listAllRuns()) {
+      for (Run run : runService.list()) {
         JSONArray inner = new JSONArray();
         inner.add(TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getName()));
         inner.add(TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getAlias()));
@@ -692,12 +688,16 @@ public class RunControllerHelperService {
     this.requestManager = requestManager;
   }
 
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
   public JSONObject deleteRunContainer(HttpSession session, JSONObject json) {
     long runId = json.getLong("runId");
     long containerId = json.getLong("containerId");
 
     try {
-      Run run = requestManager.getRunById(runId);
+      Run run = runService.get(runId);
       Iterator<SequencerPartitionContainer> it = run.getSequencerPartitionContainers().iterator();
       while (it.hasNext()) {
         SequencerPartitionContainer spc = it.next();

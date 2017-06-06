@@ -39,6 +39,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * com.eaglegenomics.miso.web
@@ -54,9 +55,15 @@ public class ListRunsController {
 
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private RunService runService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   @ModelAttribute("title")
@@ -66,7 +73,7 @@ public class ListRunsController {
 
   @RequestMapping(value = "/runs/rest/", method = RequestMethod.GET)
   public @ResponseBody Collection<Run> jsonRest() throws IOException {
-    return requestManager.listAllRuns();
+    return runService.list();
   }
 
   @RequestMapping("/runs")

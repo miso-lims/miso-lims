@@ -69,7 +69,9 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -90,10 +92,22 @@ public class FlexReportingControllerHelperService {
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private RunService runService;
+  @Autowired
+  private SampleService sampleService;
+  @Autowired
   private StudyService studyService;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   public String flexHTMLTemplate(String content) {
@@ -255,7 +269,7 @@ public class FlexReportingControllerHelperService {
     try {
       for (Project project : projects) {
         Set<Long> librariesInRun = new HashSet<>();
-        for (Run run : requestManager.listAllRunsByProjectId(project.getProjectId())) {
+        for (Run run : runService.listByProjectId(project.getProjectId())) {
           Collection<SequencerPartitionContainer> spcs = requestManager
               .listSequencerPartitionContainersByRunId(run.getId());
           if (spcs.size() > 0) {
@@ -318,7 +332,7 @@ public class FlexReportingControllerHelperService {
 
       for (Project project : projects) {
         Boolean projectBool = false;
-        Collection<Run> runs = requestManager.listAllRunsByProjectId(project.getProjectId());
+        Collection<Run> runs = runService.listByProjectId(project.getProjectId());
         for (Run run : runs) {
 
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
@@ -353,7 +367,7 @@ public class FlexReportingControllerHelperService {
   public String projectRunLaneRowBuilder(Project project) {
     StringBuilder sb = new StringBuilder();
     try {
-      Collection<Run> runs = requestManager.listAllRunsByProjectId(project.getProjectId());
+      Collection<Run> runs = runService.listByProjectId(project.getProjectId());
       if (runs.size() > 0) {
         sb.append("<ul>");
         for (Run run : runs) {
@@ -416,7 +430,7 @@ public class FlexReportingControllerHelperService {
           p = requestManager.getProjectById(j.getLong("value"));
         }
         if (j.getString("name").equals("runIds")) {
-          Run r = requestManager.getRunById(j.getLong("value"));
+          Run r = runService.get(j.getLong("value"));
           if (r != null) {
             runs.add(r);
           }
@@ -493,7 +507,7 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject jsonObject = new JSONObject();
       StringBuilder a = new StringBuilder();
-      for (String sampleType : requestManager.listAllSampleTypes()) {
+      for (String sampleType : sampleService.listSampleTypes()) {
         a.append("<option value=\"" + sampleType + "\">" + sampleType + "</option>");
       }
       jsonObject.put("type", "<option value=\"all\">all</option>" + a.toString());
@@ -525,9 +539,9 @@ public class FlexReportingControllerHelperService {
     try {
       Collection<Sample> samples = null;
       if (!isStringEmptyOrNull(searchStr)) {
-        samples = requestManager.listAllSamplesBySearch(searchStr);
+        samples = sampleService.listBySearch(searchStr);
       } else {
-        samples = requestManager.listAllSamples();
+        samples = sampleService.getAll();
       }
       for (Sample sample : samples) {
         String sampleQC = "unknown";
@@ -575,7 +589,7 @@ public class FlexReportingControllerHelperService {
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("name").equals("sampleIds")) {
-          Sample s = requestManager.getSampleById(j.getLong("value"));
+          Sample s = sampleService.get(j.getLong("value"));
           if (s != null) {
             samples.add(s);
 
@@ -592,7 +606,7 @@ public class FlexReportingControllerHelperService {
       Integer totalQcFailed = 0;
       Integer totalQcUnknown = 0;
 
-      for (String sampleType : requestManager.listAllSampleTypes()) {
+      for (String sampleType : sampleService.listSampleTypes()) {
         Integer no = typeMap.containsKey(sampleType) ? typeMap.get(sampleType) : 0;
         if (no > 0) {
           graphArray.add(JSONObject.fromObject("{'name': '" + sampleType + "','y':" + no + "}"));
@@ -893,9 +907,9 @@ public class FlexReportingControllerHelperService {
     try {
       Collection<Run> runs = null;
       if (!isStringEmptyOrNull(searchStr)) {
-        runs = requestManager.listAllRunsBySearch(searchStr);
+        runs = runService.listBySearch(searchStr);
       } else {
-        runs = requestManager.listAllRuns();
+        runs = runService.list();
       }
 
       for (Run run : runs) {
@@ -956,7 +970,7 @@ public class FlexReportingControllerHelperService {
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("name").equals("runIds")) {
-          Run run = requestManager.getRunById(j.getLong("value"));
+          Run run = runService.get(j.getLong("value"));
           if (run != null) {
             runs.add(run);
 
@@ -1072,8 +1086,8 @@ public class FlexReportingControllerHelperService {
       projectJSON.put("name", p.getName());
       projectJSON.put("description", p.getAlias());
       JSONArray projectChildrenArray = new JSONArray();
-      Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
-      Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
+      Collection<Sample> samples = sampleService.listByProjectId(p.getProjectId());
+      Collection<Run> runs = runService.listByProjectId(p.getProjectId());
       Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
 
       JSONObject runJSON = new JSONObject();

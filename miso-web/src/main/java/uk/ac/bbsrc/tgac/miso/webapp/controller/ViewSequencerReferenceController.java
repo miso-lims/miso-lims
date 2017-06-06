@@ -34,13 +34,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * Controller for View (read-only) Sequencer and Service Record pages. Redirects to /stats for 
@@ -77,6 +78,8 @@ public class ViewSequencerReferenceController {
   
   @Autowired
   private EditServiceRecordController editServiceRecordController;
+  @Autowired
+  private RunService runService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -90,6 +93,10 @@ public class ViewSequencerReferenceController {
     this.editServiceRecordController = editServiceRecordController;
   }
   
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
   @RequestMapping("/{referenceId}")
   public ModelAndView viewSequencer(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -98,7 +105,7 @@ public class ViewSequencerReferenceController {
     }
     else {
       SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-      Collection<Run> runs = requestManager.listRunsBySequencerId(referenceId);
+      Collection<Run> runs = runService.listBySequencerId(referenceId);
       Collection<SequencerServiceRecord> serviceRecords = requestManager.listSequencerServiceRecordsBySequencerId(referenceId);
       
       if (sr != null) {

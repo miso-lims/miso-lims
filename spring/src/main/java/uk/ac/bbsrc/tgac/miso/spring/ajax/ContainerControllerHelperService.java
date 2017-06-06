@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -68,10 +67,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
@@ -88,13 +87,9 @@ public class ContainerControllerHelperService {
   @Autowired
   private StudyService studyService;
   @Autowired
-  private RunStore runStore;
-  @Autowired
   private PoolService poolService;
-
-  public void setRunStore(RunStore runStore) {
-    this.runStore = runStore;
-  }
+  @Autowired
+  private RunService runService;
 
   public JSONObject getPlatformTypes(HttpSession session, JSONObject json) throws IOException {
     StringBuilder b = new StringBuilder();
@@ -728,7 +723,7 @@ public class ContainerControllerHelperService {
   public JSONObject getContainerLastRun(HttpSession session, JSONObject json) throws IOException {
     if (json.has("containerId")) {
       Long containerId = json.getLong("containerId");
-      Run run = requestManager.getLatestRunBySequencerPartitionContainerId(containerId);
+      Run run = runService.getLatestRunBySequencerPartitionContainerId(containerId);
       if (run != null && run.getSequencerReference() != null) {
         return JSONUtils.SimpleJSONResponse(run.getSequencerReference().getName());
       } else {
@@ -759,7 +754,7 @@ public class ContainerControllerHelperService {
     try {
       if (json.has("containerId")) {
         Long containerId = json.getLong("containerId");
-        List<Run> runs = runStore.listBySequencerPartitionContainerId(containerId);
+        Collection<Run> runs = runService.listByContainerId(containerId);
         for (Run run : runs) {
           if (run != null && run.getHealth() == HealthType.Completed) {
             return JSONUtils.SimpleJSONResponse("yes");
@@ -810,6 +805,10 @@ public class ContainerControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   public JSONObject isSerialNumberUnique(HttpSession session, JSONObject json) {

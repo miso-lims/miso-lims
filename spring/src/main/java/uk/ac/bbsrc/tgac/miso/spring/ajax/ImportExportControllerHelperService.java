@@ -124,7 +124,7 @@ public class ImportExportControllerHelperService {
       if (!isStringEmptyOrNull(searchStr)) {
         samples = new ArrayList<>(sampleService.getBySearch(searchStr));
       } else {
-        samples = new ArrayList<>(requestManager.listAllSamplesWithLimit(250));
+        samples = new ArrayList<>(sampleService.listWithLimit(250));
       }
 
       if (samples.size() > 0) {
@@ -232,8 +232,7 @@ public class ImportExportControllerHelperService {
             }
             if (!s.getSampleQCs().contains(sqc)) {
               s.addQc(sqc);
-              requestManager.saveSampleQC(sqc);
-              sampleService.update(s);
+              sampleService.addQc(s, sqc);
               log.info("Added sample QC: " + sqc.toString());
             }
             if (jsonArrayElement.get(7) != null && !isStringEmptyOrNull(jsonArrayElement.getString(7))) {

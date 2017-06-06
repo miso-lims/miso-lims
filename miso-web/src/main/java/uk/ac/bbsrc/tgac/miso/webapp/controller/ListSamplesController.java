@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
  * com.eaglegenomics.miso.web
@@ -53,12 +53,12 @@ public class ListSamplesController {
   protected static final Logger log = LoggerFactory.getLogger(ListSamplesController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private SampleService sampleService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
-  
+
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
   
@@ -74,7 +74,7 @@ public class ListSamplesController {
 
   @RequestMapping(value = "/samples/rest/", method = RequestMethod.GET)
   public @ResponseBody Collection<Sample> jsonRest() throws IOException {
-    return requestManager.listAllSamples();
+    return sampleService.getAll();
   }
 
   @RequestMapping("/samples")

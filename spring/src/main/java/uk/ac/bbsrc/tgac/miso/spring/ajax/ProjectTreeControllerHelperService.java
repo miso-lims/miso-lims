@@ -47,7 +47,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -67,14 +69,30 @@ public class ProjectTreeControllerHelperService {
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private RunService runService;
+  @Autowired
+  private SampleService sampleService;
+  @Autowired
   private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
 
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   /**
@@ -92,8 +110,8 @@ public class ProjectTreeControllerHelperService {
         projectJSON.put("show", "PROJECT");
         projectJSON.put("id", p.getProjectId());
         projectJSON.put("description", p.getAlias());
-        Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
-        Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
+        Collection<Sample> samples = sampleService.listByProjectId(p.getProjectId());
+        Collection<Run> runs = runService.listByProjectId(p.getProjectId());
         Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
         int subs = samples.size() + runs.size() + studies.size();
         projectJSON.put("subs", subs);
@@ -122,7 +140,7 @@ public class ProjectTreeControllerHelperService {
 
       JSONArray childArray = new JSONArray();
 
-      Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
+      Collection<Run> runs = runService.listByProjectId(projectId);
       if (runs.size() > 0) {
         JSONObject child = new JSONObject();
         child.put("name", "RUN");
@@ -131,7 +149,7 @@ public class ProjectTreeControllerHelperService {
         childArray.add(child);
       }
 
-      Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
+      Collection<Sample> samples = sampleService.listByProjectId(projectId);
 
       if (samples.size() > 0) {
         JSONObject child = new JSONObject();
@@ -172,7 +190,7 @@ public class ProjectTreeControllerHelperService {
 
       JSONArray runsArray = new JSONArray();
 
-      Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
+      Collection<Run> runs = runService.listByProjectId(projectId);
 
       JSONObject miso = new JSONObject();
       for (Run run : runs) {
@@ -205,7 +223,7 @@ public class ProjectTreeControllerHelperService {
       JSONArray samplesArray = new JSONArray();
       JSONObject miso = new JSONObject();
 
-      Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
+      Collection<Sample> samples = sampleService.listByProjectId(projectId);
 
       for (Sample sample : samples) {
         Collection<Library> libraries = libraryService.listBySampleId(sample.getId());

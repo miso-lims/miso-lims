@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -100,6 +101,8 @@ public class SubmissionControllerHelperService {
   private ExperimentService experimentService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private RunService runService;
 
   private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -399,7 +402,7 @@ public class SubmissionControllerHelperService {
           s.setExperiments(experiments);
         }
         // gets the runs for the project
-        List<Run> runs = new ArrayList<>(requestManager.listAllRunsByProjectId(projectId));
+        List<Run> runs = new ArrayList<>(runService.listByProjectId(projectId));
         Collections.sort(runs);
 
         // creates HTML list of runs
@@ -548,5 +551,9 @@ public class SubmissionControllerHelperService {
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 }

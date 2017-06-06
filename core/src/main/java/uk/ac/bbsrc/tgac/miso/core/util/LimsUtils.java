@@ -69,8 +69,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -613,6 +617,18 @@ public class LimsUtils {
 
   public static boolean isDetailedLibrary(Library library) {
     return library instanceof DetailedLibrary;
+  }
+
+  public static boolean isIlluminaRun(Run run) {
+    return run instanceof IlluminaRun;
+  }
+
+  public static boolean isPacBioRun(Run run) {
+    return run instanceof PacBioRun;
+  }
+
+  public static boolean isLS454Run(Run run) {
+    return run instanceof LS454Run;
   }
 
   public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) {
