@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -41,14 +40,8 @@ import org.springframework.context.ApplicationContextAware;
 public class ApplicationContextProvider implements ApplicationContextAware {
   private static ApplicationContext ctx = null;
 
-  private static String bugUrl;
-
   public static ApplicationContext getApplicationContext() {
     return ctx;
-  }
-
-  public static String getBugUrl() {
-    return bugUrl;
   }
 
   private String baseUrl = "";
@@ -64,11 +57,5 @@ public class ApplicationContextProvider implements ApplicationContextAware {
 
   public void setBaseUrl(String baseUrl) {
     this.baseUrl = baseUrl;
-  }
-
-  @Value("${miso.bugUrl}")
-  private void setBugUrl(String bugUrl) {
-    // This instance method writes to a static field because that's how Spring's injection system works.
-    ApplicationContextProvider.bugUrl = bugUrl;
   }
 }
