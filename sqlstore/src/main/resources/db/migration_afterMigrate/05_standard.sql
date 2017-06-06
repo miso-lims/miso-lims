@@ -275,8 +275,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END,
         CASE WHEN (NEW.filePath IS NULL) <> (OLD.filePath IS NULL) OR NEW.filePath <> OLD.filePath THEN CONCAT('file path: ', COALESCE(OLD.filePath, 'n/a'), ' → ', COALESCE(NEW.filePath, 'n/a')) END,
         CASE WHEN NEW.health <> OLD.health THEN CONCAT('health: ', COALESCE(OLD.health, 'n/a'), ' → ', COALESCE(NEW.health, 'n/a')) END,
-        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END,
-        CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('startDate: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END) END,
+        CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('startDate: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END,
         CASE WHEN (NEW.sequencerReference_sequencerReferenceId IS NULL) <> (OLD.sequencerReference_sequencerReferenceId IS NULL) OR NEW.sequencerReference_sequencerReferenceId <> OLD.sequencerReference_sequencerReferenceId THEN CONCAT('sequencer: ', COALESCE((SELECT name FROM SequencerReference WHERE referenceId = OLD.sequencerReference_sequencerReferenceId), 'n/a'), ' → ', COALESCE((SELECT name FROM SequencerReference WHERE referenceId = NEW.sequencerReference_sequencerReferenceId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
@@ -289,7 +288,6 @@ FOR EACH ROW
         CASE WHEN (NEW.filePath IS NULL) <> (OLD.filePath IS NULL) OR NEW.filePath <> OLD.filePath THEN 'filePath' END,
         CASE WHEN (NEW.health IS NULL) <> (OLD.health IS NULL) OR NEW.health <> OLD.health THEN 'health' END,
         CASE WHEN (NEW.metrics IS NULL) <> (OLD.metrics IS NULL) OR NEW.metrics <> OLD.metrics THEN 'metrics' END,
-        CASE WHEN NEW.pairedend <> OLD.pairedend THEN 'pairedend' END,
         CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN 'startDate' END,
         CASE WHEN (NEW.sequencerReference_sequencerReferenceId IS NULL) <> (OLD.sequencerReference_sequencerReferenceId IS NULL) OR NEW.sequencerReference_sequencerReferenceId <> OLD.sequencerReference_sequencerReferenceId THEN 'sequencerReference_sequencerReferenceId' END), ''),
       NEW.lastModifier,
@@ -303,12 +301,31 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END) END,
         CASE WHEN (NEW.cycles IS NULL) <> (OLD.cycles IS NULL) OR NEW.cycles <> OLD.cycles THEN CONCAT('cycles: ', COALESCE(OLD.cycles, 'n/a'), ' → ', COALESCE(NEW.cycles, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
       NEW.runId,
       COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedend' END,
         CASE WHEN (NEW.cycles IS NULL) <> (OLD.cycles IS NULL) OR NEW.cycles <> OLD.cycles THEN 'cycles' END), ''),
+      (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
+      log_message);
+  END IF;
+  END//
+  
+DROP TRIGGER IF EXISTS RunChangeSolid//
+CREATE TRIGGER RunChangeSolid BEFORE UPDATE ON RunSolid
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
+      NEW.runId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedend' END), ''),
       (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
       log_message);
   END IF;
@@ -320,14 +337,12 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
-        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN CONCAT('movie duration: ', COALESCE(OLD.movieDuration, 'n/a'), ' → ', COALESCE(NEW.movieDuration, 'n/a')) END,
-        CASE WHEN (NEW.wellName IS NULL) <> (OLD.wellName IS NULL) OR NEW.wellName <> OLD.wellName THEN CONCAT('well: ', COALESCE(OLD.wellName, 'n/a'), ' → ', COALESCE(NEW.wellName, 'n/a')) END);
+        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN CONCAT('movie duration: ', COALESCE(OLD.movieDuration, 'n/a'), ' → ', COALESCE(NEW.movieDuration, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
       NEW.runId,
       COALESCE(CONCAT_WS(',',
-        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN 'movieDuration' END,
-        CASE WHEN (NEW.wellName IS NULL) <> (OLD.wellName IS NULL) OR NEW.wellName <> OLD.wellName THEN 'wellName' END), ''),
+        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN 'movieDuration' END), ''),
       (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
       log_message);
   END IF;
@@ -339,6 +354,7 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END) END,
         CASE WHEN (NEW.callCycle IS NULL) <> (OLD.callCycle IS NULL) OR NEW.callCycle <> OLD.callCycle THEN CONCAT('call cycles: ', COALESCE(OLD.callCycle, 'n/a'), ' → ', COALESCE(NEW.callCycle, 'n/a')) END,
         CASE WHEN (NEW.imgCycle IS NULL) <> (OLD.imgCycle IS NULL) OR NEW.imgCycle <> OLD.imgCycle THEN CONCAT('image cycles: ', COALESCE(OLD.imgCycle, 'n/a'), ' → ', COALESCE(NEW.imgCycle, 'n/a')) END,
         CASE WHEN (NEW.numCycles IS NULL) <> (OLD.numCycles IS NULL) OR NEW.numCycles <> OLD.numCycles THEN CONCAT('number of cycles: ', COALESCE(OLD.numCycles, 'n/a'), ' → ', COALESCE(NEW.numCycles, 'n/a')) END,
@@ -347,6 +363,7 @@ FOR EACH ROW
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
       NEW.runId,
       COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedend' END,
         CASE WHEN (NEW.callCycle IS NULL) <> (OLD.callCycle IS NULL) OR NEW.callCycle <> OLD.callCycle THEN 'callCycle' END,
         CASE WHEN (NEW.imgCycle IS NULL) <> (OLD.imgCycle IS NULL) OR NEW.imgCycle <> OLD.imgCycle THEN 'imgCycle' END,
         CASE WHEN (NEW.numCycles IS NULL) <> (OLD.numCycles IS NULL) OR NEW.numCycles <> OLD.numCycles THEN 'numCycles' END,

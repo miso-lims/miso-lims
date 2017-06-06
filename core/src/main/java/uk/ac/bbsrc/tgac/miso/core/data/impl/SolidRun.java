@@ -27,13 +27,15 @@ public class SolidRun extends Run {
   }
 
   @Column(nullable = false)
-  private Boolean pairedEnd = true;
+  private boolean pairedEnd = true;
 
+  @Override
   public Boolean getPairedEnd() {
     return pairedEnd;
   }
 
-  public void setPairedEnd(Boolean pairedEnd) {
+  @Override
+  public void setPairedEnd(boolean pairedEnd) {
     this.pairedEnd = pairedEnd;
   }
 

@@ -116,7 +116,7 @@ public class IlluminaRun extends Run {
   private Integer numCycles;
   private Integer scoreCycle;
   @Column(nullable = false)
-  private Boolean pairedEnd = true;
+  private boolean pairedEnd = true;
 
   public Integer getCallCycle() {
     return callCycle;
@@ -150,11 +150,13 @@ public class IlluminaRun extends Run {
     this.scoreCycle = scoreCycle;
   }
 
+  @Override
   public Boolean getPairedEnd() {
     return pairedEnd;
   }
 
-  public void setPairedEnd(Boolean pairedEnd) {
+  @Override
+  public void setPairedEnd(boolean pairedEnd) {
     this.pairedEnd = pairedEnd;
   }
 

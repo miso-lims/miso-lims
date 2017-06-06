@@ -468,6 +468,7 @@ public class LoadGeneratorSource implements MigrationSource {
     String runBarcode = runNumPadded + "ADXX";
     run.setAlias(RUN_DATE_STRING + "_LoadTest_" + runNumPadded + "_" + runBarcode);
     run.setDescription(runBarcode);
+    run.setPairedEnd(true);
 
     SequencerReference sequencer = new SequencerReferenceImpl(null, null, null);
     sequencer.setId(runSequencerId);

@@ -38,14 +38,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.tgac.statsdb.exception.ConsumerException;
@@ -265,13 +262,7 @@ public class RunStatsManager {
 
   private boolean getPairedEnd(Run run) {
     boolean pairedEnd = false;
-    if (run instanceof IlluminaRun) {
-      pairedEnd = ((IlluminaRun) run).getPairedEnd();
-    } else if (run instanceof SolidRun) {
-      pairedEnd = ((SolidRun) run).getPairedEnd();
-    } else if (run instanceof LS454Run) {
-      pairedEnd = ((LS454Run) run).getPairedEnd();
-    }
+    if (run.getPairedEnd() != null) pairedEnd = run.getPairedEnd();
     return pairedEnd;
   }
 }

@@ -548,4 +548,12 @@ public class Run
     return changeLogs;
   }
 
+  public Boolean getPairedEnd() {
+    return null;
+  }
+
+  public void setPairedEnd(boolean pairedEnd) {
+    // do nothing;
+  }
+
 }

@@ -17,7 +17,6 @@ import org.w3c.dom.Element;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.google.common.base.Function;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
@@ -59,7 +58,7 @@ public class RunUtils {
   
       run.setAlias(runName);
       run.setFilePath(runName);
-      ((SolidRun) run).setPairedEnd(false);
+      run.setPairedEnd(false);
   
       Matcher m = SOLID_RUN_REGEX.matcher(runName);
       String instrument = null;
@@ -67,7 +66,7 @@ public class RunUtils {
         instrument = m.group(1);
         run.setDescription(m.group(3));
         if (m.group(3).startsWith("MP") || m.group(3).startsWith("PE")) {
-          ((SolidRun) run).setPairedEnd(true);
+          run.setPairedEnd(true);
         }
       } else {
         run.setDescription(runName);

@@ -83,7 +83,7 @@ public class DemoIlluminaConsumerMechanism implements NotificationMessageConsume
       r.setAlias(runName);
       r.setFilePath(runName);
       r.setDescription("Test Run Import");
-      ((IlluminaRun) r).setPairedEnd(false);
+      r.setPairedEnd(false);
       r.setHealth(ht);
 
       updatedRuns.put(r.getAlias(), r);

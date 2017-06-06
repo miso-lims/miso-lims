@@ -12,7 +12,7 @@ public class LS454Run extends Run {
   private static final long serialVersionUID = 1L;
   private int cycles;
   @Column(nullable = false)
-  private Boolean pairedEnd = true;
+  private boolean pairedEnd = true;
 
   public LS454Run() {
     super();
@@ -30,11 +30,13 @@ public class LS454Run extends Run {
     this.cycles = cycles;
   }
 
+  @Override
   public Boolean getPairedEnd() {
     return pairedEnd;
   }
 
-  public void setPairedEnd(Boolean pairedEnd) {
+  @Override
+  public void setPairedEnd(boolean pairedEnd) {
     this.pairedEnd = pairedEnd;
   }
 }

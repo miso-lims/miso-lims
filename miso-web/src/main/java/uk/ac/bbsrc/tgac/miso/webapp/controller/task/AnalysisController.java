@@ -48,11 +48,9 @@ import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 import uk.ac.bbsrc.tgac.miso.integration.AnalysisQueryService;
@@ -147,7 +145,7 @@ public class AnalysisController {
       if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
         // append the base mask property for miseq runs
         String basesMask = "y" + ((IlluminaRun) run).getNumCycles() + ",i" + indexValue;
-        if (((IlluminaRun) run).getPairedEnd()) {
+        if (run.getPairedEnd()) {
           basesMask += ",y" + ((IlluminaRun) run).getNumCycles();
         }
         map.put("use-bases-mask", basesMask);
@@ -164,15 +162,8 @@ public class AnalysisController {
 
       map.put("username", user.getLoginName());
 
-      boolean pairedEnd = false;
-      if (run instanceof IlluminaRun) {
-        pairedEnd = ((IlluminaRun) run).getPairedEnd();
-      } else if (run instanceof SolidRun) {
-        pairedEnd = ((SolidRun) run).getPairedEnd();
-      } else if (run instanceof LS454Run) {
-        pairedEnd = ((LS454Run) run).getPairedEnd();
-      }
-      map.put("paired-end", String.valueOf(pairedEnd));
+      String pairedEnd = (run.getPairedEnd() == null ? "n/a" : run.getPairedEnd().toString());
+      map.put("paired-end", pairedEnd);
 
       map.put("email-report", "on");
       map.put("ignore-missing-stats", "on");

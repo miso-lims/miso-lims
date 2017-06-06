@@ -41,15 +41,12 @@ import org.jfree.util.Rotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 
 /**
@@ -448,15 +445,8 @@ public class ReportsUtils {
           sb.append("<br/><br/>");
         }
         sb.append("<b>Paired End: </b> ");
-        if (run instanceof IlluminaRun) {
-          sb.append(((IlluminaRun) run).getPairedEnd().toString());
-        } else if (run instanceof SolidRun) {
-          sb.append(((SolidRun) run).getPairedEnd().toString());
-        } else if (run instanceof LS454Run) {
-          sb.append(((LS454Run) run).getPairedEnd().toString());
-        } else {
-          sb.append("n/a");
-        }
+        String pairedEnd = (run.getPairedEnd() == null ? "n/a" : run.getPairedEnd().toString());
+        sb.append(pairedEnd);
         sb.append("<br/><br/>");
         sb.append("<b>Status: </b> " + run.getHealth().getKey());
         sb.append("<br/><br/>");
@@ -492,15 +482,8 @@ public class ReportsUtils {
             sb.append("<td> " + run.getDescription());
             sb.append("</td>");
           }
-          if (run instanceof IlluminaRun) {
-            sb.append("<td> " + ((IlluminaRun) run).getPairedEnd().toString() + "</td>");
-          } else if (run instanceof SolidRun) {
-            sb.append("<td> " + ((SolidRun) run).getPairedEnd().toString() + "</td>");
-          } else if (run instanceof LS454Run) {
-            sb.append("<td> " + ((LS454Run) run).getPairedEnd().toString() + "</td>");
-          } else {
-            sb.append("<td>n/a</td>");
-          }
+          String pairedEnd = (run.getPairedEnd() == null ? "n/a" : run.getPairedEnd().toString());
+          sb.append("<td> " + pairedEnd + "</td>");
           sb.append("<td> " + run.getHealth().getKey());
           sb.append("</td></tr>");
 
