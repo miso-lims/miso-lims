@@ -282,7 +282,7 @@ Container.ui = {
       {
         'updateElement': 'containerdiv',
         'doOnSuccess': function(json) {
-            jQuery('#containerdiv').find('input[type="radio"]').first().click();
+          jQuery('#containerdiv').find('input.selectMe').click();
         }
       }
     );

@@ -144,18 +144,13 @@ public class ContainerControllerHelperService {
       SequencerPartitionContainer lf = (SequencerPartitionContainer) session
           .getAttribute("container_" + json.getString("container_cId"));
 
-      if (lf.getPlatform() == null) {
-        Platform platform = requestManager.getPlatformById(platformId);
-        if (lf.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
-          Map<String, Object> responseMap = new HashMap<>();
-          responseMap.put("partitions", getContainerOptions(platform));
-          return JSONUtils.JSONObjectResponse(responseMap);
-        } else {
-          lf.setPlatform(platform);
-          Map<String, Object> responseMap = new HashMap<>();
-          return JSONUtils.JSONObjectResponse(responseMap);
-        }
+      Platform platform = requestManager.getPlatformById(platformId);
+      if (lf.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("partitions", getContainerOptions(platform));
+        return JSONUtils.JSONObjectResponse(responseMap);
       } else {
+        lf.setPlatform(platform);
         Map<String, Object> responseMap = new HashMap<>();
         return JSONUtils.JSONObjectResponse(responseMap);
       }
@@ -246,8 +241,9 @@ public class ContainerControllerHelperService {
     } else if ("Illumina HiSeq 2500".equals(instrumentModel)) {
 
       b.append("Number of " + PlatformType.ILLUMINA.getPartitionName() + "s:");
+      // selected by default
       b.append(
-          "<input id='lane2' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='2'/>2 ");
+          "<input id='lane2' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='2' class='selectMe' />2 ");
       b.append(
           "<input id='lane8' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
       b.append("<div id='containerdiv0'> </div>");
@@ -273,9 +269,10 @@ public class ContainerControllerHelperService {
   private String generateChamberButtons(String platformName, int containerNum, int startChamberNum, int endChamberNum) {
     StringBuilder b = new StringBuilder();
     for (int i = startChamberNum; i <= endChamberNum; i *= 2) {
+      int selectMe = endChamberNum; // the number of chambers to be selected by default on the front end
       b.append("<input id='chamber" + i + "' name='container0Select'"
           + " onchange='Container.ui.changeContainer" + platformName + "Chamber(this, 0);'"
-          + " type='radio' value='" + i + "'/>" + i + " ");
+          + " type='radio' value='" + i + "'" + (i == selectMe ? " class='selectMe'" : "") + "/>" + i + " ");
     }
     return b.toString();
   }
@@ -330,9 +327,10 @@ public class ContainerControllerHelperService {
     b.append(containerInfoHtml(PlatformType.PACBIO));
     b.append("Number of " + PlatformType.PACBIO.getPartitionName() + "s:");
     for (int i = 1; i <= 8; i++) {
+      int selectMe = 8; // the number of wells to be selected by default on the front end
       b.append("<input id='chamber" + i + "' name='container0Select'"
           + " onchange='Container.ui.changeContainerPacBioChamber(this, 0);'"
-          + " type='radio' value='" + i + "'/>" + i + " ");
+          + " type='radio' value='" + i + "'" + (i == selectMe ? " class='selectMe'" : "") + "/>" + i + " ");
     }
 
     b.append("<br/><div id='containerdiv0'> </div>");
