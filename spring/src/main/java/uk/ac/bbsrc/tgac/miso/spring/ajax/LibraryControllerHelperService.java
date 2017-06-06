@@ -763,52 +763,6 @@ public class LibraryControllerHelperService {
     return JSONUtils.SimpleJSONError("Cannot add LibraryDilution");
   }
 
-  public JSONObject bulkAddLibraryDilutions(HttpSession session, JSONObject json) {
-    try {
-      JSONArray dilutions = JSONArray.fromObject(json.getString("dilutions"));
-      // validate
-      boolean ok = true;
-      for (JSONObject dil : (Iterable<JSONObject>) dilutions) {
-        String results = dil.getString("results");
-        String dilutionCreator = dil.getString("dilutionCreator");
-        String dilutionDate = dil.getString("dilutionDate");
-
-        if (isStringEmptyOrNull(results) || isStringEmptyOrNull(dilutionCreator) || isStringEmptyOrNull(dilutionDate)) {
-          ok = false;
-        }
-      }
-
-      // persist
-      if (ok) {
-        Map<String, Object> map = new HashMap<>();
-        JSONArray a = new JSONArray();
-        JSONArray errors = new JSONArray();
-        for (JSONObject dil : (Iterable<JSONObject>) dilutions) {
-          JSONObject j = addLibraryDilution(session, dil);
-          j.put("libraryId", dil.getString("libraryId"));
-          if (j.has("error")) {
-            errors.add(j);
-          } else {
-            a.add(j);
-          }
-        }
-        map.put("saved", a);
-        if (!errors.isEmpty()) {
-          map.put("errors", errors);
-        }
-        return JSONUtils.JSONObjectResponse(map);
-      } else {
-        log.error(
-            "Failed to add Library Dilutions to this Library: one of the required fields of the selected Library Dilutions is missing or invalid");
-        return JSONUtils.SimpleJSONError(
-            "Failed to add Library Dilutions to this Library: one of the required fields of the selected Library Dilutions is missing or invalid");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Library Dilutions to this Library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Library Dilutions to this Library: " + e.getMessage());
-    }
-  }
-
   public JSONObject changeLibraryDilutionRow(HttpSession session, JSONObject json) {
     try {
       JSONObject response = new JSONObject();
