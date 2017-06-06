@@ -349,6 +349,7 @@ Sample.hot = {
     var hotContainer = document.getElementById('hotContainer');
     Hot.hotTable = new Handsontable(hotContainer, {
       debug: true,
+      preventOverflow : 'horizontal',
       fixedColumnsLeft: 1,
       manualColumnResize: true,
       rowHeaders: true,
