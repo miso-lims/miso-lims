@@ -444,7 +444,9 @@ public class ReportsUtils {
           sb.append("<b>Run Description: </b> " + run.getDescription());
           sb.append("<br/><br/>");
         }
-        sb.append("<b>Pair End: </b> " + run.getPairedEnd().toString());
+        sb.append("<b>Paired End: </b> ");
+        String pairedEnd = (run.getPairedEnd() == null ? "n/a" : run.getPairedEnd().toString());
+        sb.append(pairedEnd);
         sb.append("<br/><br/>");
         sb.append("<b>Status: </b> " + run.getHealth().getKey());
         sb.append("<br/><br/>");
@@ -480,8 +482,8 @@ public class ReportsUtils {
             sb.append("<td> " + run.getDescription());
             sb.append("</td>");
           }
-          sb.append("<td> " + run.getPairedEnd().toString());
-          sb.append("</td>");
+          String pairedEnd = (run.getPairedEnd() == null ? "n/a" : run.getPairedEnd().toString());
+          sb.append("<td> " + pairedEnd + "</td>");
           sb.append("<td> " + run.getHealth().getKey());
           sb.append("</td></tr>");
 

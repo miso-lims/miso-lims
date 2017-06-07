@@ -162,7 +162,8 @@ public class AnalysisController {
 
       map.put("username", user.getLoginName());
 
-      map.put("paired-end", String.valueOf(run.getPairedEnd()));
+      String pairedEnd = (run.getPairedEnd() == null ? "n/a" : run.getPairedEnd().toString());
+      map.put("paired-end", pairedEnd);
 
       map.put("email-report", "on");
       map.put("ignore-missing-stats", "on");

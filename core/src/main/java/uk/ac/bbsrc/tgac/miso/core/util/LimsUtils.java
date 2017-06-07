@@ -83,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -629,6 +630,10 @@ public class LimsUtils {
 
   public static boolean isLS454Run(Run run) {
     return run instanceof LS454Run;
+  }
+
+  public static boolean isSolidRun(Run run) {
+    return run instanceof SolidRun;
   }
 
   public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) {

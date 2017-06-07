@@ -196,14 +196,6 @@
       <td>Movie Duration (minutes):</td>
       <td><form:input path="movieDuration" class="validateable"/></td>
     </tr>
-    <tr>
-      <td>Well:</td>
-      <td><form:input path="wellName" class="validateable"/></td>
-    </tr>
-    <tr>
-      <td>Creation Date:</td>
-      <td>${run.creationDate}</td>
-    </tr>
   </c:if>
   <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
     <tr>
@@ -230,6 +222,7 @@
     </tr>
 
   </c:if>
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun') or miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.SolidRun') or miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.LS454Run')}">
   <tr>
     <td><label for="pairedEnd">Paired End:</label></td>
     <td>
@@ -240,6 +233,7 @@
       </c:choose>
     </td>
   </tr>
+  </c:if>
 
   <tr>
     <td valign="top">Status:</td>

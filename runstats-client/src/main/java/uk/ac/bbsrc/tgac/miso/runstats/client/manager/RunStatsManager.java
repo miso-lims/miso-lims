@@ -241,8 +241,9 @@ public class RunStatsManager {
 
   public JSONObject getPerPositionBaseSequenceQualityForLane(Run run, int laneNumber) throws RunStatsException {
     D3PlotConsumer d3p = new D3PlotConsumer(reportsDecorator);
+
     try {
-      return d3p.getPerPositionBaseSequenceQualityForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
+      return d3p.getPerPositionBaseSequenceQualityForLane(run.getAlias(), getPairedEnd(run), laneNumber);
     } catch (ConsumerException e) {
       log.error("cannot generate D3 plot JSON for run " + run.getAlias(), e);
       throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
@@ -252,10 +253,16 @@ public class RunStatsManager {
   public JSONObject getPerPositionBaseContentForLane(Run run, int laneNumber) throws RunStatsException {
     D3PlotConsumer d3p = new D3PlotConsumer(reportsDecorator);
     try {
-      return d3p.getPerPositionBaseContentForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
+      return d3p.getPerPositionBaseContentForLane(run.getAlias(), getPairedEnd(run), laneNumber);
     } catch (ConsumerException e) {
       log.error("cannot generate D3 plot JSON for run " + run.getAlias(), e);
       throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
     }
+  }
+
+  private boolean getPairedEnd(Run run) {
+    boolean pairedEnd = false;
+    if (run.getPairedEnd() != null) pairedEnd = run.getPairedEnd();
+    return pairedEnd;
   }
 }

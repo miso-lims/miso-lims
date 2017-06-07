@@ -13,8 +13,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
@@ -54,8 +53,6 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultRunService implements RunService, AuthorizedPaginatedDataSource<Run> {
-
-  private static final Logger log = LoggerFactory.getLogger(DefaultRunService.class);
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -359,7 +356,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setAlias(source.getAlias());
     target.setAccession(source.getAccession());
     target.setDescription(source.getDescription());
-    target.setPairedEnd(source.getPairedEnd());
     target.setFilePath(source.getFilePath());
     target.setHealth(source.getHealth());
     target.setStartDate(source.getStartDate());
@@ -377,9 +373,15 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
     target.setSequencingParameters(source.getSequencingParameters());
     target.setSequencerReference(source.getSequencerReference());
-    if (isIlluminaRun(target)) applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
-    if (isPacBioRun(target)) applyPacBioChanges((PacBioRun) target, (PacBioRun) source);
-    if (isLS454Run(target)) applyLS454Changes((LS454Run) target, (LS454Run) source);
+    if (isIlluminaRun(target)) {
+      applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
+    } else if (isPacBioRun(target)) {
+      applyPacBioChanges((PacBioRun) target, (PacBioRun) source);
+    } else if (isLS454Run(target)) {
+      applyLS454Changes((LS454Run) target, (LS454Run) source);
+    } else if (isSolidRun(target)) {
+      applySolidChanges((SolidRun) target, (SolidRun) source);
+    }
   }
 
   private void applyIlluminaChanges(IlluminaRun target, IlluminaRun source) throws IOException {
@@ -387,18 +389,20 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setImgCycle(source.getImgCycle());
     target.setNumCycles(source.getNumCycles());
     target.setScoreCycle(source.getScoreCycle());
-    // TODO: add once Run changes are made
-    // target.setPairedEnd(source.getPairedEnd());
+    target.setPairedEnd(source.getPairedEnd());
   }
 
   private void applyPacBioChanges(PacBioRun target, PacBioRun source) throws IOException {
-    target.setCreationDate(source.getCreationDate());
     target.setMovieDuration(source.getMovieDuration());
-    target.setWellName(source.getWellName());
   }
 
   private void applyLS454Changes(LS454Run target, LS454Run source) throws IOException {
     target.setCycles(source.getCycles());
+    target.setPairedEnd(source.getPairedEnd());
+  }
+
+  private void applySolidChanges(SolidRun target, SolidRun source) throws IOException {
+    target.setPairedEnd(source.getPairedEnd());
   }
 
   /**
