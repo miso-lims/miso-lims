@@ -602,9 +602,15 @@ Library.barcode = {
 };
 
 Library.ui = {
+  updateConcentrationUnits: function() {
+    var platformType = Library.ui.getSelectedPlatformType();
+    // default to 'nM' before platform is chosen
+    var units = platformType == null ? 'nM' : platformType.libraryConcentrationUnits;
+    jQuery('#concentrationUnits').text(units);
+  },
+    
   changePlatformType: function (originalLibraryTypeId, callback) {
-    var platformTypeKey = jQuery('#platformTypes').val();
-    var platformType = Constants.platformTypes.filter(function(pt) { return pt.key == platformTypeKey; })[0];
+    var platformType = Library.ui.getSelectedPlatformType();
 
     var indexFamilySelect = jQuery('#indexFamily').empty()[0];
     Constants.indexFamilies.filter(function(family) { return !family.platformType || family.platformType == platformType.name; }).sort(function(a, b) {
@@ -629,9 +635,15 @@ Library.ui = {
       return option;
     }).forEach(function(o) { libraryTypesSelect.appendChild(o); });
     Library.ui.updateIndices();
+    Library.ui.updateConcentrationUnits();
     if (callback) {
       callback();
     }
+  },
+  
+  getSelectedPlatformType: function() {
+    var platformTypeKey = jQuery('#platformTypes').val();
+    return Constants.platformTypes.filter(function(pt) { return pt.key == platformTypeKey; })[0];
   },
 
   updateIndices: function () {
