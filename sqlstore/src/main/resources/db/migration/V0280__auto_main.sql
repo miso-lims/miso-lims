@@ -1,3 +1,34 @@
+-- refactor_pairedEnd_runs
+
+ALTER TABLE RunIllumina ADD COLUMN pairedEnd tinyint(1) NOT NULL DEFAULT '1';
+ALTER TABLE RunLS454 ADD COLUMN pairedEnd tinyint(1) NOT NULL DEFAULT '1';
+
+CREATE TABLE RunSolid(
+  runId bigint(20) NOT NULL,
+  pairedEnd tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`runId`),
+  CONSTRAINT runsolid_run_runid FOREIGN KEY (runId) REFERENCES Run (runId)
+) ENGINE=InnoDB CHARSET=utf8;
+
+INSERT INTO RunSolid (runId, pairedEnd) SELECT runId, pairedEnd FROM Run WHERE 
+  sequencerReference_sequencerReferenceId IN (SELECT sr.referenceId FROM SequencerReference sr 
+  JOIN Platform p ON sr.platformId = p.platformId WHERE p.name = 'SOLID');
+UPDATE RunIllumina SET pairedEnd = (SELECT pairedEnd FROM Run WHERE RunIllumina.runId = Run.runId);
+UPDATE RunLS454 SET pairedEnd = (SELECT pairedEnd FROM Run WHERE RunLS454.runId = Run.runId);
+
+ALTER TABLE Run DROP COLUMN pairedEnd;
+ALTER TABLE RunPacBio DROP COLUMN creationDate;
+
+
+-- fix_detailed_qc
+
+UPDATE Sample
+  SET qcPassed = (SELECT status FROM DetailedQcStatus JOIN DetailedSample ON DetailedQcStatus.detailedQcStatusId = DetailedSample.detailedQcStatusId WHERE DetailedSample.sampleId = Sample.sampleId)
+  WHERE sampleId IN (SELECT sampleId FROM DetailedSample WHERE detailedQcStatusId IS NOT NULL);
+
+
+-- merge_slides
+
 CREATE TABLE StainCategory (
   stainCategoryId bigint(20) NOT NULL AUTO_INCREMENT,
   name varchar(20) NOT NULL,
@@ -52,3 +83,5 @@ DELETE FROM SampleValidRelationship WHERE childId IN (SELECT sampleClassId FROM 
 DELETE FROM SampleValidRelationship WHERE parentId IN (SELECT sampleClassId FROM SampleClass WHERE alias IN ('CV Slide', 'H E Slide') and SampleCategory = 'Tissue Processing');
 
 DELETE FROM SampleClass WHERE alias IN ('CV Slide', 'H E Slide') and SampleCategory = 'Tissue Processing';
+
+
