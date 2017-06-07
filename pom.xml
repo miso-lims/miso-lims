@@ -27,7 +27,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
-  <version>0.2.70</version>
+  <version>0.2.70-oicr-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MISO LIMS</name>
   <url>http://tgac.github.io/miso-lims/</url>
