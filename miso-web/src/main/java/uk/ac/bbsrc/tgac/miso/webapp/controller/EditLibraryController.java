@@ -365,11 +365,6 @@ public class EditLibraryController {
     }
   }
 
-  @ModelAttribute("libraryInitialConcentrationUnits")
-  public String libraryInitialConcentrationUnits() {
-    return AbstractLibrary.UNITS;
-  }
-
   @ModelAttribute("libraryQCUnits")
   public String libraryQCUnits() {
     return LibraryQCImpl.UNITS;

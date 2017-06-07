@@ -269,6 +269,7 @@ public class MenuController implements ServletContextAware {
       dto.put("name", platformType.name());
       dto.put("key", platformType.getKey());
       dto.put("containerName", platformType.getContainerName());
+      dto.put("libraryConcentrationUnits", platformType.getLibraryConcentrationUnits());
       dto.put("active", activePlatformTypes.contains(platformType));
     }
 

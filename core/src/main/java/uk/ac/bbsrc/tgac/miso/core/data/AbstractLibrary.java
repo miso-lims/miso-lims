@@ -87,8 +87,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   private static final long serialVersionUID = 1L;
 
-  public static final String UNITS = "nM";
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long libraryId = AbstractLibrary.UNSAVED_ID;

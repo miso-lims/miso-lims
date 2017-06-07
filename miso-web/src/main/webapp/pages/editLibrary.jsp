@@ -412,15 +412,20 @@
     </td>
   </tr>
   <c:if test="${not empty library.sample.groupId}">
-  <tr>
-    <td class="h">Group ID:</td>
-    <td>${library.sample.groupId}</td>
-  </tr>
-  <tr>
-    <td class="h">Group Description:</td>
-    <td>${library.sample.groupDescription}</td>
-  </tr>
+    <tr>
+      <td class="h">Group ID:</td>
+      <td>${library.sample.groupId}</td>
+    </tr>
+    <tr>
+      <td class="h">Group Description:</td>
+      <td>${library.sample.groupDescription}</td>
+    </tr>
   </c:if>
+  <tr>
+    <td class="h"><label for="initialConcentration">Initial Concentration (<span id="concentrationUnits"></span>):</label></td>
+    <td><form:input id="initialConcentration" path="initialConcentration"/></td>
+  </tr>
+  
   <tr>
     <td class="h"><label for="archived">Archived:</label></td>
     <td><form:checkbox id="archived" path="archived"/></td>
@@ -428,6 +433,7 @@
 </table>
 </c:if>
 <script type="text/javascript">
+  Library.ui.updateConcentrationUnits();
   Hot.detailedSample = ${detailedSample};
 </script>
 

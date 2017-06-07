@@ -59,7 +59,7 @@ public enum PlatformType {
   }, //
   SOLID("Solid", true, "Slide", "Lane", "ABI_SOLID"), //
   IONTORRENT("IonTorrent", false, "Chip", "Chip", null), //
-  PACBIO("PacBio", false, "SMRT Cell", "SMRT Cell", null) {
+  PACBIO("PacBio", false, "SMRT Cell", "SMRT Cell", "pM", null) {
     @Override
     public Run createRun(User user) {
       return new PacBioRun(user);
@@ -74,6 +74,7 @@ public enum PlatformType {
   private final boolean usesEmPCR;
   private final String containerName;
   private final String partitionName;
+  private final String libraryConcentrationUnits;
   private final String sraName;
   /**
    * Field lookup
@@ -91,12 +92,17 @@ public enum PlatformType {
    * @param key
    *          of type String
    */
-  PlatformType(String key, boolean usesEmPCR, String containerName, String partitionName, String sraName) {
+  PlatformType(String key, boolean usesEmPCR, String containerName, String partitionName, String libraryConcentrationUnits, String sraName) {
     this.key = key;
     this.usesEmPCR = usesEmPCR;
     this.containerName = containerName;
     this.partitionName = partitionName;
+    this.libraryConcentrationUnits = libraryConcentrationUnits;
     this.sraName = sraName;
+  }
+
+  PlatformType(String key, boolean usesEmPCR, String containerName, String partitionName, String sraName) {
+    this(key, usesEmPCR, containerName, partitionName, "nM", sraName);
   }
 
   /**
@@ -150,6 +156,10 @@ public enum PlatformType {
 
   public String getPartitionName() {
     return partitionName;
+  }
+
+  public String getLibraryConcentrationUnits() {
+    return libraryConcentrationUnits;
   }
 
   public String getSraName() {
