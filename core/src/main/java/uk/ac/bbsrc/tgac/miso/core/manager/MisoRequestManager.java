@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -792,16 +792,16 @@ public class MisoRequestManager implements RequestManager {
           managedIllumina.setNumCycles(runIllumina.getNumCycles());
           managedIllumina.setScoreCycle(runIllumina.getScoreCycle());
           managedIllumina.setPairedEnd(runIllumina.getPairedEnd());
-        } else if (managed instanceof PacBioRun) {
+        } else if (isPacBioRun(managed)) {
           PacBioRun managedPacBio = (PacBioRun) managed;
           PacBioRun runPacBio = (PacBioRun) run;
           managedPacBio.setMovieDuration(runPacBio.getMovieDuration());
-        } else if (managed instanceof LS454Run) {
+        } else if (isLS454Run(managed)) {
           LS454Run managedLS454 = (LS454Run) managed;
           LS454Run runLS454 = (LS454Run) run;
           managedLS454.setCycles(runLS454.getCycles());
           managedLS454.setPairedEnd(runLS454.getPairedEnd());
-        } else if (managed instanceof SolidRun) {
+        } else if (isSolidRun(managed)) {
           SolidRun managedSolid = (SolidRun) managed;
           SolidRun runSolid = (SolidRun) run;
           managedSolid.setPairedEnd(runSolid.getPairedEnd());

@@ -55,9 +55,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
@@ -93,8 +90,6 @@ public class Run
     implements SecurableByProfile, Comparable<Run>, Reportable, Watchable, Deletable, Nameable, Alertable, ChangeLoggable, Aliasable,
     Serializable {
   private static final long serialVersionUID = 1L;
-
-  private static final Logger log = LoggerFactory.getLogger(Run.class);
 
   /** Field PREFIX */
   public static final String PREFIX = "RUN";
@@ -553,7 +548,7 @@ public class Run
   }
 
   public void setPairedEnd(boolean pairedEnd) {
-    // do nothing;
+    throw new UnsupportedOperationException("Cannot set paired end on runs from this platform.");
   }
 
 }
