@@ -213,7 +213,7 @@ var Sample = Sample || {
       switch (sampleCategory) {
       case 'Tissue Processing':
         switch (sampleClassAlias) {
-        case 'CV Slide':
+        case 'Slide':
           // Cuts validation
           jQuery('#cuts').attr('class', 'form-control');
           jQuery('#cuts').attr('data-parsley-type', 'digits');
@@ -475,94 +475,6 @@ Sample.library = {
     }
   },
 
-  saveBulkLibraryDilutions: function (tableName) {
-    var self = this;
-    Utils.ui.disableButton('bulkLibraryDilutionButton');
-    DatatableUtils.collapseInputs(tableName);
-
-    var table = jQuery(tableName).dataTable();
-    var aReturn = [];
-    var aTrs = table.fnGetNodes();
-    for (var i = 0; i < aTrs.length; i++) {
-      if (jQuery(aTrs[i]).hasClass('row_selected')) {
-        var obj = {};
-        jQuery(aTrs[i]).find("td:gt(0)").each(function () {
-          var at = jQuery(this).attr("name");
-          obj[at] = jQuery(this).text();
-        });
-        obj.dilutionCreator = jQuery('#currentUser').text();
-        obj.libraryId = obj.name.substring(3);
-        aReturn.push(obj);
-      }
-    }
-
-    if (aReturn.length > 0) {
-      if (Sample.library.validateLibraryDilutions(aReturn)) {
-        Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'bulkAddLibraryDilutions',
-          {
-            'dilutions': aReturn,
-            'url': ajaxurl
-          },
-          {
-            'doOnSuccess': function(json) {
-              self.processBulkLibraryDilutionTable(tableName, json);
-            }
-          }
-        );
-      }
-      else {
-        alert("The insertSize field can only contain integers, and the result field can only contain integers or decimals.");
-        Utils.ui.reenableButton('bulkLibraryDilutionButton', "Save Dilutions");
-      }
-    }
-    else {
-      alert("You have not selected any Dilution rows to save!\nPlease click the Select column cells in the rows you wish to save.");
-      Utils.ui.reenableButton('bulkLibraryDilutionButton', "Save Dilutions");
-    }
-  },
-
-  processBulkLibraryDilutionTable: function (tableName, json) {
-    Utils.ui.reenableButton('bulkLibraryDilutionButton', "Save Dilutions");
-
-    var a = json.saved;
-    for (var i = 0; i < a.length; i++) {
-      jQuery(tableName).find("tr:gt(0)").each(function () {
-        if (jQuery(this).attr("libraryId") == a[i].libraryId) {
-          jQuery(this).removeClass('row_selected');
-          jQuery(this).addClass('row_saved');
-          jQuery(this).find("td").each(function () {
-            jQuery(this).css('background', '#CCFF99');
-            if (jQuery(this).hasClass('rowSelect')) {
-              jQuery(this).removeClass('rowSelect');
-              jQuery(this).removeAttr('name');
-            }
-          });
-        }
-      });
-    }
-
-    if (json.errors) {
-      var errors = json.errors;
-      var errorStr = "";
-      for (var j = 0; j < errors.length; j++) {
-        errorStr += errors[j].error + "\n";
-        jQuery(tableName).find("tr:gt(0)").each(function () {
-          if (jQuery(this).attr("libraryId") === errors[j].libraryId) {
-            jQuery(this).find("td").each(function () {
-              jQuery(this).css('background', '#EE9966');
-            });
-          }
-        });
-      }
-      alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
-    }
-    else {
-      location.reload(true);
-    }
-  },
-  
   validateLibraryQcs: function (json) {
     var ok = true;
     for (var i = 0; i < json.length; i++) {
@@ -571,15 +483,6 @@ Sample.library = {
     }
     return ok;
   },
-  
-  validateLibraryDilutions: function (json) {
-    var ok = true;
-    for (var i = 0; i < json.length; i++) {
-      if (!json[i].results.match(/[0-9\.]+/) ||
-          Utils.validation.isNullCheck(json[i].dilutionDate)) ok = false;
-    }
-    return ok;
-  }
 };
 
 Sample.barcode = {
@@ -1347,13 +1250,12 @@ Sample.ui = {
         var classes = Sample.ui.getSampleClassesForSelected().map(function (sc) {
           return sc.alias;
         });
-        if (Sample.ui.getUniqueValues(classes).length > 1 && (classes.indexOf("LCM Tube") != -1 || classes.indexOf("CV Slide") != -1)) {
+        if (Sample.ui.getUniqueValues(classes).length > 1 && (classes.indexOf("LCM Tube") != -1 || classes.indexOf("Slide") != -1)) {
           // An ugly check which indicates that more than two Tissue Processing classes have been requested,
-          // and they include LCM Tubes or CV Slides (each of which requires a specific set of columns) plus something else.
-          // (Though it should be fine to edit Curls and H E Slides together, as they have no data specific to this class.
+          // and they include LCM Tubes or Slides (each of which requires a specific set of columns) plus something else.
           // In other words, the selected items require more than one set of columns.
           jQuery('#errors').html("Tissue Processing sample classes cannot be mixed -- you can only edit LCM Tubes with other "
-              + "LCM Tubes, or CV Slides with other CV Slides. You cannot edit LCM Tubes and CV Slides together.");
+              + "LCM Tubes, or Slides with other Slides. You cannot edit LCM Tubes and Slides together.");
           jQuery('#errors').css('display', 'block');
           return false;
         }

@@ -71,7 +71,7 @@ public class MisoFormsService {
     if (importSampleDeliveryFormSamplesValidation(samples)) {
       log.info("Samples valid. Importing...");
       for (Sample s : samples) {
-        Sample ms = requestManager.getSampleByBarcode(s.getIdentificationBarcode());
+        Sample ms = sampleService.getByBarcode(s.getIdentificationBarcode());
         if (ms != null) {
           // only process if there's a description
           if (!isStringEmptyOrNull(s.getDescription())) {

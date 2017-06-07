@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
  * A controller to handle all REST requests for Samples
@@ -56,16 +56,16 @@ public class SampleRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(SampleRestController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private SampleService sampleService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   @RequestMapping(value = "{sampleId}", method = RequestMethod.GET, produces="application/json")
   public @ResponseBody String getSampleById(@PathVariable Long sampleId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    Sample s = requestManager.getSampleById(sampleId);
+    Sample s = sampleService.get(sampleId);
     if (s == null) {
       throw new RestException("No sample found with ID: " + sampleId, Status.NOT_FOUND);
     }

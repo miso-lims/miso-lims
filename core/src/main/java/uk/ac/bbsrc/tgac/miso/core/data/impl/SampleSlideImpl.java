@@ -3,15 +3,18 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.deproxify;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
+import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 
 @Entity
-@Table(name = "SampleCVSlide")
-public class SampleCVSlideImpl extends SampleTissueProcessingImpl implements SampleCVSlide {
+@Table(name = "SampleSlide")
+public class SampleSlideImpl extends SampleTissueProcessingImpl implements SampleSlide {
 
   private static final long serialVersionUID = 1L;
 
@@ -20,6 +23,10 @@ public class SampleCVSlideImpl extends SampleTissueProcessingImpl implements Sam
   private Integer discards;
 
   private Integer thickness;
+
+  @ManyToOne
+  @JoinColumn(name = "stain", nullable = true)
+  private Stain stain;
 
   @Override
   public Integer getSlides() {
@@ -33,15 +40,26 @@ public class SampleCVSlideImpl extends SampleTissueProcessingImpl implements Sam
 
   @Override
   public Integer getSlidesRemaining() {
+    if (getSlides() == null) {
+      return null;
+    }
     int slidesConsumed = 0;
     for (Sample child : getChildren()) {
       if (child == null) continue;
       child = deproxify(child);
-      if (child instanceof SampleLCMTube && ((SampleLCMTube) child).getSlidesConsumed() != null) {
-        slidesConsumed += ((SampleLCMTube) child).getSlidesConsumed();
+      if (child instanceof SampleLCMTube) {
+        Integer consumed = ((SampleLCMTube) child).getSlidesConsumed();
+        if (consumed != null) slidesConsumed += consumed;
+      } else if (child instanceof SampleSlideImpl) {
+        Integer consumed = ((SampleSlideImpl) child).getSlides();
+        if (consumed != null) slidesConsumed += consumed;
       }
     }
-    return (getSlides() - getDiscards() - slidesConsumed);
+    int discards = 0;
+    if (getDiscards() != null) {
+      discards = getDiscards();
+    }
+    return (getSlides() - discards - slidesConsumed);
   }
 
   @Override
@@ -62,6 +80,16 @@ public class SampleCVSlideImpl extends SampleTissueProcessingImpl implements Sam
   @Override
   public void setThickness(Integer thickness) {
     this.thickness = thickness;
+  }
+
+  @Override
+  public Stain getStain() {
+    return stain;
+  }
+
+  @Override
+  public void setStain(Stain stain) {
+    this.stain = stain;
   }
 
 }

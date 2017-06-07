@@ -50,7 +50,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 
 /**
@@ -70,6 +72,10 @@ public class ProjectD3GraphController {
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private RunService runService;
+  @Autowired
+  private SampleService sampleService;
+  @Autowired
   private StudyService studyService;
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
@@ -82,8 +88,8 @@ public class ProjectD3GraphController {
       projectJSON.put("show", "PROJECT");
       projectJSON.put("description", p.getAlias());
       JSONArray projectChildrenArray = new JSONArray();
-      Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
-      Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
+      Collection<Sample> samples = sampleService.listByProjectId(p.getProjectId());
+      Collection<Run> runs = runService.listByProjectId(p.getProjectId());
       Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
 
       JSONObject runJSON = new JSONObject();
@@ -218,8 +224,24 @@ public class ProjectD3GraphController {
     }
   }
 
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  public void setStudyService(StudyService studyService) {
+    this.studyService = studyService;
   }
 
 }

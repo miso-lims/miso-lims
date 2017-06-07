@@ -44,19 +44,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -74,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleCVSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -82,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
@@ -813,8 +814,8 @@ public class Dtos {
     SampleTissueProcessingDto dto = null;
     from = deproxify(from);
 
-    if (from instanceof SampleCVSlideImpl) {
-      dto = asCVSlideSampleDto((SampleCVSlide) from);
+    if (from instanceof SampleSlideImpl) {
+      dto = asSlideSampleDto((SampleSlide) from);
     } else if (from.getClass() == SampleLCMTubeImpl.class) {
       dto = asLCMTubeSampleDto((SampleLCMTube) from);
     } else {
@@ -825,8 +826,8 @@ public class Dtos {
 
   private static SampleTissueProcessing toTissueProcessingSample(SampleTissueProcessingDto from) {
     SampleTissueProcessing to = null;
-    if (from.getClass() == SampleCVSlideDto.class) {
-      to = toCVSlideSample((SampleCVSlideDto) from);
+    if (from.getClass() == SampleSlideDto.class) {
+      to = toSlideSample((SampleSlideDto) from);
     } else if (from.getClass() == SampleLCMTubeDto.class) {
       to = toLCMTubeSample((SampleLCMTubeDto) from);
     } else {
@@ -835,20 +836,28 @@ public class Dtos {
     return to;
   }
 
-  private static SampleCVSlideDto asCVSlideSampleDto(SampleCVSlide from) {
-    SampleCVSlideDto dto = new SampleCVSlideDto();
+  private static SampleSlideDto asSlideSampleDto(SampleSlide from) {
+    SampleSlideDto dto = new SampleSlideDto();
     dto.setSlides(from.getSlides());
     dto.setDiscards(from.getDiscards());
     dto.setSlidesRemaining(from.getSlidesRemaining());
     dto.setThickness(from.getThickness());
+    dto.setStain(from.getStain() == null ? null : asDto(from.getStain()));
     return dto;
   }
 
-  private static SampleCVSlide toCVSlideSample(SampleCVSlideDto from) {
-    SampleCVSlide to = new SampleCVSlideImpl();
+  private static SampleSlide toSlideSample(SampleSlideDto from) {
+    SampleSlide to = new SampleSlideImpl();
     to.setSlides(from.getSlides());
     to.setDiscards(from.getDiscards());
     to.setThickness(from.getThickness());
+    if (from.getStain() == null) {
+      to.setStain(null);
+    } else {
+      Stain stain = new Stain();
+      stain.setId(from.getStain().getId());
+      to.setStain(stain);
+    }
     return to;
   }
 
@@ -1040,11 +1049,19 @@ public class Dtos {
     }
     if (!from.getIndices().isEmpty()) {
       dto.setIndexFamilyName(from.getIndices().get(0).getFamily().getName());
-      dto.setIndex1Id(from.getIndices().get(0).getId());
-      dto.setIndex1Label(from.getIndices().get(0).getLabel());
-      if (from.getIndices().size() > 1) {
-        dto.setIndex2Id(from.getIndices().get(1).getId());
-        dto.setIndex2Label(from.getIndices().get(1).getLabel());
+      for (Index index : from.getIndices()) {
+        switch (index.getPosition()) {
+        case 1:
+          dto.setIndex1Id(index.getId());
+          dto.setIndex1Label(index.getLabel());
+          break;
+        case 2:
+          dto.setIndex2Id(index.getId());
+          dto.setIndex2Label(index.getLabel());
+          break;
+        default:
+          throw new IllegalArgumentException("Index at position " + index.getPosition());
+        }
       }
     }
     dto.setVolume(from.getVolume());
@@ -1562,6 +1579,14 @@ public class Dtos {
     dto.setIndices(from.getIndices().stream().map(Dtos::asDto).collect(Collectors.toList()));
     dto.setMaximumNumber(from.getMaximumNumber());
     dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
+    return dto;
+  }
+
+  public static StainDto asDto(Stain from) {
+    StainDto dto = new StainDto();
+    dto.setId(from.getId());
+    dto.setCategory(from.getCategory() == null ? null : from.getCategory().getName());
+    dto.setName(from.getName());
     return dto;
   }
 }

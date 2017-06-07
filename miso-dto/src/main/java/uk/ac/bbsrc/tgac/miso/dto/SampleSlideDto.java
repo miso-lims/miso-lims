@@ -4,16 +4,17 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleCVSlide;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeName(value = SampleCVSlide.SAMPLE_CLASS_NAME)
-public class SampleCVSlideDto extends SampleTissueProcessingDto {
+@JsonTypeName(value = SampleSlide.SAMPLE_CLASS_NAME)
+public class SampleSlideDto extends SampleTissueProcessingDto {
 
   private Integer slides;
   private Integer slidesRemaining;
   private Integer discards;
   private Integer thickness;
+  private StainDto stain;
 
   public Integer getSlides() {
     return slides;
@@ -49,6 +50,14 @@ public class SampleCVSlideDto extends SampleTissueProcessingDto {
 
   public void setThickness(Integer thickness) {
     this.thickness = thickness;
+  }
+
+  public StainDto getStain() {
+    return stain;
+  }
+
+  public void setStain(StainDto stain) {
+    this.stain = stain;
   }
 
 }

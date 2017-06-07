@@ -290,7 +290,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     run.setName(runName);
     run.setAlias("RunAlias");
     run.setDescription("Run Description");
-    run.setPairedEnd(true);
     run.setSequencerReference(emptySR);
     run.setLastModifier(emptyUser);
 
@@ -380,8 +379,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   }
 
   private Run makeRun(String alias) {
-    SecurityProfile profile = new SecurityProfile();
-    profile.setProfileId(3L);
+    SecurityProfile profile = (SecurityProfile) sessionFactory.getCurrentSession().get(SecurityProfile.class, 3L);
     SequencerReference sequencer = emptySR;
     User user = new UserImpl();
     user.setUserId(1L);
@@ -390,7 +388,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     run.setSecurityProfile(profile);
     run.setAlias(alias);
     run.setDescription("description");
-    run.setPairedEnd(true);
     run.setFilePath("/somewhere/someplace/");
     run.setSequencerReference(sequencer);
     run.setLastModifier(user);

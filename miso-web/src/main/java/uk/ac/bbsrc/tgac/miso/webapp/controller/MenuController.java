@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
@@ -70,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -93,6 +95,8 @@ public class MenuController implements ServletContextAware {
   private SampleClassService sampleClassService;
   @Autowired
   private DetailedQcStatusService detailedQcStatusService;
+  @Autowired
+  private StainService stainService;
 
   @Autowired
   private LibraryService libraryService;
@@ -103,6 +107,9 @@ public class MenuController implements ServletContextAware {
 
   @Autowired
   private SampleGroupService sampleGroupService;
+
+  @Autowired
+  private NamingScheme namingScheme;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
@@ -228,6 +235,8 @@ public class MenuController implements ServletContextAware {
     ObjectNode node = mapper.createObjectNode();
     node.put("isDetailedSample", isDetailedSampleEnabled());
     node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
+    node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
+    node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
 
     final Iterable<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 
@@ -247,6 +256,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "subprojects", subprojectService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "stains", stainService.list(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

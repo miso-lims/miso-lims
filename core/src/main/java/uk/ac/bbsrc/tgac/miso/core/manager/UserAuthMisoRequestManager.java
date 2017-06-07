@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -49,11 +48,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -197,24 +194,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveRunQC(RunQC runQC) throws IOException {
-    if (writeCheck(runQC.getRun())) {
-      return backingManager.saveRunQC(runQC);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to the parent Run");
-    }
-  }
-
-  @Override
-  public long saveSampleQC(SampleQC sampleQC) throws IOException {
-    if (writeCheck(sampleQC.getSample())) {
-      return backingManager.saveSampleQC(sampleQC);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to the parent Sample ");
-    }
-  }
-
-  @Override
   public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (writeCheck(container)) {
       container.setLastModifier(getCurrentUser());
@@ -277,13 +256,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Run getRunById(long runId) throws IOException {
-    Run o = backingManager.getRunById(runId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Run " + runId);
-  }
-
-  @Override
   public Run getRunByAlias(String alias) throws IOException {
     Run o = backingManager.getRunByAlias(alias);
     if (readCheck(o)) return o;
@@ -296,20 +268,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (readCheck(o.getRun())) return o;
     else throw new AuthorizationIOException(
         "User " + getCurrentUsername() + " cannot read parent Run " + o.getRun().getId() + " for RunQC " + runQcId);
-  }
-
-  @Override
-  public Sample getSampleById(long sampleId) throws IOException {
-    Sample o = backingManager.getSampleById(sampleId);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + sampleId);
-  }
-
-  @Override
-  public Sample getSampleByBarcode(String barcode) throws IOException {
-    Sample o = backingManager.getSampleByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + o.getId());
   }
 
   @Override
@@ -376,132 +334,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Run> listAllRuns() throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    Collection<Run> runs = backingManager.listAllRuns();
-    if (runs != null) {
-      for (Run run : backingManager.listAllRuns()) {
-        if (run != null) {
-          if (run.userCanRead(user)) {
-            accessibles.add(run);
-          }
-        } else {
-          log.error("WTF. Seems to be a null run in the cached list");
-        }
-      }
-    } else {
-      log.error("WTF. Run list coming from cache is null");
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Run> listAllRunsWithLimit(long limit) throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    Collection<Run> runs = backingManager.listAllRunsWithLimit(limit);
-    if (runs != null) {
-      for (Run run : backingManager.listAllRunsWithLimit(limit)) {
-        if (run != null) {
-          if (run.userCanRead(user)) {
-            accessibles.add(run);
-          }
-        } else {
-          log.error("WTF. Seems to be a null run in the cached list");
-        }
-      }
-    } else {
-      log.error("WTF. Run list coming from cache is null");
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Run> listAllRunsBySearch(String query) throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    for (Run run : backingManager.listAllRunsBySearch(query)) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Run> listAllRunsByProjectId(long projectId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    for (Run run : backingManager.listAllRunsByProjectId(projectId)) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Run> listRunsByPoolId(long poolId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    for (Run run : backingManager.listRunsByPoolId(poolId)) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Run> listRunsBySequencerPartitionContainerId(long containerId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    for (Run run : backingManager.listRunsBySequencerPartitionContainerId(containerId)) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Run> listAllLS454Runs() throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    for (Run run : backingManager.listAllLS454Runs()) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Run> listAllIlluminaRuns() throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    for (Run run : backingManager.listAllIlluminaRuns()) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Run> listAllSolidRuns() throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    for (Run run : backingManager.listAllSolidRuns()) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<RunQC> listAllRunQCsByRunId(long runId) throws IOException {
     User user = getCurrentUser();
     Collection<RunQC> accessibles = new HashSet<>();
@@ -534,94 +366,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     for (SequencerPartitionContainer container : backingManager.listSequencerPartitionContainersByBarcode(barcode)) {
       if (container.userCanRead(user)) {
         accessibles.add(container);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> listAllSamples() throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listAllSamples()) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listAllSamplesWithLimit(limit)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesByReceivedDate(long limit) throws IOException {
-    User user = getCurrentUser();
-    List<Sample> samples = new ArrayList<>(backingManager.listAllSamplesByReceivedDate(limit));
-
-    for (int i = 0; i < samples.size(); i++) {
-      if (!samples.get(i).userCanRead(user)) {
-        samples.remove(i);
-      }
-    }
-    return samples;
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesBySearch(String query) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listAllSamplesBySearch(query)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> listAllSamplesByProjectId(long projectId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listAllSamplesByProjectId(projectId)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> listSamplesByAlias(String alias) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.listSamplesByAlias(alias)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Sample> getSamplesByIdList(List<Long> idList) throws IOException {
-    User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<>();
-    for (Sample sample : backingManager.getSamplesByIdList(idList)) {
-      if (sample.userCanRead(user)) {
-        accessibles.add(sample);
-      } else {
-        throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Sample " + sample.getId() + " "
-            + sample.getAlias() + "(" + sample.getName() + ")");
       }
     }
     return accessibles;
@@ -670,48 +414,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       accessibles.add(submission);
     }
     return accessibles;
-  }
-
-  @Override
-  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
-    User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<>();
-    for (Run run : backingManager.listRunsBySequencerId(sequencerReferenceId)) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
-      }
-    }
-    return accessibles;
-  }
-
-  /* deletes */
-
-  @Override
-  public void deleteSample(Sample sample) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteSample(sample);
-    }
-  }
-
-  @Override
-  public void deleteRun(Run run) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteRun(run);
-    }
-  }
-
-  @Override
-  public void deleteRunQC(RunQC runQc) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteRunQC(runQc);
-    }
-  }
-
-  @Override
-  public void deleteSampleQC(SampleQC sampleQc) throws IOException {
-    if (getCurrentUser().isAdmin()) {
-      backingManager.deleteSampleQC(sampleQc);
-    }
   }
 
   @Override
@@ -777,16 +479,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       }
     }
     backingManager.saveRuns(runs);
-  }
-
-  @Override
-  public void saveRunNote(Run run, Note note) throws IOException {
-    if (writeCheck(run)) {
-      note.setOwner(getCurrentUser());
-      backingManager.saveRunNote(run, note);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
-    }
   }
 
   @Override
@@ -910,11 +602,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
       }
     }
     return accessibles;
-  }
-
-  @Override
-  public Collection<String> listAllSampleTypes() throws IOException {
-    return backingManager.listAllSampleTypes();
   }
 
   @Override
@@ -1046,16 +733,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Map<String, Integer> getRunColumnSizes() throws IOException {
-    return backingManager.getRunColumnSizes();
-  }
-
-  @Override
-  public Map<String, Integer> getSampleColumnSizes() throws IOException {
-    return backingManager.getSampleColumnSizes();
-  }
-
-  @Override
   public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException {
     return backingManager.getSequencerReferenceColumnSizes();
   }
@@ -1097,56 +774,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Long countRuns() throws IOException {
-    return backingManager.countRuns();
-  }
-
-  @Override
-  public Long countRunsBySearch(String querystr) throws IOException {
-    return backingManager.countRunsBySearch(querystr);
-  }
-
-  @Override
-  public Run getLatestRunBySequencerPartitionContainerId(Long containerId) throws IOException {
-    Run o = backingManager.getLatestRunBySequencerPartitionContainerId(containerId);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Run " + o.getId());
-  }
-
-  @Override
   public Long countContainers() throws IOException {
     return backingManager.countContainers();
-  }
-
-  @Override
-  public List<Run> getRunsByPool(Pool pool) throws IOException {
-    List<Run> runs = backingManager.getRunsByPool(pool);
-    List<Run> authorizedRuns = new ArrayList<>();
-    for (Run run : runs) {
-      if (readCheck(run))
-        authorizedRuns.add(run);
-    }
-    return authorizedRuns;
-  }
-
-  @Override
-  public void addRunWatcher(Run run, User watcher) throws IOException {
-    if (!readCheck(run)) {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Run " + run.getId());
-    } else if (!run.userCanRead(watcher)) {
-      throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot read Run " + run.getId());
-    } else {
-      backingManager.addRunWatcher(run, watcher);
-    }
-  }
-
-  @Override
-  public void removeRunWatcher(Run run, User watcher) throws IOException {
-    if (!writeCheck(run)) {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read write to Run " + run.getId());
-    } else {
-      backingManager.removeRunWatcher(run, watcher);
-    }
   }
 
   @Override
@@ -1172,5 +801,14 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Collection<LibraryDesign> listLibraryDesigns() throws IOException {
     return backingManager.listLibraryDesigns();
+  }
+
+  @Override
+  public void updateContainer(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException {
+    if (!writeCheck(managed)) {
+      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to Container " + managed.getId());
+    } else {
+      backingManager.updateContainer(source, managed);
+    }
   }
 }

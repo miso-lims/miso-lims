@@ -5,6 +5,64 @@ var Box = Box || {
   visual: null,
 
   // Start the scanning process
+  fakeScan: function() {
+    var dialog = jQuery('#dialogDialog');
+    jQuery('#dialogInfoBelow').html('');
+    jQuery('#dialogInfoAbove').html('<p>Please enter the prefix for your bacodes (e.g., MYBOX for MYBOXA01, MYBOXA02, ...). Existing tubes with barcodes matching this pattern will be added to the box in positions depending on the suffix.</p>');
+    jQuery('#dialogVisual').html('<p>Prefix: <input id="prefix" type="text"/></p><p>Suffix: <input type="radio" name="suffix" id="standardSuffix" value="standard"/><label for="standardSuffix"> Standard (A01, A02, ... as row letter/column number)</label> <input type="radio" name="suffix" id="numericSuffix" value="numeric"/><label for="numericSuffix"> Numeric (001, 002, ... moving in rows)</label></p>');
+    dialog.dialog({
+      autoOpen: true,
+      width: 500,
+      height: 400,
+      modal: true,
+      resizable: false,
+      title: 'Fill by Barcode Pattern',
+      position: [jQuery(window).width()/2 - 400/2, 50],
+      buttons: {
+        "Fill": function () {
+          var prefix = document.getElementById('prefix').value;
+          var suffix = jQuery('input[name="suffix"]:checked').val() || 'standard';
+          if (!prefix || !(new RegExp(Utils.validation.sanitizeRegex).test(prefix))) {
+            alert('Not a valid prefix.');
+            return;
+          }
+          dialog.dialog('close');
+          jQuery('#dialogVisual').html('<p>Saving...</p>');
+          jQuery('#dialogInfoAbove').html('');
+          dialog.dialog({
+            autoOpen: true,
+            width: 400,
+            height: 300,
+            modal: true,
+            resizable: false,
+            position: [jQuery(window).width()/2 - 400/2, 50],
+            buttons: {}
+          });
+          Fluxion.doAjax(
+            'boxControllerHelperService',
+            'recreateBoxFromPrefix',
+            {
+              'boxId': Box.boxJSON.id,
+              'prefix': prefix,
+              'suffix': suffix,
+              'url': ajaxurl
+            },
+            {
+              'doOnSuccess':  Utils.page.pageReload,
+              'doOnError': function(json) {
+                alert("Error saving box contents: " + json.error);
+                dialog.dialog('close');
+              }
+            }
+          );
+        },
+        "Cancel": function() {
+          dialog.dialog('close');
+        }
+      }
+    });
+  },
+  // Start the scanning process
   initScan: function() {
     Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
     Box.dialogHeight = Box.boxJSON.rows * 40 + 300;

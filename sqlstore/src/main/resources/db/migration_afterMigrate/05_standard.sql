@@ -104,21 +104,24 @@ FOR EACH ROW
   END//
 
 DROP TRIGGER IF EXISTS SampleCVSlideChange//
-CREATE TRIGGER SampleCVSlideChange BEFORE UPDATE ON SampleCVSlide
+DROP TRIGGER IF EXISTS SampleSlideChange//
+CREATE TRIGGER SampleSlideChange BEFORE UPDATE ON SampleSlide
 FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
      CASE WHEN NEW.slides <> OLD.slides THEN CONCAT('slides: ', OLD.slides, ' → ', NEW.slides) END,
      CASE WHEN (NEW.discards IS NULL) <> (OLD.discards IS NULL) OR NEW.discards <> OLD.discards THEN CONCAT('discards: ', COALESCE(OLD.discards, 'n/a'), ' → ', COALESCE(NEW.discards, 'n/a')) END,
-     CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN CONCAT('thickness: ', COALESCE(OLD.thickness, 'n/a'), ' → ', COALESCE(NEW.thickness, 'n/a')) END);
+     CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN CONCAT('thickness: ', COALESCE(OLD.thickness, 'n/a'), ' → ', COALESCE(NEW.thickness, 'n/a')) END,
+     CASE WHEN (NEW.stain IS NULL) <> (OLD.stain IS NULL) OR NEW.stain <> OLD.stain THEN CONCAT('stain: ', COALESCE((SELECT name FROM Stain WHERE stainId = OLD.stain), 'none'), ' → ', COALESCE((SELECT name FROM Stain WHERE stainId = NEW.stain), 'none')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.slides <> OLD.slides THEN 'slides' END,
         CASE WHEN (NEW.discards IS NULL) <> (OLD.discards IS NULL) OR NEW.discards <> OLD.discards THEN 'discards' END,
-        CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN 'thickness' END
+        CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN 'thickness' END,
+        CASE WHEN (NEW.stain IS NULL) <> (OLD.stain IS NULL) OR NEW.stain <> OLD.stain THEN 'stain' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
       log_message
@@ -272,8 +275,7 @@ FOR EACH ROW
         CASE WHEN NEW.description <> OLD.description THEN CONCAT('description: ', OLD.description, ' → ', NEW.description) END,
         CASE WHEN (NEW.filePath IS NULL) <> (OLD.filePath IS NULL) OR NEW.filePath <> OLD.filePath THEN CONCAT('file path: ', COALESCE(OLD.filePath, 'n/a'), ' → ', COALESCE(NEW.filePath, 'n/a')) END,
         CASE WHEN NEW.health <> OLD.health THEN CONCAT('health: ', COALESCE(OLD.health, 'n/a'), ' → ', COALESCE(NEW.health, 'n/a')) END,
-        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END,
-        CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('startDate: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END) END,
+        CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('startDate: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END,
         CASE WHEN (NEW.sequencerReference_sequencerReferenceId IS NULL) <> (OLD.sequencerReference_sequencerReferenceId IS NULL) OR NEW.sequencerReference_sequencerReferenceId <> OLD.sequencerReference_sequencerReferenceId THEN CONCAT('sequencer: ', COALESCE((SELECT name FROM SequencerReference WHERE referenceId = OLD.sequencerReference_sequencerReferenceId), 'n/a'), ' → ', COALESCE((SELECT name FROM SequencerReference WHERE referenceId = NEW.sequencerReference_sequencerReferenceId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
@@ -286,7 +288,6 @@ FOR EACH ROW
         CASE WHEN (NEW.filePath IS NULL) <> (OLD.filePath IS NULL) OR NEW.filePath <> OLD.filePath THEN 'filePath' END,
         CASE WHEN (NEW.health IS NULL) <> (OLD.health IS NULL) OR NEW.health <> OLD.health THEN 'health' END,
         CASE WHEN (NEW.metrics IS NULL) <> (OLD.metrics IS NULL) OR NEW.metrics <> OLD.metrics THEN 'metrics' END,
-        CASE WHEN NEW.pairedend <> OLD.pairedend THEN 'pairedend' END,
         CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN 'startDate' END,
         CASE WHEN (NEW.sequencerReference_sequencerReferenceId IS NULL) <> (OLD.sequencerReference_sequencerReferenceId IS NULL) OR NEW.sequencerReference_sequencerReferenceId <> OLD.sequencerReference_sequencerReferenceId THEN 'sequencerReference_sequencerReferenceId' END), ''),
       NEW.lastModifier,
@@ -300,12 +301,31 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END) END,
         CASE WHEN (NEW.cycles IS NULL) <> (OLD.cycles IS NULL) OR NEW.cycles <> OLD.cycles THEN CONCAT('cycles: ', COALESCE(OLD.cycles, 'n/a'), ' → ', COALESCE(NEW.cycles, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
       NEW.runId,
       COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedend' END,
         CASE WHEN (NEW.cycles IS NULL) <> (OLD.cycles IS NULL) OR NEW.cycles <> OLD.cycles THEN 'cycles' END), ''),
+      (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
+      log_message);
+  END IF;
+  END//
+  
+DROP TRIGGER IF EXISTS RunChangeSolid//
+CREATE TRIGGER RunChangeSolid BEFORE UPDATE ON RunSolid
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
+      NEW.runId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedend' END), ''),
       (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
       log_message);
   END IF;
@@ -317,14 +337,12 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
-        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN CONCAT('movie duration: ', COALESCE(OLD.movieDuration, 'n/a'), ' → ', COALESCE(NEW.movieDuration, 'n/a')) END,
-        CASE WHEN (NEW.wellName IS NULL) <> (OLD.wellName IS NULL) OR NEW.wellName <> OLD.wellName THEN CONCAT('well: ', COALESCE(OLD.wellName, 'n/a'), ' → ', COALESCE(NEW.wellName, 'n/a')) END);
+        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN CONCAT('movie duration: ', COALESCE(OLD.movieDuration, 'n/a'), ' → ', COALESCE(NEW.movieDuration, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
       NEW.runId,
       COALESCE(CONCAT_WS(',',
-        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN 'movieDuration' END,
-        CASE WHEN (NEW.wellName IS NULL) <> (OLD.wellName IS NULL) OR NEW.wellName <> OLD.wellName THEN 'wellName' END), ''),
+        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN 'movieDuration' END), ''),
       (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
       log_message);
   END IF;
@@ -336,6 +354,7 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END) END,
         CASE WHEN (NEW.callCycle IS NULL) <> (OLD.callCycle IS NULL) OR NEW.callCycle <> OLD.callCycle THEN CONCAT('call cycles: ', COALESCE(OLD.callCycle, 'n/a'), ' → ', COALESCE(NEW.callCycle, 'n/a')) END,
         CASE WHEN (NEW.imgCycle IS NULL) <> (OLD.imgCycle IS NULL) OR NEW.imgCycle <> OLD.imgCycle THEN CONCAT('image cycles: ', COALESCE(OLD.imgCycle, 'n/a'), ' → ', COALESCE(NEW.imgCycle, 'n/a')) END,
         CASE WHEN (NEW.numCycles IS NULL) <> (OLD.numCycles IS NULL) OR NEW.numCycles <> OLD.numCycles THEN CONCAT('number of cycles: ', COALESCE(OLD.numCycles, 'n/a'), ' → ', COALESCE(NEW.numCycles, 'n/a')) END,
@@ -344,6 +363,7 @@ FOR EACH ROW
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
       NEW.runId,
       COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedend' END,
         CASE WHEN (NEW.callCycle IS NULL) <> (OLD.callCycle IS NULL) OR NEW.callCycle <> OLD.callCycle THEN 'callCycle' END,
         CASE WHEN (NEW.imgCycle IS NULL) <> (OLD.imgCycle IS NULL) OR NEW.imgCycle <> OLD.imgCycle THEN 'imgCycle' END,
         CASE WHEN (NEW.numCycles IS NULL) <> (OLD.numCycles IS NULL) OR NEW.numCycles <> OLD.numCycles THEN 'numCycles' END,
@@ -685,7 +705,8 @@ FOR EACH ROW
   BEGIN
     DECLARE log_message varchar(500) CHARACTER SET utf8;
     SET log_message = CONCAT_WS(', ',
-    CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId THEN CONCAT('pool changed in partition ', OLD.partitionNumber, ': ', COALESCE((SELECT name FROM Pool WHERE poolId = OLD.pool_poolId), 'n/a'), ' → ', COALESCE((SELECT name FROM Pool WHERE poolId = NEW.pool_poolId), 'n/a')) END);
+      CASE WHEN (NEW.pool_poolId IS NULL) <> (OLD.pool_poolId IS NULL) OR NEW.pool_poolId <> OLD.pool_poolId THEN CONCAT('pool changed in partition ', OLD.partitionNumber, ': ', COALESCE((SELECT name FROM Pool WHERE poolId = OLD.pool_poolId), 'n/a'), ' → ', COALESCE((SELECT name FROM Pool WHERE poolId = NEW.pool_poolId), 'n/a')) END);
+    
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message) VALUES (
         (SELECT spcp.container_containerId FROM SequencerPartitionContainer_Partition spcp
@@ -696,6 +717,28 @@ FOR EACH ROW
            JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
          WHERE spcp.partitions_partitionId = OLD.partitionId),
          log_message
+      );
+    END IF;
+
+    IF (NEW.pool_poolId IS NOT NULL) AND ((OLD.pool_poolId IS NULL) OR ((OLD.pool_poolId IS NOT NULL) AND (OLD.pool_poolId <> NEW.pool_poolId))) THEN
+      INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
+        NEW.pool_poolId,
+        'container',
+        (SELECT spc.lastModifier FROM SequencerPartitionContainer spc
+           JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
+         WHERE spcp.partitions_partitionId = OLD.partitionId),
+         CONCAT('Added to container ', COALESCE((SELECT spc.identificationBarcode FROM SequencerPartitionContainer spc JOIN SequencerPartitionContainer_Partition sp ON spc.containerId = sp.container_containerId WHERE sp.partitions_partitionId = NEW.partitionId), 'unknown'))
+      );
+    END IF;
+    
+    IF (OLD.pool_poolId IS NOT NULL) AND ((NEW.pool_poolId IS NULL) OR ((NEW.pool_poolId IS NOT NULL) AND (OLD.pool_poolId <> NEW.pool_poolId)))  THEN
+      INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
+        OLD.pool_poolId,
+        'container',
+        (SELECT spc.lastModifier FROM SequencerPartitionContainer spc
+           JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
+         WHERE spcp.partitions_partitionId = OLD.partitionId),
+         CONCAT('Removed from container ', COALESCE((SELECT spc.identificationBarcode FROM SequencerPartitionContainer spc JOIN SequencerPartitionContainer_Partition sp ON spc.containerId = sp.container_containerId WHERE sp.partitions_partitionId = NEW.partitionId), 'unknown'))
       );
     END IF;
   END //
@@ -821,7 +864,7 @@ CREATE PROCEDURE deleteSample(
   DELETE FROM SampleAliquot WHERE sampleId = iSampleId;
   DELETE FROM SampleStock WHERE sampleId = iSampleId;
   DELETE FROM SampleTissueProcessing WHERE sampleId = iSampleId;
-  DELETE FROM SampleCVSlide WHERE sampleId = iSampleId;
+  DELETE FROM SampleSlide WHERE sampleId = iSampleId;
   DELETE FROM SampleLCMTube WHERE sampleId = iSampleId;
   DELETE FROM SampleTissue WHERE sampleId = iSampleId;
   DELETE FROM `Identity` WHERE sampleId = iSampleId;
@@ -886,12 +929,12 @@ DELIMITER ;
 
 DROP VIEW IF EXISTS CompletedPartitions;
 CREATE OR REPLACE VIEW RunPartitionsByHealth AS
-  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS num_partitions, health AS health, (SELECT MAX(changeTime) FROM RunChangeLog WHERE RunChangeLog.runId = Run.runId) as lastUpdated
+  SELECT pool_poolId AS poolId, sequencingParameters_parametersId as parametersId, COUNT(*) AS num_partitions, health AS health, MAX((SELECT MAX(changeTime) FROM RunChangeLog WHERE RunChangeLog.runId = Run.runId)) as lastUpdated
     FROM Run JOIN Run_SequencerPartitionContainer ON Run.runId = Run_SequencerPartitionContainer.Run_runId
      JOIN SequencerPartitionContainer_Partition ON Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId
      JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
     WHERE sequencingParameters_parametersId IS NOT NULL AND pool_poolId IS NOT NULL
-    GROUP BY pool_poolId, sequencingParameters_parametersId, health, lastUpdated;;
+    GROUP BY pool_poolId, sequencingParameters_parametersId, health;
 
 CREATE OR REPLACE VIEW DesiredPartitions AS
   SELECT poolId, parametersId, SUM(partitions) AS num_partitions, MAX(lastUpdated) as lastUpdated

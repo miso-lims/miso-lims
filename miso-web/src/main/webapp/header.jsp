@@ -104,7 +104,7 @@
       <a href='<c:url value='/'/>'>
         <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo" border="0" id="misologo"/>
       </a>
-       <span id="instanceName">${initParam['miso.name']}</span>
+       <span id="instanceName">${misoInstanceName}</span>
     </td>
     <td class="headertable" align="right">
       <img src="<c:url value='/styles/images/brand_logo.png'/>" alt="Brand Logo" name="logo" border="0" id="brandlogo"/>
@@ -155,7 +155,9 @@
 
 <sec:authorize access="isAuthenticated()">
   <div id="loggedInBanner" style="display:inline-block">
-    <a href="${ApplicationContextProvider.getBugUrl()}" target="_blank">Report a problem</a> |
+    <c:if test="${misoBugUrl != null}">
+      <a href="${misoBugUrl}" target="_blank">Report a problem</a> |
+    </c:if>
     Logged in as:
     <b id="currentUser"><sec:authentication property="principal.username"/></b>
     | <a href="<c:url value="/logout"/>">Logout</a>

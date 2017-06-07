@@ -152,7 +152,6 @@ public class PacBioNotificationMessageConsumerMechanism
 
                 r.setAlias(run.getString("runName"));
                 r.setDescription(m.group(1));
-                r.setPairedEnd(false);
 
                 if (run.has("fullPath")) {
                   r.setFilePath(run.getString("fullPath"));
@@ -191,7 +190,6 @@ public class PacBioNotificationMessageConsumerMechanism
                 r.setAlias(runName);
 
                 r.setDescription(m.group(1));
-                r.setPairedEnd(false);
                 r.setHealth(ht);
                 r.setName(runName);
 

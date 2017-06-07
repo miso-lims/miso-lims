@@ -44,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -62,9 +63,19 @@ public class ListPoolsController {
 
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private RunService runService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setPoolService(PoolService poolService) {
+    this.poolService = poolService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   @ModelAttribute("platformTypes")
@@ -103,7 +114,7 @@ public class ListPoolsController {
         List<Pool> pools = new ArrayList<>();
         List<Pool> poolsUsed = new ArrayList<>();
         for (Pool p : poolService.listReadyPoolsByPlatform(pt)) {
-          if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
+          if (runService.listByPoolId(p.getId()).isEmpty()) {
             pools.add(p);
           } else {
             poolsUsed.add(p);

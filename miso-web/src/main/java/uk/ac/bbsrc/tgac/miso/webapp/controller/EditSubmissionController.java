@@ -55,7 +55,9 @@ import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 @Controller
 @RequestMapping("/submission")
@@ -65,6 +67,10 @@ public class EditSubmissionController {
 
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private RunService runService;
+  @Autowired
+  private SampleService sampleService;
   @Autowired
   private StudyService studyService;
 
@@ -76,6 +82,14 @@ public class EditSubmissionController {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
   public void setSubmissionManager(SubmissionManager submissionManager) {
@@ -101,12 +115,12 @@ public class EditSubmissionController {
 
   @ModelAttribute("samples")
   public Collection<Sample> populateSamples() throws IOException {
-    return requestManager.listAllSamples();
+    return sampleService.getAll();
   }
 
   @ModelAttribute("runs")
   public Collection<Run> populateRuns() throws IOException {
-    return requestManager.listAllRuns();
+    return runService.list();
   }
 
   @ModelAttribute("experiments")

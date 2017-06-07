@@ -49,7 +49,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
@@ -74,8 +73,6 @@ public class RunRestController extends RestController {
   @Autowired
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
-  @Autowired
   private RunService runService;
 
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<Run, RunDto>() {
@@ -95,14 +92,10 @@ public class RunRestController extends RestController {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
   @RequestMapping(value = "{runId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String getRunById(@PathVariable Long runId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    Run r = requestManager.getRunById(runId);
+    Run r = runService.get(runId);
     if (r == null) {
       throw new RestException("No run found with ID: " + runId, Status.NOT_FOUND);
     }
@@ -112,7 +105,7 @@ public class RunRestController extends RestController {
   @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String getRunByAlias(@PathVariable String runAlias) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    Run r = requestManager.getRunByAlias(runAlias);
+    Run r = runService.getRunByAlias(runAlias);
     if (r == null) {
       throw new RestException("No run found with alias: " + runAlias, Status.NOT_FOUND);
     }
@@ -121,7 +114,7 @@ public class RunRestController extends RestController {
 
   @RequestMapping(value = "{runAlias}/samplesheet", method = RequestMethod.GET)
   public @ResponseBody String getSampleSheetForRun(@PathVariable String runAlias) throws IOException {
-    Run r = requestManager.getRunByAlias(runAlias);
+    Run r = runService.getRunByAlias(runAlias);
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     if (r == null) {
       throw new RestException("No run found with alias: " + runAlias, Status.NOT_FOUND);
@@ -135,7 +128,7 @@ public class RunRestController extends RestController {
 
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String listAllRuns() throws IOException {
-    Collection<Run> lr = requestManager.listAllRuns();
+    Collection<Run> lr = runService.list();
     ObjectMapper mapper = new ObjectMapper();
     return mapper.writeValueAsString(lr);
   }

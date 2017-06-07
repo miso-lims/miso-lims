@@ -31,6 +31,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.xml.parsers.ParserConfigurationException;
@@ -114,6 +115,8 @@ public class IlluminaRun extends Run {
   private Integer imgCycle;
   private Integer numCycles;
   private Integer scoreCycle;
+  @Column(nullable = false)
+  private boolean pairedEnd = true;
 
   public Integer getCallCycle() {
     return callCycle;
@@ -145,6 +148,16 @@ public class IlluminaRun extends Run {
 
   public void setScoreCycle(Integer scoreCycle) {
     this.scoreCycle = scoreCycle;
+  }
+
+  @Override
+  public Boolean getPairedEnd() {
+    return pairedEnd;
+  }
+
+  @Override
+  public void setPairedEnd(boolean pairedEnd) {
+    this.pairedEnd = pairedEnd;
   }
 
 }

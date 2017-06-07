@@ -68,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
@@ -100,6 +101,8 @@ public class ProjectControllerHelperService {
   private LibraryDilutionService dilutionService;
   @Autowired
   private SampleService sampleService;
+  @Autowired
+  private RunService runService;
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
@@ -135,6 +138,10 @@ public class ProjectControllerHelperService {
 
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   public JSONObject validateProjectShortName(HttpSession session, JSONObject json) {
@@ -413,7 +420,7 @@ public class ProjectControllerHelperService {
   }
 
   private String checkSamples(Long projectId) throws IOException {
-    final Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
+    final Collection<Sample> samples = sampleService.listByProjectId(projectId);
     if (samples.size() > 0) {
       int pass = 0;
       for (final Sample s : samples) {
@@ -454,7 +461,7 @@ public class ProjectControllerHelperService {
 
   private String checkRuns(Long projectId) throws IOException {
     int pass = 0;
-    final Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
+    final Collection<Run> runs = runService.listByProjectId(projectId);
     if (runs.size() > 0) {
       for (final Run run : runs) {
         if (run.getHealth() == HealthType.Completed) {
@@ -496,12 +503,12 @@ public class ProjectControllerHelperService {
 
   public JSONObject printAllSampleBarcodes(HttpSession session, JSONObject json) {
     return ControllerHelperServiceUtils.printAllBarcodes(printerService, json,
-        new SampleControllerHelperService.SampleBarcodeAssister(requestManager, sampleService));
+        new SampleControllerHelperService.SampleBarcodeAssister(sampleService));
   }
 
   public JSONObject printSelectedSampleBarcodes(HttpSession session, JSONObject json) {
     return ControllerHelperServiceUtils.printBarcodes(printerService, json,
-        new SampleControllerHelperService.SampleBarcodeAssister(requestManager, sampleService));
+        new SampleControllerHelperService.SampleBarcodeAssister(sampleService));
   }
 
   public JSONObject printAllLibraryBarcodes(HttpSession session, JSONObject json) {
@@ -696,7 +703,7 @@ public class ProjectControllerHelperService {
     try {
       final JSONObject j = new JSONObject();
       final JSONArray jsonArray = new JSONArray();
-      for (final Sample sample : requestManager.listAllSamplesByProjectId(projectId)) {
+      for (final Sample sample : sampleService.listByProjectId(projectId)) {
         jsonArray.add("{'id':'" + sample.getId() + "'," + "'name':'" + sample.getName() + "'," + "'alias':'" + sample.getAlias() + "',"
             + "'type':'" + sample.getSampleType() + "'," + "'description':'" + sample.getDescription() + "'}");
       }
@@ -745,7 +752,7 @@ public class ProjectControllerHelperService {
         final JSONArray a = JSONArray.fromObject(json.get("samples"));
         for (final JSONObject j : (Iterable<JSONObject>) a) {
           if (j.has("sampleId")) {
-            final Sample s = requestManager.getSampleById(j.getLong("sampleId"));
+            final Sample s = sampleService.get(j.getLong("sampleId"));
             if (overview.getSamples().contains(s)) {
               log.error("Sample group already contains " + s.getName());
             } else {

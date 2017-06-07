@@ -446,11 +446,11 @@ DELETE FROM `RunIllumina`;
 DELETE FROM `RunPacBio`;
 DELETE FROM `RunLS454`;
 DELETE FROM `Run`;
-INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `pairedEnd`, `filePath`, `securityProfile_profileId`, `alias`, `sequencerReference_sequencerReferenceId`, `lastModifier`, `health`, `completionDate`) 
-VALUES (1,'RUN1','BC0JHTACXX',NULL,1,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX',12,'120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31'),
-(2,'RUN2','AD0VJ9ACXX',NULL,1,'/.mounts/labs/prod/archive/h1179/120404_h1179_0072_AD0VJ9ACXX',13,'120404_h1179_0072_AD0VJ9ACXX',1,1,'Failed','2012-04-04'),
-(3,'RUN3','BC075RACXX',NULL,1,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX',14,'120412_h1179_0073_BC075RACXX',1,1,'Completed','2012-04-20'),
-(4,'RUN4','AC0KY7ACXX',NULL,1,'/.mounts/labs/prod/archive/h1179/120314_h1179_0068_AC0KY7ACXX',15,'120314_h1179_0068_AC0KY7ACXX',1,1,'Completed','2012-03-23');
+INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `filePath`, `securityProfile_profileId`, `alias`, `sequencerReference_sequencerReferenceId`, `lastModifier`, `health`, `completionDate`) 
+VALUES (1,'RUN1','BC0JHTACXX',NULL,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX',12,'120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31'),
+(2,'RUN2','AD0VJ9ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120404_h1179_0072_AD0VJ9ACXX',13,'120404_h1179_0072_AD0VJ9ACXX',1,1,'Failed','2012-04-04'),
+(3,'RUN3','BC075RACXX',NULL,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX',14,'120412_h1179_0073_BC075RACXX',1,1,'Completed','2012-04-20'),
+(4,'RUN4','AC0KY7ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120314_h1179_0068_AC0KY7ACXX',15,'120314_h1179_0068_AC0KY7ACXX',1,1,'Completed','2012-03-23');
 INSERT INTO RunIllumina(runId) VALUES (1), (2), (3), (4);
 
 INSERT INTO `RunChangeLog`(`runId`, `columnsChanged`, `userId`, `message`, `changeTime`)
@@ -569,9 +569,11 @@ DELETE FROM `Run_Note`;
 DELETE FROM `Pool_Note`;
 
 -- DetailedSample and DetailedLibrary values
+DELETE FROM `SampleClass`;
 INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
-(2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00');
+(2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
+(3,'Stock','Stock',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00');
 
 DELETE FROM `LibraryDesignCode`;
 INSERT INTO `LibraryDesignCode`(`code`,`description`) 
@@ -582,10 +584,10 @@ INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `library
 VALUES (1, 'DESIGN1', 1, 1, 1, 1), 
 (2, 'DESIGN2', 2, 1, 1, 1);
 
-INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`)
-VALUES (15,1,0,NULL),
-(16,2,0,15),
-(17,2,0,15);
+INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`)
+VALUES (15,1,0,NULL,NULL),
+(16,2,0,15,1),
+(17,2,0,15,2);
 
 DELETE FROM `Identity`;
 INSERT INTO `Identity` (`sampleId`, `externalName`,`donorSex`)

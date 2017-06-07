@@ -55,9 +55,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
@@ -75,8 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -95,8 +90,6 @@ public class Run
     implements SecurableByProfile, Comparable<Run>, Reportable, Watchable, Deletable, Nameable, Alertable, ChangeLoggable, Aliasable,
     Serializable {
   private static final long serialVersionUID = 1L;
-
-  private static final Logger log = LoggerFactory.getLogger(Run.class);
 
   /** Field PREFIX */
   public static final String PREFIX = "RUN";
@@ -145,9 +138,6 @@ public class Run
       @JoinColumn(name = "run_runId") }, inverseJoinColumns = {
           @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
-
-  @Column(nullable = false)
-  private Boolean pairedEnd;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -205,13 +195,9 @@ public class Run
     this.notes.add(note);
   }
 
-  public void addQc(RunQC runQC) throws MalformedRunQcException {
+  public void addQc(RunQC runQC) {
     this.runQCs.add(runQC);
-    try {
-      runQC.setRun(this);
-    } catch (MalformedRunException e) {
-      log.error("set run QC", e);
-    }
+    runQC.setRun(this);
     fireRunQcAddedEvent();
   }
 
@@ -377,10 +363,6 @@ public class Run
     return notes;
   }
 
-  public Boolean getPairedEnd() {
-    return pairedEnd;
-  }
-
   public Collection<RunQC> getRunQCs() {
     return runQCs;
   }
@@ -512,10 +494,6 @@ public class Run
     this.notes = notes;
   }
 
-  public void setPairedEnd(Boolean pairedEnd) {
-    this.pairedEnd = pairedEnd;
-  }
-
   public void setQCs(Collection<RunQC> qcs) {
     this.runQCs = qcs;
   }
@@ -563,6 +541,14 @@ public class Run
   @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLogs;
+  }
+
+  public Boolean getPairedEnd() {
+    return null;
+  }
+
+  public void setPairedEnd(boolean pairedEnd) {
+    throw new UnsupportedOperationException("Cannot set paired end on runs from this platform.");
   }
 
 }

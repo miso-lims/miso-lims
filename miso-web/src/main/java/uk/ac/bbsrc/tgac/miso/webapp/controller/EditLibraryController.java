@@ -65,6 +65,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
 import net.sf.json.JSONArray;
@@ -101,6 +102,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
+import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
@@ -108,6 +110,8 @@ import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -150,7 +154,8 @@ public class EditLibraryController {
 
   @Autowired
   private NamingScheme namingScheme;
-
+  @Autowired
+  private RunService runService;
   @Autowired
   private PoolService poolService;
 
@@ -186,6 +191,10 @@ public class EditLibraryController {
     this.kitService = kitService;
   }
 
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
   @Value("${miso.notification.interop.enabled}")
   private Boolean metrixEnabled;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -198,6 +207,7 @@ public class EditLibraryController {
   private Boolean showDescription;
   @Value("${miso.display.library.bulk.volume}")
   private Boolean showVolume;
+
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
     return metrixEnabled;
@@ -234,7 +244,7 @@ public class EditLibraryController {
   public Set<Run> getRunsByLibraryPools(List<Pool> pools) throws IOException {
     Set<Run> runs = new TreeSet<>();
     for (Pool pool : pools) {
-      Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
+      Collection<Run> prs = runService.listByPoolId(pool.getId());
       runs.addAll(prs);
     }
     return runs;
@@ -255,21 +265,6 @@ public class EditLibraryController {
     List<LibraryType> types = new ArrayList<>(libraryService.listLibraryTypes());
     Collections.sort(types);
     return types;
-  }
-
-  @ModelAttribute("hideCols")
-  public String populateHideCols() {
-    JSONArray hideCols = new JSONArray();
-    if (!showDescription) {
-      hideCols.add("description");
-    }
-    if (!showVolume) {
-      hideCols.add("volume");
-    }
-    if (!showLibraryAlias) {
-      hideCols.add("libraryAlias");
-    }
-    return hideCols.toString();
   }
 
   @ModelAttribute("maxLengths")
@@ -596,67 +591,6 @@ public class EditLibraryController {
     return rtn;
   }
 
-  /* HOT */
-  @RequestMapping(value = "indexFamiliesJson", method = RequestMethod.GET)
-  public @ResponseBody JSONObject indexFamiliesJson(@RequestParam("platform") String platform) throws IOException {
-    final JSONObject rtn = new JSONObject();
-
-    if (platform != null && !"".equals(platform)) {
-      final List<String> indexFamilies = new ArrayList<>();
-      indexFamilies.add(IndexFamily.NULL.getName());
-      for (final IndexFamily ifam : indexService.getIndexFamiliesByPlatform(PlatformType.get(platform))) {
-        indexFamilies.add(ifam.getName());
-      }
-      rtn.put("indexFamilies", indexFamilies);
-    }
-    return rtn;
-  }
-
-  @RequestMapping(value = "librarytypes", method = RequestMethod.GET)
-  public @ResponseBody String jsonRestLibraryTypes(@RequestParam("platform") String platform) throws IOException {
-    if (!isStringEmptyOrNull(platform)) {
-      List<String> types = new ArrayList<>();
-      for (LibraryType t : populateLibraryTypesByPlatform(platform)) {
-        types.add("\"" + t.getDescription() + "\"" + ":" + "\"" + t.getDescription() + "\"");
-      }
-      return "{" + LimsUtils.join(types, ",") + "}";
-    } else {
-      return "{}";
-    }
-  }
-
-  @RequestMapping(value = "indexFamilies", method = RequestMethod.GET)
-  public @ResponseBody String jsonRestIndexFamilies(@RequestParam("platform") String platform) throws IOException {
-    if (!isStringEmptyOrNull(platform)) {
-      List<String> types = new ArrayList<>();
-      for (IndexFamily t : indexService.getIndexFamiliesByPlatform(PlatformType.get(platform))) {
-        types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
-      }
-      return "{" + LimsUtils.join(types, ",") + "}";
-    } else {
-      return "{}";
-    }
-  }
-
-  @RequestMapping(value = "indicesForPosition", method = RequestMethod.GET)
-  public @ResponseBody String jsonRestIndices(@RequestParam("indexFamily") String indexFamily, @RequestParam("position") String position)
-      throws IOException {
-    if (!isStringEmptyOrNull(indexFamily)) {
-      IndexFamily ifam = indexService.getIndexFamilyByName(indexFamily);
-      if (ifam != null) {
-        List<String> names = new ArrayList<>();
-        for (Index index : ifam.getIndicesForPosition(Integer.parseInt(position))) {
-          names.add("\"" + index.getId() + "\"" + ":" + "\"" + index.getName() + " (" + index.getSequence() + ")\"");
-        }
-        return "{" + LimsUtils.join(names, ",") + "}";
-      } else {
-        return "{}";
-      }
-    } else {
-      return "{}";
-    }
-  }
-
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
     return changeLogService.listAll("Library");
@@ -744,7 +678,7 @@ public class EditLibraryController {
           sampleClass = detailed.getSampleClass();
         }
 
-        List<Sample> projectSamples = new ArrayList<>(requestManager.listAllSamplesByProjectId(sample.getProject().getProjectId()));
+        List<Sample> projectSamples = new ArrayList<>(sampleService.listByProjectId(sample.getProject().getProjectId()));
         Collections.sort(projectSamples, new AliasComparator<>());
         model.put("projectSamples", projectSamples);
 
@@ -769,8 +703,7 @@ public class EditLibraryController {
         }
       }
 
-      populateDesigns(model, sampleClass);
-      populateDesignCodes(model);
+      model.put("sampleClass", sampleClass);
 
       model.put("formObj", library);
       model.put("library", library);
@@ -800,18 +733,43 @@ public class EditLibraryController {
     }
   }
 
-  /**
-   * used to edit samples with ids from given {sampleIds} sends Dtos objects which will then be used for editing in grid
-   */
-  @RequestMapping(value = "/bulk/propagate/{sampleIds}", method = RequestMethod.GET)
-  public ModelAndView editPropagateSamples(@PathVariable String sampleIds, ModelMap model) throws IOException, MisoNamingException {
-    try {
-      List<Long> idList = getIdsFromString(sampleIds);
-      ObjectMapper mapper = new ObjectMapper();
-      List<LibraryDto> libraryDtos = new ArrayList<>();
+  private final BulkTableBackend<Library, LibraryDto, Sample> libraryBulkBackend = new BulkTableBackend<Library, LibraryDto, Sample>(
+      "Libraries", "Samples", "library") {
+
+    @Override
+    protected LibraryDto packageDtoFromParent(Sample sample) {
+      LibraryDto dto;
+      if (LimsUtils.isDetailedSample(sample)) {
+        DetailedLibraryDto detailedDto = new DetailedLibraryDto();
+        detailedDto.setParentSampleClassId(((DetailedSample) sample).getSampleClass().getId());
+        detailedDto.setNonStandardAlias(((DetailedSample) sample).hasNonStandardAlias());
+
+        dto = detailedDto;
+      } else {
+        dto = new LibraryDto();
+      }
+      dto.setParentSampleId(sample.getId());
+      dto.setParentSampleAlias(sample.getAlias());
+      if (namingScheme.hasLibraryAliasGenerator()) {
+        try {
+        Library tempLibrary = new LibraryImpl();
+        tempLibrary.setSample(sample);
+        final String libraryAlias = namingScheme.generateLibraryAlias(tempLibrary);
+        dto.setAlias(libraryAlias);
+        } catch (MisoNamingException e) {
+          log.error("Failed to generate library name", e);
+        }
+      }
+      return dto;
+    }
+
+    @Override
+    protected Iterable<Sample> loadParents(List<Long> ids) throws IOException {
+      Collection<Sample> results = sampleService.listByIdList(ids);
+
       SampleClass sampleClass = null;
       boolean hasPlain = false;
-      for (Sample sample : requestManager.getSamplesByIdList(idList)) {
+      for (Sample sample : results) {
         if (sample instanceof DetailedSample) {
           DetailedSample detailed = (DetailedSample) sample;
           if (sampleClass == null) {
@@ -822,82 +780,18 @@ public class EditLibraryController {
         } else {
           hasPlain = true;
         }
-        LibraryDto library = isDetailedSampleEnabled() ? new DetailedLibraryDto() : new LibraryDto();
-        if (namingScheme.hasLibraryAliasGenerator()) {
-          Library tempLibrary = new LibraryImpl();
-          tempLibrary.setSample(sample);
-          final String libraryAlias = namingScheme.generateLibraryAlias(tempLibrary);
-          library.setAlias(libraryAlias);
-        }
-        library.setParentSampleId(sample.getId());
-        library.setParentSampleAlias(sample.getAlias());
-
-        if (isDetailedSampleEnabled()) {
-          ((DetailedLibraryDto) library).setNonStandardAlias(((DetailedSample) sample).hasNonStandardAlias());
-        }
-        libraryDtos.add(library);
       }
       if (hasPlain && sampleClass != null) {
         throw new IOException("Cannot mix plain and detailed samples.");
       }
-
-      libraryDtos.sort(new Comparator<LibraryDto>() {
-
-        @Override
-        public int compare(LibraryDto o1, LibraryDto o2) {
-          int rtn = 0;
-          if (o1 == null || o2 == null || o1.getParentSampleAlias() == null || o2.getParentSampleAlias() == null) {
-            throw new RuntimeException("Cannot compare null Objects!");
-          }
-          String alias1 = o1.getParentSampleAlias();
-          String alias2 = o2.getParentSampleAlias();
-          String regex = "\\D";
-          List<String> alias1Nums = new ArrayList<>(Arrays.asList(alias1.split(regex)));
-          List<String> alias2Nums = new ArrayList<>(Arrays.asList(alias2.split(regex)));
-
-          alias1Nums.removeAll(Arrays.asList(""));
-          alias2Nums.removeAll(Arrays.asList(""));
-          if (alias1Nums.size() != alias2Nums.size()) {
-            // give up, just compare by default.
-            rtn = alias1.compareTo(alias2);
-          }
-          for (int i = 0; i < alias1Nums.size() && rtn == 0; i++) {
-            rtn = Integer.compare(Integer.valueOf(alias1Nums.get(i)), Integer.valueOf(alias2Nums.get(i)));
-          }
-          return rtn;
-        }
-      });
-      model.put("title", "Bulk Create Libraries");
-      model.put("librariesJSON", mapper.writeValueAsString(libraryDtos));
-      model.put("platformTypes", mapper.writeValueAsString(populatePlatformTypes()));
-      JSONArray libraryDesigns = new JSONArray();
-      libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
-      model.put("libraryDesignsJSON", libraryDesigns.toString());
-      JSONArray libraryDesignCodes = new JSONArray();
-      libraryDesignCodes.addAll(requestManager.listLibraryDesignCodes());
-
-      model.put("libraryDesignCodesJSON", libraryDesignCodes.toString());
-      model.put("method", "Propagate");
-      return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.error("Failed to get bulk samples", ex);
-      }
-      throw ex;
+      return results;
     }
-  }
 
-  @RequestMapping(value = "/bulk/edit/{libraryIds}", method = RequestMethod.GET)
-  public ModelAndView editBulkLibraries(@PathVariable String libraryIds, ModelMap model) throws IOException {
-    try {
+    @Override
+    protected Iterable<Library> load(List<Long> ids) throws IOException {
+      List<Library> results = libraryService.listByIdList(ids);
       SampleClass sampleClass = null;
-      List<Long> idList = getIdsFromString(libraryIds);
-      ObjectMapper mapper = new ObjectMapper();
-      List<LibraryDto> libraryDtos = new ArrayList<>();
-      List<String> currentPlatforms = new ArrayList<>();
-      for (Library library : libraryService.listByIdList(idList)) {
-        libraryDtos.add(Dtos.asDto(library));
-        currentPlatforms.add(library.getPlatformType().getKey());
+      for (Library library : results) {
         if (!isDetailedSampleEnabled()) {
           // Do nothing about sample classes.
         } else if (sampleClass == null) {
@@ -906,29 +800,72 @@ public class EditLibraryController {
           throw new IOException("Can only update libraries when samples all have the same class.");
         }
       }
-      model.put("title", "Bulk Edit Libraries");
-      model.put("librariesJSON", mapper.writerFor(new TypeReference<List<LibraryDto>>() {
-      }).writeValueAsString(libraryDtos));
-      model.put("method", "Edit");
-
-      JSONArray libraryDesigns = new JSONArray();
-      if (sampleClass != null) {
-        libraryDesigns.addAll(requestManager.listLibraryDesignByClass(sampleClass));
-      }
-      model.put("libraryDesignsJSON", libraryDesigns.toString());
-      JSONArray libraryDesignCodes = new JSONArray();
-      libraryDesignCodes.addAll(requestManager.listLibraryDesignCodes());
-      model.put("libraryDesignCodesJSON", libraryDesignCodes.toString());
-      model.put("platformTypes", mapper.writeValueAsString(populatePlatformTypes(currentPlatforms)));
-
-      return new ModelAndView("/pages/bulkEditLibraries.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.error("Failed to get bulk libraries", ex);
-      }
-      throw ex;
+      return results;
     }
+
+    @Override
+    protected LibraryDto asDto(Library model) {
+      return Dtos.asDto(model);
+    }
+
+    @Override
+    protected Class<? extends LibraryDto> getDtoClass() {
+      return isDetailedSampleEnabled() ? DetailedLibraryDto.class : LibraryDto.class;
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      config.put("showDescription", showDescription);
+      config.put("showVolume", showVolume);
+      config.put("showLibraryAlias", showLibraryAlias);
+    }
+  };
+
+  @RequestMapping(value = "/bulk/propagate/{sampleIds}", method = RequestMethod.GET)
+  public ModelAndView propagateFromSamples(@PathVariable String sampleIds, ModelMap model) throws IOException, MisoNamingException {
+    return libraryBulkBackend.propagate(sampleIds, model);
   }
+
+  @RequestMapping(value = "/bulk/edit/{libraryIds}", method = RequestMethod.GET)
+  public ModelAndView editBulkLibraries(@PathVariable String libraryIds, ModelMap model) throws IOException {
+    return libraryBulkBackend.edit(libraryIds, model);
+  }
+
+  private final BulkTableBackend<LibraryDilution, DilutionDto, Library> dilutionBulkBackend = new BulkTableBackend<LibraryDilution, DilutionDto, Library>(
+      "Dilutions", "Libraries", "dilution") {
+
+    @Override
+    protected DilutionDto asDto(LibraryDilution model) {
+      return Dtos.asDto(model);
+    }
+
+    @Override
+    protected Class<? extends DilutionDto> getDtoClass() {
+      return DilutionDto.class;
+    }
+
+    @Override
+    protected DilutionDto packageDtoFromParent(Library item) {
+      DilutionDto dto = new DilutionDto();
+      dto.setLibrary(Dtos.asDto(item));
+      return dto;
+    }
+
+    @Override
+    protected Iterable<LibraryDilution> load(List<Long> ids) throws IOException {
+      // TODO implement
+      return Collections.emptyList();
+    }
+
+    @Override
+    protected Iterable<Library> loadParents(List<Long> ids) throws IOException {
+      return libraryService.listByIdList(ids);
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    }
+  };
 
   @RequestMapping(value = "/dilutions/bulk/propagate/{libraryIds}", method = RequestMethod.GET)
   public ModelAndView editPropagateDilutions(@PathVariable String libraryIds, ModelMap model) throws IOException {

@@ -44,14 +44,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import nki.core.MetrixContainer;
-import nki.decorators.MetrixContainerDecorator;
-import nki.objects.Summary;
-import nki.parsers.illumina.ExtractionMetrics;
-import nki.parsers.xml.RunInfoHandler;
-
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +55,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import nki.core.MetrixContainer;
+import nki.decorators.MetrixContainerDecorator;
+import nki.objects.Summary;
+import nki.parsers.illumina.ExtractionMetrics;
+import nki.parsers.xml.RunInfoHandler;
 
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
@@ -574,6 +575,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   private String checkRunStatus(JSONObject run, File rootFile, int numReads, boolean lastCycleComplete) throws IOException {
     final String runName = run.getString(JSON_RUN_NAME);
 
+    // This file gets written after the FIRST read, so doesn't really indicate the end
     boolean baseCompleteFileFound = PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete.txt");
     boolean baseCompleteReadFilesFound = checkReadCompleteFiles(rootFile, numReads);
 
@@ -604,12 +606,12 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         returnStatus = STATUS_COMPLETE;
       } else {
         // Missing ReadX files, no Run.completed
-        if (!baseCompleteFileFound && !lastCycleComplete) {
-          // Missing ReadX files, no Run.completed, no BaseComplete file, no lastCycle evidence
+        if (!lastCycleComplete) {
+          // Missing ReadX files, no Run.completed, no lastCycle evidence
           log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist and no evidence of last cycle completion.");
           returnStatus = STATUS_RUNNING;
         } else {
-          // Missing ReadX files, no Run.completed, BaseComplete undetermined, lastCycle undetermined
+          // Missing ReadX files, no Run.completed, lastCycle undetermined
           log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist.");
           returnStatus = STATUS_UNKNOWN;
         }

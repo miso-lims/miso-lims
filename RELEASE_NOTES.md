@@ -1,3 +1,16 @@
+# 0.2.70
+
+Changes:
+
+ * Remove broken bulk dilution table
+ * Fix bug URL link
+ * Allow adjusting run dates if admin or new run
+ * Allow filling a box by user-defined barcodes
+ * Unify all CV and HE slides into a single class
+ * Fixed notification server reporting unknown status after read 1
+ * Set lastModifier on KitDescriptor before save
+ * Fix aggregation of order completions to not include update time
+
 # 0.2.69
 
 Changes:

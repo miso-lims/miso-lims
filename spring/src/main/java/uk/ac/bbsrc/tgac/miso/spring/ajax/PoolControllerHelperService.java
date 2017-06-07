@@ -85,6 +85,7 @@ import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
@@ -115,6 +116,8 @@ public class PoolControllerHelperService {
   private LibraryDilutionService dilutionService;
   @Autowired
   private PoolableElementViewService poolableElementViewService;
+  @Autowired
+  private RunService runService;
   @Autowired
   private StudyService studyService;
 
@@ -482,7 +485,7 @@ public class PoolControllerHelperService {
 
       if (json.has("runId") && json.get("runId") != null) {
         Long runId = json.getLong("runId");
-        Run r = requestManager.getRunById(runId);
+        Run r = runService.get(runId);
         if (r != null) {
           StringBuilder sb = new StringBuilder();
 
@@ -731,5 +734,9 @@ public class PoolControllerHelperService {
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 }

@@ -1,24 +1,25 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
@@ -49,18 +52,15 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
 
   @Autowired
   private JdbcTemplate template;
-  @Mock
-  private NamingScheme namingScheme;
-
-  @InjectMocks
-  private HibernateSampleDao dao;
 
   @Autowired
   private SessionFactory sessionFactory;
 
+  private HibernateSampleDao dao;
+
   @Before
   public void setup() {
-    MockitoAnnotations.initMocks(this);
+    dao = new HibernateSampleDao();
     dao.setSessionFactory(sessionFactory);
     dao.setJdbcTemplate(template);
   }
@@ -87,10 +87,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     User user = new UserImpl();
     user.setUserId(1L);
     sample.setLastModifier(user);
-
-    when(namingScheme.generateNameFor(any(Sample.class))).thenReturn(sampleName);
-    when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
-    when(namingScheme.validateSampleAlias(anyString())).thenReturn(ValidationResult.success());
 
     int sizeBefore = dao.listAll().size();
     long id = dao.save(sample);
@@ -119,10 +115,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     user.setUserId(1L);
     sample.setLastModifier(user);
 
-    when(namingScheme.generateNameFor(any(Sample.class))).thenReturn(sampleName);
-    when(namingScheme.validateName(anyString())).thenReturn(ValidationResult.success());
-    when(namingScheme.validateSampleAlias(anyString())).thenReturn(ValidationResult.success());
-
     int sizeBefore = dao.listAll().size();
     long id = dao.save(sample);
     Sample retrieved = dao.get(id);
@@ -142,7 +134,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
 
     Date previous = null;
     for (Sample sample : samples) {
-      if (previous != null) {
+      if (previous != null && sample.getReceivedDate() != null) {
         log.debug("testing receivedDates " + previous + " comes before " + sample.getReceivedDate());
         assertTrue(
             "not ordered by received date descending",
@@ -350,16 +342,147 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
 
   @Test
   public void getNextSiblingNumberTest() throws Exception {
-    // sibling numbers are missing. getNextSiblingNumber should fix these and return first truly available number
+    String partialAlias = "TEST_0001_TISSUE_";
     DetailedSample s1 = (DetailedSample) dao.get(16L);
     DetailedSample s2 = (DetailedSample) dao.get(17L);
-    assertNull(s1.getSiblingNumber());
-    assertNull(s2.getSiblingNumber());
-    assertEquals(3, dao.getNextSiblingNumber("TEST_0001_TISSUE_"));
-    sessionFactory.getCurrentSession().refresh(s1);
-    sessionFactory.getCurrentSession().refresh(s2);
+    assertTrue(s1.getAlias().startsWith(partialAlias));
     assertEquals(new Integer(1), s1.getSiblingNumber());
+    assertTrue(s2.getAlias().startsWith(partialAlias));
     assertEquals(new Integer(2), s2.getSiblingNumber());
+    assertEquals(3, dao.getNextSiblingNumber(partialAlias));
+  }
+
+  @Test
+  public void concurrentSaveTest() throws Exception {
+    final int jobCount = 10;
+    testConcurrentTask(new ConcurrentTestWork() {
+
+      private final Sample[] samples = new Sample[jobCount];
+
+      @Override
+      public void prepare(Session session, int jobNumber) throws Exception {
+        SampleStock sample = new SampleStockImpl();
+        String name = "SAMMY" + jobNumber;
+        sample.setName(name);
+        sample.setAlias(name);
+        sample.setSampleType("type");
+        Project project = (Project) session.get(ProjectImpl.class, 1L);
+        sample.setProject(project);
+        sample.setScientificName("scientific");
+        User user = (User) session.get(UserImpl.class, 1L);
+        sample.setLastModifier(user);
+        SampleClass sampleClass = (SampleClass) session.get(SampleClassImpl.class, 3L);
+        sample.setSampleClass(sampleClass);
+        DetailedSample parent = (DetailedSample) session.get(SampleImpl.class, 17L);
+        sample.setParent(parent);
+        samples[jobNumber] = sample;
+      }
+
+      @Override
+      public void doWork(HibernateSampleDao threadDao, int jobNumber) throws Exception {
+        samples[jobNumber].setId(threadDao.save(samples[jobNumber]));
+      }
+
+      @Override
+      public void assertEach(int jobNumber) throws Exception {
+        assertNotNull(dao.get(samples[jobNumber].getId()));
+      }
+
+    }, jobCount);
+  }
+
+  @Test
+  public void concurrentGetSiblingNumberTest() throws Exception {
+    testConcurrentTask(new ConcurrentTestWork() {
+
+      @Override
+      public void doWork(HibernateSampleDao threadDao, int jobNumber) throws Exception {
+        int num = threadDao.getNextSiblingNumber("TEST_0001_TISSUE_");
+        assertEquals(3, num);
+      }
+
+    }, 10);
+  }
+
+  /**
+   * Attempt to run a similar task on multiple threads to test concurrency. The scheduler could of course prevent some or all of the
+   * tasks from actually running concurrently
+   * 
+   * @param work
+   * @param jobCount
+   * @throws Exception
+   */
+  private void testConcurrentTask(ConcurrentTestWork work, int jobCount) throws Exception {
+    List<Thread> threads = new ArrayList<>();
+    CyclicBarrier barrier = new CyclicBarrier(jobCount + 1);
+    AtomicInteger successCount = new AtomicInteger(0);
+
+    for (int i = 0; i < jobCount; i++) {
+      final int jobNum = i;
+      Thread thread = new Thread(() -> {
+        try {
+          Session session = sessionFactory.openSession();
+          work.prepare(session, jobNum);
+          // wait for all threads to be at the same point
+          barrier.await(1, TimeUnit.SECONDS);
+          SessionFactory mockSessionFactory = Mockito.mock(SessionFactory.class);
+          Mockito.when(mockSessionFactory.getCurrentSession()).thenReturn(session);
+          HibernateSampleDao threadDao = new HibernateSampleDao();
+          threadDao.setJdbcTemplate(template);
+          threadDao.setSessionFactory(mockSessionFactory);
+          work.doWork(threadDao, jobNum);
+          successCount.incrementAndGet();
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      });
+      threads.add(thread);
+      thread.start();
+    }
+
+    // release all threads to do their work
+    barrier.await(1, TimeUnit.SECONDS);
+
+    for (Thread thread : threads) {
+      thread.join(3000);
+    }
+
+    assertEquals(jobCount, successCount.get());
+    for (int i = 0; i < jobCount; i++) {
+      work.assertEach(i);
+    }
+  }
+
+  private static interface ConcurrentTestWork {
+    /**
+     * Any preparation work needing done before the task to be concurrency-tested should be done here. Default implementation does nothing
+     * 
+     * @param session a Session that is valid for this thread. Should be used for database lookups
+     * @param jobNumber
+     * @throws Exception on any failure
+     */
+    public default void prepare(Session session, final int jobNumber) throws Exception {
+
+    };
+
+    /**
+     * The work to be concurrency-tested. May contain assertions that don't require waiting until all jbos have completed
+     * 
+     * @param threadDao the dao to test against. Uses a Session valid for the thread
+     * @param jobNumber
+     * @throws Exception on any failure
+     */
+    public void doWork(HibernateSampleDao threadDao, final int jobNumber) throws Exception;
+
+    /**
+     * Test any relevant postconditions after all jobs are completed. Called once per job. Default implementation does nothing
+     * 
+     * @param jobNumber
+     * @throws Exception
+     */
+    public default void assertEach(int jobNumber) throws Exception {
+
+    };
   }
 
 }

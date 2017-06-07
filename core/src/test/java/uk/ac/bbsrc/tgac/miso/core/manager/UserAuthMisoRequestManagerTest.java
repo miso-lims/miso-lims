@@ -286,80 +286,6 @@ public class UserAuthMisoRequestManagerTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveRunQC(uk.ac.bbsrc.tgac.miso.core.data.RunQC)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveRunQC() throws IOException {
-    final long expectedReturn = 1L;
-    when(runQC.getRun()).thenReturn(run);
-    when(run.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveRunQC(runQC)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveRunQC(runQC));
-
-    verify(backingManager).saveRunQC(runQC);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveRunQC(uk.ac.bbsrc.tgac.miso.core.data.RunQC)}
-   * .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveRunQCThrows() throws IOException {
-    when(runQC.getRun()).thenReturn(run);
-    when(run.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to the parent Run");
-    userAuthMisoRequestManager.saveRunQC(runQC);
-
-    verify(backingManager, never()).saveRunQC(runQC);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSampleQC(uk.ac.bbsrc.tgac.miso.core.data.SampleQC)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveSampleQC() throws IOException {
-    final long expectedReturn = 1L;
-    when(sampleQC.getSample()).thenReturn(sample);
-    when(sample.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveSampleQC(sampleQC)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveSampleQC(sampleQC));
-
-    verify(backingManager).saveSampleQC(sampleQC);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSampleQC(uk.ac.bbsrc.tgac.miso.core.data.SampleQC)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveSampleQCThrows() throws IOException {
-    when(sampleQC.getSample()).thenReturn(sample);
-    when(sample.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to the parent Sample");
-    userAuthMisoRequestManager.saveSampleQC(sampleQC);
-
-    verify(backingManager, never()).saveSampleQC(sampleQC);
-  }
-
-
-
-  /**
    * Test method for
    * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSequencerPartitionContainer(uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer)}
    * .
@@ -601,37 +527,6 @@ public class UserAuthMisoRequestManagerTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunById(long)} .
-   */
-  @Test
-  public void testGetRunById() throws IOException {
-    long id = 1L;
-    when(backingManager.getRunById(id)).thenReturn(run);
-    when(run.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(run, userAuthMisoRequestManager.getRunById(id));
-
-    verify(backingManager).getRunById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunById(long)} .
-   */
-  @Test
-  public void testGetRunByIdThrows() throws IOException {
-    long id = 1L;
-    when(backingManager.getRunById(id)).thenReturn(run);
-    when(run.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Run " + id);
-
-    userAuthMisoRequestManager.getRunById(id);
-
-    verify(backingManager).getRunById(id);
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunByAlias(java.lang.String)} .
    */
   @Test
@@ -695,68 +590,6 @@ public class UserAuthMisoRequestManagerTest {
     userAuthMisoRequestManager.getRunQCById(id);
 
     verify(backingManager).getRunQCById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleById(long)} .
-   */
-  @Test
-  public void testGetSampleById() throws IOException {
-    long id = 1L;
-    when(backingManager.getSampleById(id)).thenReturn(sample);
-    when(sample.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(sample, userAuthMisoRequestManager.getSampleById(id));
-
-    verify(backingManager).getSampleById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleById(long)} .
-   */
-  @Test
-  public void testGetSampleByIdThrows() throws IOException {
-    long id = 1L;
-    when(backingManager.getSampleById(id)).thenReturn(sample);
-    when(sample.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Sample " + id);
-
-    userAuthMisoRequestManager.getSampleById(id);
-
-    verify(backingManager).getSampleById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetSampleByBarcode() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getSampleByBarcode(barcode)).thenReturn(sample);
-    when(sample.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(sample, userAuthMisoRequestManager.getSampleByBarcode(barcode));
-
-    verify(backingManager).getSampleByBarcode(barcode);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleByBarcode(java.lang.String)} .
-   */
-  @Test
-  public void testGetSampleByBarcodeThrows() throws IOException {
-    String barcode = "barcode";
-    when(backingManager.getSampleByBarcode(barcode)).thenReturn(sample);
-    when(sample.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Sample ");
-
-    userAuthMisoRequestManager.getSampleByBarcode(barcode);
-
-    verify(backingManager).getSampleByBarcode(barcode);
   }
 
   /**

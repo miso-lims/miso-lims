@@ -54,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 @Controller
 @RequestMapping("/container")
@@ -69,6 +70,8 @@ public class EditSequencerPartitionContainerController {
 
   @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private RunService runService;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -76,6 +79,10 @@ public class EditSequencerPartitionContainerController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
@@ -113,7 +120,7 @@ public class EditSequencerPartitionContainerController {
 
       model.put("formObj", container);
       model.put("container", container);
-      model.put("containerRuns", requestManager.listRunsBySequencerPartitionContainerId(container.getId()));
+      model.put("containerRuns", runService.listByContainerId(container.getId()));
       return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
@@ -138,7 +145,6 @@ public class EditSequencerPartitionContainerController {
           pool.setLastModifier(user);
         }
       }
-      container.setLastModifier(user);
       long containerId = requestManager.saveSequencerPartitionContainer(container);
       session.setComplete();
       model.clear();

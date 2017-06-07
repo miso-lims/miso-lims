@@ -23,12 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.util.Date;
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -40,33 +36,12 @@ public class PacBioRun extends Run {
 
   private Integer movieDuration;
 
-  private String wellName;
-
-  @Temporal(TemporalType.DATE)
-  private Date creationDate;
-
   public PacBioRun(User user) {
     super(user);
   }
 
   public PacBioRun() {
     super();
-  }
-
-  public String getWellName() {
-    return wellName;
-  }
-
-  public Date getCreationDate() {
-    return creationDate;
-  }
-
-  public void setWellName(String wellName) {
-    this.wellName = wellName;
-  }
-
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
   }
 
   public Integer getMovieDuration() {

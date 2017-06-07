@@ -54,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.SolidService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -96,11 +97,17 @@ public class StatsController {
 
   @Autowired
   private RequestManager requestManager;
+  @Autowired
+  private RunService runService;
 
   public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
     this.requestManager = requestManager;
   }
   
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return requestManager.getSequencerReferenceColumnSizes();
@@ -123,7 +130,7 @@ public class StatsController {
     
     if (sr != null) {
 
-      Collection<Run> runs = requestManager.listRunsBySequencerId(referenceId);
+      Collection<Run> runs = runService.listBySequencerId(referenceId);
       Collection<SequencerServiceRecord> serviceRecords = requestManager.listSequencerServiceRecordsBySequencerId(referenceId);
       Collection<SequencerReference> otherSequencers = getOtherSequencers(sr.getId());
       model.put("preUpgradeSeqRef", requestManager.getSequencerReferenceByUpgradedReferenceId(sr.getId()));

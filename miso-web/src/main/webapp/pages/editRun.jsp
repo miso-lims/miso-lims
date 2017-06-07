@@ -175,8 +175,8 @@
     <td>Run Path:*</td>
     <td>
       <c:choose>
-        <c:when test="${not empty run.filePath}">${run.filePath}</c:when>
-        <c:otherwise><form:input path="filePath"/></c:otherwise>
+        <c:when test="${empty run.filePath or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}"><form:input path="filePath"/></c:when>
+        <c:otherwise>${run.filePath}</c:otherwise>
       </c:choose>
     </td>
   </tr>
@@ -195,14 +195,6 @@
     <tr>
       <td>Movie Duration (minutes):</td>
       <td><form:input path="movieDuration" class="validateable"/></td>
-    </tr>
-    <tr>
-      <td>Well:</td>
-      <td><form:input path="wellName" class="validateable"/></td>
-    </tr>
-    <tr>
-      <td>Creation Date:</td>
-      <td>${run.creationDate}</td>
     </tr>
   </c:if>
   <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
@@ -230,6 +222,7 @@
     </tr>
 
   </c:if>
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun') or miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.SolidRun') or miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.LS454Run')}">
   <tr>
     <td><label for="pairedEnd">Paired End:</label></td>
     <td>
@@ -240,12 +233,13 @@
       </c:choose>
     </td>
   </tr>
+  </c:if>
 
   <tr>
     <td valign="top">Status:</td>
     <td>
       <form:radiobuttons id="health" path="health" items="${healthTypes}"
-                         onchange="Run.checkForCompletionDate();"/><br/>
+                         onchange="Run.checkForCompletionDate(true);"/><br/>
       <table class="list" id="runStatusTable">
         <thead>
         <tr>
@@ -256,13 +250,27 @@
         </thead>
         <tbody>
         <tr>
-          <td><fmt:formatDate pattern="dd/MM/yyyy" value="${run.startDate}"/></td>
           <c:choose>
-          <c:when test="${(run.health.isDone() and empty run.completionDate)}">
+          <c:when test="${run.id == 0 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <td><form:input path="startDate"/></td>
+          
+              <script type="text/javascript">
+              Utils.ui.addDatePicker("startDate");
+              </script>
+            </c:when>
+            <c:otherwise>
+              <td id="startDate">
+                <fmt:formatDate pattern="dd/MM/yyyy" value="${run.startDate}"/>
+              </td>
+            </c:otherwise>
+          </c:choose>
+          <c:choose>
+          <c:when test="${(run.health.isDone() and empty run.completionDate) or run.id == 0 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
               <td><form:input path="completionDate"/></td>
           
               <script type="text/javascript">
               Utils.ui.addDatePicker("completionDate");
+              Run.checkForCompletionDate(false);
               </script>
             </c:when>
             <c:otherwise>

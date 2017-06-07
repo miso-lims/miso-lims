@@ -349,6 +349,7 @@ Sample.hot = {
     var hotContainer = document.getElementById('hotContainer');
     Hot.hotTable = new Handsontable(hotContainer, {
       debug: true,
+      preventOverflow : 'horizontal',
       fixedColumnsLeft: 1,
       manualColumnResize: true,
       rowHeaders: true,
@@ -656,7 +657,9 @@ Sample.hot = {
     for (i = startProgression; i <= endProgression && i != -1; i++) {
       show[progression[i]] = true;
     }
-  	// If we aren't starting or finished with a tissue processing, hide those columns.
+  	// If we aren't starting or finished with a tissue processing, hide those
+  	// columns since we don't really want to show tissue processing unless the
+  	// user specifically requested it.
   	if (sourceSampleCategory != 'Tissue Processing' && targetSampleCategory != 'Tissue Processing') {
       show['Tissue Processing'] = false;
     }
@@ -862,25 +865,34 @@ Sample.hot = {
         include: show['Tissue']
       },
 
-      // Tissue Processing: CV Slides columns
+      // Tissue Processing: Slides columns
       {
         header: 'Slides',
         data: 'slides',
         validator: validatePosReqdNumber,
         renderer: Hot.requiredNumericRenderer,
-        include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
+        include: show['Tissue Processing'] && sampleClassAlias == 'Slide'
       },
       {
         header: 'Discards',
         data: 'discards',
         type: 'numeric',
-        include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
+        include: show['Tissue Processing'] && sampleClassAlias == 'Slide'
       },
       {
         header: 'Thickness',
         data: 'thickness',
         type: 'numeric',
-        include: show['Tissue Processing'] && sampleClassAlias == 'CV Slide'
+        include: show['Tissue Processing'] && sampleClassAlias == 'Slide'
+      },
+      {
+        header: 'Stain',
+        data: 'stainName',
+        type: 'dropdown',
+        trimDropdown: false,
+        source: Constants.stains.sort(function(a, b) { return (a.group || "").localeCompare(b.group || ""); }).map(function(s) { return s.name; }),
+        validator: Hot.permitEmpty,
+        include: show['Tissue Processing'] && sampleClassAlias == 'Slide'
       },
 
       // Tissue Processing: LCM Tube columns
@@ -1220,9 +1232,14 @@ Sample.hot = {
       case 'Tissue Processing':
         if (obj.slides) {
           sample.slides = obj.slides;
-          sample.type = 'CV Slide'; // add type info for deserialization
+          sample.type = 'Slide'; // add type info for deserialization
           sample.discards = (obj.discards ? obj.discards : 0);
           if (obj.thickness) sample.thickness = obj.thickness;
+          if (obj.stainName) {
+            sample.stain = Hot.findFirstOrNull(Hot.namePredicate(obj.stainName), Constants.stains);
+          } else {
+            sample.stain = null;
+          }
         }
         if (obj.slidesConsumed) {
           sample.slidesConsumed = obj.slidesConsumed;

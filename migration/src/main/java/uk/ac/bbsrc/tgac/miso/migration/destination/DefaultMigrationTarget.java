@@ -630,7 +630,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
       }
       for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
         container.setLastModifier(migrationUser);
-        container.setId(serviceManager.getSequencerPartitionContainerDao().save(container));
+        container.setId(serviceManager.getRequestManager().saveSequencerPartitionContainer(container));
       }
       run.setLastModifier(migrationUser);
       run.setId(serviceManager.getRequestManager().saveRun(run));

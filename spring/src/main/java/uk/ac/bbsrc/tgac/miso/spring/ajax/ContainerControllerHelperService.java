@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -68,10 +67,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
@@ -88,13 +87,9 @@ public class ContainerControllerHelperService {
   @Autowired
   private StudyService studyService;
   @Autowired
-  private RunStore runStore;
-  @Autowired
   private PoolService poolService;
-
-  public void setRunStore(RunStore runStore) {
-    this.runStore = runStore;
-  }
+  @Autowired
+  private RunService runService;
 
   public JSONObject getPlatformTypes(HttpSession session, JSONObject json) throws IOException {
     StringBuilder b = new StringBuilder();
@@ -144,18 +139,13 @@ public class ContainerControllerHelperService {
       SequencerPartitionContainer lf = (SequencerPartitionContainer) session
           .getAttribute("container_" + json.getString("container_cId"));
 
-      if (lf.getPlatform() == null) {
-        Platform platform = requestManager.getPlatformById(platformId);
-        if (lf.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
-          Map<String, Object> responseMap = new HashMap<>();
-          responseMap.put("partitions", getContainerOptions(platform));
-          return JSONUtils.JSONObjectResponse(responseMap);
-        } else {
-          lf.setPlatform(platform);
-          Map<String, Object> responseMap = new HashMap<>();
-          return JSONUtils.JSONObjectResponse(responseMap);
-        }
+      Platform platform = requestManager.getPlatformById(platformId);
+      if (lf.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("partitions", getContainerOptions(platform));
+        return JSONUtils.JSONObjectResponse(responseMap);
       } else {
+        lf.setPlatform(platform);
         Map<String, Object> responseMap = new HashMap<>();
         return JSONUtils.JSONObjectResponse(responseMap);
       }
@@ -246,8 +236,9 @@ public class ContainerControllerHelperService {
     } else if ("Illumina HiSeq 2500".equals(instrumentModel)) {
 
       b.append("Number of " + PlatformType.ILLUMINA.getPartitionName() + "s:");
+      // selected by default
       b.append(
-          "<input id='lane2' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='2'/>2 ");
+          "<input id='lane2' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='2' class='selectMe' />2 ");
       b.append(
           "<input id='lane8' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
       b.append("<div id='containerdiv0'> </div>");
@@ -273,9 +264,10 @@ public class ContainerControllerHelperService {
   private String generateChamberButtons(String platformName, int containerNum, int startChamberNum, int endChamberNum) {
     StringBuilder b = new StringBuilder();
     for (int i = startChamberNum; i <= endChamberNum; i *= 2) {
+      int selectMe = endChamberNum; // the number of chambers to be selected by default on the front end
       b.append("<input id='chamber" + i + "' name='container0Select'"
           + " onchange='Container.ui.changeContainer" + platformName + "Chamber(this, 0);'"
-          + " type='radio' value='" + i + "'/>" + i + " ");
+          + " type='radio' value='" + i + "'" + (i == selectMe ? " class='selectMe'" : "") + "/>" + i + " ");
     }
     return b.toString();
   }
@@ -330,9 +322,10 @@ public class ContainerControllerHelperService {
     b.append(containerInfoHtml(PlatformType.PACBIO));
     b.append("Number of " + PlatformType.PACBIO.getPartitionName() + "s:");
     for (int i = 1; i <= 8; i++) {
+      int selectMe = 8; // the number of wells to be selected by default on the front end
       b.append("<input id='chamber" + i + "' name='container0Select'"
           + " onchange='Container.ui.changeContainerPacBioChamber(this, 0);'"
-          + " type='radio' value='" + i + "'/>" + i + " ");
+          + " type='radio' value='" + i + "'" + (i == selectMe ? " class='selectMe'" : "") + "/>" + i + " ");
     }
 
     b.append("<br/><div id='containerdiv0'> </div>");
@@ -730,7 +723,7 @@ public class ContainerControllerHelperService {
   public JSONObject getContainerLastRun(HttpSession session, JSONObject json) throws IOException {
     if (json.has("containerId")) {
       Long containerId = json.getLong("containerId");
-      Run run = requestManager.getLatestRunBySequencerPartitionContainerId(containerId);
+      Run run = runService.getLatestRunBySequencerPartitionContainerId(containerId);
       if (run != null && run.getSequencerReference() != null) {
         return JSONUtils.SimpleJSONResponse(run.getSequencerReference().getName());
       } else {
@@ -761,7 +754,7 @@ public class ContainerControllerHelperService {
     try {
       if (json.has("containerId")) {
         Long containerId = json.getLong("containerId");
-        List<Run> runs = runStore.listBySequencerPartitionContainerId(containerId);
+        Collection<Run> runs = runService.listByContainerId(containerId);
         for (Run run : runs) {
           if (run != null && run.getHealth() == HealthType.Completed) {
             return JSONUtils.SimpleJSONResponse("yes");
@@ -812,6 +805,10 @@ public class ContainerControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   public JSONObject isSerialNumberUnique(HttpSession session, JSONObject json) {

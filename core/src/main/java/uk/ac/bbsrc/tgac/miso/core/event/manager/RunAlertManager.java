@@ -41,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.manager
@@ -155,11 +154,7 @@ public class RunAlertManager {
           }
           for (RunQC qc : r.getRunQCs()) {
             if (!clonedQCs.containsKey(qc.getId())) {
-              try {
-                clone.addQc(partialCopy(qc));
-              } catch (MalformedRunQcException e) {
-                throw new IOException(e);
-              }
+              clone.addQc(partialCopy(qc));
             }
           }
         }
@@ -222,11 +217,7 @@ public class RunAlertManager {
     clone.setAlias(run.getAlias());
     clone.setHealth(run.getHealth());
     for (RunQC qc : run.getRunQCs()) {
-      try {
-        clone.addQc(partialCopy(qc));
-      } catch (MalformedRunQcException e) {
-        log.error("Can't track Malformed RunQC", e);
-      }
+      clone.addQc(partialCopy(qc));
     }
     for (User u : run.getWatchers()) {
       clone.addWatcher(u);

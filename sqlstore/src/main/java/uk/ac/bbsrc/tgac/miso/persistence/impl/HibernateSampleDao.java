@@ -9,9 +9,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
@@ -77,21 +78,24 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
   @Override
   public int getNextSiblingNumber(String partialAlias) throws IOException {
     // Find highest existing siblingNumber matching this partialAlias
-    Query query = currentSession().createQuery("select max(siblingNumber) from DetailedSampleImpl as ds"
-        + " where alias IN (concat(:alias, ds.siblingNumber), concat(:alias, '0', ds.siblingNumber))");
-    query.setString("alias", partialAlias);
-    Number result = ((Number) query.uniqueResult());
-    int next = result == null ? 0 : result.intValue();
-
-    // Increment and verify uniqueness. If alias is used, fix siblingNumber for existing sample. Repeat until unique
-    Query verifyQuery = null;
-    do {
-      next++;
-      verifyQuery = currentSession().createQuery("update DetailedSampleImpl ds set ds.siblingNumber = :siblingNumber"
-          + " where alias IN (concat(:alias, :siblingNumber), concat(:alias, '0', :siblingNumber))");
-      verifyQuery.setString("alias", partialAlias).setString("siblingNumber", String.valueOf(next));
-    } while (verifyQuery.executeUpdate() > 0);
-
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+    criteria.add(Restrictions.like("alias", partialAlias, MatchMode.START));
+    @SuppressWarnings("unchecked")
+    List<Sample> samples = criteria.list();
+    String regex = "^.{" + partialAlias.length() + "}(\\d*)$";
+    Pattern pattern = Pattern.compile(regex);
+    int next = 0;
+    for (Sample sample : samples) {
+      Matcher m = pattern.matcher(sample.getAlias());
+      if (!m.matches()) {
+        continue;
+      }
+      int siblingNumber = Integer.parseInt(m.group(1));
+      if (siblingNumber > next) {
+        next = siblingNumber;
+      }
+    }
+    next++;
     return next;
   }
 
@@ -196,13 +200,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
     @SuppressWarnings("unchecked")
     List<Sample> records = criteria.list();
     return records;
-  }
-
-  @Override
-  public boolean aliasExists(String alias) throws IOException {
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(Restrictions.eq("alias", alias));
-    return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult() > 0;
   }
 
   @Override
