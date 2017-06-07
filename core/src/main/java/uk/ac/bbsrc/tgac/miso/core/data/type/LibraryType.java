@@ -65,6 +65,8 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
   @Column(nullable = false)
   private Boolean archived;
 
+  private String abbreviation;
+
   /**
    * Returns the libraryTypeId of this LibraryType object.
    * 
@@ -128,6 +130,14 @@ public class LibraryType implements Comparable<LibraryType>, Serializable {
 
   public void setArchived(Boolean archived) {
     this.archived = archived;
+  }
+
+  public String getAbbreviation() {
+    return abbreviation;
+  }
+
+  public void setAbbreviation(String abbreviation) {
+    this.abbreviation = abbreviation;
   }
 
   @Override
