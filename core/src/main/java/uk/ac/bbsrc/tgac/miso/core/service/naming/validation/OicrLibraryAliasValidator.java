@@ -2,7 +2,10 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.validation;
 
 public class OicrLibraryAliasValidator extends RegexValidator {
 
-  private static final String regex = "([A-Z\\d]{3,5})_([0-9]{3,4}|[0-9][CR][0-9]{1,2})_(nn|[A-Z]{1}[a-z]{1})_([A-Zn])_(SE|PE|MP|LR|CCR|\\?\\?)_(nn|\\d{2,6}|\\dK)_(TS|EX|CH|BS|WG|TR|WT|SM|MR|AS|\\?\\?)";
+  private static final String commonPrefix = "([A-Z\\d]{3,5})_";
+  private static final String illuminaRegex = "(\\d{3,4}|\\d[CR]\\d{1,2})_(nn|[A-Z][a-z])_([A-Zn])_(SE|PE|MP|TR|\\?\\?)_(nn|\\d{2,6}|\\dK)_(TS|EX|CH|BS|WG|TR|WT|SM|MR|AS|\\?\\?)";
+  private static final String pacBioRegex = "(\\d{1,2})_(\\d+)pM";
+  private static final String regex = String.format("^%s(%s|%s)$", commonPrefix, illuminaRegex, pacBioRegex);
 
   public OicrLibraryAliasValidator() {
     super(regex, false, false);
