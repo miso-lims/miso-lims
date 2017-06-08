@@ -125,7 +125,7 @@ public abstract class AbstractProject implements Project {
   @JoinColumn(name = "referenceGenomeId", referencedColumnName = "referenceGenomeId", nullable = false)
   private ReferenceGenome referenceGenome;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
 

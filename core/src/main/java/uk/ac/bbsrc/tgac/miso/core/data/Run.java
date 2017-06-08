@@ -146,7 +146,7 @@ public class Run
   @OneToMany(targetEntity = RunQCImpl.class, mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
   private Collection<RunQC> runQCs = new TreeSet<>();
 
-  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = new SecurityProfile();
 

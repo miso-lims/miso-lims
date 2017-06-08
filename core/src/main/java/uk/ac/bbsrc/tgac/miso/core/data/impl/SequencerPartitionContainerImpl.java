@@ -90,7 +90,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @BatchSize(size = 10)
   private Collection<Run> runs = null;
 
-  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
