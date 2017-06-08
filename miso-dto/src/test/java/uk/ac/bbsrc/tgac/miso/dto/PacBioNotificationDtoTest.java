@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.nio.file.Paths;
-import java.time.LocalDate;
 
 import org.junit.Test;
 
@@ -14,8 +13,6 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
-import uk.ac.bbsrc.tgac.miso.dto.PacBioNotificationDto;
 
 public class PacBioNotificationDtoTest {
 
@@ -25,7 +22,7 @@ public class PacBioNotificationDtoTest {
     PacBioNotificationDto notificationDto = new PacBioNotificationDto();
     notificationDto.setSequencerName("Coffee");
     notificationDto.setMovieDurationInSec(42);
-    notificationDto.setCompletionDate(LocalDate.of(2017, 2, 23));
+    notificationDto.setCompletionDate("2017-02-23");
     notificationDto.setHealthType(HealthType.Started);
 
     ObjectMapper mapper = new ObjectMapper();
@@ -59,8 +56,8 @@ public class PacBioNotificationDtoTest {
     notificationDto.setSequencerName(sequencerName);
     notificationDto.setLaneCount(8);
     notificationDto.setHealthType(HealthType.Started);
-    notificationDto.setStartDate(LocalDate.of(2017, 2, 23));
-    notificationDto.setCompletionDate(LocalDate.of(2017, 2, 27));
+    notificationDto.setStartDate("2017-02-23");
+    notificationDto.setCompletionDate("2017-02-27");
     notificationDto.setPairedEndRun(true);
     notificationDto.setSoftware("Fido Opus SEAdog Standard Interface Layer");
     notificationDto.setMovieDurationInSec(42);
