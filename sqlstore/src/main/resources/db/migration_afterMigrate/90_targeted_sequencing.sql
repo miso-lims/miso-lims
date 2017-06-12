@@ -52,10 +52,6 @@ CALL addTargetedSequencing('SureSelect v4','GSLE Legacy','Agilent SureSelect XT'
 CALL addTargetedSequencing('SureSelect v4','GSLE Legacy','Agilent SureSelect XT2',1);
 CALL addTargetedSequencing('SureSelect v4','GSLE Legacy','GA_multiplex',1);
 CALL addTargetedSequencing('SureSelect v4','GSLE Legacy','KAPA Hyper Prep',1);
-CALL addTargetedSequencing('SureSelect v5', 'FFPE-R', 'Agilent SureSelect XT2', 0);
-CALL addTargetedSequencing('SureSelect v5','GSLE Legacy','KAPA Hyper Prep',1);
-CALL addTargetedSequencing('SureSelect v5','GSLE Legacy','QXT',0);
-CALL addTargetedSequencing('SureSelect v5','FFPE-R','KAPA Hyper Prep and SureSelect XT2 v5',0);
 CALL addTargetedSequencing('Thunderbolts','GSLE Legacy','Thunderbolt Cancer Panel',0);
 CALL addTargetedSequencing('TruSeq Amplicon - Cancer Panel','GSLE Legacy','GA_PE',1);
 CALL addTargetedSequencing('TruSeq Amplicon - Cancer Panel','GSLE Legacy','TruSeq Amplicon - Cancer Panel',0);
@@ -68,6 +64,9 @@ CALL addTargetedSequencing('xGen Lockdown AML','GSLE Legacy','KAPA Hyper Prep',1
 CALL addTargetedSequencing('xGen Lockdown AML','GSLE Legacy','KAPA OnBead ',1);
 CALL addTargetedSequencing('xGen Lockdown AML','GSLE Legacy','Kapa Hyper Prep Plus',1);
 
+CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5', 'Human all exon V5', 'Agilent SureSelect XT2', 0);
+CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5', 'Human all exon V5', 'KAPA Hyper Prep', 1);
+CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5', 'Human all exon V5', 'QXT', 0);
 CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5', 'Human all exon V5', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
 CALL addTargetedSequencing('Agilent SureSelect Human All Exon V5 + UTRs', 'Human all exon V5 + UTRs', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
 CALL addTargetedSequencing('Agilent SureSelect Human All Exon V6', 'Human all exon V6', 'KAPA Hyper Prep and Agilent SureSelect XT2', 0);
