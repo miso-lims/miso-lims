@@ -949,7 +949,7 @@ CREATE PROCEDURE deleteDilution(
   -- confirm that the dilution is not present in any pools
   IF EXISTS (SELECT * FROM Pool_Dilution WHERE dilution_dilutionId = iDilutionId)
   THEN
-    SET errorMessage = CONCAT('Cannot delete dilution with ID ', iDilutionId, ' since it is present in oen or more pools.');
+    SET errorMessage = CONCAT('Cannot delete dilution with ID ', iDilutionId, ' since it is present in one or more pools.');
     SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
   END IF;
   
