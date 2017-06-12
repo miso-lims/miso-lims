@@ -248,7 +248,7 @@ Library.dilution = {
       column3.innerHTML = "<input id='libraryDilutionDate' name='libraryDilutionDate' type='text'/>";
       var column6 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<input id='libraryDilutionResults' name='libraryDilutionResults' type='text' onchange='Library.qc.changeLibraryQcUnits(this);'/>";
-      if (Hot.detailedSample) {
+      if (Constants.isDetailedSample) {
         var column7 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
         column7.innerHTML = "<select id='libraryDilutionTargetedSequencing' name='libraryDilutionTargetedSequencing'/>"
       }
@@ -263,7 +263,7 @@ Library.dilution = {
 
       Utils.ui.addMaxDatePicker("libraryDilutionDate", 0);
       
-      if (Hot.detailedSample) {
+      if (Constants.isDetailedSample) {
         Fluxion.doAjax(
           'libraryControllerHelperService',
           'getTargetedSequencingTypes',
@@ -300,10 +300,10 @@ Library.dilution = {
       'dilutionDate': f.libraryDilutionDate,
       'results': f.libraryDilutionResults,
       'autoGenerateIdBarcodes': autoGenerateIdBarcodes,
-      'detailedSample': Hot.detailedSample,
+      'detailedSample': Constants.isDetailedSample,
       'url': ajaxurl
     };
- 	  if (Hot.detailedSample) {
+ 	  if (Constants.isDetailedSample) {
       jQuery('#libraryDilutionTargetedSequencing').attr('class', 'form-control');
       jQuery('#libraryDilutionTargetedSequencing').attr('data-parsley-required', 'true');
       jQuery('#libraryDilutionTargetedSequencing').attr('data-parsley-type', 'number');  

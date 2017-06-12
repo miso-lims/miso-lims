@@ -492,15 +492,6 @@ Utils.array = {
     return objArr.map(function (obj) { return obj[key]; });
   },
 
-  /**
-   * Sorts by a given property
-   */
-  sortByProperty: function (array, propertyName) {
-    return array.sort(function (a, b) {
-      return a[propertyName] > b[propertyName] ? 1 : ((b[propertyName] > a[propertyName]) ? -1 : 0);
-    });
-  },
-
   findFirstOrNull: function (predicate, referenceCollection) {
     var results = referenceCollection.filter(predicate);
     return results.length > 0 ? results[0] : null;
@@ -549,4 +540,13 @@ Utils.array = {
   getAliasFromId: function (id, referenceCollection) {
     return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(id), referenceCollection), 'alias');
   },
+  
+  /**
+   * Sorts based on a given property.
+   */
+  standardSort: function (property) {
+    return function (a, b) {
+      return a[property].localeCompare(b[property]);
+    };
+  }
 };

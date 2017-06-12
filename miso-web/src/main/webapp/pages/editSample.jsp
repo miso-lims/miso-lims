@@ -45,20 +45,9 @@
 <script src="<c:url value='/scripts/handsontable/dist/handsontable.full.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/handsontable_renderers.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" media="screen" href="/scripts/handsontable/dist/handsontable.full.css">
-<script src="<c:url value='/scripts/sample_hot.js'/>" type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
-<c:if test="${sample.id == 0}">
-<div id="tabs">
-<ul>
-  <li><a href="#tab-1"><span>Single</span></a></li>
-  <li><a href="#tab-2"><span>Bulk</span></a></li>
-</ul>
-
-<div id="tab-1">
-</c:if>
-
 
 <form:form id="sample-form" data-parsley-validate="" action="/miso/sample" method="POST" commandName="sample" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="sample"/>
@@ -229,7 +218,6 @@
         </c:choose>
       </td>
       <td><form:input id="alias" path="alias" name="alias" data-parsley-required='${!aliasGenerationEnabled || sample.id != 0}'/><span id="aliasCounter" class="counter"></span>
-        <%--<td><a href="void(0);" onclick="popup('help/sampleAlias.html');">Help</a></td>--%>
         <c:if test="${detailedSample}">
           <c:if test="${sample.hasNonStandardAlias() || sample.parent.hasNonStandardAlias()}">
 	          <ul class="parsley-errors-list filled" id="nonStandardAlias">
@@ -245,7 +233,6 @@
       <td>Description:</td>
       <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span>
       </td>
-        <%--<td><a href="void(0);" onclick="popup('help/sampleDescription.html');">Help</a></td>--%>
     </tr>
     <tr>
       <td>Date of receipt:</td>
@@ -263,14 +250,12 @@
         <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), Sample.validateNCBITaxon, 1000, 2);</script>
         </c:if>
       </td>
-        <%--<td><a href="void(0);" onclick="popup('help/sampleScientificName.html');">Help</a></td>--%>
     </tr>
     <c:if test="${not empty sample.accession}">
       <tr>
         <td class="h">Accession:</td>
         <td><a href="http://www.ebi.ac.uk/ena/data/view/${sample.accession}">${sample.accession}</a>
         </td>
-          <%--<td><a href="void(0);" onclick="popup('help/sampleAccession.html');">Help</a></td>--%>
       </tr>
     </c:if>
     <tr>
@@ -673,10 +658,7 @@
           }
         );
       }
-
-      // display tabs correctly for sample creation
-      jQuery('#tabs').tabs();
-      jQuery('#tabs').removeClass('ui-widget').removeClass('ui-widget-content');
+      HotUtils.projects = ${projectsDtos};
     });
   </script>
 
@@ -721,101 +703,6 @@
   </c:if>
 </div>
 </form:form>
-<c:if test="${sample.id == 0}">
-</div>
-<div id="tab-2">
-  <h1>
-    Create Samples
-    <button id="saveSamples" class="disabled fg-button ui-state-default ui-corner-all" disabled="disabled" onclick="Sample.hot.saveData();">Save</button>
-  </h1>
-  <c:if test="${not empty sample.project}">
-	  <div class="breadcrumbs">
-	    <ul>
-	      <li>
-	        <a href="/">Home</a>
-	      </li>
-	      <li>
-	        <div class="breadcrumbsbubbleInfo">
-	          <div class="trigger">
-	            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.alias}</a>
-	          </div>
-	          <div class="breadcrumbspopup">
-	              ${sample.project.name}
-	          </div>
-	        </div>
-	      </li>
-	    </ul>
-	    <c:if test="${not empty nextSample}">
-	      <span style="float:right; padding-top: 5px; padding-left: 6px">
-	        <a class='arrowright' href='<c:url value="/miso/sample/${nextSample.id}"/>'>Next Sample <b>${nextSample.name}</b></a>
-	      </span>
-	    </c:if>
-	    <c:if test="${not empty previousSample}">
-	      <span style="float:right; padding-top: 5px">
-	        <a class='arrowleft' href='<c:url value="/miso/sample/${previousSample.id}"/>'>Previous Sample <b>${previousSample.name}</b></a>
-	      </span>
-	    </c:if>
-	  </div>
-  </c:if>
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#hothelp_arrowclick'), 'hothelpdiv');">Quick Help
-    <div id="hothelp_arrowclick" class="toggleLeft"></div>
-  </div>
-  <div id="hothelpdiv" class="note" style="display:none;">
-    <p>To fill all columns below with the value of your selected cell, <b>double-click</b> the square in the bottom right of your selected cell.
-      <br/>To fill a variable number of columns with the value of your selected cell,  <b>click</b> the square in the bottom right of your
-      filled-in selected cell and <b>drag</b> up or down. All selected columns will be filled in.
-      <br/>To fill down a column with values following an incremental (+1) pattern, select two adjacent cells in a 
-      column and then either drag down, or double-click the square in the bottom right of the selected cells.
-	    <c:if test="${aliasGenerationEnabled}">
-	      <br/>Leave <b>alias</b> cell blank to auto-generate an alias for this sample.
-	    </c:if>
-    </p>
-  </div>
-  <div class="clear"></div>
-  <br/>
-  <br/>
-
-  <div id="HOTbulkForm" data-detailed-sample="${detailedSample}">
-    <div id="ctrlV" class="note">
-      <p>Paste values using Ctrl + V in Windows or Linux, or Command-V (&#8984;-V) on a Mac.</p>
-    </div>
-    <div class="floatleft" id="tableProps">
-	    <div><label>Project: <select id="projectSelect"></select></label></div>
-	    <div id="subpSelectOptions"></div>
-	    <div id="classOptions"></div>
-	    <div><label>Number of Samples: <input id="numSamples" type="text"/></label></div>
-	    <div id="saveSuccesses"  class="parsley-success hidden">
-	      <p id="successMessages"></p>
-	    </div>
-	    <div id="saveErrors" class="bs-callout bs-callout-warning hidden">
-	      <h2>Oh snap!</h2>
-	      <p>The following rows failed to save:</p>
-	      <p id="errorMessages"></p>
-	    </div>
-	    <div>
-	      <button id="makeTable" onclick="Sample.hot.makeNewSamplesTable();">Make Table</button>
-          <c:if test="${detailedSample}">
-            <button id="lookupIdentities" onclick="Sample.hot.lookupIdentities();" disabled="disabled">Look up Identities</button>
-          </c:if>
-	    </div>
-	  </div>
-    <div class="clear"></div>
-    <div id="hotContainer"></div>
-
-    <script type="text/javascript">
-      Sample.hot.createOrEdit = 'Create';
-      Hot.dropdownRef = ${referenceDataJSON};
-      Sample.hot.aliasGenerationEnabled = ${aliasGenerationEnabled};
-      Hot.autoGenerateIdBarcodes = ${autoGenerateIdBarcodes};
-      Sample.hot.selectedProjectId = <c:out value="${sample.project.id}" default="null"/>;
-      Hot.detailedSample = JSON.parse(document.getElementById('HOTbulkForm').dataset.detailedSample);
-      Hot.saveButton = document.getElementById('saveSamples');
-      Hot.fetchSampleOptions(Sample.hot.processSampleOptionsFurther);
-    </script>
-  </div>
-</div>
-</div>
-</c:if>
 
 <c:if test="${sample.id != 0}">
   <a id="sampleqc"></a>
