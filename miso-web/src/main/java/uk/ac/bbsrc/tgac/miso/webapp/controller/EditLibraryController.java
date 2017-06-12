@@ -219,6 +219,11 @@ public class EditLibraryController {
     return autoGenerateIdBarcodes;
   }
 
+  @ModelAttribute("aliasGenerationEnabled")
+  public Boolean isAliasGenerationEnabled() {
+    return namingScheme != null && namingScheme.hasLibraryAliasGenerator();
+  }
+
   @ModelAttribute("detailedSample")
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
@@ -704,6 +709,10 @@ public class EditLibraryController {
       model.put("formObj", library);
       model.put("library", library);
       model.put("platformTypes", populatePlatformTypes());
+      populateDesigns(model,
+          LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
+      populateDesignCodes(model);
+
       populateAvailableIndexFamilies(library, model);
 
       addAdjacentLibraries(library, model);
@@ -786,6 +795,7 @@ public class EditLibraryController {
           log.error("Failed to generate library name", e);
         }
       }
+
       return dto;
     }
 
