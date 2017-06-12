@@ -59,7 +59,7 @@ HotTarget.library = (function() {
         } else {
           data = '';
         }
-        setOptions(indices);
+        setOptions({ 'source' : indices });
         setData(data);
       }
     };
@@ -90,8 +90,7 @@ HotTarget.library = (function() {
       }, lib.paired);
       if (Constants.isDetailedSample) {
         // if any members are null, fill them with empty objects otherwise
-        // things
-        // go poorly
+        // things go poorly
         if (!lib.kitDescriptorId) {
           lib.kitDescriptorId = '';
           lib.kitDescriptorName = '';
@@ -164,43 +163,22 @@ HotTarget.library = (function() {
             pack : function(lib, flat, errorHandler) {
             }
           },
-          {
-            header : 'Matrix Barcode',
-            data : 'identificationBarcode',
-            type : 'text',
-            validator : HotUtils.validator.optionalTextNoSpecialChars,
-            include : !Constants.automaticBarcodes,
-            unpack : function(lib, flat, setCellMeta) {
-              flat.identificationBarcode = lib.identificationBarcode;
-            },
-            pack : function(lib, flat, errorHandler) {
-              if (flat.identificationBarcode) {
-                lib.identificationBarcode = flat.identificationBarcode;
-              }
-            }
-          },
-          {
-            header : 'Description',
-            data : 'description',
-            include : config.showDescription,
-            validator : HotUtils.validator.optionalTextNoSpecialChars,
-            unpack : function(lib, flat, setCellMeta) {
-              flat.description = lib.description;
-            },
-            pack : function(lib, flat, errorHandler) {
-              lib.description = flat.description;
-            }
-          },
+          HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes, 'identificationBarcode',
+              { validator: HotUtils.validator.optionalTextNoSpecialChars }
+          ),
+          HotUtils.makeColumnForText('Description', config.showDescription, 'description',
+              { validator: HotUtils.validator.optionalTextNoSpecialChars }
+          ),
           {
             header : 'Design',
             data : 'libraryDesignAlias',
             type : 'dropdown',
             trimDropdown : false,
-            validator : HotUtils.validator.permitEmpty,
+            validator : Handsontable.AutocompleteValidator,
             source : [ '' ],
             include : Constants.isDetailedSample,
             unpack : function(lib, flat, setCellMeta) {
-              flat.libraryDesignAlias = Hot.maybeGetProperty(Utils.array
+              flat.libraryDesignAlias = Utils.array.maybeGetProperty(Utils.array
                   .findFirstOrNull(
                       Utils.array.idPredicate(lib.libraryDesignId),
                       Constants.libraryDesigns), 'name') || '(None)';
@@ -225,16 +203,17 @@ HotTarget.library = (function() {
             // creation only
             update : function(lib, flat, value, setReadOnly, setOptions,
                 setData) {
-              setOptions([ '(None)' ].concat(Constants.libraryDesigns.filter(
+              setOptions({ 'source' : [ '(None)' ].concat(Constants.libraryDesigns.filter(
                   function(design) {
                     return design.sampleClassId == lib.parentSampleClassId;
-                  }).map(Utils.array.getName).sort()));
+                  }).map(Utils.array.getName).sort())
+              });
             }
           },
           HotUtils.makeColumnForConstantsList('Code',
               Constants.isDetailedSample, 'libraryDesignCode',
               'libraryDesignCodeId', 'id', 'code',
-              Constants.libraryDesignCodes, {
+              Constants.libraryDesignCodes, true, {
                 depends : 'libraryDesignAlias',
                 update : makeDesignUpdate('designCodeId', 'code', 'WG',
                     Constants.libraryDesignCodes)
@@ -274,27 +253,28 @@ HotTarget.library = (function() {
                   .findFirstOrNull(Utils.array.idPredicate(lib.libraryTypeId),
                       Constants.libraryTypes), 'alias');
             },
-            'pack' : function(obj, flat, errorHander) {
-              obj.libraryTypeId = Utils.array.maybeGetProperty(Utils.array
+            'pack' : function(lib, flat, errorHander) {
+              lib.libraryTypeId = Utils.array.maybeGetProperty(Utils.array
                   .findFirstOrNull(Utils.array
                       .aliasPredicate(flat.libraryTypeAlias),
                       Constants.libraryTypes), 'id');
             },
             update : function(lib, flat, value, setReadOnly, setOptions) {
               var pt = getPlatformType(value);
-              setOptions(Constants.libraryTypes
+              setOptions({ 'source' : Constants.libraryTypes
                   .filter(
                       function(lt) {
                         return lt.platform == pt && (!lt.archived || lib.libraryTypeId == lt.id);
                       }).map(function(lt) {
                     return lt.alias;
-                  }).sort());
+                  }).sort()
+              });
             }
           
           },
           HotUtils.makeColumnForConstantsList('Selection', true,
               'librarySelectionTypeAlias', 'librarySelectionTypeId', 'id',
-              'name', Constants.librarySelections, {
+              'name', Constants.librarySelections, true, {
                 depends : 'libraryDesignAlias',
                 update : makeDesignUpdate('selectionId', 'name', '(None)',
                     Constants.librarySelections)
@@ -302,7 +282,7 @@ HotTarget.library = (function() {
               }),
           HotUtils.makeColumnForConstantsList('Strategy', true,
               'libraryStrategyTypeAlias', 'libraryStrategyTypeId', 'id',
-              'name', Constants.libraryStrategies, {
+              'name', Constants.libraryStrategies, true, {
                 depends : 'libraryDesignAlias',
                 update : makeDesignUpdate('strategyId', 'name', '(None)',
                     Constants.libraryStrategies)
@@ -329,14 +309,15 @@ HotTarget.library = (function() {
                     return platformType.key == value;
                   }, Constants.platformTypes), 'name');
               if (!pt) {
-                setOptions([ '' ]);
+                setOptions({ 'source' : [ '' ] });
               } else {
-                setOptions([ 'No indices' ].concat(Constants.indexFamilies
+                setOptions({ 'source': [ 'No indices' ].concat(Constants.indexFamilies
                     .filter(function(family) {
                       return family.platformType == pt;
                     }).map(function(family) {
                       return family.name;
-                    }).sort()));
+                    }).sort())
+                });
               }
             }
           
@@ -348,14 +329,14 @@ HotTarget.library = (function() {
             data : 'kitDescriptorName',
             type : 'dropdown',
             trimDropdown : false,
-            validator : HotUtils.validator.requiredText,
+            validator : HotUtils.validator.requiredAutocomplete,
             source : [ '' ],
             include : true,
             unpack : function(lib, flat, setCellMeta) {
               flat.kitDescriptorName = Utils.array.maybeGetProperty(Utils.array
                   .findFirstOrNull(
                       Utils.array.idPredicate(lib.kitDescriptorId),
-                      Constants.kitDescriptors), 'name') || 'None';
+                      Constants.kitDescriptors), 'name');
             },
             pack : function(lib, flat, errorHandler) {
               lib.kitDescriptorId = Utils.array
@@ -368,11 +349,12 @@ HotTarget.library = (function() {
             },
             depends : 'platformType',
             update : function(lib, flat, value, setReadOnly, setOptions) {
-              setOptions(Constants.kitDescriptors
+              setOptions({ 'source' : Constants.kitDescriptors
                   .filter(
                       function(kit) {
                         return kit.platformType == flat.platformType && kit.kitType == 'Library';
-                      }).map(Utils.array.getName).sort());
+                      }).map(Utils.array.getName).sort()
+              }); 
             }
           },
           HotUtils.makeColumnForOptionalBoolean('QC Passed?', true, 'qcPassed'),

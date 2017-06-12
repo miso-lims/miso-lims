@@ -70,10 +70,10 @@
    <div id="saveSuccesses"  class="parsley-success hidden">
      <p id="successMessages"></p>
    </div>
-     <div id="saveErrors" class="bs-callout bs-callout-warning hidden">
+     <div id="errors" class="bs-callout bs-callout-warning hidden">
        <h2>Oh snap!</h2>
-       <p>The following rows failed to save:</p>
-       <p id="errorMessages"></p>
+       <div id="serverErrors"></div>
+       <div id="saveErrors"></div>
      </div>
 
    <div id="bulkactions" class="fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix paging_full_numbers"></div>

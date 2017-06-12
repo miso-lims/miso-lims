@@ -439,7 +439,6 @@
 </c:if>
 <script type="text/javascript">
   Library.ui.updateConcentrationUnits();
-  Hot.detailedSample = ${detailedSample};
 </script>
 
 <c:choose>

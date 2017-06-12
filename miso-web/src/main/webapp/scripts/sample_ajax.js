@@ -670,7 +670,7 @@ Sample.ui = {
     
     // find the selected detailedQcStatus
     var dqcsId = jQuery('#detailedQcStatus option:selected').val();
-    var selectedDQCS = Hot.findFirstOrNull(Hot.idPredicate(dqcsId), Constants.detailedQcStatuses);
+    var selectedDQCS = Utils.array.findFirstOrNull(Utils.array.idPredicate(dqcsId), Constants.detailedQcStatuses);
     if (selectedDQCS !== null && selectedDQCS.noteRequired) {
       jQuery('#qcStatusNote').show();
     }  else {
@@ -924,7 +924,7 @@ Sample.ui = {
           }).complete(function (data) {
             console.log(data);
           }).success(function (data) {
-            var identitiesResults = data.identitiesResults[0];
+            var identitiesResults = data.matchingIdentities;
             var parentSelect = Sample.ui.createParentSelect(identitiesResults);
             jQuery('#ajaxLoader').remove();
             jQuery('#parentSelectDiv').html(parentSelect);
@@ -935,7 +935,9 @@ Sample.ui = {
               if (jQuery('#parentSelect').val() === '') {
                 externalName = jQuery('#externalNameInput').val();
               } else {
-                externalName = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(jQuery('#parentSelect').val()), identitiesResults), 'externalName');
+                externalName = Utils.array.maybeGetProperty(
+                    Utils.array.findFirstOrNull(
+                        Utils.array.idPredicate(jQuery('#parentSelect').val()), identitiesResults), 'externalName');
               }
               jQuery('#externalNameVal').html(externalName);
               jQuery('#externalName').html(externalName);
@@ -960,17 +962,22 @@ Sample.ui = {
   
   createParentSelect: function (identities) {
     var selectedProjectId = jQuery('#project').val();
-    var sortedIdentities = identities.sort(function (a, b) {
-      var aSortId = a.projectId == selectedProjectId ? 0 : a.projectId;
-      var bSortId = b.projectId == selectedProjectId ? 0 : b.projectId;
-      return aSortId - bSortId;
-    });
-    var hasIdentityInProject = (sortedIdentities.length > 0 && sortedIdentities[0].projectId == selectedProjectId);
+    var sortedIdentities;
+    if (identities.length) {
+      sortedIdentities = identities.sort(function (a, b) {
+        var aSortId = a.projectId == selectedProjectId ? 0 : a.projectId;
+        var bSortId = b.projectId == selectedProjectId ? 0 : b.projectId;
+        return aSortId - bSortId;
+      });
+    } else {
+      sortedIdentities = identities;
+    }
     var parentSelect = ['<select id="parentSelect" style="padding:3px;">'];
-    var projShortName = Hot.maybeGetProperty(Hot.findFirstOrNull(Hot.idPredicate(selectedProjectId), Hot.dropdownRef.projects), 'shortname');
+    var projShortName = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(selectedProjectId), HotUtils.projects), 'shortname');
+    var hasIdentityInProject = (sortedIdentities.length > 0 && sortedIdentities[0].projectId == selectedProjectId);
     if (!hasIdentityInProject) parentSelect.push('<option value="">First Receipt' + (projShortName ? ' (' + projShortName + ')' : '') + '</option>');
     for (var i = 0; i < sortedIdentities.length; i++) {
-      parentSelect.push('<option value="' + sortedIdentities[i].id + '">' + Sample.hot.getIdentityLabel(sortedIdentities[i]) + '</option>');
+      parentSelect.push('<option value="' + sortedIdentities[i].id + '">' + sortedIdentities[i].alias + " --" + sortedIdentityes[i].externalName + '</option>');
     }
     parentSelect.push('</select>');
     return parentSelect.join('');
@@ -1064,7 +1071,10 @@ Sample.ui = {
       "sTitle": "Sample Class",
       "mData": "sampleClassId",
       "mRender": function (data, type, full) {
-        return Hot.getAliasFromId(data, Constants.sampleClasses) || "Plain";
+        return Utils.array.maybeGetProperty(
+            Utils.array.findFirstOrNull(
+                Utils.array.idPredicate(data), 
+                Constants.sampleClasses), 'alias') || "Plain";
       },
       "bVisible": "true",
       "bSortable": false,
@@ -1288,7 +1298,7 @@ Sample.ui = {
       Sample.ui.displayMultipleCategoriesError();
       return false;
     }
-    window.location="sample/bulk/create/" + Sample.selectedIdsArray.join(',') + "&scid=" + selectedClassId;
+    window.location="sample/bulk/new?parentIds=" + Sample.selectedIdsArray.join(',') + "&scid=" + selectedClassId;
   },
   
   /**

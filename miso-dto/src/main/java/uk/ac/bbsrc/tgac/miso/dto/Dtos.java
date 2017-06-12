@@ -1446,7 +1446,7 @@ public class Dtos {
     return dtoList;
   }
 
-  private static QcTypeDto asDto(QcType from) {
+  public static QcTypeDto asDto(QcType from) {
     QcTypeDto dto = new QcTypeDto();
     dto.setId(from.getQcTypeId());
     dto.setName(from.getName());
@@ -1458,7 +1458,7 @@ public class Dtos {
     return dto;
   }
 
-  private static QcType to(QcTypeDto from) {
+  public static QcType to(QcTypeDto from) {
     QcType to = new QcType();
     if (from.getId() != null) to.setQcTypeId(from.getId());
     to.setName(from.getName());
@@ -1470,7 +1470,7 @@ public class Dtos {
     return to;
   }
 
-  private static SampleQcDto asDto(SampleQC from) {
+  public static SampleQcDto asDto(SampleQC from) {
     SampleQcDto dto = new SampleQcDto();
     dto.setId(from.getId());
     dto.setQcDate(getDateString(from.getQcDate()));
@@ -1481,7 +1481,7 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleQC to(SampleQcDto from) {
+  public static SampleQC to(SampleQcDto from) {
     SampleQC to = new SampleQCImpl();
     if (from.getId() != null) to.setId(from.getId());
     to.setQcType(to(from.getQcType()));
@@ -1489,7 +1489,7 @@ public class Dtos {
     return to;
   }
 
-  private static LibraryQcDto asDto(LibraryQC from) {
+  public static LibraryQcDto asDto(LibraryQC from) {
     LibraryQcDto dto = new LibraryQcDto();
     dto.setId(from.getId());
     dto.setQcDate(getDateString(from.getQcDate()));
@@ -1500,7 +1500,7 @@ public class Dtos {
     return dto;
   }
 
-  private static LibraryQC to(LibraryQcDto from) {
+  public static LibraryQC to(LibraryQcDto from) {
     LibraryQC to = new LibraryQCImpl();
     if (from.getId() != null) to.setId(from.getId());
     to.setQcType(to(from.getQcType()));
@@ -1564,6 +1564,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setAlias(from.getAlias());
+    dto.setShortName(from.getShortName());
     return dto;
   }
 

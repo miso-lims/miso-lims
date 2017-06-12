@@ -757,7 +757,7 @@ public class EditLibraryController {
           if (sampleClass == null) {
             sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
           } else if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
-            throw new IOException("Can only update libraries when samples all have the same class.");
+            throw new IOException("Can only edit libraries when samples all have the same class.");
           }
         }
       }
@@ -779,19 +779,20 @@ public class EditLibraryController {
       "library", LibraryDto.class, "Libraries", "Samples") {
 
     @Override
-    protected LibraryDto createDtoFromParent(Sample sample) {
+    protected LibraryDto createDtoFromParent(Sample item) {
       LibraryDto dto;
-      if (LimsUtils.isDetailedSample(sample)) {
+      if (LimsUtils.isDetailedSample(item)) {
+        DetailedSample sample = (DetailedSample) item;
         DetailedLibraryDto detailedDto = new DetailedLibraryDto();
-        detailedDto.setParentSampleClassId(((DetailedSample) sample).getSampleClass().getId());
-        detailedDto.setNonStandardAlias(((DetailedSample) sample).hasNonStandardAlias());
+        detailedDto.setParentSampleClassId(sample.getSampleClass().getId());
+        detailedDto.setNonStandardAlias(sample.hasNonStandardAlias());
 
         dto = detailedDto;
       } else {
         dto = new LibraryDto();
       }
-      dto.setParentSampleId(sample.getId());
-      dto.setParentSampleAlias(sample.getAlias());
+      dto.setParentSampleId(item.getId());
+      dto.setParentSampleAlias(item.getAlias());
       return dto;
     }
 

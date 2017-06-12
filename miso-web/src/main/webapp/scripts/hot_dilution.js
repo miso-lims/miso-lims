@@ -71,7 +71,7 @@ HotTarget.dilution = {
           type : 'dropdown',
           trimDropdown : false,
           source : [],
-          validator : HotUtils.validator.permitEmpty,
+          validator : HotUtils.validator.permitEmptyDropdown,
           include : Constants.isDetailedSample,
           unpack : function(dil, flat, setCellMeta) {
             flat.targetedSequencingAlias = Utils.array.maybeGetProperty(
@@ -92,12 +92,12 @@ HotTarget.dilution = {
           depends : '*start', // This is a dummy value that gets this run on
           // table creation only
           update : function(dil, flat, value, setReadOnly, setOptions, setData) {
-            setOptions([ '(None)' ].concat(Constants.targetedSequencings
+            setOptions({ source: [ '(None)' ].concat(Constants.targetedSequencings
                 .filter(
                     function(targetedSequencing) {
                       return targetedSequencing.kitDescriptorIds
                           .indexOf(dil.library.kitDescriptorId) != -1;
-                    }).map(Utils.array.getAlias).sort()));
+                    }).map(Utils.array.getAlias).sort()) });
           }
         } ];
   },
