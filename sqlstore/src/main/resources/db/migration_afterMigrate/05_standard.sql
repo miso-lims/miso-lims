@@ -913,12 +913,48 @@ CREATE PROCEDURE deleteLibrary(
   DELETE FROM Library_Note WHERE library_libraryId = iLibraryId;
   DELETE FROM Library_Index WHERE library_libraryId = iLibraryId;
 
-  -- delete from libraryAdditionalInfo
+  -- delete from DetailedLibrary
   DELETE FROM DetailedLibrary WHERE libraryId = iLibraryId;
   DELETE FROM LibraryChangeLog WHERE libraryId = iLibraryId;
 
   -- delete from Library table
   DELETE FROM Library WHERE libraryId = iLibraryId;
+  SELECT ROW_COUNT() AS number_deleted;
+
+  COMMIT;
+END//
+
+DROP PROCEDURE IF EXISTS deleteDilution//
+CREATE PROCEDURE deleteDilution(
+  iDilutionId BIGINT(20),
+  iLibraryId BIGINT(20)
+) BEGIN
+  DECLARE errorMessage varchar(300);
+  -- rollback if any errors are thrown
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    RESIGNAL;
+  END;
+
+  START TRANSACTION;
+
+  -- check that the library dilution exists and is derived from the given library
+  IF NOT EXISTS (SELECT 1 FROM LibraryDilution WHERE dilutionId = iDilutionId AND library_libraryId = iLibraryId)
+  THEN
+    SET errorMessage = CONCAT('Dilution with ID ', iDilutionId, ' derived from library LIB', iLibraryId, ' not found.');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+
+  -- confirm that the dilution is not present in any pools
+  IF EXISTS (SELECT * FROM Pool_Dilution WHERE dilution_dilutionId = iDilutionId)
+  THEN
+    SET errorMessage = CONCAT('Cannot delete dilution with ID ', iDilutionId, ' since it is present in oen or more pools.');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+  
+  -- delete from LibraryDilution table
+  DELETE FROM LibraryDilution WHERE dilutionId = iDilutionId;
   SELECT ROW_COUNT() AS number_deleted;
 
   COMMIT;
