@@ -67,17 +67,20 @@ var Library = Library || {
     }
   },
   
-  validateLibrary: function () {
+  validateLibrary: function (skipAliasValidation) {
     Validate.cleanFields('#library-form');
     jQuery('#library-form').parsley().destroy();
 
     // Alias input field validation
     jQuery('#alias').attr('class', 'form-control');
-    jQuery('#alias').attr('data-parsley-required', 'true');
     jQuery('#alias').attr('data-parsley-maxlength', '100');
     jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    jQuery('#alias').attr('data-parsley-library-alias', '');
-    jQuery('#alias').attr('data-parsley-debounce', '500');
+    if (skipAliasValidation) {
+      jQuery('#alias').attr('data-parsley-required', 'true');
+    } else {
+      jQuery('#alias').attr('data-parsley-library-alias', '');
+      jQuery('#alias').attr('data-parsley-debounce', '500');
+    }
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
@@ -94,7 +97,12 @@ var Library = Library || {
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
-    if (Hot.detailedSample) {
+    if (Constants.isDetailedSample) {
+      var generatingAlias = Constants.automaticLibraryAlias == true && jQuery('#alias').val().length === 0;
+      var selectedPlatform = jQuery('#platformTypes option:selected').text();
+      
+      jQuery('#dnaSize').attr('data-parsley-required', generatingAlias && selectedPlatform === 'Illumina');
+      
       // Prep Kit validation
       jQuery('#libraryKit').attr('class', 'form-control');
       jQuery('#libraryKit').attr('data-parsley-required', 'true');
@@ -102,6 +110,12 @@ var Library = Library || {
       jQuery('#libraryDesignCodes').attr('class', 'form-control');
       jQuery('#libraryDesignCodes').attr('data-parsley-required', 'true');
       jQuery('#libraryDesignCodes').attr('data-parsley-min', 1);
+      
+      // Concentration validation
+      jQuery('#initialConcentration').attr('class', 'form-control');
+      jQuery('#initialConcentration').attr('data-parsley-maxlength', '10');
+      jQuery('#initialConcentration').attr('data-parsley-type', 'number');
+      jQuery('#initialConcentration').attr('data-parsley-required', generatingAlias && selectedPlatform === 'PacBio');
     }
 
     jQuery('#library-form').parsley();
