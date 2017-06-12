@@ -914,7 +914,7 @@ CREATE PROCEDURE deleteLibrary(
   DELETE FROM Library_Index WHERE library_libraryId = iLibraryId;
 
   -- delete from libraryAdditionalInfo
-  DELETE FROM LibraryAdditionalInfo WHERE libraryId = iLibraryId;
+  DELETE FROM DetailedLibrary WHERE libraryId = iLibraryId;
   DELETE FROM LibraryChangeLog WHERE libraryId = iLibraryId;
 
   -- delete from Library table
