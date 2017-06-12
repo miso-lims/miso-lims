@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,20 +35,17 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -95,26 +93,30 @@ public class LibraryRestController extends RestController {
     this.libraryService = libraryService;
   }
 
-  @RequestMapping(value = "{libraryId}", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String getLibraryById(@PathVariable Long libraryId) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
+  @RequestMapping(value = "/{libraryId}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public LibraryDto getLibraryById(@PathVariable Long libraryId) throws IOException {
     Library l = libraryService.get(libraryId);
     if (l == null) {
       throw new RestException("No library found with ID: " + libraryId, Status.NOT_FOUND);
     }
-    return mapper.writeValueAsString(l);
+    LibraryDto dto = Dtos.asDto(l);
+    return dto;
   }
 
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String listAllLibraries() throws IOException {
+  @ResponseBody
+  public List<LibraryDto> listAllLibraries() throws IOException {
     Collection<Library> libraries = libraryService.list();
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.writeValueAsString(libraries);
+    List<LibraryDto> dtos = Dtos.asLibraryDtos(libraries);
+    return dtos;
   }
 
-  @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @RequestMapping(method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public ResponseEntity<?> createLibrary(@RequestBody LibraryDto libraryDto, UriComponentsBuilder b) throws IOException {
+  public LibraryDto createLibrary(@RequestBody LibraryDto libraryDto, UriComponentsBuilder b, HttpServletResponse response)
+      throws IOException {
     if (libraryDto == null) {
       log.error(
           "Received null libraryDto from front end; cannot convert to Library. Something likely went wrong in the JS DTO conversion.");
@@ -132,15 +134,16 @@ public class LibraryRestController extends RestController {
       }
       throw restException;
     }
+    LibraryDto created = getLibraryById(id);
     UriComponents uriComponents = b.path("/library/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    response.setHeader("Location", uriComponents.toUri().toString());
+    return created;
   }
 
-  @RequestMapping(value = "/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+  @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public ResponseEntity<?> updateLibrary(@PathVariable("id") Long id, @RequestBody LibraryDto libraryDto) throws IOException {
+  public LibraryDto updateLibrary(@PathVariable("id") Long id, @RequestBody LibraryDto libraryDto) throws IOException {
     if (libraryDto == null) {
       log.error(
           "Received null libraryDto from front end; cannot convert to Library. Something likely went wrong in the JS DTO conversion.");
@@ -170,7 +173,7 @@ public class LibraryRestController extends RestController {
       libraryService.addQc(library, qc);
     }
     libraryService.update(library);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return getLibraryById(id);
   }
 
   @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
