@@ -927,7 +927,8 @@ END//
 DROP PROCEDURE IF EXISTS deleteDilution//
 CREATE PROCEDURE deleteDilution(
   iDilutionId BIGINT(20),
-  iLibraryId BIGINT(20)
+  iLibraryId BIGINT(20),
+  iLoginName VARCHAR(255)
 ) BEGIN
   DECLARE errorMessage varchar(300);
   -- rollback if any errors are thrown
@@ -956,6 +957,12 @@ CREATE PROCEDURE deleteDilution(
   -- delete from LibraryDilution table
   DELETE FROM LibraryDilution WHERE dilutionId = iDilutionId;
   SELECT ROW_COUNT() AS number_deleted;
+  
+  INSERT INTO LibraryChangeLog (libraryId, columnsChanged, userId, message) VALUES
+    (iLibraryId,
+    CONCAT('LDI', iDilutionId),
+    (SELECT userId FROM `User` WHERE loginName = iLoginName),
+    CONCAT('Deleted dilution LDI', iDilutionId, '.'));
 
   COMMIT;
 END//
