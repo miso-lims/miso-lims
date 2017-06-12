@@ -534,6 +534,7 @@ FOR EACH ROW
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN CONCAT('QC passed: ', COALESCE(OLD.qcPassed, 'n/a'), ' → ', COALESCE(NEW.qcPassed, 'n/a')) END,
         CASE WHEN NEW.discarded <> OLD.discarded THEN CONCAT('discarded: ', OLD.discarded, ' → ', NEW.discarded) END,
         CASE WHEN (NEW.dnaSize IS NULL) <> (OLD.dnaSize IS NULL) OR NEW.dnaSize <> OLD.dnaSize THEN CONCAT('size: ', COALESCE(OLD.dnaSize, 'n/a'), ' → ', COALESCE(NEW.dnaSize, 'n/a')) END,
+        CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN CONCAT('parent: ', (SELECT name FROM Sample WHERE sampleId = OLD.sample_sampleId), ' → ', (SELECT name FROM Sample WHERE sampleId = NEW.sample_sampleId)) END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
@@ -554,6 +555,7 @@ FOR EACH ROW
         CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN 'sample_sampleId' END,
         CASE WHEN NEW.discarded <> OLD.discarded THEN 'discarded' END,
         CASE WHEN (NEW.dnaSize IS NULL) <> (OLD.dnaSize IS NULL) OR NEW.dnaSize <> OLD.dnaSize THEN 'dnaSize' END,
+        CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN 'parentSample' END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END
   ), ''),
       NEW.lastModifier,
@@ -595,6 +597,7 @@ FOR EACH ROW
     SET log_message = CONCAT_WS(', ',
       CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT(NEW.name, ' concentration: ', OLD.concentration, ' → ', NEW.concentration) END,
       CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT(NEW.name, ' barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
+      CASE WHEN NEW.library_libraryId <> OLD.library_libraryId THEN CONCAT('parent: ', (SELECT name FROM Library WHERE libraryId = OLD.library_libraryId), ' → ', (SELECT name FROM Library WHERE libraryId = NEW.library_libraryId)) END,
       CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targeted sequencing: ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = OLD.targetedSequencingId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = NEW.targetedSequencingId), 'n/a')) END);
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
@@ -602,6 +605,7 @@ FOR EACH ROW
         COALESCE(CONCAT_WS(',',
           CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT(NEW.name, ' concentration') END,
           CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT(NEW.name, ' identificationBarcode') END,
+          CASE WHEN NEW.library_libraryId <> OLD.library_libraryId THEN CONCAT(NEW.name, ' parent') END,
           CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targetedSequencingId') END
         ), ''),
         NEW.lastModifier,
