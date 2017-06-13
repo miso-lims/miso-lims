@@ -1,8 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,9 +30,17 @@ public class DefaultLibraryAliasGenerator implements NameGenerator<Library> {
 
       if (m.matches()) {
         try {
-          int numLibs = libraryStore.listBySampleId(library.getSample().getId()).size();
-          String la = m.group(1) + "_" + "L" + m.group(2) + "-" + (numLibs + 1) + "_" + m.group(3);
-          return la;
+          Collection<Library> siblings = libraryStore.listBySampleId(library.getSample().getId());
+          Set<String> siblingAliases = siblings.stream()
+              .map(Library::getAlias)
+              .collect(Collectors.toSet());
+          String alias = null;
+          int siblingNumber = siblings.size();
+          do {
+            siblingNumber++;
+            alias = m.group(1) + "_" + "L" + m.group(2) + "-" + siblingNumber + "_" + m.group(3);
+          } while (siblingAliases.contains(alias));
+          return alias;
         } catch (IOException e) {
           throw new MisoNamingException("Cannot generate Library alias for: " + library.toString(), e);
         }
