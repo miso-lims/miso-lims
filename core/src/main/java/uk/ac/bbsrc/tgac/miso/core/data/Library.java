@@ -45,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}. A Library is then diluted down to a
- * {@link Dilution}, and put in a {@link Pool}, which is then sequenced.
+ * {@link LibraryDilution}, and put in a {@link Pool}, which is then sequenced.
  * <p/>
  * Library properties are specified mainly by the SRA schema requirements, i.e. they have a {@link LibraryType}, a
  * {@link LibraryStrategyType} and a {@link LibrarySelectionType} which are SRA enumerations. Libraries also have a target {@link Platform}

@@ -36,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
@@ -47,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * provide the link between the {@link Sample} tree and the {@link Run} tree of the MISO data model, which means that multiple samples from
  * multiple {@link Project}s can be pooled together.
  * <p/>
- * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can accept {@link Dilution}
+ * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can accept {@link LibraryDilution}
  * objects at present. At creation time, a Pool is said to be "ready to run", which makes it easy to categorise and list Pools according to
  * whether they have been placed on a {@link SequencerPoolPartition} (at which point ready to run becomes false) or not.
  * 

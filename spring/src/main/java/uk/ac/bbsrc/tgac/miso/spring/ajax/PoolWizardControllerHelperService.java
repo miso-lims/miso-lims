@@ -47,7 +47,6 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -271,7 +270,7 @@ public class PoolWizardControllerHelperService {
       List<LibraryDilution> dls = new ArrayList<>(dilutionService.list(0, 0, false, "id", PaginationFilter.platformType(platformType),
           PaginationFilter.project(projectId)));
       Collections.sort(dls);
-      for (Dilution dl : dls) {
+      for (LibraryDilution dl : dls) {
         if (dl.getLibrary().getQcPassed() != null) {
           if (dl.getLibrary().getQcPassed()) {
             StringBuilder indexsb = new StringBuilder();

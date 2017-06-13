@@ -17,7 +17,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -102,7 +101,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
           @JoinColumn(name = "index_indexId", nullable = false) })
   private List<Index> indices = new ArrayList<>();
 
-  public static PoolableElementView fromDilution(Dilution dilution) {
+  public static PoolableElementView fromDilution(LibraryDilution dilution) {
     PoolableElementView v = new PoolableElementView();
     v.setDilutionBarcode(dilution.getIdentificationBarcode());
     v.setDilutionConcentration(dilution.getConcentration());
