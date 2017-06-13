@@ -534,6 +534,7 @@ FOR EACH ROW
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN CONCAT('QC passed: ', COALESCE(OLD.qcPassed, 'n/a'), ' → ', COALESCE(NEW.qcPassed, 'n/a')) END,
         CASE WHEN NEW.discarded <> OLD.discarded THEN CONCAT('discarded: ', OLD.discarded, ' → ', NEW.discarded) END,
         CASE WHEN (NEW.dnaSize IS NULL) <> (OLD.dnaSize IS NULL) OR NEW.dnaSize <> OLD.dnaSize THEN CONCAT('size: ', COALESCE(OLD.dnaSize, 'n/a'), ' → ', COALESCE(NEW.dnaSize, 'n/a')) END,
+        CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN CONCAT('parent: ', (SELECT name FROM Sample WHERE sampleId = OLD.sample_sampleId), ' → ', (SELECT name FROM Sample WHERE sampleId = NEW.sample_sampleId)) END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
@@ -554,6 +555,7 @@ FOR EACH ROW
         CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN 'sample_sampleId' END,
         CASE WHEN NEW.discarded <> OLD.discarded THEN 'discarded' END,
         CASE WHEN (NEW.dnaSize IS NULL) <> (OLD.dnaSize IS NULL) OR NEW.dnaSize <> OLD.dnaSize THEN 'dnaSize' END,
+        CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN 'parentSample' END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END
   ), ''),
       NEW.lastModifier,
@@ -595,6 +597,7 @@ FOR EACH ROW
     SET log_message = CONCAT_WS(', ',
       CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT(NEW.name, ' concentration: ', OLD.concentration, ' → ', NEW.concentration) END,
       CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT(NEW.name, ' barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
+      CASE WHEN NEW.library_libraryId <> OLD.library_libraryId THEN CONCAT('parent: ', (SELECT name FROM Library WHERE libraryId = OLD.library_libraryId), ' → ', (SELECT name FROM Library WHERE libraryId = NEW.library_libraryId)) END,
       CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targeted sequencing: ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = OLD.targetedSequencingId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = NEW.targetedSequencingId), 'n/a')) END);
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
@@ -602,6 +605,7 @@ FOR EACH ROW
         COALESCE(CONCAT_WS(',',
           CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT(NEW.name, ' concentration') END,
           CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT(NEW.name, ' identificationBarcode') END,
+          CASE WHEN NEW.library_libraryId <> OLD.library_libraryId THEN CONCAT(NEW.name, ' parent') END,
           CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targetedSequencingId') END
         ), ''),
         NEW.lastModifier,
@@ -913,13 +917,56 @@ CREATE PROCEDURE deleteLibrary(
   DELETE FROM Library_Note WHERE library_libraryId = iLibraryId;
   DELETE FROM Library_Index WHERE library_libraryId = iLibraryId;
 
-  -- delete from libraryAdditionalInfo
-  DELETE FROM LibraryAdditionalInfo WHERE libraryId = iLibraryId;
+  -- delete from DetailedLibrary
+  DELETE FROM DetailedLibrary WHERE libraryId = iLibraryId;
   DELETE FROM LibraryChangeLog WHERE libraryId = iLibraryId;
 
   -- delete from Library table
   DELETE FROM Library WHERE libraryId = iLibraryId;
   SELECT ROW_COUNT() AS number_deleted;
+
+  COMMIT;
+END//
+
+DROP PROCEDURE IF EXISTS deleteDilution//
+CREATE PROCEDURE deleteDilution(
+  iDilutionId BIGINT(20),
+  iLibraryId BIGINT(20),
+  iLoginName VARCHAR(255)
+) BEGIN
+  DECLARE errorMessage varchar(300);
+  -- rollback if any errors are thrown
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    RESIGNAL;
+  END;
+
+  START TRANSACTION;
+
+  -- check that the library dilution exists and is derived from the given library
+  IF NOT EXISTS (SELECT 1 FROM LibraryDilution WHERE dilutionId = iDilutionId AND library_libraryId = iLibraryId)
+  THEN
+    SET errorMessage = CONCAT('Dilution with ID ', iDilutionId, ' derived from library LIB', iLibraryId, ' not found.');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+
+  -- confirm that the dilution is not present in any pools
+  IF EXISTS (SELECT * FROM Pool_Dilution WHERE dilution_dilutionId = iDilutionId)
+  THEN
+    SET errorMessage = CONCAT('Cannot delete dilution with ID ', iDilutionId, ' since it is present in one or more pools.');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+  
+  -- delete from LibraryDilution table
+  DELETE FROM LibraryDilution WHERE dilutionId = iDilutionId;
+  SELECT ROW_COUNT() AS number_deleted;
+  
+  INSERT INTO LibraryChangeLog (libraryId, columnsChanged, userId, message) VALUES
+    (iLibraryId,
+    CONCAT('LDI', iDilutionId),
+    (SELECT userId FROM `User` WHERE loginName = iLoginName),
+    CONCAT('Deleted dilution LDI', iDilutionId, '.'));
 
   COMMIT;
 END//

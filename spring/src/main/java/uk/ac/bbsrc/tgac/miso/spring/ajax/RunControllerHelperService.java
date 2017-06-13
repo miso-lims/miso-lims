@@ -61,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -101,99 +100,6 @@ public class RunControllerHelperService {
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
-  }
-
-  public JSONObject changePlatformType(HttpSession session, JSONObject json) {
-    String cId = json.getString("run_cId");
-    Run run = (Run) session.getAttribute("run_" + cId);
-
-    String newRuntype = json.getString("platformtype");
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Long runId = Run.UNSAVED_ID;
-
-      if (json.has("runId") && !isStringEmptyOrNull(json.getString("runId"))) {
-        // edit existing run
-        Map<String, Object> responseMap = new HashMap<>();
-        runId = Long.parseLong(json.getString("runId"));
-        Run storedRun = runService.get(runId);
-        String storedPlatformType = storedRun.getSequencerReference().getPlatform().getPlatformType().getKey();
-
-        PlatformType newPt = PlatformType.get(newRuntype);
-        if (newPt != null) {
-          log.info("STORED: " + newRuntype + " :: " + storedPlatformType);
-          if (!newRuntype.equals(storedPlatformType)) {
-            run = new Run(user);
-            run.setId(storedRun.getId());
-          } else {
-            run = storedRun;
-          }
-
-          session.setAttribute("run_" + cId, run);
-          StringBuilder srb = new StringBuilder();
-          srb.append("<select name='sequencer' id='sequencerReference' onchange='Run.ui.populateRunOptions(this);'>");
-          srb.append("<option value='0' selected='selected'>Please select...</option>");
-          for (SequencerReference sr : requestManager.listSequencerReferencesByPlatformType(newPt)) {
-            if (sr.isActive()) {
-              srb.append(
-                  "<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
-            }
-          }
-          srb.append("</select>");
-          responseMap.put("sequencers", srb.toString());
-        } else {
-          return JSONUtils.SimpleJSONError("Unrecognised PlatformType");
-        }
-        return JSONUtils.JSONObjectResponse(responseMap);
-      } else {
-        // new run
-        Map<String, Object> responseMap = new HashMap<>();
-
-        PlatformType newPt = PlatformType.get(newRuntype);
-        if (newPt != null) {
-          StringBuilder srb = new StringBuilder();
-          srb.append("<select name='sequencer' id='sequencerReference' onchange='Run.ui.populateRunOptions(this);'>");
-          srb.append("<option value='0' selected='selected'>Please select...</option>");
-          for (SequencerReference sr : requestManager.listSequencerReferencesByPlatformType(newPt)) {
-            if (sr.isActive()) {
-              srb.append(
-                  "<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
-            }
-          }
-          srb.append("</select>");
-          responseMap.put("sequencers", srb.toString());
-        } else {
-          return JSONUtils.SimpleJSONError("Unrecognised PlatformType");
-        }
-
-        return JSONUtils.JSONObjectResponse(responseMap);
-      }
-    } catch (IOException e) {
-      log.debug("Failed to change PlatformType", e);
-      return JSONUtils.SimpleJSONError("Failed to change PlatformType");
-    }
-  }
-
-  public JSONObject populateRunOptions(HttpSession session, JSONObject json) {
-    Long sequencerReferenceId = json.getLong("sequencerReference");
-    String cId = json.getString("run_cId");
-    try {
-      SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
-      Map<String, Object> responseMap = new HashMap<>();
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      Run run = new Run(user);
-
-      run.setSequencerReference(sr);
-
-      session.setAttribute("run_" + cId, run);
-
-      return JSONUtils.JSONObjectResponse(responseMap);
-    } catch (IOException e) {
-      log.error("failed to get run options", e);
-      return JSONUtils.SimpleJSONError("Failed to get Run options");
-    }
   }
 
   public String containerInfoHtml(PlatformType platformType) {
