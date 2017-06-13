@@ -27,8 +27,7 @@ ListTarget.dilution = {
     return "/miso/rest/librarydilution/dt" + (projectId ? "/project/" + projectId : "");
   },
   createBulkActions : function(config, projectId) {
-    // TODO return HotTarget.dilution.bulkActions;
-    return [];
+    return HotTarget.dilution.bulkActions;
   },
   createStaticActions : function(config, prodjectId) {
     return [];

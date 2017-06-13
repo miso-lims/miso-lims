@@ -57,6 +57,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -238,6 +239,7 @@ public class MenuController implements ServletContextAware {
     node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
     node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
     node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
+    node.put("libraryDilutionConcentrationUnits", LibraryDilution.UNITS);
     node.put("poolConcentrationUnits", PoolImpl.CONCENTRATION_UNITS);
 
     final Iterable<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
@@ -259,6 +261,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "subprojects", subprojectService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "stains", stainService.list(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "targetedSequencings", requestManager.listAllTargetedSequencing(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

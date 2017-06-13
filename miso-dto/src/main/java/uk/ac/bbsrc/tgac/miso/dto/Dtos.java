@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
@@ -1103,7 +1105,9 @@ public class Dtos {
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setInitialConcentration(from.getConcentration());
     to.setLowQuality(from.getLowQuality());
-    to.setPaired(from.getPaired());
+    if (from.getPaired() != null) {
+      to.setPaired(from.getPaired());
+    }
     to.setPlatformType(PlatformType.get(from.getPlatformType()));
     if (from.getParentSampleId() != null) {
       to.setSample(new SampleImpl());
@@ -1204,7 +1208,7 @@ public class Dtos {
     return to;
   }
 
-  public static DilutionDto asDto(LibraryDilution from) {
+  private static DilutionDto asDto(LibraryDilution from, LibraryDto libraryDto) {
     DilutionDto dto = new DilutionDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1217,9 +1221,20 @@ public class Dtos {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
     }
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
-    LibraryDto ldto = asMinimalDto(from.getLibrary());
-    dto.setLibrary(ldto);
+    if (from.getTargetedSequencing() != null) {
+      dto.setTargetedSequencingId(from.getTargetedSequencing().getId());
+    }
+    dto.setLibrary(libraryDto);
     return dto;
+  }
+
+  public static DilutionDto asMinimalDto(LibraryDilution from) {
+    return asDto(from, asMinimalDto(from.getLibrary()));
+  }
+
+  public static DilutionDto asDto(LibraryDilution from) {
+    return asDto(from, asDto(from.getLibrary()));
+
   }
 
   public static DilutionDto asDto(PoolableElementView from) {
@@ -1273,17 +1288,22 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getDilutionUserName())) {
       to.setDilutionCreator(from.getDilutionUserName());
     }
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      to.setCreationDate(df.parse(from.getCreationDate()));
-    } catch (ParseException e) {
-      // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
-    }
+    to.setCreationDate(extractDate(from.getCreationDate()));
     if (from.getTargetedSequencingId() != null) {
       to.setTargetedSequencing(new TargetedSequencing());
       to.getTargetedSequencing().setId(from.getTargetedSequencingId());
     }
     return to;
+  }
+
+  private static Date extractDate(String from) {
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    try {
+      return df.parse(from);
+    } catch (ParseException e) {
+      // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
+      return null;
+    }
   }
 
   public static PoolDto asDto(Pool from, boolean includeContents) {
@@ -1298,6 +1318,9 @@ public class Dtos {
     dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(getDateAsString(from.getCreationDate()));
+    dto.setDiscarded(from.isDiscarded());
+    dto.setVolume(from.getVolume());
+    dto.setPlatformType(from.getPlatformType().name());
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
     }
@@ -1625,6 +1648,34 @@ public class Dtos {
     to.setHealth(from.getHealthType());
     to.setStartDate(LimsUtils.toBadDate(from.getStartDate()));
     to.setCompletionDate(LimsUtils.toBadDate(from.getCompletionDate()));
+    return to;
+  }
+
+  public static TargetedSequencingDto asDto(TargetedSequencing from) {
+    TargetedSequencingDto dto = new TargetedSequencingDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    dto.setKitDescriptorIds(from.getKitDescriptors().stream().map(KitDescriptor::getId).collect(Collectors.toList()));
+    return dto;
+  }
+
+  public static Pool to(PoolDto dto) {
+    PoolImpl to = new PoolImpl();
+    to.setId(dto.getId() == null ? PoolImpl.UNSAVED_ID : dto.getId());
+    to.setAlias(dto.getAlias());
+    to.setConcentration(dto.getConcentration());
+    to.setCreationDate(extractDate(dto.getCreationDate()));
+    to.setDescription(dto.getDescription());
+    to.setIdentificationBarcode(dto.getIdentificationBarcode());
+    to.setDiscarded(dto.isDiscarded());
+    to.setVolume(dto.getVolume());
+    to.setPlatformType(PlatformType.valueOf(dto.getPlatformType()));
+    to.setPoolableElementViews(dto.getPooledElements().stream().map(dilution -> {
+      PoolableElementView view = new PoolableElementView();
+      view.setDilutionId(dilution.getId());
+      view.setDilutionName(dilution.getName());
+      return view;
+    }).collect(Collectors.toSet()));
     return to;
   }
 }

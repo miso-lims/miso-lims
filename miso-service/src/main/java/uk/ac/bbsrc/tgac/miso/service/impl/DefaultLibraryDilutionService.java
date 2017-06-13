@@ -204,4 +204,11 @@ public class DefaultLibraryDilutionService
   public PaginatedDataSource<LibraryDilution> getBackingPaginationSource() {
     return dilutionDao;
   }
+
+  @Override
+  public List<LibraryDilution> listByIdList(List<Long> idList) throws IOException {
+    Collection<LibraryDilution> dilutions = dilutionDao.listByIdList(idList);
+    return authorizationManager.filterUnreadable(dilutions);
+
+  }
 }

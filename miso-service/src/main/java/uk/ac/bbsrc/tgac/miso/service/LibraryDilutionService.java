@@ -18,6 +18,8 @@ public interface LibraryDilutionService extends PaginatedDataSource<LibraryDilut
 
   List<LibraryDilution> listByLibraryId(Long libraryId) throws IOException;
 
+  List<LibraryDilution> listByIdList(List<Long> idList) throws IOException;
+
   List<LibraryDilution> list() throws IOException;
 
   LibraryDilution getByBarcode(String barcode) throws IOException;

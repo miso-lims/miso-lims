@@ -106,6 +106,7 @@ ListUtils = {
           button.append(document.createTextNode(buttonDescription.name));
           button.href = '#';
           button.setAttribute('class', 'ui-button ui-state-default');
+          button.setAttribute('title', buttonDescription.title || '');
           button.onclick = buttonDescription.handler;
         } else {
           button = document.createElement('SPAN');

@@ -345,4 +345,14 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     return "Pool";
   }
 
+  @Override
+  public Collection<Pool> listPoolsById(List<Long> poolIds) {
+    if (poolIds.isEmpty()) return Collections.emptyList();
+    Criteria criteria = currentSession().createCriteria(PoolImpl.class);
+    criteria.add(Restrictions.in("id", poolIds));
+    @SuppressWarnings("unchecked")
+    List<Pool> pools = criteria.list();
+    return pools;
+  }
+
 }

@@ -342,4 +342,9 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     if (poolAlertManager != null) poolAlertManager.removeWatcher(pool, watcher);
   }
 
+  @Override
+  public Collection<Pool> listPoolsById(List<Long> poolIds) throws IOException {
+    return authorizationManager.filterUnreadable(poolStore.listPoolsById(poolIds));
+  }
+
 }

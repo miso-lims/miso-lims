@@ -109,4 +109,6 @@ public interface PoolStore extends Store<Pool>, Remover<Pool>, PaginatedDataSour
   void removeWatcher(Pool pool, User watcher);
 
   void addWatcher(Pool pool, User watcher);
+
+  Collection<Pool> listPoolsById(List<Long> poolIds);
 }
