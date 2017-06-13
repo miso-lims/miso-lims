@@ -1,1 +1,0 @@
-UPDATE LibraryType SET archived = 1 WHERE platformType = 'PACBIO' AND description NOT IN ('cDNA', 'Whole Genome');

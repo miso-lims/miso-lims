@@ -1,3 +1,10 @@
+-- archive_PacBio_libtypes
+-- StartNoTest
+UPDATE LibraryType SET archived = 1 WHERE platformType = 'PACBIO' AND description NOT IN ('cDNA', 'Whole Genome');
+-- EndNoTest
+
+-- deduplicate_kits_tarseqs
+-- StartNoTest
 -- StartNoTest
 SELECT kitDescriptorId INTO @goodKit FROM KitDescriptor WHERE name = 'KAPA Hyper Prep and Agilent SureSelect XT2';
 SELECT kitDescriptorId INTO @badKit1 FROM KitDescriptor WHERE name = 'KAPA Hyper Prep and SureSelect XT2 v5';
@@ -58,3 +65,5 @@ DELETE FROM KitDescriptorChangeLog WHERE kitDescriptorId IN (@badKit1, @badKit2)
 DELETE FROM KitDescriptor WHERE kitDescriptorId IN (@badKit1, @badKit2);
 DELETE FROM TargetedSequencing WHERE targetedSequencingId = @badTarSeq;
 -- EndNoTest
+-- EndNoTest
+

@@ -63,7 +63,7 @@
         <role>Administrator</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>tdebat</id>
@@ -75,7 +75,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>amasella</id>
@@ -87,7 +87,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>dcooke</id>
@@ -99,7 +99,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>harmstrong</id>
@@ -111,7 +111,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
   <modules>
@@ -471,7 +471,7 @@
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-jsr310</artifactId>
         <version>${jackson.version}</version>
-      </dependency>      
+      </dependency>
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
