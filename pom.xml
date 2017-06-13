@@ -27,7 +27,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
-  <version>0.2.71-SNAPSHOT</version>
+  <version>0.2.71</version>
   <packaging>pom</packaging>
   <name>MISO LIMS</name>
   <url>http://tgac.github.io/miso-lims/</url>
@@ -135,7 +135,7 @@
     <connection>scm:git:https://www.github.com/TGAC/miso-lims</connection>
     <developerConnection>scm:git:git@github.com:TGAC/miso-lims</developerConnection>
     <url>http://www.github.com/TGAC/miso-lims</url>
-    <tag>v0.2.46</tag>
+    <tag>v0.2.71</tag>
   </scm>
   <!-- Bug Tracker -->
   <issueManagement>
