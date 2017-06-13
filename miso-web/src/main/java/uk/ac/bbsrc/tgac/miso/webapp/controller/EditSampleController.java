@@ -63,8 +63,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -116,14 +116,9 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
@@ -139,9 +134,6 @@ import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ui.SampleOptionsController;
-import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
-import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
-import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 
 @Controller
 @RequestMapping("/sample")
@@ -867,99 +859,61 @@ public class EditSampleController {
    */
   @RequestMapping(value = "/bulk/edit/{sampleIds}", method = RequestMethod.GET)
   public ModelAndView editBulkSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
-    return sampleBulkEditBackend.edit(sampleIds, model);
+    try {
+      List<Long> idList = getIdsFromString(sampleIds);
+      ObjectMapper mapper = new ObjectMapper();
+      List<SampleDto> samplesDtos = new ArrayList<>();
+      for (Sample sample : sampleService.listByIdList(idList)) {
+        samplesDtos.add(Dtos.asDto(sample));
+      }
+      model.put("title", "Bulk Edit Samples");
+      model.put("samplesJSON", mapper.writerFor(new TypeReference<List<SampleDto>>() {
+      }).writeValueAsString(samplesDtos));
+      model.put("method", "Edit");
+      return new ModelAndView("/pages/bulkEditSamples.jsp", model);
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.error("Failed to get bulk samples", ex);
+      }
+      throw ex;
+    }
   }
-
-  private final BulkEditTableBackend<Sample, SampleDto> sampleBulkEditBackend = new BulkEditTableBackend<Sample, SampleDto>("sample",
-      SampleDto.class, "Samples") {
-    @Override
-    protected SampleDto asDto(Sample model) {
-      return Dtos.asDto(model);
-    }
-
-    @Override
-    protected Iterable<Sample> load(List<Long> modelIds) throws IOException {
-      return sampleService.listByIdList(modelIds);
-    }
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-    }
-  };
-
-  @RequestMapping(value = "/bulk/create", method = RequestMethod.GET)
-  public ModelAndView createBulkSamples(ModelMap model) throws IOException {
-    SampleDto dto = (isDetailedSampleEnabled() ? new DetailedSampleDto() : new SampleDto());
-    return new BulkCreateTableBackend<>("sample", SampleDto.class, "Sample", dto).create(model);
-  }
-
 
   /**
    * used to create new samples parented to samples with ids from given {sampleIds} sends Dtos objects which will then be used for editing
    * in grid
    */
-  @RequestMapping(value = "/bulk/propagate/{sampleIds}&scid={sampleClassId}", method = RequestMethod.GET)
-  public ModelAndView propagateBulkSamples(@PathVariable String sampleIds, @PathVariable Long sampleClassId, ModelMap model)
+  @RequestMapping(value = "/bulk/create/{sampleIds}&scid={sampleClassId}", method = RequestMethod.GET)
+  public ModelAndView createBulkSamples(@PathVariable String sampleIds, @PathVariable Long sampleClassId, ModelMap model)
       throws IOException {
-    if (!isDetailedSampleEnabled()) throw new IOException("Cannot propagate samples from other samples in plain sample mode");
-    final SampleClass childClass = sampleClassService.get(sampleClassId);
-    
-    return new BulkPropagateTableBackend<Sample, DetailedSampleDto>("sample", DetailedSampleDto.class, "Sample", "Sample") {
-
-      @Override
-      protected DetailedSampleDto createDtoFromParent(Sample item) {
-        DetailedSampleDto child;
-        DetailedSample parent = (DetailedSample) item;
-        switch (childClass.getSampleCategory()) {
-        case SampleTissue.CATEGORY_NAME:
-          child = new SampleTissueDto();
-          break;
-        case SampleTissueProcessing.CATEGORY_NAME:
-          child = new SampleTissueProcessingDto();
-          break;
-        case SampleStock.CATEGORY_NAME:
-          child = new SampleStockDto();
-          break;
-        case SampleAliquot.CATEGORY_NAME:
-          child = new SampleAliquotDto();
-          break;
-        default:
-          throw new IllegalArgumentException("Cannot propagate to child class " + childClass.getAlias());
-        }
-        child.setParentId(parent.getId());
-        child.setParentAlias(parent.getAlias());
-        child.setProjectId(parent.getProject().getId());
-        child.setScientificName(parent.getScientificName());
-        child.setSampleType(parent.getSampleType());
-        child.setGroupDescription(parent.getGroupDescription());
-        child.setGroupId(parent.getGroupId());
-        child.setNonStandardAlias(parent.hasNonStandardAlias());
-
-        if (childClass.getSampleCategory().equals(SampleTissue.CATEGORY_NAME) && LimsUtils.isTissueSample(parent)) {
-          // copy parent fields
-          SampleTissueDto childTissue = (SampleTissueDto) child;
-          SampleTissue parentTissue = (SampleTissue) parent;
-          childTissue.setTissueOriginId(parentTissue.getTissueOrigin().getId());
-          childTissue.setTissueTypeId(parentTissue.getTissueType().getId());
-          childTissue.setTissueMaterialId(parentTissue.getTissueMaterial().getId());
-          childTissue.setPassageNumber(parentTissue.getPassageNumber());
-          childTissue.setTimesReceived(parentTissue.getTimesReceived());
-          childTissue.setTubeNumber(parentTissue.getTubeNumber());
-        }
-        return child;
+    try {
+      List<Long> idList = getIdsFromString(sampleIds);
+      ObjectMapper mapper = new ObjectMapper();
+      List<SampleDto> samplesDtos = new ArrayList<>();
+      for (Sample sample : sampleService.listByIdList(idList)) {
+        samplesDtos.add(Dtos.asDto(sample));
       }
-
-      @Override
-      protected Iterable<Sample> loadParents(List<Long> parentIds) throws IOException {
-        return sampleService.listByIdList(parentIds);
+      model.put("title", "Bulk Create Samples");
+      model.put("samplesJSON", mapper.writerFor(new TypeReference<List<SampleDto>>() {
+      }).writeValueAsString(samplesDtos));
+      model.put("method", "Create");
+      model.put("sampleClassId", sampleClassId);
+      return new ModelAndView("/pages/bulkEditSamples.jsp", model);
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.error("Failed to get bulk samples", ex);
       }
+      throw ex;
+    }
+  }
 
-      @Override
-      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-        config.put("sampleClassId", sampleClassId);
-      }
-
-    }.propagate(sampleIds, model);
+  public List<Long> getIdsFromString(String idString) {
+    String[] split = idString.split(",");
+    List<Long> idList = new ArrayList<>();
+    for (int i = 0; i < split.length; i++) {
+      idList.add(Long.parseLong(split[i]));
+    }
+    return idList;
   }
 
   @RequestMapping(method = RequestMethod.POST)
