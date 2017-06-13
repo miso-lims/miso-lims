@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
@@ -47,10 +48,17 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -66,7 +74,12 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @Entity
 @Table(name = "LibraryDilution")
-public class LibraryDilution implements Dilution {
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile" })
+public class LibraryDilution
+    implements SecurableByProfile, Barcodable, Comparable<LibraryDilution>, Deletable, Nameable, Boxable, Serializable {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -147,7 +160,6 @@ public class LibraryDilution implements Dilution {
     return EntityType.DILUTION;
   }
 
-  @Override
   public Library getLibrary() {
     return library;
   }
@@ -156,7 +168,6 @@ public class LibraryDilution implements Dilution {
     this.library = library;
   }
 
-  @Override
   public String getUnits() {
     return UNITS;
   }
@@ -199,37 +210,30 @@ public class LibraryDilution implements Dilution {
     return name;
   }
 
-  @Override
   public void setName(String name) {
     this.name = name;
   }
 
-  @Override
   public String getDilutionCreator() {
     return dilutionCreator;
   }
 
-  @Override
   public void setDilutionCreator(String dilutionUserName) {
     this.dilutionCreator = dilutionUserName;
   }
 
-  @Override
   public Date getCreationDate() {
     return this.creationDate;
   }
 
-  @Override
   public void setCreationDate(Date creationDate) {
     this.creationDate = creationDate;
   }
 
-  @Override
   public Double getConcentration() {
     return this.concentration;
   }
 
-  @Override
   public void setConcentration(Double concentration) {
     this.concentration = concentration;
   }
@@ -244,12 +248,10 @@ public class LibraryDilution implements Dilution {
     this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
   }
 
-  @Override
   public Set<Pool> getPools() {
     return pools;
   }
 
-  @Override
   public void setPools(Set<Pool> pools) {
     this.pools = pools;
   }
@@ -275,7 +277,6 @@ public class LibraryDilution implements Dilution {
     return preMigrationId;
   }
 
-  @Override
   public void setPreMigrationId(Long preMigrationId) {
     this.preMigrationId = preMigrationId;
   }
@@ -337,7 +338,7 @@ public class LibraryDilution implements Dilution {
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof Dilution)) return false;
+    if (!(obj instanceof LibraryDilution)) return false;
     final LibraryDilution them = (LibraryDilution) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -406,10 +407,9 @@ public class LibraryDilution implements Dilution {
   }
 
   @Override
-  public int compareTo(Dilution o) {
-    LibraryDilution t = (LibraryDilution) o;
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+  public int compareTo(LibraryDilution o) {
+    if (getId() < o.getId()) return -1;
+    if (getId() > o.getId()) return 1;
     return 0;
   }
 

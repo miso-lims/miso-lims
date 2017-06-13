@@ -42,7 +42,6 @@ import javax.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -80,7 +79,7 @@ public class SubmissionImpl implements Submission {
       @JoinColumn(name = "partition_partitionId") })
   @MapKeyJoinColumn(name = "dilution_dilutionId")
   @MapKeyClass(LibraryDilution.class)
-  private Map<Dilution, Partition> dilutions;
+  private Map<LibraryDilution, Partition> dilutions;
 
   @ManyToMany(targetEntity = ExperimentImpl.class)
   @JoinTable(name = "Submission_Experiment", joinColumns = {
@@ -140,7 +139,7 @@ public class SubmissionImpl implements Submission {
   }
 
   @Override
-  public Map<Dilution, Partition> getDilutions() {
+  public Map<LibraryDilution, Partition> getDilutions() {
     return dilutions;
   }
 
@@ -220,7 +219,7 @@ public class SubmissionImpl implements Submission {
   }
 
   @Override
-  public void setDilutions(Map<Dilution, Partition> dilutions) {
+  public void setDilutions(Map<LibraryDilution, Partition> dilutions) {
     this.dilutions = dilutions;
   }
 

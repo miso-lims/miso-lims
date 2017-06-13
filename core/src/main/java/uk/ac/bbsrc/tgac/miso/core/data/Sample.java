@@ -34,6 +34,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -41,7 +42,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * A Sample contains information about the original material upon which a sequencing experiment is to be based.
  * <p/>
  * Samples can be used in any number of sequencing {@link Experiment}s in the form of a {@link Library} that is processed further into
- * pooled {@link Dilution}s. Samples can be described further by a scientific name which, when enabled, will be checked against the NCBI
+ * pooled {@link LibraryDilution}s. Samples can be described further by a scientific name which, when enabled, will be checked against the
+ * NCBI
  * Taxonomy database.
  * <p/>
  * Sample properties are specified mainly by the SRA schema requirements, e.g. they have a Sample type string based on an SRA enumeration.
@@ -175,6 +177,7 @@ public interface Sample
    * 
    * @return Collection<ChangeLog> change logs.
    */
+  @Override
   public Collection<ChangeLog> getChangeLog();
 
   /**
