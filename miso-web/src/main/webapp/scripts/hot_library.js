@@ -364,26 +364,7 @@ HotTarget.library = (function() {
                       }).map(Utils.array.getName).sort());
             }
           },
-          {
-            header : 'QC Passed?',
-            data : 'qcPassed',
-            type : 'dropdown',
-            trimDropdown : false,
-            source : [ 'unknown', 'true', 'false' ],
-            include : true,
-            unpack : function(lib, flat, setCellMeta) {
-              flat.qcPassed = lib.qcPassed;
-            },
-            pack : function(lib, flat, errorHandler) {
-              if (flat.qcPassed === 'true') {
-                lib.qcPassed = true;
-              } else if (flat.qcPassed === 'false') {
-                lib.qcPassed = false;
-              } else {
-                lib.qcPassed = null;
-              }
-            }
-          },
+          HotUtils.makeColumnForOptionalBoolean('QC Passed?', true, 'qcPassed'),
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize'),
           HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume,
               'volume'),
