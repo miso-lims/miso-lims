@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
+import java.io.IOException;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -16,7 +18,7 @@ public abstract class AbstractNamingScheme implements NamingScheme {
   }
 
   @Override
-  public String generateNameFor(Nameable nameable) throws MisoNamingException {
+  public String generateNameFor(Nameable nameable) throws MisoNamingException, IOException {
     if (getNameGenerator() == null) throw new UnsupportedOperationException("check hasNameGenerator() to determine availability");
     String name = getNameGenerator().generate(nameable);
     ValidationResult vr = validateName(name);
@@ -36,7 +38,7 @@ public abstract class AbstractNamingScheme implements NamingScheme {
   }
 
   @Override
-  public String generateSampleAlias(Sample sample) throws MisoNamingException {
+  public String generateSampleAlias(Sample sample) throws MisoNamingException, IOException {
     if (getSampleAliasGenerator() == null)
       throw new UnsupportedOperationException("check hasSampleAliasGenerator() to determine availability");
     return getSampleAliasGenerator().generate(sample);
@@ -54,7 +56,7 @@ public abstract class AbstractNamingScheme implements NamingScheme {
   }
 
   @Override
-  public String generateLibraryAlias(Library library) throws MisoNamingException {
+  public String generateLibraryAlias(Library library) throws MisoNamingException, IOException {
     if (getLibraryAliasGenerator() == null)
       throw new UnsupportedOperationException("check hasLibraryAliasGenerator() to determine availability");
     return getLibraryAliasGenerator().generate(library);

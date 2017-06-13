@@ -44,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
@@ -127,7 +126,7 @@ public class DefaultSampleServiceTest {
   private Set<SampleValidRelationship> relationships;
 
   @Before
-  public void setUp() throws MisoNamingException {
+  public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     sut.setAutoGenerateIdBarcodes(false);
     relationships = new HashSet<>();

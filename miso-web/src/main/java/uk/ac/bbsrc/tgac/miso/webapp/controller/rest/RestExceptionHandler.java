@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.util.NestedServletException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -40,6 +41,12 @@ public class RestExceptionHandler {
     Map<String, String> data = null;
     
     ResponseStatus rs = AnnotationUtils.findAnnotation(exception.getClass(), ResponseStatus.class);
+    if (exception instanceof NestedServletException) {
+      NestedServletException nested = (NestedServletException) exception;
+      if (nested.getCause() instanceof Exception) {
+        return handleException(request, response, (Exception) nested.getCause());
+      }
+    }
     if (rs != null) {
       // Spring-annotated exception
       status = Status.fromStatusCode(rs.value().value());
@@ -58,10 +65,10 @@ public class RestExceptionHandler {
     if (status.getFamily() == Status.Family.SERVER_ERROR) {
       if (data == null) data = new HashMap<>();
       data.put("exceptionClass", exception.getClass().getName());
-      log.error(status.getStatusCode() + "error handling REST request", exception);
+      log.error(status.getStatusCode() + " error handling REST request", exception);
     }
     else {
-      log.debug(status.getStatusCode() + "error handling REST request", exception);
+      log.debug(status.getStatusCode() + " error handling REST request", exception);
     }
     
     response.setStatus(status.getStatusCode());
