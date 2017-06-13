@@ -136,7 +136,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       }
       return managed;
     } catch (MisoNamingException e) {
-      throw new IllegalArgumentException("Name generator failed to generate valid name for library");
+      throw new IllegalArgumentException(e.getMessage(), e);
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),

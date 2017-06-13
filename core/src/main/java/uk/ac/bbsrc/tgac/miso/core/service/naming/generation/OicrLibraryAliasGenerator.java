@@ -113,6 +113,9 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
    * @throws NullPointerException if the project or its shortName are missing
    */
   private String getProjectShortName(Library library) {
+    if (library.getSample().getProject() == null || library.getSample().getProject().getShortName() == null) {
+      throw new NullPointerException("Project or shortName missing");
+    }
     return library.getSample().getProject().getShortName().toString();
   }
 
@@ -129,7 +132,7 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
         return tissue.getTimesReceived().toString();
       }
     }
-    throw new IllegalArgumentException("No Tissue sample found in hierarchy");
+    throw new IllegalStateException("No Tissue sample found in hierarchy");
   }
 
   /**

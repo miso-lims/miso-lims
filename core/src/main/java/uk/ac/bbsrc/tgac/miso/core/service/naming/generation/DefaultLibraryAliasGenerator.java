@@ -23,33 +23,29 @@ public class DefaultLibraryAliasGenerator implements NameGenerator<Library> {
   }
 
   @Override
-  public String generate(Library library) throws MisoNamingException {
+  public String generate(Library library) throws MisoNamingException, IOException {
     if (library.getSample() != null) {
       Pattern samplePattern = Pattern.compile("([A-z0-9]+)_S([A-z0-9]+)_(.*)");
       Matcher m = samplePattern.matcher(library.getSample().getAlias());
 
       if (m.matches()) {
-        try {
-          Collection<Library> siblings = libraryStore.listBySampleId(library.getSample().getId());
-          Set<String> siblingAliases = siblings.stream()
-              .map(Library::getAlias)
-              .collect(Collectors.toSet());
-          String alias = null;
-          int siblingNumber = siblings.size();
-          do {
-            siblingNumber++;
-            alias = m.group(1) + "_" + "L" + m.group(2) + "-" + siblingNumber + "_" + m.group(3);
-          } while (siblingAliases.contains(alias));
-          return alias;
-        } catch (IOException e) {
-          throw new MisoNamingException("Cannot generate Library alias for: " + library.toString(), e);
-        }
+        Collection<Library> siblings = libraryStore.listBySampleId(library.getSample().getId());
+        Set<String> siblingAliases = siblings.stream()
+            .map(Library::getAlias)
+            .collect(Collectors.toSet());
+        String alias = null;
+        int siblingNumber = siblings.size();
+        do {
+          siblingNumber++;
+          alias = m.group(1) + "_" + "L" + m.group(2) + "-" + siblingNumber + "_" + m.group(3);
+        } while (siblingAliases.contains(alias));
+        return alias;
       } else {
         throw new MisoNamingException(
             "Cannot generate Library alias for: " + library.toString() + " from supplied sample alias: " + library.getSample().getAlias());
       }
     } else {
-      throw new MisoNamingException("This alias generation scheme requires the Library to have a parent Sample set.");
+      throw new NullPointerException("This alias generation scheme requires the Library to have a parent Sample set.");
     }
   }
 

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
+import java.io.IOException;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -63,7 +65,7 @@ public class DelegatingNamingScheme implements NamingScheme {
   }
 
   @Override
-  public String generateNameFor(Nameable nameable) throws MisoNamingException {
+  public String generateNameFor(Nameable nameable) throws MisoNamingException, IOException {
     return actualNamingScheme.generateNameFor(nameable);
   }
 
@@ -83,7 +85,7 @@ public class DelegatingNamingScheme implements NamingScheme {
   }
 
   @Override
-  public String generateSampleAlias(Sample sample) throws MisoNamingException {
+  public String generateSampleAlias(Sample sample) throws MisoNamingException, IOException {
     return actualNamingScheme.generateSampleAlias(sample);
   }
 
@@ -103,7 +105,7 @@ public class DelegatingNamingScheme implements NamingScheme {
   }
 
   @Override
-  public String generateLibraryAlias(Library library) throws MisoNamingException {
+  public String generateLibraryAlias(Library library) throws MisoNamingException, IOException {
     return actualNamingScheme.generateLibraryAlias(library);
   }
 
