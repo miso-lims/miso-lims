@@ -8,7 +8,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * Create a Handsontable for propagating or editing a particular entity type
+ * Create a Handsontable for editing a particular entity type
  *
  * @param <Model> The database model for the entity being edited
  * @param <Dto> The DTO for the entity being edited

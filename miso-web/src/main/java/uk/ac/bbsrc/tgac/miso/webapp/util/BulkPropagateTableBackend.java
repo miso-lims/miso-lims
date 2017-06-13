@@ -8,10 +8,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * Create a Handsontable for propagating or editing a particular entity type
+ * Create a Handsontable for propagating a particular entity type
  *
  * @param <ParentModel> The database model for the entity from which the model can be propagated
- * @param <Dto> The DTO for the entity being edited
+ * @param <Dto> The DTO for the entity being propagated
  */
 public abstract class BulkPropagateTableBackend<ParentModel, Dto> extends BulkTableBackend<Dto> {
   private final String name;

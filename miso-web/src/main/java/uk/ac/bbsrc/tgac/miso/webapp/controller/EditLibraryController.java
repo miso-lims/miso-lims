@@ -742,12 +742,12 @@ public class EditLibraryController {
       List<Library> results = libraryService.listByIdList(ids);
       SampleClass sampleClass = null;
       for (Library library : results) {
-        if (!isDetailedSampleEnabled()) {
-          // Do nothing about sample classes.
-        } else if (sampleClass == null) {
-          sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
-        } else if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
-          throw new IOException("Can only update libraries when samples all have the same class.");
+        if (isDetailedSampleEnabled()) {
+          if (sampleClass == null) {
+            sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
+          } else if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
+            throw new IOException("Can only update libraries when samples all have the same class.");
+          }
         }
       }
       return results;

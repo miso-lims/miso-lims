@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Create a Handsontable for propagating or editing a particular entity type
+ * Create a Handsontable for creating a particular entity type that has no parent
  *
  * @param <Dto> The DTO for the entity being edited
  */
