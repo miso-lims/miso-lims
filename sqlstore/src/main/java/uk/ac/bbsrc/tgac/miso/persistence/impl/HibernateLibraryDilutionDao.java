@@ -200,4 +200,16 @@ public class HibernateLibraryDilutionDao
   public String getFriendlyName() {
     return "Dilution";
   }
+
+  @Override
+  public Collection<LibraryDilution> listByIdList(List<Long> idList) throws IOException {
+    if (idList.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
+    criteria.add(Restrictions.in("id", idList));
+    @SuppressWarnings("unchecked")
+    List<LibraryDilution> records = criteria.list();
+    return records;
+  }
 }

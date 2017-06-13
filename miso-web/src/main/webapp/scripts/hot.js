@@ -400,21 +400,21 @@ var HotUtils = {
                             var bulkActionsDiv = document
                                 .getElementById('bulkactions');
                             var ids = data.map(Utils.array.getId);
-                            for (var i = 0; i < target.bulkActions.length; i++) {
-                              var link = document.createElement('A');
-                              link.href = '#';
-                              link.setAttribute('class',
-                                  'ui-button ui-state-default');
-                              link.onclick = (function() {
-                                var doAction = target.bulkActions[i].action;
-                                return function() {
-                                  doAction(ids);
-                                };
-                              })();
-                              link.appendChild(document
-                                  .createTextNode(target.bulkActions[i].name));
-                              bulkActionsDiv.append(link);
-                            }
+                            target.bulkActions
+                                .forEach(function(bulkAction) {
+                                  var link = document.createElement('A');
+                                  link.href = '#';
+                                  link.setAttribute('class',
+                                      'ui-button ui-state-default');
+                                  link.setAttribute('title',
+                                      bulkAction.title || '');
+                                  link.onclick = function() {
+                                    bulkAction.action(ids);
+                                  };
+                                  link.appendChild(document
+                                      .createTextNode(bulkAction.name));
+                                  bulkActionsDiv.append(link);
+                                });
                           }
                           saveSuccessesClasses.remove('hidden');
                         } else {
@@ -505,7 +505,7 @@ var HotUtils = {
     };
     return baseobj;
   },
-
+  
   makeColumnForOptionalBoolean : function(headerName, include, property) {
     return {
       header : headerName,
@@ -537,7 +537,7 @@ var HotUtils = {
     };
   },
   
-  makeColumnForFloat : function(headerName, include, property) {
+  makeColumnForFloat : function(headerName, include, property, required) {
     return {
       'header' : headerName,
       'data' : property,
@@ -546,6 +546,7 @@ var HotUtils = {
       'unpack' : function(obj, flat, setCellMeta) {
         flat[property] = obj[property];
       },
+      'validator' : required ? HotUtils.validator.requiredNumber : null,
       'pack' : function(obj, flat, errorHandler) {
         var output = null;
         var raw = flat[property];
