@@ -496,6 +496,37 @@ var HotUtils = {
     };
     return baseobj;
   },
+
+  makeColumnForOptionalBoolean : function(headerName, include, property) {
+    return {
+      header : headerName,
+      data : property,
+      type : 'dropdown',
+      trimDropdown : false,
+      source : [ 'Unknown', 'True', 'False' ],
+      include : include,
+      unpack : function(obj, flat, setCellMeta) {
+        var result;
+        if (obj[property] === true) {
+          result = 'True';
+        } else if (obj[property] === false) {
+          result = 'False';
+        } else {
+          result = 'Unknown';
+        }
+        flat[property] = result;
+      },
+      pack : function(obj, flat, errorHandler) {
+        if (flat[property] === 'True') {
+          obj[property] = true;
+        } else if (flat[property] === 'False') {
+          obj[property] = false;
+        } else {
+          obj[property] = null;
+        }
+      }
+    };
+  },
   
   makeColumnForFloat : function(headerName, include, property) {
     return {
