@@ -111,7 +111,8 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
-import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -733,11 +734,41 @@ public class EditLibraryController {
     }
   }
 
-  private final BulkTableBackend<Library, LibraryDto, Sample> libraryBulkBackend = new BulkTableBackend<Library, LibraryDto, Sample>(
-      "Libraries", "Samples", "library") {
+  private final BulkEditTableBackend<Library, LibraryDto> libraryBulkEditBackend = new BulkEditTableBackend<Library, LibraryDto>(
+      "library", LibraryDto.class, "Libraries") {
 
     @Override
-    protected LibraryDto packageDtoFromParent(Sample sample) {
+    protected Iterable<Library> load(List<Long> ids) throws IOException {
+      List<Library> results = libraryService.listByIdList(ids);
+      SampleClass sampleClass = null;
+      for (Library library : results) {
+        if (isDetailedSampleEnabled()) {
+          if (sampleClass == null) {
+            sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
+          } else if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
+            throw new IOException("Can only update libraries when samples all have the same class.");
+          }
+        }
+      }
+      return results;
+    }
+
+    @Override
+    protected LibraryDto asDto(Library model) {
+      return Dtos.asDto(model);
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      writeLibraryConfiguration(mapper, config);
+    }
+  };
+
+  private final BulkPropagateTableBackend<Sample, LibraryDto> libraryBulkPropagateBackend = new BulkPropagateTableBackend<Sample, LibraryDto>(
+      "library", LibraryDto.class, "Libraries", "Samples") {
+
+    @Override
+    protected LibraryDto createDtoFromParent(Sample sample) {
       LibraryDto dto;
       if (LimsUtils.isDetailedSample(sample)) {
         DetailedLibraryDto detailedDto = new DetailedLibraryDto();
@@ -752,10 +783,10 @@ public class EditLibraryController {
       dto.setParentSampleAlias(sample.getAlias());
       if (namingScheme.hasLibraryAliasGenerator()) {
         try {
-        Library tempLibrary = new LibraryImpl();
-        tempLibrary.setSample(sample);
-        final String libraryAlias = namingScheme.generateLibraryAlias(tempLibrary);
-        dto.setAlias(libraryAlias);
+          Library tempLibrary = new LibraryImpl();
+          tempLibrary.setSample(sample);
+          final String libraryAlias = namingScheme.generateLibraryAlias(tempLibrary);
+          dto.setAlias(libraryAlias);
         } catch (MisoNamingException e) {
           log.error("Failed to generate library name", e);
         }
@@ -788,73 +819,35 @@ public class EditLibraryController {
     }
 
     @Override
-    protected Iterable<Library> load(List<Long> ids) throws IOException {
-      List<Library> results = libraryService.listByIdList(ids);
-      SampleClass sampleClass = null;
-      for (Library library : results) {
-        if (!isDetailedSampleEnabled()) {
-          // Do nothing about sample classes.
-        } else if (sampleClass == null) {
-          sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
-        } else if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
-          throw new IOException("Can only update libraries when samples all have the same class.");
-        }
-      }
-      return results;
-    }
-
-    @Override
-    protected LibraryDto asDto(Library model) {
-      return Dtos.asDto(model);
-    }
-
-    @Override
-    protected Class<? extends LibraryDto> getDtoClass() {
-      return isDetailedSampleEnabled() ? DetailedLibraryDto.class : LibraryDto.class;
-    }
-
-    @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      config.put("showDescription", showDescription);
-      config.put("showVolume", showVolume);
-      config.put("showLibraryAlias", showLibraryAlias);
+      writeLibraryConfiguration(mapper, config);
     }
   };
 
+  private void writeLibraryConfiguration(ObjectMapper mapper, ObjectNode config) {
+    config.put("showDescription", showDescription);
+    config.put("showVolume", showVolume);
+    config.put("showLibraryAlias", showLibraryAlias);
+  }
+
   @RequestMapping(value = "/bulk/propagate/{sampleIds}", method = RequestMethod.GET)
   public ModelAndView propagateFromSamples(@PathVariable String sampleIds, ModelMap model) throws IOException, MisoNamingException {
-    return libraryBulkBackend.propagate(sampleIds, model);
+    return libraryBulkPropagateBackend.propagate(sampleIds, model);
   }
 
   @RequestMapping(value = "/bulk/edit/{libraryIds}", method = RequestMethod.GET)
   public ModelAndView editBulkLibraries(@PathVariable String libraryIds, ModelMap model) throws IOException {
-    return libraryBulkBackend.edit(libraryIds, model);
+    return libraryBulkEditBackend.edit(libraryIds, model);
   }
 
-  private final BulkTableBackend<LibraryDilution, DilutionDto, Library> dilutionBulkBackend = new BulkTableBackend<LibraryDilution, DilutionDto, Library>(
-      "Dilutions", "Libraries", "dilution") {
+  private final BulkPropagateTableBackend<Library, DilutionDto> dilutionBulkPropagateBackend = new BulkPropagateTableBackend<Library, DilutionDto>(
+      "dilution", DilutionDto.class, "Dilutions", "Libraries") {
 
     @Override
-    protected DilutionDto asDto(LibraryDilution model) {
-      return Dtos.asDto(model);
-    }
-
-    @Override
-    protected Class<? extends DilutionDto> getDtoClass() {
-      return DilutionDto.class;
-    }
-
-    @Override
-    protected DilutionDto packageDtoFromParent(Library item) {
+    protected DilutionDto createDtoFromParent(Library item) {
       DilutionDto dto = new DilutionDto();
       dto.setLibrary(Dtos.asDto(item));
       return dto;
-    }
-
-    @Override
-    protected Iterable<LibraryDilution> load(List<Long> ids) throws IOException {
-      // TODO implement
-      return Collections.emptyList();
     }
 
     @Override
