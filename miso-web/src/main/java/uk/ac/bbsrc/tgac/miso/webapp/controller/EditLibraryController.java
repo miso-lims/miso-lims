@@ -785,17 +785,6 @@ public class EditLibraryController {
       }
       dto.setParentSampleId(sample.getId());
       dto.setParentSampleAlias(sample.getAlias());
-      if (namingScheme.hasLibraryAliasGenerator()) {
-        try {
-          Library tempLibrary = new LibraryImpl();
-          tempLibrary.setSample(sample);
-          final String libraryAlias = namingScheme.generateLibraryAlias(tempLibrary);
-          dto.setAlias(libraryAlias);
-        } catch (MisoNamingException e) {
-          log.error("Failed to generate library name", e);
-        }
-      }
-
       return dto;
     }
 
