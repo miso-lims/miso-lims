@@ -347,7 +347,7 @@ HotTarget.library = (function() {
                       Constants.kitDescriptors), 'name') || 'None';
             },
             pack : function(lib, flat, errorHandler) {
-              lib.kitDescriptorName = Utils.array
+              lib.kitDescriptorId = Utils.array
                   .maybeGetProperty(
                       Utils.array
                           .findFirstOrNull(
