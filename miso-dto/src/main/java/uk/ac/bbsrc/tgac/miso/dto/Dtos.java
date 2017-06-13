@@ -28,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
@@ -36,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
@@ -103,6 +105,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class Dtos {
 
@@ -1588,5 +1591,41 @@ public class Dtos {
     dto.setCategory(from.getCategory() == null ? null : from.getCategory().getName());
     dto.setName(from.getName());
     return dto;
+  }
+
+  public static Run to(NotificationDto from) {
+    Run to = null;
+    if (from instanceof PacBioNotificationDto) {
+      to = new PacBioRun();
+      to = setPacBioRunValues((PacBioNotificationDto) from, (PacBioRun) to);
+      to = setCommonRunValues(from, to);
+    } else if (from instanceof IlluminaNotificationDto) {
+      to = new IlluminaRun();
+      to = setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
+      to = setCommonRunValues(from, to);
+    } else {
+      throw new IllegalArgumentException(
+          String.format("The argument with the type '%s' cannot be converted into a Run.", from.getClass().getName()));
+    }
+    return to;
+  }
+
+  private static Run setPacBioRunValues(PacBioNotificationDto from, PacBioRun to) {
+    to.setMovieDuration(from.getMovieDurationInSec());
+    return to;
+  }
+
+  private static Run setIlluminaRunValues(IlluminaNotificationDto from, IlluminaRun to) {
+    to.setPairedEnd(from.isPairedEndRun());
+    return to;
+  }
+
+  private static Run setCommonRunValues(NotificationDto from, Run to) {
+    to.setName(from.getRunName());
+    to.setFilePath(from.getSequencerFolderPath().toString());
+    to.setHealth(from.getHealthType());
+    to.setStartDate(LimsUtils.toBadDate(from.getStartDate()));
+    to.setCompletionDate(LimsUtils.toBadDate(from.getCompletionDate()));
+    return to;
   }
 }

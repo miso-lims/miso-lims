@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
@@ -17,8 +18,8 @@ public abstract class NotificationDto {
   private String containerId;
   private int laneCount;
   private HealthType healthType;
-  private String startDate;
-  private String completionDate;
+  private LocalDate startDate;
+  private LocalDate completionDate;
   private boolean pairedEndRun;
   private String software;
 
@@ -86,19 +87,19 @@ public abstract class NotificationDto {
     this.software = software;
   }
 
-  public String getStartDate() {
+  public LocalDate getStartDate() {
     return startDate;
   }
 
-  public void setStartDate(String startDate) {
+  public void setStartDate(LocalDate startDate) {
     this.startDate = startDate;
   }
 
-  public String getCompletionDate() {
+  public LocalDate getCompletionDate() {
     return completionDate;
   }
 
-  public void setCompletionDate(String completionDate) {
+  public void setCompletionDate(LocalDate completionDate) {
     this.completionDate = completionDate;
   }
 

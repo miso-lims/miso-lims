@@ -4,6 +4,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
 import org.junit.Test;
 
@@ -12,6 +16,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 
 public class IlluminaNotificationDtoTest {
@@ -21,7 +26,7 @@ public class IlluminaNotificationDtoTest {
   public void testPartiallyPopulatedIlluminaNotificationRoundTrip() throws Exception {
     IlluminaNotificationDto notificationDto = new IlluminaNotificationDto();
     notificationDto.setSequencerName("Coffee");
-    notificationDto.setCompletionDate("2017-02-23");
+    notificationDto.setCompletionDate(LocalDate.of(2017, 2, 23));
     notificationDto.setHealthType(HealthType.Started);
 
     ObjectMapper mapper = new ObjectMapper();
@@ -47,6 +52,16 @@ public class IlluminaNotificationDtoTest {
     assertThat("Round trip of", notificationDto, is(deSerialized));
   }
 
+  @Test
+  public void testConvertToUtilDate() throws ParseException {
+    NotificationDto dto = fullyPopulatedIlluminaNotificationDto("RUN_B");
+
+    Run run = Dtos.to(dto);
+
+    DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    assertThat(dto.getStartDate().toString(), is(format.format(run.getStartDate())));
+  }
+
   static IlluminaNotificationDto fullyPopulatedIlluminaNotificationDto(String sequencerName) {
     IlluminaNotificationDto notificationDto = new IlluminaNotificationDto();
     notificationDto.setRunName("TEST_RUN_NAME");
@@ -55,8 +70,8 @@ public class IlluminaNotificationDtoTest {
     notificationDto.setSequencerName(sequencerName);
     notificationDto.setLaneCount(8);
     notificationDto.setHealthType(HealthType.Started);
-    notificationDto.setStartDate("2017-02-23");
-    notificationDto.setCompletionDate("2017-02-27");
+    notificationDto.setStartDate(LocalDate.of(2017, 2, 23));
+    notificationDto.setCompletionDate(LocalDate.of(2017, 2, 27));
     notificationDto.setPairedEndRun(true);
     notificationDto.setSoftware("Fido Opus SEAdog Standard Interface Layer");
     notificationDto.setNumCycles(20);
