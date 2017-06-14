@@ -47,6 +47,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -744,4 +746,21 @@ public class LimsUtils {
     }
     return results;
   }
+
+  /**
+   * Switches from a representation of date without time or a time zone to one that contains milliseconds from epoch as interpreted from
+   * some place with a time zone. No good will come of this. Turn back now.
+   * 
+   * @param localDate A date without time.
+   * @param timezone A time zone. We'll calculate milliseconds from the epoch from this particular time zone.
+   * @return Milliseconds from the epoch.
+   */
+  public static Date toBadDate(LocalDate localDate, ZoneId timezone) {
+    return Date.from(localDate.atStartOfDay(timezone).toInstant());
+  }
+  
+  public static Date toBadDate(LocalDate localDate) {
+    return toBadDate(localDate, ZoneId.systemDefault());
+  }
+
 }
