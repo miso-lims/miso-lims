@@ -30,11 +30,6 @@
 				Export</a></li>
 	</ul>
 
-	<h2>Sequencing</h2>
-	<ul class="bullets">
-		<li><a href="<c:url value="/miso/pools/ready"/>">Ready to Run</a></li>
-	</ul>
-
     <h2>Tracking</h2>
     <ul class="bullets">
         <li><a href="<c:url value="/miso/samples"/>">Samples</a></li>

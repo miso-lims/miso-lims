@@ -132,10 +132,11 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<PoolDto> getDTPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    if (!PlatformType.getKeys().contains(platform)) {
+    PlatformType platformType = PlatformType.valueOf(platform);
+    if (platformType == null) {
       throw new RestException("Invalid platform type.");
     }
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(PlatformType.get(platform)));
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
   }
 
   @RequestMapping(value = "dt/project/{id}", method = RequestMethod.GET, produces = "application/json")

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -24,27 +24,15 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -56,86 +44,16 @@ import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
  */
 @Controller
 public class ListPoolsController {
-  protected static final Logger log = LoggerFactory.getLogger(ListPoolsController.class);
-
   @Autowired
   private RequestManager requestManager;
 
-  @Autowired
-  private PoolService poolService;
-  @Autowired
-  private RunService runService;
+  @RequestMapping("/pools")
+  public ModelAndView listPools(ModelMap model) throws IOException {
+    return TabbedListItemsPage.createForPlatformType("pool", requestManager)
+        .list(model);
+  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setPoolService(PoolService poolService) {
-    this.poolService = poolService;
-  }
-
-  public void setRunService(RunService runService) {
-    this.runService = runService;
-  }
-
-  @ModelAttribute("platformTypes")
-  public Collection<String> populatePlatformTypes() throws IOException {
-    Collection<PlatformType> platforms = requestManager.listActivePlatformTypes();
-    if (platforms.size() > 0) {
-      return PlatformType.platformTypeNames(platforms);
-    } else {
-      return requestManager.listDistinctPlatformNames();
-    }
-  }
-
-  @ModelAttribute("poolConcentrationUnits")
-  public String poolConcentrationUnits() {
-    return PoolImpl.CONCENTRATION_UNITS;
-  }
-
-  @ModelAttribute("title")
-  public String title() {
-    return "Pools";
-  }
-
-  @RequestMapping("/pools")
-  public ModelAndView listPools() throws IOException {
-    return new ModelAndView("/pages/listPools.jsp");
-  }
-
-  @RequestMapping("/pools/ready")
-  public ModelAndView listReadyPools(ModelMap model) throws IOException {
-    try {
-
-      Map<String, List<Pool>> poolMap = new HashMap<>();
-      Map<String, List<Pool>> usedPoolMap = new HashMap<>();
-
-      for (PlatformType pt : PlatformType.values()) {
-        List<Pool> pools = new ArrayList<>();
-        List<Pool> poolsUsed = new ArrayList<>();
-        for (Pool p : poolService.listReadyPoolsByPlatform(pt)) {
-          if (runService.listByPoolId(p.getId()).isEmpty()) {
-            pools.add(p);
-          } else {
-            poolsUsed.add(p);
-          }
-        }
-        String ident = pt.getKey();
-
-        poolMap.put(ident, pools);
-        usedPoolMap.put(ident, poolsUsed);
-      }
-
-      model.addAttribute("pools", poolMap);
-      model.addAttribute("usedpools", usedPoolMap);
-
-      model.addAttribute("ready", true);
-      return new ModelAndView("/pages/readyPools.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list pools", ex);
-      }
-      throw ex;
-    }
   }
 }
