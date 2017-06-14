@@ -943,6 +943,13 @@ CREATE PROCEDURE deleteDilution(
   END;
 
   START TRANSACTION;
+  
+  -- check that the user exists
+  IF NOT EXISTS (SELECT 1 FROM User WHERE loginName = iLoginName)
+  THEN
+    SET errorMessage = CONCAT('Cannot find user with login name ', iLoginName);
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
 
   -- check that the library dilution exists and is derived from the given library
   IF NOT EXISTS (SELECT 1 FROM LibraryDilution WHERE dilutionId = iDilutionId AND library_libraryId = iLibraryId)
@@ -962,6 +969,7 @@ CREATE PROCEDURE deleteDilution(
   DELETE FROM LibraryDilution WHERE dilutionId = iDilutionId;
   SELECT ROW_COUNT() AS number_deleted;
   
+  -- add changelog to library
   INSERT INTO LibraryChangeLog (libraryId, columnsChanged, userId, message) VALUES
     (iLibraryId,
     CONCAT('LDI', iDilutionId),
