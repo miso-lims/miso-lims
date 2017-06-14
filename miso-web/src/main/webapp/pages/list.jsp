@@ -20,13 +20,6 @@
   ~
   ~ **********************************************************************
   --%>
-
-<%--
-  Created by IntelliJ IDEA.
-  User: davey
-  Date: 16-Feb-2010
-  Time: 08:51:03
---%>
 <%@ include file="../header.jsp" %>
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
