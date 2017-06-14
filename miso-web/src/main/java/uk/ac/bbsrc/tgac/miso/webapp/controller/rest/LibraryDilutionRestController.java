@@ -142,6 +142,13 @@ public class LibraryDilutionRestController extends RestController {
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
 
+  @RequestMapping(value = "dt", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<DilutionDto> getDilutions(HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+    return jQueryBackend.get(request, response, uriBuilder);
+  }
+
   @RequestMapping(value = "dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<DilutionDto> getDilutionsByProject(@PathVariable("id") Long id, HttpServletRequest request,
