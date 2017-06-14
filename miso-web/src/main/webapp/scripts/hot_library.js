@@ -376,14 +376,14 @@ HotTarget.library = (function() {
     
     bulkActions : [
         {
-          name : 'Edit these libraries',
+          name : 'Edit',
           action : function(ids) {
             window.location = window.location.origin + '/miso/library/bulk/edit/' + ids
                 .join(',');
           }
         },
         {
-          name : 'Propagate dilutions',
+          name : 'Make dilutions',
           action : function(ids) {
             window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate/' + ids
                 .join(',');
