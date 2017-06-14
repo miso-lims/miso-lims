@@ -729,7 +729,7 @@
 </div>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    Library.ui.createListingDilutionsTable(${project.id});
+    ListUtils.createTable('listingDilutionsTable', ListTarget.dilution, ${project.id}, {});
   });
 </script>
 
