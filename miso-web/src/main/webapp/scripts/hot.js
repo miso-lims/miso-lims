@@ -393,6 +393,8 @@ var HotUtils = {
                             for (var i = 0; i < target.bulkActions.length; i++) {
                               var link = document.createElement('A');
                               link.href = '#';
+                              link.setAttribute('class',
+                                  'ui-button ui-state-default');
                               link.onclick = (function() {
                                 var doAction = target.bulkActions[i].action;
                                 return function() {
@@ -401,9 +403,7 @@ var HotUtils = {
                               })();
                               link.appendChild(document
                                   .createTextNode(target.bulkActions[i].name));
-                              var p = document.createElement('P');
-                              p.append(link)
-                              bulkActionsDiv.append(p);
+                              bulkActionsDiv.append(link);
                             }
                           }
                           saveSuccessesClasses.remove('hidden');
