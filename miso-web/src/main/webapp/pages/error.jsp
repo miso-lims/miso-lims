@@ -27,9 +27,11 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>Error</h1>
-    Please copy the URL in the address bar and the <b>full</b> text below and raise a
-    <a href="${ApplicationContextProvider.getBugUrl()}">ticket</a>, describing what you were
-    trying to do when this error occurred.<br/><br/>
+    <c:if test="${misoBugUrl != null}">
+      Please copy the URL in the address bar and the <b>full</b> text below and raise a
+      <a href="${misoBugUrl}" target="_blank">ticket</a>, describing what you were
+      trying to do when this error occurred.<br/><br/>
+    </c:if>
 
     <h2>${pageContext.exception.message}</h2><br/>
     <ul>
