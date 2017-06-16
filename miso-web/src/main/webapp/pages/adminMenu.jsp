@@ -65,16 +65,6 @@
         </div>
       </div>
 
-      <div class="portlet">
-        <div class="portlet-header">Sequencing Machines</div>
-        <div class="portlet-content">
-          <a href="<c:url value='/miso/stats/ls454'/>">454</a><br/>
-          <a href="<c:url value='/miso/stats/illumina'/>">Illumina</a><br/>
-          <a href="<c:url value='/miso/stats/solid'/>">SOLiD</a><br/><br/>
-          <a href="<c:url value='/miso/stats'/>">Configure</a>
-        </div>
-      </div>
-
     </div>
 
   </div>

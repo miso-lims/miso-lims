@@ -158,7 +158,7 @@ var Utils = Utils || {
       fields.forEach(function(field) {
           var p = document.createElement('P');
           var input;
-          p.appendChild(document.createTextNode(field.label + ": "));
+          p.appendChild(document.createTextNode(field.label + (field.required ? "*" : "") + ": "));
           switch (field.type) {
             case 'select':
                 if (field.values.length == 0) {
@@ -192,6 +192,17 @@ var Utils = Utils || {
                     output[field.property] = parseInt(input.value);
                 };
                 break;
+            case 'date':
+                input = document.createElement('INPUT');
+                input.setAttribute('type', 'text');
+                input.onchange = function() {
+                    output[field.property] = input.value;
+                };
+                jQuery(input).datepicker({
+                    dateFormat: 'yyyy-mm-dd',
+                    showButtonPanel: true,
+                });
+                break;
             default:
                 throw "Unknown field type: " + field.type;
           }
@@ -200,13 +211,21 @@ var Utils = Utils || {
       });
 
       var buttons = {};
-      buttons[okButton] = function () { dialog.dialog("close"); callback(output); };
+      buttons[okButton] = function () {
+        var badFields = fields.filter(function(field) { return field.required && !output[field.property]; }).map(function(field) { return field.label; });
+        if (badFields.length) {
+          alert("You must fill out the following fields: " + badFields.join(", "));
+          return;
+        }
+        dialog.dialog("close");
+        callback(output);
+      };
       buttons["Cancel"] = function () { dialog.dialog("close"); };
       var dialog = jQuery('#dialog').dialog({
           autoOpen: true,
-          height: 400,
-          width: 350,
-          title:title,
+          height: fields.length * 40 + 200,
+          width: 500,
+          title: title,
           modal: true,
           buttons: buttons
       });

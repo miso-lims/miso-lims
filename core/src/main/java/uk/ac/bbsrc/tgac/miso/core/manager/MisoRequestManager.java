@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
@@ -49,7 +51,6 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -70,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 /**
  * Implementation of a RequestManager to facilitate persistence operations on MISO model objects
@@ -77,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Transactional(rollbackFor = Exception.class)
 public class MisoRequestManager implements RequestManager {
   protected static final Logger log = LoggerFactory.getLogger(MisoRequestManager.class);
 
@@ -440,16 +443,8 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public Collection<PlatformType> listActivePlatformTypes() throws IOException {
-    Collection<PlatformType> activePlatformTypes = Lists.newArrayList();
-    for (PlatformType platformType : PlatformType.values()) {
-      for (SequencerReference sequencer : sequencerReferenceStore.listByPlatformType(platformType)) {
-        if (sequencer.isActive()) {
-          activePlatformTypes.add(platformType);
-          break;
-        }
-      }
-    }
-    return activePlatformTypes;
+    return sequencerReferenceStore.list(0, 0, true, "id", PaginationFilter.archived(false)).stream()
+        .map(sr -> sr.getPlatform().getPlatformType()).collect(Collectors.toSet());
   }
 
   @Override

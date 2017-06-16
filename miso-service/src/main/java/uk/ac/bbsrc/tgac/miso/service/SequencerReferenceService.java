@@ -7,8 +7,9 @@ import java.util.Map;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface SequencerReferenceService {
+public interface SequencerReferenceService extends PaginatedDataSource<SequencerReference> {
 
   Collection<SequencerReference> listByPlatformType(PlatformType platformType) throws IOException;
 
