@@ -28,6 +28,7 @@ import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -151,8 +154,20 @@ public class ContainerRestController extends RestController {
 
   @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<ContainerDto> getContainers(HttpServletRequest request, HttpServletResponse response,
+  public DataTablesResponseDto<ContainerDto> dataTable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
+  }
+
+  @RequestMapping(value = "/dt/platform/{platform}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<ContainerDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
+      HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    PlatformType platformType = PlatformType.valueOf(platform);
+    if (platformType == null) {
+      throw new RestException("Invalid platform.", Status.BAD_REQUEST);
+    }
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
   }
 }

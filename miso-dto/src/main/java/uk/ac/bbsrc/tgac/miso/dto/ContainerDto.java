@@ -10,6 +10,8 @@ public class ContainerDto implements WritableUrls {
   private String platform;
   private String lastRunAlias;
   private Long lastRunId;
+  private String lastSequencerName;
+  private Long lastSequencerId;
   private String lastModified;
 
   public Long getId() {
@@ -72,5 +74,21 @@ public class ContainerDto implements WritableUrls {
   public void writeUrls(URI baseUri) {
     setUrl(
         WritableUrls.buildUriPath(baseUri, "/rest/run/container/{barcode}", getIdentificationBarcode()));
+  }
+
+  public String getLastSequencerName() {
+    return lastSequencerName;
+  }
+
+  public void setLastSequencerName(String lastSequencerName) {
+    this.lastSequencerName = lastSequencerName;
+  }
+
+  public Long getLastSequencerId() {
+    return lastSequencerId;
+  }
+
+  public void setLastSequencerId(Long lastSequencerId) {
+    this.lastSequencerId = lastSequencerId;
   }
 }
