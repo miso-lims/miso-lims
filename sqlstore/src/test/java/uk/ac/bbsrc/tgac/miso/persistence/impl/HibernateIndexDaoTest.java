@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +14,7 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateIndexDaoTest extends AbstractDAOTest {
   private HibernateIndexDao dao;
@@ -39,7 +39,7 @@ public class HibernateIndexDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListIndicesByPlatform() throws Exception {
-    Collection<Index> illumina = dao.listAllIndices(PlatformType.ILLUMINA);
+    Collection<Index> illumina = dao.list(0, 0, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertTrue(illumina.size() > 0);
   }
 
@@ -51,7 +51,7 @@ public class HibernateIndexDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllIndices() throws Exception {
-    List<Index> list = dao.listAllIndices();
+    List<Index> list = dao.list(0, 0, true, "id");
     assertEquals(80, list.size());
   }
 

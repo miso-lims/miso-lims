@@ -22,6 +22,16 @@ public abstract interface PaginationFilter {
 
   public static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
+  public static PaginationFilter archived(boolean isArchived) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByArchived(item, isArchived, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter box(String name) {
     return new PaginationFilter() {
 

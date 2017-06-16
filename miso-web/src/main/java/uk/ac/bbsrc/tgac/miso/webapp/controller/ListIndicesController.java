@@ -1,37 +1,35 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
 public class ListIndicesController {
+
   @Autowired
-  private IndexService indexService;
+  private RequestManager requestManager;
 
   @ModelAttribute("title")
   public String title() {
     return "Indices";
   }
 
+  @ModelAttribute("note")
+  public String note() {
+    return "<p>Archived indices are not shown.</p>";
+  }
+
   @RequestMapping("/indices")
-  public ModelAndView listIndices() throws IOException {
-    ModelAndView model = new ModelAndView("/pages/listIndices.jsp");
-    Set<Index> indices = new HashSet<>();
-    for (IndexFamily family : indexService.getIndexFamilies()) {
-      indices.addAll(family.getIndices());
-    }
-    model.addObject("indices", indices);
-    return model;
+  public ModelAndView listIndices(ModelMap model) throws IOException {
+    return TabbedListItemsPage.createForPlatformType("index", requestManager).list(model);
   }
 }

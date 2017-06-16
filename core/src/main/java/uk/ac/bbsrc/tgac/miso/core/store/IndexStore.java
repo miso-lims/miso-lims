@@ -28,8 +28,9 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface IndexStore {
+public interface IndexStore extends PaginatedDataSource<Index> {
 
   public IndexFamily getIndexFamilyByName(String name);
 
@@ -38,8 +39,4 @@ public interface IndexStore {
   public List<IndexFamily> getIndexFamiliesByPlatform(PlatformType platformType);
 
   public Index getIndexById(long id);
-
-  public List<Index> listAllIndices(PlatformType platformType);
-
-  public List<Index> listAllIndices();
 }

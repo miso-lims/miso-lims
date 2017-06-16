@@ -1630,21 +1630,34 @@ public class Dtos {
   }
 
   public static IndexDto asDto(Index from) {
+    return asDto(from, true);
+  }
+
+  public static IndexDto asDto(Index from, boolean includeFamily) {
     IndexDto dto = new IndexDto();
     dto.setId(from.getId());
     dto.setLabel(from.getLabel());
     dto.setName(from.getName());
     dto.setPosition(from.getPosition());
     dto.setSequence(from.getSequence());
+    if (includeFamily) {
+      dto.setFamily(asDto(from.getFamily(), false));
+    }
     return dto;
   }
 
   public static IndexFamilyDto asDto(IndexFamily from) {
+    return asDto(from, true);
+  }
+
+  private static IndexFamilyDto asDto(IndexFamily from, boolean includeChildren) {
     IndexFamilyDto dto = new IndexFamilyDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setArchived(from.getArchived());
-    dto.setIndices(from.getIndices().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    if (includeChildren) {
+      dto.setIndices(from.getIndices().stream().map(x -> asDto(x, false)).collect(Collectors.toList()));
+    }
     dto.setMaximumNumber(from.getMaximumNumber());
     dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
     return dto;
@@ -1721,6 +1734,7 @@ public class Dtos {
     }).collect(Collectors.toSet()));
     return to;
   }
+
   public static PrinterBackendDto asDto(Backend from) {
     PrinterBackendDto dto = new PrinterBackendDto();
     dto.setId(from.ordinal());

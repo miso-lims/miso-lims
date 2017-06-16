@@ -27,6 +27,7 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1 id="tableTitle"></h1>
+    ${note}
     <div id="tabs">
       <ul>
         <c:forEach items="${tabs}" var="tab" varStatus="c">
