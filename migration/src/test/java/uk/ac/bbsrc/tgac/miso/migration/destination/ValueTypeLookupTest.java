@@ -159,7 +159,7 @@ public class ValueTypeLookupTest {
     HibernateIndexDao iDao = Mockito.mock(HibernateIndexDao.class);
     List<Index> inds = new ArrayList<>();
     inds.add(makeIndex(VALID_LONG, VALID_STRING, VALID_STRING));
-    Mockito.when(iDao.listAllIndices()).thenReturn(inds);
+    Mockito.when(iDao.list(0, 0, true, "id")).thenReturn(inds);
     Mockito.when(mgr.getIndexDao()).thenReturn(iDao);
 
     HibernateSampleQcDao sqcDao = Mockito.mock(HibernateSampleQcDao.class);

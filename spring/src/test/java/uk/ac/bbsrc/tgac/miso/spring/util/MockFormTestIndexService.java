@@ -1,12 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.spring.util;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class MockFormTestIndexService implements IndexService {
   private static IndexFamily TRUSEQ = new IndexFamily();
@@ -48,11 +52,13 @@ public class MockFormTestIndexService implements IndexService {
   }
 
   @Override
-  public Collection<Index> listAllIndices(PlatformType platformType) {
-    if (platformType == TRUSEQ.getPlatformType()) {
-      return TRUSEQ.getIndices();
-    } else {
-      return Collections.emptySet();
-    }
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return 0;
+  }
+
+  @Override
+  public List<Index> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+      throws IOException {
+    return Collections.emptyList();
   }
 }

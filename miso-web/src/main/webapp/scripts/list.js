@@ -285,12 +285,19 @@ ListUtils = (function() {
       };
     },
     render : {
+      archived : function(data, type, full) {
+        return data ? "🗄" : "";
+      },
       booleanChecks : function(data, type, full) {
         if (typeof data == 'boolean') {
           return data ? "✔" : "✘";
         } else {
           return "?";
         }
+      },
+      platformType : function(data, type, full) {
+        return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(
+            Utils.array.namePredicate(data), Constants.platformTypes), 'key') || 'Unknown';
       },
       textFromId : function(list, property, unknown) {
         return function(data, type, full) {

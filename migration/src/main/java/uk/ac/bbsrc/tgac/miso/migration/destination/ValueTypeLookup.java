@@ -117,7 +117,7 @@ public class ValueTypeLookup {
     setLibraryTypes(misoServiceManager.getLibraryDao().listAllLibraryTypes());
     setLibraryDesigns(misoServiceManager.getLibraryDesignDao().getLibraryDesigns());
     setLibraryDesignCodes(misoServiceManager.getLibraryDesignCodeDao().getLibraryDesignCodes());
-    setIndices(misoServiceManager.getIndexDao().listAllIndices());
+    setIndices(misoServiceManager.getIndexDao().list(0, 0, true, "id"));
     setSampleQcTypes(misoServiceManager.getSampleQcDao().listAllSampleQcTypes());
     setLibraryQcTypes(misoServiceManager.getLibraryQcDao().listAllLibraryQcTypes());
     setSequencers(misoServiceManager.getSequencerReferenceDao().listAll());
