@@ -79,6 +79,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
   }
 
   @Override
+  public boolean isInternalUser() throws IOException {
+    return getCurrentUser().isInternal();
+  }
+
+  @Override
   public void throwIfNonAdmin() throws IOException, AuthorizationException {
     if (!isAdminUser()) {
       throw new AuthorizationException("Current user is not admin");
