@@ -30,14 +30,6 @@
 
     <div class="column">
       <div class="portlet">
-        <div class="portlet-header">Sequencing Machines</div>
-        <div class="portlet-content">
-          <a href="<c:url value="/miso/stats/ls454"/>">454</a><br/>
-          <a href="<c:url value="/miso/stats/illumina"/>">Illumina</a><br/>
-          <a href="<c:url value="/miso/stats/solid"/>">SOLiD</a><br/><br/>
-        </div>
-      </div>
-      <div class="portlet">
         <div class="portlet-header">Barcode Printing</div>
         <div class="portlet-content">
           <a href="<c:url value="/miso/custombarcode"/>">Custom Barcode Printing</a><br/>

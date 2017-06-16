@@ -2,7 +2,9 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -38,7 +41,7 @@ public class DefaultSequencerReferenceService implements SequencerReferenceServi
 
   @Override
   public Collection<SequencerReference> listByPlatformType(PlatformType platformType) throws IOException {
-    return sequencerReferenceDao.listByPlatformType(platformType);
+    return sequencerReferenceDao.list(0, 0, true, "id", PaginationFilter.platformType(platformType), PaginationFilter.archived(false));
   }
 
   @Override
@@ -170,6 +173,17 @@ public class DefaultSequencerReferenceService implements SequencerReferenceServi
 
   public void setRunService(RunService runService) {
     this.runService = runService;
+  }
+
+  @Override
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return sequencerReferenceDao.count(errorHandler, filter);
+  }
+
+  @Override
+  public List<SequencerReference> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter) throws IOException {
+    return sequencerReferenceDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
 }

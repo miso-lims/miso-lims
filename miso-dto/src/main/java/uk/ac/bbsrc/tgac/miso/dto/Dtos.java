@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -95,6 +96,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -1856,5 +1858,29 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setName(from.getName());
     return dto;
+  }
+
+  public static SequencerDto asDto(SequencerReference from) {
+    SequencerDto dto = new SequencerDto();
+    dto.setId(from.getId());
+    dto.setDateCommissioned(getDateString(from.getDateCommissioned()));
+    dto.setDateDecommissioned(getDateString(from.getDateDecommissioned()));
+    dto.setIp(from.getIpAddress());
+    dto.setName(from.getName());
+    dto.setPlatform(asDto(from.getPlatform()));
+    dto.setSerialNumber(from.getSerialNumber());
+    return dto;
+  }
+
+  public static SequencerReference to(SequencerDto dto) {
+    SequencerReference to = new SequencerReferenceImpl();
+    to.setId(dto.getId());
+    to.setDateCommissioned(extractDateOrNull(dto.getDateCommissioned()));
+    to.setDateDecommissioned(extractDateOrNull(dto.getDateDecommissioned()));
+    to.setIpAddress(dto.getIp());
+    to.setName(dto.getName());
+    to.setPlatform(to(dto.getPlatform()));
+    to.setSerialNumber(dto.getSerialNumber());
+    return to;
   }
 }

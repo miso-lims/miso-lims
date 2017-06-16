@@ -12,17 +12,21 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -30,18 +34,37 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+
 @Controller
 @RequestMapping("/sequencers")
 public class ListSequencerReferencesController {
+  @Autowired
+  private SecurityManager securityManager;
+  private final ListItemsPage listPage = new ListItemsPage("sequencer") {
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      config.put("isAdmin",
+          securityManager
+              .getUserByLoginName(SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication().getName())
+              .isAdmin());
+    }
+
+  };
 
   @ModelAttribute("title")
   public String title() {
     return "Sequencers";
   }
-  
+
   @RequestMapping(method = RequestMethod.GET)
-  public ModelAndView listSequencers(ModelMap model) {
-    return new ModelAndView("/pages/listSequencerReferences.jsp", model);
+  public ModelAndView listSequencers(ModelMap model) throws IOException {
+    return listPage.list(model);
   }
 
 }
