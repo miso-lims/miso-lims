@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -101,6 +102,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -1692,6 +1695,43 @@ public class Dtos {
       view.setDilutionName(dilution.getName());
       return view;
     }).collect(Collectors.toSet()));
+    return to;
+  }
+  public static PrinterBackendDto asDto(Backend from) {
+    PrinterBackendDto dto = new PrinterBackendDto();
+    dto.setId(from.ordinal());
+    dto.setName(from.name());
+    dto.setConfigurationKeys(from.getConfigurationKeys());
+    return dto;
+  }
+
+  public static PrinterDriverDto asDto(Driver from) {
+    PrinterDriverDto dto = new PrinterDriverDto();
+    dto.setId(from.ordinal());
+    dto.setName(from.name());
+    return dto;
+  }
+
+  public static PrinterDto asDto(Printer from) {
+    PrinterDto dto = new PrinterDto();
+    dto.setId(from.getId());
+    dto.setAvailable(from.isEnabled());
+    dto.setBackend(from.getBackend().name());
+    // We intentionally do not pass configuration to the front end since it has passwords in it.
+    dto.setDriver(from.getDriver().name());
+    dto.setName(from.getName());
+    return dto;
+  }
+
+  public static Printer to(PrinterDto dto) {
+    Printer to = new Printer();
+    to.setId(dto.getId());
+    to.setBackend(Backend.valueOf(dto.getBackend()));
+    to.setConfiguration(dto.getConfiguration().asText());
+    to.setDriver(Driver.valueOf(dto.getDriver()));
+    to.setEnabled(dto.isAvailable());
+    to.setName(dto.getName());
+
     return to;
   }
 }

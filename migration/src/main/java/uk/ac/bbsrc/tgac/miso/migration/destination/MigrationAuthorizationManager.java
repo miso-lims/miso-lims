@@ -57,6 +57,12 @@ public class MigrationAuthorizationManager implements AuthorizationManager {
   }
 
   @Override
+  public boolean isInternalUser() throws IOException {
+    // auth disabled in this manager; allow all access
+    return true;
+  }
+
+  @Override
   public void throwIfNonAdmin() throws IOException, AuthorizationException {
     // auth disabled in this manager; do nothing
   }

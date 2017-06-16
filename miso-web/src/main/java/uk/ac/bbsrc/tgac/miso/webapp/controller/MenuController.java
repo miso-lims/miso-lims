@@ -62,6 +62,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
@@ -100,6 +102,7 @@ public class MenuController implements ServletContextAware {
   private DetailedQcStatusService detailedQcStatusService;
   @Autowired
   private StainService stainService;
+
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -112,6 +115,7 @@ public class MenuController implements ServletContextAware {
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
   private SubprojectService subprojectService;
+
   @Autowired
   private SampleGroupService sampleGroupService;
   @Autowired
@@ -218,7 +222,8 @@ public class MenuController implements ServletContextAware {
     this.servletContext = servletContext;
   }
 
-  private static <Model, Dto> void createArray(ObjectMapper mapper, URI baseUri, ObjectNode node, String name, Iterable<Model> items,
+  private static <Model, Dto> void createArray(ObjectMapper mapper, URI baseUri, ObjectNode node, String name,
+      Iterable<Model> items,
       Function<Model, Dto> asDto) {
     ArrayNode array = node.putArray(name);
     for (Model item : items) {
@@ -269,6 +274,8 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "subprojects", subprojectService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "stains", stainService.list(), Dtos::asDto);
     createArray(mapper, baseUri, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
+    createArray(mapper, baseUri, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface PrinterStore extends Store<Printer>, Remover<Printer> {
+public interface PrinterStore extends Store<Printer>, Remover<Printer>, PaginatedDataSource<Printer> {
 }

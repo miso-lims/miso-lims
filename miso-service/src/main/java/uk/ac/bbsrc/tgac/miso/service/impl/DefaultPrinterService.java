@@ -2,8 +2,9 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.store.PrinterStore;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -37,14 +39,9 @@ public class DefaultPrinterService implements PrinterService {
   }
 
   @Override
-  public Collection<Printer> getAll() throws IOException {
-    return printerStore.listAll();
-  }
-
-  @Override
   public List<Printer> getEnabled() throws IOException {
     List<Printer> enabled = new ArrayList<>();
-    for (Printer printer : getAll()) {
+    for (Printer printer : list(0, 0, true, "id")) {
       if (printer.isEnabled()) {
         enabled.add(printer);
       }
@@ -72,6 +69,21 @@ public class DefaultPrinterService implements PrinterService {
     original.setEnabled(printer.isEnabled());
     original.setName(printer.getName());
     return printerStore.save(original);
+  }
+
+  @Override
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return printerStore.count(errorHandler, filter);
+  }
+
+  @Override
+  public List<Printer> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter) throws IOException {
+    if (authorizationManager.isInternalUser())  {
+    return printerStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+    } else {
+      return Collections.emptyList();
+    }
   }
 
 }
