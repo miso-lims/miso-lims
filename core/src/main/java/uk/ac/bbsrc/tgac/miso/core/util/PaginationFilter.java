@@ -286,6 +286,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter sequencer(long id) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationBySequencerId(item, id, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter user(String loginName, boolean creator) {
     return new PaginationFilter() {
 

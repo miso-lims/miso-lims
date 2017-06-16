@@ -386,6 +386,12 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
+  public void restrictPaginationBySequencerId(Criteria criteria, long id, Consumer<String> errorHandler) {
+    criteria.createAlias("sequencerReference", "sequencerReference");
+    criteria.add(Restrictions.eq("sequencerReference.id", id));
+  }
+
+  @Override
   public String getFriendlyName() {
     return "Run";
   }

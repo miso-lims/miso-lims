@@ -29,6 +29,7 @@
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
@@ -305,52 +306,15 @@
     
     <br/>
     <a id="runs"></a>
-    <div class="sectionDivider">
-      <c:choose>
-        <c:when test="${fn:length(sequencerRuns) == 1}">1 Run</c:when>
-        <c:otherwise>${fn:length(sequencerRuns)} Runs</c:otherwise>
-      </c:choose>
+    <div class="sectionDivider">Runs
     </div>
     <h1>Runs</h1>
     <div style="clear:both">
-      <table class="list" id="run_table">
-        <thead>
-          <tr>
-            <th>Run Alias</th>
-            <th>Status</th>
-            <th>Started At</th>
-            <th>Completed At</th>
-          </tr>
-        </thead>
-        <tbody>
-          <c:forEach items="${sequencerRuns}" var="run">
-            <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-              <td><a href='<c:url value="/miso/run/${run.id}"/>'>${run.alias}</a></td>
-              <td>${run.health.key}</td>
-              <td>${run.startDate}</td>
-              <td>${run.completionDate}</td>
-            </tr>
-          </c:forEach>
-        </tbody>
+      <table id="run_table">
       </table>
     </div>
     <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#run_table').dataTable({
-          "aaSorting": [
-            [2, 'desc']
-          ],
-          "aoColumns": [
-            { "sType": 'string' },
-            { "sType": 'string' },
-            { "sType": 'date' },
-            { "sType": 'date' }
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true
-        });
-      });
+      ListUtils.createTable('run_table', ListTarget.run, null, { sequencer : ${sequencerReference.id} });
     </script>
     
   </div>

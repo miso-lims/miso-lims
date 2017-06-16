@@ -762,7 +762,7 @@
 </div>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    Run.ui.createListingRunsTable(${project.id});
+    ListUtils.createTable('listingRunsTable', ListTarget.run, ${project.id}, {});
   });
 </script>
 </c:when>

@@ -37,7 +37,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -54,7 +53,6 @@ public class ViewSequencerReferenceController {
   private enum ModelKeys {
     
     SEQUENCER("sequencerReference"),
-    RUNS("sequencerRuns"),
     RECORDS("sequencerServiceRecords"),
     TRIMMED_IP("trimmedIpAddress");
     
@@ -105,12 +103,10 @@ public class ViewSequencerReferenceController {
     }
     else {
       SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-      Collection<Run> runs = runService.listBySequencerId(referenceId);
       Collection<SequencerServiceRecord> serviceRecords = requestManager.listSequencerServiceRecordsBySequencerId(referenceId);
       
       if (sr != null) {
         model.put(ModelKeys.SEQUENCER.getKey(), sr);
-        model.put(ModelKeys.RUNS.getKey(), runs);
         model.put(ModelKeys.RECORDS.getKey(), serviceRecords);
         model.put("title", "Edit Sequencer");
         String ip = sr.getIpAddress() == null ? "" : sr.getIpAddress().toString();
