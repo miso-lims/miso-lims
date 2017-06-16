@@ -147,7 +147,100 @@ var Utils = Utils || {
       }
     }
   },
+  showDialog: function(title, okButton, fields, callback) {
+      var dialogArea = document.getElementById('dialog');
+      while (dialogArea.hasChildNodes()) {
+          dialogArea.removeChild(dialogArea.lastChild);
+      }
 
+      var output = {};
+      fields.forEach(function(field) {
+          var p = document.createElement('P');
+          var input;
+          p.appendChild(document.createTextNode(field.label + ": "));
+          switch (field.type) {
+            case 'select':
+                if (field.values.length == 0) {
+                    return;
+                }
+                input = document.createElement('SELECT');
+                field.values.forEach(function(value, index) {
+                    var option = document.createElement('OPTION');
+                    option.text = field.getLabel ? field.getLabel(value) : value;
+                    option.value = index;
+                    input.appendChild(option);
+                });
+                input.onchange = function() {
+                    output[field.property] = field.values[parseInt(input.value)];
+                };
+                output[field.property] = field.values[0];
+                break;
+            case 'text':
+                input = document.createElement('INPUT');
+                input.setAttribute('type', 'text');
+                input.onchange = function() {
+                    output[field.property] = input.value;
+                };
+                break;
+            case 'int':
+                input = document.createElement('INPUT');
+                input.setAttribute('type', 'text');
+                input.onchange = function() {
+                output[field.property] = parseInt(input.value);
+                };
+                break;
+            default:
+                throw "Unknown field type: " + field.type;
+          }
+          p.appendChild(input);
+          dialogArea.appendChild(p);
+      });
+
+      var buttons = {};
+      buttons[okButton] = function () { dialog.dialog("close"); callback(output); };
+      buttons["Cancel"] = function () { dialog.dialog("close"); };
+      var dialog = jQuery('#dialog').dialog({
+          autoOpen: true,
+          height: 400,
+          width: 350,
+          title:title,
+          modal: true,
+          buttons: buttons
+      });
+    },
+    ajaxWithDialog: function(title, method, url, data, callback) {
+        var dialogArea = document.getElementById('dialog');
+        while (dialogArea.hasChildNodes()) {
+            dialogArea.removeChild(dialogArea.lastChild);
+        }
+        var p = document.createElement('P');
+        p.appendChild(document.createTextNode('Working...'));
+        dialogArea.appendChild(p);
+
+        var dialog = jQuery('#dialog').dialog({
+            autoOpen: true,
+            height: 400,
+            width: 350,
+            title:title,
+            modal: true,
+            buttons: {}
+        });
+        jQuery.ajax({
+            'dataType' : 'json',
+            'type' : method,
+            'url' : url,
+            'data' : JSON.stringify(data),
+            'contentType' : 'application/json; charset=utf8',
+            'success' : function(data, textStatus, xhr) {
+                dialog.dialog("close");
+                callback(data, textStatus, xhr);
+            },
+            'error' : function(xhr, textStatus) {
+                dialog.dialog("close");
+                alert('Sadness: ' + textStatus);
+            }
+        });
+    }
 };
 
 Utils.timer = {

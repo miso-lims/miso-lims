@@ -125,5 +125,10 @@ ListUtils = {
         toolbar.append(button);
       });
     }
+  },
+  render : {
+    booleanChecks : function(data, type, full) {
+      return data ? "✔" : "";
+    }
   }
 };
