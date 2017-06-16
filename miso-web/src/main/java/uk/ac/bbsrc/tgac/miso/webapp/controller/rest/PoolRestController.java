@@ -150,7 +150,7 @@ public class PoolRestController extends RestController {
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     PlatformType platformType = PlatformType.valueOf(platform);
     if (platformType == null) {
-      throw new RestException("Invalid platform type.");
+      throw new RestException("Invalid platform type.", Status.BAD_REQUEST);
     }
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
   }

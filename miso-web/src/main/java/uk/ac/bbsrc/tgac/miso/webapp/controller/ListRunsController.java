@@ -30,25 +30,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
-/**
- * com.eaglegenomics.miso.web
- * <p/>
- * TODO Info
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
 @Controller
 public class ListRunsController {
   protected static final Logger log = LoggerFactory.getLogger(ListRunsController.class);
@@ -66,24 +58,14 @@ public class ListRunsController {
     this.runService = runService;
   }
 
-  @ModelAttribute("title")
-  public String title() {
-    return "Runs";
-  }
-
   @RequestMapping(value = "/runs/rest/", method = RequestMethod.GET)
   public @ResponseBody Collection<Run> jsonRest() throws IOException {
     return runService.list();
   }
 
   @RequestMapping("/runs")
-  public ModelAndView listRuns() throws Exception {
-    return new ModelAndView("/pages/listRuns.jsp");
-  }
-
-  @ModelAttribute("platformTypes")
-  public PlatformType[] populatePlatformTypes() {
-    return PlatformType.values();
+  public ModelAndView listRuns(ModelMap model) throws Exception {
+    return TabbedListItemsPage.createForPlatformType("run", requestManager).list(model);
   }
 
 }

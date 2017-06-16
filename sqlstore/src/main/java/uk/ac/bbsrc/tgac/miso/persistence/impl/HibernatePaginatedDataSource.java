@@ -199,6 +199,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationBySequencerId(Criteria criteria, long id, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be filtered by sequencer.");
+  }
+
+  @Override
   public default void restrictPaginationByUser(Criteria criteria, String userName, boolean creator, Consumer<String> errorHandler) {
     String property = propertyForUserName(criteria, creator);
     if (property != null) {

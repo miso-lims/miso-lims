@@ -33,6 +33,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByQuery(T item, String query, Consumer<String> errorHandler);
 
+  public void restrictPaginationBySequencerId(T item, long id, Consumer<String> errorHandler);
+
   public void restrictPaginationByUser(T item, String userName, boolean creator, Consumer<String> errorHandler);
 
 }
