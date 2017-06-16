@@ -27,22 +27,23 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-@Controller
-public class ListSequencerPartitionContainerController {
-  protected static final Logger log = LoggerFactory.getLogger(ListSequencerPartitionContainerController.class);
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
-  @ModelAttribute("title")
-  public String title() {
-    return "Sequencing Containers";
-  }
+@Controller
+public class ListContainerController {
+  protected static final Logger log = LoggerFactory.getLogger(ListContainerController.class);
+  @Autowired
+  private RequestManager requestManager;
 
   @RequestMapping("/containers")
-  public ModelAndView listContainers() throws IOException {
-    return new ModelAndView("/pages/listSequencerPartitionContainers.jsp");
+  public ModelAndView listContainers(ModelMap model) throws IOException {
+    return TabbedListItemsPage.createForPlatformType("container", requestManager).list(model);
   }
 }

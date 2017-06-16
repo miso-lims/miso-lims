@@ -1406,6 +1406,8 @@ public class Dtos {
     if (lastRun != null) {
       dto.setLastRunAlias(lastRun.getAlias());
       dto.setLastRunId(lastRun.getId());
+      dto.setLastSequencerId(lastRun.getSequencerReference().getId());
+      dto.setLastSequencerName(lastRun.getSequencerReference().getName());
     }
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
