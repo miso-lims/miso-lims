@@ -18,6 +18,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -174,6 +175,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   default void restrictPaginationByInstitute(Criteria criteria, String name, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " has no institute associated with it.");
+  }
+
+  @Override
+  default void restrictPaginationByKitType(Criteria criteria, KitType type, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be filtered by pool.");
   }
 
   @Override

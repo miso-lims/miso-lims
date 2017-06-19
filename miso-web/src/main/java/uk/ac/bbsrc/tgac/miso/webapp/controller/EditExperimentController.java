@@ -145,7 +145,6 @@ public class EditExperimentController {
       model.put("formObj", experiment);
       model.put("experiment", experiment);
       model.put("libraryKits", experiment.getKitsByKitType(KitType.LIBRARY));
-      model.put("emPcrKits", experiment.getKitsByKitType(KitType.EMPCR));
       model.put("clusteringKits", experiment.getKitsByKitType(KitType.CLUSTERING));
       model.put("sequencingKits", experiment.getKitsByKitType(KitType.SEQUENCING));
       model.put("multiplexingKits", experiment.getKitsByKitType(KitType.MULTIPLEXING));
@@ -201,7 +200,6 @@ public class EditExperimentController {
       model.put("formObj", experiment);
       model.put("experiment", experiment);
       model.put("libraryKits", experiment.getKitsByKitType(KitType.LIBRARY));
-      model.put("emPcrKits", experiment.getKitsByKitType(KitType.EMPCR));
       model.put("clusteringKits", experiment.getKitsByKitType(KitType.CLUSTERING));
       model.put("sequencingKits", experiment.getKitsByKitType(KitType.SEQUENCING));
       model.put("multiplexingKits", experiment.getKitsByKitType(KitType.MULTIPLEXING));

@@ -25,8 +25,10 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -45,11 +47,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateKitDao implements KitStore {
+public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<KitDescriptor> {
   private static final String DESCRIPTOR_TABLE_NAME = "KitDescriptor";
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateKitDao.class);
@@ -67,7 +70,8 @@ public class HibernateKitDao implements KitStore {
     this.jdbcTemplate = jdbcTemplate;
   }
 
-  private Session currentSession() {
+  @Override
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 
@@ -179,4 +183,52 @@ public class HibernateKitDao implements KitStore {
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(jdbcTemplate, DESCRIPTOR_TABLE_NAME);
   }
+
+  @Override
+  public void restrictPaginationByKitType(Criteria criteria, KitType type, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("kitType", type));
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Kit";
+  }
+
+  @Override
+  public String getProjectColumn() {
+    return null;
+  }
+
+  @Override
+  public Class<? extends KitDescriptor> getRealClass() {
+    return KitDescriptor.class;
+  }
+
+  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "manufacturer", "partNumber", "description" };
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, DateType type) {
+    return null;
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    return original;
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return creator ? null : "lastModifier";
+  }
+
 }

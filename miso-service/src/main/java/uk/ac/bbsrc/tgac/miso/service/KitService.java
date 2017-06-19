@@ -9,8 +9,9 @@ import com.eaglegenomics.simlims.core.Note;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface KitService {
+public interface KitService extends PaginatedDataSource<KitDescriptor> {
 
   public Collection<Kit> listKits() throws IOException;
 

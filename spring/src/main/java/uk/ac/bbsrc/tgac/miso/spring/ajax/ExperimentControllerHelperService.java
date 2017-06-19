@@ -247,42 +247,6 @@ public class ExperimentControllerHelperService {
     return addKit(session, json, KitType.LIBRARY);
   }
 
-  // empcr
-  public JSONObject getEmPcrKitDescriptors(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        Experiment e = experimentService.get(new Long(experimentId));
-
-        Collection<KitDescriptor> kits = kitService.listKitDescriptorsByType(KitType.EMPCR);
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        int count = 0;
-        for (KitDescriptor k : kits) {
-          if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-            sb.append("{'name':'" + k.getName() + "', 'id':'" + k.getId() + "', 'partNumber':'" + k.getPartNumber() + "'}");
-            if (count < kits.size()) sb.append(",");
-            count++;
-          }
-        }
-        sb.append("]");
-
-        Map<String, Object> m = new HashMap<>();
-        m.put("experimentId", experimentId);
-        m.put("emPcrKitDescriptors", JSONArray.fromObject(sb.toString()));
-        return JSONUtils.JSONObjectResponse(m);
-      }
-    } catch (Exception e) {
-      log.debug("Failed to generate kit selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate kit selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select EmPCR kits");
-  }
-
-  public JSONObject addEmPcrKit(HttpSession session, JSONObject json) {
-    return addKit(session, json, KitType.EMPCR);
-  }
-
   // clustering
   public JSONObject getClusteringKitDescriptors(HttpSession session, JSONObject json) {
     try {
