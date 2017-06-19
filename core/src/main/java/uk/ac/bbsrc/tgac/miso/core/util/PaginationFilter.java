@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public abstract interface PaginationFilter {
@@ -91,6 +92,16 @@ public abstract interface PaginationFilter {
       }
     };
   }
+  public static PaginationFilter kitType(KitType type) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByKitType(item, type, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter[] parse(String request, String currentUser, Consumer<String> errorHandler) {
     return Arrays.stream(request.split("\\s+")).<PaginationFilter> map(x -> {
       if (x.contains(":")) {

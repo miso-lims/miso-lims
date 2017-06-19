@@ -30,6 +30,7 @@ import java.util.Map;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * Defines a DAO interface for storing Kits
@@ -37,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface KitStore extends Store<Kit> {
+public interface KitStore extends Store<Kit>, PaginatedDataSource<KitDescriptor> {
   Kit getKitByIdentificationBarcode(String barcode) throws IOException;
 
   Kit getKitByLotNumber(String lotNumber) throws IOException;

@@ -3,7 +3,9 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -155,6 +158,17 @@ public class DefaultKitService implements KitService {
   private void setChangeDetails(KitDescriptor kitDescriptor) throws IOException {
     User user = authorizationManager.getCurrentUser();
     kitDescriptor.setLastModifier(user);
+  }
+
+  @Override
+  public List<KitDescriptor> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter) throws IOException {
+    return kitStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+  }
+
+  @Override
+  public long count(Consumer<String> errorHandler, PaginationFilter... filter) throws IOException {
+    return kitStore.count(errorHandler, filter);
   }
 
 }

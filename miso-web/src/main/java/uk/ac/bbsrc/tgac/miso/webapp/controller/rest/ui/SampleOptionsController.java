@@ -15,7 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.dto.SampleOptionsDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.InstituteController;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.KitDescriptorController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.KitDescriptorRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.LabController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.DetailedQcStatusController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.SampleClassController;
@@ -56,7 +56,7 @@ public class SampleOptionsController {
   @Autowired
   private InstituteController instituteController;
   @Autowired
-  private KitDescriptorController kitDescriptorController;
+  private KitDescriptorRestController kitDescriptorController;
 
   @RequestMapping(value = "/sampleoptions", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody

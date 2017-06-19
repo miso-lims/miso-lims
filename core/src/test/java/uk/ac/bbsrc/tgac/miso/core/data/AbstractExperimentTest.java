@@ -31,19 +31,16 @@ public class AbstractExperimentTest {
   public final void testGetKitsByKitType() {
     final Collection<Kit> expectedLibraryKits = getNMockKits(3, KitType.LIBRARY);
     final Collection<Kit> expectedSequencingKits = getNMockKits(2, KitType.SEQUENCING);
-    final Collection<Kit> expectedEmpcrKits = getNMockKits(4, KitType.EMPCR);
     final Collection<Kit> expectedClusteringKits = getNMockKits(5, KitType.CLUSTERING);
     final Collection<Kit> expectedMultiplexingKits = getNMockKits(6, KitType.MULTIPLEXING);
 
     final Collection<Kit> libraryKits = ae.getKitsByKitType(KitType.LIBRARY);
     final Collection<Kit> sequencingKits = ae.getKitsByKitType(KitType.SEQUENCING);
-    final Collection<Kit> empcrKits = ae.getKitsByKitType(KitType.EMPCR);
     final Collection<Kit> clusteringKits = ae.getKitsByKitType(KitType.CLUSTERING);
     final Collection<Kit> multiplexingKits = ae.getKitsByKitType(KitType.MULTIPLEXING);
 
     assertKitListEqual(expectedLibraryKits, libraryKits);
     assertKitListEqual(expectedSequencingKits, sequencingKits);
-    assertKitListEqual(expectedEmpcrKits, empcrKits);
     assertKitListEqual(expectedClusteringKits, clusteringKits);
     assertKitListEqual(expectedMultiplexingKits, multiplexingKits);
   }

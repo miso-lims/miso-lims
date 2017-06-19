@@ -35,12 +35,12 @@ import java.util.Map;
  * @since 0.0.2
  */
 public enum KitType {
-  LIBRARY("Library"), SEQUENCING("Sequencing"), EMPCR("EmPCR"), CLUSTERING("Clustering"), MULTIPLEXING("Multiplexing"), EXTRACTION("Extraction");
+  LIBRARY("Library"), SEQUENCING("Sequencing"), CLUSTERING("Clustering"), MULTIPLEXING("Multiplexing"), EXTRACTION("Extraction");
 
   /** Field key */
   private String key;
   /** Field lookup */
-  private static final Map<String, KitType> lookup = new HashMap<String, KitType>();
+  private static final Map<String, KitType> lookup = new HashMap<>();
 
   static {
     for (KitType s : EnumSet.allOf(KitType.class))
@@ -83,7 +83,7 @@ public enum KitType {
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
+    ArrayList<String> keys = new ArrayList<>();
     for (KitType k : KitType.values()) {
       keys.add(k.getKey());
     }
