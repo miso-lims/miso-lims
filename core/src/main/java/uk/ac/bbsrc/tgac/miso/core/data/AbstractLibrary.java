@@ -155,7 +155,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinColumn(name = "libraryStrategyType")
   private LibraryStrategyType libraryStrategyType;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
@@ -165,7 +165,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
           @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
 
-  @OneToMany(targetEntity = LibraryChangeLog.class, mappedBy = "library")
+  @OneToMany(targetEntity = LibraryChangeLog.class, mappedBy = "library", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @OneToOne

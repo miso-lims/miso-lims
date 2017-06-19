@@ -9,7 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -35,11 +35,11 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
   @Column(nullable = false)
   private Integer partitions;
 
-  @OneToOne(targetEntity = SequencingParametersImpl.class)
+  @ManyToOne(targetEntity = SequencingParametersImpl.class)
   @JoinColumn(name = "parametersId", nullable = true)
   private SequencingParameters parameters;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
 
@@ -47,7 +47,7 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
 

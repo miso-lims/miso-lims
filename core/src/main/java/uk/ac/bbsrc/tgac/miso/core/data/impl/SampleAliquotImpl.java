@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -14,7 +14,7 @@ public class SampleAliquotImpl extends DetailedSampleImpl implements SampleAliqu
 
   private static final long serialVersionUID = 1L;
 
-  @OneToOne(targetEntity = SamplePurposeImpl.class)
+  @ManyToOne(targetEntity = SamplePurposeImpl.class)
   @JoinColumn(name = "samplePurposeId")
   private SamplePurpose samplePurpose;
 

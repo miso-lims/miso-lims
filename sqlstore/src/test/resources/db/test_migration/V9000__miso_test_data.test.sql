@@ -262,6 +262,7 @@ VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_30
 (13,'LIB13','Inherited from TEST_0007',NULL,1,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1),
 (14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1);
 
+DELETE FROM LibraryChangeLog;
 INSERT INTO `LibraryChangeLog`(`libraryId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (2, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:51'),
@@ -508,6 +509,12 @@ INSERT INTO `Box` (`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `descripti
 VALUES
 ('1','1', '1', 'box1', 'box1alias', 'box1', 'barcode1','identifcationbarcode1', '1', '1'),
 ('2','1', '2', 'box2', 'box2alias', 'box2', 'barcode2','identifcationbarcode2', '1', '1');
+
+DELETE FROM BoxChangeLog;
+INSERT INTO BoxChangeLog(boxChangeLogId, boxId, columnsChanged, userId, message, changeTime)
+VALUES
+(1, 1, '', 1, 'Box created', '2017-06-20 16:02:00'),
+(2, 2, '', 1, 'Box created', '2017-06-20 16:02:00');
 
 DELETE FROM BoxPosition;
 INSERT INTO `BoxPosition` (`boxId`, `position`, `targetType`, `targetId`)

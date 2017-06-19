@@ -33,7 +33,7 @@ public abstract class AbstractBox implements Box {
 
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
-  private SecurityProfile securityProfile;
+  private SecurityProfile securityProfile = null;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -55,19 +55,13 @@ public abstract class AbstractBox implements Box {
   @ManyToOne
   @JoinColumn(name = "boxSizeId")
   private BoxSize size;
+
   @ManyToOne
   @JoinColumn(name = "boxUseId")
   private BoxUse use;
 
-  @OneToMany(targetEntity = BoxChangeLog.class, mappedBy = "box")
-  private final Collection<ChangeLog> changeLog;
-
-  @CoverageIgnore
-  public AbstractBox() {
-    securityProfile = null;
-    boxId = AbstractBox.UNSAVED_ID;
-    changeLog = new ArrayList<>();
-  }
+  @OneToMany(targetEntity = BoxChangeLog.class, mappedBy = "box", cascade = CascadeType.REMOVE)
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Override
   public User getLastModifier() {

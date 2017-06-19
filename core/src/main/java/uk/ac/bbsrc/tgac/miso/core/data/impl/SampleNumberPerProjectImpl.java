@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -29,7 +30,7 @@ public class SampleNumberPerProjectImpl implements SampleNumberPerProject, Seria
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long sampleNumberPerProjectId;
 
-  @OneToOne(targetEntity = ProjectImpl.class)
+  @OneToOne(targetEntity = ProjectImpl.class, optional = false)
   @JoinColumn(name = "projectId", nullable = false, unique = true)
   private Project project;
 
@@ -39,7 +40,7 @@ public class SampleNumberPerProjectImpl implements SampleNumberPerProject, Seria
   @Column(nullable = false)
   private Integer padding;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
 
@@ -47,7 +48,7 @@ public class SampleNumberPerProjectImpl implements SampleNumberPerProject, Seria
   @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
 

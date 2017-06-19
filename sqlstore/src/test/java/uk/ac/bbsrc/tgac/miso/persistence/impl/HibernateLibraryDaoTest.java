@@ -260,6 +260,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
 
     assertNotNull(insertedLibrary);
     assertTrue(dao.remove(insertedLibrary));
+    assertNull(dao.get(libraryId));
   }
 
   @Test

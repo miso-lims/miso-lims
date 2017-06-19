@@ -84,7 +84,7 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   @Temporal(TemporalType.DATE)
   private Date dateDecommissioned = null;
 
-  @OneToOne(targetEntity = SequencerReferenceImpl.class)
+  @OneToOne(targetEntity = SequencerReferenceImpl.class, optional = true)
   @JoinColumn(name = "upgradedSequencerReferenceId")
   private SequencerReference upgradedSequencerReference;
 

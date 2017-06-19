@@ -112,7 +112,7 @@ public class Run
           @JoinColumn(name = "containers_containerId") })
   private List<SequencerPartitionContainer> containers = new ArrayList<>();
 
-  @OneToOne(targetEntity = RunDerivedInfo.class)
+  @OneToOne
   @PrimaryKeyJoinColumn
   private RunDerivedInfo derivedInfo;
   private String description;
