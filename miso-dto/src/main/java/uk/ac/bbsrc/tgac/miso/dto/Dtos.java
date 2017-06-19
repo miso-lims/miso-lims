@@ -970,9 +970,9 @@ public class Dtos {
     dto.setParameters(asDto(from.getSequencingParameter()));
     dto.setPartitions(from.getPartitions());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(dateFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(dateFormatter.print(from.getLastUpdated().getTime()));
     return dto;
   }
 

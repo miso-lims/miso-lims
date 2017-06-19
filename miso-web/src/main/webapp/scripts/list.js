@@ -61,7 +61,18 @@ ListUtils = {
                       'type' : 'GET',
                       'url' : sSource,
                       'data' : aoData,
-                      'success' : fnCallback
+                      'success' : function(data, textStatus, xhr) {
+                        columns.forEach(function(column, index) {
+                          if (!column.visibilityFilter) {
+                            return;
+                          }
+                          jqTable.fnSetColumnVis(index, column
+                              .visibilityFilter(data.aaData.map(function(d) {
+                                return d[column.mData];
+                              })));
+                        });
+                        fnCallback(data, textStatus, xhr);
+                      }
                     });
                   },
                   'fnDrawCallback' : function(oSettings) {
