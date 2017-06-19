@@ -104,7 +104,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
 
-  @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool")
+  @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Column(length = CONCENTRATION_LENGTH)
@@ -112,9 +112,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Temporal(TemporalType.DATE)
   private Date creationDate;
-  @OneToOne(targetEntity = PoolDerivedInfo.class)
+
+  @OneToOne
   @PrimaryKeyJoinColumn
   private PoolDerivedInfo derivedInfo;
+
   @Column(length = DESCRIPTION_LENGTH)
   private String description;
 
@@ -168,7 +170,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Column(name = "ready")
   private boolean readyToRun = false;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 

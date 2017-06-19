@@ -4,7 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
@@ -21,7 +21,7 @@ public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue
 
   private String externalInstituteIdentifier;
 
-  @OneToOne(targetEntity = LabImpl.class)
+  @ManyToOne(targetEntity = LabImpl.class)
   @JoinColumn(name = "labId", nullable = true)
   private Lab lab;
 
@@ -31,15 +31,15 @@ public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue
 
   private Integer timesReceived;
 
-  @OneToOne(targetEntity = TissueMaterialImpl.class)
+  @ManyToOne(targetEntity = TissueMaterialImpl.class)
   @JoinColumn(name = "tissueMaterialId")
   private TissueMaterial tissueMaterial;
 
-  @OneToOne(targetEntity = TissueOriginImpl.class, optional = false)
+  @ManyToOne(targetEntity = TissueOriginImpl.class, optional = false)
   @JoinColumn(name = "tissueOriginId")
   private TissueOrigin tissueOrigin;
 
-  @OneToOne(targetEntity = TissueTypeImpl.class, optional = false)
+  @ManyToOne(targetEntity = TissueTypeImpl.class, optional = false)
   @JoinColumn(name = "tissueTypeId")
   private TissueType tissueType;
 

@@ -4,11 +4,12 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -40,7 +41,7 @@ public class SampleClassImpl implements SampleClass {
   @Column(nullable = true)
   private String suffix;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
 
@@ -48,7 +49,7 @@ public class SampleClassImpl implements SampleClass {
   @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
 

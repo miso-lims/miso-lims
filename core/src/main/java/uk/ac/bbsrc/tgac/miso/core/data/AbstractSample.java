@@ -103,7 +103,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
           @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
 
-  @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample")
+  @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @ManyToOne
@@ -123,12 +123,12 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private String identificationBarcode;
   private String locationBarcode;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   @JsonBackReference
   private User lastModifier;
 
-  @OneToOne(targetEntity = SampleDerivedInfo.class)
+  @OneToOne
   @PrimaryKeyJoinColumn
   private SampleDerivedInfo derivedInfo;
 

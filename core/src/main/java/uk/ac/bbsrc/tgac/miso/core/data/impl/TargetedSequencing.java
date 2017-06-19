@@ -7,6 +7,7 @@ import java.util.HashSet;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,7 +49,7 @@ public class TargetedSequencing implements Serializable {
   @Column(nullable = false)
   private boolean archived;
 
-  @ManyToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
 
@@ -56,7 +57,7 @@ public class TargetedSequencing implements Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
 
-  @ManyToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
 

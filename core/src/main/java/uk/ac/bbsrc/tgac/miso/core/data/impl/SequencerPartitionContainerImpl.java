@@ -107,7 +107,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @JoinColumn(name = "lastModifier")
   private User lastModifier;
 
-  @OneToOne(targetEntity = ContainerDerivedInfo.class)
+  @OneToOne
   @PrimaryKeyJoinColumn
   private ContainerDerivedInfo derivedInfo;
 

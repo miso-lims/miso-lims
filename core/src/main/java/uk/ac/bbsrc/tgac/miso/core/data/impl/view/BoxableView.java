@@ -11,12 +11,14 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Immutable;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 
 @Entity
+@Immutable
 @Table(name = "BoxableView")
 public class BoxableView implements Serializable {
 
