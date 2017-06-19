@@ -25,7 +25,7 @@ Application Server:
 
 Database Server:
 
-* MySql 5.7
+* MySQL 5.7
 * Flyway
 
 Notification Server:
@@ -223,12 +223,12 @@ The options for `miso.naming.scheme` are `default` and `oicr`, which have these
 default configurations:
 
 |                             | default                      | oicr                          |
-|--------------------------------------------------------------------------------------------|
+|-----------------------------|------------------------------|-------------------------------|
 | Name generator              | DefaultNameGenerator         | DefaultNameGenerator          |
 | Name Validator              | DefaultNameValidator         | DefaultNameValidator          |
 | Sample Alias Generator      | none                         | OicrSampleAliasGenerator      |
 | Sample Alias Validator      | DefaultSampleAliasValidator  | OicrSampleAliasValidator      |
-| Library Alias Generator     | DefaultLibraryAliasGenerator | none                          |
+| Library Alias Generator     | DefaultLibraryAliasGenerator | OicrLibraryAliasGenerator     |
 | Library Alias Validator     | DefaultLibraryAliasValidator | OicrLibraryAliasValidator     |
 | Project ShortName Validator | AllowAnythingValidator       | OicrProjectShortNameValidator |
 | Configurable components     | all                          | none                          |
@@ -239,43 +239,50 @@ as follows.
 ### `miso.naming.generator.nameable.name`
 
 | Option    | Example     |
+|-----------|-------------|
 | default   | SAM1        |
 | classname | SampleImpl1 |
 
 ### `miso.naming.generator.sample.alias`
 
 | Option  | Example               | Note                             |
+|---------|-----------------------|----------------------------------|
 | oicr    | PROJ_0001_Ad_P_nn_1-1 | for use with DetailedSample only |
 
 ### `miso.naming.generator.library.alias`
 
 | Option  | Example                  | Note                                                                                                     |
+|---------|--------------------------|----------------------------------------------------------------------------------------------------------|
 | default | XX_LYY-1                 | XX and YY taken from sample alias - depends on sample alias passing default validator with default regex |
-| oicr    | PROJ_0001_Ad_P_PE_300_WG | for use with DetailedSample only. depends on sample alias passing oicr validator                         |
+| oicr    | PROJ_0001_Ad_P_PE_300_WG | For use with DetailedSample only. Depends on sample alias passing oicr validator                         |
 
 ### `miso.naming.validator.nameable.name`
 
 | Option   | Detail                                       | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
+|----------|----------------------------------------------|------------|------------------|--------------|--------------------|
 | default  | Matches 'default' generator, or custom regex | no         | no               | yes          | yes                |
-| allowany | Only checks that the name is not null        | yes        | yes              | no           | no                 |
+| allowany | Only checks that the name is not null        | no         | yes              | no           | no                 |
 
 ### `miso.naming.validator.sample.alias`
 
 | Option   | Detail                                         | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
+|----------|------------------------------------------------|------------|------------------|--------------|--------------------|
 | default  | Default regex: `([A-z0-9]+)_S([A-z0-9]+)_(.*)` | no         | no               | yes          | no                 |
-| allowany | Only checks that the alias is not null         | yes        | yes              | no           | no                 |
+| allowany | Only checks that the alias is not null         | no         | yes              | no           | no                 |
 | oicr     | Matches 'oicr' generator                       | no         | no               | no           | no                 |
 
 ### `miso.naming.validator.library.alias`
 
 | Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
+|----------|----------------------------------------|------------|------------------|--------------|--------------------|
 | default  | Matches 'default' generator            | no         | no               | yes          | no                 |
-| allowany | Only checks that the alias is not null | yes        | yes              | no           | no                 |
+| allowany | Only checks that the alias is not null | no         | yes              | no           | no                 |
 | oicr     | Matches 'oicr' generator               | no         | no               | no           | no                 |
 
 ### `miso.naming.validator.project.shortName`
 
 | Option   | Detail                                 | Allow null | Allow duplicates | Custom Regex | Custom Duplication |
+|----------|----------------------------------------|------------|------------------|--------------|--------------------|
 | allowany | Optional field, no format specified    | yes        | yes              | no           | no                 |
 | oicr     | 3-5 characters, CAPS and numbers only  | no         | no               | no           | no                 |
 
@@ -295,7 +302,7 @@ Existing naming schemes:
 |----------------------------|-----------|-------------------------------------------------------------|--------------------|
 | DefaultEntityNamingScheme  | all       | Uses 3-digit entity identifier (e.g. 'SAM' for Sample) + ID | Matches validation |
 | AllowAnythingNamingScheme  | all       | Uses Java class name. Not intended for generation purposes  | None               |
-| DefaultSampleNamingScheme  | Samples   | None built in                                               | TGAC's standard    |
+| DefaultSampleNamingScheme  | Samples   | None built in                                               | TGAC/EI's standard |
 | OicrSampleNamingScheme     | Samples   | None built in                                               | OICR's standard    |
 | DefaultLibraryNamingScheme | Libraries | None built in                                               | TGAC's standard    |
 | OicrLibraryNamingScheme    | Libraries | None built in                                               | OICR's standard    |
@@ -365,7 +372,7 @@ Updating the database (or setting it up initially) will apply patches to the dat
     cd ${FLYWAY}
     rm -f lib/sqlstore-*.jar
     unzip -xjo $CATALINA_HOME/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d lib
-    ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration migrate
+    ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration migrate,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate
 
 
 
