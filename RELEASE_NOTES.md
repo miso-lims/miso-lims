@@ -1,8 +1,21 @@
+# 0.2.72
+
+Changes:
+
+ * Allow bulk propagation of dilutions to pool
+ * Generate library aliases (OICR)
+ * Add list dilutions page
+ * [maven-release-plugin] prepare for next development iteration
+
 # 0.2.71
 
 Changes:
 
  * No user facing changes.
+
+Bad:
+
+ * Kits are not saved during bulk library save
 
 # 0.2.70
 
@@ -16,6 +29,10 @@ Changes:
  * Fixed notification server reporting unknown status after read 1
  * Set lastModifier on KitDescriptor before save
  * Fix aggregation of order completions to not include update time
+
+Bad:
+
+ * Kits are not saved during bulk library save
 
 # 0.2.69
 

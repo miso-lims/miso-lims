@@ -38,13 +38,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -105,13 +104,30 @@ public class PoolRestController extends RestController {
   }
 
   @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String getPoolById(@PathVariable Long poolId) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
+  public @ResponseBody PoolDto getPoolById(@PathVariable Long poolId) throws IOException {
     Pool p = poolService.getPoolById(poolId);
     if (p == null) {
       throw new RestException("No pool found with ID: " + poolId, Status.NOT_FOUND);
     }
-    return mapper.writeValueAsString(p);
+    return Dtos.asDto(p, true);
+  }
+
+  @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+  @ResponseBody
+  public PoolDto createPool(@RequestBody PoolDto pool, UriComponentsBuilder uriBuilder, HttpServletResponse response)
+      throws IOException {
+    Long id = poolService.savePool(Dtos.to(pool));
+    return getPoolById(id);
+
+  }
+
+  @RequestMapping(value = "{poolId}", method = RequestMethod.PUT, produces = "application/json")
+  @ResponseBody
+  public PoolDto updatePool(@PathVariable Long poolId, @RequestBody PoolDto pool) throws IOException {
+    Pool p = Dtos.to(pool);
+    p.setId(poolId);
+    poolService.savePool(p);
+    return getPoolById(poolId);
   }
 
   @RequestMapping(value = "platform/{platform}", method = RequestMethod.GET, produces = "application/json")
@@ -132,10 +148,11 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<PoolDto> getDTPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    if (!PlatformType.getKeys().contains(platform)) {
+    PlatformType platformType = PlatformType.valueOf(platform);
+    if (platformType == null) {
       throw new RestException("Invalid platform type.");
     }
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(PlatformType.get(platform)));
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
   }
 
   @RequestMapping(value = "dt/project/{id}", method = RequestMethod.GET, produces = "application/json")

@@ -30,7 +30,9 @@
 
 <script src="<c:url value='/scripts/handsontable/dist/handsontable.full.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/handsontable_renderers.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" media="screen" href="/scripts/handsontable/dist/handsontable.full.css">
+<link rel="stylesheet" media="screen" href="<c:url value='/scripts/handsontable/dist/handsontable.full.css'/>">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -74,7 +76,7 @@
        <p id="errorMessages"></p>
      </div>
 
-   <div id="bulkactions"></div>
+   <div id="bulkactions" class="fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix paging_full_numbers"></div>
    <div id="hotContainer"></div>
 
  </div>

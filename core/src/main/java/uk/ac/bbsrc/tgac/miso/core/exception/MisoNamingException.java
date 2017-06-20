@@ -35,14 +35,13 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
 public class MisoNamingException extends Exception {
   private static final long serialVersionUID = 1L;
 
+  /**
+   * Construct a new MisoNamingException containing a user-friendly message as to why the failure occurred
+   * 
+   * @param s user-friendly message
+   */
   public MisoNamingException(String s) {
     super(s);
   }
 
-  public MisoNamingException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-      initCause(cause);
-    }
-  }
 }

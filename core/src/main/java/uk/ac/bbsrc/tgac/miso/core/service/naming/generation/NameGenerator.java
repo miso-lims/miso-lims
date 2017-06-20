@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
+import java.io.IOException;
+
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 
 /**
@@ -9,6 +11,14 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
  */
 public interface NameGenerator<T> {
 
-  public String generate(T object) throws MisoNamingException;
+  /**
+   * Generates the field value for object
+   * 
+   * @param object the entity to generate a field value for
+   * @return the generated value
+   * @throws MisoNamingException if any <b>user-preventable</b> error occurs
+   * @throws IOException if database access is required and fails
+   */
+  public String generate(T object) throws MisoNamingException, IOException;
 
 }

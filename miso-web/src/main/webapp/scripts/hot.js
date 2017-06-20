@@ -331,6 +331,16 @@ var HotUtils = {
                 }
               }
               
+              function toFlatObj(item) {
+                var flatObj = {};
+                columns.forEach(function(c, colIndex) {
+                  c.unpack(item, flatObj, function(key, val) {
+                    // Do nothing. We're unpacking only - not setting cell meta
+                  });
+                });
+                return flatObj;
+              }
+              
               save.disabled = true;
               var ajaxLoader = document.getElementById('ajaxLoader');
               ajaxLoader.classList.remove('hidden');
@@ -390,21 +400,21 @@ var HotUtils = {
                             var bulkActionsDiv = document
                                 .getElementById('bulkactions');
                             var ids = data.map(Utils.array.getId);
-                            for (var i = 0; i < target.bulkActions.length; i++) {
-                              var link = document.createElement('A');
-                              link.href = '#';
-                              link.onclick = (function() {
-                                var doAction = target.bulkActions[i].action;
-                                return function() {
-                                  doAction(ids);
-                                };
-                              })();
-                              link.appendChild(document
-                                  .createTextNode(target.bulkActions[i].name));
-                              var p = document.createElement('P');
-                              p.append(link)
-                              bulkActionsDiv.append(p);
-                            }
+                            target.bulkActions
+                                .forEach(function(bulkAction) {
+                                  var link = document.createElement('A');
+                                  link.href = '#';
+                                  link.setAttribute('class',
+                                      'ui-button ui-state-default');
+                                  link.setAttribute('title',
+                                      bulkAction.title || '');
+                                  link.onclick = function() {
+                                    bulkAction.action(ids);
+                                  };
+                                  link.appendChild(document
+                                      .createTextNode(bulkAction.name));
+                                  bulkActionsDiv.append(link);
+                                });
                           }
                           saveSuccessesClasses.remove('hidden');
                         } else {
@@ -426,11 +436,9 @@ var HotUtils = {
                       xhr.onreadystatechange = function() {
                         if (xhr.readyState === XMLHttpRequest.DONE) {
                           if (xhr.status === 200 || xhr.status === 201) {
+                            data[index] = JSON.parse(xhr.response);
+                            flatObjects[index] = toFlatObj(data[index]);
                             flatObjects[index].saved = true;
-                            if (!data[index].id) {
-                              data[index].id = parseInt(xhr.getResponseHeader(
-                                  'Location').split('/').pop());
-                            }
                           } else {
                             try {
                               var response = JSON.parse(xhr.responseText);
@@ -438,7 +446,7 @@ var HotUtils = {
                                   .push('<b>Row ' + (index + 1) + ': ' + (response.detail || 'Something went terribly wrong. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.</b>'));
                             } catch (e) {
                               failed
-                                  .push('<b>Row ' + (index + 1) + ': The server is talking non-sense again. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.</b>');
+                                  .push('<b>Row ' + (index + 1) + ': The server is talking nonsense again. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.</b>');
                             }
                           }
                           invokeNext(index + 1);
@@ -448,6 +456,7 @@ var HotUtils = {
                           ? target.createUrl
                           : (target.updateUrl + data[index].id));
                       xhr.setRequestHeader('Content-Type', 'application/json');
+                      xhr.setRequestHeader('Accept', 'application/json');
                       xhr.send(JSON.stringify(data[index]));
                     };
                     invokeNext(0);
@@ -497,7 +506,38 @@ var HotUtils = {
     return baseobj;
   },
   
-  makeColumnForFloat : function(headerName, include, property) {
+  makeColumnForOptionalBoolean : function(headerName, include, property) {
+    return {
+      header : headerName,
+      data : property,
+      type : 'dropdown',
+      trimDropdown : false,
+      source : [ 'Unknown', 'True', 'False' ],
+      include : include,
+      unpack : function(obj, flat, setCellMeta) {
+        var result;
+        if (obj[property] === true) {
+          result = 'True';
+        } else if (obj[property] === false) {
+          result = 'False';
+        } else {
+          result = 'Unknown';
+        }
+        flat[property] = result;
+      },
+      pack : function(obj, flat, errorHandler) {
+        if (flat[property] === 'True') {
+          obj[property] = true;
+        } else if (flat[property] === 'False') {
+          obj[property] = false;
+        } else {
+          obj[property] = null;
+        }
+      }
+    };
+  },
+  
+  makeColumnForFloat : function(headerName, include, property, required) {
     return {
       'header' : headerName,
       'data' : property,
@@ -506,6 +546,7 @@ var HotUtils = {
       'unpack' : function(obj, flat, setCellMeta) {
         flat[property] = obj[property];
       },
+      'validator' : required ? HotUtils.validator.requiredNumber : null,
       'pack' : function(obj, flat, errorHandler) {
         var output = null;
         var raw = flat[property];

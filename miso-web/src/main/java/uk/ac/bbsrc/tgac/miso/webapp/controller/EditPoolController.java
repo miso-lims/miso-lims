@@ -52,6 +52,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.sf.json.JSONArray;
 
@@ -65,12 +66,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -266,5 +269,28 @@ public class EditPoolController {
     JSONArray array = new JSONArray();
     array.addAll(sequencingParameters);
     model.put("sequencingParametersJson", array.toString());
+  }
+
+  private final BulkEditTableBackend<Pool, PoolDto> bulkEditBackend = new BulkEditTableBackend<Pool, PoolDto>(
+      "pool", PoolDto.class, "Pools") {
+
+    @Override
+    protected PoolDto asDto(Pool model) {
+      return Dtos.asDto(model, true);
+    }
+
+    @Override
+    protected Iterable<Pool> load(List<Long> modelIds) throws IOException {
+      return poolService.listPoolsById(modelIds);
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    }
+  };
+
+  @RequestMapping(value = "/bulk/edit/{poolIds}", method = RequestMethod.GET)
+  public ModelAndView editDilutions(@PathVariable String poolIds, ModelMap model) throws IOException {
+    return bulkEditBackend.edit(poolIds, model);
   }
 }

@@ -23,6 +23,9 @@ public class PoolDto implements WritableUrls {
   private String lastModified;
   private String description;
   private Long boxId;
+  private boolean discarded;
+  private Double volume;
+  private String platformType;
 
 
   public String getAlias() {
@@ -155,5 +158,29 @@ public class PoolDto implements WritableUrls {
       ldto.setLibraryUrl(
           WritableUrls.buildUriPath(baseUri, "/rest/library/{id}", ldto.getLibrary().getId()));
     }
+  }
+
+  public boolean isDiscarded() {
+    return discarded;
+  }
+
+  public void setDiscarded(boolean isDiscarded) {
+    this.discarded = isDiscarded;
+  }
+
+  public Double getVolume() {
+    return volume;
+  }
+
+  public void setVolume(Double volume) {
+    this.volume = volume;
+  }
+
+  public String getPlatformType() {
+    return platformType;
+  }
+
+  public void setPlatformType(String platformType) {
+    this.platformType = platformType;
   }
 }

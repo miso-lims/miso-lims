@@ -419,6 +419,38 @@ CREATE PROCEDURE addTissueType(
   END IF;
 END//
 
+--  Use inconjunction with the spreadsheet formula: =CONCATENATE("CALL addIdentity('",A2,"', '",B2,"', '",C2,"', ", IF(ISBLANK(D2), "NULL", CONCATENATE("'", D2, "'")), ", '", E2, "', '", F2, "');")
+DROP PROCEDURE IF EXISTS addIdentity//
+CREATE PROCEDURE addIdentity(
+  iProject varchar(255),
+  iExternalName varchar(255),
+  iAlias varchar(255),
+  iDescription varchar(255),
+  iScientificName varchar(255),
+  iSampleType varchar(255)
+) BEGIN
+  DECLARE newSampleId bigint(20);
+  DECLARE errorMessage varchar(300);
+  
+  IF EXISTS (SELECT 1 FROM Identity JOIN Sample USING (sampleId) JOIN Project ON Project.projectId = Sample.project_projectId WHERE externalName = iExternalName AND Project.shortName = iProject OR Sample.alias = iAlias) THEN
+    SET errorMessage = CONCAT('Duplicate identity: ', iExternalName);
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+
+  INSERT INTO Sample(name, alias, description, sampleType, project_projectId, scientificName, lastModifier, securityProfile_profileId) VALUES 
+      ('TEMP_IDENT', iAlias, iDescription, iSampleType, (SELECT projectId FROM Project WHERE shortName = iProject), iScientificName, getAdminUserId(), (SELECT securityProfile_profileId FROM Project WHERE shortName = iProject));
+  SET newSampleId = LAST_INSERT_ID();
+
+  UPDATE Sample SET name = CONCAT('SAM', sampleId) WHERE sampleId = newSampleId;
+
+  INSERT INTO DetailedSample (sampleId, sampleClassId, archived) VALUES (newSampleId, (SELECT sampleClassId FROM SampleClass WHERE alias = 'Identity'), 0);
+
+  INSERT INTO Identity (sampleId, externalName) VALUES (newSampleId, iExternalName);
+
+  INSERT INTO SampleChangeLog (sampleId, columnsChanged, userId, message, changeTime) VALUES (newSampleId, '', getAdminUserId(), 'Sample created.', CURRENT_TIMESTAMP);
+
+END//
+
 DELIMITER ;
 -- EndNoTest
 DROP TRIGGER IF EXISTS BeforeInsertLibrary;

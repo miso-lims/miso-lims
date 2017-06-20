@@ -347,7 +347,7 @@ HotTarget.library = (function() {
                       Constants.kitDescriptors), 'name') || 'None';
             },
             pack : function(lib, flat, errorHandler) {
-              lib.kitDescriptorName = Utils.array
+              lib.kitDescriptorId = Utils.array
                   .maybeGetProperty(
                       Utils.array
                           .findFirstOrNull(
@@ -364,45 +364,25 @@ HotTarget.library = (function() {
                       }).map(Utils.array.getName).sort());
             }
           },
-          {
-            header : 'QC Passed?',
-            data : 'qcPassed',
-            type : 'dropdown',
-            trimDropdown : false,
-            source : [ 'unknown', 'true', 'false' ],
-            include : true,
-            unpack : function(lib, flat, setCellMeta) {
-              flat.qcPassed = lib.qcPassed;
-            },
-            pack : function(lib, flat, errorHandler) {
-              if (flat.qcPassed === 'true') {
-                lib.qcPassed = true;
-              } else if (flat.qcPassed === 'false') {
-                lib.qcPassed = false;
-              } else {
-                lib.qcPassed = null;
-              }
-            }
-          },
+          HotUtils.makeColumnForOptionalBoolean('QC Passed?', true, 'qcPassed'),
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize'),
-          HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume,
-              'volume'),
+          HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume, 'volume'),
+          HotUtils.makeColumnForFloat('Conc.*', true, 'concentration'),
           HotUtils.makeColumnForFloat('Qubit (ng/&#181;l)', !create, 'qcQubit'),
-          HotUtils.makeColumnForFloat('TapeStation (bp)', !create,
-              'qcTapeStation'),
+          HotUtils.makeColumnForFloat('TapeStation (bp)', !create, 'qcTapeStation'),
           HotUtils.makeColumnForFloat('qPCR (mol/&#181;l)', !create, 'qcQPcr'), ];
     },
     
     bulkActions : [
         {
-          name : 'Edit these libraries',
+          name : 'Edit',
           action : function(ids) {
             window.location = window.location.origin + '/miso/library/bulk/edit/' + ids
                 .join(',');
           }
         },
         {
-          name : 'Propagate dilutions',
+          name : 'Make dilutions',
           action : function(ids) {
             window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate/' + ids
                 .join(',');

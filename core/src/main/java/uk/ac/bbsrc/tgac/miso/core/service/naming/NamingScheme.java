@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
+import java.io.IOException;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -32,10 +34,11 @@ public interface NamingScheme {
    * @param nameable the object to generate a name for
    * @return the generated name
    * @throws MisoNamingException if name generation fails
+   * @throws IOException if database access is required and fails
    * @throws UnsupportedOperationException if name generation is not supported. this can be avoided by checking {@link #hasNameGenerator()}
    *           first
    */
-  public String generateNameFor(Nameable nameable) throws MisoNamingException;
+  public String generateNameFor(Nameable nameable) throws MisoNamingException, IOException;
   
   /**
    * Optional method. Sets a validator to be used for all {@link Nameable} object names
@@ -77,10 +80,11 @@ public interface NamingScheme {
    * @param sample the {@link Sample} to generate an alias for
    * @return the generated alias
    * @throws MisoNamingException if alias generation fails
+   * @throws IOException if database access is required and fails
    * @throws UnsupportedOperationException if {@link Sample} alias generation is not supported. this can be avoided by checking
    *           {@link #hasSampleAliasGenerator()} first
    */
-  public String generateSampleAlias(Sample sample) throws MisoNamingException;
+  public String generateSampleAlias(Sample sample) throws MisoNamingException, IOException;
 
   /**
    * Optional method. Sets a validator to be used for {@link Sample} aliases
@@ -122,10 +126,11 @@ public interface NamingScheme {
    * @param library the {@link Library} to generate an alias for
    * @return the generated alias
    * @throws MisoNamingException if alias generation fails
+   * @throws IOException if database access is required and fails
    * @throws UnsupportedOperationException if {@link Library} alias generation is not supported. this can be avoided by checking
    *           {@link #hasLibraryAliasGenerator()} first
    */
-  public String generateLibraryAlias(Library library) throws MisoNamingException;
+  public String generateLibraryAlias(Library library) throws MisoNamingException, IOException;
 
   /**
    * Optional method. Sets a validator to be used for {@link Library} aliases

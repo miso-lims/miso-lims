@@ -96,8 +96,11 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     return library;
   }
 
-  private Library save(Library library) throws IOException {
+  private Library save(Library library, boolean validateAliasUniqueness) throws IOException {
     try {
+      if (!hasTemporaryAlias(library)) {
+        validateAliasOrThrow(library);
+      }
       Long newId = libraryDao.save(library);
       
       Library managed = libraryDao.get(newId);
@@ -109,15 +112,31 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
         validateNameOrThrow(managed, namingScheme);
         needsUpdate = true;
       }
+      if (hasTemporaryAlias(library)) {
+        String generatedAlias = namingScheme.generateLibraryAlias(managed);
+        managed.setAlias(generatedAlias);
+        if (isDetailedLibrary(managed)) {
+          // generation of non-standard aliases is allowed
+          ((DetailedLibrary) managed).setNonStandardAlias(!namingScheme.validateLibraryAlias(generatedAlias).isValid());
+        } else {
+          validateAliasOrThrow(managed);
+        }
+        needsUpdate = true;
+      }
       if (autoGenerateIdBarcodes && isStringEmptyOrNull(managed.getIdentificationBarcode())) {
         // if !autoGenerateIdBarcodes then the identificationBarcode is set by the user
         generateAndSetIdBarcode(managed);
         needsUpdate = true;
       }
-      if (needsUpdate) libraryDao.save(managed);
+      if (needsUpdate) {
+        libraryDao.save(managed);
+      }
+      if (validateAliasUniqueness) {
+        validateAliasUniqueness(managed);
+      }
       return managed;
     } catch (MisoNamingException e) {
-      throw new IllegalArgumentException("Name generator failed to generate valid name for library");
+      throw new IllegalArgumentException(e.getMessage(), e);
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
       throw new ConstraintViolationException(e.getMessage() + " " + ExceptionUtils.getRootCauseMessage(e), e.getSQLException(),
@@ -138,15 +157,9 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     // pre-save field generation
     library.setName(generateTemporaryName());
     if (isStringEmptyOrNull(library.getAlias()) && namingScheme.hasLibraryAliasGenerator()) {
-      try {
-        library.setAlias(namingScheme.generateLibraryAlias(library));
-      } catch (MisoNamingException e) {
-        throw new IOException("Error generating alias for library", e);
-      }
-    } else if (!isDetailedLibrary(library) || !((DetailedLibrary) library).hasNonStandardAlias()) {
-      validateAliasOrThrow(library);
+      library.setAlias(generateTemporaryName());
     }
-    return save(library).getId();
+    return save(library, true).getId();
   }
 
   @Override
@@ -154,12 +167,12 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     Library updatedLibrary = get(library.getId());
     List<Index> originalIndices = new ArrayList<>(updatedLibrary.getIndices());
     authorizationManager.throwIfNotWritable(updatedLibrary);
+    boolean validateAliasUniqueness = !updatedLibrary.getAlias().equals(library.getAlias());
     applyChanges(updatedLibrary, library);
-    validateAliasOrThrow(updatedLibrary);
     setChangeDetails(updatedLibrary);
     loadChildEntities(updatedLibrary);
     makeChangeLogForIndices(originalIndices, updatedLibrary.getIndices(), updatedLibrary);
-    save(updatedLibrary);
+    save(updatedLibrary, validateAliasUniqueness);
   }
 
   @Override
@@ -320,7 +333,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     note.setCreationDate(new Date());
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
-    save(managed);
+    save(managed, false);
   }
 
   @Override

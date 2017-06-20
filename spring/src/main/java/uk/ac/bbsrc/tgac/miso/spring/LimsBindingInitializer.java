@@ -54,7 +54,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
@@ -451,10 +450,10 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     }.register(binder).register(binder, Set.class, "libraries");
 
-    new BindingConverterByPrefixedId<Dilution>(Dilution.class, "LDI") {
+    new BindingConverterByPrefixedId<LibraryDilution>(LibraryDilution.class, "LDI") {
 
       @Override
-      public Dilution resolveById(long id) throws Exception {
+      public LibraryDilution resolveById(long id) throws Exception {
         return dilutionService.get(id);
       }
     }.register(binder).register(binder,

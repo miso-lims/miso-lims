@@ -712,7 +712,7 @@
 </div>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    Library.ui.createListingLibrariesTable(${project.id});
+    ListUtils.createTable('listingLibrariesTable', ListTarget.library, ${project.id}, {});
   });
 </script>
 
@@ -729,7 +729,7 @@
 </div>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    Library.ui.createListingDilutionsTable(${project.id});
+    ListUtils.createTable('listingDilutionsTable', ListTarget.dilution, ${project.id}, {});
   });
 </script>
 

@@ -52,7 +52,6 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -61,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -144,7 +144,7 @@ public class SubmissionControllerHelperService {
           if (j.getString("name").contains("DIL")) {
             Long dilutionId = Long.parseLong(j.getString("name").replaceAll("\\D+", ""));
             Long partitionId = Long.parseLong(j.getString("value").replaceAll("\\D+", ""));
-            Dilution dilution = dilutionService.get(dilutionId);
+            LibraryDilution dilution = dilutionService.get(dilutionId);
             Partition partition = requestManager.getPartitionById(partitionId);
             newSubmission.getDilutions().put(dilution, partition);
           }

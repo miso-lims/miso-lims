@@ -11,9 +11,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,7 +41,7 @@ public class LibraryDilutionRestController extends RestController {
   private final JQueryDataTableBackend<LibraryDilution, DilutionDto> jQueryBackend = new JQueryDataTableBackend<LibraryDilution, DilutionDto>() {
     @Override
     protected DilutionDto asDto(LibraryDilution model) {
-      return Dtos.asDto(model);
+      return Dtos.asMinimalDto(model);
     }
 
     @Override
@@ -112,13 +109,14 @@ public class LibraryDilutionRestController extends RestController {
   @ResponseBody
   public DilutionDto getDilution(@PathVariable Long dilutionId) throws IOException {
     LibraryDilution dilution = dilutionService.get(dilutionId);
-    DilutionDto dilutionDto = Dtos.asDto(dilution);
+    DilutionDto dilutionDto = Dtos.asMinimalDto(dilution);
     return dilutionDto;
   }
 
   @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createDilution(@RequestBody DilutionDto dilutionDto, UriComponentsBuilder b) throws IOException {
+  public DilutionDto createDilution(@RequestBody DilutionDto dilutionDto, UriComponentsBuilder b, HttpServletResponse response)
+      throws IOException {
     if (dilutionDto == null) {
       log.error(
           "Received null dilutionDto from front end; cannot convert to Dilution. Something likely went wrong in the JS DTO conversion.");
@@ -135,11 +133,31 @@ public class LibraryDilutionRestController extends RestController {
       restException.addData("constraintName", e.getConstraintName());
       throw restException;
     }
-    UriComponents uriComponents = b.path("/library/{id}").buildAndExpand(dilution.getLibrary().getId());
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    headers.set("Id", id.toString());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    UriComponents uriComponents = b.path("/{id}").buildAndExpand(dilution.getId());
+    response.setHeader("Location", uriComponents.toUri().toString());
+    return getDilution(id);
+  }
+
+  @RequestMapping(value = "{dilutionId}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @ResponseBody
+  public DilutionDto updateDilution(@PathVariable Long dilutionId, @RequestBody DilutionDto dilutionDto)
+      throws IOException {
+    if (dilutionDto == null) {
+      log.error(
+          "Received null dilutionDto from front end; cannot convert to Dilution. Something likely went wrong in the JS DTO conversion.");
+      throw new RestException("Cannot convert null to Dilution", Status.BAD_REQUEST);
+    }
+    LibraryDilution dilution = Dtos.to(dilutionDto);
+    dilution.setId(dilutionId);
+    dilutionService.update(dilution);
+    return getDilution(dilutionId);
+  }
+
+  @RequestMapping(value = "dt", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<DilutionDto> getDilutions(HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+    return jQueryBackend.get(request, response, uriBuilder);
   }
 
   @RequestMapping(value = "dt/project/{id}", method = RequestMethod.GET, produces = "application/json")

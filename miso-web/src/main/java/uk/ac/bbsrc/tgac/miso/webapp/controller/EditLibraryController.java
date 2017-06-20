@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -105,13 +105,17 @@ import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
+import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
-import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -158,6 +162,9 @@ public class EditLibraryController {
   private RunService runService;
   @Autowired
   private PoolService poolService;
+
+  @Autowired
+  private LibraryDilutionService dilutionService;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -216,6 +223,11 @@ public class EditLibraryController {
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
     return autoGenerateIdBarcodes;
+  }
+
+  @ModelAttribute("aliasGenerationEnabled")
+  public Boolean isAliasGenerationEnabled() {
+    return namingScheme != null && namingScheme.hasLibraryAliasGenerator();
   }
 
   @ModelAttribute("detailedSample")
@@ -362,11 +374,6 @@ public class EditLibraryController {
       visibleFamilies.addAll(indexService.getIndexFamiliesByPlatform(library.getPlatformType()));
       model.put("indexFamilies", visibleFamilies);
     }
-  }
-
-  @ModelAttribute("libraryInitialConcentrationUnits")
-  public String libraryInitialConcentrationUnits() {
-    return AbstractLibrary.UNITS;
   }
 
   @ModelAttribute("libraryQCUnits")
@@ -708,6 +715,10 @@ public class EditLibraryController {
       model.put("formObj", library);
       model.put("library", library);
       model.put("platformTypes", populatePlatformTypes());
+      populateDesigns(model,
+          LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
+      populateDesignCodes(model);
+
       populateAvailableIndexFamilies(library, model);
 
       addAdjacentLibraries(library, model);
@@ -733,11 +744,41 @@ public class EditLibraryController {
     }
   }
 
-  private final BulkTableBackend<Library, LibraryDto, Sample> libraryBulkBackend = new BulkTableBackend<Library, LibraryDto, Sample>(
-      "Libraries", "Samples", "library") {
+  private final BulkEditTableBackend<Library, LibraryDto> libraryBulkEditBackend = new BulkEditTableBackend<Library, LibraryDto>(
+      "library", LibraryDto.class, "Libraries") {
 
     @Override
-    protected LibraryDto packageDtoFromParent(Sample sample) {
+    protected Iterable<Library> load(List<Long> ids) throws IOException {
+      List<Library> results = libraryService.listByIdList(ids);
+      SampleClass sampleClass = null;
+      for (Library library : results) {
+        if (isDetailedSampleEnabled()) {
+          if (sampleClass == null) {
+            sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
+          } else if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
+            throw new IOException("Can only update libraries when samples all have the same class.");
+          }
+        }
+      }
+      return results;
+    }
+
+    @Override
+    protected LibraryDto asDto(Library model) {
+      return Dtos.asDto(model);
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      writeLibraryConfiguration(mapper, config);
+    }
+  };
+
+  private final BulkPropagateTableBackend<Sample, LibraryDto> libraryBulkPropagateBackend = new BulkPropagateTableBackend<Sample, LibraryDto>(
+      "library", LibraryDto.class, "Libraries", "Samples") {
+
+    @Override
+    protected LibraryDto createDtoFromParent(Sample sample) {
       LibraryDto dto;
       if (LimsUtils.isDetailedSample(sample)) {
         DetailedLibraryDto detailedDto = new DetailedLibraryDto();
@@ -750,16 +791,6 @@ public class EditLibraryController {
       }
       dto.setParentSampleId(sample.getId());
       dto.setParentSampleAlias(sample.getAlias());
-      if (namingScheme.hasLibraryAliasGenerator()) {
-        try {
-        Library tempLibrary = new LibraryImpl();
-        tempLibrary.setSample(sample);
-        final String libraryAlias = namingScheme.generateLibraryAlias(tempLibrary);
-        dto.setAlias(libraryAlias);
-        } catch (MisoNamingException e) {
-          log.error("Failed to generate library name", e);
-        }
-      }
       return dto;
     }
 
@@ -788,73 +819,35 @@ public class EditLibraryController {
     }
 
     @Override
-    protected Iterable<Library> load(List<Long> ids) throws IOException {
-      List<Library> results = libraryService.listByIdList(ids);
-      SampleClass sampleClass = null;
-      for (Library library : results) {
-        if (!isDetailedSampleEnabled()) {
-          // Do nothing about sample classes.
-        } else if (sampleClass == null) {
-          sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
-        } else if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
-          throw new IOException("Can only update libraries when samples all have the same class.");
-        }
-      }
-      return results;
-    }
-
-    @Override
-    protected LibraryDto asDto(Library model) {
-      return Dtos.asDto(model);
-    }
-
-    @Override
-    protected Class<? extends LibraryDto> getDtoClass() {
-      return isDetailedSampleEnabled() ? DetailedLibraryDto.class : LibraryDto.class;
-    }
-
-    @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      config.put("showDescription", showDescription);
-      config.put("showVolume", showVolume);
-      config.put("showLibraryAlias", showLibraryAlias);
+      writeLibraryConfiguration(mapper, config);
     }
   };
 
+  private void writeLibraryConfiguration(ObjectMapper mapper, ObjectNode config) {
+    config.put("showDescription", showDescription);
+    config.put("showVolume", showVolume);
+    config.put("showLibraryAlias", showLibraryAlias);
+  }
+
   @RequestMapping(value = "/bulk/propagate/{sampleIds}", method = RequestMethod.GET)
   public ModelAndView propagateFromSamples(@PathVariable String sampleIds, ModelMap model) throws IOException, MisoNamingException {
-    return libraryBulkBackend.propagate(sampleIds, model);
+    return libraryBulkPropagateBackend.propagate(sampleIds, model);
   }
 
   @RequestMapping(value = "/bulk/edit/{libraryIds}", method = RequestMethod.GET)
   public ModelAndView editBulkLibraries(@PathVariable String libraryIds, ModelMap model) throws IOException {
-    return libraryBulkBackend.edit(libraryIds, model);
+    return libraryBulkEditBackend.edit(libraryIds, model);
   }
 
-  private final BulkTableBackend<LibraryDilution, DilutionDto, Library> dilutionBulkBackend = new BulkTableBackend<LibraryDilution, DilutionDto, Library>(
-      "Dilutions", "Libraries", "dilution") {
+  private final BulkPropagateTableBackend<Library, DilutionDto> dilutionBulkPropagateBackend = new BulkPropagateTableBackend<Library, DilutionDto>(
+      "dilution", DilutionDto.class, "Dilutions", "Libraries") {
 
     @Override
-    protected DilutionDto asDto(LibraryDilution model) {
-      return Dtos.asDto(model);
-    }
-
-    @Override
-    protected Class<? extends DilutionDto> getDtoClass() {
-      return DilutionDto.class;
-    }
-
-    @Override
-    protected DilutionDto packageDtoFromParent(Library item) {
+    protected DilutionDto createDtoFromParent(Library item) {
       DilutionDto dto = new DilutionDto();
-      dto.setLibrary(Dtos.asDto(item));
+      dto.setLibrary(Dtos.asMinimalDto(item));
       return dto;
-    }
-
-    @Override
-    protected Iterable<LibraryDilution> load(List<Long> ids) throws IOException {
-      // TODO implement
-      return Collections.emptyList();
     }
 
     @Override
@@ -868,34 +861,31 @@ public class EditLibraryController {
   };
 
   @RequestMapping(value = "/dilutions/bulk/propagate/{libraryIds}", method = RequestMethod.GET)
-  public ModelAndView editPropagateDilutions(@PathVariable String libraryIds, ModelMap model) throws IOException {
-    try {
-      List<Long> idList = getIdsFromString(libraryIds);
-      ObjectMapper mapper = new ObjectMapper();
-      List<LibraryDto> libraryDtos = new ArrayList<>();
-      for (Library library : libraryService.listByIdList(idList)) {
-        libraryDtos.add(Dtos.asDto(library));
-      }
-      model.put("title", "Bulk Create Dilutions");
-      model.put("librariesJSON", mapper.writerFor(new TypeReference<List<LibraryDto>>() {
-      }).writeValueAsString(libraryDtos));
-      model.put("method", "Propagate");
-      return new ModelAndView("/pages/bulkEditDilutions.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.error("Failed to get bulk libraries", ex);
-      }
-      throw ex;
-    }
+  public ModelAndView propagateDilutions(@PathVariable String libraryIds, ModelMap model) throws IOException {
+    return dilutionBulkPropagateBackend.propagate(libraryIds, model);
   }
 
-  public List<Long> getIdsFromString(String idString) {
-    String[] split = idString.split(",");
-    List<Long> idList = new ArrayList<>();
-    for (int i = 0; i < split.length; i++) {
-      idList.add(Long.parseLong(split[i]));
+  private final BulkEditTableBackend<LibraryDilution, DilutionDto> dilutionBulkEditBackend = new BulkEditTableBackend<LibraryDilution, DilutionDto>(
+      "dilution", DilutionDto.class, "Dilutions") {
+
+    @Override
+    protected DilutionDto asDto(LibraryDilution model) {
+      return Dtos.asDto(model);
     }
-    return idList;
+
+    @Override
+    protected Iterable<LibraryDilution> load(List<Long> modelIds) throws IOException {
+      return dilutionService.listByIdList(modelIds);
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    }
+  };
+
+  @RequestMapping(value = "dilution/bulk/edit/{dilutionIds}", method = RequestMethod.GET)
+  public ModelAndView editDilutions(@PathVariable String dilutionIds, ModelMap model) throws IOException {
+    return dilutionBulkEditBackend.edit(dilutionIds, model);
   }
 
   @RequestMapping(method = RequestMethod.POST)
@@ -943,5 +933,103 @@ public class EditLibraryController {
       }
       throw ex;
     }
+  }
+
+  private final BulkPropagateTableBackend<LibraryDilution, PoolDto> poolBulkPropagateBackend = new BulkPropagateTableBackend<LibraryDilution, PoolDto>(
+      "pool", PoolDto.class, "Pools", "Dilutions") {
+
+    @Override
+    protected PoolDto createDtoFromParent(LibraryDilution item) {
+      PoolDto dto = new PoolDto();
+      dto.setAlias(item.getLibrary().getAlias() + "_POOL");
+      dto.setPooledElements(Collections.singleton(Dtos.asDto(item)));
+      dto.setPlatformType(item.getLibrary().getPlatformType().name());
+      dto.setReadyToRun(true);
+      return dto;
+    }
+
+    @Override
+    protected Iterable<LibraryDilution> loadParents(List<Long> ids) throws IOException {
+      return dilutionService.listByIdList(ids);
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    }
+  };
+
+  @RequestMapping(value = "dilution/bulk/propagate/{dilutionIds}", method = RequestMethod.GET)
+  public ModelAndView propagatePoolsIndividual(@PathVariable String dilutionIds, ModelMap model) throws IOException {
+    return poolBulkPropagateBackend.propagate(dilutionIds, model);
+  }
+
+  private final BulkMergeTableBackend<PoolDto> poolBulkMergeBackend = new BulkMergeTableBackend<PoolDto>(
+      "pool", PoolDto.class, "Pools", "Dilutions") {
+
+    /** Given a bunch of strings, find the long substring that matches all of them that doesn't end in numbers or underscores. */
+    private String findCommonPrefix(String[] str) {
+      StringBuilder commonPrefix = new StringBuilder();
+
+      while (commonPrefix.length() < str[0].length()) {
+        char current = str[0].charAt(commonPrefix.length());
+        boolean matches = true;
+        for (int i = 1; matches && i < str.length; i++) {
+          if (str[i].charAt(commonPrefix.length()) != current) {
+            matches = false;
+          }
+        }
+        if (matches) {
+          commonPrefix.append(current);
+        } else {
+          break;
+        }
+      }
+      // Chew back any digits at the end
+      while (commonPrefix.length() > 0 && Character.isDigit(commonPrefix.charAt(commonPrefix.length() - 1))) {
+        commonPrefix.setLength(commonPrefix.length() - 1);
+      }
+      if (commonPrefix.length() > 0 && commonPrefix.charAt(commonPrefix.length() - 1) == '_') {
+        commonPrefix.setLength(commonPrefix.length() - 1);
+      }
+      return (commonPrefix.length() > 0) ? commonPrefix.toString() : null;
+
+    }
+
+    @Override
+    protected PoolDto createDtoFromParents(List<Long> ids) throws IOException {
+      List<LibraryDilution> parents = dilutionService.listByIdList(ids);
+      if (parents.isEmpty()) {
+        throw new IllegalStateException("Cannot have no dilutions for pool propagation.");
+      }
+      List<PlatformType> platformTypes = parents.stream().map(dilution -> dilution.getLibrary().getPlatformType()).distinct()
+          .collect(Collectors.toList());
+      if (platformTypes.size() > 1) {
+        throw new IllegalArgumentException("Cannot create a pool for multiple platforms: "
+            + String.join(", ", platformTypes.stream().map(Enum::name).toArray(CharSequence[]::new)));
+      }
+      PoolDto dto = new PoolDto();
+      dto.setPlatformType(platformTypes.get(0).name());
+      dto.setReadyToRun(true);
+
+      if (parents.size() == 1) {
+        dto.setAlias(parents.get(0).getLibrary().getAlias() + "_POOL");
+      } else {
+        String commonPrefix = findCommonPrefix(parents.stream().map(dilution -> dilution.getLibrary().getAlias()).toArray(String[]::new));
+        if (commonPrefix != null) {
+          dto.setAlias(commonPrefix + "_POOL");
+        }
+      }
+      dto.setPooledElements(parents.stream().map(Dtos::asDto).collect(Collectors.toSet()));
+      return dto;
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    }
+  };
+
+  @RequestMapping(value = "dilution/bulk/merge/{dilutionIds}", method = RequestMethod.GET)
+  public ModelAndView propagatePoolsMerged(@PathVariable String dilutionIds, ModelMap model) throws IOException {
+    return poolBulkMergeBackend.propagate(dilutionIds, model);
   }
 }

@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 
 /**
@@ -98,7 +99,7 @@ public interface Submission extends Nameable, Comparable<Submission>, Serializab
 
   void setExperiments(Set<Experiment> experiments);
 
-  Map<Dilution, Partition> getDilutions();
+  Map<LibraryDilution, Partition> getDilutions();
 
-  void setDilutions(Map<Dilution, Partition> dilutions);
+  void setDilutions(Map<LibraryDilution, Partition> dilutions);
 }

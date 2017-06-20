@@ -25,7 +25,7 @@ public class OicrNamingScheme extends AbstractNamingScheme {
   private final OicrSampleAliasValidator sampleAliasValidator = new OicrSampleAliasValidator();
   private final OicrSampleAliasGenerator sampleAliasGenerator = new OicrSampleAliasGenerator();
   private final OicrLibraryAliasValidator libraryAliasValidator = new OicrLibraryAliasValidator();
-  private final OicrLibraryAliasGenerator libraryAliasGenerator = null;
+  private final OicrLibraryAliasGenerator libraryAliasGenerator = new OicrLibraryAliasGenerator();
   private final OicrProjectShortNameValidator projectShortNameValidator = new OicrProjectShortNameValidator();
 
   /**

@@ -73,7 +73,6 @@ import org.w3c.dom.NodeList;
 
 import net.sf.json.JSONArray;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -81,6 +80,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -474,10 +474,10 @@ public class ERASubmissionManager implements SubmissionManager {
 
   private static final DateFormat DF_TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-  private final class DilutionXmlSubfile extends XmlSubmissionFromSet<Entry<Dilution, Partition>> {
+  private final class DilutionXmlSubfile extends XmlSubmissionFromSet<Entry<LibraryDilution, Partition>> {
 
     @Override
-    protected Set<Entry<Dilution, Partition>> items(Submission submission) {
+    protected Set<Entry<LibraryDilution, Partition>> items(Submission submission) {
       return submission.getDilutions().entrySet();
     }
 
@@ -492,7 +492,7 @@ public class ERASubmissionManager implements SubmissionManager {
     }
 
     @Override
-    protected void populate(Element xml, Entry<Dilution, Partition> entry) {
+    protected void populate(Element xml, Entry<LibraryDilution, Partition> entry) {
       Run r = entry.getValue().getSequencerPartitionContainer().getLastRun();
 
       xml.setAttribute("alias", "L00" + entry.getValue().getPartitionNumber() + ":" + entry.getKey().getName() + ":" + r.getAlias());

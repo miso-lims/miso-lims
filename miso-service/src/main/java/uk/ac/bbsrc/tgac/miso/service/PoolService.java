@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -19,6 +20,8 @@ public interface PoolService extends PaginatedDataSource<Pool> {
   public Collection<Pool> listAllPoolsWithLimit(int limit) throws IOException;
 
   public Collection<Pool> listAllPools() throws IOException;
+
+  public Collection<Pool> listPoolsById(List<Long> poolIds) throws IOException;
 
   public Collection<Pool> listAllPoolsByPlatform(PlatformType platformType) throws IOException;
 

@@ -69,9 +69,9 @@
     <c:otherwise><span id="status" data-status="create">Create</span></c:otherwise>
   </c:choose> Sample
   <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return Sample.validateSample(${detailedSample},
-            ${detailedSample && sample.hasNonStandardAlias()} || ${detailedSample && sample.parent.hasNonStandardAlias()},
-            ${sample.id == 0});">Save
+      onclick="return Sample.validateSample(${detailedSample},
+      ${detailedSample && (sample.hasNonStandardAlias() || sample.parent.hasNonStandardAlias())}, ${sample.id == 0});">
+    Save
   </button>
 </h1>
 
@@ -217,13 +217,14 @@
       <td class="h">
         Alias:
         <c:choose>
-          <c:when test="${aliasGenerationEnabled && sample.id == 0}">
-            (blank to auto-generate)
+          <c:when test="${!aliasGenerationEnabled || sample.id != 0}">
+            *
+          </c:when>
+          <c:when test="${detailedSample && sample.parent.hasNonStandardAlias()}">
+            * (cannot auto-generate since parent has non-standard alias)
           </c:when>
           <c:otherwise>
-            *<c:if test="${detailedSample && sample.parent.hasNonStandardAlias()}">
-            (cannot auto-generate since parent has non-standard alias)
-            </c:if>
+            (blank to auto-generate)
           </c:otherwise>
         </c:choose>
       </td>

@@ -32,27 +32,23 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
   }
 
   @Override
-  public String generate(Sample sample) throws MisoNamingException {
+  public String generate(Sample sample) throws MisoNamingException, IOException {
     if (!LimsUtils.isDetailedSample(sample)) {
       throw new IllegalArgumentException("Can only generate an alias for detailed samples");
     }
     DetailedSample detailed = (DetailedSample) sample;
 
-    try {
-      for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
-        if (isAliquotSample(parent)) {
-          return addSiblingTag(parent.getAlias(), detailed);
-        }
-        if (isTissueSample(parent)) {
-          return addSiblingTag(parent.getAlias(), detailed);
-        }
-        if (isIdentitySample(parent)) {
-          if (!isTissueSample(detailed)) throw new IllegalArgumentException("Missing parent tissue");
-          return generateTissueAlias((SampleTissue) detailed, (Identity) parent);
-        }
+    for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
+      if (isAliquotSample(parent)) {
+        return addSiblingTag(parent.getAlias(), detailed);
       }
-    } catch (IOException e) {
-      throw new MisoNamingException("Failed to determine next sibling number", e);
+      if (isTissueSample(parent)) {
+        return addSiblingTag(parent.getAlias(), detailed);
+      }
+      if (isIdentitySample(parent)) {
+        if (!isTissueSample(detailed)) throw new IllegalArgumentException("Missing parent tissue");
+        return generateTissueAlias((SampleTissue) detailed, (Identity) parent);
+      }
     }
     // Identity name generation requires access to SampleNumberPerProjectDao
     throw new IllegalArgumentException("Cannot generate alias for Identities");

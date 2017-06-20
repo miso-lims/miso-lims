@@ -67,17 +67,20 @@ var Library = Library || {
     }
   },
   
-  validateLibrary: function () {
+  validateLibrary: function (skipAliasValidation) {
     Validate.cleanFields('#library-form');
     jQuery('#library-form').parsley().destroy();
 
     // Alias input field validation
     jQuery('#alias').attr('class', 'form-control');
-    jQuery('#alias').attr('data-parsley-required', 'true');
     jQuery('#alias').attr('data-parsley-maxlength', '100');
     jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    jQuery('#alias').attr('data-parsley-library-alias', '');
-    jQuery('#alias').attr('data-parsley-debounce', '500');
+    if (skipAliasValidation) {
+      jQuery('#alias').attr('data-parsley-required', 'true');
+    } else {
+      jQuery('#alias').attr('data-parsley-library-alias', '');
+      jQuery('#alias').attr('data-parsley-debounce', '500');
+    }
 
     // Description input field validation
     jQuery('#description').attr('class', 'form-control');
@@ -94,7 +97,12 @@ var Library = Library || {
     jQuery('#volume').attr('data-parsley-maxlength', '10');
     jQuery('#volume').attr('data-parsley-type', 'number');
 
-    if (Hot.detailedSample) {
+    if (Constants.isDetailedSample) {
+      var generatingAlias = Constants.automaticLibraryAlias == true && jQuery('#alias').val().length === 0;
+      var selectedPlatform = jQuery('#platformTypes option:selected').text();
+      
+      jQuery('#dnaSize').attr('data-parsley-required', generatingAlias && selectedPlatform === 'Illumina');
+      
       // Prep Kit validation
       jQuery('#libraryKit').attr('class', 'form-control');
       jQuery('#libraryKit').attr('data-parsley-required', 'true');
@@ -102,6 +110,12 @@ var Library = Library || {
       jQuery('#libraryDesignCodes').attr('class', 'form-control');
       jQuery('#libraryDesignCodes').attr('data-parsley-required', 'true');
       jQuery('#libraryDesignCodes').attr('data-parsley-min', 1);
+      
+      // Concentration validation
+      jQuery('#initialConcentration').attr('class', 'form-control');
+      jQuery('#initialConcentration').attr('data-parsley-maxlength', '10');
+      jQuery('#initialConcentration').attr('data-parsley-type', 'number');
+      jQuery('#initialConcentration').attr('data-parsley-required', generatingAlias && selectedPlatform === 'PacBio');
     }
 
     jQuery('#library-form').parsley();
@@ -387,130 +401,6 @@ Library.dilution = {
   }
 };
 
-Library.empcr = {
-  insertEmPcrRow: function (dilutionId) {
-    if (!jQuery('#emPcrTable').attr("pcrInProgress")) {
-      jQuery('#emPcrTable').attr("pcrInProgress", "true");
-
-      jQuery('#emPcrTable')[0].insertRow(1);
-
-      var column2 = jQuery('#emPcrTable')[0].rows[1].insertCell(-1);
-      column2.innerHTML = "" + dilutionId + " <input type='hidden' id='dilutionId' name='dilutionId' value='" + dilutionId + "'/>";
-      var column3 = jQuery('#emPcrTable')[0].rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='emPcrCreator' name='emPcrCreator' type='hidden' value='" + jQuery('#currentUser')[0].innerHTML + "'/>" + jQuery('#currentUser')[0].innerHTML;
-      var column4 = jQuery('#emPcrTable')[0].rows[1].insertCell(-1);
-      column4.innerHTML = "<input id='emPcrDate' name='emPcrDate' type='text'/>";
-      var column5 = jQuery('#emPcrTable')[0].rows[1].insertCell(-1);
-      column5.innerHTML = "<input id='emPcrResults' name='emPcrResults' type='text'/>";
-      var column6 = jQuery('#emPcrTable')[0].rows[1].insertCell(-1);
-      column6.innerHTML = "<a href='javascript:void(0);' onclick='Library.empcr.addEmPcr();'/>Add</a>";
-
-      Utils.ui.addMaxDatePicker("emPcrDate", 0);
-    }
-    else {
-      alert("Cannot add another emPCR when one is already in progress.");
-    }
-  },
-
-  addEmPcr: function () {
-    var f = Utils.mappifyForm("addEmPcrForm");
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'addEmPcr',
-      {
-        'dilutionId': f.dilutionId,
-        'pcrCreator': f.emPcrCreator,
-        'pcrDate': f.emPcrDate,
-        'results': f.emPcrResults,
-        'url': ajaxurl},
-      {
-        'updateElement': 'emPcrTable',
-        'doOnSuccess': function () {
-          jQuery('#emPcrTable').removeAttr("pcrInProgress");
-        }
-      }
-    );
-  },
-
-  insertEmPcrDilutionRow: function (emPcrId) {
-    if (!jQuery('#emPcrDilutionTable').attr("dilutionInProgress")) {
-      jQuery('#emPcrDilutionTable').attr("dilutionInProgress", "true");
-
-      jQuery('#emPcrDilutionTable')[0].insertRow(1);
-
-      var column2 = jQuery('#emPcrDilutionTable')[0].rows[1].insertCell(-1);
-      column2.innerHTML = "" + emPcrId + " <input type='hidden' id='emPcrId' name='emPcrId' value='" + emPcrId + "'/>";
-      var column3 = jQuery('#emPcrDilutionTable')[0].rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='emPcrDilutionCreator' name='emPcrDilutionCreator' type='hidden' value='" + jQuery('#currentUser')[0].innerHTML + "'/>" + jQuery('#currentUser')[0].innerHTML;
-      var column4 = jQuery('#emPcrDilutionTable')[0].rows[1].insertCell(-1);
-      column4.innerHTML = "<input id='emPcrDilutionDate' name='emPcrDilutionDate' type='text'/>";
-      var column6 = jQuery('#emPcrDilutionTable')[0].rows[1].insertCell(-1);
-      column6.innerHTML = "<input id='emPcrDilutionResults' name='emPcrDilutionResults' type='text'/>";
-      var column7 = jQuery('#emPcrDilutionTable')[0].rows[1].insertCell(-1);
-      column7.innerHTML = "<a href='javascript:void(0);' onclick='Library.empcr.addEmPcrDilution();'/>Add</a>";
-
-      Utils.ui.addMaxDatePicker("emPcrDilutionDate", 0);
-    }
-    else {
-      alert("Cannot add another dilution when one is already in progress.");
-    }
-  },
-
-  addEmPcrDilution: function () {
-    var f = Utils.mappifyForm("addEmPcrDilutionForm");
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'addEmPcrDilution',
-      {
-        'pcrId': f.emPcrId,
-        'pcrDilutionCreator': f.emPcrDilutionCreator,
-        'pcrDilutionDate': f.emPcrDilutionDate,
-        //'pcrDilutionBarcode':f.emPcrDilutionBarcode.value,
-        'results': f.emPcrDilutionResults,
-        'url': ajaxurl
-      },
-      {
-        'updateElement': 'emPcrDilutionTable',
-        'doOnSuccess': function () {
-          jQuery('#emPcrDilutionTable').removeAttr("dilutionInProgress");
-        }
-      }
-    );
-  },
-
-  deleteEmPCR: function (empcrId) {
-    if (confirm("Are you sure you really want to delete EmPCR " + empcrId + "? This operation is permanent!")) {
-      Fluxion.doAjax(
-        'libraryControllerHelperService',
-        'deleteEmPCR',
-        {
-          'empcrId': empcrId,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': window.location.reload(true)
-        }
-      );
-    }
-  },
-
-  deleteEmPCRDilution: function (empcrDilutionId) {
-    if (confirm("Are you sure you really want to delete EmPCRDilution" + empcrDilutionId + "? This operation is permanent!")) {
-      Fluxion.doAjax(
-        'libraryControllerHelperService',
-        'deleteEmPCRDilution',
-        {
-          'empcrDilutionId': empcrDilutionId,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': window.location.reload(true)
-        }
-      );
-    }
-  }
-};
-
 Library.barcode = {
   editLibraryBarcode: function(span, id) {
     Fluxion.doAjax(
@@ -726,9 +616,15 @@ Library.barcode = {
 };
 
 Library.ui = {
+  updateConcentrationUnits: function() {
+    var platformType = Library.ui.getSelectedPlatformType();
+    // default to 'nM' before platform is chosen
+    var units = platformType == null ? 'nM' : platformType.libraryConcentrationUnits;
+    jQuery('#concentrationUnits').text(units);
+  },
+    
   changePlatformType: function (originalLibraryTypeId, callback) {
-    var platformTypeKey = jQuery('#platformTypes').val();
-    var platformType = Constants.platformTypes.filter(function(pt) { return pt.key == platformTypeKey; })[0];
+    var platformType = Library.ui.getSelectedPlatformType();
 
     var indexFamilySelect = jQuery('#indexFamily').empty()[0];
     Constants.indexFamilies.filter(function(family) { return !family.platformType || family.platformType == platformType.name; }).sort(function(a, b) {
@@ -753,9 +649,15 @@ Library.ui = {
       return option;
     }).forEach(function(o) { libraryTypesSelect.appendChild(o); });
     Library.ui.updateIndices();
+    Library.ui.updateConcentrationUnits();
     if (callback) {
       callback();
     }
+  },
+  
+  getSelectedPlatformType: function() {
+    var platformTypeKey = jQuery('#platformTypes').val();
+    return Constants.platformTypes.filter(function(pt) { return pt.key == platformTypeKey; })[0];
   },
 
   updateIndices: function () {
@@ -1064,301 +966,6 @@ Library.ui = {
         }
       );
     }
-  },
-  toAdd: [],
-
-  createListingLibrariesTable: function (projectId) {
-    jQuery('#listingLibrariesTable').html("");
-    jQuery('#listingLibrariesTable').dataTable(Utils.setSortFromPriority({
-      "aoColumns": [
-    	Utils.createToggleColumn("Library.ui.toAdd"),
-        {
-          "sTitle": "Library Name",
-          "mData": "id",
-          "include": true,
-          "iSortPriority": 1,
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/library/" + data + "\">" + full.name + "</a>";
-          }
-        },
-        {
-          "sTitle": "Alias",
-          "mData": "alias",
-          "include": true,
-          "iSortPriority": 0,
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/library/" + full.id + "\">" + data + "</a>";
-          }
-        },
-        {
-          "sTitle": "Sample Name", 
-          "sType": "no-sam",
-          "mData": "parentSampleId" ,
-          "include": true,
-          "iSortPriority": 0,
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/sample/" + data + "\">" + full.parentSampleAlias + " (SAM" + data + ")</a>";
-          }
-        },
-        {
-          "sTitle": "QC Passed",
-          "mData": "qcPassed",
-          "include": true,
-          "iSortPriority": 0,
-          "mRender": function (data, type, full) {
-            // data is returned as "true", "false", or "null"
-            return (data != null ? (data ? "True" : "False") : "Unknown");
-          }
-        },
-        {
-          "sTitle": "Index(es)",
-          "mData": "index1Label",
-          "mRender": function (data, type, full) {
-            return (data ? (full.index2Label ? data + ", " + full.index2Label : data) : "None");
-          },
-          "include": true,
-          "iSortPriority": 0,
-          "bSortable": false
-        },
-        {
-          "sTitle": "Location",
-          "mData": "locationLabel",
-          "include": true,
-          "iSortPriority": 0,
-          "mRender": function (data, type, full) {
-            return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
-          },
-          "bSortable": false
-        },
-        {
-          "sTitle": "Last Updated",
-          "mData": "lastModified",
-          "include": true,
-          "iSortPriority": 2,
-          "bVisible": (Sample.detailedSample ? "true" : "false")
-        },
-        {
-          "sTitle": "Barcode",
-          "mData": "identificationBarcode",
-          "include": true,
-          "iSortPriority": 0,
-          "bVisible": false
-        }
-      ].filter(function(x) { return x.include; }),
-      "bJQueryUI": true,
-      "bAutoWidth": false,
-      "iDisplayLength": 25,
-      "iDisplayStart": 0,
-      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-      "sPaginationType": "full_numbers",
-      "bProcessing": true,
-      "bServerSide": true,
-      "sAjaxSource": "/miso/rest/library/dt" + (projectId ? "/project/" + projectId : ""),
-      "fnServerData": function (sSource, aoData, fnCallback) {
-        jQuery('#listingLibrariesTable').addClass('disabled');
-        jQuery.ajax({
-          "dataType": "json",
-          "type": "GET",
-          "url": sSource,
-          "data": aoData,
-          "success": function(d, s, x) {
-             Library.listData = d;
-             fnCallback(d, s, x);
-          }
-        });
-      },
-      "fnDrawCallback": function (oSettings) {
-        jQuery('#listingLibrariesTable').removeClass('disabled');
-        jQuery('#listingLibrariesTable_paginate').find('.fg-button').removeClass('fg-button');
-      }
-    })).fnSetFilteringDelay();
-  },
-  createListingLibrariesTableMain: function (projectId) {
-    Library.ui.createListingLibrariesTable(null);
-    jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    
-    var selectAll = '<label><input type="checkbox" onchange="Library.ui.checkAll(this)" id="checkAll">Select All</label>';
-    document.getElementById('listingLibrariesTable').insertAdjacentHTML('beforebegin', selectAll);
-    
-    var actions = ['<select id="dropdownActions"><option value="">-- Bulk actions</option>'];
-    actions.push('<option value="update">Update selected</option>');
-    actions.push('<option value="dilutions">Make dilutions from selected</option>');
-    actions.push('<option value="empty">Empty selected</option>');
-    actions.push('<option value="archive">Archive selected</option>');
-    actions.push('</select>');
-    document.getElementById('listingLibrariesTable').insertAdjacentHTML('afterend', actions.join(''));
-    var saveButton = '<button id="go" type="button" onclick="Library.ui.handleBulkAction();">Go</button>';
-    document.getElementById('dropdownActions').insertAdjacentHTML('afterend', saveButton);
-  },
-   createListingDilutionsTable: function (projectId) {
-    jQuery('#listingDilutionsTable').html("");
-    jQuery('#listingDilutionsTable').dataTable(Utils.setSortFromPriority({
-      "aoColumns": [
-        {
-          "sTitle": "Dilution Name",
-          "mData": "name",
-          "include": true,
-          "iSortPriority": 1,
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/library/" + full.library.id + "\">" + data + "</a>";
-          }
-        },
-        {
-          "sTitle": "Parent Library",
-          "mData": "library.alias",
-          "include": true,
-          "iSortPriority": 0,
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/library/" + full.library.id + "\">" + data + "</a>";
-          }
-        },
-        {
-          "sTitle": "Creator",
-          "mData": "dilutionUserName" ,
-          "include": true,
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Creation Date",
-          "mData": "creationDate",
-          "include": true,
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Platform",
-          "mData": "library.platformType",
-          "include": true,
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Concentration",
-          "mData": "concentration",
-          "include": true,
-          "iSortPriority": 0
-        }
-      ].filter(function(x) { return x.include; }),
-      "bJQueryUI": true,
-      "bAutoWidth": false,
-      "iDisplayLength": 25,
-      "iDisplayStart": 0,
-      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-      "sPaginationType": "full_numbers",
-      "bProcessing": true,
-      "bServerSide": true,
-      "sAjaxSource": "/miso/rest/librarydilution/dt" + (projectId ? "/project/" + projectId : ""),
-      "fnServerData": function (sSource, aoData, fnCallback) {
-        jQuery('#listingDilutionsTable').addClass('disabled');
-        jQuery.ajax({
-          "dataType": "json",
-          "type": "GET",
-          "url": sSource,
-          "data": aoData,
-          "success": function(d, s, x) {
-             Library.listData = d;
-             fnCallback(d, s, x);
-          }
-        });
-      },
-      "fnDrawCallback": function (oSettings) {
-        jQuery('#listingDilutionsTable').removeClass('disabled');
-        jQuery('#listingDilutionsTable_paginate').find('.fg-button').removeClass('fg-button');
-      }
-    })).fnSetFilteringDelay();
-  },
-
-  /**
-   * Check all boxes to select all libraries on the page.
-   */
-  checkAll: function (el) {
-    jQuery('.bulkCheckbox').each(function() {
-      this.checked = el.checked;
-    })
-  },
-  
-  handleBulkAction: function () {
-    var selectedValue = document.getElementById('dropdownActions').value;
-    var options = {
-      "update": Library.ui.updateSelectedItems,
-      "dilutions": Library.ui.makeDilutionsFromSelectedItems,
-      "empty": Library.ui.emptySelectedItems,
-      "archive": Library.ui.archiveSelectedItems
-    }
-    var action = options[selectedValue];
-    action();
-  },
-  
-  // get array of selected IDs
-  getSelectedIds: function () {
-    jQuery('.bulkCheckbox').each(function() {
-      if (this.checked) {
-        var elementId = Number(jQuery(this).attr('elementid'));
-        Library.ui.toAdd.push(elementId);
-      }
-    });
-	  return Library.ui.toAdd;
-  },
-  
-  updateSelectedItems: function () {
-    var selectedIdsArray = Library.ui.getSelectedIds();
-    if (selectedIdsArray.length === 0) {
-      alert("Please select one or more Libraries to update.");
-      return false;
-    }
-    if (!Utils.checkCommonSampleClasses(Library.listData, function(x) { return x.parentSampleClassId; }, selectedIdsArray, "All selected libraries must be made from samples of the same class.")) {
-      return false;
-    }
-    window.location = "library/bulk/edit/" + selectedIdsArray.join(',');
-  },
-  
-  makeDilutionsFromSelectedItems: function () {
-    var selectedIdsArray = Library.ui.getSelectedIds();
-    if (selectedIdsArray.length === 0) {
-      alert("Please select one or more Libraries to dilute.");
-      return false;
-    }
-    window.location="library/dilutions/bulk/propagate/" + selectedIdsArray.join(',');
-  },
-  
-  // TODO: finish this, and the one in sample_ajax.js
-  emptySelectedItems: function () {
-    var selectedIdsArray = Library.ui.getSelectedIds();
-    if (selectedIdsArray.length === 0) {
-      alert("Please select one or more Libraries to empty.");
-      return false;
-    }
-    var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
-      + '<img src="http://nicolascage.us/wp-content/uploads/2013/08/Comet-Cage1.jpg"/></span></div>';
-    document.getElementById('go').insertAdjacentHTML('afterend', cageDiv);
-    jQuery('#cageDialog').dialog({
-      modal: true,
-      width: 620,
-      buttons: {
-        "Ok": function () {
-          jQuery(this).dialog("close");
-        }
-      }
-    });
-  },
-  
-  //TODO: finish this, and the one in sample_ajax.js
-  archiveSelectedItems: function () {
-    var selectedIdsArray = Library.ui.getSelectedIds();
-    if (selectedIdsArray.length === 0) {
-      alert("Please select one or more Libraries to archive.");
-      return false;
-    }
-    var cageDiv = '<div id="cageDialog"><span class="dialog">Look for this feature in the next release!<br>' 
-      + '<img src="http://i2.listal.com/image/1675309/600full-fast-times-at-ridgemont-high-screenshot.jpg"/></span></div>';
-    document.getElementById('go').insertAdjacentHTML('afterend', cageDiv);
-    jQuery('#cageDialog').dialog({
-      modal: true,
-      width: 620,
-      buttons: {
-        "Ok": function () {
-          jQuery(this).dialog("close");
-        }
-      }
-    });
   },
 
   changeDesign: function(callback) {
