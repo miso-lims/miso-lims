@@ -57,6 +57,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -1736,5 +1738,24 @@ public class Dtos {
     to.setName(dto.getName());
 
     return to;
+  }
+
+  public static StudyDto asDto(Study from) {
+    StudyDto dto = new StudyDto();
+    dto.setId(from.getId());
+    dto.setAccession(from.getAccession());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    dto.setName(from.getName());
+    dto.setProjectId(from.getProject().getId());
+    dto.setStudyTypeId(from.getStudyType().getId());
+    return dto;
+  }
+
+  public static StudyTypeDto asDto(StudyType from) {
+    StudyTypeDto dto = new StudyTypeDto();
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    return dto;
   }
 }

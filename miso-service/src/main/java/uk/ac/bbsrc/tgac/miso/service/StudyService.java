@@ -6,8 +6,9 @@ import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface StudyService {
+public interface StudyService extends PaginatedDataSource<Study> {
   public void delete(Study study) throws IOException;
 
   public Study get(long studyId) throws IOException;
@@ -15,8 +16,6 @@ public interface StudyService {
   public Map<String, Integer> getColumnSizes() throws IOException;
 
   public StudyType getType(long id);
-
-  public Collection<Study> list() throws IOException;
 
   /**
    * Obtain a list of all the Studys the user has access to. Access is defined as either read or write access.

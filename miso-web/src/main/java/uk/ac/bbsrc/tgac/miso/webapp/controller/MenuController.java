@@ -79,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -124,6 +125,9 @@ public class MenuController implements ServletContextAware {
 
   @Autowired
   private BoxService boxService;
+
+  @Autowired
+  private StudyService studyService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -282,6 +286,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "boxSizes", boxService.listSizes(), Function.identity());
     createArray(mapper, baseUri, node, "boxUses", boxService.listUses(), Function.identity());
+    createArray(mapper, baseUri, node, "studyTypes", studyService.listTypes(), Dtos::asDto);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);
