@@ -1,3 +1,12 @@
+# 0.2.72
+
+Changes:
+
+ * Allow bulk propagation of dilutions to pool
+ * Generate library aliases (OICR)
+ * Add list dilutions page
+ * [maven-release-plugin] prepare for next development iteration
+
 # 0.2.71
 
 Changes:
