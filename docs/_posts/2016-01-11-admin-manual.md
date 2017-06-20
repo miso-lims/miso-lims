@@ -372,7 +372,7 @@ Updating the database (or setting it up initially) will apply patches to the dat
     cd ${FLYWAY}
     rm -f lib/sqlstore-*.jar
     unzip -xjo $CATALINA_HOME/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d lib
-    ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration migrate,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate
+    ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate
 
 
 
