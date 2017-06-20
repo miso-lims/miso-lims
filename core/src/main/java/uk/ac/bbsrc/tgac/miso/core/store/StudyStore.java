@@ -30,6 +30,7 @@ import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * Defines a DAO interface for storing Studies
@@ -37,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
  * @author Rob Davey
  * @since version
  */
-public interface StudyStore extends Store<Study>, Remover<Study> {
+public interface StudyStore extends Store<Study>, Remover<Study>, PaginatedDataSource<Study> {
   /**
    * List all Studies that match a search criteria
    * 

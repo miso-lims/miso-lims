@@ -42,6 +42,6 @@ public class ListItemsPage {
   /**
    * Pass arbitrary configuration data to the front end so that it can display the correct interface.
    */
-  protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+  protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
   }
 }

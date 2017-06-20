@@ -99,7 +99,7 @@ public class StudyImpl implements Study {
   private StudyType studyType;
   @Column(name = "alias")
   private String alias;
-  @OneToMany(targetEntity = StudyChangeLog.class, mappedBy = "study")
+  @OneToMany(targetEntity = StudyChangeLog.class, mappedBy = "study", cascade = { CascadeType.REMOVE })
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @ManyToOne(targetEntity = UserImpl.class)

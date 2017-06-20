@@ -539,74 +539,21 @@
 <br/>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#studies_arrowclick'), 'studiesdiv');">
-  ${fn:length(project.studies)} Studies
+  Studies
   <div id="studies_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="studiesdiv" style="display:none;">
-  <h1>${fn:length(project.studies)} Studies</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('studymenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="studymenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <a href='<c:url value="/miso/study/new/${project.id}"/> '>Add new Study</a>
-        <a href='<c:url value="/miso/experimentwizard/new/${project.id}"/> '>Create Experiments</a>
-        <a href='<c:url value="/miso/poolwizard/new/${project.id}"/> '>Create Pools</a>
-      </div>
-    </li>
-  </ul>
+  <h1>Studies</h1>
   <div style="clear:both">
     <table class="list" id="study_table">
-      <thead>
-      <tr>
-        <th>Study Name</th>
-        <th>Study Alias</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${project.studies}" var="study">
-        <tr studyId="${study.id}" onMouseOver="this.className='highlightrow'"
-            onMouseOut="this.className='normalrow'">
-          <td><b><a href="<c:url value='/miso/study/${study.id}'/>">${study.name}</a></b></td>
-          <td><a href="<c:url value='/miso/study/${study.id}'/>">${study.alias}</a></td>
-
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Study.deleteStudy(${study.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"></span>
-            </td>
-          </sec:authorize>
-        </tr>
-      </c:forEach>
-      </tbody>
     </table>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#study_table').dataTable({
-          "aaSorting": [
-            [1, 'asc']
-          ],
-          "aoColumns": [
-            null,
-            { "sType": 'natural' }
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true,
-          "sPaginationType": "full_numbers",
-          "fnDrawCallback": function (oSettings) {
-            jQuery('#study_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-          }
-        });
-      });
-    </script>
   </div>
 </div>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    ListUtils.createTable('study_table', ListTarget.study, ${project.id}, { "isAdmin" : ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')} });
+  });
+</script>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_arrowclick'), 'samplesdiv');">
   Samples

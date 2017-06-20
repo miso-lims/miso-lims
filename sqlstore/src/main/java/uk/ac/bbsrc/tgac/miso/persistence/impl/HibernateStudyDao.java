@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
@@ -57,8 +59,10 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  */
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateStudyDao implements StudyStore {
+public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSource<Study> {
   private static final String TABLE_NAME = "Study";
+  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "description" };
+  private static final Iterable<String> STANDARD_ALIASES = Arrays.asList("project", "lastModifier");
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateStudyDao.class);
 
@@ -84,7 +88,8 @@ public class HibernateStudyDao implements StudyStore {
     this.template = template;
   }
 
-  private Session currentSession() {
+  @Override
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 
@@ -169,4 +174,50 @@ public class HibernateStudyDao implements StudyStore {
   public StudyType getType(long id) {
     return (StudyType) currentSession().get(StudyType.class, id);
   }
+
+  @Override
+  public String getFriendlyName() {
+    return "Study";
+  }
+
+  @Override
+  public String getProjectColumn() {
+    return "project.id";
+  }
+
+  @Override
+  public Class<? extends Study> getRealClass() {
+    return StudyImpl.class;
+  }
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return STANDARD_ALIASES;
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, DateType type) {
+    return null;
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    switch (original) {
+    case "studyTypeId":
+      return "studyType.id";
+    default:
+    return original;
+    }
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return creator ? null : "lastModifier.loginName";
+  }
+
 }
