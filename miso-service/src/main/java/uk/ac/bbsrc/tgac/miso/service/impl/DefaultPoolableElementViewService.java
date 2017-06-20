@@ -52,4 +52,9 @@ public class DefaultPoolableElementViewService implements PoolableElementViewSer
     return poolableElementViewDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
+  @Override
+  public List<PoolableElementView> list(List<Long> dilutionIds) throws IOException {
+    return poolableElementViewDao.list(dilutionIds);
+  }
+
 }

@@ -36,7 +36,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,18 +71,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
@@ -104,8 +100,6 @@ public class PoolControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
-  @Autowired
   private PoolService poolService;
   @Autowired
   private MisoFilesManager misoFileManager;
@@ -115,8 +109,6 @@ public class PoolControllerHelperService {
   private ExperimentService experimentService;
   @Autowired
   private LibraryDilutionService dilutionService;
-  @Autowired
-  private PoolableElementViewService poolableElementViewService;
   @Autowired
   private RunService runService;
   @Autowired
@@ -597,68 +589,8 @@ public class PoolControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
   }
 
-  public JSONObject addDilutions(HttpSession session, JSONObject json) {
-    Long poolId = json.getLong("poolId");
-    JSONArray dilutionIds = json.getJSONArray("dilutionIds");
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = poolService.get(poolId);
-      if (!pool.userCanWrite(user)) {
-        return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
-      }
-      for (int i = 0; i < dilutionIds.size(); i++) {
-        PoolableElementView target = poolableElementViewService.get(dilutionIds.getLong(i));
-        if (target == null) {
-          return JSONUtils.SimpleJSONError("No such element.");
-        }
-        pool.getPoolableElementViews().add(target);
-      }
-      pool.setLastModifier(user);
-      poolService.save(pool);
-      return JSONUtils.SimpleJSONResponse("Pool modified.");
-    } catch (IOException e) {
-      log.error("Add poolable element", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-  }
-
-  public JSONObject removeDilutions(HttpSession session, JSONObject json) {
-    Long poolId = json.getLong("poolId");
-    JSONArray dilutionIds = json.getJSONArray("dilutionIds");
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = poolService.get(poolId);
-      if (!pool.userCanWrite(user)) {
-        return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
-      }
-      Set<Long> deadIds = new HashSet<>();
-      for (int i = 0; i < dilutionIds.size(); i++) {
-        deadIds.add(dilutionIds.getLong(i));
-      }
-      List<PoolableElementView> deadDilutions = new ArrayList<>();
-      for (PoolableElementView element : pool.getPoolableElementViews()) {
-        if (deadIds.contains(element.getDilutionId())) {
-          deadDilutions.add(element);
-        }
-      }
-      if (deadDilutions.size() > 0) {
-        pool.getPoolableElementViews().removeAll(deadDilutions);
-        pool.setLastModifier(user);
-        poolService.save(pool);
-      }
-      return JSONUtils.SimpleJSONResponse("Pool modified.");
-    } catch (IOException e) {
-      log.error("Remove poolable element", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-  }
-
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
   }
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
