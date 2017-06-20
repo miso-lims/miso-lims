@@ -453,20 +453,18 @@
   <div id="pooled_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="pooled" style="display:block">
-<h1>Pooled Elements</h1>
+<h1>Dilutions</h1>
 <c:choose>
 <c:when test="${pool.id == 0}">
-<p>Please save the pool before adding elements.</p>
+<p>Please save the pool before adding dilutions.</p>
 </c:when>
 <c:otherwise>
-  <h2>Selected element(s):</h2>
-  <button type="button" onclick="return Pool.ui.removeDilutions(${pool.id});" class="fg-button ui-state-default ui-corner-all">Remove Selected</button>
+  <h2>Included:</h2>
   <div id="pooledList">
     <table class="display no-border full-width" id="includedTable"></table>
   </div>
 
-  <h2 class="hrule">Select poolable elements:</h2>
-  <button type="button" onclick="return Pool.ui.addDilutions(${pool.id});" class="fg-button ui-state-default ui-corner-all">Add Selected</button>
+  <h2 class="hrule">Available:</h2>
   
   <div id="elementSelectDatatableDiv">
     <table class="display no-border full-width" id="availableTable"></table>
@@ -474,9 +472,8 @@
   
   <script type="text/javascript">
       jQuery(document).ready(function () {
-          Pool.ui.dilutionConcentrationUnits = '${libraryDilutionUnits}';
-          Pool.ui.createIncludedDilutionTable(${pool.id});
-          Pool.ui.createAvailableDilutionTable(${pool.id});
+          ListUtils.createTable('includedTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : false });
+          ListUtils.createTable('availableTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : true });
       });
   </script>
 </c:otherwise>
@@ -508,6 +505,7 @@
   </div>
 </c:if>
 
+<div id="dialog"></div>
 <div id="order-dialog" title="Order" hidden="true">
 <span id="partitionName">${pool.platformType.partitionName}s</span>: <input type="text" name="partitions" value="1" id="orderPartitions" /><br/>
 Platform: <select id="orderPlatformId" onchange="Pool.orders.changePlatform()"><c:forEach items="${platforms}" var="platform"><option value="${platform.id}">${platform.nameAndModel}</option></c:forEach></select><br/>

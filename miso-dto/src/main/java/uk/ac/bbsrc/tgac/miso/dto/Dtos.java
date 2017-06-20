@@ -1266,18 +1266,23 @@ public class Dtos {
     dto.setName(from.getDilutionName());
     dto.setDilutionUserName(from.getCreatorName());
     dto.setConcentration(from.getDilutionConcentration());
+    dto.setLastModified(getDateString(from.getLastModified()));
     if (from.getCreated() != null) {
       dto.setCreationDate(getDateTimeString(from.getCreated()));
     }
     if (!isStringEmptyOrNull(from.getDilutionBarcode())) {
       dto.setIdentificationBarcode(from.getDilutionBarcode());
     }
+    dto.setIndexIds(from.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
 
     LibraryDto ldto = new LibraryDto();
     ldto.setId(from.getLibraryId());
     ldto.setName(from.getLibraryName());
     ldto.setAlias(from.getLibraryAlias());
     ldto.setIdentificationBarcode(from.getLibraryBarcode());
+    ldto.setLowQuality(from.isLowQualityLibrary());
+    ldto.setParentSampleId(from.getSampleId());
+    ldto.setParentSampleAlias(from.getSampleAlias());
     if (from.getPlatformType() != null) {
       ldto.setPlatformType(from.getPlatformType().getKey());
     }

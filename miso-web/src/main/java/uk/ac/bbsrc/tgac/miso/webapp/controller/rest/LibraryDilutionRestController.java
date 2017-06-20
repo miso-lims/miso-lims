@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.hibernate.exception.ConstraintViolationException;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -47,48 +45,6 @@ public class LibraryDilutionRestController extends RestController {
     @Override
     protected PaginatedDataSource<PoolableElementView> getSource() throws IOException {
       return poolableElementViewService;
-    }
-  };
-
-  static class SelectRowDto {
-    public String name;
-    public Double concentration;
-    public String library;
-    public String sample;
-    public String indices;
-    public String lowquality;
-    public Long id;
-    public String lastModified;
-  }
-
-  private final JQueryDataTableBackend<PoolableElementView, SelectRowDto> jQueryBackendSelect = new JQueryDataTableBackend<PoolableElementView, SelectRowDto>() {
-
-    @Override
-    protected PaginatedDataSource<PoolableElementView> getSource() throws IOException {
-      return poolableElementViewService;
-    }
-
-    @Override
-    protected SelectRowDto asDto(PoolableElementView dil) {
-      SelectRowDto dto = new SelectRowDto();
-      dto.id = dil.getDilutionId();
-      dto.name = dil.getDilutionName();
-      dto.concentration = dil.getDilutionConcentration();
-      dto.library = String.format("<a href='/miso/library/%d'>%s (%s)</a>", dil.getLibraryId(), dil.getLibraryAlias(),
-          dil.getLibraryName());
-      dto.sample = String.format("<a href='/miso/sample/%d'>%s (%s)</a>", dil.getSampleId(),
-          dil.getSampleAlias(), dil.getSampleName());
-      StringBuilder indices = new StringBuilder();
-      for (final Index index : dil.getIndices()) {
-        indices.append(index.getPosition());
-        indices.append(": ");
-        indices.append(index.getLabel());
-        indices.append("<br/>");
-      }
-      dto.indices = indices.toString();
-      dto.lowquality = dil.isLowQualityLibrary() ? "&#9888;" : "";
-      dto.lastModified = Dtos.dateFormatter.print(new DateTime(dil.getLastModified()));
-      return dto;
     }
   };
 
@@ -168,19 +124,19 @@ public class LibraryDilutionRestController extends RestController {
   }
 
   @RequestMapping(value = "dt/pool/{id}/available", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<SelectRowDto> availableDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
+  public @ResponseBody DataTablesResponseDto<DilutionDto> availableDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
 
     final Pool pool = poolService.get(poolId);
-    return jQueryBackendSelect.get(request, response, null, PaginationFilter.platformType(pool.getPlatformType()));
+    return jQueryBackend.get(request, response, null, PaginationFilter.platformType(pool.getPlatformType()));
   }
 
   @RequestMapping(value = "dt/pool/{id}/included", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<SelectRowDto> includedDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
+  public @ResponseBody DataTablesResponseDto<DilutionDto> includedDilutions(@PathVariable("id") Long poolId, HttpServletRequest request,
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return jQueryBackendSelect.get(request, response, null, PaginationFilter.pool(poolId));
+    return jQueryBackend.get(request, response, null, PaginationFilter.pool(poolId));
   }
 
 }
