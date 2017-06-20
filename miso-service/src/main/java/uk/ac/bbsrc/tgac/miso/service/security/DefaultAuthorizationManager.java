@@ -115,11 +115,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
 
   @Override
   public <T, R extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered, Function<T, R> getOwner) throws IOException {
-    throwIfUnauthenticated();
+    User currentUser = getCurrentUser();
     List<T> filtered = new ArrayList<>();
     if (unfiltered != null) {
       for (T item : unfiltered) {
-        if (readCheck(getOwner.apply(item))) {
+        if (getOwner.apply(item).userCanRead(currentUser)) {
           filtered.add(item);
         }
       }
