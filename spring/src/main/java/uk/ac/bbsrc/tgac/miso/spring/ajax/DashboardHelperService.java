@@ -58,13 +58,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.event.Alert;
-import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.service.AlertService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -91,8 +88,6 @@ public class DashboardHelperService {
   @Autowired
   private RequestManager requestManager;
   @Autowired
-  private AlertService alertService;
-  @Autowired
   private ExperimentService experimentService;
   @Autowired
   private LibraryService libraryService;
@@ -106,7 +101,6 @@ public class DashboardHelperService {
   private StudyService studyService;
   @Autowired
   private PoolService poolService;
-
 
   public JSONObject checkUser(HttpSession session, JSONObject json) {
     String username = json.getString("username");
@@ -416,124 +410,6 @@ public class DashboardHelperService {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
-  }
-
-  public JSONObject checkAlerts(HttpSession session, JSONObject json) {
-    JSONObject response = new JSONObject();
-    try {
-      if (!alertService.listUnreadForCurrentUser().isEmpty()) {
-        response.put("newAlerts", true);
-      }
-    } catch (IOException e) {
-      log.error("check alerts", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-    return response;
-  }
-
-  public JSONObject getAlerts(HttpSession session, JSONObject json) {
-    StringBuilder b = new StringBuilder();
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      List<Alert> alerts;
-      if (json.has("showReadAlerts") && json.getBoolean("showReadAlerts")) {
-        alerts = new ArrayList<>(alertService.listByUserId(user.getUserId()));
-      } else {
-        alerts = new ArrayList<>(alertService.listUnreadForCurrentUser());
-      }
-      Collections.sort(alerts);
-      for (Alert a : alerts) {
-        if (a.getAlertLevel().equals(AlertLevel.CRITICAL) || a.getAlertLevel().equals(AlertLevel.HIGH)) {
-          b.append("<div alertId='" + a.getAlertId() + "' class=\"dashboard error\">");
-        } else {
-          b.append("<div alertId='" + a.getAlertId() + "' class=\"dashboard\">");
-        }
-
-        b.append(a.getAlertDate() + " <b>" + a.getAlertTitle() + "</b><br/>");
-        b.append(a.getAlertText() + "<br/>");
-        if (!a.getAlertRead()) {
-          b.append("<span onclick='Utils.alert.confirmAlertRead(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
-        }
-        b.append("</div>");
-      }
-    } catch (IOException e) {
-      log.error("get alerts", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-
-    return JSONUtils.JSONObjectResponse("html", b.toString());
-  }
-
-  public JSONObject getSystemAlerts(HttpSession session, JSONObject json) {
-    StringBuilder b = new StringBuilder();
-
-    long limit = 20;
-    if (json.has("limit")) limit = json.getLong("limit");
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        List<Alert> alerts = new ArrayList<>(alertService.listByUserId(0L, limit));
-        Collections.sort(alerts);
-        Collections.reverse(alerts);
-        for (Alert a : alerts) {
-          if (a.getAlertLevel().equals(AlertLevel.CRITICAL) || a.getAlertLevel().equals(AlertLevel.HIGH)) {
-            b.append("<div alertId='" + a.getAlertId() + "' class=\"dashboard error\">");
-          } else {
-            b.append("<div alertId='" + a.getAlertId() + "' class=\"dashboard\">");
-          }
-
-          b.append(a.getAlertDate() + " <b>" + a.getAlertTitle() + "</b><br/>");
-          b.append(a.getAlertText() + "<br/>");
-          b.append("</div>");
-        }
-      } else {
-        log.debug(String.format("The user '%s' cannot view the system alerts. Only the admin may do this. This is not an error.",
-            SecurityContextHolder.getContext().getAuthentication().getName()));
-      }
-    } catch (IOException e) {
-      log.error("get system alerts", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-
-    return JSONUtils.JSONObjectResponse("html", b.toString());
-  }
-
-  public JSONObject setAlertAsRead(HttpSession session, JSONObject json) {
-    Long alertId = json.getLong("alertId");
-    try {
-      Alert a = alertService.get(alertId);
-      try {
-        a.setAlertRead(true);
-        alertService.save(a);
-      } catch (AuthorizationException e) {
-        return JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
-      }
-    } catch (IOException e) {
-      log.error("set alert as read", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONResponse("ok");
-  }
-
-  public JSONObject setAllAlertsAsRead(HttpSession session, JSONObject json) {
-
-    try {
-      List<Alert> alerts = new ArrayList<>(alertService.listUnreadForCurrentUser());
-      for (Alert a : alerts) {
-        try {
-          a.setAlertRead(true);
-          alertService.save(a);
-        } catch (AuthorizationException e) {
-          return JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
-        }
-      }
-    } catch (IOException e) {
-      log.error("set all alerts as read", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONResponse("ok");
   }
 
   public JSONObject showLatestReceivedSamples(HttpSession session, JSONObject json) {

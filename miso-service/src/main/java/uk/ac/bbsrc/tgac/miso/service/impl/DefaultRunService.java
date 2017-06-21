@@ -33,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -60,8 +59,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   private RunStore runDao;
   @Autowired
   private ChangeLogService changeLogService;
-  @Autowired
-  private RunAlertManager runAlertManager;
   @Autowired
   private RunQcStore runQcDao;
   @Autowired
@@ -159,7 +156,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot see this run.");
     }
     runDao.addWatcher(run, watcher);
-    if (runAlertManager != null) runAlertManager.addWatcher(run, watcher);
   }
 
   @Override
@@ -167,7 +163,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     User managedWatcher = securityManager.getUserById(watcher.getUserId());
     authorizationManager.throwIfNonAdminOrMatchingOwner(managedWatcher);
     runDao.removeWatcher(run, managedWatcher);
-    if (runAlertManager != null) runAlertManager.removeWatcher(run, watcher);
   }
 
   @Override
@@ -306,7 +301,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
         runDao.save(saved);
         saved = runDao.get(saved.getId());
       }
-      if (runAlertManager != null) runAlertManager.update(saved);
       return saved;
     } catch (MisoNamingException e) {
       throw new IllegalArgumentException("Name generator failed to generate a valid name", e);
@@ -470,10 +464,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   @Override
   public Map<String, Integer> getRunColumnSizes() throws IOException {
     return runDao.getRunColumnSizes();
-  }
-
-  public void setRunAlertManager(RunAlertManager runAlertManager) {
-    this.runAlertManager = runAlertManager;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

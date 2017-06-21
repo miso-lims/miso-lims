@@ -63,14 +63,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Alertable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Watchable;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.model.ProjectOverviewEvent;
-import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -87,7 +83,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @JsonIgnoreProperties({ "project", "samples", "libraries", "runs", "qcPassedSamples" })
 @Entity
 @Table(name = "ProjectOverview")
-public class ProjectOverview implements Watchable, Alertable, Nameable, Serializable {
+public class ProjectOverview implements Watchable, Nameable, Serializable {
 
   protected static final Logger log = LoggerFactory.getLogger(ProjectOverview.class);
 
@@ -128,8 +124,6 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   @Transient
   private boolean libraryPreparationComplete;
-  @Transient
-  private final transient Set<MisoListener> listeners = new HashSet<>();
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "ProjectOverview_Note", joinColumns = {
@@ -158,11 +152,6 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   private Set<User> watchUsers = new HashSet<>();
 
   @Override
-  public boolean addListener(MisoListener listener) {
-    return listeners.add(listener);
-  }
-
-  @Override
   public void addWatcher(User user) {
     watchUsers.add(user);
   }
@@ -186,66 +175,6 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
         .append(principalInvestigator, other.principalInvestigator)
         .append(startDate, other.startDate)
         .isEquals();
-  }
-
-  protected void fireLibraryPreparationCompleteEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.LIBRARY_PREPARATION_COMPLETED,
-          this.getProject().getAlias() + " : all libraries have been constructed.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  protected void fireLibraryQcPassedEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.ALL_LIBRARIES_QC_PASSED,
-          this.getProject().getAlias() + " : all project libraries have passed QC.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  protected void firePoolsConstructedEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.POOL_CONSTRUCTION_COMPLETE,
-          this.getProject().getAlias() + " : all project samples have now been pooled.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  protected void firePrimaryAnalysisCompletedEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.PRIMARY_ANALYSIS_COMPLETED,
-          this.getProject().getAlias() + " : primary analysis has completed.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  protected void fireRunsCompletedEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.ALL_RUNS_COMPLETED,
-          this.getProject().getAlias() + " : all project runs have now completed.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  protected void fireSampleQcPassedEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.ALL_SAMPLES_QC_PASSED,
-          this.getProject().getAlias() + " : all project samples have passed QC.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
   }
 
   public boolean getAllLibrariesQcPassed() {
@@ -279,11 +208,6 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
 
   public boolean getLibraryPreparationComplete() {
     return libraryPreparationComplete;
-  }
-
-  @Override
-  public Set<MisoListener> getListeners() {
-    return this.listeners;
   }
 
   public boolean getLocked() {
@@ -382,49 +306,24 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   }
 
   @Override
-  public boolean removeListener(MisoListener listener) {
-    return listeners.remove(listener);
-  }
-
-  @Override
   public void removeWatcher(User user) {
     watchUsers.remove(user);
   }
 
   public void setAllLibrariesQcPassed(boolean allLibrariesQcPassed) {
-    if (this.allLibrariesQcPassed != allLibrariesQcPassed && allLibrariesQcPassed) {
-      this.allLibrariesQcPassed = allLibrariesQcPassed;
-      fireLibraryQcPassedEvent();
-    } else {
-      this.allLibrariesQcPassed = allLibrariesQcPassed;
-    }
+    this.allLibrariesQcPassed = allLibrariesQcPassed;
   }
 
   public void setAllPoolsConstructed(boolean allPoolsConstructed) {
-    if (this.allPoolsConstructed != allPoolsConstructed && allPoolsConstructed) {
-      this.allPoolsConstructed = allPoolsConstructed;
-      firePoolsConstructedEvent();
-    } else {
-      this.allPoolsConstructed = allPoolsConstructed;
-    }
+    this.allPoolsConstructed = allPoolsConstructed;
   }
 
   public void setAllRunsCompleted(boolean allRunsCompleted) {
-    if (this.allRunsCompleted != allRunsCompleted && allRunsCompleted) {
-      this.allRunsCompleted = allRunsCompleted;
-      fireRunsCompletedEvent();
-    } else {
-      this.allRunsCompleted = allRunsCompleted;
-    }
+    this.allRunsCompleted = allRunsCompleted;
   }
 
   public void setAllSampleQcPassed(boolean allSampleQcPassed) {
-    if (this.allSampleQcPassed != allSampleQcPassed && allSampleQcPassed) {
-      this.allSampleQcPassed = allSampleQcPassed;
-      fireSampleQcPassedEvent();
-    } else {
-      this.allSampleQcPassed = allSampleQcPassed;
-    }
+    this.allSampleQcPassed = allSampleQcPassed;
   }
 
   public void setEndDate(Date endDate) {
@@ -440,12 +339,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   }
 
   public void setLibraryPreparationComplete(boolean libraryPreparationComplete) {
-    if (this.libraryPreparationComplete != libraryPreparationComplete && libraryPreparationComplete) {
-      this.libraryPreparationComplete = libraryPreparationComplete;
-      fireLibraryPreparationCompleteEvent();
-    } else {
-      this.libraryPreparationComplete = libraryPreparationComplete;
-    }
+    this.libraryPreparationComplete = libraryPreparationComplete;
   }
 
   public void setLocked(boolean locked) {
@@ -461,12 +355,7 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   }
 
   public void setPrimaryAnalysisCompleted(boolean primaryAnalysisCompleted) {
-    if (this.primaryAnalysisCompleted != primaryAnalysisCompleted && primaryAnalysisCompleted) {
-      this.primaryAnalysisCompleted = primaryAnalysisCompleted;
-      firePrimaryAnalysisCompletedEvent();
-    } else {
-      this.primaryAnalysisCompleted = primaryAnalysisCompleted;
-    }
+    this.primaryAnalysisCompleted = primaryAnalysisCompleted;
   }
 
   public void setPrincipalInvestigator(String principalInvestigator) {

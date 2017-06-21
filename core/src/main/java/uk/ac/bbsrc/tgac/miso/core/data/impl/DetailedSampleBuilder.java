@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class DetailedSampleBuilder
@@ -664,11 +663,6 @@ public class DetailedSampleBuilder
   @Override
   public boolean userCanWrite(User arg0) {
     return true;
-  }
-
-  @Override
-  public void buildReport() throws ReportingException {
-    throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override

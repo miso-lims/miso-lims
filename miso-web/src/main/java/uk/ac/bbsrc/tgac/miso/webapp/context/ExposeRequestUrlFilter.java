@@ -34,14 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
-
-import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 
 /**
  * A Spring filter that checks whether a session has expired when doing an AJAX request. Usually, the request would just fail, but this
@@ -104,18 +99,6 @@ public class ExposeRequestUrlFilter extends SessionManagementFilter {
       // Basically, because it's hard to get the FQDN without an initial request, and then setting it in any beans
       // is a manual process
       applicationContextProvider.setBaseUrl(baseURL);
-
-      AutowireCapableBeanFactory bf = ApplicationContextProvider.getApplicationContext().getAutowireCapableBeanFactory();
-
-      RunAlertManager ram = (RunAlertManager) bf.getBean("runAlertManager");
-      ram.getRunListener().setBaseURL(applicationContextProvider.getBaseUrl());
-
-      ProjectAlertManager pam = (ProjectAlertManager) bf.getBean("projectAlertManager");
-      pam.getProjectListener().setBaseURL(applicationContextProvider.getBaseUrl());
-      pam.getProjectOverviewListener().setBaseURL(applicationContextProvider.getBaseUrl());
-
-      PoolAlertManager poam = (PoolAlertManager) bf.getBean("poolAlertManager");
-      poam.getPoolListener().setBaseURL(applicationContextProvider.getBaseUrl());
 
       req.getSession(false).setAttribute(FILTER_APPLIED, baseURL);
 

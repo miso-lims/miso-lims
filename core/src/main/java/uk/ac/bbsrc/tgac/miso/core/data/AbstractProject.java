@@ -69,7 +69,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
@@ -128,9 +127,6 @@ public abstract class AbstractProject implements Project {
   @ManyToOne
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = null;
-
-  @Transient
-  private final transient Set<MisoListener> listeners = new HashSet<>();
 
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
@@ -355,24 +351,6 @@ public abstract class AbstractProject implements Project {
   @Override
   public void addIssueKey(String issueKey) {
     this.issueKeys.add(issueKey);
-  }
-
-  @Override
-  public abstract void buildReport();
-
-  @Override
-  public Set<MisoListener> getListeners() {
-    return this.listeners;
-  }
-
-  @Override
-  public boolean addListener(MisoListener listener) {
-    return listeners.add(listener);
-  }
-
-  @Override
-  public boolean removeListener(MisoListener listener) {
-    return listeners.remove(listener);
   }
 
   public void setWatchUsers(Set<User> watchUsers) {

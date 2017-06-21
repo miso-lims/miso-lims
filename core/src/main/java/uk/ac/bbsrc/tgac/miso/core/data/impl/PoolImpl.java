@@ -77,9 +77,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
-import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
@@ -135,10 +132,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
-
-  // listeners
-  @Transient
-  private final transient Set<MisoListener> listeners = new HashSet<>();
 
   @Column(length = NAME_LENGTH)
   private String name;
@@ -213,11 +206,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public boolean addListener(MisoListener listener) {
-    return listeners.add(listener);
-  }
-
-  @Override
   public void addNote(Note note) {
     this.notes.add(note);
   }
@@ -262,15 +250,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         .append(identificationBarcode, other.getIdentificationBarcode()).append(readyToRun, other.getReadyToRun())
         .append(qcPassed, other.getQcPassed())
         .isEquals();
-  }
-
-  protected void firePoolReadyEvent() {
-    if (this.getId() != 0L) {
-      PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool " + getName() + " ready to run");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(pe);
-      }
-    }
   }
 
   @Override
@@ -326,11 +305,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public String getLabelText() {
     return getAlias();
-  }
-
-  @Override
-  public Set<MisoListener> getListeners() {
-    return this.listeners;
   }
 
   @Override
@@ -438,11 +412,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public boolean removeListener(MisoListener listener) {
-    return listeners.remove(listener);
-  }
-
-  @Override
   public void removeWatcher(User user) {
     watchUsers.remove(user);
   }
@@ -501,12 +470,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public void setReadyToRun(boolean readyToRun) {
-    if (!getReadyToRun() && readyToRun) {
-      this.readyToRun = readyToRun;
-      firePoolReadyEvent();
-    } else {
-      this.readyToRun = readyToRun;
-    }
+    this.readyToRun = readyToRun;
   }
 
   @Override

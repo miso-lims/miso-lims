@@ -30,10 +30,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 
 /**
  * @author Chris Salt
@@ -46,9 +44,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
 
   @Autowired
   private SessionFactory sessionFactory;
-
-  @Mock
-  private ProjectAlertManager projectAlertManager;
 
   @Mock
   private SecurityStore securityStore;
@@ -69,7 +64,6 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     projectDAO.setJdbcTemplate(jdbcTemplate);
     projectDAO.setSessionFactory(sessionFactory);
-    projectDAO.setProjectAlertManager(projectAlertManager);
     projectDAO.setSecurityStore(securityStore);
 
     project.setProgress(ProgressType.ACTIVE);
