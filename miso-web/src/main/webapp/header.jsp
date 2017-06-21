@@ -186,8 +186,6 @@
       )
     });
 
-    Utils.alert.checkAlerts();
-
     jQuery(document).ready(function () {
       jQuery('.misoicon').hover(
         function () {

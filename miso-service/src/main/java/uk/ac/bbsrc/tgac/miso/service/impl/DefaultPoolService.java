@@ -28,7 +28,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -58,8 +57,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
-  private PoolAlertManager poolAlertManager;
-  @Autowired
   private ChangeLogService changeLogService;
   @Autowired
   private SecurityManager securityManager;
@@ -84,10 +81,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
-    this.poolAlertManager = poolAlertManager;
   }
 
   public void setChangeLogService(ChangeLogService changeLogService) {
@@ -249,7 +242,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       pool = original;
     }
     long id = poolStore.save(pool);
-    if (poolAlertManager != null) poolAlertManager.update(pool);
     return id;
   }
 
@@ -369,7 +361,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot see this pool.");
     }
     poolStore.addWatcher(pool, watcher);
-    if (poolAlertManager != null) poolAlertManager.addWatcher(pool, watcher);
   }
 
   @Override
@@ -377,7 +368,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     User managedWatcher = securityManager.getUserById(watcher.getUserId());
     authorizationManager.throwIfNonAdminOrMatchingOwner(managedWatcher);
     poolStore.removeWatcher(pool, managedWatcher);
-    if (poolAlertManager != null) poolAlertManager.removeWatcher(pool, watcher);
   }
 
   @Override

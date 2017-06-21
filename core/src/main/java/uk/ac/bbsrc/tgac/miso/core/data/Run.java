@@ -66,9 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
-import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -84,7 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @Table(name = "Run")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Run
-    implements SecurableByProfile, Comparable<Run>, Reportable, Watchable, Deletable, Nameable, Alertable, ChangeLoggable, Aliasable,
+    implements SecurableByProfile, Comparable<Run>, Watchable, Deletable, Nameable, ChangeLoggable, Aliasable,
     Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -131,9 +128,6 @@ public class Run
   @Column(nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
-
-  @Transient
-  private final Set<MisoListener> listeners = new HashSet<>();
 
   private String metrics;
 
@@ -192,11 +186,6 @@ public class Run
     setSecurityProfile(new SecurityProfile(user));
   }
 
-  @Override
-  public boolean addListener(MisoListener listener) {
-    return listeners.add(listener);
-  }
-
   public void addNote(Note note) {
     this.notes.add(note);
   }
@@ -204,7 +193,6 @@ public class Run
   public void addQc(RunQC runQC) {
     this.runQCs.add(runQC);
     runQC.setRun(this);
-    fireRunQcAddedEvent();
   }
 
   public void addSequencerPartitionContainer(SequencerPartitionContainer f) {
@@ -222,10 +210,6 @@ public class Run
   @Override
   public void addWatcher(User user) {
     watchUsers.add(user);
-  }
-
-  @Override
-  public void buildReport() {
   }
 
   @Override
@@ -257,59 +241,6 @@ public class Run
       return getAlias().equals(them.getAlias());
     } else {
       return getId() == them.getId();
-    }
-  }
-
-  protected void fireRunCompletedEvent() {
-    if (this.getId() != 0L) {
-      RunEvent re = new RunEvent(this, MisoEventType.RUN_COMPLETED, "Run completed");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(re);
-      }
-    }
-  }
-
-  protected void fireRunFailedEvent() {
-    if (this.getId() != 0L) {
-      RunEvent re = new RunEvent(this, MisoEventType.RUN_FAILED, "Run failed");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(re);
-      }
-    }
-  }
-
-  protected void fireRunQcAddedEvent() {
-    if (this.getId() != 0L) {
-      RunEvent re = new RunEvent(this, MisoEventType.RUN_QC_ADDED, "Run QC added");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(re);
-      }
-    }
-  }
-
-  protected void fireRunStartedEvent() {
-    if (this.getId() != 0L) {
-      RunEvent re = new RunEvent(this, MisoEventType.RUN_STARTED, "Run started");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(re);
-      }
-    }
-  }
-
-  protected void fireStatusChangedEvent() {
-    switch (getHealth()) {
-    case Started:
-      fireRunStartedEvent();
-      break;
-    case Completed:
-      fireRunCompletedEvent();
-      break;
-    case Failed:
-      fireRunFailedEvent();
-      break;
-    default:
-      break;
-
     }
   }
 
@@ -373,11 +304,6 @@ public class Run
 
   public void setCreationTime(Date created) {
     this.created = created;
-  }
-
-  @Override
-  public Set<MisoListener> getListeners() {
-    return this.listeners;
   }
 
   public String getMetrics() {
@@ -464,11 +390,6 @@ public class Run
   @Override
   public boolean isDeletable() {
     return getId() != AbstractQC.UNSAVED_ID;
-  }
-
-  @Override
-  public boolean removeListener(MisoListener listener) {
-    return listeners.remove(listener);
   }
 
   @Override

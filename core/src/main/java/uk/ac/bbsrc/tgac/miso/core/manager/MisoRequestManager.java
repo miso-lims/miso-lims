@@ -68,8 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -122,10 +120,6 @@ public class MisoRequestManager implements RequestManager {
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
-  private RunAlertManager runAlertManager;
-  @Autowired
-  private ProjectAlertManager projectAlertManager;
-  @Autowired
   private SecurityManager securityManager;
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -138,14 +132,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setSecurityProfileStore(SecurityProfileStore securityProfileStore) {
     this.securityProfileStore = securityProfileStore;
-  }
-
-  public void setProjectAlertManager(ProjectAlertManager projectAlertManager) {
-    this.projectAlertManager = projectAlertManager;
-  }
-
-  public void setRunAlertManager(RunAlertManager runAlertManager) {
-    this.runAlertManager = runAlertManager;
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {
@@ -301,7 +287,6 @@ public class MisoRequestManager implements RequestManager {
       }
       project.getSecurityProfile().setProfileId(saveSecurityProfile(project.getSecurityProfile()));
       long id = projectStore.save(project);
-      if (projectAlertManager != null) projectAlertManager.update(project);
       return id;
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
@@ -510,7 +495,6 @@ public class MisoRequestManager implements RequestManager {
           changeLogStore.create(changeLog);
         }
         runStore.save(managed);
-        if (runAlertManager != null) runAlertManager.update(managed);
         return run.getId();
       }
     } else {
@@ -728,13 +712,11 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public void addProjectWatcher(Project project, User watcher) throws IOException {
     projectStore.addWatcher(project, watcher);
-    if (projectAlertManager != null) projectAlertManager.addWatcher(project, watcher);
   }
 
   @Override
   public void removeProjectWatcher(Project project, User watcher) throws IOException {
     projectStore.removeWatcher(project, watcher);
-    if (projectAlertManager != null) projectAlertManager.removeWatcher(project, watcher);
   }
 
   public void autoGenerateIdBarcode(Pool pool) {

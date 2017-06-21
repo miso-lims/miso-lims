@@ -45,7 +45,6 @@
           <a href="javascript:void(0);" onclick="flushAllCaches();">Flush All Caches</a><br/>
         </c:if>
           <a href="javascript:void(0);" onclick="regenAllBarcodes();">Regenerate All Barcodes</a>
-          <a href="javascript:void(0);" onclick="reindexAlertManagers();">Reindex Alert Managers</a><br/>
         </div>
       </div>
 
@@ -109,28 +108,6 @@
     Fluxion.doAjax(
       'cacheHelperService',
       'regenerateAllBarcodes',
-      {'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery("body").append(json.html);
-        jQuery("#dialog").dialog("destroy");
-
-        jQuery("#dialog-message").dialog({
-          modal: true,
-          buttons: {
-            Ok: function () {
-              jQuery(this).dialog('close');
-            }
-          }
-        });
-      }
-      }
-    );
-  }
-
-  function reindexAlertManagers() {
-    Fluxion.doAjax(
-      'cacheHelperService',
-      'reindexAlertManagers',
       {'url': ajaxurl},
       {'doOnSuccess': function (json) {
         jQuery("body").append(json.html);

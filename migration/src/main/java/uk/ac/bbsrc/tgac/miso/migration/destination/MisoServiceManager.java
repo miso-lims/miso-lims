@@ -13,9 +13,6 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrNamingScheme;
@@ -147,10 +144,6 @@ public class MisoServiceManager {
   private DefaultTargetedSequencingService targetedSequencingService;
   private DefaultBoxService boxService;
 
-  private PoolAlertManager poolAlertManager;
-  private ProjectAlertManager projectAlertManager;
-  private RunAlertManager runAlertManager;
-
   private HibernateSampleClassDao sampleClassDao;
   private HibernateSampleDao sampleDao;
   private HibernateLabDao labDao;
@@ -262,10 +255,6 @@ public class MisoServiceManager {
     // sigh
     m.setDefaultRequestManager();
 
-    m.setDefaultPoolAlertManager();
-    m.setDefaultProjectAlertManager();
-    m.setDefaultRunAlertManager();
-
     User migrationUser = m.getUserByLoginNameInTransaction(m.getSecurityStore(), username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
     m.setUpSecurityContext(migrationUser);
@@ -365,8 +354,6 @@ public class MisoServiceManager {
     rm.setNamingScheme(getNamingScheme());
     rm.setSecurityStore(securityStore);
     rm.setSecurityProfileStore(securityProfileDao);
-    rm.setProjectAlertManager(projectAlertManager);
-    rm.setRunAlertManager(runAlertManager);
     rm.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
     rm.setSecurityStore(securityStore);
     rm.setSecurityManager(securityManager);
@@ -439,9 +426,6 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityManagerDependencies() {
-    if (poolAlertManager != null) poolAlertManager.setSecurityManager(securityManager);
-    if (projectAlertManager != null) projectAlertManager.setSecurityManager(securityManager);
-    if (runAlertManager != null) runAlertManager.setSecurityManager(securityManager);
     if (requestManager != null) requestManager.setSecurityManager(securityManager);
     if (libraryService != null) libraryService.setSecurityManager(securityManager);
     if (sampleService != null) sampleService.setSecurityManager(securityManager);
@@ -462,7 +446,6 @@ public class MisoServiceManager {
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
     dao.setSecurityStore(securityStore);
-    dao.setProjectAlertManager(projectAlertManager);
     setProjectDao(dao);
   }
 
@@ -776,7 +759,6 @@ public class MisoServiceManager {
     service.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
     service.setAuthorizationManager(authorizationManager);
     service.setNamingScheme(getNamingScheme());
-    service.setPoolAlertManager(poolAlertManager);
     service.setPoolStore(poolDao);
     service.setPoolableElementViewService(poolableElementViewService);
     setPoolService(service);
@@ -1365,64 +1347,6 @@ public class MisoServiceManager {
     if (sequencingParametersService != null) sequencingParametersService.setSequencingParametersDao(sequencingParametersDao);
   }
 
-  public PoolAlertManager getPoolAlertManager() {
-    return poolAlertManager;
-  }
-
-  public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
-    this.poolAlertManager = poolAlertManager;
-    updatePoolAlertManagerDependencies();
-  }
-
-  public void setDefaultPoolAlertManager() {
-    PoolAlertManager pam = new PoolAlertManager();
-    pam.setSecurityManager(securityManager);
-    setPoolAlertManager(pam);
-  }
-
-  private void updatePoolAlertManagerDependencies() {
-    if (poolService != null) poolService.setPoolAlertManager(poolAlertManager);
-  }
-
-  public ProjectAlertManager getProjectAlertManager() {
-    return projectAlertManager;
-  }
-
-  public void setProjectAlertManager(ProjectAlertManager projectAlertManager) {
-    this.projectAlertManager = projectAlertManager;
-    updateProjectAlertManagerDependencies();
-  }
-
-  public void setDefaultProjectAlertManager() {
-    ProjectAlertManager pam = new ProjectAlertManager();
-    pam.setSecurityManager(securityManager);
-    setProjectAlertManager(pam);
-  }
-
-  private void updateProjectAlertManagerDependencies() {
-    if (projectDao != null) projectDao.setProjectAlertManager(projectAlertManager);
-  }
-
-  public RunAlertManager getRunAlertManager() {
-    return runAlertManager;
-  }
-
-  public void setRunAlertManager(RunAlertManager runAlertManager) {
-    this.runAlertManager = runAlertManager;
-    updateRunAlertManagerDependencies();
-  }
-
-  public void setDefaultRunAlertManager() {
-    RunAlertManager ram = new RunAlertManager();
-    ram.setSecurityManager(securityManager);
-    setRunAlertManager(ram);
-  }
-
-  private void updateRunAlertManagerDependencies() {
-    if (requestManager != null) requestManager.setRunAlertManager(runAlertManager);
-    if (runService != null) runService.setRunAlertManager(runAlertManager);
-  }
-
   public HibernatePoolableElementViewDao getPoolableElementViewDao() {
     return this.poolableElementViewDao;
   }
@@ -1474,7 +1398,6 @@ public class MisoServiceManager {
     DefaultRunService service = new DefaultRunService();
     service.setAuthorizationManager(authorizationManager);
     service.setRunDao(runDao);
-    service.setRunAlertManager(runAlertManager);
     service.setRunQcDao(runQcDao);
     service.setSecurityManager(securityManager);
     service.setNamingScheme(getNamingScheme());
@@ -1779,7 +1702,8 @@ public class MisoServiceManager {
   private void updateBoxServiceDependencies() {
 
   }
-  public BoxService getBoxService() { 
+
+  public BoxService getBoxService() {
     return boxService;
   }
 }

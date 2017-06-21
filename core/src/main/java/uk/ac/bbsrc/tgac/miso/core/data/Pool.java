@@ -60,7 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "dilutions" })
 public interface Pool
-    extends SecurableByProfile, Comparable<Pool>, Barcodable, Watchable, Deletable, Alertable, Boxable, Nameable, ChangeLoggable,
+    extends SecurableByProfile, Comparable<Pool>, Barcodable, Watchable, Deletable, Boxable, Nameable, ChangeLoggable,
     Serializable {
 
   /**

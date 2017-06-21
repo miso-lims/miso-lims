@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -51,8 +51,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 // @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
-public interface Project extends com.eaglegenomics.simlims.core.Project, Comparable<Project>, SecurableByProfile, Reportable<Project>,
-    Deletable, Watchable, Nameable, Alertable {
+public interface Project extends com.eaglegenomics.simlims.core.Project, Comparable<Project>, SecurableByProfile,
+    Deletable, Watchable, Nameable {
   /** Field PREFIX */
   public static final String PREFIX = "PRO";
 
@@ -191,5 +191,6 @@ public interface Project extends com.eaglegenomics.simlims.core.Project, Compara
 
   public void setReferenceGenome(ReferenceGenome referenceGenome);
 
+  @Override
   public void setWatchGroup(Group group);
 }

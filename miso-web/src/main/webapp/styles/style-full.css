@@ -702,21 +702,6 @@ div.checklist {
     overflow: auto;
 }
 
-.alertwidget {
-    /*border: 1px solid lightgray;*/
-    /*padding-top: 0px;*/
-    /*padding-left: 5px;*/
-    /*padding-right: 5px;*/
-    /*padding-bottom: 5px;*/
-    /*margin-top: 0px;*/
-    /*margin-left: 5px;*/
-    /*margin-right: 5px;*/
-    /*margin-bottom: 5px;*/
-    /*width: 380px;*/
-    height: 200px;
-    overflow: auto;
-}
-
 .barcodes {
     float: right;
 }
@@ -1606,14 +1591,6 @@ table.fields {
 .slice text {
     font-size: 8pt;
     font-family: Arial;
-}
-
-#navtabs a span.unreadAlertSpan {
-    background: url("images/right-red.png") no-repeat right top;
-}
-
-#navtabs a.unreadAlertLink {
-    background: url("images/left-red.png") no-repeat left top;
 }
 
 table.overviewSummary {

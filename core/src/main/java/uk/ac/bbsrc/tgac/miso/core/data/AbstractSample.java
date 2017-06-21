@@ -409,9 +409,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public abstract void buildReport();
-
-  @Override
   public int compareTo(Sample s) {
     if (getId() != 0L && s.getId() != 0L) {
       if (getId() < s.getId()) return -1;
