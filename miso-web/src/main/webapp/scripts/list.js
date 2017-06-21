@@ -36,6 +36,7 @@ ListUtils = {
       ListState[elementId] = [];
       columns.unshift(Utils.createToggleColumn('ListState.' + elementId));
     }
+    var errorMessage = document.createElement('DIV');
     var jqTable = jQuery('#' + elementId).html('');
     jqTable
         .dataTable(
@@ -62,6 +63,7 @@ ListUtils = {
                       'url' : sSource,
                       'data' : aoData,
                       'success' : function(data, textStatus, xhr) {
+                        errorMessage.innerText = data.sError;
                         columns.forEach(function(column, index) {
                           if (!column.visibilityFilter) {
                             return;
@@ -72,6 +74,16 @@ ListUtils = {
                               })));
                         });
                         fnCallback(data, textStatus, xhr);
+                      },
+                      'error' : function(xhr, statusText, errorThrown) {
+                        errorMessage.innerText = errorThrown;
+                        fnCallback({
+                          iTotalRecords : 0,
+                          iTotalDisplayRecords : 0,
+                          sEcho : aoData.sEcho,
+                          aaData : []
+                        });
+                        
                       }
                     });
                   },
@@ -86,8 +98,10 @@ ListUtils = {
                     });
                   }
                 })).fnSetFilteringDelay(600);
+    var tableNode = document.getElementById(elementId + '_wrapper');
+    errorMessage.setAttribute('class', 'parsley-error');
+    tableNode.parentNode.insertBefore(errorMessage, tableNode);
     if (bulkActions.length > 0 || staticActions.length > 0) {
-      var tableNode = document.getElementById(elementId + '_wrapper');
       var toolbar = document.createElement('DIV');
       toolbar
           .setAttribute(

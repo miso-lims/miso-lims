@@ -87,6 +87,7 @@ public class DataTablesResponseDto<T> {
     return sError;
   }
 
+  @JsonProperty("sError")
   public void setSError(String sError) {
     this.sError = sError;
   }

@@ -143,7 +143,7 @@ public abstract interface PaginationFilter {
           case "incomplete":
             return health(EnumSet.of(HealthType.Running, HealthType.Started, HealthType.Stopped));
           default:
-            errorHandler.accept("No filter for " + parts[1]);
+            errorHandler.accept("No filter for " + x);
             return null;
           }
         case "created":
