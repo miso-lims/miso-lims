@@ -284,21 +284,6 @@ public interface Library
   public void setInitialConcentration(Double initialConcentration);
 
   /**
-   * Returns the creationDate of this Library object.
-   * 
-   * @return Date creationDate.
-   */
-  public Date getCreationDate();
-
-  /**
-   * Sets the creationDate of this Library object.
-   * 
-   * @param date
-   *          creationDate.
-   */
-  public void setCreationDate(Date date);
-
-  /**
    * Returns the qcPassed of this Library object.
    * 
    * @return Boolean qcPassed.
@@ -318,16 +303,6 @@ public interface Library
   public Collection<ChangeLog> getChangeLog();
 
   /**
-   * Returns the user who last modified this item.
-   */
-  public User getLastModifier();
-
-  /**
-   * Sets the user who last modified this item. It should always be set to the current user on save.
-   */
-  public void setLastModifier(User user);
-
-  /**
    * Set the flag that this library is sufficiently bad that it is not worth sequencing.
    */
   public void setLowQuality(boolean lowquality);
@@ -339,5 +314,30 @@ public interface Library
   Integer getDnaSize();
 
   void setDnaSize(Integer dnaSize);
+
+  // TODO: remove below fields to ChangeLoggable interface
+
+  /**
+   * Returns the user who last modified this item.
+   */
+  public User getLastModifier();
+
+  /**
+   * Sets the user who last modified this item. It should always be set to the current user on save.
+   */
+  public void setLastModifier(User user);
+
+  @Override
+  public Date getLastModified();
+
+  public void setLastModified(Date lastModified);
+
+  public User getCreator();
+
+  public void setCreator(User user);
+
+  public Date getCreationTime();
+
+  public void setCreationTime(Date creationTime);
 
 }

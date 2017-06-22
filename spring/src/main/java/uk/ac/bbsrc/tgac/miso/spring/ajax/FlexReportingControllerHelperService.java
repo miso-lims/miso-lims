@@ -727,9 +727,9 @@ public class FlexReportingControllerHelperService {
         if ((platform.equals("all") || platform.equals(library.getPlatformType()))
             && (qc.equals("all") || qc.equals(library.getQcPassed().toString()))) {
 
-          if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to) && library.getCreationDate() != null) {
+          if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to) && library.getCreationTime() != null) {
 
-            Date receivedDate = library.getCreationDate();
+            Date receivedDate = library.getCreationTime();
             if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate)
                 || receivedDate.equals(endDate)) {
               jsonArray.add(libraryFormRowBuilder(library));
@@ -872,7 +872,8 @@ public class FlexReportingControllerHelperService {
       jsonArray.add(
           "['" + library.getSample().getProject().getName() + "','" + library.getName() + "','" + library.getAlias() + "','"
               + library.getDescription() + "','" + library.getPlatformType() + "','" + library.getLibraryType().getDescription() + "','"
-              + qc + "','" + LimsUtils.getDateAsString(library.getCreationDate()) + "','" + library.getSample().getName() + "','" + sampleQC
+              + qc + "','" + LimsUtils.getDateAsString(library.getCreationTime()) + "','" + library.getSample().getName() + "','"
+              + sampleQC
               + "','" + scientificName + "']");
     }
     return jsonArray;

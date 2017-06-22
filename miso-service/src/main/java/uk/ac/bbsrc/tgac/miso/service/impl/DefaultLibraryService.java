@@ -374,7 +374,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     authorizationManager.throwIfNotWritable(managed);
     // TODO: update concentration if QC is of relevant type
     managed.addQc(qc);
-    managed.setLastModifier(authorizationManager.getCurrentUser());
+    setChangeDetails(managed);
     libraryDao.save(managed);
   }
 
@@ -395,7 +395,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     if (deleteQc == null) throw new IOException("QC " + qcId + " not found for Library " + library.getId());
     authorizationManager.throwIfNonAdminOrMatchingOwner(securityManager.getUserByLoginName(deleteQc.getQcCreator()));
     managed.getLibraryQCs().remove(deleteQc);
-    managed.setLastModifier(authorizationManager.getCurrentUser());
+    setChangeDetails(managed);
     libraryDao.save(managed);
   }
 
@@ -530,7 +530,20 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
    */
   private void setChangeDetails(Library library) throws IOException {
     User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
     library.setLastModifier(user);
+
+    if (library.getId() == Library.UNSAVED_ID) {
+      library.setCreator(user);
+      if (library.getCreationTime() == null) {
+        library.setCreationTime(now);
+        library.setLastModified(now);
+      } else if (library.getLastModified() == null) {
+        library.setLastModified(now);
+      }
+    } else {
+      library.setLastModified(now);
+    }
   }
 
   /**

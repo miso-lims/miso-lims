@@ -1033,9 +1033,6 @@ CREATE OR REPLACE VIEW ContainerDerivedInfo AS
 CREATE OR REPLACE VIEW PoolDerivedInfo AS
   SELECT a.*, userId AS creator FROM PoolChangeLog o JOIN (SELECT poolId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(poolChangeLogId) AS firstId FROM PoolChangeLog GROUP BY poolId) AS a WHERE a.poolId = o.poolId AND a.firstId = o.poolChangeLogId;
 
-CREATE OR REPLACE VIEW LibraryDerivedInfo AS
-  SELECT a.*, userId AS creator FROM LibraryChangeLog o JOIN (SELECT libraryId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(libraryChangeLogId) AS firstId FROM LibraryChangeLog GROUP BY libraryId) AS a WHERE a.libraryId = o.libraryId AND a.firstId = o.libraryChangeLogId;
-  
 CREATE OR REPLACE VIEW BoxDerivedInfo AS
   SELECT a.*, userId AS creator FROM BoxChangeLog o JOIN (SELECT boxId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(boxChangeLogId) AS firstId FROM BoxChangeLog GROUP BY boxId) AS a WHERE a.boxId = o.boxId AND a.firstId = o.boxChangeLogId;
 

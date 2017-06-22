@@ -916,7 +916,6 @@ public class FormUtils {
       } else {
         library.setDescription(s.getDescription());
       }
-      library.setCreationDate(new Date());
       library.setPlatformType(pt.name());
       library.setLibraryType(lt);
       library.setLibrarySelectionType(ls);

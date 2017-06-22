@@ -344,7 +344,6 @@ public class ImportExportControllerHelperService {
               library.setSample(s);
               library.setSecurityProfile(s.getSecurityProfile());
               library.setDescription(jsonArrayElement.getString(4));
-              library.setCreationDate(new Date());
               library.setPlatformType(pt.getKey());
               library.setLibraryType(lt);
               library.setLibrarySelectionType(ls);

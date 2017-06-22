@@ -1028,7 +1028,7 @@ public class Dtos {
     if (from.getSample() instanceof DetailedSample) {
       dto.setParentSampleClassId(((DetailedSample) from.getSample()).getSampleClass().getId());
     }
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationTime().getTime()));
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());
     dto.setConcentration(from.getInitialConcentration());
@@ -1145,6 +1145,7 @@ public class Dtos {
     to.setVolume(from.getVolume());
     to.setDnaSize(from.getDnaSize());
     to.setLocationBarcode(from.getLocationBarcode());
+    to.setCreationTime(extractDateTimeOrNull(from.getCreationDate()));
 
     if (from.getQcs() != null && !from.getQcs().isEmpty()) {
       for (LibraryQcDto qcDto : from.getQcs()) {
@@ -1304,6 +1305,13 @@ public class Dtos {
       // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
       return null;
     }
+  }
+
+  private static Date extractDateTimeOrNull(String from) {
+    if (isStringEmptyOrNull(from)) {
+      return null;
+    }
+    return new Date(dateTimeFormatter.parseMillis(from));
   }
 
   public static PoolDto asDto(Pool from, boolean includeContents) {

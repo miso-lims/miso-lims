@@ -388,7 +388,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     if (isDetailedLibrary(library)) {
 
-      if (library.getCreationDate() == null) library.setCreationDate(timeStamp);
+      if (library.getCreationTime() == null) library.setCreationTime(timeStamp);
       // Check for duplicate alias
       Collection<Library> dupes = serviceManager.getLibraryService().listByAlias(library.getAlias());
       if (!dupes.isEmpty()) {

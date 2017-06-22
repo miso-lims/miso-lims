@@ -99,8 +99,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   @Override
   public long save(Library library) throws IOException {
-    Date now = new Date();
-    if (library.getCreationDate() == null) library.setCreationDate(now);
     long id;
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
       id = (long) currentSession().save(library);
@@ -309,8 +307,7 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
     return DbUtils.getColumnSizes(template, "Library");
   }
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "sample", "lastModifier",
-      "derivedInfo.creator");
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("sample", "lastModifier", "creator");
 
   @Override
   public long countLibrariesBySearch(String querystr) throws IOException {
@@ -413,13 +410,10 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   @Override
   public String propertyForSortColumn(String original) {
-    switch (original) {
-      case "lastModified":
-        return "derivedInfo.lastModified";
-      case "parentSampleId":
-        return "sample.id";
-      default:
-        return original;
+    if ("parentSampleId".equals(original)) {
+      return "sample.id";
+    } else {
+      return original;
     }
   }
 
@@ -427,9 +421,9 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
-      return "derivedInfo.created";
+      return "created";
     case UPDATE:
-      return "derivedInfo.lastModified";
+      return "lastModified";
     default:
       return null;
     }

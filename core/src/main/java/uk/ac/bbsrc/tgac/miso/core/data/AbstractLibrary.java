@@ -61,7 +61,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -96,10 +95,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   private String description;
   private String accession;
-
-  @Column(nullable = false)
-  @Temporal(TemporalType.DATE)
-  private Date creationDate = new Date();
 
   private String identificationBarcode;
   private String locationBarcode;
@@ -156,8 +151,20 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private LibraryStrategyType libraryStrategyType;
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date created;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Library_Note", joinColumns = {
@@ -167,10 +174,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @OneToMany(targetEntity = LibraryChangeLog.class, mappedBy = "library", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
-
-  @OneToOne
-  @PrimaryKeyJoinColumn
-  private LibraryDerivedInfo derivedInfo;
 
   @OneToOne(optional = true)
   @PrimaryKeyJoinColumn
@@ -231,16 +234,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setAccession(String accession) {
     this.accession = accession;
-  }
-
-  @Override
-  public Date getCreationDate() {
-    return creationDate;
-  }
-
-  @Override
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
   }
 
   @Override
@@ -425,11 +418,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public Date getLastModified() {
-    return (derivedInfo == null ? null : derivedInfo.getLastModified());
-  }
-
-  @Override
   public void setLowQuality(boolean lowquality) {
     lowQuality = lowquality;
   }
@@ -514,6 +502,36 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return created;
+  }
+
+  @Override
+  public void setCreationTime(Date created) {
+    this.created = created;
   }
 
   @Override

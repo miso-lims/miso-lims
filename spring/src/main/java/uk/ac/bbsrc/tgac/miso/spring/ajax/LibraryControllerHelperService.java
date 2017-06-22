@@ -420,7 +420,6 @@ public class LibraryControllerHelperService {
               library.setSecurityProfile(sp);
               library.setDescription(descr);
               library.setPlatformType(platform);
-              library.setCreationDate(new Date());
               library.setLocationBarcode(locationBarcode);
               library.setQcPassed(false);
               library

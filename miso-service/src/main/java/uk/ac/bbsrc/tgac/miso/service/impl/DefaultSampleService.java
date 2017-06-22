@@ -562,8 +562,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       sample.setCreator(user);
       if (sample.getCreationTime() == null) {
         sample.setCreationTime(now);
-      }
-      if (sample.getLastModified() == null) {
+        sample.setLastModified(now);
+      } else if (sample.getLastModified() == null) {
         sample.setLastModified(now);
       }
     } else {
