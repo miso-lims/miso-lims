@@ -267,8 +267,22 @@ public interface Sample
    */
   void setQCs(Collection<SampleQC> qcs);
 
+  // TODO: remove below fields to ChangeLoggable interface
   public User getLastModifier();
 
   public void setLastModifier(User user);
+
+  @Override
+  public Date getLastModified();
+
+  public void setLastModified(Date lastModified);
+
+  public User getCreator();
+
+  public void setCreator(User user);
+
+  public Date getCreationTime();
+
+  public void setCreationTime(Date creationTime);
 
 }

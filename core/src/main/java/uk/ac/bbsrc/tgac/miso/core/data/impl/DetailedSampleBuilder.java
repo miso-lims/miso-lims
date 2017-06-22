@@ -315,6 +315,31 @@ public class DetailedSampleBuilder
   }
 
   @Override
+  public User getCreator() {
+    return null;
+  }
+
+  @Override
+  public void setCreator(User user) {
+    throw new UnsupportedOperationException("Method not implemented on builder");
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return null;
+  }
+
+  @Override
+  public void setCreationTime(Date creationTime) {
+    throw new UnsupportedOperationException("Method not implemented on builder");
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    throw new UnsupportedOperationException("Method not implemented on builder");
+  }
+
+  @Override
   public User getLastModifier() {
     return lastModifier;
   }
