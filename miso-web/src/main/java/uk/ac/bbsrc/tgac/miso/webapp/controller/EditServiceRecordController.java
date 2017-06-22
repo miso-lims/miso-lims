@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 
 @Controller
 @RequestMapping("/sequencer/servicerecord")
@@ -77,7 +78,8 @@ public class EditServiceRecordController {
   
   @Autowired
   private RequestManager requestManager;
-
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private FilesManager filesManager;
 
@@ -102,12 +104,12 @@ public class EditServiceRecordController {
   
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getServiceRecordColumnSizes();
+    return sequencerReferenceService.getServiceRecordColumnSizes();
   }
 
   @RequestMapping(value = "/{recordId}", method = RequestMethod.GET)
   public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId, ModelMap model) throws IOException {
-    SequencerServiceRecord sr = requestManager.getSequencerServiceRecordById(recordId);
+    SequencerServiceRecord sr = sequencerReferenceService.getServiceRecord(recordId);
     if (sr != null) {
       model.put(ModelKeys.RECORD.getKey(), sr);
       model.put(ModelKeys.FILES.getKey(), populateServiceRecordFiles(sr));
@@ -119,7 +121,7 @@ public class EditServiceRecordController {
   
   @RequestMapping(value = "/new/{sequencerReferenceId}", method = RequestMethod.GET)
   public ModelAndView newServiceRecord(@PathVariable(value = "sequencerReferenceId") Long sequencerReferenceId, ModelMap model) throws IOException {
-    SequencerReference sequencer = requestManager.getSequencerReferenceById(sequencerReferenceId);
+    SequencerReference sequencer = sequencerReferenceService.get(sequencerReferenceId);
     if (sequencer == null) {
       throw new IOException("No such Sequencer.");
     }
@@ -132,10 +134,16 @@ public class EditServiceRecordController {
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("serviceRecord") SequencerServiceRecord record, ModelMap model, SessionStatus session)
       throws IOException {
-    requestManager.saveSequencerServiceRecord(record);
+    Long recordId = null;
+    if (record.getId() == SequencerServiceRecordImpl.UNSAVED_ID) {
+      recordId = sequencerReferenceService.createServiceRecord(record);
+    } else {
+      sequencerReferenceService.updateServiceRecord(record);
+      recordId = record.getId();
+    }
     session.setComplete();
     model.clear();
-    return "redirect:/miso/sequencer/servicerecord/" + record.getId();
+    return "redirect:/miso/sequencer/servicerecord/" + recordId;
   }
   
   @InitBinder

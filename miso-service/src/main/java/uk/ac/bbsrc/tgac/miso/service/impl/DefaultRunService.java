@@ -37,15 +37,15 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
@@ -59,7 +59,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   @Autowired
   private RunStore runDao;
   @Autowired
-  private ChangeLogStore changeLogStore;
+  private ChangeLogService changeLogService;
   @Autowired
   private RunAlertManager runAlertManager;
   @Autowired
@@ -73,9 +73,9 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   @Autowired
   private ContainerService containerService;
   @Autowired
-  private SequencerReferenceStore sequencerReferenceDao;
+  private SequencerReferenceService sequencerReferenceService;
   @Autowired
-  private SequencingParametersDao sequencingParametersDao;
+  private SequencingParametersService sequencingParametersService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -259,6 +259,16 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   @Override
+  public QcType getRunQcType(long qcTypeId) throws IOException {
+    return runQcDao.getRunQcTypeById(qcTypeId);
+  }
+
+  @Override
+  public QcType getRunQcTypeByName(String qcTypeName) throws IOException {
+    return runQcDao.getRunQcTypeByName(qcTypeName);
+  }
+
+  @Override
   public Long create(Run run) throws IOException {
     loadChildEntities(run);
     authorizationManager.throwIfNotWritable(run);
@@ -348,8 +358,8 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       }
       run.setSequencerPartitionContainers(containersToSave);
     }
-    run.setSequencingParameters(sequencingParametersDao.getSequencingParameters(run.getSequencingParameters().getId()));
-    run.setSequencerReference(sequencerReferenceDao.get(run.getSequencerReference().getId()));
+    run.setSequencingParameters(sequencingParametersService.get(run.getSequencingParameters().getId()));
+    run.setSequencerReference(sequencerReferenceService.get(run.getSequencerReference().getId()));
   }
 
   private void applyChanges(Run target, Run source) throws IOException {
@@ -416,7 +426,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     run.setLastModifier(user);
   }
 
-  private void makeContainerChangesChangeLog(Run managedRun, List<SequencerPartitionContainer> updatedContainers) {
+  private void makeContainerChangesChangeLog(Run managedRun, List<SequencerPartitionContainer> updatedContainers) throws IOException {
     Set<String> originalContainersString = Barcodable.extractLabels(managedRun.getSequencerPartitionContainers());
     Set<String> updatedContainersString = Barcodable.extractLabels(updatedContainers);
     Set<String> added = new TreeSet<>(updatedContainersString);
@@ -435,7 +445,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       changeLog.setSummary(message.toString());
       changeLog.setTime(new Date());
       changeLog.setUser(managedRun.getLastModifier());
-      changeLogStore.create(changeLog);
+      changeLogService.create(changeLog);
     }
   }
 
@@ -469,16 +479,16 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     this.securityProfileStore = securityProfileStore;
   }
 
-  public void setSequencingParametersDao(SequencingParametersDao sequencingParametersDao) {
-    this.sequencingParametersDao = sequencingParametersDao;
+  public void setSequencingParametersService(SequencingParametersService sequencingParametersService) {
+    this.sequencingParametersService = sequencingParametersService;
   }
 
-  public void setSequencerReferenceDao(SequencerReferenceStore sequencerReferenceDao) {
-    this.sequencerReferenceDao = sequencerReferenceDao;
+  public void setSequencerReferenceService(SequencerReferenceService sequencerReferenceService) {
+    this.sequencerReferenceService = sequencerReferenceService;
   }
 
-  public void setChangeLogStore(ChangeLogStore changeLogStore) {
-    this.changeLogStore = changeLogStore;
+  public void setChangeLogService(ChangeLogService changeLogService) {
+    this.changeLogService = changeLogService;
   }
 
   public void setContainerService(ContainerService containerService) {

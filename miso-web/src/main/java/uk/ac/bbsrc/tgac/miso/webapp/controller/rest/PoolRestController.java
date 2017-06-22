@@ -51,7 +51,6 @@ import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -59,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 
 /**
@@ -87,25 +87,23 @@ public class PoolRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
   @Autowired
-  private RequestManager requestManager;
-
-  @Autowired
   private LibraryDilutionService dilutionService;
-
+  @Autowired
+  private PlatformService platformService;
   @Autowired
   private PoolService poolService;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
   }
 
+  public void setPlatformService(PlatformService platformService) {
+    this.platformService = platformService;
+  }
+
   @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody PoolDto getPoolById(@PathVariable Long poolId) throws IOException {
-    Pool p = poolService.getPoolById(poolId);
+    Pool p = poolService.get(poolId);
     if (p == null) {
       throw new RestException("No pool found with ID: " + poolId, Status.NOT_FOUND);
     }
@@ -116,7 +114,7 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public PoolDto createPool(@RequestBody PoolDto pool, UriComponentsBuilder uriBuilder, HttpServletResponse response)
       throws IOException {
-    Long id = poolService.savePool(Dtos.to(pool));
+    Long id = poolService.save(Dtos.to(pool));
     return getPoolById(id);
 
   }
@@ -126,8 +124,8 @@ public class PoolRestController extends RestController {
   public PoolDto updatePool(@PathVariable Long poolId, @RequestBody PoolDto pool) throws IOException {
     Pool p = Dtos.to(pool);
     p.setId(poolId);
-    poolService.savePool(p);
-    return getPoolById(poolId);
+    poolService.save(p);
+    return Dtos.asDto(poolService.get(poolId), true);
   }
 
   @RequestMapping(value = "platform/{platform}", method = RequestMethod.GET, produces = "application/json")
@@ -137,7 +135,7 @@ public class PoolRestController extends RestController {
     if (PlatformType.getKeys().contains(platform)) {
       Collection<Pool> pools = new ArrayList<>();
       PlatformType platformType = PlatformType.get(platform);
-      pools = poolService.listAllPoolsByPlatform(platformType);
+      pools = poolService.listByPlatform(platformType);
       return serializePools(pools, uriBuilder);
     } else {
       throw new RestException("Request must specify a platform");
@@ -175,7 +173,7 @@ public class PoolRestController extends RestController {
   public @ResponseBody JSONObject ldRest() throws IOException {
     Collection<LibraryDilution> lds = dilutionService.list();
 
-    List<String> types = new ArrayList<>(requestManager.listDistinctPlatformNames());
+    List<String> types = new ArrayList<>(platformService.listDistinctPlatformTypeNames());
     Collections.sort(types);
 
     JSONArray platformTypeArray = new JSONArray();
@@ -200,7 +198,7 @@ public class PoolRestController extends RestController {
   @RequestMapping(value = "/wizard/platformtypes", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String platformTypesRest() throws IOException {
     List<String> names = new ArrayList<>();
-    List<String> types = new ArrayList<>(requestManager.listDistinctPlatformNames());
+    List<String> types = new ArrayList<>(platformService.listDistinctPlatformTypeNames());
     for (String name : types) {
       names.add("\"" + name + "\"");
     }

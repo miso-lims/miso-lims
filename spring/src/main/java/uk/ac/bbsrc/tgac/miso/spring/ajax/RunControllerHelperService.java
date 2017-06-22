@@ -61,16 +61,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
@@ -88,11 +90,13 @@ public class RunControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
+  private ContainerService containerService;
   @Autowired
   private PoolService poolService;
   @Autowired
   private RunService runService;
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
@@ -100,6 +104,99 @@ public class RunControllerHelperService {
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
+  }
+
+  public JSONObject changePlatformType(HttpSession session, JSONObject json) {
+    String cId = json.getString("run_cId");
+    Run run = (Run) session.getAttribute("run_" + cId);
+
+    String newRuntype = json.getString("platformtype");
+
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Long runId = Run.UNSAVED_ID;
+
+      if (json.has("runId") && !isStringEmptyOrNull(json.getString("runId"))) {
+        // edit existing run
+        Map<String, Object> responseMap = new HashMap<>();
+        runId = Long.parseLong(json.getString("runId"));
+        Run storedRun = runService.get(runId);
+        String storedPlatformType = storedRun.getSequencerReference().getPlatform().getPlatformType().getKey();
+
+        PlatformType newPt = PlatformType.get(newRuntype);
+        if (newPt != null) {
+          log.info("STORED: " + newRuntype + " :: " + storedPlatformType);
+          if (!newRuntype.equals(storedPlatformType)) {
+            run = new Run(user);
+            run.setId(storedRun.getId());
+          } else {
+            run = storedRun;
+          }
+
+          session.setAttribute("run_" + cId, run);
+          StringBuilder srb = new StringBuilder();
+          srb.append("<select name='sequencer' id='sequencerReference' onchange='Run.ui.populateRunOptions(this);'>");
+          srb.append("<option value='0' selected='selected'>Please select...</option>");
+          for (SequencerReference sr : sequencerReferenceService.listByPlatformType(newPt)) {
+            if (sr.isActive()) {
+              srb.append(
+                  "<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
+            }
+          }
+          srb.append("</select>");
+          responseMap.put("sequencers", srb.toString());
+        } else {
+          return JSONUtils.SimpleJSONError("Unrecognised PlatformType");
+        }
+        return JSONUtils.JSONObjectResponse(responseMap);
+      } else {
+        // new run
+        Map<String, Object> responseMap = new HashMap<>();
+
+        PlatformType newPt = PlatformType.get(newRuntype);
+        if (newPt != null) {
+          StringBuilder srb = new StringBuilder();
+          srb.append("<select name='sequencer' id='sequencerReference' onchange='Run.ui.populateRunOptions(this);'>");
+          srb.append("<option value='0' selected='selected'>Please select...</option>");
+          for (SequencerReference sr : sequencerReferenceService.listByPlatformType(newPt)) {
+            if (sr.isActive()) {
+              srb.append(
+                  "<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
+            }
+          }
+          srb.append("</select>");
+          responseMap.put("sequencers", srb.toString());
+        } else {
+          return JSONUtils.SimpleJSONError("Unrecognised PlatformType");
+        }
+
+        return JSONUtils.JSONObjectResponse(responseMap);
+      }
+    } catch (IOException e) {
+      log.debug("Failed to change PlatformType", e);
+      return JSONUtils.SimpleJSONError("Failed to change PlatformType");
+    }
+  }
+
+  public JSONObject populateRunOptions(HttpSession session, JSONObject json) {
+    Long sequencerReferenceId = json.getLong("sequencerReference");
+    String cId = json.getString("run_cId");
+    try {
+      SequencerReference sr = sequencerReferenceService.get(sequencerReferenceId);
+      Map<String, Object> responseMap = new HashMap<>();
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+
+      Run run = new Run(user);
+
+      run.setSequencerReference(sr);
+
+      session.setAttribute("run_" + cId, run);
+
+      return JSONUtils.JSONObjectResponse(responseMap);
+    } catch (IOException e) {
+      log.error("failed to get run options", e);
+      return JSONUtils.SimpleJSONError("Failed to get Run options");
+    }
   }
 
   public String containerInfoHtml(PlatformType platformType) {
@@ -202,7 +299,7 @@ public class RunControllerHelperService {
 
           long containerId = Long.parseLong(id.split("_")[1]);
           long partitionNumber = Long.parseLong(id.split("_")[2]);
-          SequencerPartitionContainer f = requestManager.getSequencerPartitionContainerById(containerId);
+          SequencerPartitionContainer f = containerService.get(containerId);
           for (Partition p : f.getPartitions()) {
             if (p.getPartitionNumber() == partitionNumber) {
               p.setSequencerPartitionContainer(f);
@@ -214,7 +311,7 @@ public class RunControllerHelperService {
         RunQC newQc = new RunQCImpl();
         newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
-        newQc.setQcType(requestManager.getRunQcTypeById(json.getLong("qcType")));
+        newQc.setQcType(runService.getRunQcType(json.getLong("qcType")));
         newQc.setInformation(json.getString("information"));
         newQc.setDoNotProcess(json.getBoolean("doNotProcess"));
         newQc.setPartitionSelections(partitionSelections);
@@ -272,8 +369,8 @@ public class RunControllerHelperService {
     try {
       Run run = runService.get(runId);
       String barcode = json.getString("barcode");
-      Collection<SequencerPartitionContainer> containers = requestManager
-          .listSequencerPartitionContainersByBarcode(barcode);
+      Collection<SequencerPartitionContainer> containers = containerService
+          .listByBarcode(barcode);
       if (containers.isEmpty()) {
         return JSONUtils.SimpleJSONError("No containers with this barcode.");
       }
@@ -286,7 +383,7 @@ public class RunControllerHelperService {
             container.getPlatform().getNameAndModel(), run.getSequencerReference().getPlatform().getNameAndModel()));
       }
       run.addSequencerPartitionContainer(container);
-      requestManager.saveRun(run);
+      runService.update(run);
       return JSONUtils.SimpleJSONResponse("Success!");
     } catch (IOException e) {
       log.error("unable to lookup barcode", e);
@@ -297,7 +394,7 @@ public class RunControllerHelperService {
   public JSONObject generateIlluminaDemultiplexCSV(HttpSession session, JSONObject json) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Run r = runService.get(json.getLong("runId"));
-    SequencerPartitionContainer f = requestManager.getSequencerPartitionContainerById(json.getLong("containerId"));
+    SequencerPartitionContainer f = containerService.get(json.getLong("containerId"));
     if (r != null && f != null) {
       String casavaVersion = "1.8.2";
       if (json.has("casavaVersion") && !isStringEmptyOrNull(json.getString("casavaVersion"))) {
@@ -392,10 +489,10 @@ public class RunControllerHelperService {
       PlatformType pt = json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))
           ? PlatformType.get(json.getString("platform")) : r.getSequencerReference().getPlatform().getPlatformType();
 
-      Pool p = poolService.getPoolByBarcode(barcode);
+      Pool p = poolService.getByBarcode(barcode);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (p == null) {
-        p = poolService.getPoolByBarcode(new String(Base64.decodeBase64(barcode)));
+        p = poolService.getByBarcode(new String(Base64.decodeBase64(barcode)));
       }
       // if pool still can't be found, return error
       if (p == null) {
@@ -424,7 +521,7 @@ public class RunControllerHelperService {
     try {
       String partition = json.getString("partition");
       Long poolId = json.getLong("poolId");
-      Pool p = poolService.getPoolById(poolId);
+      Pool p = poolService.get(poolId);
       StringBuilder sb = new StringBuilder();
       sb.append("<div style='float:left; clear:both'>");
 
@@ -590,8 +687,8 @@ public class RunControllerHelperService {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setContainerService(ContainerService containerService) {
+    this.containerService = containerService;
   }
 
   public void setRunService(RunService runService) {
@@ -611,7 +708,7 @@ public class RunControllerHelperService {
           it.remove();
         }
       }
-      requestManager.saveRun(run);
+      runService.update(run);
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("delete run container", e);

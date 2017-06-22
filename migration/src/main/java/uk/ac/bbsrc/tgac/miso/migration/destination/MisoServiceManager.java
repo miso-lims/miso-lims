@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDilutionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolOrderDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolableElementViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
@@ -56,10 +57,18 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.DefaultLibraryDesignCodeService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultContainerService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultIndexService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultKitService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPlatformService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
@@ -68,7 +77,10 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultStudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultTargetedSequencingService;
 
 /**
  * This class is used to simplify creation and wiring of MISO services. Some of the config is currently hardcoded - mainly naming schemes
@@ -105,20 +117,32 @@ public class MisoServiceManager {
   private HibernateSequencerReferenceDao sequencerReferenceDao;
   private HibernateBoxDao boxDao;
   private HibernatePoolableElementViewDao poolableElementViewDao;
+  private HibernatePoolOrderDao poolOrderDao;
 
+  private DefaultChangeLogService changeLogService;
   private DefaultContainerService containerService;
+  private DefaultExperimentService experimentService;
   private DefaultSampleClassService sampleClassService;
   private DefaultSampleService sampleService;
+  private DefaultIndexService indexService;
+  private DefaultKitService kitService;
   private DefaultLabService labService;
   private DefaultLibraryService libraryService;
+  private DefaultLibraryDesignService libraryDesignService;
+  private DefaultLibraryDesignCodeService libraryDesignCodeService;
   private DefaultLibraryDilutionService dilutionService;
+  private DefaultPlatformService platformService;
   private DefaultSampleNumberPerProjectService sampleNumberPerProjectService;
   private DefaultSampleValidRelationshipService sampleValidRelationshipService;
   private DefaultReferenceGenomeService referenceGenomeService;
   private DefaultRunService runService;
+  private DefaultSequencerReferenceService sequencerReferenceService;
+  private DefaultSequencingParametersService sequencingParametersService;
   private DefaultStudyService studyService;
   private DefaultPoolableElementViewService poolableElementViewService;
+  private DefaultPoolOrderService poolOrderService;
   private DefaultPoolService poolService;
+  private DefaultTargetedSequencingService targetedSequencingService;
 
   private PoolAlertManager poolAlertManager;
   private ProjectAlertManager projectAlertManager;
@@ -169,19 +193,28 @@ public class MisoServiceManager {
     MisoServiceManager m = new MisoServiceManager(jdbcTemplate, sessionFactory);
     m.setDefaultBoxDao();
     m.setDefaultChangeLogDao();
+    m.setDefaultChangeLogService();
     m.setDefaultContainerService();
     m.setDefaultDilutionDao();
     m.setDefaultDilutionService();
     m.setDefaultExperimentDao();
+    m.setDefaultExperimentService();
+    m.setDefaultIndexService();
     m.setDefaultInstituteDao();
     m.setDefaultKitDao();
+    m.setDefaultKitService();
     m.setDefaultLabDao();
     m.setDefaultLabService();
     m.setDefaultLibraryDao();
     m.setDefaultLibraryService();
+    m.setDefaultLibraryDesignService();
+    m.setDefaultLibraryDesignCodeService();
     m.setDefaultLibraryQcDao();
     m.setDefaultPlatformDao();
+    m.setDefaultPlatformService();
     m.setDefaultPoolDao();
+    m.setDefaultPoolOrderDao();
+    m.setDefaultPoolOrderService();
     m.setDefaultPoolService();
     m.setDefaultReferenceGenomeDao();
     m.setDefaultReferenceGenomeService();
@@ -205,10 +238,13 @@ public class MisoServiceManager {
     m.setDefaultSecurityStore();
     m.setDefaultSequencerPartitionContainerDao();
     m.setDefaultSequencerReferenceDao();
+    m.setDefaultSequencerReferenceService();
+    m.setDefaultSequencingParametersService();
     m.setDefaultStudyDao();
     m.setDefaultStudyService();
     m.setDefaultSubprojectDao();
     m.setDefaultTargetedSequencingDao();
+    m.setDefaultTargetedSequencingService();
     m.setDefaultTissueMaterialDao();
     m.setDefaultTissueOriginDao();
     m.setDefaultTissueTypeDao();
@@ -300,6 +336,10 @@ public class MisoServiceManager {
     if (poolService != null) poolService.setAuthorizationManager(authorizationManager);
     if (runService != null) runService.setAuthorizationManager(authorizationManager);
     if (containerService != null) containerService.setAuthorizationManager(authorizationManager);
+    if (sequencerReferenceService != null) sequencerReferenceService.setAuthorizationManager(authorizationManager);
+    if (kitService != null) kitService.setAuthorizationManager(authorizationManager);
+    if (changeLogService != null) changeLogService.setAuthorizationManager(authorizationManager);
+    if (experimentService != null) experimentService.setAuthorizationManager(authorizationManager);
   }
 
   public MisoRequestManager getRequestManager() {
@@ -317,22 +357,17 @@ public class MisoServiceManager {
     rm.setProjectStore(projectDao);
     rm.setPoolStore(poolDao);
     rm.setRunStore(runDao);
-    rm.setSampleQcStore(sampleQcDao);
     rm.setNamingScheme(getNamingScheme());
     rm.setSecurityStore(securityStore);
     rm.setSecurityProfileStore(securityProfileDao);
-    rm.setPoolAlertManager(poolAlertManager);
     rm.setProjectAlertManager(projectAlertManager);
     rm.setRunAlertManager(runAlertManager);
     rm.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
     rm.setSecurityStore(securityStore);
     rm.setSecurityManager(securityManager);
-    rm.setLibraryDilutionStore(dilutionDao);
     rm.setChangeLogStore(changeLogDao);
     rm.setSequencerPartitionContainerStore(sequencerPartitionContainerDao);
     rm.setBoxStore(boxDao);
-    rm.setSampleStore(sampleDao);
-    rm.setLibraryStore(libraryDao);
     setRequestManager(rm);
   }
 
@@ -358,6 +393,7 @@ public class MisoServiceManager {
     if (requestManager != null) requestManager.setSecurityStore(securityStore);
     if (projectDao != null) projectDao.setSecurityStore(securityStore);
     if (runDao != null) runDao.setSecurityStore(securityStore);
+    if (experimentService != null) experimentService.setSecurityStore(securityStore);
   }
 
   public HibernateSecurityProfileDao getSecurityProfileDao() {
@@ -378,6 +414,8 @@ public class MisoServiceManager {
   private void updateSecurityProfileDaoDependencies() {
     if (requestManager != null) requestManager.setSecurityProfileStore(securityProfileDao);
     if (runService != null) runService.setSecurityProfileStore(securityProfileDao);
+    if (containerService != null) containerService.setSecurityProfileDao(securityProfileDao);
+    if (experimentService != null) experimentService.setSecurityProfileStore(securityProfileDao);
   }
 
   public LocalSecurityManager getSecurityManager() {
@@ -426,6 +464,8 @@ public class MisoServiceManager {
   private void updateProjectDaoDependencies() {
     if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setProjectStore(projectDao);
     if (requestManager != null) requestManager.setProjectStore(projectDao);
+    if (sampleService != null) sampleService.setProjectStore(projectDao);
+    if (studyService != null) studyService.setProjectStore(projectDao);
   }
 
   public HibernateSampleClassDao getSampleClassDao() {
@@ -445,7 +485,6 @@ public class MisoServiceManager {
 
   private void updateSampleClassDaoDependencies() {
     if (sampleClassService != null) sampleClassService.setSampleClassDao(sampleClassDao);
-    if (sampleService != null) sampleService.setSampleClassDao(sampleClassDao);
     if (sampleValidRelationshipService != null) sampleValidRelationshipService.setSampleClassDao(sampleClassDao);
   }
 
@@ -466,7 +505,7 @@ public class MisoServiceManager {
   }
 
   private void updateSampleClassServiceDependencies() {
-
+    if (sampleService != null) sampleService.setSampleClassService(sampleClassService);
   }
 
   public DefaultSampleService getSampleService() {
@@ -485,7 +524,7 @@ public class MisoServiceManager {
     svc.setNamingScheme(getNamingScheme());
     svc.setProjectStore(projectDao);
     svc.setDetailedQcStatusDao(detailedQcStatusDao);
-    svc.setSampleClassDao(sampleClassDao);
+    svc.setSampleClassService(sampleClassService);
     svc.setSampleNumberPerProjectService(sampleNumberPerProjectService);
     svc.setSamplePurposeDao(samplePurposeDao);
     svc.setSampleValidRelationshipService(sampleValidRelationshipService);
@@ -501,6 +540,7 @@ public class MisoServiceManager {
   }
 
   private void updateSampleServiceDependencies() {
+    if (libraryService != null) libraryService.setSampleService(sampleService);
   }
 
   public HibernateSampleDao getSampleDao() {
@@ -522,8 +562,6 @@ public class MisoServiceManager {
 
   private void updateSampleDaoDependencies() {
     if (sampleService != null) sampleService.setSampleDao(sampleDao);
-    if (libraryService != null) libraryService.setSampleDao(sampleDao);
-    if (requestManager != null) requestManager.setSampleStore(sampleDao);
   }
 
   public HibernateChangeLogDao getChangeLogDao() {
@@ -542,9 +580,8 @@ public class MisoServiceManager {
   }
 
   private void updateChangeLogDaoDependencies() {
-    if (libraryService != null) libraryService.setChangeLogDao(changeLogDao);
     if (requestManager != null) requestManager.setChangeLogStore(changeLogDao);
-    if (runService != null) runService.setChangeLogStore(changeLogDao);
+    if (changeLogService != null) changeLogService.setChangeLogDao(changeLogDao);
   }
 
   public HibernateSampleQcDao getSampleQcDao() {
@@ -563,7 +600,6 @@ public class MisoServiceManager {
   }
 
   private void updateSampleQcDaoDependencies() {
-    if (requestManager != null) requestManager.setSampleQcStore(sampleQcDao);
     if (sampleService != null) sampleService.setSampleQcDao(sampleQcDao);
   }
 
@@ -586,8 +622,6 @@ public class MisoServiceManager {
 
   private void updateLibraryDaoDependencies() {
     if (libraryService != null) libraryService.setLibraryDao(libraryDao);
-    if (dilutionService != null) dilutionService.setLibraryDao(libraryDao);
-    if (requestManager != null) requestManager.setLibraryStore(libraryDao);
   }
 
   public DefaultLibraryService getLibraryService() {
@@ -605,18 +639,19 @@ public class MisoServiceManager {
     svc.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
     svc.setNamingScheme(getNamingScheme());
     svc.setLibraryDao(libraryDao);
-    svc.setLibraryDesignDao(libraryDesignDao);
-    svc.setLibraryDesignCodeDao(libraryDesignCodeDao);
+    svc.setLibraryDesignService(libraryDesignService);
+    svc.setLibraryDesignCodeService(libraryDesignCodeService);
     svc.setLibraryQcDao(libraryQcDao);
-    svc.setIndexDao(indexDao);
-    svc.setKitDao(kitDao);
-    svc.setSampleDao(sampleDao);
+    svc.setIndexService(indexService);
+    svc.setKitService(kitService);
+    svc.setSampleService(sampleService);
     svc.setSecurityManager(securityManager);
-    svc.setChangeLogDao(changeLogDao);
+    svc.setChangeLogService(changeLogService);
     setLibraryService(svc);
   }
 
   private void updateLibraryServiceDependencies() {
+    if (dilutionService != null) dilutionService.setLibraryService(libraryService);
   }
 
   public HibernateLibraryQcDao getLibraryQcDao() {
@@ -656,7 +691,6 @@ public class MisoServiceManager {
 
   private void updateDilutionDaoDependencies() {
     if (dilutionService != null) dilutionService.setDilutionDao(dilutionDao);
-    if (requestManager != null) requestManager.setLibraryDilutionStore(dilutionDao);
   }
 
   public DefaultLibraryDilutionService getDilutionService() {
@@ -673,8 +707,8 @@ public class MisoServiceManager {
     svc.setDilutionDao(dilutionDao);
     svc.setAuthorizationManager(authorizationManager);
     svc.setNamingScheme(getNamingScheme());
-    svc.setLibraryDao(libraryDao);
-    svc.setTargetedSequencingDao(targetedSequencingDao);
+    svc.setLibraryService(libraryService);
+    svc.setTargetedSequencingService(targetedSequencingService);
     svc.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
     setDilutionService(svc);
   }
@@ -698,7 +732,7 @@ public class MisoServiceManager {
   }
 
   private void updateTargetedSequencingDaoDependencies() {
-    if (dilutionService != null) dilutionService.setTargetedSequencingDao(targetedSequencingDao);
+    if (targetedSequencingService != null) targetedSequencingService.setTargetedSequencingDao(targetedSequencingDao);
   }
 
   public HibernatePoolDao getPoolDao() {
@@ -720,6 +754,7 @@ public class MisoServiceManager {
 
   private void updatePoolDaoDependencies() {
     if (requestManager != null) requestManager.setPoolStore(poolDao);
+    if (poolService != null) poolService.setPoolStore(poolDao);
   }
 
   public DefaultPoolService getPoolService() {
@@ -735,7 +770,7 @@ public class MisoServiceManager {
     DefaultPoolService service = new DefaultPoolService();
     service.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
     service.setAuthorizationManager(authorizationManager);
-    service.setNamingScheme(namingScheme);
+    service.setNamingScheme(getNamingScheme());
     service.setPoolAlertManager(poolAlertManager);
     service.setPoolStore(poolDao);
     service.setPoolableElementViewService(poolableElementViewService);
@@ -744,6 +779,7 @@ public class MisoServiceManager {
 
   private void updatePoolServiceDependencies() {
     if (containerService != null) containerService.setPoolService(poolService);
+    if (experimentService != null) experimentService.setPoolService(poolService);
   }
 
   public HibernateExperimentDao getExperimentDao() {
@@ -763,6 +799,7 @@ public class MisoServiceManager {
   }
 
   private void updateExperimentDaoDependencies() {
+    if (experimentService != null) experimentService.setExperimentStore(experimentDao);
   }
 
   public HibernateKitDao getKitDao() {
@@ -782,7 +819,7 @@ public class MisoServiceManager {
   }
 
   private void updateKitDaoDependencies() {
-    if (libraryService != null) libraryService.setKitDao(kitDao);
+    if (kitService != null) kitService.setKitStore(kitDao);
   }
 
   public HibernatePlatformDao getPlatformDao() {
@@ -803,6 +840,7 @@ public class MisoServiceManager {
 
   private void updatePlatformDaoDependencies() {
     if (requestManager != null) requestManager.setPlatformStore(platformDao);
+    if (platformService != null) platformService.setPlatformDao(platformDao);
   }
 
   public HibernateStudyDao getStudyDao() {
@@ -822,6 +860,7 @@ public class MisoServiceManager {
   }
 
   private void updateStudyDaoDependencies() {
+    if (studyService != null) studyService.setStudyStore(studyDao);
   }
 
   public HibernateRunDao getRunDao() {
@@ -843,6 +882,7 @@ public class MisoServiceManager {
 
   private void updateRunDaoDependencies() {
     if (requestManager != null) requestManager.setRunStore(runDao);
+    if (runService != null) runService.setRunDao(runDao);
   }
 
   public HibernateRunQcDao getRunQcDao() {
@@ -881,7 +921,7 @@ public class MisoServiceManager {
 
   private void updateSequencerPartitionContainerDaoDependencies() {
     if (requestManager != null) requestManager.setSequencerPartitionContainerStore(getSequencerPartitionContainerDao());
-    if (containerService != null) containerService.setContainerStore(sequencerPartitionContainerDao);
+    if (containerService != null) containerService.setContainerDao(sequencerPartitionContainerDao);
   }
 
   public HibernateSequencerReferenceDao getSequencerReferenceDao() {
@@ -901,7 +941,8 @@ public class MisoServiceManager {
   }
 
   private void updateSequencerReferenceDaoDependencies() {
-    if (runService != null) runService.setSequencerReferenceDao(sequencerReferenceDao);
+    if (sequencerReferenceService != null) sequencerReferenceService.setSequencerReferenceDao(sequencerReferenceDao);
+    if (requestManager != null) requestManager.setSequencerReferenceStore(sequencerReferenceDao);
   }
 
   public HibernateBoxDao getBoxDao() {
@@ -1182,6 +1223,7 @@ public class MisoServiceManager {
   }
 
   private void updateStudyServiceDependencies() {
+    if (experimentService != null) experimentService.setStudyService(studyService);
   }
 
   public DefaultReferenceGenomeService getReferenceGenomeService() {
@@ -1190,6 +1232,7 @@ public class MisoServiceManager {
 
   private void setReferenceGenomeService(DefaultReferenceGenomeService referenceGenomeService) {
     this.referenceGenomeService = referenceGenomeService;
+    updateReferenceGenomeServiceDependencies();
   }
 
   public void setDefaultReferenceGenomeService() {
@@ -1197,6 +1240,10 @@ public class MisoServiceManager {
     svc.setAuthorizationManager(authorizationManager);
     svc.setReferenceGenomeDao(referenceGenomeDao);
     setReferenceGenomeService(svc);
+  }
+
+  private void updateReferenceGenomeServiceDependencies() {
+
   }
 
   public HibernateReferenceGenomeDao getReferenceGenomeDao() {
@@ -1216,6 +1263,7 @@ public class MisoServiceManager {
 
   private void updateReferenceGenomeDaoDependencies() {
     if (referenceGenomeService != null) referenceGenomeService.setReferenceGenomeDao(referenceGenomeDao);
+    if (requestManager != null) requestManager.setReferenceGenomeStore(referenceGenomeDao);
   }
 
   public HibernateSampleValidRelationshipDao getSampleValidRelationshipDao() {
@@ -1253,7 +1301,7 @@ public class MisoServiceManager {
   }
 
   private void updateLibraryDesignDaoDependencies() {
-    if (libraryService != null) libraryService.setLibraryDesignDao(libraryDesignDao);
+    if (libraryDesignService != null) libraryDesignService.setLibraryDesignDao(libraryDesignDao);
   }
 
   public HibernateLibraryDesignCodeDao getLibraryDesignCodeDao() {
@@ -1272,7 +1320,7 @@ public class MisoServiceManager {
   }
 
   private void updateLibraryDesignCodeDaoDependencies() {
-    if (libraryService != null) libraryService.setLibraryDesignCodeDao(libraryDesignCodeDao);
+    if (libraryDesignCodeService != null) libraryDesignCodeService.setLibraryDesignCodeDao(libraryDesignCodeDao);
   }
 
   public HibernateIndexDao getIndexDao() {
@@ -1291,7 +1339,7 @@ public class MisoServiceManager {
   }
 
   private void updateIndexDaoDependencies() {
-    if (libraryService != null) libraryService.setIndexDao(indexDao);
+    if (indexService != null) indexService.setIndexStore(indexDao);
   }
 
   public void setDefaultSequencingParametersDao() {
@@ -1310,7 +1358,7 @@ public class MisoServiceManager {
   }
 
   private void updateSequencingParametersDaoDependencies() {
-    if (runService != null) runService.setSequencingParametersDao(sequencingParametersDao);
+    if (sequencingParametersService != null) sequencingParametersService.setSequencingParametersDao(sequencingParametersDao);
   }
 
   public PoolAlertManager getPoolAlertManager() {
@@ -1329,7 +1377,7 @@ public class MisoServiceManager {
   }
 
   private void updatePoolAlertManagerDependencies() {
-    if (requestManager != null) requestManager.setPoolAlertManager(poolAlertManager);
+    if (poolService != null) poolService.setPoolAlertManager(poolAlertManager);
   }
 
   public ProjectAlertManager getProjectAlertManager() {
@@ -1349,6 +1397,7 @@ public class MisoServiceManager {
 
   private void updateProjectAlertManagerDependencies() {
     if (projectDao != null) projectDao.setProjectAlertManager(projectAlertManager);
+    if (requestManager != null) requestManager.setProjectAlertManager(projectAlertManager);
   }
 
   public RunAlertManager getRunAlertManager() {
@@ -1425,15 +1474,16 @@ public class MisoServiceManager {
     service.setRunAlertManager(runAlertManager);
     service.setRunQcDao(runQcDao);
     service.setSecurityManager(securityManager);
-    service.setNamingScheme(namingScheme);
+    service.setNamingScheme(getNamingScheme());
     service.setSecurityProfileStore(securityProfileDao);
     service.setContainerService(containerService);
-    service.setSequencerReferenceDao(sequencerReferenceDao);
-    service.setSequencingParametersDao(sequencingParametersDao);
+    service.setSequencerReferenceService(sequencerReferenceService);
+    service.setSequencingParametersService(sequencingParametersService);
     setRunService(service);
   }
 
   private void updateRunServiceDependencies() {
+    if (sequencerReferenceService != null) sequencerReferenceService.setRunService(runService);
   }
 
   public DefaultContainerService getContainerService() {
@@ -1448,8 +1498,10 @@ public class MisoServiceManager {
   public void setDefaultContainerService() {
     DefaultContainerService service = new DefaultContainerService();
     service.setAuthorizationManager(authorizationManager);
-    service.setContainerStore(sequencerPartitionContainerDao);
+    service.setContainerDao(sequencerPartitionContainerDao);
     service.setPoolService(poolService);
+    service.setPlatformService(platformService);
+    service.setSecurityProfileDao(securityProfileDao);
     setContainerService(service);
   }
 
@@ -1457,4 +1509,251 @@ public class MisoServiceManager {
     if (runService != null) runService.setContainerService(containerService);
   }
 
+  public DefaultPlatformService getPlatformService() {
+    return platformService;
+  }
+
+  public void setPlatformService(DefaultPlatformService service) {
+    this.platformService = service;
+    updatePlatformServiceDependencies();
+  }
+
+  public void setDefaultPlatformService() {
+    DefaultPlatformService service = new DefaultPlatformService();
+    service.setPlatformDao(platformDao);
+    service.setSequencerReferenceService(sequencerReferenceService);
+    setPlatformService(service);
+  }
+
+  private void updatePlatformServiceDependencies() {
+    if (containerService != null) containerService.setPlatformService(platformService);
+    if (experimentService != null) experimentService.setPlatformService(platformService);
+  }
+
+  public DefaultSequencerReferenceService getSequencerReferenceService() {
+    return sequencerReferenceService;
+  }
+
+  public void setSequencerReferenceService(DefaultSequencerReferenceService service) {
+    this.sequencerReferenceService = service;
+    updateSequencerReferenceServiceDependencies();
+  }
+
+  public void setDefaultSequencerReferenceService() {
+    DefaultSequencerReferenceService service = new DefaultSequencerReferenceService();
+    service.setAuthorizationManager(authorizationManager);
+    service.setSequencerReferenceDao(sequencerReferenceDao);
+    service.setRunService(runService);
+    setSequencerReferenceService(service);
+  }
+
+  private void updateSequencerReferenceServiceDependencies() {
+    if (runService != null) runService.setSequencerReferenceService(sequencerReferenceService);
+  }
+
+  public DefaultLibraryDesignService getLibraryDesignService() {
+    return libraryDesignService;
+  }
+
+  public void setLibraryDesignService(DefaultLibraryDesignService service) {
+    this.libraryDesignService = service;
+    updateLibraryDesignServiceDependencies();
+  }
+
+  public void setDefaultLibraryDesignService() {
+    DefaultLibraryDesignService service = new DefaultLibraryDesignService();
+    service.setLibraryDesignDao(libraryDesignDao);
+    setLibraryDesignService(service);
+  }
+
+  private void updateLibraryDesignServiceDependencies() {
+    if (libraryService != null) libraryService.setLibraryDesignService(libraryDesignService);
+  }
+
+  public DefaultLibraryDesignCodeService getLibraryDesignCodeService() {
+    return libraryDesignCodeService;
+  }
+
+  public void setLibraryDesignCodeService(DefaultLibraryDesignCodeService service) {
+    this.libraryDesignCodeService = service;
+    updateLibraryDesignCodeServiceDependencies();
+  }
+
+  public void setDefaultLibraryDesignCodeService() {
+    DefaultLibraryDesignCodeService service = new DefaultLibraryDesignCodeService();
+    service.setLibraryDesignCodeDao(libraryDesignCodeDao);
+    setLibraryDesignCodeService(service);
+  }
+
+  private void updateLibraryDesignCodeServiceDependencies() {
+    if (libraryService != null) libraryService.setLibraryDesignCodeService(libraryDesignCodeService);
+  }
+
+  public DefaultIndexService getIndexService() {
+    return indexService;
+  }
+
+  public void setIndexService(DefaultIndexService service) {
+    this.indexService = service;
+    updateIndexServiceDependencies();
+  }
+
+  public void setDefaultIndexService() {
+    DefaultIndexService service = new DefaultIndexService();
+    service.setIndexStore(indexDao);
+    setIndexService(service);
+  }
+
+  private void updateIndexServiceDependencies() {
+    if (libraryService != null) libraryService.setIndexService(indexService);
+  }
+
+  public DefaultKitService getKitService() {
+    return kitService;
+  }
+
+  public void setKitService(DefaultKitService service) {
+    this.kitService = service;
+    updateKitServiceDependencies();
+  }
+
+  public void setDefaultKitService() {
+    DefaultKitService service = new DefaultKitService();
+    service.setKitStore(kitDao);
+    service.setAuthorizationManager(authorizationManager);
+    setKitService(service);
+  }
+
+  private void updateKitServiceDependencies() {
+    if (libraryService != null) libraryService.setKitService(kitService);
+    if (experimentService != null) experimentService.setKitService(kitService);
+  }
+
+  public DefaultTargetedSequencingService getTargetedSequencingService() {
+    return targetedSequencingService;
+  }
+
+  public void setTargetedSequencingService(DefaultTargetedSequencingService service) {
+    this.targetedSequencingService = service;
+    updateTargetedSequencingServiceDependencies();
+  }
+
+  public void setDefaultTargetedSequencingService() {
+    DefaultTargetedSequencingService service = new DefaultTargetedSequencingService();
+    service.setTargetedSequencingDao(targetedSequencingDao);
+    setTargetedSequencingService(service);
+  }
+
+  private void updateTargetedSequencingServiceDependencies() {
+    if (dilutionService != null) dilutionService.setTargetedSequencingService(targetedSequencingService);
+  }
+
+  public DefaultChangeLogService getChangeLogService() {
+    return changeLogService;
+  }
+
+  public void setChangeLogService(DefaultChangeLogService service) {
+    this.changeLogService = service;
+    updateChangeLogServiceDependencies();
+  }
+
+  public void setDefaultChangeLogService() {
+    DefaultChangeLogService service = new DefaultChangeLogService();
+    service.setChangeLogDao(changeLogDao);
+    service.setAuthorizationManager(authorizationManager);
+    setChangeLogService(service);
+  }
+
+  private void updateChangeLogServiceDependencies() {
+    if (runService != null) runService.setChangeLogService(changeLogService);
+    if (poolService != null) poolService.setChangeLogService(changeLogService);
+    if (libraryService != null) libraryService.setChangeLogService(changeLogService);
+  }
+
+  public DefaultSequencingParametersService getSequencingParametersService() {
+    return sequencingParametersService;
+  }
+
+  public void setSequencingParametersService(DefaultSequencingParametersService service) {
+    this.sequencingParametersService = service;
+    updateSequencingParametersServiceDependencies();
+  }
+
+  public void setDefaultSequencingParametersService() {
+    DefaultSequencingParametersService service = new DefaultSequencingParametersService();
+    service.setSequencingParametersDao(sequencingParametersDao);
+    service.setAuthorizationManager(authorizationManager);
+    setSequencingParametersService(service);
+  }
+
+  private void updateSequencingParametersServiceDependencies() {
+    if (runService != null) runService.setSequencingParametersService(sequencingParametersService);
+    if (poolOrderService != null) poolOrderService.setSequencingParametersService(sequencingParametersService);
+  }
+
+  public DefaultPoolOrderService getPoolOrderService() {
+    return poolOrderService;
+  }
+
+  public void setPoolOrderService(DefaultPoolOrderService service) {
+    this.poolOrderService = service;
+    updatePoolOrderServiceDependencies();
+  }
+
+  public void setDefaultPoolOrderService() {
+    DefaultPoolOrderService service = new DefaultPoolOrderService();
+    service.setPoolOrderDao(poolOrderDao);
+    service.setSequencingParametersService(sequencingParametersService);
+    service.setPoolService(poolService);
+    service.setAuthorizationManager(authorizationManager);
+    setPoolOrderService(service);
+  }
+
+  private void updatePoolOrderServiceDependencies() {
+  }
+
+  public HibernatePoolOrderDao getPoolOrderDao() {
+    return poolOrderDao;
+  }
+
+  public void setPoolOrderDao(HibernatePoolOrderDao dao) {
+    this.poolOrderDao = dao;
+    updatePoolOrderDaoDependencies();
+  }
+
+  public void setDefaultPoolOrderDao() {
+    HibernatePoolOrderDao dao = new HibernatePoolOrderDao();
+    dao.setSessionFactory(sessionFactory);
+    setPoolOrderDao(dao);
+  }
+
+  private void updatePoolOrderDaoDependencies() {
+    if (poolOrderService != null) poolOrderService.setPoolOrderDao(poolOrderDao);
+  }
+
+  public DefaultExperimentService getExperimentService() {
+    return experimentService;
+  }
+
+  public void setExperimentService(DefaultExperimentService svc) {
+    this.experimentService = svc;
+    updateExperimentServiceDependencies();
+  }
+
+  public void setDefaultExperimentService() {
+    DefaultExperimentService service = new DefaultExperimentService();
+    service.setAuthorizationManager(authorizationManager);
+    service.setExperimentStore(experimentDao);
+    service.setKitService(kitService);
+    service.setNamingScheme(getNamingScheme());
+    service.setPlatformService(platformService);
+    service.setPoolService(poolService);
+    service.setSecurityStore(securityStore);
+    service.setSecurityProfileStore(securityProfileDao);
+    service.setStudyService(studyService);
+    setExperimentService(service);
+  }
+
+  private void updateExperimentServiceDependencies() {
+  }
 }

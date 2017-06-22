@@ -5,21 +5,22 @@ import java.text.MessageFormat;
 
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 
 @Ajaxified
 public class ServiceRecordControllerHelperService {
@@ -27,6 +28,8 @@ public class ServiceRecordControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(ServiceRecordControllerHelperService.class);
   @Autowired
   private SecurityManager securityManager;
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private RequestManager requestManager;
   @Autowired
@@ -57,7 +60,7 @@ public class ServiceRecordControllerHelperService {
       if (json.has("recordId")) {
         Long recordId = json.getLong("recordId");
         try {
-          requestManager.deleteSequencerServiceRecord(requestManager.getSequencerServiceRecordById(recordId));
+          sequencerReferenceService.deleteServiceRecord(recordId);
           return JSONUtils.SimpleJSONResponse("Service Record deleted");
         } catch (IOException e) {
           log.error("cannot delete service record", e);

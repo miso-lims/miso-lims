@@ -20,13 +20,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
-import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -38,22 +38,19 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   @Autowired
   private ExperimentStore experimentStore;
   @Autowired
-  private KitStore kitStore;
+  private KitService kitService;
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
-  private PlatformStore platformStore;
+  private PlatformService platformService;
   @Autowired
-  private PoolStore poolStore;
-
+  private PoolService poolService;
   @Autowired
   private SecurityStore securityStore;
-
   @Autowired
   private SecurityProfileStore securityProfileStore;
-
   @Autowired
-  private StudyStore studyStore;
+  private StudyService studyService;
 
   @Override
   public void delete(Experiment experiment) throws IOException {
@@ -91,7 +88,7 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
 
   @Override
   public Collection<Experiment> listAllByStudyId(long studyId) throws IOException {
-    return authorizationManager.filterUnreadable(studyStore.get(studyId).getExperiments());
+    return authorizationManager.filterUnreadable(studyService.get(studyId).getExperiments());
   }
 
   @Override
@@ -103,13 +100,14 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   public long save(Experiment experiment) throws IOException {
     try {
       authorizationManager.throwIfNotWritable(experiment);
+      experiment.setLastModifier(authorizationManager.getCurrentUser());
       if (experiment.getId() == ExperimentImpl.UNSAVED_ID) {
         experiment.setName(DbUtils.generateTemporaryName());
-        experiment.setPlatform(platformStore.get(experiment.getPlatform().getId()));
+        experiment.setPlatform(platformService.get(experiment.getPlatform().getId()));
         if (experiment.getPool() != null) {
-          experiment.setPool(poolStore.get(experiment.getPool().getId()));
+          experiment.setPool(poolService.get(experiment.getPool().getId()));
         }
-        experiment.setStudy(studyStore.get(experiment.getStudy().getId()));
+        experiment.setStudy(studyService.get(experiment.getStudy().getId()));
         if (experiment.getSecurityProfile().getProfileId() == SecurityProfile.UNSAVED_ID) {
           securityProfileStore.save(experiment.getSecurityProfile());
         } else {
@@ -137,16 +135,17 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
       original.setAlias(experiment.getAlias());
       original.setDescription(experiment.getDescription());
       original.setName(experiment.getName());
-      original.setPlatform(experiment.getPool() == null ? null : platformStore.get(experiment.getPlatform().getId()));
-      original.setPool(poolStore.get(experiment.getPool().getId()));
-      original.setStudy(studyStore.get(experiment.getStudy().getId()));
+      original.setPlatform(experiment.getPool() == null ? null : platformService.get(experiment.getPlatform().getId()));
+      original.setPool(poolService.get(experiment.getPool().getId()));
+      original.setStudy(studyService.get(experiment.getStudy().getId()));
       original.setSecurityProfile(securityStore.getSecurityProfileById(experiment.getSecurityProfile().getProfileId()));
       original.setTitle(experiment.getTitle());
       Set<Kit> kits = new HashSet<>();
       for (Kit k : experiment.getKits()) {
-        kits.add(kitStore.get(k.getId()));
+        kits.add(kitService.getKitById(k.getId()));
       }
       original.setKits(kits);
+      original.setLastModifier(authorizationManager.getCurrentUser());
       return experimentStore.save(original);
     } catch (MisoNamingException e) {
       throw new IOException("Cannot save Experiment - issue with naming scheme", e);
@@ -157,4 +156,37 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
+  public void setExperimentStore(ExperimentStore experimentStore) {
+    this.experimentStore = experimentStore;
+  }
+
+  public void setKitService(KitService kitService) {
+    this.kitService = kitService;
+  }
+
+  public void setPlatformService(PlatformService platformService) {
+    this.platformService = platformService;
+  }
+
+  public void setPoolService(PoolService poolService) {
+    this.poolService = poolService;
+  }
+
+  public void setSecurityStore(SecurityStore securityStore) {
+    this.securityStore = securityStore;
+  }
+
+  public void setSecurityProfileStore(SecurityProfileStore securityProfileStore) {
+    this.securityProfileStore = securityProfileStore;
+  }
+
+  public void setStudyService(StudyService studyService) {
+    this.studyService = studyService;
+  }
+
 }

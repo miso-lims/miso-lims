@@ -56,7 +56,7 @@ public class PoolControllerHelperServiceTest {
   public final void testChangePoolIdBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "idBarcode";
-    when(poolService.getPoolById(anyLong())).thenReturn(pool);
+    when(poolService.get(anyLong())).thenReturn(pool);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");
     final SecurityContextImpl context = new SecurityContextImpl();
@@ -70,7 +70,7 @@ public class PoolControllerHelperServiceTest {
     final JSONObject response = poolControllerHelperService.changePoolIdBarcode(null, json);
 
     verify(pool).setIdentificationBarcode(idBarcode);
-    verify(poolService).savePool(pool);
+    verify(poolService).save(pool);
 
     assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
@@ -79,7 +79,7 @@ public class PoolControllerHelperServiceTest {
   public final void testChangePoolIdBarcodeBlankBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "";
-    when(poolService.getPoolById(anyLong())).thenReturn(pool);
+    when(poolService.get(anyLong())).thenReturn(pool);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");
     final SecurityContextImpl context = new SecurityContextImpl();
@@ -93,7 +93,7 @@ public class PoolControllerHelperServiceTest {
     JSONObject response = poolControllerHelperService.changePoolIdBarcode(null, json);
 
     verify(pool).setIdentificationBarcode(null);
-    verify(poolService).savePool(pool);
+    verify(poolService).save(pool);
 
     assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
@@ -103,8 +103,8 @@ public class PoolControllerHelperServiceTest {
     final long id = 1L;
     final String idBarcode = "idBarcode";
     final IOException expected = new IOException("thrown by mock");
-    when(poolService.getPoolById(anyLong())).thenReturn(pool);
-    when(poolService.savePool(pool)).thenThrow(expected);
+    when(poolService.get(anyLong())).thenReturn(pool);
+    when(poolService.save(pool)).thenThrow(expected);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");
     final SecurityContextImpl context = new SecurityContextImpl();

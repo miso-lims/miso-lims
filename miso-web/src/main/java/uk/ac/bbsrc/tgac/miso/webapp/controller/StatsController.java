@@ -49,11 +49,12 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.SolidService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
@@ -96,25 +97,25 @@ public class StatsController {
   }
 
   @Autowired
-  private RequestManager requestManager;
-  @Autowired
   private RunService runService;
-
-  public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
   
   public void setRunService(RunService runService) {
     this.runService = runService;
   }
 
+  public void setSequencerReferenceService(SequencerReferenceService sequencerReferenceService) {
+    this.sequencerReferenceService = sequencerReferenceService;
+  }
+
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getSequencerReferenceColumnSizes();
+    return sequencerReferenceService.getSequencerReferenceColumnSizes();
   }
 
   public Collection<SequencerReference> populateSequencerReferences() throws IOException {
-    return requestManager.listAllSequencerReferences();
+    return sequencerReferenceService.list();
   }
 
   @RequestMapping(method = RequestMethod.GET)
@@ -126,14 +127,14 @@ public class StatsController {
 
   @RequestMapping(value = "/sequencer/{referenceId}", method = RequestMethod.GET)
   public ModelAndView viewSequencer(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+    SequencerReference sr = sequencerReferenceService.get(referenceId);
     
     if (sr != null) {
 
       Collection<Run> runs = runService.listBySequencerId(referenceId);
-      Collection<SequencerServiceRecord> serviceRecords = requestManager.listSequencerServiceRecordsBySequencerId(referenceId);
+      Collection<SequencerServiceRecord> serviceRecords = sequencerReferenceService.listServiceRecordsByInstrument(referenceId);
       Collection<SequencerReference> otherSequencers = getOtherSequencers(sr.getId());
-      model.put("preUpgradeSeqRef", requestManager.getSequencerReferenceByUpgradedReferenceId(sr.getId()));
+      model.put("preUpgradeSeqRef", sequencerReferenceService.getByUpgradedReferenceId(sr.getId()));
       
       model.put(ModelKeys.SEQUENCER.getKey(), sr);
       model.put(ModelKeys.RUNS.getKey(), runs);
@@ -152,7 +153,7 @@ public class StatsController {
   }
   
   private Collection<SequencerReference> getOtherSequencers(long selfId) throws IOException {
-    Collection<SequencerReference> otherSequencers = requestManager.listAllSequencerReferences();
+    Collection<SequencerReference> otherSequencers = sequencerReferenceService.list();
     
     // remove self from upgraded sequencer reference list
     SequencerReference sameRef = null;
@@ -170,7 +171,13 @@ public class StatsController {
   public String processSubmit(@ModelAttribute("sequencerReference") SequencerReference sr, ModelMap model, SessionStatus session)
       throws IOException {
     try {
-      Long srId = requestManager.saveSequencerReference(sr);
+      Long srId = null;
+      if (sr.getId() == SequencerReferenceImpl.UNSAVED_ID) {
+        srId = sequencerReferenceService.create(sr);
+      } else {
+        sequencerReferenceService.update(sr);
+        srId = sr.getId();
+      }
       session.setComplete();
       model.clear();
       return "redirect:/miso/stats/sequencer/" + srId;
@@ -198,7 +205,7 @@ public class StatsController {
   private ModelAndView statsBySequencer(PlatformType platformType, Long referenceId, ModelMap model) throws IOException {
     model.put(ModelKeys.PLATFORM.getKey(), platformType);
 
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+    SequencerReference sr = sequencerReferenceService.get(referenceId);
     if (sr != null) {
       if (sr.getPlatform().getPlatformType() != platformType) {
 
@@ -248,7 +255,7 @@ public class StatsController {
 
   @RequestMapping(value = "/solid/{referenceId}", method = RequestMethod.GET)
   public ModelAndView solidStats(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+    SequencerReference sr = sequencerReferenceService.get(referenceId);
 
 
     if (!sr.getPlatform().getInstrumentModel().contains("5500xl")) {

@@ -124,7 +124,7 @@ public class PoolControllerHelperService {
   public JSONObject getPoolQcTypes(HttpSession session, JSONObject json) {
     try {
       StringBuilder sb = new StringBuilder();
-      Collection<QcType> types = requestManager.listAllPoolQcTypes();
+      Collection<QcType> types = poolService.listPoolQcTypes();
       for (QcType s : types) {
         sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
@@ -147,14 +147,14 @@ public class PoolControllerHelperService {
       }
       if (json.has("poolId") && !isStringEmptyOrNull(json.getString("poolId"))) {
         Long poolId = Long.parseLong(json.getString("poolId"));
-        Pool pool = poolService.getPoolById(poolId);
+        Pool pool = poolService.get(poolId);
         PoolQC newQc = new PoolQCImpl();
         if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
           pool.setQcPassed(true);
         }
         newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
-        newQc.setQcType(requestManager.getPoolQcTypeById(json.getLong("qcType")));
+        newQc.setQcType(poolService.getPoolQcType(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
         pool.addQc(newQc);
         poolService.savePoolQC(newQc);
@@ -223,7 +223,7 @@ public class PoolControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       Long qcId = Long.parseLong(json.getString("qcId"));
-      PoolQC poolQc = poolService.getPoolQCById(qcId);
+      PoolQC poolQc = poolService.getPoolQC(qcId);
       response.put("results", "<input type='text' id='" + qcId + "' value='" + poolQc.getResults() + "'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Pool.qc.editPoolQC(\"" + qcId + "\");'>Save</a>");
       return response;
@@ -237,7 +237,7 @@ public class PoolControllerHelperService {
     try {
       if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
         Long qcId = Long.parseLong(json.getString("qcId"));
-        PoolQC poolQc = poolService.getPoolQCById(qcId);
+        PoolQC poolQc = poolService.getPoolQC(qcId);
         poolQc.setResults(Double.parseDouble(json.getString("result")));
         poolService.savePoolQC(poolQc);
         return JSONUtils.SimpleJSONResponse("OK");
@@ -333,7 +333,7 @@ public class PoolControllerHelperService {
     Long poolId = json.getLong("poolId");
     File temploc = getBarcodeFileLocation(session);
     try {
-      Pool pool = poolService.getPoolById(poolId);
+      Pool pool = poolService.get(poolId);
       BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
@@ -375,12 +375,12 @@ public class PoolControllerHelperService {
 
       @Override
       public Pool fetch(long id) throws IOException {
-        return poolService.getPoolById(id);
+        return poolService.get(id);
       }
 
       @Override
       public void store(Pool item) throws IOException {
-        poolService.savePool(item);
+        poolService.save(item);
       }
 
       @Override
@@ -423,10 +423,10 @@ public class PoolControllerHelperService {
         }
       }
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = poolService.getPoolById(poolId);
+      Pool pool = poolService.get(poolId);
       pool.setIdentificationBarcode(idBarcode);
       pool.setLastModifier(user);
-      poolService.savePool(pool);
+      poolService.save(pool);
     } catch (IOException e) {
       log.debug("Could not change Pool identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -478,7 +478,7 @@ public class PoolControllerHelperService {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Long poolId = json.getLong("poolId");
-      Pool p = poolService.getPoolById(poolId);
+      Pool p = poolService.get(poolId);
 
       Long studyId = json.getLong("studyId");
       Study s = studyService.get(studyId);
@@ -528,7 +528,7 @@ public class PoolControllerHelperService {
   public JSONObject listPoolAverageInsertSizes(HttpSession session, JSONObject json) {
     try {
       JSONObject j = new JSONObject();
-      for (Pool pool : poolService.listAllPools()) {
+      for (Pool pool : poolService.list()) {
 
         StringBuilder b = new StringBuilder();
         Integer avg = calculateAverageInsertSize(pool);
@@ -547,7 +547,7 @@ public class PoolControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       Long poolId = json.getLong("poolId");
-      Pool pool = poolService.getPoolById(poolId);
+      Pool pool = poolService.get(poolId);
       StringBuilder b = new StringBuilder();
       Integer avg = calculateAverageInsertSize(pool);
       if (avg != null) {
@@ -577,7 +577,7 @@ public class PoolControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       Long poolId = json.getLong("poolId");
-      Pool pool = poolService.getPoolById(poolId);
+      Pool pool = poolService.get(poolId);
       double concentration = pool.getConcentration();
       j.put("response", concentration);
       return j;
@@ -600,7 +600,7 @@ public class PoolControllerHelperService {
       if (json.has("poolId")) {
         Long poolId = json.getLong("poolId");
         try {
-          poolService.deletePool(poolService.getPoolById(poolId));
+          poolService.delete(poolService.get(poolId));
           return JSONUtils.SimpleJSONResponse("Pool deleted");
         } catch (IOException e) {
           log.error("cannot delete pool", e);
@@ -619,8 +619,8 @@ public class PoolControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
-      Pool pool = poolService.getPoolById(poolId);
-      poolService.deletePoolNote(pool, noteId);
+      Pool pool = poolService.get(poolId);
+      poolService.deleteNote(pool, noteId);
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
       log.error("cannot remove note", e);
@@ -635,7 +635,7 @@ public class PoolControllerHelperService {
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = poolService.getPoolById(poolId);
+      Pool pool = poolService.get(poolId);
       Note note = new Note();
 
       internalOnly = internalOnly.equals("on") ? "true" : "false";
@@ -645,9 +645,9 @@ public class PoolControllerHelperService {
       note.setOwner(user);
       note.setCreationDate(new Date());
       pool.getNotes().add(note);
-      poolService.savePoolNote(pool, note);
+      poolService.saveNote(pool, note);
       pool.setLastModifier(user);
-      poolService.savePool(pool);
+      poolService.save(pool);
     } catch (IOException e) {
       log.error("add pool note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -661,7 +661,7 @@ public class PoolControllerHelperService {
     JSONArray dilutionIds = json.getJSONArray("dilutionIds");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = poolService.getPoolById(poolId);
+      Pool pool = poolService.get(poolId);
       if (!pool.userCanWrite(user)) {
         return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
       }
@@ -673,7 +673,7 @@ public class PoolControllerHelperService {
         pool.getPoolableElementViews().add(target);
       }
       pool.setLastModifier(user);
-      poolService.savePool(pool);
+      poolService.save(pool);
       return JSONUtils.SimpleJSONResponse("Pool modified.");
     } catch (IOException e) {
       log.error("Add poolable element", e);
@@ -686,7 +686,7 @@ public class PoolControllerHelperService {
     JSONArray dilutionIds = json.getJSONArray("dilutionIds");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = poolService.getPoolById(poolId);
+      Pool pool = poolService.get(poolId);
       if (!pool.userCanWrite(user)) {
         return JSONUtils.SimpleJSONError("Not authorized to modify pool.");
       }
@@ -703,7 +703,7 @@ public class PoolControllerHelperService {
       if (deadDilutions.size() > 0) {
         pool.getPoolableElementViews().removeAll(deadDilutions);
         pool.setLastModifier(user);
-        poolService.savePool(pool);
+        poolService.save(pool);
       }
       return JSONUtils.SimpleJSONResponse("Pool modified.");
     } catch (IOException e) {

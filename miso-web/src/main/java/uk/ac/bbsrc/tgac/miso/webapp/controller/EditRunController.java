@@ -62,6 +62,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
@@ -79,8 +81,12 @@ public class EditRunController {
   private ChangeLogService changeLogService;
   @Autowired
   private RunService runService;
+  @Autowired
+  private PlatformService platformService;
 
   private RunStatsManager runStatsManager;
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
 
@@ -107,7 +113,7 @@ public class EditRunController {
 
   @ModelAttribute("platformTypes")
   public Collection<String> populatePlatformTypes() throws IOException {
-    return PlatformType.platformTypeNames(requestManager.listActivePlatformTypes());
+    return PlatformType.platformTypeNames(platformService.listActivePlatformTypes());
   }
 
   @ModelAttribute("healthTypes")
@@ -117,7 +123,7 @@ public class EditRunController {
 
   @ModelAttribute("platforms")
   public Collection<Platform> populatePlatforms() throws IOException {
-    return requestManager.listAllPlatforms();
+    return platformService.list();
   }
 
   public Boolean isMultiplexed(Run run) throws IOException {
@@ -241,7 +247,7 @@ public class EditRunController {
         throw new SecurityException("Permission denied.");
       }
 
-      model.put("sequencerReferences", requestManager.listSequencerReferencesByPlatformType(platformType));
+      model.put("sequencerReferences", sequencerReferenceService.listByPlatformType(platformType));
       if (run.getSequencerReference() != null) {
         model.put("sequencingParameters",
             sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getId()));

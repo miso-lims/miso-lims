@@ -200,7 +200,7 @@ public class EditProjectController {
   @ModelAttribute("libraryQcTypesString")
   public String libraryTypesString() throws IOException {
     List<String> types = new ArrayList<>();
-    List<QcType> libraryQcTypes = new ArrayList<>(requestManager.listAllLibraryQcTypes());
+    List<QcType> libraryQcTypes = new ArrayList<>(libraryService.listLibraryQcTypes());
     Collections.sort(libraryQcTypes);
     for (QcType s : libraryQcTypes) {
       types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");

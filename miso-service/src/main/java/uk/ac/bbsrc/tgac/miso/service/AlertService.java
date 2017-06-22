@@ -42,6 +42,11 @@ public interface AlertService {
   public Collection<Alert> listUnreadByUserId(long userId) throws IOException;
 
   /**
+   * Fetch all unread alerts for current user
+   */
+  public Collection<Alert> listUnreadForCurrentUser() throws IOException;
+
+  /**
    * Save a new alert or update an existing one
    * 
    * @param alert the Alert to save or update

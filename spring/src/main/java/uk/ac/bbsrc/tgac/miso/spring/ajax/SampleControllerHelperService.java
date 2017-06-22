@@ -235,7 +235,7 @@ public class SampleControllerHelperService {
         SampleQC newQc = new SampleQCImpl();
         newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
-        newQc.setQcType(requestManager.getSampleQcTypeById(json.getLong("qcType")));
+        newQc.setQcType(sampleService.getSampleQcType(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
         sample.addQc(newQc);
         sampleService.addQc(sample, newQc);
@@ -263,7 +263,7 @@ public class SampleControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       Long qcId = Long.parseLong(json.getString("qcId"));
-      SampleQC sampleQc = requestManager.getSampleQCById(qcId);
+      SampleQC sampleQc = sampleService.getSampleQC(qcId);
       response.put("results", "<input type='text' id='" + qcId + "' value='" + sampleQc.getResults() + "'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Sample.qc.editSampleQC(\"" + qcId + "\");'>Save</a>");
       return response;
@@ -277,7 +277,7 @@ public class SampleControllerHelperService {
     try {
       if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
         Long qcId = Long.parseLong(json.getString("qcId"));
-        SampleQC sampleQc = requestManager.getSampleQCById(qcId);
+        SampleQC sampleQc = sampleService.getSampleQC(qcId);
         sampleQc.setResults(Double.parseDouble(json.getString("result")));
         Sample sample = sampleQc.getSample();
         sampleService.addQc(sample, sampleQc);
@@ -606,7 +606,7 @@ public class SampleControllerHelperService {
   public String getSampleLastQC(Long sampleId) {
     try {
       String sampleQCValue = "NA";
-      Collection<SampleQC> sampleQCs = requestManager.listAllSampleQCsBySampleId(sampleId);
+      Collection<SampleQC> sampleQCs = sampleService.listSampleQCsBySampleId(sampleId);
       if (sampleQCs.size() > 0) {
         List<SampleQC> list = new ArrayList<>(sampleQCs);
         Collections.sort(list, new Comparator<SampleQC>() {

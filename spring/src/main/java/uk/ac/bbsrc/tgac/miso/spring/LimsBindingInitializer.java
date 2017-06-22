@@ -84,16 +84,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
@@ -114,20 +117,21 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private SecurityManager securityManager;
 
   @Autowired
-  private LibraryDesignDao libraryDesignDao;
-
+  private LibraryDesignService libraryDesignService;
   @Autowired
-  private LibraryDesignCodeDao libraryDesignCodeDao;
-
+  private LibraryDesignCodeService libraryDesignCodeService;
   @Autowired
   private BoxStore sqlBoxDAO;
-
+  @Autowired
+  private ContainerService containerService;
   @Autowired
   private LibraryDilutionService dilutionService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
   private IndexService indexService;
+  @Autowired
+  private PlatformService platformService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -148,7 +152,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   private TissueTypeService tissueTypeService;
   @Autowired
   private TissueOriginService tissueOriginService;
-
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private SequencingParametersDao sequencingParametersDao;
 
@@ -406,7 +411,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<Pool>(Pool.class) {
       @Override
       public Pool resolveById(long id) throws Exception {
-        return poolService.getPoolById(id);
+        return poolService.get(id);
       }
     }.register(binder, "sequencerPartitionContainers.partitions.pool");
 
@@ -430,7 +435,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
       @Override
       public Partition resolveById(long id) throws Exception {
-        return requestManager.getPartitionById(id);
+        return containerService.getPartition(id);
       }
 
     }.register(binder, List.class, "partitions");
@@ -438,7 +443,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<SequencerPartitionContainer>(SequencerPartitionContainer.class) {
       @Override
       public SequencerPartitionContainer resolveById(long id) throws Exception {
-        return requestManager.getSequencerPartitionContainerById(id);
+        return containerService.get(id);
       }
     }.register(binder).register(binder, List.class, "containers");
 
@@ -508,14 +513,14 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<Platform>(Platform.class) {
       @Override
       public Platform resolveById(long id) throws Exception {
-        return requestManager.getPlatformById(id);
+        return platformService.get(id);
       }
     }.register(binder);
 
     new BindingConverterById<SequencerReference>(SequencerReference.class) {
       @Override
       public SequencerReference resolveById(long id) throws Exception {
-        return requestManager.getSequencerReferenceById(id);
+        return sequencerReferenceService.get(id);
       }
     }.register(binder);
 
@@ -552,7 +557,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterById<LibraryDesign>(LibraryDesign.class) {
       @Override
       public LibraryDesign resolveById(long id) throws Exception {
-        return id == -1 ? null : libraryDesignDao.getLibraryDesign(id);
+        return id == -1 ? null : libraryDesignService.get(id);
       }
 
     }.register(binder);
@@ -561,7 +566,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
       @Override
       public LibraryDesignCode resolveById(long id) throws Exception {
-        return id == -1 ? null : libraryDesignCodeDao.getLibraryDesignCode(id);
+        return id == -1 ? null : libraryDesignCodeService.get(id);
       }
     }.register(binder);
 
@@ -619,5 +624,17 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   public void setRunService(RunService runService) {
     this.runService = runService;
+  }
+
+  public void setContainerService(ContainerService containerService) {
+    this.containerService = containerService;
+  }
+
+  public void setPlatformService(PlatformService platformService) {
+    this.platformService = platformService;
+  }
+
+  public void setSequencerReferenceService(SequencerReferenceService sequencerReferenceService) {
+    this.sequencerReferenceService = sequencerReferenceService;
   }
 }

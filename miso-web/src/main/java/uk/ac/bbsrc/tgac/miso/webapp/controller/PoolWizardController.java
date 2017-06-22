@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
@@ -59,6 +60,8 @@ public class PoolWizardController {
   private RequestManager requestManager;
 
   @Autowired
+  private PlatformService platformService;
+  @Autowired
   private StudyService studyService;
 
   public void setRequestManager(RequestManager requestManager) {
@@ -67,7 +70,7 @@ public class PoolWizardController {
 
   @ModelAttribute("platformNames")
   public Collection<String> populatePlatformNames() throws IOException {
-    List<String> types = new ArrayList<>(PlatformType.platformTypeNames(requestManager.listActivePlatformTypes()));
+    List<String> types = new ArrayList<>(PlatformType.platformTypeNames(platformService.listActivePlatformTypes()));
     Collections.sort(types);
     return types;
   }

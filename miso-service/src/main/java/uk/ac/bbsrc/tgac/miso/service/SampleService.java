@@ -23,9 +23,7 @@ public interface SampleService extends PaginatedDataSource<Sample> {
 
   void update(Sample sample) throws IOException;
 
-  List<Sample> getAll() throws IOException;
-
-  List<Sample> getBySearch(String querystr) throws IOException;
+  List<Sample> list() throws IOException;
 
   List<Sample> getByAlias(String alias) throws IOException;
 
@@ -55,8 +53,6 @@ public interface SampleService extends PaginatedDataSource<Sample> {
 
   Collection<Sample> listWithLimit(long limit) throws IOException;
 
-  Collection<Sample> listBySearch(String query) throws IOException;
-
   Collection<Sample> listByReceivedDate(long limit) throws IOException;
 
   Collection<Sample> listByProjectId(long projectId) throws IOException;
@@ -73,5 +69,13 @@ public interface SampleService extends PaginatedDataSource<Sample> {
   Collection<String> listSampleTypes() throws IOException;
 
   Map<String, Integer> getSampleColumnSizes() throws IOException;
+
+  SampleQC getSampleQC(long sampleQcId) throws IOException;
+
+  QcType getSampleQcType(long qcTypeId) throws IOException;
+
+  QcType getSampleQcTypeByName(String qcTypeName) throws IOException;
+
+  Collection<SampleQC> listSampleQCsBySampleId(long sampleId) throws IOException;
 
 }
