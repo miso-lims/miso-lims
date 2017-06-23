@@ -3,32 +3,36 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import java.nio.file.Path;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "class")
 public abstract class NotificationDto {
 
-  private String runName;
+  private String runAlias;
   private Path sequencerFolderPath;
   private String sequencerName;
-  private String containerId;
+  private String containerSerialNumber;
   private int laneCount;
   private HealthType healthType;
   private LocalDate startDate;
   private LocalDate completionDate;
   private boolean pairedEndRun;
   private String software;
+  private ArrayNode metrics;
 
-  public String getRunName() {
-    return runName;
+  public String getRunAlias() {
+    return runAlias;
   }
 
-  public void setRunName(String runName) {
-    this.runName = runName;
+  public void setRunAlias(String runAlias) {
+    this.runAlias = runAlias;
   }
 
   public String getSequencerName() {
@@ -39,12 +43,12 @@ public abstract class NotificationDto {
     this.sequencerName = sequencerName;
   }
 
-  public String getContainerId() {
-    return containerId;
+  public String getContainerSerialNumber() {
+    return containerSerialNumber;
   }
 
-  public void setContainerId(String containerId) {
-    this.containerId = containerId;
+  public void setContainerSerialNumber(String containerId) {
+    this.containerSerialNumber = containerId;
   }
 
   public int getLaneCount() {
@@ -103,16 +107,35 @@ public abstract class NotificationDto {
     this.completionDate = completionDate;
   }
 
+  public ArrayNode getMetrics() {
+    return metrics;
+  }
+
+  public void setMetrics(ArrayNode metrics) {
+    this.metrics = metrics;
+  }
+
+  @JsonIgnore
+  public abstract PlatformType getPlatformType();
+
+  @Override
+  public String toString() {
+    return "NotificationDto [runAlias=" + runAlias + ", sequencerFolderPath=" + sequencerFolderPath + ", sequencerName=" + sequencerName
+        + ", containerSerialNumber=" + containerSerialNumber + ", laneCount=" + laneCount + ", healthType=" + healthType + ", startDate="
+        + startDate + ", completionDate=" + completionDate + ", pairedEndRun=" + pairedEndRun + ", software=" + software + "]";
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((completionDate == null) ? 0 : completionDate.hashCode());
-    result = prime * result + ((containerId == null) ? 0 : containerId.hashCode());
+    result = prime * result + ((containerSerialNumber == null) ? 0 : containerSerialNumber.hashCode());
     result = prime * result + ((healthType == null) ? 0 : healthType.hashCode());
     result = prime * result + laneCount;
+    result = prime * result + ((metrics == null) ? 0 : metrics.hashCode());
     result = prime * result + (pairedEndRun ? 1231 : 1237);
-    result = prime * result + ((runName == null) ? 0 : runName.hashCode());
+    result = prime * result + ((runAlias == null) ? 0 : runAlias.hashCode());
     result = prime * result + ((sequencerFolderPath == null) ? 0 : sequencerFolderPath.hashCode());
     result = prime * result + ((sequencerName == null) ? 0 : sequencerName.hashCode());
     result = prime * result + ((software == null) ? 0 : software.hashCode());
@@ -129,15 +152,18 @@ public abstract class NotificationDto {
     if (completionDate == null) {
       if (other.completionDate != null) return false;
     } else if (!completionDate.equals(other.completionDate)) return false;
-    if (containerId == null) {
-      if (other.containerId != null) return false;
-    } else if (!containerId.equals(other.containerId)) return false;
+    if (containerSerialNumber == null) {
+      if (other.containerSerialNumber != null) return false;
+    } else if (!containerSerialNumber.equals(other.containerSerialNumber)) return false;
     if (healthType != other.healthType) return false;
     if (laneCount != other.laneCount) return false;
+    if (metrics == null) {
+      if (other.metrics != null) return false;
+    } else if (!metrics.equals(other.metrics)) return false;
     if (pairedEndRun != other.pairedEndRun) return false;
-    if (runName == null) {
-      if (other.runName != null) return false;
-    } else if (!runName.equals(other.runName)) return false;
+    if (runAlias == null) {
+      if (other.runAlias != null) return false;
+    } else if (!runAlias.equals(other.runAlias)) return false;
     if (sequencerFolderPath == null) {
       if (other.sequencerFolderPath != null) return false;
     } else if (!sequencerFolderPath.equals(other.sequencerFolderPath)) return false;
@@ -152,12 +178,4 @@ public abstract class NotificationDto {
     } else if (!startDate.equals(other.startDate)) return false;
     return true;
   }
-
-  @Override
-  public String toString() {
-    return "NotificationDto [runName=" + runName + ", sequencerFolderPath=" + sequencerFolderPath + ", sequencerName=" + sequencerName
-        + ", containerId=" + containerId + ", laneCount=" + laneCount + ", healthType=" + healthType + ", completionDate=" + completionDate
-        + ", startDate=" + startDate + ", pairedEndRun=" + pairedEndRun + ", software=" + software + "]";
-  }
-
 }

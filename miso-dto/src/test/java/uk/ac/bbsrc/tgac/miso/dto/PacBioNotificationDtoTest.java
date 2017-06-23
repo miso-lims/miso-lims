@@ -57,7 +57,7 @@ public class PacBioNotificationDtoTest {
   public void testConvertToUtilDate() throws ParseException {
     NotificationDto dto = fullyPopulatedPacBioNotificationDto("RUN_B");
 
-    Run run = Dtos.to(dto);
+    Run run = Dtos.to(dto, null);
 
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     assertThat(dto.getStartDate().toString(), is(format.format(run.getStartDate())));
@@ -65,9 +65,9 @@ public class PacBioNotificationDtoTest {
 
   static PacBioNotificationDto fullyPopulatedPacBioNotificationDto(String sequencerName) {
     PacBioNotificationDto notificationDto = new PacBioNotificationDto();
-    notificationDto.setRunName("TEST_RUN_NAME");
+    notificationDto.setRunAlias("TEST_RUN_NAME");
     notificationDto.setSequencerFolderPath(Paths.get("/sequencers/TEST_RUN_FOLDER"));
-    notificationDto.setContainerId("CONTAINER_ID");
+    notificationDto.setContainerSerialNumber("CONTAINER_ID");
     notificationDto.setSequencerName(sequencerName);
     notificationDto.setLaneCount(8);
     notificationDto.setHealthType(HealthType.Started);

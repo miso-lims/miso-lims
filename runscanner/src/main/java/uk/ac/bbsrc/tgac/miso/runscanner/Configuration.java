@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.runscanner;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
@@ -19,6 +18,10 @@ public class Configuration {
 
   public RunProcessor getProcessor() {
     return processor;
+  }
+
+  public Stream<? extends Pair<File, Configuration>> getRuns() {
+    return processor.getRunsFromRoot(getPath()).map(directory -> new Pair<>(directory, this));
   }
 
   public TimeZone getTimeZone() {
@@ -39,9 +42,5 @@ public class Configuration {
 
   public void setTimeZone(TimeZone timeZone) {
     this.timeZone = timeZone;
-  }
-
-  public Stream<? extends Pair<File, Configuration>> getRuns() {
-    return Arrays.stream(getPath().listFiles(File::isDirectory)).map(directory -> new Pair<>(directory, this));
   }
 }

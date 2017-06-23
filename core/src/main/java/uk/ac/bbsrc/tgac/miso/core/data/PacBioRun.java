@@ -28,6 +28,7 @@ import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
 @Table(name = "RunPacBio")
@@ -50,6 +51,11 @@ public class PacBioRun extends Run {
 
   public void setMovieDuration(Integer movieDuration) {
     this.movieDuration = movieDuration;
+  }
+
+  @Override
+  public PlatformType getPlatformType() {
+    return PlatformType.PACBIO;
   }
 
 }

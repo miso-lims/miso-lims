@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
@@ -56,6 +58,9 @@ public final class Main {
           }
         }
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule())
+            .setDateFormat(new ISO8601DateFormat());
+
         try {
           mapper.writeValue(System.out, results);
         } catch (IOException e) {

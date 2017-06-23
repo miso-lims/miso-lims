@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+
 public class IlluminaNotificationDto extends NotificationDto {
 
   private int numCycles;
@@ -40,6 +42,20 @@ public class IlluminaNotificationDto extends NotificationDto {
   }
 
   @Override
+  public PlatformType getPlatformType() {
+    return PlatformType.ILLUMINA;
+  }
+
+  @Override
+  public String toString() {
+    return "IlluminaNotificationDto [numCycles=" + numCycles + ", ImgCycle=" + ImgCycle + ", ScoreCycle=" + ScoreCycle + ", CallCycle="
+        + CallCycle + ", getRunAlias()=" + getRunAlias() + ", getSequencerName()=" + getSequencerName() + ", getContainerSerialNumber()="
+        + getContainerSerialNumber() + ", getLaneCount()=" + getLaneCount() + ", getHealthType()=" + getHealthType()
+        + ", getSequencerFolderPath()=" + getSequencerFolderPath() + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()="
+        + getSoftware() + ", getStartDate()=" + getStartDate() + ", getCompletionDate()=" + getCompletionDate() + "]";
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
@@ -61,15 +77,6 @@ public class IlluminaNotificationDto extends NotificationDto {
     if (ScoreCycle != other.ScoreCycle) return false;
     if (numCycles != other.numCycles) return false;
     return true;
-  }
-
-  @Override
-  public String toString() {
-    return "IlluminaNotificationDto [numCycles=" + numCycles + ", ImgCycle=" + ImgCycle + ", ScoreCycle=" + ScoreCycle + ", CallCycle="
-        + CallCycle + ", getRunName()=" + getRunName() + ", getSequencerName()=" + getSequencerName() + ", getCompletionDate()="
-        + getCompletionDate() + ", getStartDate()=" + getStartDate() + ", getContainerId()=" + getContainerId() + ", getLaneCount()="
-        + getLaneCount() + ", getHealthType()=" + getHealthType() + ", getSequencerFolderPath()=" + getSequencerFolderPath()
-        + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()=" + getSoftware() + "]";
   }
 
 }

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+
 public class PacBioNotificationDto extends NotificationDto {
 
   private int movieDurationInSec;
@@ -10,6 +12,20 @@ public class PacBioNotificationDto extends NotificationDto {
 
   public void setMovieDurationInSec(int movieDurationInSec) {
     this.movieDurationInSec = movieDurationInSec;
+  }
+
+  @Override
+  public PlatformType getPlatformType() {
+    return PlatformType.PACBIO;
+  }
+
+  @Override
+  public String toString() {
+    return "PacBioNotificationDto [movieDurationInSec=" + movieDurationInSec + ", getRunAlias()=" + getRunAlias() + ", getSequencerName()="
+        + getSequencerName() + ", getContainerSerialNumber()=" + getContainerSerialNumber() + ", getLaneCount()=" + getLaneCount()
+        + ", getHealthType()=" + getHealthType() + ", getSequencerFolderPath()=" + getSequencerFolderPath() + ", isPairedEndRun()="
+        + isPairedEndRun() + ", getSoftware()=" + getSoftware() + ", getStartDate()=" + getStartDate() + ", getCompletionDate()="
+        + getCompletionDate() + "]";
   }
 
   @Override
@@ -28,14 +44,6 @@ public class PacBioNotificationDto extends NotificationDto {
     PacBioNotificationDto other = (PacBioNotificationDto) obj;
     if (movieDurationInSec != other.movieDurationInSec) return false;
     return true;
-  }
-
-  @Override
-  public String toString() {
-    return "PacBioNotificationDto [movieDurationInSec=" + movieDurationInSec + ", getRunName()=" + getRunName() + ", getSequencerName()="
-        + getSequencerName() + ", getCompletionDate()=" + getCompletionDate() + ", getStartDate()=" + getStartDate() + ", getContainerId()="
-        + getContainerId() + ", getLaneCount()=" + getLaneCount() + ", getHealthType()=" + getHealthType() + ", getSequencerFolderPath()="
-        + getSequencerFolderPath() + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()=" + getSoftware() + "]";
   }
 
 }

@@ -86,6 +86,12 @@ public class PartitionImpl implements Partition {
   public PartitionImpl() {
   }
 
+  public PartitionImpl(SequencerPartitionContainer sequencerPartitionContainer, Integer partitionNumber) {
+    super();
+    this.sequencerPartitionContainer = sequencerPartitionContainer;
+    this.partitionNumber = partitionNumber;
+  }
+
   @Override
   public SequencerPartitionContainer getSequencerPartitionContainer() {
     return this.sequencerPartitionContainer;

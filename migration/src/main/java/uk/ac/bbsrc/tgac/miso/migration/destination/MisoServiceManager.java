@@ -14,6 +14,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
+import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrNamingScheme;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
@@ -289,7 +290,7 @@ public class MisoServiceManager {
    * @param migrationUser
    */
   public void setUpSecurityContext(User migrationUser) {
-    Authentication auth = new MigrationAuthentication(migrationUser);
+    Authentication auth = new SuperuserAuthentication(migrationUser);
     SecurityContext context = new SecurityContextImpl();
     context.setAuthentication(auth);
     SecurityContextHolder.setContext(context);

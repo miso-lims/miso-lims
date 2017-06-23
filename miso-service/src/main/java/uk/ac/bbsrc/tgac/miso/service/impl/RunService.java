@@ -3,13 +3,16 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
@@ -87,5 +90,15 @@ public interface RunService extends PaginatedDataSource<Run> {
   QcType getRunQcType(long qcTypeId) throws IOException;
 
   QcType getRunQcTypeByName(String qcTypeName) throws IOException;
+
+  /**
+   * Save a scanned run to the database or update the run if it exists.
+   * 
+   * @param run the update from notification server
+   * @return true if the run is new, false if it already existed
+   * @throws MisoNamingException
+   */
+  boolean processNotification(Run run, int laneCount, String containerSerialNumber, String sequencerName,
+      Predicate<SequencingParameters> filterParameters) throws IOException, MisoNamingException;
 
 }
