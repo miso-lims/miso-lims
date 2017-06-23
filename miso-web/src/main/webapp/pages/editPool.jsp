@@ -385,7 +385,7 @@
   <div id="orders_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="orders" style="display:block">
-  <h1>Orders</h1>
+  <h1>Requested Orders</h1>
   <span onclick="Pool.orders.createOrder()" class="sddm fg-button ui-state-default ui-corner-all">Add Order</span>
 
   <table class="display no-border" id="edit-order-table"></table>
@@ -509,7 +509,7 @@
 </c:if>
 
 <div id="order-dialog" title="Order" hidden="true">
-Partitions: <input type="text" name="partitions" value="1" id="orderPartitions" /><br/>
+<span id="partitionName">${pool.platformType.partitionName}s</span>: <input type="text" name="partitions" value="1" id="orderPartitions" /><br/>
 Platform: <select id="orderPlatformId" onchange="Pool.orders.changePlatform()"><c:forEach items="${platforms}" var="platform"><option value="${platform.id}">${platform.nameAndModel}</option></c:forEach></select><br/>
 Sequencing Parameters: <select id="orderParameterId"></select>
 </div>
