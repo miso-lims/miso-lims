@@ -48,8 +48,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -60,7 +58,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
@@ -112,9 +109,6 @@ public class Run
           @JoinColumn(name = "containers_containerId") })
   private List<SequencerPartitionContainer> containers = new ArrayList<>();
 
-  @OneToOne
-  @PrimaryKeyJoinColumn
-  private RunDerivedInfo derivedInfo;
   private String description;
   private String filePath;
 
@@ -123,8 +117,20 @@ public class Run
   private HealthType health = HealthType.Unknown;
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date created;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   @Transient
   private final Set<MisoListener> listeners = new HashSet<>();
@@ -341,8 +347,32 @@ public class Run
     return lastModifier;
   }
 
-  public Date getLastUpdated() {
-    return (derivedInfo == null ? null : derivedInfo.getLastModified());
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  public User getCreator() {
+    return creator;
+  }
+
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  public Date getCreationTime() {
+    return created;
+  }
+
+  public void setCreationTime(Date created) {
+    this.created = created;
   }
 
   @Override
@@ -476,10 +506,6 @@ public class Run
 
   public void setId(long id) {
     this.runId = id;
-  }
-
-  public void setLastModifier(User lastModifier) {
-    this.lastModifier = lastModifier;
   }
 
   public void setMetrics(String metrics) {

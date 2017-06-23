@@ -1024,9 +1024,6 @@ CREATE OR REPLACE VIEW OrderCompletion AS SELECT
 
 CREATE OR REPLACE VIEW OrderCompletion_Items AS SELECT poolId, parametersId, health, num_partitions FROM OrderCompletion_Backing;
 
-CREATE OR REPLACE VIEW RunDerivedInfo AS
-  SELECT a.*, userId AS creator FROM RunChangeLog o JOIN (SELECT runId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(runChangeLogId) AS firstId FROM RunChangeLog GROUP BY runId) AS a WHERE a.runId = o.runId AND a.firstId = o.runChangeLogId;
-
 CREATE OR REPLACE VIEW ContainerDerivedInfo AS
   SELECT a.*, userId AS creator FROM SequencerPartitionContainerChangeLog o JOIN (SELECT containerId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(containerChangeLogId) AS firstId FROM SequencerPartitionContainerChangeLog GROUP BY containerId) AS a WHERE a.containerId = o.containerId AND a.firstId = o.containerChangeLogId;
 

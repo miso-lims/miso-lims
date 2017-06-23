@@ -231,7 +231,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
       if (lastRun == null) {
         lastRun = thisRun;
       } else if (lastRun.getStartDate() == null && thisRun.getStartDate() == null) {
-        if (thisRun.getLastUpdated().after(lastRun.getLastUpdated())) lastRun = thisRun;
+        if (thisRun.getLastModified().after(lastRun.getLastModified())) lastRun = thisRun;
       } else if (lastRun.getStartDate() == null && thisRun.getStartDate() != null) {
         lastRun = thisRun;
       } else if (lastRun.getStartDate() != null && thisRun.getStartDate() == null) {

@@ -423,7 +423,20 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
    */
   private void setChangeDetails(Run run) throws IOException {
     User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
     run.setLastModifier(user);
+
+    if (run.getId() == Run.UNSAVED_ID) {
+      run.setCreator(user);
+      if (run.getCreationTime() == null) {
+        run.setCreationTime(now);
+        run.setLastModified(now);
+      } else if (run.getLastModified() == null) {
+        run.setLastModified(now);
+      }
+    } else {
+      run.setLastModified(now);
+    }
   }
 
   private void makeContainerChangesChangeLog(Run managedRun, List<SequencerPartitionContainer> updatedContainers) throws IOException {
