@@ -570,7 +570,7 @@ public class RunControllerHelperService {
     try {
       b.append(
           "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
-      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + LimsUtils.getDateAsString(p.getCreationDate()) + ")</b><br/>");
+      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + LimsUtils.getDateAsString(p.getCreationTime()) + ")</b><br/>");
 
       Collection<PoolableElementView> ds = p.getPoolableElementViews();
       for (PoolableElementView d : ds) {

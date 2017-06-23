@@ -145,9 +145,9 @@ public class PoolSearchService {
     }
 
     if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
-      b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationDate() + "</b><br/>");
+      b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationTime() + "</b><br/>");
     } else {
-      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
+      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationTime() + "</b><br/>");
     }
 
     List<PoolableElementView> ds = new ArrayList<>(p.getPoolableElementViews());

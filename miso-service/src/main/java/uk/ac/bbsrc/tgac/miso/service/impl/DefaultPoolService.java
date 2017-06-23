@@ -22,6 +22,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -195,7 +196,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     if (pool.isDiscarded()) {
       pool.setVolume(0.0);
     }
-    pool.setLastModifier(authorizationManager.getCurrentUser());
+    setChangeDetails(pool);
 
     if (pool.getId() == PoolImpl.UNSAVED_ID) {
       pool.setName(generateTemporaryName());
@@ -250,6 +251,32 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     long id = poolStore.save(pool);
     if (poolAlertManager != null) poolAlertManager.update(pool);
     return id;
+  }
+
+  /**
+   * Updates all user data and timestamps associated with the change. Existing timestamps will be preserved
+   * if the Pool is unsaved, and they are already set
+   * 
+   * @param pool the Pool to update
+   * @param preserveTimestamps if true, the creationTime and lastModified date are not updated
+   * @throws IOException
+   */
+  private void setChangeDetails(Pool pool) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
+    pool.setLastModifier(user);
+
+    if (pool.getId() == Sample.UNSAVED_ID) {
+      pool.setCreator(user);
+      if (pool.getCreationTime() == null) {
+        pool.setCreationTime(now);
+      }
+      if (pool.getLastModified() == null) {
+        pool.setLastModified(now);
+      }
+    } else {
+      pool.setLastModified(now);
+    }
   }
 
   private void loadPooledElements(Collection<PoolableElementView> source, Pool target) throws IOException {

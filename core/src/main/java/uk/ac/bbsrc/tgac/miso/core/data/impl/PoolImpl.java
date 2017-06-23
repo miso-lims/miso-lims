@@ -110,13 +110,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Column(length = CONCENTRATION_LENGTH)
   private Double concentration;
 
-  @Temporal(TemporalType.DATE)
-  private Date creationDate;
-
-  @OneToOne
-  @PrimaryKeyJoinColumn
-  private PoolDerivedInfo derivedInfo;
-
   @Column(length = DESCRIPTION_LENGTH)
   private String description;
 
@@ -128,8 +121,20 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private String identificationBarcode;
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date created;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   // listeners
   @Transient
@@ -289,11 +294,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public Date getCreationDate() {
-    return this.creationDate;
-  }
-
-  @Override
   public String getDescription() {
     return description;
   }
@@ -326,16 +326,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public String getLabelText() {
     return getAlias();
-  }
-
-  @Override
-  public Date getLastModified() {
-    return (derivedInfo == null ? null : derivedInfo.getLastModified());
-  }
-
-  @Override
-  public User getLastModifier() {
-    return lastModifier;
   }
 
   @Override
@@ -463,11 +453,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
-  }
-
-  @Override
   public void setDescription(String description) {
     this.description = description;
   }
@@ -492,11 +477,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
-  }
-
-  @Override
-  public void setLastModifier(User lastModifier) {
-    this.lastModifier = lastModifier;
   }
 
   @Override
@@ -597,6 +577,46 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public Set<PoolableElementView> getPoolableElementViews() {
     return this.pooledElementViews;
+  }
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return created;
+  }
+
+  @Override
+  public void setCreationTime(Date created) {
+    this.created = created;
   }
 
 }

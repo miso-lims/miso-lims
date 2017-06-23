@@ -128,20 +128,6 @@ public interface Pool
   public Collection<Experiment> getExperiments();
 
   /**
-   * Returns the creationDate of this Pool object.
-   * 
-   * @return Date creationDate.
-   */
-  public Date getCreationDate();
-
-  /**
-   * Sets the creationDate of this Pool object.
-   * 
-   * @param creationDate creationDate.
-   */
-  public void setCreationDate(Date creationDate);
-
-  /**
    * Returns the concentration of this Pool object.
    * 
    * @return Double concentration.
@@ -216,16 +202,6 @@ public interface Pool
   @Override
   public Collection<ChangeLog> getChangeLog();
 
-  /**
-   * Returns the user who last modified this item.
-   */
-  public User getLastModifier();
-
-  /**
-   * Sets the user who last modified this item. It should always be set to the current user on save.
-   */
-  public void setLastModifier(User user);
-
   public boolean getHasLowQualityMembers();
 
   /**
@@ -267,5 +243,29 @@ public interface Pool
 
   @Override
   void setWatchGroup(Group group);
+
+  // TODO: remove below fields to ChangeLoggable interface
+  /**
+   * Returns the user who last modified this item.
+   */
+  public User getLastModifier();
+
+  /**
+   * Sets the user who last modified this item. It should always be set to the current user on save.
+   */
+  public void setLastModifier(User user);
+
+  @Override
+  public Date getLastModified();
+
+  public void setLastModified(Date lastModified);
+
+  public User getCreator();
+
+  public void setCreator(User user);
+
+  public Date getCreationTime();
+
+  public void setCreationTime(Date creationTime);
 
 }
