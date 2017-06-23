@@ -149,6 +149,10 @@ public class PoolSearchService {
     } else {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
     }
+    if (p.hasDuplicateIndices()) {
+      b.append("<span class=\"lowquality\">DUPLICATE INDICES</span><br/>");
+      b.append("<img style=\"float:right; height:40px;\" src=\"/styles/images/fail.png\"/>");
+    }
 
     List<PoolableElementView> ds = new ArrayList<>(p.getPoolableElementViews());
     for (int i = 0; i < Math.min(ds.size(), 5); i++) {
