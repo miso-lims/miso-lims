@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -39,10 +40,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.BatchSize;
 
@@ -104,12 +105,20 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
-  @JoinColumn(name = "lastModifier")
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date created;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
-  @OneToOne
-  @PrimaryKeyJoinColumn
-  private ContainerDerivedInfo derivedInfo;
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   @OneToMany(targetEntity = PartitionImpl.class, mappedBy = "sequencerPartitionContainer", cascade = CascadeType.ALL)
   @OrderBy("partitionNumber")
@@ -149,7 +158,32 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @Override
   public Date getLastModified() {
-    return (derivedInfo == null ? null : derivedInfo.getLastModified());
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return created;
+  }
+
+  @Override
+  public void setCreationTime(Date created) {
+    this.created = created;
   }
 
   @Override
