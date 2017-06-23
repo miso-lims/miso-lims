@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.integration.test.visionmate;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.test.BoxScannerTests;
@@ -15,8 +14,6 @@ import ca.on.oicr.gsi.visionmate.Scan;
 import ca.on.oicr.gsi.visionmate.ServerConfig;
 import ca.on.oicr.gsi.visionmate.mockServer.MockScannerServer;
 
-// TODO: re-enable after server port-assignment has been "randomized" to prevent collisions
-@Ignore
 public class VisionMateScannerTests extends BoxScannerTests<VisionMateScanner> {
   
   private static MockScannerServer server;
@@ -26,8 +23,9 @@ public class VisionMateScannerTests extends BoxScannerTests<VisionMateScanner> {
   
   @BeforeClass
   public static void setup() throws IntegrationException {
-    server = new MockScannerServer();
-    client = new VisionMateScanner("127.0.0.1", 8000, 2000, 5000);
+    int port = Integer.parseInt(System.getProperty("miso.test.visionmate.port"));
+    server = new MockScannerServer(port);
+    client = new VisionMateScanner("127.0.0.1", port, 2000, 5000);
   }
   
   @Override
