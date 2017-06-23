@@ -29,7 +29,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -152,7 +151,6 @@ public class PoolWizardControllerHelperService {
             pool.setAlias(alias);
           }
 
-          pool.setCreationDate(new Date());
           pool.setConcentration(concentration);
           pool.setPlatformType(platformType);
           pool.setReadyToRun(true);

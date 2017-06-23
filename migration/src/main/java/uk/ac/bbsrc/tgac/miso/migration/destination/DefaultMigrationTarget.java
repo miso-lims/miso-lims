@@ -608,8 +608,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
 
   private void setPoolModifiedDetails(Pool pool) throws IOException {
-    if (pool.getId() == PoolImpl.UNSAVED_ID) pool.setCreationDate(timeStamp);
+    if (pool.getId() == PoolImpl.UNSAVED_ID) pool.setCreationTime(timeStamp);
+    pool.setCreator(migrationUser);
     pool.setLastModifier(migrationUser);
+    pool.setLastModified(timeStamp);
     for (Note note : pool.getNotes()) {
       if (note.getNoteId() == Note.UNSAVED_ID) {
         note.setCreationDate(timeStamp);

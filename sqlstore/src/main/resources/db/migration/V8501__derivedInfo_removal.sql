@@ -33,3 +33,22 @@ ALTER TABLE Library CHANGE COLUMN creator creator bigint(20) NOT NULL;
 ALTER TABLE Library ADD CONSTRAINT fk_library_creator FOREIGN KEY (creator) REFERENCES User (userId);
 
 DROP VIEW IF EXISTS LibraryDerivedInfo;
+
+ALTER TABLE Pool ADD COLUMN creator bigint(20);
+ALTER TABLE Pool ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
+ALTER TABLE Pool ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
+
+-- StartNoTest
+UPDATE Pool SET
+  created = IF(ABS(DATEDIFF(TIMESTAMP(creationDate), (SELECT MIN(changeTime) FROM PoolChangeLog WHERE poolId = Pool.poolId))) > 1,
+        LEAST(TIMESTAMP(creationDate), (SELECT MIN(changeTime) FROM PoolChangeLog WHERE poolId = Pool.poolId)),
+        (SELECT MIN(changeTime) FROM PoolChangeLog WHERE poolId = Pool.poolId)),
+  lastModified = (SELECT MAX(changeTime) FROM PoolChangeLog WHERE poolId = Pool.poolId),
+  creator = (SELECT userId FROM PoolChangeLog WHERE poolId = Pool.poolId ORDER BY changeTime ASC LIMIT 1);
+-- EndNoTest
+
+ALTER TABLE Pool DROP COLUMN creationDate;
+ALTER TABLE Pool CHANGE COLUMN creator creator bigint(20) NOT NULL;
+ALTER TABLE Pool ADD CONSTRAINT fk_pool_creator FOREIGN KEY (creator) REFERENCES User (userId);
+
+DROP VIEW IF EXISTS PoolDerivedInfo;

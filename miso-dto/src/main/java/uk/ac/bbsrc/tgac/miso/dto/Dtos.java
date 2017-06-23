@@ -1325,7 +1325,7 @@ public class Dtos {
     dto.setConcentration(from.getConcentration());
     dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
-    dto.setCreationDate(getDateAsString(from.getCreationDate()));
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationTime().getTime()));
     dto.setDiscarded(from.isDiscarded());
     dto.setVolume(from.getVolume());
     dto.setPlatformType(from.getPlatformType().name());
@@ -1674,7 +1674,7 @@ public class Dtos {
     to.setId(dto.getId() == null ? PoolImpl.UNSAVED_ID : dto.getId());
     to.setAlias(dto.getAlias());
     to.setConcentration(dto.getConcentration());
-    to.setCreationDate(extractDate(dto.getCreationDate()));
+    to.setCreationTime(extractDateTimeOrNull(dto.getCreationDate()));
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());
     to.setDiscarded(dto.isDiscarded());

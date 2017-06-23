@@ -479,9 +479,9 @@ public class ContainerControllerHelperService {
       b.append(
           "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
       if (isStringEmptyOrNull(p.getAlias())) {
-        b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationDate() + "</b><br/>");
+        b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationTime() + "</b><br/>");
       } else {
-        b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
+        b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationTime() + "</b><br/>");
       }
 
       Collection<PoolableElementView> ds = p.getPoolableElementViews();
@@ -637,7 +637,7 @@ public class ContainerControllerHelperService {
                   + "].pool' class='runPartitionDroppable'>");
               sb.append("<div class='dashboard'>");
               sb.append(p.getPool().getName());
-              sb.append("(" + p.getPool().getCreationDate() + ")<br/>");
+              sb.append("(" + p.getPool().getCreationTime() + ")<br/>");
               sb.append("<span style='font-size:8pt'>");
               if (!p.getPool().getExperiments().isEmpty()) {
                 sb.append("<i>");

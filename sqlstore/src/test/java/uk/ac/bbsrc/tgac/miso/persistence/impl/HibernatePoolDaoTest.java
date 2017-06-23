@@ -42,7 +42,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     assertEquals(expected.getConcentration(), actual.getConcentration());
     assertEquals(expected.getName(), actual.getName());
     assertEquals(expected.getIdentificationBarcode(), actual.getIdentificationBarcode());
-    assertEquals(0, (expected.getCreationDate().getTime() - actual.getCreationDate().getTime()) / 84600000);
+    assertEquals(0, (expected.getCreationTime().getTime() - actual.getCreationTime().getTime()) / 84600000);
     assertEquals(expected.getSecurityProfile().getProfileId(), actual.getSecurityProfile().getProfileId());
     assertEquals(expected.getExperiments().size(), actual.getExperiments().size());
     assertEquals(expected.getPlatformType(), actual.getPlatformType());
@@ -73,12 +73,14 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     rtn.setConcentration((double) counter);
     rtn.setName("Test Pool " + counter);
     rtn.setIdentificationBarcode("BOOP" + counter);
-    rtn.setCreationDate(creationDate);
+    rtn.setCreationTime(creationDate);
+    rtn.setLastModified(creationDate);
     rtn.setSecurityProfile(mockSecurityProfile);
     rtn.setPlatformType(PlatformType.ILLUMINA);
     rtn.setReadyToRun(true);
     rtn.setAlias("Alias " + counter);
     rtn.setLastModifier(mockUser);
+    rtn.setCreator(mockUser);
     rtn.setDiscarded(discarded);
     rtn.setVolume(discarded ? 0.0 : counter);
     rtn.setQcPassed(false);
@@ -127,7 +129,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     testPool.setConcentration(5D);
     testPool.setName("Test Pool xxx");
     testPool.setIdentificationBarcode("Foob");
-    testPool.setCreationDate(new Date());
+    testPool.setCreationTime(new Date());
     testPool.setExperiments(new ArrayList<Experiment>());
     testPool.setPlatformType(PlatformType.IONTORRENT);
     testPool.setReadyToRun(false);
