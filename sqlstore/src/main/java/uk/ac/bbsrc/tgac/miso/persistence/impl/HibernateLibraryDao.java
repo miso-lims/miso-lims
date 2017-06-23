@@ -413,7 +413,14 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   @Override
   public String propertyForSortColumn(String original) {
-    return "lastModified".equals(original) ? "derivedInfo.lastModified" : original;
+    switch (original) {
+      case "lastModified":
+        return "derivedInfo.lastModified";
+      case "parentSampleId":
+        return "sample.id";
+      default:
+        return original;
+    }
   }
 
   @Override
