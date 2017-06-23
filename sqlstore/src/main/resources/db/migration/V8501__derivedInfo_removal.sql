@@ -68,3 +68,19 @@ ALTER TABLE Run CHANGE COLUMN creator creator bigint(20) NOT NULL;
 ALTER TABLE Run ADD CONSTRAINT fk_run_creator FOREIGN KEY (creator) REFERENCES User (userId);
 
 DROP VIEW IF EXISTS RunDerivedInfo;
+
+ALTER TABLE SequencerPartitionContainer ADD COLUMN creator bigint(20);
+ALTER TABLE SequencerPartitionContainer ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
+ALTER TABLE SequencerPartitionContainer ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
+
+-- StartNoTest
+UPDATE SequencerPartitionContainer SET
+  created = (SELECT MIN(changeTime) FROM SequencerPartitionContainerChangeLog WHERE containerId = SequencerPartitionContainer.containerId),
+  lastModified = (SELECT MAX(changeTime) FROM SequencerPartitionContainerChangeLog WHERE containerId = SequencerPartitionContainer.containerId),
+  creator = (SELECT userId FROM SequencerPartitionContainerChangeLog WHERE containerId = SequencerPartitionContainer.containerId ORDER BY changeTime ASC LIMIT 1);
+-- EndNoTest
+
+ALTER TABLE SequencerPartitionContainer CHANGE COLUMN creator creator bigint(20) NOT NULL;
+ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT fk_container_creator FOREIGN KEY (creator) REFERENCES User (userId);
+
+DROP VIEW IF EXISTS ContainerDerivedInfo;

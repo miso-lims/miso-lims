@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
@@ -153,7 +155,20 @@ public class DefaultContainerService
    */
   private void setChangeDetails(SequencerPartitionContainer container) throws IOException {
     User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
     container.setLastModifier(user);
+
+    if (container.getId() == Sample.UNSAVED_ID) {
+      container.setCreator(user);
+      if (container.getCreationTime() == null) {
+        container.setCreationTime(now);
+        container.setLastModified(now);
+      } else if (container.getLastModified() == null) {
+        container.setLastModified(now);
+      }
+    } else {
+      container.setLastModified(now);
+    }
   }
 
   @Override

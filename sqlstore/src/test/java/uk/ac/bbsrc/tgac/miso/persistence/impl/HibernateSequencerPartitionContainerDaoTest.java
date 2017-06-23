@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -178,16 +179,11 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
 
   @Test
   public void testRemove() throws IOException {
-    SequencerPartitionContainer spc = new SequencerPartitionContainerImpl();
-    String spcIDBC = "ABCDEFXX";
-    spc.setIdentificationBarcode(spcIDBC);
-    spc.setPlatform(new PlatformImpl());
-    spc.getPlatform().setId(1L);
-    spc.setLastModifier(emptyUser);
-
+    SequencerPartitionContainer spc = makeSPC("ABCDEFXX");
     long spcId = dao.save(spc);
     SequencerPartitionContainer insertedSpc = dao.get(spcId);
     assertNotNull(insertedSpc);
+
     assertTrue(dao.remove(spc));
     assertNull(dao.get(insertedSpc.getId()));
   }
@@ -195,12 +191,16 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
   private SequencerPartitionContainer makeSPC(String identificationBarcode) throws IOException {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     SequencerPartitionContainer pc = new SequencerPartitionContainerImpl();
+    Date now = new Date();
     pc.setSecurityProfile(profile);
     pc.setIdentificationBarcode(identificationBarcode);
     pc.setLocationBarcode("location");
     Platform platform = new PlatformImpl();
     platform.setId(1L);
     pc.setPlatform(platform);
+    pc.setCreationTime(now);
+    pc.setCreator(emptyUser);
+    pc.setLastModified(now);
     pc.setLastModifier(emptyUser);
     return pc;
   }
