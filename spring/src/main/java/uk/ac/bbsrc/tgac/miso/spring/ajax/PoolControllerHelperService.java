@@ -525,68 +525,6 @@ public class PoolControllerHelperService {
     }
   }
 
-  public JSONObject listPoolAverageInsertSizes(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      for (Pool pool : poolService.list()) {
-
-        StringBuilder b = new StringBuilder();
-        Integer avg = calculateAverageInsertSize(pool);
-        if (avg != null) {
-          b.append(avg + " bp");
-        }
-      }
-      return j;
-    } catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-  }
-
-  public JSONObject checkAverageInsertSizeByPoolId(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      Long poolId = json.getLong("poolId");
-      Pool pool = poolService.get(poolId);
-      StringBuilder b = new StringBuilder();
-      Integer avg = calculateAverageInsertSize(pool);
-      if (avg != null) {
-        b.append(avg + " bp");
-      }
-      j.put("response", b.toString());
-      return j;
-    } catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-  }
-
-  private Integer calculateAverageInsertSize(Pool pool) {
-    Collection<PoolableElementView> dls = pool.getPoolableElementViews();
-    if (dls.isEmpty()) return null;
-    long sum = 0;
-    for (PoolableElementView ld : dls) {
-      if (ld.getLibraryDnaSize() != null) {
-        sum += ld.getLibraryDnaSize();
-      }
-    }
-    return Math.round(sum / dls.size());
-  }
-
-  public JSONObject checkConcentrationByPoolId(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      Long poolId = json.getLong("poolId");
-      Pool pool = poolService.get(poolId);
-      double concentration = pool.getConcentration();
-      j.put("response", concentration);
-      return j;
-    } catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-  }
-
   public JSONObject deletePool(HttpSession session, JSONObject json) {
     User user;
     try {
