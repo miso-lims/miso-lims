@@ -30,13 +30,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.NotImplementedException;
+
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.IonTorrentRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 
 /**
  * Enum representing the different platform types available
@@ -57,15 +61,30 @@ public enum PlatformType {
       return new LS454Run(user);
     }
   }, //
-  SOLID("Solid", true, "Slide", "Lane", "ABI_SOLID"), //
-  IONTORRENT("IonTorrent", false, "Chip", "Chip", null), //
+  SOLID("Solid", true, "Slide", "Lane", "ABI_SOLID") {
+    @Override
+    public Run createRun(User user) {
+      return new SolidRun(user);
+    }
+  }, //
+  IONTORRENT("IonTorrent", false, "Chip", "Chip", null) {
+    @Override
+    public Run createRun(User user) {
+      return new IonTorrentRun(user);
+    }
+  }, //
   PACBIO("PacBio", false, "SMRT Cell", "SMRT Cell", "pM", null) {
     @Override
     public Run createRun(User user) {
       return new PacBioRun(user);
     }
   }, //
-  OXFORDNANOPORE("OxfordNanopore", false, "Flow Cell", "Flow Cell", null);
+  OXFORDNANOPORE("OxfordNanopore", false, "Flow Cell", "Flow Cell", null) {
+    @Override
+    public Run createRun(User user) {
+      throw new NotImplementedException();
+    }
+  };
 
   /**
    * Field key
@@ -166,8 +185,6 @@ public enum PlatformType {
     return sraName;
   }
 
-  public Run createRun(User user) {
-    return new Run(user);
-  }
+  public abstract Run createRun(User user);
 
 }

@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.core.data.impl;
+package uk.ac.bbsrc.tgac.miso.core.data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -6,7 +6,7 @@ import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
 @Table(name = "RunSolid")
@@ -32,6 +32,11 @@ public class SolidRun extends Run {
   @Override
   public void setPairedEnd(boolean pairedEnd) {
     this.pairedEnd = pairedEnd;
+  }
+
+  @Override
+  public PlatformType getPlatformType() {
+    return PlatformType.SOLID;
   }
 
 }

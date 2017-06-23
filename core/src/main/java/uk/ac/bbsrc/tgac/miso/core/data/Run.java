@@ -80,7 +80,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @Entity
 @Table(name = "Run")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Run
+public abstract class Run
     implements SecurableByProfile, Comparable<Run>, Watchable, Deletable, Nameable, ChangeLoggable, Aliasable,
     Serializable {
   private static final long serialVersionUID = 1L;
@@ -497,5 +497,7 @@ public class Run
   public void setPairedEnd(boolean pairedEnd) {
     throw new UnsupportedOperationException("Cannot set paired end on runs from this platform.");
   }
+  
+  public abstract PlatformType getPlatformType();
 
 }

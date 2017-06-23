@@ -49,6 +49,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -380,7 +381,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     User user = new UserImpl();
     user.setUserId(1L);
 
-    Run run = new Run();
+    Run run = new IlluminaRun();
     run.setSecurityProfile(profile);
     run.setAlias(alias);
     run.setDescription("description");

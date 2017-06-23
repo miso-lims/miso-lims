@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.migration.destination;
+package uk.ac.bbsrc.tgac.miso.core.security;
 
 import java.util.Collection;
 
@@ -9,26 +9,26 @@ import com.eaglegenomics.simlims.core.User;
 
 /**
  * Custom Authentication that sets the user to attribute migration to and authorizes that user to do everything.
- * This basically disables authorization checks and should only be used for migration
+ * This basically disables authorization checks and should only be used for migration and notification processing
  */
-public class MigrationAuthentication implements Authentication {
+public class SuperuserAuthentication implements Authentication {
 
   private static final long serialVersionUID = 1L;
 
-  private final User migrationUser;
+  private final User user;
   
   /**
-   * Creates a MigrationAuthentication to perform migration as migrationUser
+   * Creates a SuperAuthentication to perform actions as user
    * 
-   * @param migrationUser
+   * @param user
    */
-  public MigrationAuthentication(User migrationUser) {
-    this.migrationUser = migrationUser;
+  public SuperuserAuthentication(User user) {
+    this.user = user;
   }
 
   @Override
   public String getName() {
-    return migrationUser.getLoginName();
+    return user.getLoginName();
   }
 
   @Override
@@ -48,7 +48,7 @@ public class MigrationAuthentication implements Authentication {
 
   @Override
   public Object getPrincipal() {
-    return migrationUser;
+    return user;
   }
 
   @Override

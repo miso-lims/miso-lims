@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.runscanner;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 
@@ -36,6 +39,16 @@ import io.prometheus.client.Histogram;
 
 @Service
 public class Scheduler {
+  private static class FinishedWork {
+    Instant created = Instant.now();
+    NotificationDto dto;
+    int epoch;
+
+    public boolean shouldRerun() {
+      return !dto.getHealthType().isDone() && Duration.between(created, Instant.now()).toMinutes() > 10;
+    }
+  }
+
   public static class SuppliedDirectoryConfig {
 
     private String name;
@@ -85,9 +98,11 @@ public class Scheduler {
       .help("The number of entries from the last configuration.").register();
 
   private static final Gauge configurationTimestamp = Gauge.build().name("miso_run_scanner_configuration_timestamp")
-      .help("The epoch time when teh configuration was last read.").register();
+      .help("The epoch time when the configuration was last read.").register();
   private static final Gauge configurationValid = Gauge.build().name("miso_runscanner_configuration_valid")
       .help("Whether the configuration loaded from disk is valid.").register();
+  private static final Gauge epochGauge = Gauge.build().name("miso_run_scanner_epoch")
+      .help("The current round of processing done for keeping the client in sync when progressively scanning.").register();
 
   private static final Counter errors = Counter.build().name("miso_runscanner_errors").help("The number of bad directories encountered.")
       .labelNames("platform").register();
@@ -102,17 +117,20 @@ public class Scheduler {
   private static final Counter reentered = Counter.build().name("miso_run_scanner_reentered")
       .help("The number of times the scanner was already running while scheduled to run again.").register();
 
-  private static final Histogram scanTime = Histogram.build().buckets(1, 5, 10, 30, 60, 300, 600, 3600)
-      .name("miso_runscanner_directory_scan_time").help("Time to scan the run directories in seconds.").register();
+  private static final LatencyHistogram scanTime = new LatencyHistogram("miso_runscanner_directory_scan_time",
+      "Time to scan the run directories in seconds.");
+
   private File configurationFile;
 
   private Instant configurationLastRead = Instant.now();
+
+  private final AtomicInteger epoch = new AtomicInteger();
 
   // The paths that threw an exception while processing.
   private final Set<File> failed = new ConcurrentSkipListSet<>();
 
   // The paths for which we have a notification to send.
-  private final Map<File, NotificationDto> finishedWork = new ConcurrentHashMap<>();
+  private final Map<File, FinishedWork> finishedWork = new ConcurrentHashMap<>();
 
   private boolean isConfigurationGood = true;
 
@@ -124,17 +142,22 @@ public class Scheduler {
 
   private ScheduledFuture<?> scanDirectoriesFuture = null;
 
+  private Instant scanLastStarted = null;
+
   private boolean scanningNow = false;
 
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
   private final ExecutorService workPool = Executors.newWorkStealingPool();
 
   // The paths that need to be processed (and the corresponding processor).
   private final Set<File> workToDo = new ConcurrentSkipListSet<>();
 
-  public Stream<Map.Entry<File, NotificationDto>> finished() {
-    return finishedWork.entrySet().stream();
+  public Stream<Pair<File, NotificationDto>> finished() {
+    return finishedWork.entrySet().stream().map(x -> new Pair<>(x.getKey(), x.getValue().dto));
+  }
+
+  public Stream<Pair<File, NotificationDto>> finished(long epoch) {
+    return finishedWork.entrySet().stream().filter(x -> x.getValue().epoch >= epoch).map(x -> new Pair<>(x.getKey(), x.getValue().dto));
   }
 
   public Iterable<Configuration> getConfiguration() {
@@ -149,6 +172,10 @@ public class Scheduler {
     return processing;
   }
 
+  public int getEpoch() {
+    return epoch.get();
+  }
+
   public Set<File> getFailedDirectories() {
     return failed;
   }
@@ -159,6 +186,10 @@ public class Scheduler {
 
   public Set<File> getRoots() {
     return roots.stream().map(Configuration::getPath).collect(Collectors.toSet());
+  }
+
+  public Instant getScanLastStarted() {
+    return scanLastStarted;
   }
 
   public Set<File> getScheduledWork() {
@@ -183,7 +214,7 @@ public class Scheduler {
 
   private boolean isUnprocessed(File directory) {
     return !workToDo.contains(directory) && !processing.contains(directory) && !failed.contains(directory)
-        && !finishedWork.containsKey(directory);
+        && (!finishedWork.containsKey(directory) || finishedWork.get(directory).shouldRerun());
   }
 
   private void queueDirectory(final File directory, final RunProcessor processor, final TimeZone tz) {
@@ -199,7 +230,11 @@ public class Scheduler {
         if (!LimsUtils.isStringBlankOrNull(dto.getSequencerName())) {
           instrumentName = dto.getSequencerName();
         }
-        finishedWork.put(directory, dto);
+        FinishedWork work = new FinishedWork();
+        work.dto = dto;
+        work.epoch = epoch.incrementAndGet();
+        finishedWork.put(directory, work);
+        epochGauge.set(work.epoch);
       } catch (Exception e) {
         log.error("Failed to process run: " + directory.getPath(), e);
         errors.labels(processor.getPlatformType().name()).inc();
@@ -254,10 +289,11 @@ public class Scheduler {
             && configurationFile.lastModified() > configurationLastRead.getEpochSecond()) {
           readConfiguration();
         }
-        long startTime = System.nanoTime();
+        scanLastStarted = Instant.now();
         try (StreamCountSpy<Pair<File, Configuration>> newRuns = new StreamCountSpy<>(newRunsScanned);
             StreamCountSpy<Pair<File, Configuration>> attempted = new StreamCountSpy<>(attemptedDirectories);
-            StreamCountSpy<Pair<File, Configuration>> accepted = new StreamCountSpy<>(acceptedDirectories)) {
+            StreamCountSpy<Pair<File, Configuration>> accepted = new StreamCountSpy<>(acceptedDirectories);
+            AutoCloseable timer = scanTime.start()) {
           roots.stream()//
               .filter(Configuration::isValid)//
               .flatMap(Configuration::getRuns)//
@@ -271,7 +307,6 @@ public class Scheduler {
         } catch (Exception e) {
           log.error("Error scanning directory.", e);
         }
-        scanTime.observe((System.nanoTime() - startTime) / 1e9);
         scanningNow = false;
       }, 1, 15, TimeUnit.MINUTES);
     }

@@ -30,7 +30,7 @@ public class RunUtils {
       Document statusDoc = SubmissionUtils.emptyDocument();
       SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
   
-      Run run = new Run();
+      Run run = new SolidRun();
       String runName;
       if (statusDoc.getDocumentElement().getTagName().equals("error")) {
         runName = (statusDoc.getElementsByTagName("RunName").item(0).getTextContent());

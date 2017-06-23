@@ -43,6 +43,7 @@
         <tr><td>Last Configuration Read</td><td>${lastConfigurationRead}</td></tr>
         <tr><td>Scanning Enabled</td><td>${isScanningEnabled}</td></tr>
         <tr><td>Currently Scanning</td><td>${isScanningNow}</td></tr>
+        <tr><td>Time Since Last Scan</td><td>${timeSinceLastScan}</td></tr>
         <tr><td>Processed Runs</td><td>${finished}</td></tr>
         <tr><td>Waiting Runs</td><td>${scheduled}</td></tr>
       </table>
@@ -50,7 +51,7 @@
       <h1>Processors</h1>
       <table>
         <tr><th>Name</th><th>Platform</th></tr>
-        <c:forEach items="${processors}" var="processor"><td>${processor.name}</td><td>${processor.platformType}</td></c:forEach>
+        <c:forEach items="${processors}" var="processor"><tr><td>${processor.name}</td><td>${processor.platformType}</td></tr></c:forEach>
       </table>
 
       <h1>Configuration</h1>

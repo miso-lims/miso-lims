@@ -14,9 +14,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -27,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
+import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -1671,40 +1674,44 @@ public class Dtos {
     return dto;
   }
 
-  public static Run to(NotificationDto from) {
-    Run to = null;
-    if (from instanceof PacBioNotificationDto) {
-      to = new PacBioRun();
-      to = setPacBioRunValues((PacBioNotificationDto) from, (PacBioRun) to);
-      to = setCommonRunValues(from, to);
-    } else if (from instanceof IlluminaNotificationDto) {
-      to = new IlluminaRun();
-      to = setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
-      to = setCommonRunValues(from, to);
-    } else {
-      throw new IllegalArgumentException(
-          String.format("The argument with the type '%s' cannot be converted into a Run.", from.getClass().getName()));
+  public static Run to(NotificationDto from, User user) {
+    final Run to = from.getPlatformType().createRun(user);
+    setCommonRunValues(from, to);
+
+    switch (to.getPlatformType()) {
+    case PACBIO:
+      setPacBioRunValues((PacBioNotificationDto) from, (PacBioRun) to);
+      break;
+    case ILLUMINA:
+      setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
+      break;
+    case LS454:
+      to.setPairedEnd(((LS454NotificationDto) from).isPairedEndRun());
+      ((LS454Run) to).setCycles(((LS454NotificationDto) from).getCycles());
+      break;
+    case SOLID:
+      to.setPairedEnd(((SolidNotificationDto) from).isPairedEndRun());
+      break;
+    default:
+      throw new NotImplementedException();
     }
     return to;
   }
 
-  private static Run setPacBioRunValues(PacBioNotificationDto from, PacBioRun to) {
+  private static void setPacBioRunValues(PacBioNotificationDto from, PacBioRun to) {
     to.setMovieDuration(from.getMovieDurationInSec());
-    return to;
   }
 
-  private static Run setIlluminaRunValues(IlluminaNotificationDto from, IlluminaRun to) {
+  private static void setIlluminaRunValues(IlluminaNotificationDto from, IlluminaRun to) {
     to.setPairedEnd(from.isPairedEndRun());
-    return to;
   }
 
-  private static Run setCommonRunValues(NotificationDto from, Run to) {
-    to.setName(from.getRunName());
+  private static void setCommonRunValues(NotificationDto from, Run to) {
+    to.setAlias(from.getRunAlias());
     to.setFilePath(from.getSequencerFolderPath().toString());
     to.setHealth(from.getHealthType());
     to.setStartDate(LimsUtils.toBadDate(from.getStartDate()));
     to.setCompletionDate(LimsUtils.toBadDate(from.getCompletionDate()));
-    return to;
   }
 
   public static TargetedSequencingDto asDto(TargetedSequencing from) {

@@ -56,7 +56,7 @@ public class IlluminaNotificationDtoTest {
   public void testConvertToUtilDate() throws ParseException {
     NotificationDto dto = fullyPopulatedIlluminaNotificationDto("RUN_B");
 
-    Run run = Dtos.to(dto);
+    Run run = Dtos.to(dto, null);
 
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     assertThat(dto.getStartDate().toString(), is(format.format(run.getStartDate())));
@@ -64,9 +64,9 @@ public class IlluminaNotificationDtoTest {
 
   static IlluminaNotificationDto fullyPopulatedIlluminaNotificationDto(String sequencerName) {
     IlluminaNotificationDto notificationDto = new IlluminaNotificationDto();
-    notificationDto.setRunName("TEST_RUN_NAME");
+    notificationDto.setRunAlias("TEST_RUN_NAME");
     notificationDto.setSequencerFolderPath(Paths.get("/sequencers/TEST_RUN_FOLDER"));
-    notificationDto.setContainerId("CONTAINER_ID");
+    notificationDto.setContainerSerialNumber("CONTAINER_ID");
     notificationDto.setSequencerName(sequencerName);
     notificationDto.setLaneCount(8);
     notificationDto.setHealthType(HealthType.Started);
