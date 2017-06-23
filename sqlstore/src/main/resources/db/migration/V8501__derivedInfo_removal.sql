@@ -52,3 +52,19 @@ ALTER TABLE Pool CHANGE COLUMN creator creator bigint(20) NOT NULL;
 ALTER TABLE Pool ADD CONSTRAINT fk_pool_creator FOREIGN KEY (creator) REFERENCES User (userId);
 
 DROP VIEW IF EXISTS PoolDerivedInfo;
+
+ALTER TABLE Run ADD COLUMN creator bigint(20);
+ALTER TABLE Run ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
+ALTER TABLE Run ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
+
+-- StartNoTest
+UPDATE Run SET
+  created = (SELECT MIN(changeTime) FROM RunChangeLog WHERE runId = Run.runId),
+  lastModified = (SELECT MAX(changeTime) FROM RunChangeLog WHERE runId = Run.runId),
+  creator = (SELECT userId FROM RunChangeLog WHERE runId = Run.runId ORDER BY changeTime ASC LIMIT 1);
+-- EndNoTest
+
+ALTER TABLE Run CHANGE COLUMN creator creator bigint(20) NOT NULL;
+ALTER TABLE Run ADD CONSTRAINT fk_run_creator FOREIGN KEY (creator) REFERENCES User (userId);
+
+DROP VIEW IF EXISTS RunDerivedInfo;

@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -285,13 +286,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
 
   @Test
   public void testRemove() throws IOException, MisoNamingException {
-    Run run = new Run();
-    String runName = "RUN111";
-    run.setName(runName);
-    run.setAlias("RunAlias");
-    run.setDescription("Run Description");
-    run.setSequencerReference(emptySR);
-    run.setLastModifier(emptyUser);
+    Run run = makeRun("RunAlias");
 
     long runId = dao.save(run);
     Run insertedRun = dao.get(runId);
@@ -381,6 +376,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   private Run makeRun(String alias) {
     SecurityProfile profile = (SecurityProfile) sessionFactory.getCurrentSession().get(SecurityProfile.class, 3L);
     SequencerReference sequencer = emptySR;
+    Date now = new Date();
     User user = new UserImpl();
     user.setUserId(1L);
 
@@ -390,7 +386,10 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     run.setDescription("description");
     run.setFilePath("/somewhere/someplace/");
     run.setSequencerReference(sequencer);
+    run.setCreator(user);
+    run.setCreationTime(now);
     run.setLastModifier(user);
+    run.setLastModified(now);
     return run;
   }
 
