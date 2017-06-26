@@ -24,6 +24,7 @@ import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.LibraryControllerHelperService;
 
@@ -46,6 +47,8 @@ public class LibraryControllerHelperServiceTest {
   private MisoFilesManager misoFileManager;
   @Mock
   private LibraryService libraryService;
+  @Mock
+  private BoxService boxService;
 
   @Before
   public void setUp() throws Exception {

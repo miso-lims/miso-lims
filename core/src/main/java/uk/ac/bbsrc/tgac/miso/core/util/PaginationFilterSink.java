@@ -40,4 +40,6 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByUser(T item, String userName, boolean creator, Consumer<String> errorHandler);
 
+  public void restrictPaginationByBoxUse(T item, long id, Consumer<String> errorHandler);
+
 }

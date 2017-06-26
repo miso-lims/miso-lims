@@ -30,16 +30,12 @@ import java.util.Map;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public interface RequestManager {
@@ -65,7 +61,6 @@ public interface RequestManager {
 
   public long saveSubmission(Submission submission) throws IOException;
 
-  public long saveBox(Box box) throws IOException;
 
   // GETS
 
@@ -89,12 +84,6 @@ public interface RequestManager {
   @Deprecated
   public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException;
 
-  public Box getBoxById(long boxId) throws IOException;
-
-  public Box getBoxByBarcode(String barcode) throws IOException;
-
-  public Box getBoxByAlias(String alias) throws IOException;
-
   // LISTS
   /**
    * Obtain a list of all the projects the user has access to. Access is defined as either read or write access.
@@ -107,44 +96,19 @@ public interface RequestManager {
 
   public Collection<ProjectOverview> listAllOverviewsByProjectId(long projectId) throws IOException;
 
-  public Collection<Box> listAllBoxes() throws IOException;
-
-  public Collection<Box> listAllBoxesWithLimit(long limit) throws IOException;
-
   /** TODO: delete after refactoring NotificationConsumerMechanisms. Use containerService.listByBarcode instead */
   @Deprecated
   public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode)
       throws IOException;
 
-  /**
-   * Obtain a list of all of the Box attributes (uses, sizes)
-   */
-  public Collection<BoxUse> listAllBoxUses() throws IOException;
-
-  public Collection<BoxSize> listAllBoxSizes() throws IOException;
 
   public Collection<Submission> listAllSubmissions() throws IOException;
 
   public Collection<PlatformType> listActivePlatformTypes() throws IOException;
 
-  /**
-   * Obtain a list of Boxables by supplied identificationBarcode list
-   */
-  public Collection<BoxableView> getBoxableViewsFromBarcodeList(Collection<String> barcodeList) throws IOException;
-
-  public BoxableView getBoxableViewByBarcode(String barcode) throws IOException;
-
-  public void discardSingleTube(Box box, String position) throws IOException;
-
-  public void discardAllTubes(Box box) throws IOException;
-
   // DELETES
 
   public void deleteProjectOverviewNote(ProjectOverview projectOverview, Long noteId) throws IOException;
-
-  public void deleteBox(Box box) throws IOException;
-
-  public Map<String, Integer> getBoxColumnSizes() throws IOException;
 
   public Map<String, Integer> getProjectColumnSizes() throws IOException;
 

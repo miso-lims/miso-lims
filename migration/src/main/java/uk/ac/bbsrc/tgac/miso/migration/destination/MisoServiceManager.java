@@ -57,7 +57,9 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.DefaultLibraryDesignCodeService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultContainerService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultExperimentService;
@@ -143,6 +145,7 @@ public class MisoServiceManager {
   private DefaultPoolOrderService poolOrderService;
   private DefaultPoolService poolService;
   private DefaultTargetedSequencingService targetedSequencingService;
+  private DefaultBoxService boxService;
 
   private PoolAlertManager poolAlertManager;
   private ProjectAlertManager projectAlertManager;
@@ -254,6 +257,7 @@ public class MisoServiceManager {
     m.setDefaultSequencingParametersDao();
     m.setDefaultPoolableElementViewDao();
     m.setDefaultPoolableElementViewService();
+    m.setDefaultBoxService();
 
     // sigh
     m.setDefaultRequestManager();
@@ -340,6 +344,7 @@ public class MisoServiceManager {
     if (kitService != null) kitService.setAuthorizationManager(authorizationManager);
     if (changeLogService != null) changeLogService.setAuthorizationManager(authorizationManager);
     if (experimentService != null) experimentService.setAuthorizationManager(authorizationManager);
+    if (boxService != null) boxService.setAuthorizationManager(authorizationManager);
   }
 
   public MisoRequestManager getRequestManager() {
@@ -367,7 +372,6 @@ public class MisoServiceManager {
     rm.setSecurityManager(securityManager);
     rm.setChangeLogStore(changeLogDao);
     rm.setSequencerPartitionContainerStore(sequencerPartitionContainerDao);
-    rm.setBoxStore(boxDao);
     setRequestManager(rm);
   }
 
@@ -416,6 +420,7 @@ public class MisoServiceManager {
     if (runService != null) runService.setSecurityProfileStore(securityProfileDao);
     if (containerService != null) containerService.setSecurityProfileDao(securityProfileDao);
     if (experimentService != null) experimentService.setSecurityProfileStore(securityProfileDao);
+    if (boxService != null) boxService.setSecurityProfileStore(securityProfileDao);
   }
 
   public LocalSecurityManager getSecurityManager() {
@@ -963,7 +968,6 @@ public class MisoServiceManager {
 
   private void updateBoxDaoDependencies() {
     if (poolDao != null) poolDao.setBoxStore(boxDao);
-    if (requestManager != null) requestManager.setBoxStore(boxDao);
     if (sampleDao != null) sampleDao.setBoxStore(boxDao);
     if (libraryDao != null) libraryDao.setBoxDao(boxDao);
     if (dilutionDao != null) dilutionDao.setBoxStore(boxDao);
@@ -1397,7 +1401,6 @@ public class MisoServiceManager {
 
   private void updateProjectAlertManagerDependencies() {
     if (projectDao != null) projectDao.setProjectAlertManager(projectAlertManager);
-    if (requestManager != null) requestManager.setProjectAlertManager(projectAlertManager);
   }
 
   public RunAlertManager getRunAlertManager() {
@@ -1755,5 +1758,28 @@ public class MisoServiceManager {
   }
 
   private void updateExperimentServiceDependencies() {
+  }
+
+  public void setDefaultBoxService() {
+    DefaultBoxService service = new DefaultBoxService();
+    service.setBoxStore(boxDao);
+    service.setAuthorizationManager(authorizationManager);
+    service.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
+    service.setChangeLogStore(changeLogDao);
+    service.setNamingScheme(namingScheme);
+    service.setSecurityProfileStore(securityProfileDao);
+    setBoxService(service);
+  }
+
+  public void setBoxService(DefaultBoxService service) {
+    this.boxService = service;
+    updateBoxServiceDependencies();
+  }
+
+  private void updateBoxServiceDependencies() {
+
+  }
+  public BoxService getBoxService() { 
+    return boxService;
   }
 }

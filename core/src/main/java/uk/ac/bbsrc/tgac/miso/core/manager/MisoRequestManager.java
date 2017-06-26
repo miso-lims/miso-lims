@@ -47,13 +47,8 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
@@ -71,17 +66,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -125,8 +116,6 @@ public class MisoRequestManager implements RequestManager {
   @Autowired
   private ChangeLogStore changeLogStore;
   @Autowired
-  private BoxStore boxStore;
-  @Autowired
   private SecurityStore securityStore;
   @Autowired
   private SecurityProfileStore securityProfileStore;
@@ -157,10 +146,6 @@ public class MisoRequestManager implements RequestManager {
 
   public void setRunAlertManager(RunAlertManager runAlertManager) {
     this.runAlertManager = runAlertManager;
-  }
-
-  public void setBoxStore(BoxStore boxStore) {
-    this.boxStore = boxStore;
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {
@@ -237,11 +222,6 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
     }
-  }
-
-  @Override
-  public Collection<BoxableView> getBoxableViewsFromBarcodeList(Collection<String> barcodeList) throws IOException {
-    return boxStore.getBoxableViewsByBarcodeList(barcodeList);
   }
 
   @Override
@@ -691,176 +671,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public BoxableView getBoxableViewByBarcode(String barcode) throws IOException {
-    return boxStore.getBoxableViewByBarcode(barcode);
-  }
-
-  @Override
-  public long saveBox(Box box) throws IOException {
-    if (box.getId() == AbstractBox.UNSAVED_ID) {
-      return saveNewBox(box);
-    } else {
-      Box original = boxStore.get(box.getId());
-      applyChanges(box, original);
-      StringBuilder message = new StringBuilder();
-
-      // Process additions/moves
-      Set<BoxableId> handled = Sets.newHashSet();
-      for (Map.Entry<String, BoxableView> entry : box.getBoxables().entrySet()) {
-        BoxableView previousOccupant = original.getBoxable(entry.getKey());
-        BoxableView newOccupant = entry.getValue();
-        handled.add(newOccupant.getId());
-
-        if (previousOccupant != null && newOccupant.getId().equals(previousOccupant.getId())) {
-          // Unchanged
-          continue;
-        }
-        if (message.length() > 0) {
-          message.append("\n");
-        }
-        
-        BoxableView oldOccupant = boxStore.getBoxableView(newOccupant.getId());
-        if (oldOccupant.getBoxId() != null) {
-          if (oldOccupant.getBoxId().longValue() == box.getId()) {
-            // Moved within same box
-            message.append(String.format("Relocated %s (%s) from %s to %s", oldOccupant.getAlias(), oldOccupant.getName(),
-                oldOccupant.getBoxPosition(), entry.getKey()));
-          } else {
-            // Moved from a different box
-            message.append(String.format("Moved %s (%s) from %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(),
-                oldOccupant.getBoxAlias(), oldOccupant.getBoxName(), entry.getKey()));
-
-            Box oldHome = boxStore.get(oldOccupant.getBoxId());
-            String oldHomeMessage = String.format("Moved %s (%s) to %s (%s)", oldOccupant.getAlias(), oldOccupant.getName(),
-                original.getAlias(), original.getName());
-            addBoxContentsChangeLog(oldHome, oldHomeMessage);
-          }
-          boxStore.removeBoxableFromBox(oldOccupant);
-        } else {
-          message.append(String.format("Added %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(), entry.getKey()));
-        }
-      }
-
-      // Process removals
-      for (Map.Entry<String, BoxableView> entry : original.getBoxables().entrySet()) {
-        if (box.getBoxables().keySet().contains(entry.getKey()) || handled.contains(entry.getValue().getId())) {
-          // Already handled. Only checking for removals at this point
-          continue;
-        }
-        if (message.length() > 0) {
-          message.append("\n");
-        }
-        BoxableView oldItem = entry.getValue();
-        message.append(String.format("Removed %s (%s)", oldItem.getAlias(), oldItem.getName()));
-      }
-
-      original.setBoxables(box.getBoxables());
-
-      if (message.length() > 0) {
-        addBoxContentsChangeLog(original, message.toString());
-      }
-      return boxStore.save(box);
-    }
-  }
-
-  private void addBoxContentsChangeLog(Box box, String message) throws IOException {
-    BoxChangeLog changeLog = new BoxChangeLog();
-    changeLog.setBox(box);
-    changeLog.setTime(new Date());
-    changeLog.setColumnsChanged("contents");
-    changeLog.setUser(getCurrentUser());
-    changeLog.setSummary(message);
-    changeLogStore.create(changeLog);
-  }
-
-  private long saveNewBox(Box box) throws IOException {
-    try {
-      box.setName(generateTemporaryName());
-      box.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(box.getSecurityProfile())));
-      boxStore.save(box);
-
-      if (autoGenerateIdBarcodes) {
-        box.setIdentificationBarcode(box.getName() + "::" + box.getAlias());
-      }
-      box.setName(namingScheme.generateNameFor(box));
-      validateNameOrThrow(box, namingScheme);
-      return boxStore.save(box);
-    } catch (MisoNamingException e) {
-      throw new IOException("Invalid name for box", e);
-    }
-  }
-
-  private void applyChanges(Box from, Box to) throws IOException {
-    to.setAlias(from.getAlias());
-    to.setDescription(from.getDescription());
-    to.setIdentificationBarcode(from.getIdentificationBarcode());
-    to.setUse(boxStore.getUseById(from.getUse().getId()));
-  }
-
-  @Override
-  public Box getBoxById(long boxId) throws IOException {
-    if (boxStore != null) {
-      return boxStore.get(boxId);
-    } else {
-      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Box getBoxByBarcode(String barcode) throws IOException {
-    if (boxStore != null) {
-      return boxStore.getByBarcode(barcode);
-    } else {
-      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Box getBoxByAlias(String alias) throws IOException {
-    if (boxStore != null) {
-      return boxStore.getBoxByAlias(alias);
-    } else {
-      throw new IOException("No boxStore available. Check that is has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<Box> listAllBoxes() throws IOException {
-    if (boxStore != null) {
-      return boxStore.listAll();
-    } else {
-      throw new IOException("No boxStore available. Check that is has been declared in the Spring config");
-    }
-  }
-
-  @Override
-  public Collection<Box> listAllBoxesWithLimit(long limit) throws IOException {
-    if (boxStore != null) {
-      return boxStore.listWithLimit(limit);
-    } else {
-      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<BoxSize> listAllBoxSizes() throws IOException {
-    if (boxStore != null) {
-      return boxStore.listAllBoxSizes();
-    } else {
-      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<BoxUse> listAllBoxUses() throws IOException {
-    if (boxStore != null) {
-      return boxStore.listAllBoxUses();
-    } else {
-      throw new IOException("No boxStore available. Check that is has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<PlatformType> listActivePlatformTypes() throws IOException {
     Collection<PlatformType> activePlatformTypes = Lists.newArrayList();
     for (PlatformType platformType : PlatformType.values()) {
@@ -872,44 +682,6 @@ public class MisoRequestManager implements RequestManager {
       }
     }
     return activePlatformTypes;
-  }
-
-  @Override
-  public void discardSingleTube(Box box, String position) throws IOException {
-    if (boxStore != null) {
-      boxStore.discardSingleTube(box, position);
-    } else {
-      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void discardAllTubes(Box box) throws IOException {
-    if (boxStore != null) {
-      boxStore.discardAllTubes(box);
-    } else {
-      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public void deleteBox(Box box) throws IOException {
-    if (boxStore != null) {
-      if (!boxStore.remove(box)) {
-        throw new IOException("Unable to delete box.");
-      }
-    } else {
-      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Map<String, Integer> getBoxColumnSizes() throws IOException {
-    if (boxStore != null) {
-      return boxStore.getBoxColumnSizes();
-    } else {
-      throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
-    }
   }
 
   @Override

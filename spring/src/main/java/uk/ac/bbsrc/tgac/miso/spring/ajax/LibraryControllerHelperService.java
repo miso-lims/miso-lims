@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -89,6 +88,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -196,6 +196,8 @@ public class LibraryControllerHelperService {
   private KitService kitService;
   @Autowired
   private TargetedSequencingService targetedSequencingService;
+  @Autowired
+  private BoxService boxService;
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -230,7 +232,6 @@ public class LibraryControllerHelperService {
       note.setInternalOnly(Boolean.parseBoolean(internalOnly));
       note.setText(text);
       note.setOwner(user);
-      note.setCreationDate(new Date());
       libraryService.addNote(library, note);
     } catch (IOException e) {
       log.error("add library note", e);
@@ -333,7 +334,7 @@ public class LibraryControllerHelperService {
         // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
         idBarcode = null;
       } else {
-        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays.asList(idBarcode)));
+        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty() && (
             previouslyBarcodedItems.size() != 1
                 || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.LIBRARY
@@ -815,7 +816,7 @@ public class LibraryControllerHelperService {
             // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
             idBarcode = null;
           } else {
-            List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays
+            List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays
                 .asList(idBarcode)));
             if (!previouslyBarcodedItems.isEmpty() && (
                 previouslyBarcodedItems.size() != 1

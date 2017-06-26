@@ -68,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
@@ -120,6 +121,9 @@ public class MenuController implements ServletContextAware {
   private SampleGroupService sampleGroupService;
   @Autowired
   private TargetedSequencingService targetedSequencingService;
+
+  @Autowired
+  private BoxService boxService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -276,6 +280,8 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
     createArray(mapper, baseUri, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
+    createArray(mapper, baseUri, node, "boxSizes", boxService.listSizes(), Function.identity());
+    createArray(mapper, baseUri, node, "boxUses", boxService.listUses(), Function.identity());
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

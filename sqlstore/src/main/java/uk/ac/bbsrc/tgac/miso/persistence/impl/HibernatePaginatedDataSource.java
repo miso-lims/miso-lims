@@ -140,6 +140,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByBoxUse(Criteria criteria, long id, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " has no use.");
+  }
+
+  @Override
   public default void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " is exempt from class strugle.");
   }

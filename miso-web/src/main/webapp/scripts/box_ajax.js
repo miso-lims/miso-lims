@@ -276,47 +276,6 @@ Box.ui = {
     table.fnFilter(alias, 5);
   },
 
-  createListingBoxesTable: function () {
-    jQuery('#listingBoxesTable').html("<img src='/styles/images/ajax-loader.gif'/>");
-
-    Fluxion.doAjax(
-      'boxControllerHelperService',
-      'listAllBoxesTable',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#listingBoxesTable').html('');
-          jQuery('#listingBoxesTable').dataTable({
-            "aaData": json.array,
-            "aoColumns": [
-              { "sTitle" : "Box Name", "iDataSort": 7 },
-              { "sTitle" : "Alias" },
-              { "sTitle" : "Location" },
-              { "sTitle" : "Items/Capacity" },
-              { "sTitle" : "Size" },
-              { "sTitle" : "Box Use" },
-              { "sTitle" : "Barcode", "bVisible": false },
-              { "sTitle": "ID", "bVisible": false }
-            ],
-            "bJQueryUI": true,
-            "bAutoWidth": false,
-            "bRetrieve": true,
-            "iDisplayLength": 25,
-            "sPaginationType": "full_numbers",
-            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-            "fnDrawCallback": function (oSettings) {
-              jQuery('#listingBoxesTable_paginate').find('.fg-button').removeClass('fg-button');
-            }
-          });
-          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/box/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Box</button>");
-        }
-      }
-    );
-  },
-
   //creates the table of the box contents
   createListingBoxablesTable: function(box) {
     jQuery('#listingBoxablesTable').empty();

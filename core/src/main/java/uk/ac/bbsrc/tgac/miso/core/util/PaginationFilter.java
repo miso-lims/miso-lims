@@ -29,6 +29,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter boxUse(long id) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByBoxUse(item, id, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter date(Date start, Date end, DateType type) {
     return new PaginationFilter() {
 
