@@ -8,9 +8,9 @@ import java.security.InvalidParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
@@ -43,7 +43,12 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
         return addSiblingTag(parent.getAlias(), detailed);
       }
       if (isTissueSample(parent)) {
-        return addSiblingTag(parent.getAlias(), detailed);
+        if (isTissueSample(detailed) && isIdentitySample(parent.getParent())) {
+          // tissues parented to tissues
+          return generateTissueAlias((SampleTissue) detailed, (SampleIdentity) LimsUtils.deproxify(parent.getParent()));
+        } else {
+          return addSiblingTag(parent.getAlias(), detailed);
+        }
       }
       if (isIdentitySample(parent)) {
         if (!isTissueSample(detailed)) throw new IllegalArgumentException("Missing parent tissue");
