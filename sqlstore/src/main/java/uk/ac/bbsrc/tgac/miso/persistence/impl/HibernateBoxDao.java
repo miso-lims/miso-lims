@@ -38,8 +38,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   public static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode", "locationBarcode" };
 
-  private final static List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "lastModifier",
-      "derivedInfo.creator", "size", "use");
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("lastModifier",
+      "creator", "size", "use");
 
   private static final Logger log = LoggerFactory.getLogger(HibernateBoxDao.class);
 
@@ -288,9 +288,9 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
-      return "derivedInfo.created";
+      return "created";
     case UPDATE:
-      return "derivedInfo.lastModified";
+      return "lastModified";
     default:
       return null;
     }
@@ -303,8 +303,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
       return "size.id";
     case "useId":
       return "use.id";
-    case "lastModified":
-      return "derivedInfo.lastModified";
     default:
       return original;
     }

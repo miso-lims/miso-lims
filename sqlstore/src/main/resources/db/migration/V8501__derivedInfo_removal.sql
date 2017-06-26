@@ -84,3 +84,19 @@ ALTER TABLE SequencerPartitionContainer CHANGE COLUMN creator creator bigint(20)
 ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT fk_container_creator FOREIGN KEY (creator) REFERENCES User (userId);
 
 DROP VIEW IF EXISTS ContainerDerivedInfo;
+
+ALTER TABLE Box ADD COLUMN creator bigint(20);
+ALTER TABLE Box ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
+ALTER TABLE Box ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
+
+-- StartNoTest
+UPDATE Box SET
+  created = (SELECT MIN(changeTime) FROM BoxChangeLog WHERE boxId = Box.boxId),
+  lastModified = (SELECT MAX(changeTime) FROM BoxChangeLog WHERE boxId = Box.boxId),
+  creator = (SELECT userId FROM BoxChangeLog WHERE boxId = Box.boxId ORDER BY changeTime ASC LIMIT 1);
+-- EndNoTest
+
+ALTER TABLE Box CHANGE COLUMN creator creator bigint(20) NOT NULL;
+ALTER TABLE Box ADD CONSTRAINT fk_box_creator FOREIGN KEY (creator) REFERENCES User (userId);
+
+DROP VIEW IF EXISTS BoxDerivedInfo;

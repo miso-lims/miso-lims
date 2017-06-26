@@ -1024,9 +1024,6 @@ CREATE OR REPLACE VIEW OrderCompletion AS SELECT
 
 CREATE OR REPLACE VIEW OrderCompletion_Items AS SELECT poolId, parametersId, health, num_partitions FROM OrderCompletion_Backing;
 
-CREATE OR REPLACE VIEW BoxDerivedInfo AS
-  SELECT a.*, userId AS creator FROM BoxChangeLog o JOIN (SELECT boxId, MAX(changeTime) as lastModified, MIN(changeTime) as created, MIN(boxChangeLogId) AS firstId FROM BoxChangeLog GROUP BY boxId) AS a WHERE a.boxId = o.boxId AND a.firstId = o.boxChangeLogId;
-
 CREATE OR REPLACE VIEW SampleBoxPosition
 AS SELECT s.sampleId, bp.boxId, bp.position
 FROM Sample s
