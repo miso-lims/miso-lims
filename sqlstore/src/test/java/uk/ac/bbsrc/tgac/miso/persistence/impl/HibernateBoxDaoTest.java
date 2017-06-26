@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -187,7 +188,11 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     Box box = new BoxImpl(new UserImpl());
     UserImpl user = new UserImpl();
     user.setId(1l);
+    Date now = new Date();
+    box.setCreator(user);
+    box.setCreationTime(now);
     box.setLastModifier(user);
+    box.setLastModified(now);
     box.setDescription("newboxdescription");
     box.setAlias("newboxalias");
     box.setName("newbox");
@@ -214,8 +219,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   @Test
   public void testGetBoxColumnSizes() throws Exception {
     Map<String, Integer> boxColumnSizes = dao.getBoxColumnSizes();
-
-    assertTrue(10 == boxColumnSizes.size());
+    assertEquals(13, boxColumnSizes.size());
   }
 
   @Test

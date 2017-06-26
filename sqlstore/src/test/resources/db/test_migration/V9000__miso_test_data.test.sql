@@ -509,10 +509,10 @@ VALUES
 ('2', 'boxuse2');
 
 DELETE FROM Box;
-INSERT INTO `Box` (`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `description`, `identificationBarcode`, `locationBarcode`, `securityProfile_profileId`, `lastModifier`)
+INSERT INTO `Box` (`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `description`, `identificationBarcode`, `locationBarcode`, `securityProfile_profileId`, `lastModifier`, `lastModified`, `creator`, `created`)
 VALUES
-('1','1', '1', 'box1', 'box1alias', 'box1', 'barcode1','identifcationbarcode1', '1', '1'),
-('2','1', '2', 'box2', 'box2alias', 'box2', 'barcode2','identifcationbarcode2', '1', '1');
+('1','1', '1', 'box1', 'box1alias', 'box1', 'barcode1','identificationbarcode1', '1', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00'),
+('2','1', '2', 'box2', 'box2alias', 'box2', 'barcode2','identificationbarcode2', '1', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00');
 
 DELETE FROM BoxChangeLog;
 INSERT INTO BoxChangeLog(boxChangeLogId, boxId, columnsChanged, userId, message, changeTime)

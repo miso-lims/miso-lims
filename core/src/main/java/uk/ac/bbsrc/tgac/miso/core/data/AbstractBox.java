@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -12,13 +13,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -45,12 +45,20 @@ public abstract class AbstractBox implements Box {
   private String locationBarcode;
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date created;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
-  @OneToOne
-  @PrimaryKeyJoinColumn
-  private BoxDerivedInfo derivedInfo;
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   @ManyToOne
   @JoinColumn(name = "boxSizeId")
@@ -62,16 +70,6 @@ public abstract class AbstractBox implements Box {
 
   @OneToMany(targetEntity = BoxChangeLog.class, mappedBy = "box", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
-
-  @Override
-  public User getLastModifier() {
-    return lastModifier;
-  }
-
-  @Override
-  public void setLastModifier(User lastModifier) {
-    this.lastModifier = lastModifier;
-  }
 
   @Override
   public long getId() {
@@ -191,8 +189,43 @@ public abstract class AbstractBox implements Box {
   }
 
   @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
   public Date getLastModified() {
-    return (derivedInfo == null ? null : derivedInfo.getLastModified());
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return created;
+  }
+
+  @Override
+  public void setCreationTime(Date created) {
+    this.created = created;
   }
 
   @Override
