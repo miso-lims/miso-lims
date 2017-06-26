@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
@@ -137,6 +138,8 @@ public class SampleControllerHelperService {
   private PrinterService printerService;
   @Autowired
   private NamingScheme namingScheme;
+  @Autowired
+  private BoxService boxService;
 
   public JSONObject validateSampleAlias(HttpSession session, JSONObject json) {
     try {
@@ -496,7 +499,7 @@ public class SampleControllerHelperService {
         // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
         idBarcode = null;
       } else {
-        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays.asList(idBarcode)));
+        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty() && (
             previouslyBarcodedItems.size() != 1
                 || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.SAMPLE

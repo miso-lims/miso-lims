@@ -708,7 +708,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info("Migrating boxes...");
     for (Box newBox : boxes) {
       resolveBoxables(newBox);
-      Box box = serviceManager.getRequestManager().getBoxByAlias(newBox.getAlias());
+      Box box = serviceManager.getBoxService().getByAlias(newBox.getAlias());
       if (box == null) {
         saveBox(newBox);
       } else {
@@ -737,7 +737,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Saving new box " + box.getAlias());
     valueTypeLookup.resolveAll(box);
     box.setLastModifier(migrationUser);
-    serviceManager.getRequestManager().saveBox(box);
+    serviceManager.getBoxService().save(box);
     log.debug("Saved box " + box.getAlias());
   }
 
@@ -755,7 +755,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         to.setBoxable(entry.getKey(), entry.getValue());
       }
     }
-    serviceManager.getRequestManager().saveBox(to);
+    serviceManager.getBoxService().save(to);
     log.debug("Saved changes to box " + to.getAlias());
   }
 

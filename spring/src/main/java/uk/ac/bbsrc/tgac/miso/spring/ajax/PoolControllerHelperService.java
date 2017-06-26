@@ -79,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
@@ -120,6 +121,8 @@ public class PoolControllerHelperService {
   private RunService runService;
   @Autowired
   private StudyService studyService;
+  @Autowired
+  private BoxService boxService;
 
   public JSONObject getPoolQcTypes(HttpSession session, JSONObject json) {
     try {
@@ -409,7 +412,7 @@ public class PoolControllerHelperService {
         // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
         idBarcode = null;
       } else {
-        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays.asList(idBarcode)));
+        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty() && (
             previouslyBarcodedItems.size() != 1
                 || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.POOL

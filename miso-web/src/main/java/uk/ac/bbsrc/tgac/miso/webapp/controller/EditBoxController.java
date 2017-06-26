@@ -31,8 +31,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 
 @Controller
@@ -45,13 +45,13 @@ public class EditBoxController {
   private SecurityManager securityManager;
 
   @Autowired
-  private RequestManager requestManager;
+  private BoxService boxService;
 
   @Autowired
   private ChangeLogService changeLogService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setBoxService(BoxService boxService) {
+    this.boxService = boxService;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -68,12 +68,12 @@ public class EditBoxController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getBoxColumnSizes();
+    return boxService.getColumnSizes();
   }
 
   public List<String> boxSizesAsRowsByColumns() throws IOException {
     List<String> sizes = new ArrayList<>();
-    for (BoxSize boxSize : requestManager.listAllBoxSizes()) {
+    for (BoxSize boxSize : boxService.listSizes()) {
       sizes.add("\"" + boxSize.getRowsByColumns() + "\"" + ":" + "\"" + boxSize.getRowsByColumns() + "\"");
     }
     return sizes;
@@ -86,7 +86,7 @@ public class EditBoxController {
 
   @RequestMapping(value = "/rest/{boxId}", method = RequestMethod.GET)
   public @ResponseBody Box jsonRest(@PathVariable Long boxId) throws IOException {
-    return requestManager.getBoxById(boxId);
+    return boxService.get(boxId);
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
@@ -104,7 +104,7 @@ public class EditBoxController {
         box = new BoxImpl(user);
         model.put("title", "New Box");
       } else {
-        box = requestManager.getBoxById(boxId);
+        box = boxService.get(boxId);
         if (box == null) {
           throw new SecurityException("No such Box");
         }
@@ -118,10 +118,10 @@ public class EditBoxController {
       model.put("box", box);
 
       // add all BoxUses
-      model.put("boxUses", requestManager.listAllBoxUses());
+      model.put("boxUses", boxService.listUses());
 
       // add all BoxSizes
-      model.put("boxSizes", requestManager.listAllBoxSizes());
+      model.put("boxSizes", boxService.listSizes());
 
       // add JSON
       ObjectMapper mapper = new ObjectMapper();
@@ -146,11 +146,11 @@ public class EditBoxController {
 
       // The user may have modified the box contents while editing the form. Update the contents.
       if (box.getId() != AbstractBox.UNSAVED_ID) {
-        Box original = requestManager.getBoxById(box.getId());
+        Box original = boxService.get(box.getId());
         box.setBoxables(original.getBoxables());
       }
       box.setLastModifier(user);
-      requestManager.saveBox(box);
+      boxService.save(box);
       session.setComplete();
       model.clear();
       return "redirect:/miso/box/" + box.getId();

@@ -1158,9 +1158,11 @@ public class Dtos {
   public static BoxDto asDto(Box from) {
     BoxDto dto = new BoxDto();
     dto.setId(from.getId());
+    dto.setName(from.getName());
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    dto.setLocationBarcode(from.getLocationBarcode());
     if (from.getUse() != null) {
       dto.setUseId(from.getUse().getId());
       dto.setUseAlias(from.getUse().getAlias());

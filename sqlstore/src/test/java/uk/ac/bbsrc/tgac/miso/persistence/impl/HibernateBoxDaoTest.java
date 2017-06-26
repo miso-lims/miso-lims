@@ -134,12 +134,6 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListWithLimit() throws Exception {
-    Collection<Box> boxes = dao.listWithLimit(1);
-    assertTrue(boxes.size() == 1);
-  }
-
-  @Test
   public void testRemove() throws Exception {
     Collection<Box> boxesBefore = dao.listAll();
     assertEquals(2, boxesBefore.size());

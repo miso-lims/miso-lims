@@ -129,6 +129,16 @@ ListUtils = {
   render : {
     booleanChecks : function(data, type, full) {
       return data ? "✔" : "";
-    }
+    },
+    idHyperlink : function(urlFragment) {
+          return function (data, type, full) {
+            return "<a href=\"/miso/" + urlFragment + "/" + full.id + "\">" + data + "</a>";
+          };
+    },
+    textFromId : function(list, property) {
+          return function (data, type, full) {
+            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(data), list), property) || "Unknown";
+          };
+    },
   }
 };

@@ -39,9 +39,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -49,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -341,14 +337,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     backingManager.saveRuns(runs);
   }
 
-  @Override
-  public long saveBox(Box box) throws IOException {
-    if (writeCheck(box)) {
-      return backingManager.saveBox(box);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Box");
-    }
-  }
 
   @Override
   public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException {
@@ -356,101 +344,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Box getBoxById(long boxId) throws IOException {
-    Box o = backingManager.getBoxById(boxId);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Box " + boxId);
-  }
-
-  @Override
-  public Box getBoxByBarcode(String barcode) throws IOException {
-    Box o = backingManager.getBoxByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Box " + barcode);
-  }
-
-  @Override
-  public Box getBoxByAlias(String alias) throws IOException {
-    Box o = backingManager.getBoxByAlias(alias);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Box " + alias);
-  }
-
-  @Override
-  public Collection<Box> listAllBoxes() throws IOException {
-    User user = getCurrentUser();
-    Collection<Box> accessibles = new HashSet<>();
-    for (Box o : backingManager.listAllBoxes()) {
-      if (o.userCanRead(user)) {
-        accessibles.add(o);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<Box> listAllBoxesWithLimit(long limit) throws IOException {
-    User user = getCurrentUser();
-    Collection<Box> accessibles = new HashSet<>();
-    for (Box o : backingManager.listAllBoxesWithLimit(limit)) {
-      if (o.userCanRead(user)) {
-        accessibles.add(o);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
-  public Collection<BoxUse> listAllBoxUses() throws IOException {
-    return backingManager.listAllBoxUses();
-  }
-
-  @Override
-  public Collection<BoxSize> listAllBoxSizes() throws IOException {
-    return backingManager.listAllBoxSizes();
-  }
-
-  @Override
   public Collection<PlatformType> listActivePlatformTypes() throws IOException {
     return backingManager.listActivePlatformTypes();
-  }
-
-  @Override
-  public Collection<BoxableView> getBoxableViewsFromBarcodeList(Collection<String> barcodeList) throws IOException {
-    return backingManager.getBoxableViewsFromBarcodeList(barcodeList);
-  }
-
-  @Override
-  public BoxableView getBoxableViewByBarcode(String barcode) throws IOException {
-    return backingManager.getBoxableViewByBarcode(barcode);
-  }
-
-  @Override
-  public void discardSingleTube(Box box, String position) throws IOException {
-    if (writeCheck(box)) {
-      backingManager.discardSingleTube(box, position);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot change Box " + box.getAlias());
-    }
-
-  }
-
-  @Override
-  public void discardAllTubes(Box box) throws IOException {
-    if (writeCheck(box)) {
-      backingManager.discardAllTubes(box);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot change Box " + box.getAlias());
-    }
-  }
-
-  @Override
-  public void deleteBox(Box box) throws IOException {
-    if (writeCheck(box)) {
-      backingManager.deleteBox(box);
-    } else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot change Box " + box.getAlias());
-    }
   }
 
   @Override
@@ -492,11 +387,4 @@ public class UserAuthMisoRequestManager implements RequestManager {
       backingManager.removeProjectWatcher(project, watcher);
     }
   }
-
-  @Override
-  public Map<String, Integer> getBoxColumnSizes() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 }
