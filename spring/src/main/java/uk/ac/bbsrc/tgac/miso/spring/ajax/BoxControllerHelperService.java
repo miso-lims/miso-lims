@@ -357,7 +357,7 @@ public class BoxControllerHelperService {
       boxService.save(box);
 
       ObjectMapper mapper = new ObjectMapper();
-      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()))));
+      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
       response.put("addedToBox", boxable.getName() + " was successfully added to position " + position);
     } catch (IOException e) {
       log.debug("Error updating one boxable item", e);
@@ -406,7 +406,7 @@ public class BoxControllerHelperService {
 
       Map<String, Object> response = new HashMap<>();
       ObjectMapper mapper = new ObjectMapper();
-      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()))));
+      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
       return JSONUtils.JSONObjectResponse(response);
     } catch (IOException e) {
       log.debug("Error removing one boxable item", e);
@@ -457,7 +457,7 @@ public class BoxControllerHelperService {
           boxService.discardSingleTube(box, position);
           box = boxService.get(boxId);
           ObjectMapper mapper = new ObjectMapper();
-          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()))));
+          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
         } catch (IOException e) {
           log.debug("Failed to discard single tube", e);
           return JSONUtils.SimpleJSONError("Failed to discard single tube: " + e.getMessage());
@@ -505,7 +505,7 @@ public class BoxControllerHelperService {
           boxService.discardAllTubes(box); // box save is performed as part of this method
           box = boxService.get(boxId);
           ObjectMapper mapper = new ObjectMapper();
-          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()))));
+          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
           return response;
         } catch (IOException e) {
           log.debug("Error discarding box", e);

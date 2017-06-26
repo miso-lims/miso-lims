@@ -61,12 +61,12 @@ ListTarget.box = {
         },
         {
           "sTitle" : "Items/Capacity",
-          "mData" : "items.length",
+          "mData" : "tubeCount",
           "include" : true,
           "iSortPriority" : 0,
           "bSortable" : false,
           "mRender" : function(data, type, full) {
-            return full.items.length + "/" + (full.rows * full.cols);
+            return full.tubeCount + "/" + (full.rows * full.cols);
           }
         },
         {
