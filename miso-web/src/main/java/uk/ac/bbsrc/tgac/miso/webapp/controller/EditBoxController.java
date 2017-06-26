@@ -125,7 +125,7 @@ public class EditBoxController {
 
       // add JSON
       ObjectMapper mapper = new ObjectMapper();
-      model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(box)));
+      model.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(box, true)));
 
       return new ModelAndView("/pages/editBox.jsp", model);
     } catch (IOException ex) {

@@ -17,6 +17,15 @@ public class BoxDto {
   private String useAlias;
   private String identificationBarcode;
   private String locationBarcode;
+  private int tubeCount;
+
+  public int getTubeCount() {
+    return tubeCount;
+  }
+
+  public void setTubeCount(int tubeCount) {
+    this.tubeCount = tubeCount;
+  }
 
   public String getAlias() {
     return alias;

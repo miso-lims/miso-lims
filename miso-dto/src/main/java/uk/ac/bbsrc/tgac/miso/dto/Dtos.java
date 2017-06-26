@@ -1155,7 +1155,7 @@ public class Dtos {
     return to;
   }
 
-  public static BoxDto asDto(Box from) {
+  public static BoxDto asDto(Box from, boolean includeBoxables) {
     BoxDto dto = new BoxDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1173,9 +1173,10 @@ public class Dtos {
       dto.setCols(from.getSize().getColumns());
       dto.setScannable(from.getSize().getScannable());
     }
-    if (from.getBoxables() != null) {
+    if (includeBoxables && from.getBoxables() != null) {
       dto.setItems(asBoxablesDtos(from.getBoxables()));
     }
+    dto.setTubeCount(from.getTubeCount());
     return dto;
   }
 

@@ -32,7 +32,7 @@ public class BoxRestController extends RestController {
   private final JQueryDataTableBackend<Box, BoxDto> jQueryBackend = new JQueryDataTableBackend<Box, BoxDto>() {
     @Override
     protected BoxDto asDto(Box model) {
-      return Dtos.asDto(model);
+      return Dtos.asDto(model, false);
     }
 
     @Override
