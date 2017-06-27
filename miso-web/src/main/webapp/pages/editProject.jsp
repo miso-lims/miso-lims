@@ -510,29 +510,31 @@
         </td>
       </tr>
     </table>
-  </div>
 
-  <div id="projectfiles">
-    <c:forEach items="${projectFiles}" var="file">
-      <div id='btnPanel' style='float: left; width: 32px;'>
-        <table>
-          <tr>
-            <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="Project.ui.deleteFile(${project.id}, ${file.key});">
-                <span class="ui-icon ui-icon-trash"></span>
-              </td>
-            </sec:authorize>
-          </tr>
-        </table>
+    <div id="projectfiles" style="display:inline-block;">
+      <c:forEach items="${projectFiles}" var="file">
+        <br/>
+        <div id='btnPanel' style='width: 32px;'>
+          <table>
+            <tr>
+              <sec:authorize access="hasRole('ROLE_ADMIN')">
+                <td class="misoicon" onclick="Project.ui.deleteFile(${project.id}, ${file.key});">
+                  <span class="ui-icon ui-icon-trash"></span>
+                </td>
+              </sec:authorize>
+            </tr>
+          </table>
+      </div>
+      <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
+  
+        <span onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
+            ${file.value}
+        </span>
+      </a>
+      </c:forEach>
+      </div>
+  
     </div>
-    <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
-
-      <span onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
-          ${file.value}
-      </span>
-    </a>
-    </c:forEach>
-  </div>
 </div>
 <br/>
 

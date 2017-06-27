@@ -296,6 +296,7 @@ public class MenuController implements ServletContextAware {
       dto.put("containerName", platformType.getContainerName());
       dto.put("libraryConcentrationUnits", platformType.getLibraryConcentrationUnits());
       dto.put("active", activePlatformTypes.contains(platformType));
+      dto.put("partitionName", platformType.getPartitionName());
     }
 
     // Save the regenerated file in cache. This has a race condition where multiple concurrent requests could results in regenerating this

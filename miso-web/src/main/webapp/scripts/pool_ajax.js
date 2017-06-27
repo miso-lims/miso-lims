@@ -1003,7 +1003,7 @@ Pool.orders = Pool.orders || {
           }
         },
         {
-          "sTitle": "Partitions",
+          "sTitle": (!document.getElementById('partitionName') ? "Partitions" : document.getElementById('partitionName').innerHTML),
           "mData": "partitions"
         },
         {
