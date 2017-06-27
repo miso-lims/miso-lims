@@ -15,12 +15,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
@@ -164,11 +166,12 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
   @Override
   public long save(Box box) throws IOException {
-    authorizationManager.throwIfNotWritable(box);
+    setChangeDetails(box);
     if (box.getId() == AbstractBox.UNSAVED_ID) {
       return saveNewBox(box);
     } else {
       Box original = boxStore.get(box.getId());
+      authorizationManager.throwIfNotWritable(original);
       applyChanges(box, original);
       StringBuilder message = new StringBuilder();
 
@@ -227,14 +230,17 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       if (message.length() > 0) {
         addBoxContentsChangeLog(original, message.toString());
       }
-      return boxStore.save(box);
+      setChangeDetails(original);
+      return boxStore.save(original);
     }
   }
 
   private long saveNewBox(Box box) throws IOException {
+    authorizationManager.throwIfNotWritable(box);
     try {
       box.setName(generateTemporaryName());
       box.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(box.getSecurityProfile())));
+      setChangeDetails(box);
       boxStore.save(box);
 
       if (autoGenerateIdBarcodes) {
@@ -270,6 +276,32 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
   public void setSecurityProfileStore(SecurityProfileStore securityProfileStore) {
     this.securityProfileStore = securityProfileStore;
+  }
+
+  /**
+   * Updates all user data and timestamps associated with the change. Existing timestamps will be preserved
+   * if the Box is unsaved, and they are already set
+   * 
+   * @param box the Box to update
+   * @param preserveTimestamps if true, the creationTime and lastModified date are not updated
+   * @throws IOException
+   */
+  private void setChangeDetails(Box box) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
+    box.setLastModifier(user);
+
+    if (box.getId() == Sample.UNSAVED_ID) {
+      box.setCreator(user);
+      if (box.getCreationTime() == null) {
+        box.setCreationTime(now);
+      }
+      if (box.getLastModified() == null) {
+        box.setLastModified(now);
+      }
+    } else {
+      box.setLastModified(now);
+    }
   }
 
 }

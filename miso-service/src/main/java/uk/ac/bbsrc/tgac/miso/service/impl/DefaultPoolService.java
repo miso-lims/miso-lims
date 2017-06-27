@@ -189,11 +189,11 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     if (pool.isDiscarded()) {
       pool.setVolume(0.0);
     }
-    setChangeDetails(pool);
 
     if (pool.getId() == PoolImpl.UNSAVED_ID) {
       pool.setName(generateTemporaryName());
       loadPooledElements(pool.getPoolableElementViews(), pool);
+      setChangeDetails(pool);
       poolStore.save(pool);
 
       if (autoGenerateIdBarcodes) {
@@ -240,6 +240,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
         changeLogService.create(changeLog);
       }
       pool = original;
+      setChangeDetails(pool);
     }
     long id = poolStore.save(pool);
     return id;
