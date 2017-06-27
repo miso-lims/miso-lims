@@ -417,6 +417,7 @@ public class MisoRequestManager implements RequestManager {
           }
           run.setSequencerPartitionContainers(containersToSave);
         }
+        setChangeDetails(run);
         run.setId(runStore.save(run));
         try {
           String name = namingScheme.generateNameFor(run);
@@ -494,11 +495,30 @@ public class MisoRequestManager implements RequestManager {
           changeLog.setUser(managed.getLastModifier());
           changeLogStore.create(changeLog);
         }
+        setChangeDetails(managed);
         runStore.save(managed);
         return run.getId();
       }
     } else {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  private void setChangeDetails(Run run) throws IOException {
+    User user = getCurrentUser();
+    Date now = new Date();
+    run.setLastModifier(user);
+
+    if (run.getId() == Run.UNSAVED_ID) {
+      run.setCreator(user);
+      if (run.getCreationTime() == null) {
+        run.setCreationTime(now);
+        run.setLastModified(now);
+      } else if (run.getLastModified() == null) {
+        run.setLastModified(now);
+      }
+    } else {
+      run.setLastModified(now);
     }
   }
 
