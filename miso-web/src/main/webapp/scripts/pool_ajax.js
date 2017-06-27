@@ -394,24 +394,6 @@ Pool.ui = {
     );
   },
 
-  listPoolAverageInsertSizes : function() {
-    jQuery('.averageInsertSize').html("<img src='../styles/images/ajax-loader.gif'/>");
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'listPoolAverageInsertSizes',
-      {
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          jQuery.each(json, function(i, val) {
-            jQuery('#average' + i).html(val);
-          });
-        }
-      }
-    );
-  },
-
   createListingPoolsTablePlatform: function (platform, poolConcentrationUnits) {
     var table = 'listing' + platform + 'PoolsTable';
     // This URL has to be singular because of mapping in PoolRestController

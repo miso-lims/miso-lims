@@ -116,7 +116,7 @@
   <tr>
     <td colspan="2">
     <c:if test="${pool.hasDuplicateIndices()}">
-      <p style="font-size:200%; font-weight:bold">This pool contains duplicate indices!</p>
+      <p style="font-size:200%; font-weight:bold; color:#a93232; margin-top:0px;">This pool contains duplicate indices!<span style="float:right;"><img src="/styles/images/fail.png"/></span></p>
     </c:if>
     </td>
   </tr>

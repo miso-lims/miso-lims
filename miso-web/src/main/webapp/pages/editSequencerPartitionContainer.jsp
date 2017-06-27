@@ -226,6 +226,9 @@
                                   ${partition.pool.name}
                                 (${partition.pool.creationDate})
                               </a><br/>
+                              <c:if test="${partition.pool.hasDuplicateIndices()}">
+                                <span class="lowquality">DUPLICATE INDICES</span><img style="float:right; height:25px;" src="/styles/images/fail.png" /><br/>
+                              </c:if>
                               <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
                               <c:choose>
                                 <c:when test="${not empty partition.pool.experiments}">
