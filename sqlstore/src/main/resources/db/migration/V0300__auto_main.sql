@@ -1,3 +1,5 @@
+-- derivedInfo_removal
+
 ALTER TABLE Sample ADD COLUMN creator bigint(20);
 ALTER TABLE Sample ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 ALTER TABLE Sample ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
@@ -94,3 +96,15 @@ ALTER TABLE Box CHANGE COLUMN creator creator bigint(20) NOT NULL;
 ALTER TABLE Box ADD CONSTRAINT fk_box_creator FOREIGN KEY (creator) REFERENCES User (userId);
 
 DROP VIEW IF EXISTS BoxDerivedInfo;
+
+
+-- delete_empcr_kits
+
+DELETE FROM KitDescriptor WHERE kitType = 'EMPCR';
+
+
+-- remove_alerts
+
+DROP TABLE Alert;
+
+

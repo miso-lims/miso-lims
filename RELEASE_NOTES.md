@@ -1,3 +1,16 @@
+# 0.2.73
+
+Changes:
+
+ * Changed list pages to display error messages if they fail to load
+ * Improved indicators for duplicate indices in a pool on the Pool and Container pages
+ * Changed the Pool page to use platform-specific terms for partitions
+ * Changed project file list to collapsed on page laod
+ * Removed faulty alerting system
+ * Fixed sorting libraries by sample
+ * Improved UI of Orders, Kits, Containers, Runs, Printers, and Boxes List pages
+ * Improved performance of several pages
+
 # 0.2.72
 
 Changes:
@@ -5,7 +18,6 @@ Changes:
  * Allow bulk propagation of dilutions to pool
  * Generate library aliases (OICR)
  * Add list dilutions page
- * [maven-release-plugin] prepare for next development iteration
 
 # 0.2.71
 
