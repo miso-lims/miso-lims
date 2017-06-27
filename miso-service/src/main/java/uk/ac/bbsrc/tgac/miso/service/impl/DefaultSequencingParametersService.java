@@ -77,4 +77,12 @@ public class DefaultSequencingParametersService implements SequencingParametersS
     return results;
   }
 
+  public void setSequencingParametersDao(SequencingParametersDao sequencingParametersDao) {
+    this.sequencingParametersDao = sequencingParametersDao;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
 }

@@ -49,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
@@ -67,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 
 public class ValueTypeLookupTest {
@@ -204,15 +204,15 @@ public class ValueTypeLookupTest {
     Mockito.when(tarSeqDao.listAll()).thenReturn(tarSeqs);
     Mockito.when(mgr.getTargetedSequencingDao()).thenReturn(tarSeqDao);
 
-    MisoRequestManager requestMgr = Mockito.mock(MisoRequestManager.class);
+    DefaultBoxService boxService = Mockito.mock(DefaultBoxService.class);
     List<BoxUse> boxUses = Lists.newArrayList();
     boxUses.add(makeBoxUse(VALID_LONG, VALID_STRING));
-    Mockito.when(requestMgr.listAllBoxUses()).thenReturn(boxUses);
-    Mockito.when(mgr.getRequestManager()).thenReturn(requestMgr);
+    Mockito.when(boxService.listUses()).thenReturn(boxUses);
+    Mockito.when(mgr.getBoxService()).thenReturn(boxService);
 
     List<BoxSize> boxSizes = Lists.newArrayList();
     boxSizes.add(makeBoxSize(VALID_LONG, 8, 12, true));
-    Mockito.when(requestMgr.listAllBoxSizes()).thenReturn(boxSizes);
+    Mockito.when(boxService.listSizes()).thenReturn(boxSizes);
 
     sut = new ValueTypeLookup(mgr);
   }

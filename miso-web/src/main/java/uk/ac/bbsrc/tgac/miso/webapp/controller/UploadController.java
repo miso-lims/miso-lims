@@ -36,10 +36,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -65,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService;
 
@@ -86,6 +89,8 @@ public class UploadController {
   private IndexService tagBarcodeService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -149,6 +154,7 @@ public class UploadController {
   }
 
   @RequestMapping(value = "/project", method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.OK)
   public void uploadProjectDocument(MultipartHttpServletRequest request) throws IOException {
     String projectId = request.getParameter("projectId");
     if (projectId == null) {
@@ -316,7 +322,7 @@ public class UploadController {
     String recordId = request.getParameter("serviceRecordId");
     if (recordId == null) {
       throw new IOException("Cannot upload file - serviceRecordId parameter missing or null");
-    } else if (requestManager.getSequencerServiceRecordById(Long.valueOf(recordId)) == null) {
+    } else if (sequencerReferenceService.getServiceRecord(Long.valueOf(recordId)) == null) {
       throw new IOException("Cannot upload file - service record does not exist");
     }
 

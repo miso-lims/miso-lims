@@ -56,7 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeName("sample")
 @JsonIgnoreProperties({ "securityProfile", "submissionDocument", "children", "parent" })
 public interface Sample
-    extends SecurableByProfile, Locatable, Reportable, Comparable<Sample>, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable {
+    extends SecurableByProfile, Locatable, Comparable<Sample>, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
@@ -267,8 +267,22 @@ public interface Sample
    */
   void setQCs(Collection<SampleQC> qcs);
 
+  // TODO: remove below fields to ChangeLoggable interface
   public User getLastModifier();
 
   public void setLastModifier(User user);
+
+  @Override
+  public Date getLastModified();
+
+  public void setLastModified(Date lastModified);
+
+  public User getCreator();
+
+  public void setCreator(User user);
+
+  public Date getCreationTime();
+
+  public void setCreationTime(Date creationTime);
 
 }

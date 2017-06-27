@@ -308,10 +308,6 @@ Project.ui = {
     jQuery('#inputformdiv').css("display", "none");
   },
 
-  addPoolEmPCR: function (tableId) {
-    alert("This function is not available at present");
-  },
-
   saveBulkSampleQc: function (tableName) {
     var self = this;
     Utils.ui.disableButton('bulkSampleQcButton');

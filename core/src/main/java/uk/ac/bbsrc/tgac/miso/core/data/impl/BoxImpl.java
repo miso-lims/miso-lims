@@ -12,8 +12,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +37,16 @@ public class BoxImpl extends AbstractBox {
   protected static final Logger log = LoggerFactory.getLogger(BoxImpl.class);
 
   // The contents of the Box
-  @OneToMany(targetEntity = BoxableView.class, fetch = FetchType.EAGER)
+  @OneToMany(targetEntity = BoxableView.class, fetch = FetchType.LAZY)
   @MapKeyColumn(name = "position", unique = true)
   @JoinTable(name = "BoxPosition", joinColumns = { @JoinColumn(name = "boxId") }, inverseJoinColumns = {
       @JoinColumn(name = "targetType", referencedColumnName = "targetType"),
       @JoinColumn(name = "targetId", referencedColumnName = "targetId") })
   @Fetch(FetchMode.SUBSELECT)
   private Map<String, BoxableView> boxableViews = new HashMap<>();
+
+  @Formula("(SELECT COUNT(bp.targetId) from BoxPosition bp WHERE bp.boxId = boxId)")
+  private int tubeCountOnLoad;
 
   /**
    * Construct new Box with defaults, and an empty SecurityProfile
@@ -96,7 +101,11 @@ public class BoxImpl extends AbstractBox {
   
   @Override
   public int getTubeCount() {
-    return boxableViews.size();
+    if (Hibernate.isInitialized(boxableViews)) {
+      return boxableViews.size();
+    } else {
+      return tubeCountOnLoad;
+    }
   }
 
   @Override
@@ -169,4 +178,5 @@ public class BoxImpl extends AbstractBox {
     changeLog.setUser(user);
     return changeLog;
   }
+
 }

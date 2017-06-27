@@ -72,13 +72,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -108,6 +111,8 @@ public class ImportExportControllerHelperService {
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private PlatformService platformService;
+  @Autowired
   private PoolService poolService;
   @Autowired
   private MisoFilesManager misoFileManager;
@@ -119,16 +124,18 @@ public class ImportExportControllerHelperService {
   public JSONObject searchSamples(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
     try {
-      List<Sample> samples;
+      Collection<Sample> samples;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        samples = new ArrayList<>(sampleService.getBySearch(searchStr));
+        samples = new ArrayList<>(sampleService.list(0, 0, true, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
       } else {
-        samples = new ArrayList<>(sampleService.listWithLimit(250));
+        samples = new ArrayList<>(sampleService.list(0, 250, true, "id"));
       }
 
       if (samples.size() > 0) {
-        Collections.sort(samples);
         for (Sample s : samples) {
           String dnaOrRNA = "O";
           if ("GENOMIC".equals(s.getSampleType()) || "METAGENOMIC".equals(s.getSampleType())) {
@@ -225,10 +232,11 @@ public class ImportExportControllerHelperService {
             sqc.setResults(jsonArrayElement.getDouble(6));
             sqc.setQcCreator(user.getLoginName());
             sqc.setQcDate(date);
-            if (requestManager.getSampleQcTypeByName("Picogreen") != null) {
-              sqc.setQcType(requestManager.getSampleQcTypeByName("Picogreen"));
+            QcType qcType = sampleService.getSampleQcTypeByName("Picogreen");
+            if (qcType != null) {
+              sqc.setQcType(qcType);
             } else {
-              sqc.setQcType(requestManager.getSampleQcTypeByName("QuBit"));
+              sqc.setQcType(sampleService.getSampleQcTypeByName("QuBit"));
             }
             if (!s.getSampleQCs().contains(sqc)) {
               s.addQc(sqc);
@@ -369,7 +377,7 @@ public class ImportExportControllerHelperService {
                   lqc.setResults(Double.valueOf(jsonArrayElement.getString(5)));
                   lqc.setQcCreator(user.getLoginName());
                   lqc.setQcDate(new Date());
-                  lqc.setQcType(requestManager.getLibraryQcTypeByName("Qubit"));
+                  lqc.setQcType(libraryService.getLibraryQcTypeByName("Qubit"));
 
                   if (!library.getLibraryQCs().contains(lqc)) {
                     library.addQc(lqc);
@@ -395,7 +403,7 @@ public class ImportExportControllerHelperService {
                   LibraryQC lqc = new LibraryQCImpl();
                   lqc.setLibrary(library);
                   lqc.setResults(Double.valueOf(jsonArrayElement.getString(7)));
-                  lqc.setQcType(requestManager.getLibraryQcTypeByName("Bioanalyzer"));
+                  lqc.setQcType(libraryService.getLibraryQcTypeByName("Bioanalyzer"));
 
                   if (!library.getLibraryQCs().contains(lqc)) {
                     library.addQc(lqc);
@@ -475,7 +483,7 @@ public class ImportExportControllerHelperService {
                 Matcher m = poolPattern.matcher(poolName);
 
                 if (m.matches()) {
-                  Pool existedPool = poolService.getPoolById(Integer.valueOf(m.group(1)));
+                  Pool existedPool = poolService.get(Integer.valueOf(m.group(1)));
                   pools.put(poolName, existedPool);
                   if (jsonArrayElement.get(13) != null && !isStringEmptyOrNull(jsonArrayElement.getString(13))) {
                     existedPool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
@@ -484,7 +492,7 @@ public class ImportExportControllerHelperService {
                   if (ldiView != null) {
                     existedPool.getPoolableElementViews().add(ldiView);
                   }
-                  poolService.savePool(existedPool);
+                  poolService.save(existedPool);
                 } else {
                   Pool pool = new PoolImpl();
                   if (!pools.containsKey(poolName)) {
@@ -502,12 +510,12 @@ public class ImportExportControllerHelperService {
                     if (ldiView != null) {
                       pool.getPoolableElementViews().add(ldiView);
                     }
-                    poolService.savePool(pool);
+                    poolService.save(pool);
                   } else {
                     pool = pools.get(poolName);
                     if (ldiView != null) {
                       pool.getPoolableElementViews().add(ldiView);
-                      poolService.savePool(pool);
+                      poolService.save(pool);
                     }
                   }
                 }
@@ -542,7 +550,7 @@ public class ImportExportControllerHelperService {
   }
 
   public Collection<String> populatePlatformNames() throws IOException {
-    List<String> types = new ArrayList<>(requestManager.listDistinctPlatformNames());
+    List<String> types = new ArrayList<>(platformService.listDistinctPlatformTypeNames());
     Collections.sort(types);
     return types;
   }

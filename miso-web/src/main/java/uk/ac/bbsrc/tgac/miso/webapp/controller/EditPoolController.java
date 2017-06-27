@@ -63,12 +63,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
@@ -96,20 +96,15 @@ public class EditPoolController {
   private SecurityManager securityManager;
 
   @Autowired
-  private RequestManager requestManager;
-
-  @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private PlatformService platformService;
   @Autowired
   private PoolableElementViewService poolableElementViewService;
   @Autowired
   private PoolService poolService;
   @Autowired
   private RunService runService;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -123,6 +118,10 @@ public class EditPoolController {
     this.runService = runService;
   }
 
+  public void setPlatformService(PlatformService platformService) {
+    this.platformService = platformService;
+  }
+
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
   public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
     return changeLogService.listAll("Pool");
@@ -130,7 +129,7 @@ public class EditPoolController {
 
   @ModelAttribute("platformTypes")
   public Collection<String> populatePlatformTypes() throws IOException {
-    return PlatformType.platformTypeNames(requestManager.listActivePlatformTypes());
+    return PlatformType.platformTypeNames(platformService.listActivePlatformTypes());
   }
 
   @ModelAttribute("libraryDilutionUnits")
@@ -170,7 +169,7 @@ public class EditPoolController {
         pool = new PoolImpl(user);
         model.put("title", "New Pool");
       } else {
-        pool = poolService.getPoolById(poolId);
+        pool = poolService.get(poolId);
         model.put("title", "Pool " + poolId);
       }
 
@@ -203,7 +202,7 @@ public class EditPoolController {
 
   private Collection<Platform> getFilteredPlatforms(PlatformType platformType) throws IOException {
     List<Platform> selected = new ArrayList<>();
-    for (Platform p : requestManager.listAllPlatforms()) {
+    for (Platform p : platformService.list()) {
       if (p.getPlatformType() == platformType && !sequencingParametersService.getForPlatform(p.getId()).isEmpty()) {
         selected.add(p);
       }
@@ -231,7 +230,7 @@ public class EditPoolController {
     }
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     p.setLastModifier(user);
-    poolService.savePool(p);
+    poolService.save(p);
     return "redirect:/miso/pool/" + p.getId();
   }
 
@@ -246,12 +245,12 @@ public class EditPoolController {
       // The pooled elements may have been modified asynchronously while the form was being edited. Since they can't be edited by form,
       // update them to avoid reverting the state.
       if (pool.getId() != PoolImpl.UNSAVED_ID) {
-        Pool original = poolService.getPoolById(pool.getId());
+        Pool original = poolService.get(pool.getId());
         pool.setPoolableElementViews(original.getPoolableElementViews());
       }
 
       pool.setLastModifier(user);
-      poolService.savePool(pool);
+      poolService.save(pool);
       session.setComplete();
       model.clear();
       return "redirect:/miso/pool/" + pool.getId();
@@ -281,7 +280,7 @@ public class EditPoolController {
 
     @Override
     protected Iterable<Pool> load(List<Long> modelIds) throws IOException {
-      return poolService.listPoolsById(modelIds);
+      return poolService.listByIdList(modelIds);
     }
 
     @Override

@@ -2,9 +2,11 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -27,13 +29,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateBoxDao implements BoxStore {
+public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<Box> {
 
   public static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "identificationBarcode", "locationBarcode" };
+
+  private final static List<String> STANDARD_ALIASES = Arrays.asList("lastModifier",
+      "creator", "size", "use");
 
   private static final Logger log = LoggerFactory.getLogger(HibernateBoxDao.class);
 
@@ -51,7 +57,8 @@ public class HibernateBoxDao implements BoxStore {
     return (int) c;
   }
 
-  private Session currentSession() {
+  @Override
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 
@@ -173,15 +180,6 @@ public class HibernateBoxDao implements BoxStore {
   }
 
   @Override
-  public Collection<Box> listWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
-    criteria.setMaxResults((int) limit);
-    @SuppressWarnings("unchecked")
-    List<Box> results = criteria.list();
-    return results;
-  }
-
-  @Override
   public boolean remove(Box box) throws IOException {
     if (box.getId() != AbstractBox.UNSAVED_ID) {
       currentSession().delete(box);
@@ -260,4 +258,64 @@ public class HibernateBoxDao implements BoxStore {
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
+
+  @Override
+  public String getFriendlyName() {
+    return "Box";
+  }
+
+  @Override
+  public String getProjectColumn() {
+    return null;
+  }
+
+  @Override
+  public Class<? extends Box> getRealClass() {
+    return BoxImpl.class;
+  }
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return STANDARD_ALIASES;
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, DateType type) {
+    switch (type) {
+    case CREATE:
+      return "creationTime";
+    case UPDATE:
+      return "lastModified";
+    default:
+      return null;
+    }
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    switch (original) {
+    case "sizeId":
+      return "size.id";
+    case "useId":
+      return "use.id";
+    default:
+      return original;
+    }
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return creator ? null : "lastModifier.loginName";
+  }
+
+  @Override
+  public void restrictPaginationByBoxUse(Criteria criteria, long id, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("use.id", id));
+  }
+
 }

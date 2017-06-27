@@ -15,9 +15,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
-import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -29,7 +29,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
   private PoolOrderDao poolOrderDao;
 
   @Autowired
-  SequencingParametersDao sequencingParametersDao;
+  SequencingParametersService sequencingParametersService;
 
   @Autowired
   private PoolService poolService;
@@ -44,7 +44,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public Long create(PoolOrderDto poolOrderDto) throws IOException {
-    Pool pool = poolService.getPoolById(poolOrderDto.getPoolId());
+    Pool pool = poolService.get(poolOrderDto.getPoolId());
     authorizationManager.throwIfNotWritable(pool);
     if (pool == null) {
       throw new IOException("No such pool: " + poolOrderDto.getPoolId());
@@ -53,7 +53,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
     User user = authorizationManager.getCurrentUser();
     PoolOrder poolOrder = Dtos.to(poolOrderDto);
     poolOrder.setPoolId(pool.getId());
-    poolOrder.setSequencingParameter(sequencingParametersDao.getSequencingParameters(poolOrderDto.getParameters().getId()));
+    poolOrder.setSequencingParameter(sequencingParametersService.get(poolOrderDto.getParameters().getId()));
     poolOrder.setCreatedBy(user);
     poolOrder.setUpdatedBy(user);
     return poolOrderDao.addPoolOrder(poolOrder);
@@ -61,7 +61,7 @@ public class DefaultPoolOrderService implements PoolOrderService {
 
   @Override
   public void update(PoolOrder poolOrder) throws IOException {
-    Pool owner = poolService.getPoolById(poolOrder.getPoolId());
+    Pool owner = poolService.get(poolOrder.getPoolId());
     authorizationManager.throwIfNotWritable(owner);
     User user = authorizationManager.getCurrentUser();
     poolOrder.setCreatedBy(user);
@@ -78,16 +78,32 @@ public class DefaultPoolOrderService implements PoolOrderService {
   @Override
   public void delete(Long poolOrderId) throws IOException {
     PoolOrder poolOrder = poolOrderDao.getPoolOrder(poolOrderId);
-    Pool pool = poolService.getPoolById(poolOrder.getPoolId());
+    Pool pool = poolService.get(poolOrder.getPoolId());
     authorizationManager.throwIfNotWritable(pool);
     if (poolOrder != null) poolOrderDao.deletePoolOrder(poolOrder);
   }
 
   @Override
   public Set<PoolOrder> getByPool(Long id) throws AuthorizationException, IOException {
-    Pool pool = poolService.getPoolById(id);
+    Pool pool = poolService.get(id);
     authorizationManager.throwIfNotReadable(pool);
     return Sets.newHashSet(poolOrderDao.getByPool(id));
+  }
+
+  public void setPoolOrderDao(PoolOrderDao poolOrderDao) {
+    this.poolOrderDao = poolOrderDao;
+  }
+
+  public void setSequencingParametersService(SequencingParametersService sequencingParametersService) {
+    this.sequencingParametersService = sequencingParametersService;
+  }
+
+  public void setPoolService(PoolService poolService) {
+    this.poolService = poolService;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
   }
 
 }

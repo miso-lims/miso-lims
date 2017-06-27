@@ -11,12 +11,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * This interface defines a DAO for storing Boxes
  * 
  */
-public interface BoxStore extends Store<Box>, Remover<Box> {
+public interface BoxStore extends Store<Box>, Remover<Box>, PaginatedDataSource<Box> {
   /**
    * Retrieve a Box from data store given a Box alias.
    * 
@@ -36,24 +37,6 @@ public interface BoxStore extends Store<Box>, Remover<Box> {
    * @throws IOException
    */
   Box getByBarcode(String barcode) throws IOException;
-
-  /**
-   * List all the boxes
-   * 
-   * @return Collection<Box> boxes
-   * @throws IOException
-   */
-  @Override
-  Collection<Box> listAll() throws IOException;
-
-  /**
-   * List all the boxes with a limit.
-   * 
-   * @param long limit
-   * @return Collection<Box> boxes
-   * @throws IOException
-   */
-  Collection<Box> listWithLimit(long limit) throws IOException;
 
   BoxUse getUseById(long id) throws IOException;
 

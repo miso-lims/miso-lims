@@ -58,11 +58,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
@@ -76,23 +76,15 @@ public class EditExperimentController {
   private SecurityManager securityManager;
 
   @Autowired
-  private RequestManager requestManager;
-
-  @Autowired
   private ExperimentService experimentService;
-
   @Autowired
   private ChangeLogService changeLogService;
-
   @Autowired
   private StudyService studyService;
-
+  @Autowired
+  private PlatformService platformService;
   @Autowired
   private PoolService poolService;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -105,13 +97,13 @@ public class EditExperimentController {
 
   @ModelAttribute("platforms")
   public Collection<Platform> populatePlatforms() throws IOException {
-    return requestManager.listAllPlatforms();
+    return platformService.list();
   }
 
   public Collection<? extends Pool> populateAvailablePools(User user, Experiment experiment) throws IOException {
     if (experiment.getPlatform() != null) {
       List<Pool> pools = new ArrayList<>();
-      for (Pool p : poolService.listAllPoolsByPlatform(experiment.getPlatform().getPlatformType())) {
+      for (Pool p : poolService.listByPlatform(experiment.getPlatform().getPlatformType())) {
         if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
           pools.add(p);
         }
@@ -153,7 +145,6 @@ public class EditExperimentController {
       model.put("formObj", experiment);
       model.put("experiment", experiment);
       model.put("libraryKits", experiment.getKitsByKitType(KitType.LIBRARY));
-      model.put("emPcrKits", experiment.getKitsByKitType(KitType.EMPCR));
       model.put("clusteringKits", experiment.getKitsByKitType(KitType.CLUSTERING));
       model.put("sequencingKits", experiment.getKitsByKitType(KitType.SEQUENCING));
       model.put("multiplexingKits", experiment.getKitsByKitType(KitType.MULTIPLEXING));
@@ -209,7 +200,6 @@ public class EditExperimentController {
       model.put("formObj", experiment);
       model.put("experiment", experiment);
       model.put("libraryKits", experiment.getKitsByKitType(KitType.LIBRARY));
-      model.put("emPcrKits", experiment.getKitsByKitType(KitType.EMPCR));
       model.put("clusteringKits", experiment.getKitsByKitType(KitType.CLUSTERING));
       model.put("sequencingKits", experiment.getKitsByKitType(KitType.SEQUENCING));
       model.put("multiplexingKits", experiment.getKitsByKitType(KitType.MULTIPLEXING));

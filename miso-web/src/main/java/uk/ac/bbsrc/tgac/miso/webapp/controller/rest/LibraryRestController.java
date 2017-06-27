@@ -156,19 +156,19 @@ public class LibraryRestController extends RestController {
     library = Dtos.to(libraryDto);
     if (libraryDto.getQcQubit() != null) {
       LibraryQC qc = new LibraryQCImpl();
-      qc.setQcType(requestManager.getLibraryQcTypeByName("Qubit"));
+      qc.setQcType(libraryService.getLibraryQcTypeByName("Qubit"));
       qc.setResults(libraryDto.getQcQubit());
       libraryService.addQc(library, qc);
     }
     if (libraryDto.getQcTapeStation() != null) {
       LibraryQC qc = new LibraryQCImpl();
-      qc.setQcType(requestManager.getLibraryQcTypeByName("Tape Station"));
+      qc.setQcType(libraryService.getLibraryQcTypeByName("Tape Station"));
       qc.setResults(libraryDto.getQcTapeStation());
       libraryService.addQc(library, qc);
     }
     if (libraryDto.getQcQPcr() != null) {
       LibraryQC qc = new LibraryQCImpl();
-      qc.setQcType(requestManager.getLibraryQcTypeByName("qPCR"));
+      qc.setQcType(libraryService.getLibraryQcTypeByName("qPCR"));
       qc.setResults(libraryDto.getQcQPcr());
       libraryService.addQc(library, qc);
     }

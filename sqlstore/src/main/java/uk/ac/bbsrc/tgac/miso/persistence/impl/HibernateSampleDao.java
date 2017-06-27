@@ -101,7 +101,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
 
   @Override
   public int count() throws IOException {
-    return getSamples().size();
+    return list().size();
   }
 
   @Override
@@ -155,7 +155,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
   }
 
   @Override
-  public List<Sample> getSamples() throws IOException {
+  public List<Sample> list() throws IOException {
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     @SuppressWarnings("unchecked")
     List<Sample> records = criteria.list();
@@ -175,7 +175,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
 
   @Override
   public Collection<Sample> listAll() throws IOException {
-    return getSamples();
+    return list();
   }
 
   @Override
@@ -246,15 +246,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
     criteria.createAlias("lab", "lab");
     criteria.createAlias("lab.institute", "institute");
     criteria.add(DbUtils.searchRestrictions(name, "lab.alias", "institute.alias"));
-  }
-
-  @Override
-  public Collection<Sample> listBySearch(String querystr) throws IOException {
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(DbUtils.searchRestrictions(querystr, SEARCH_PROPERTIES));
-    @SuppressWarnings("unchecked")
-    List<Sample> records = criteria.list();
-    return records;
   }
 
   @Override
@@ -329,7 +320,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
     return (Sample) criteria.uniqueResult();
   }
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "lastModifier", "derivedInfo.creator");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator");
 
   @Override
   public String getProjectColumn() {
@@ -343,7 +334,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
 
   @Override
   public String propertyForSortColumn(String original) {
-    return "lastModified".equals(original) ? "derivedInfo.lastModified" : original;
+    return original;
   }
 
   @Override
@@ -355,9 +346,9 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
-      return "derivedInfo.created";
+      return "creationTime";
     case UPDATE:
-      return "derivedInfo.lastModified";
+      return "lastModified";
     case RECEIVE:
       return "receivedDate";
     default:

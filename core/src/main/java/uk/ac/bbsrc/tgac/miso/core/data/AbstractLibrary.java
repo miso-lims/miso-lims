@@ -61,7 +61,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -155,9 +154,21 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinColumn(name = "libraryStrategyType")
   private LibraryStrategyType libraryStrategyType;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Library_Note", joinColumns = {
@@ -165,12 +176,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
           @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
 
-  @OneToMany(targetEntity = LibraryChangeLog.class, mappedBy = "library")
+  @OneToMany(targetEntity = LibraryChangeLog.class, mappedBy = "library", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
-
-  @OneToOne
-  @PrimaryKeyJoinColumn
-  private LibraryDerivedInfo derivedInfo;
 
   @OneToOne(optional = true)
   @PrimaryKeyJoinColumn
@@ -425,11 +432,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public Date getLastModified() {
-    return (derivedInfo == null ? null : derivedInfo.getLastModified());
-  }
-
-  @Override
   public void setLowQuality(boolean lowquality) {
     lowQuality = lowquality;
   }
@@ -514,6 +516,36 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return creationTime;
+  }
+
+  @Override
+  public void setCreationTime(Date created) {
+    this.creationTime = created;
   }
 
   @Override

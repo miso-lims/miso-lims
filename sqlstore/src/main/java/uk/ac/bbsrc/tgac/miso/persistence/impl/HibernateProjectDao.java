@@ -47,7 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -62,9 +61,6 @@ public class HibernateProjectDao implements ProjectStore {
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias",
       "description", "shortName" };
   private static final String TABLE_NAME = "Project";
-
-  @Autowired
-  private ProjectAlertManager projectAlertManager;
 
   @Autowired
   private SecurityStore securityStore;
@@ -95,7 +91,6 @@ public class HibernateProjectDao implements ProjectStore {
   @Override
   public Project get(long projectId) throws IOException {
     Project result = (Project) currentSession().get(ProjectImpl.class, projectId);
-    projectAlertManager.push(result);
     return withWatcherGroup(result);
   }
 
@@ -117,10 +112,6 @@ public class HibernateProjectDao implements ProjectStore {
   @CoverageIgnore
   public JdbcTemplate getJdbcTemplate() {
     return template;
-  }
-
-  public ProjectAlertManager getProjectAlertManager() {
-    return projectAlertManager;
   }
 
   @Override
@@ -229,11 +220,6 @@ public class HibernateProjectDao implements ProjectStore {
   @CoverageIgnore
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
-  }
-
-  @CoverageIgnore
-  public void setProjectAlertManager(ProjectAlertManager projectAlertManager) {
-    this.projectAlertManager = projectAlertManager;
   }
 
   public void setSecurityStore(SecurityStore securityStore) {

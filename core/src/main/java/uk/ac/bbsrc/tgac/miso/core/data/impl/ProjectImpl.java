@@ -61,11 +61,4 @@ public class ProjectImpl extends AbstractProject implements Serializable {
     setSecurityProfile(new SecurityProfile(user));
   }
 
-  /**
-   * Method buildReport ...
-   */
-  @Override
-  public void buildReport() {
-
-  }
 }

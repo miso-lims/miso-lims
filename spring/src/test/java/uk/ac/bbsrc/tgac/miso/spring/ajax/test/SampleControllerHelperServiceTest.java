@@ -26,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.SampleControllerHelperService;
 
@@ -48,6 +49,8 @@ public class SampleControllerHelperServiceTest {
   private RequestManager requestManager;
   @Mock
   private SampleService sampleService;
+  @Mock
+  private BoxService boxService;
 
   @Before
   public void setUp() throws Exception {
@@ -69,7 +72,7 @@ public class SampleControllerHelperServiceTest {
     json.put("sampleId", id);
     json.put("identificationBarcode", idBarcode);
 
-    Mockito.when(requestManager.getBoxableViewsFromBarcodeList(Matchers.anyListOf(String.class))).thenReturn(new HashSet<BoxableView>());
+    Mockito.when(boxService.getViewsFromBarcodeList(Matchers.anyListOf(String.class))).thenReturn(new HashSet<BoxableView>());
 
     final JSONObject response = sampleControllerHelperService.changeSampleIdBarcode(null, json);
 

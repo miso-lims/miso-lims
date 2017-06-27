@@ -389,6 +389,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (isDetailedLibrary(library)) {
 
       if (library.getCreationDate() == null) library.setCreationDate(timeStamp);
+      if (library.getCreationTime() == null) library.setCreationTime(timeStamp);
       // Check for duplicate alias
       Collection<Library> dupes = serviceManager.getLibraryService().listByAlias(library.getAlias());
       if (!dupes.isEmpty()) {
@@ -542,7 +543,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
   private Pool findExistingPool(Pool pool) throws IOException {
     if (pool.getIdentificationBarcode() != null) {
-      Pool poolByBarcode = serviceManager.getPoolService().getPoolByBarcode(pool.getIdentificationBarcode());
+      Pool poolByBarcode = serviceManager.getPoolService().getByBarcode(pool.getIdentificationBarcode());
       if (poolByBarcode != null) {
         if (poolByBarcode.getAlias().equals(pool.getAlias())) {
           return poolByBarcode;
@@ -554,7 +555,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         }
       }
     }
-    Collection<Pool> matches = serviceManager.getPoolService().listAllPoolsBySearch(pool.getAlias());
+    Collection<Pool> matches = serviceManager.getPoolService().listBySearch(pool.getAlias());
 
     // filter by alias
     List<Pool> aliasMatches = Lists.newArrayList();
@@ -588,7 +589,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info("Migrating pools...");
     for (Pool pool : pools) {
       setPoolModifiedDetails(pool);
-      pool.setId(serviceManager.getPoolService().savePool(pool));
+      pool.setId(serviceManager.getPoolService().save(pool));
       log.debug("Saved pool " + pool.getAlias());
     }
     log.info(pools.size() + " pools migrated.");
@@ -608,8 +609,13 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
 
   private void setPoolModifiedDetails(Pool pool) throws IOException {
-    if (pool.getId() == PoolImpl.UNSAVED_ID) pool.setCreationDate(timeStamp);
+    if (pool.getId() == PoolImpl.UNSAVED_ID) {
+      pool.setCreationTime(timeStamp);
+      pool.setCreationDate(timeStamp);
+    }
+    pool.setCreator(migrationUser);
     pool.setLastModifier(migrationUser);
+    pool.setLastModified(timeStamp);
     for (Note note : pool.getNotes()) {
       if (note.getNoteId() == Note.UNSAVED_ID) {
         note.setCreationDate(timeStamp);
@@ -693,9 +699,9 @@ public class DefaultMigrationTarget implements MigrationTarget {
       Collection<PoolableElementView> toPoolables = toPool.getPoolableElementViews();
       toPoolables.addAll(fromPoolables);
       setPoolModifiedDetails(toPool);
-      serviceManager.getPoolService().savePool(toPool);
+      serviceManager.getPoolService().save(toPool);
       for (Note note : fromPool.getNotes()) {
-        serviceManager.getPoolService().savePoolNote(toPool, note);
+        serviceManager.getPoolService().saveNote(toPool, note);
       }
       log.debug(String.format("Merged new pool %s with existing pool '%s'", fromPool.getAlias(), toPool.getAlias()));
     }
@@ -706,7 +712,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.info("Migrating boxes...");
     for (Box newBox : boxes) {
       resolveBoxables(newBox);
-      Box box = serviceManager.getRequestManager().getBoxByAlias(newBox.getAlias());
+      Box box = serviceManager.getBoxService().getByAlias(newBox.getAlias());
       if (box == null) {
         saveBox(newBox);
       } else {
@@ -735,7 +741,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Saving new box " + box.getAlias());
     valueTypeLookup.resolveAll(box);
     box.setLastModifier(migrationUser);
-    serviceManager.getRequestManager().saveBox(box);
+    serviceManager.getBoxService().save(box);
     log.debug("Saved box " + box.getAlias());
   }
 
@@ -753,7 +759,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
         to.setBoxable(entry.getKey(), entry.getValue());
       }
     }
-    serviceManager.getRequestManager().saveBox(to);
+    serviceManager.getBoxService().save(to);
     log.debug("Saved changes to box " + to.getAlias());
   }
 

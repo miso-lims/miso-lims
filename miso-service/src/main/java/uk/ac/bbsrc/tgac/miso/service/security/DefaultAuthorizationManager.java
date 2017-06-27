@@ -79,6 +79,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
   }
 
   @Override
+  public boolean isInternalUser() throws IOException {
+    return getCurrentUser().isInternal();
+  }
+
+  @Override
   public void throwIfNonAdmin() throws IOException, AuthorizationException {
     if (!isAdminUser()) {
       throw new AuthorizationException("Current user is not admin");
@@ -115,11 +120,11 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
 
   @Override
   public <T, R extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered, Function<T, R> getOwner) throws IOException {
-    throwIfUnauthenticated();
+    User currentUser = getCurrentUser();
     List<T> filtered = new ArrayList<>();
     if (unfiltered != null) {
       for (T item : unfiltered) {
-        if (readCheck(getOwner.apply(item))) {
+        if (getOwner.apply(item).userCanRead(currentUser)) {
           filtered.add(item);
         }
       }

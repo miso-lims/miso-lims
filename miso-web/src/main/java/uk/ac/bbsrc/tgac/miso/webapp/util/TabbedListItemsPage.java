@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 public class TabbedListItemsPage {
+
   public static TabbedListItemsPage createForPlatformType(String targetType, RequestManager requestManager)
       throws IOException {
     return TabbedListItemsPage.createWithJson(targetType, "platformType", getPlatformTypes(requestManager), PlatformType::getKey,

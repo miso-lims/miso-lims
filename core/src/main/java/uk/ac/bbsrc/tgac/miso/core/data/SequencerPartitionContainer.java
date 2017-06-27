@@ -126,13 +126,24 @@ public interface SequencerPartitionContainer
    */
   public void setValidationBarcode(String validationBarcode);
 
-  public User getLastModifier();
-
-  public void setLastModifier(User lastModifier);
-
   @Override
   public Collection<ChangeLog> getChangeLog();
 
+  // TODO: remove below fields to ChangeLoggable interface
+  public User getLastModifier();
+
+  public void setLastModifier(User user);
+
   public Date getLastModified();
+
+  public void setLastModified(Date lastModified);
+
+  public User getCreator();
+
+  public void setCreator(User user);
+
+  public Date getCreationTime();
+
+  public void setCreationTime(Date creationTime);
 
 }

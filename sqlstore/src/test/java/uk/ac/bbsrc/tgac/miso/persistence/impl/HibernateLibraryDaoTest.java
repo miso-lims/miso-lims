@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -80,7 +81,11 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
     library.setLibraryStrategyType(libraryStrategyType);
     User mockUser = new UserImpl();
     mockUser.setUserId(1L);
+    Date now = new Date();
+    library.setCreator(mockUser);
+    library.setCreationTime(now);
     library.setLastModifier(mockUser);
+    library.setLastModified(now);
 
     long libraryId = dao.save(library);
     Library insertedLibrary = dao.get(libraryId);
@@ -253,13 +258,18 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
     library.setLibraryStrategyType(dao.getLibraryStrategyTypeById(1L));
     User emptyUser = new UserImpl();
     emptyUser.setUserId(1L);
+    library.setCreator(emptyUser);
     library.setLastModifier(emptyUser);
+    Date now = new Date();
+    library.setCreationTime(now);
+    library.setLastModified(now);
 
     long libraryId = dao.save(library);
     Library insertedLibrary = dao.get(libraryId);
 
     assertNotNull(insertedLibrary);
     assertTrue(dao.remove(insertedLibrary));
+    assertNull(dao.get(libraryId));
   }
 
   @Test

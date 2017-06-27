@@ -48,8 +48,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -60,7 +58,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
@@ -69,9 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
-import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -87,7 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @Table(name = "Run")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Run
-    implements SecurableByProfile, Comparable<Run>, Reportable, Watchable, Deletable, Nameable, Alertable, ChangeLoggable, Aliasable,
+    implements SecurableByProfile, Comparable<Run>, Watchable, Deletable, Nameable, ChangeLoggable, Aliasable,
     Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -112,9 +106,6 @@ public class Run
           @JoinColumn(name = "containers_containerId") })
   private List<SequencerPartitionContainer> containers = new ArrayList<>();
 
-  @OneToOne(targetEntity = RunDerivedInfo.class)
-  @PrimaryKeyJoinColumn
-  private RunDerivedInfo derivedInfo;
   private String description;
   private String filePath;
 
@@ -123,11 +114,20 @@ public class Run
   private HealthType health = HealthType.Unknown;
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
-  @Transient
-  private final Set<MisoListener> listeners = new HashSet<>();
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   private String metrics;
 
@@ -186,11 +186,6 @@ public class Run
     setSecurityProfile(new SecurityProfile(user));
   }
 
-  @Override
-  public boolean addListener(MisoListener listener) {
-    return listeners.add(listener);
-  }
-
   public void addNote(Note note) {
     this.notes.add(note);
   }
@@ -198,7 +193,6 @@ public class Run
   public void addQc(RunQC runQC) {
     this.runQCs.add(runQC);
     runQC.setRun(this);
-    fireRunQcAddedEvent();
   }
 
   public void addSequencerPartitionContainer(SequencerPartitionContainer f) {
@@ -216,10 +210,6 @@ public class Run
   @Override
   public void addWatcher(User user) {
     watchUsers.add(user);
-  }
-
-  @Override
-  public void buildReport() {
   }
 
   @Override
@@ -251,59 +241,6 @@ public class Run
       return getAlias().equals(them.getAlias());
     } else {
       return getId() == them.getId();
-    }
-  }
-
-  protected void fireRunCompletedEvent() {
-    if (this.getId() != 0L) {
-      RunEvent re = new RunEvent(this, MisoEventType.RUN_COMPLETED, "Run completed");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(re);
-      }
-    }
-  }
-
-  protected void fireRunFailedEvent() {
-    if (this.getId() != 0L) {
-      RunEvent re = new RunEvent(this, MisoEventType.RUN_FAILED, "Run failed");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(re);
-      }
-    }
-  }
-
-  protected void fireRunQcAddedEvent() {
-    if (this.getId() != 0L) {
-      RunEvent re = new RunEvent(this, MisoEventType.RUN_QC_ADDED, "Run QC added");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(re);
-      }
-    }
-  }
-
-  protected void fireRunStartedEvent() {
-    if (this.getId() != 0L) {
-      RunEvent re = new RunEvent(this, MisoEventType.RUN_STARTED, "Run started");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(re);
-      }
-    }
-  }
-
-  protected void fireStatusChangedEvent() {
-    switch (getHealth()) {
-    case Started:
-      fireRunStartedEvent();
-      break;
-    case Completed:
-      fireRunCompletedEvent();
-      break;
-    case Failed:
-      fireRunFailedEvent();
-      break;
-    default:
-      break;
-
     }
   }
 
@@ -341,13 +278,32 @@ public class Run
     return lastModifier;
   }
 
-  public Date getLastUpdated() {
-    return (derivedInfo == null ? null : derivedInfo.getLastModified());
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
   }
 
-  @Override
-  public Set<MisoListener> getListeners() {
-    return this.listeners;
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  public User getCreator() {
+    return creator;
+  }
+
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  public Date getCreationTime() {
+    return creationTime;
+  }
+
+  public void setCreationTime(Date created) {
+    this.creationTime = created;
   }
 
   public String getMetrics() {
@@ -437,11 +393,6 @@ public class Run
   }
 
   @Override
-  public boolean removeListener(MisoListener listener) {
-    return listeners.remove(listener);
-  }
-
-  @Override
   public void removeWatcher(User user) {
     watchUsers.remove(user);
   }
@@ -476,10 +427,6 @@ public class Run
 
   public void setId(long id) {
     this.runId = id;
-  }
-
-  public void setLastModifier(User lastModifier) {
-    this.lastModifier = lastModifier;
   }
 
   public void setMetrics(String metrics) {

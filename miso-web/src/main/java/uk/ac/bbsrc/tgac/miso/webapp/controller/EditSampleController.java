@@ -123,6 +123,7 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
@@ -154,25 +155,20 @@ public class EditSampleController {
 
   @Autowired
   private SampleOptionsController sampleOptionsController;
-
   @Autowired
   private SampleService sampleService;
-
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
-
   @Autowired
   private ExperimentService experimentService;
-
   @Autowired
   private ChangeLogService changeLogService;
-
+  @Autowired
+  private LibraryService libraryService;
   @Autowired
   private PoolService poolService;
-
   @Autowired
   private RunService runService;
-
   @Autowired
   private StainService stainService;
 
@@ -373,7 +369,7 @@ public class EditSampleController {
     if (!s.getLibraries().isEmpty()) {
       Set<Pool> pools = new TreeSet<>();
       for (Library l : s.getLibraries()) {
-        List<Pool> prs = new ArrayList<>(poolService.listPoolsByLibraryId(l.getId()));
+        List<Pool> prs = new ArrayList<>(poolService.listByLibraryId(l.getId()));
         pools.addAll(prs);
       }
       return pools;
@@ -427,7 +423,7 @@ public class EditSampleController {
   @ModelAttribute("libraryQcTypesString")
   public String libraryTypesString() throws IOException {
     List<String> types = new ArrayList<>();
-    List<QcType> libraryQcTypes = new ArrayList<>(requestManager.listAllLibraryQcTypes());
+    List<QcType> libraryQcTypes = new ArrayList<>(libraryService.listLibraryQcTypes());
     Collections.sort(libraryQcTypes);
     for (QcType s : libraryQcTypes) {
       types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");

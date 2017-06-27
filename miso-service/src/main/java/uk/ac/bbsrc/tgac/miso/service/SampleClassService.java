@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -18,5 +19,7 @@ public interface SampleClassService {
   void delete(Long sampleClassId) throws IOException;
 
   public SampleClass inferStockFromAliquot(SampleClass sampleClass);
+
+  List<SampleClass> listByCategory(String sampleCategory) throws IOException;
 
 }

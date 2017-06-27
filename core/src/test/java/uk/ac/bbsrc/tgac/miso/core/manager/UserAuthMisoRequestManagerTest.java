@@ -44,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 
 /**
  * @author Chris Salt
@@ -332,104 +331,6 @@ public class UserAuthMisoRequestManagerTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSequencerPoolPartitionById(long)} .
-   */
-  @Test
-  public void testGetSequencerPoolPartitionById() throws IOException {
-    long inputId = 1L;
-    when(backingManager.getPartitionById(inputId)).thenReturn(sequencerPoolParition);
-    when(sequencerPoolParition.getSequencerPartitionContainer()).thenReturn(sequencerPartitionContainer);
-    when(sequencerPartitionContainer.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(sequencerPoolParition, userAuthMisoRequestManager.getPartitionById(inputId));
-
-    verify(backingManager).getPartitionById(inputId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSequencerPoolPartitionById(long)} .
-   */
-  @Test
-  public void testGetSequencerPoolPartitionByIdThrows() throws IOException {
-    long inputId = 1L;
-    when(backingManager.getPartitionById(inputId)).thenReturn(sequencerPoolParition);
-    when(sequencerPoolParition.getSequencerPartitionContainer()).thenReturn(sequencerPartitionContainer);
-    when(sequencerPartitionContainer.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Partition " + inputId);
-
-    userAuthMisoRequestManager.getPartitionById(inputId);
-
-    verify(backingManager).getPartitionById(inputId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryQCById(long)} .
-   */
-  @Test
-  public void testGetLibraryQCById() throws IOException {
-    long id = 1L;
-    when(backingManager.getLibraryQCById(id)).thenReturn(libraryQC);
-    when(libraryQC.getLibrary()).thenReturn(library);
-    when(library.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(libraryQC, userAuthMisoRequestManager.getLibraryQCById(id));
-
-    verify(backingManager).getLibraryQCById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryQCById(long)} .
-   */
-  @Test
-  public void testGetLibraryQCByIdThrows() throws IOException {
-    long qcId = 1L;
-    long libraryId = 2;
-    when(backingManager.getLibraryQCById(qcId)).thenReturn(libraryQC);
-    when(libraryQC.userCanRead(any(User.class))).thenReturn(false);
-    when(libraryQC.getLibrary()).thenReturn(library);
-    when(library.getId()).thenReturn(libraryId);
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read parent Library " + libraryId + " for LibraryQC " + qcId);
-
-    userAuthMisoRequestManager.getLibraryQCById(qcId);
-
-    verify(backingManager).getLibraryQCById(qcId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSequencerPartitionContainerById(long)} .
-   */
-  @Test
-  public void testGetSequencerPartitionContainerById() throws IOException {
-    long id = 1L;
-    when(backingManager.getSequencerPartitionContainerById(id)).thenReturn(sequencerPartitionContainer);
-    when(sequencerPartitionContainer.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(sequencerPartitionContainer, userAuthMisoRequestManager.getSequencerPartitionContainerById(id));
-
-    verify(backingManager).getSequencerPartitionContainerById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSequencerPartitionContainerById(long)} .
-   */
-  @Test
-  public void testGetSequencerPartitionContainerByIdThrows() throws IOException {
-    long id = 1L;
-    when(backingManager.getSequencerPartitionContainerById(id)).thenReturn(sequencerPartitionContainer);
-    when(sequencerPartitionContainer.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read SequencerPartitionContainer " + id);
-
-    userAuthMisoRequestManager.getSequencerPartitionContainerById(id);
-
-    verify(backingManager).getSequencerPartitionContainerById(id);
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getProjectById(long)} .
    */
   @Test
@@ -555,76 +456,6 @@ public class UserAuthMisoRequestManagerTest {
     userAuthMisoRequestManager.getRunByAlias(alias);
 
     verify(backingManager).getProjectByAlias(alias);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunQCById(long)} .
-   */
-  @Test
-  public void testGetRunQCById() throws IOException {
-    long id = 1L;
-    when(backingManager.getRunQCById(id)).thenReturn(runQC);
-    when(runQC.getRun()).thenReturn(run);
-    when(run.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(runQC, userAuthMisoRequestManager.getRunQCById(id));
-
-    verify(backingManager).getRunQCById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunQCById(long)} .
-   */
-  @Test
-  public void testGetRunQCByIdThrows() throws IOException {
-    long id = 1L;
-    long runId = 2L;
-    when(backingManager.getRunQCById(id)).thenReturn(runQC);
-    when(runQC.getRun()).thenReturn(run);
-    when(run.userCanRead(any(User.class))).thenReturn(false);
-    when(run.getId()).thenReturn(runId);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read parent Run " + runId + " for RunQC " + id);
-
-    userAuthMisoRequestManager.getRunQCById(id);
-
-    verify(backingManager).getRunQCById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleQCById(long)} .
-   */
-  @Test
-  public void testGetSampleQCById() throws IOException {
-    long id = 1L;
-    when(backingManager.getSampleQCById(id)).thenReturn(sampleQC);
-    when(sampleQC.getSample()).thenReturn(sample);
-    when(sample.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(sampleQC, userAuthMisoRequestManager.getSampleQCById(id));
-
-    verify(backingManager).getSampleQCById(id);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleQCById(long)} .
-   */
-  @Test
-  public void testGetSampleQCByIdThrows() throws IOException {
-    long id = 1L, sampleId = 2L;
-
-    when(backingManager.getSampleQCById(id)).thenReturn(sampleQC);
-    when(sampleQC.getSample()).thenReturn(sample);
-    when(sample.userCanRead(any(User.class))).thenReturn(false);
-    when(sample.getId()).thenReturn(sampleId);
-
-    thrown.expect(AuthorizationIOException.class);
-    thrown.expectMessage("User null cannot read parent Sample " + sampleId + " for SampleQC " + id);
-
-    userAuthMisoRequestManager.getSampleQCById(id);
-
-    verify(backingManager).getSampleQCById(id);
   }
 
   /**

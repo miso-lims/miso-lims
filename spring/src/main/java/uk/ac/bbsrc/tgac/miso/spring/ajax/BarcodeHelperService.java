@@ -73,7 +73,7 @@ public class BarcodeHelperService {
 
   public JSONObject regenerateAllBarcodes(HttpSession session, JSONObject json) {
     try {
-      for (Sample s : sampleService.getAll()) {
+      for (Sample s : sampleService.list()) {
         if (isStringEmptyOrNull(s.getIdentificationBarcode())) {
           sampleService.update(s);
         }
@@ -91,9 +91,9 @@ public class BarcodeHelperService {
         }
       }
 
-      for (Pool p : poolService.listAllPools()) {
+      for (Pool p : poolService.list()) {
         if (isStringEmptyOrNull(p.getIdentificationBarcode())) {
-          poolService.savePool(p);
+          poolService.save(p);
         }
       }
     } catch (IOException e) {

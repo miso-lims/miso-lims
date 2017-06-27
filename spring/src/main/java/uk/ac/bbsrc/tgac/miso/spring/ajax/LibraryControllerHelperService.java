@@ -89,10 +89,12 @@ import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
@@ -193,6 +195,10 @@ public class LibraryControllerHelperService {
   private LibraryDilutionService dilutionService;
   @Autowired
   private KitService kitService;
+  @Autowired
+  private TargetedSequencingService targetedSequencingService;
+  @Autowired
+  private BoxService boxService;
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -227,7 +233,6 @@ public class LibraryControllerHelperService {
       note.setInternalOnly(Boolean.parseBoolean(internalOnly));
       note.setText(text);
       note.setOwner(user);
-      note.setCreationDate(new Date());
       libraryService.addNote(library, note);
     } catch (IOException e) {
       log.error("add library note", e);
@@ -330,7 +335,7 @@ public class LibraryControllerHelperService {
         // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
         idBarcode = null;
       } else {
-        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays.asList(idBarcode)));
+        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty() && (
             previouslyBarcodedItems.size() != 1
                 || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.LIBRARY
@@ -416,8 +421,8 @@ public class LibraryControllerHelperService {
               library.setAlias(libAlias);
               library.setSecurityProfile(sp);
               library.setDescription(descr);
-              library.setPlatformType(platform);
               library.setCreationDate(new Date());
+              library.setPlatformType(platform);
               library.setLocationBarcode(locationBarcode);
               library.setQcPassed(false);
               library
@@ -550,7 +555,7 @@ public class LibraryControllerHelperService {
 
   public JSONArray getTargetedSequencingTypes() throws IOException {
     Collection<TargetedSequencing> targetedSequencings = getNonArchivedTargetedSequencing(
-        requestManager.listAllTargetedSequencing());
+        targetedSequencingService.list());
     JSONArray fullTargetedSequencingCollection = new JSONArray();
 
     for (TargetedSequencing targetedSequencing : targetedSequencings) {
@@ -604,7 +609,7 @@ public class LibraryControllerHelperService {
         Library library = libraryService.get(libraryId);
         LibraryQC newQc = new LibraryQCImpl();
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
-        newQc.setQcType(requestManager.getLibraryQcTypeById(json.getLong("qcType")));
+        newQc.setQcType(libraryService.getLibraryQcType(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
         libraryService.addQc(library, newQc);
 
@@ -693,7 +698,7 @@ public class LibraryControllerHelperService {
         if (json.has("targetedSequencing")) {
           Long libraryDilutionTargetedSequencingId = Long.parseLong(json.getString("targetedSequencing"));
           if (libraryDilutionTargetedSequencingId > 0) {
-            TargetedSequencing targetedSequencing = requestManager.getTargetedSequencingById(libraryDilutionTargetedSequencingId);
+            TargetedSequencing targetedSequencing = targetedSequencingService.get(libraryDilutionTargetedSequencingId);
             newDilution.setTargetedSequencing(targetedSequencing);
           }
         }
@@ -803,7 +808,7 @@ public class LibraryControllerHelperService {
           if (isStringEmptyOrNull(json.getString("targetedSequencing"))) {
             dilution.setTargetedSequencing(null);
           } else {
-            dilution.setTargetedSequencing(requestManager.getTargetedSequencingById(json.getLong("targetedSequencing")));
+            dilution.setTargetedSequencing(targetedSequencingService.get(json.getLong("targetedSequencing")));
           }
         }
         if (json.has("idBarcode")) {
@@ -813,7 +818,7 @@ public class LibraryControllerHelperService {
             // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
             idBarcode = null;
           } else {
-            List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays
+            List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays
                 .asList(idBarcode)));
             if (!previouslyBarcodedItems.isEmpty() && (
                 previouslyBarcodedItems.size() != 1
@@ -844,7 +849,7 @@ public class LibraryControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       Long qcId = Long.parseLong(json.getString("qcId"));
-      LibraryQC libraryQc = requestManager.getLibraryQCById(qcId);
+      LibraryQC libraryQc = libraryService.getLibraryQC(qcId);
       Long libraryId = Long.parseLong(json.getString("libraryId"));
 
       response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "'/>");
@@ -861,7 +866,7 @@ public class LibraryControllerHelperService {
     try {
       if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
         Long qcId = Long.parseLong(json.getString("qcId"));
-        LibraryQC libraryQc = requestManager.getLibraryQCById(qcId);
+        LibraryQC libraryQc = libraryService.getLibraryQC(qcId);
 
         libraryQc.setResults(Double.parseDouble(json.getString("result")));
         libraryService.addQc(libraryService.get(libraryQc.getLibrary().getId()), libraryQc);

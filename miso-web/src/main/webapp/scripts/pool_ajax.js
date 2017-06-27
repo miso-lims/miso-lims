@@ -394,24 +394,6 @@ Pool.ui = {
     );
   },
 
-  listPoolAverageInsertSizes : function() {
-    jQuery('.averageInsertSize').html("<img src='../styles/images/ajax-loader.gif'/>");
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'listPoolAverageInsertSizes',
-      {
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          jQuery.each(json, function(i, val) {
-            jQuery('#average' + i).html(val);
-          });
-        }
-      }
-    );
-  },
-
   createListingPoolsTablePlatform: function (platform, poolConcentrationUnits) {
     var table = 'listing' + platform + 'PoolsTable';
     // This URL has to be singular because of mapping in PoolRestController
@@ -696,106 +678,6 @@ Pool.ui = {
       );
     }
   },
-
-  createCompletionTable: function(table, url) {
-    jQuery('#'+table).html('');
-    jQuery('#'+table).dataTable(Utils.setSortFromPriority({
-      "aoColumns": [
-        {
-          "sTitle": "Name",
-          "mData": "pool.id",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/pool/" + data + "\">" + full.pool.name + "</a>";
-          },
-          "iSortPriority" : 1
-        },
-        {
-          "sTitle": "Alias",
-          "mData": "pool.alias",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/pool/" + full.pool.id + "\">" + data + "</a>";
-          },
-          "iSortPriority" : 0
-        },
-        {
-          "sTitle": "Platform",
-          "mData": "parameters.platform.instrumentModel",
-          "bSortable": false
-        },
-        {
-          "sTitle": "Sequencing Parameters",
-          "mData": "parameters.name"
-        },
-        {
-          "sTitle": "Completed",
-          "mData": "completed",
-          "bSortable": false,
-        },
-        {
-          "sTitle": "Failed",
-          "mData": "failed",
-          "bSortable": false,
-        },
-        {
-          "sTitle": "Requested",
-          "mData": "requested",
-          "bSortable": false,
-        },
-        {
-          "sTitle": "Running",
-          "mData": "running",
-          "bSortable": false,
-        },
-        {
-          "sTitle": "Started",
-          "mData": "started",
-          "bSortable": false,
-        },
-        {
-          "sTitle": "Stopped",
-          "mData": "stopped",
-          "bSortable": false,
-        },
-        {
-          "sTitle": "Unknown",
-          "mData": "unknown",
-          "bSortable": false,
-        },
-        {
-          "sTitle": "Remaining",
-          "mData": "remaining"
-        },
-        {
-          "sTitle": "Last Updated",
-          "mData": "lastUpdated",
-          "iSortPriority" : 2
-        }
-      ],
-      "bJQueryUI": true,
-      "bAutoWidth": false,
-      "iDisplayLength": 25,
-      "iDisplayStart": 0,
-      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-      "sPaginationType": "full_numbers",
-      "bProcessing": true,
-      "bServerSide": true,
-      "sAjaxSource": url,
-      "fnServerData": function (sSource, aoData, fnCallback) {
-        jQuery('#'+table).addClass('disabled');
-        jQuery.ajax({
-          "dataType": "json",
-          "type": "GET",
-          "url": sSource,
-          "data": aoData,
-          "success": fnCallback // do not alter this DataTables property
-        });
-      },
-      "fnDrawCallback": function (oSettings) {
-        jQuery('#'+table).removeClass('disabled');
-        jQuery('#'+table+'_paginate').find('.fg-button').removeClass('fg-button');
-      }
-    })).fnSetFilteringDelay();
-  }
 };
 
 Pool.search = {
@@ -1103,7 +985,7 @@ Pool.orders = Pool.orders || {
           }
         },
         {
-          "sTitle": "Partitions",
+          "sTitle": (!document.getElementById('partitionName') ? "Partitions" : document.getElementById('partitionName').innerHTML),
           "mData": "partitions"
         },
         {
@@ -1144,7 +1026,7 @@ Pool.orders = Pool.orders || {
         jQuery('#edit-order-table').find('.fg-button').removeClass('fg-button');
       }
     });
-    Pool.ui.createCompletionTable('order-completion-table', '/miso/rest/pool/' + poolId + '/dt/completions');
+    ListUtils.createTable('order-completion-table', ListTarget.completion, null, { "poolId" : poolId });
   },
 
   'setOptionsForPlatform': function(platformId, selectedParameterId) {

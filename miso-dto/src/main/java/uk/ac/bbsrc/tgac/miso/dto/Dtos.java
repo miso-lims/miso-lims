@@ -2,9 +2,6 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,7 +14,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -42,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -105,6 +102,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -120,9 +119,9 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setLabel(from.getItemLabel());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     return dto;
   }
 
@@ -149,9 +148,9 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setLabel(from.getItemLabel());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     return dto;
   }
 
@@ -179,9 +178,9 @@ public class Dtos {
     dto.setPriority(from.getPriority());
     dto.setParentProjectId(from.getParentProject().getProjectId());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     dto.setReferenceGenomeId(from.getReferenceGenomeId());
     return dto;
   }
@@ -210,9 +209,9 @@ public class Dtos {
     dto.setSampleCategory(from.getSampleCategory());
     dto.setSuffix(from.getSuffix());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     dto.setDNAseTreatable(from.getDNAseTreatable());
     return dto;
   }
@@ -241,9 +240,9 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setNoteRequired(from.getNoteRequired());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     return dto;
   }
 
@@ -286,7 +285,7 @@ public class Dtos {
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     dto.setSampleType(from.getSampleType());
     if (from.getReceivedDate() != null) {
-      dto.setReceivedDate(dateTimeFormatter.print(from.getReceivedDate().getTime()));
+      dto.setReceivedDate(getDateString(from.getReceivedDate()));
     }
     if (from.getQcPassed() != null) {
       dto.setQcPassed(from.getQcPassed());
@@ -457,9 +456,9 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     return dto;
   }
 
@@ -482,9 +481,9 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     return dto;
   }
 
@@ -510,9 +509,9 @@ public class Dtos {
     dto.setSubprojectId(from.getSubproject() == null ? null : from.getSubproject().getId());
     dto.setDescription(from.getDescription());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     return dto;
   }
 
@@ -613,7 +612,7 @@ public class Dtos {
     }
     to.setSampleType(from.getSampleType());
     if (from.getReceivedDate() != null) {
-      to.setReceivedDate(dateFormatter.parseDateTime(from.getReceivedDate()).toDate());
+      to.setReceivedDate(extractDateOrNull(from.getReceivedDate()));
     }
     to.setQcPassed(from.getQcPassed());
     if (!isStringEmptyOrNull(from.getAlias())) {
@@ -663,9 +662,9 @@ public class Dtos {
     dto.setHighestSampleNumber(from.getHighestSampleNumber());
     dto.setPadding(from.getPadding());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     return dto;
   }
 
@@ -690,9 +689,9 @@ public class Dtos {
     dto.setParentId(from.getParent().getId());
     dto.setChildId(from.getChild().getId());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     dto.setArchived(from.getArchived());
     return dto;
   }
@@ -715,9 +714,9 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     return dto;
   }
 
@@ -742,9 +741,9 @@ public class Dtos {
     dto.setInstituteAlias(from.getInstitute().getAlias());
     dto.setAlias(from.getAlias());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     return dto;
   }
 
@@ -970,9 +969,9 @@ public class Dtos {
     dto.setParameters(asDto(from.getSequencingParameter()));
     dto.setPartitions(from.getPartitions());
     dto.setCreatedById(from.getCreatedBy().getUserId());
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
-    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     return dto;
   }
 
@@ -1028,7 +1027,7 @@ public class Dtos {
     if (from.getSample() instanceof DetailedSample) {
       dto.setParentSampleClassId(((DetailedSample) from.getSample()).getSampleClass().getId());
     }
-    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setCreationDate(getDateString(from.getCreationDate()));
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());
     dto.setConcentration(from.getInitialConcentration());
@@ -1145,6 +1144,7 @@ public class Dtos {
     to.setVolume(from.getVolume());
     to.setDnaSize(from.getDnaSize());
     to.setLocationBarcode(from.getLocationBarcode());
+    to.setCreationDate(extractDateOrNull(from.getCreationDate()));
 
     if (from.getQcs() != null && !from.getQcs().isEmpty()) {
       for (LibraryQcDto qcDto : from.getQcs()) {
@@ -1155,12 +1155,14 @@ public class Dtos {
     return to;
   }
 
-  public static BoxDto asDto(Box from) {
+  public static BoxDto asDto(Box from, boolean includeBoxables) {
     BoxDto dto = new BoxDto();
     dto.setId(from.getId());
+    dto.setName(from.getName());
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    dto.setLocationBarcode(from.getLocationBarcode());
     if (from.getUse() != null) {
       dto.setUseId(from.getUse().getId());
       dto.setUseAlias(from.getUse().getAlias());
@@ -1171,9 +1173,10 @@ public class Dtos {
       dto.setCols(from.getSize().getColumns());
       dto.setScannable(from.getSize().getScannable());
     }
-    if (from.getBoxables() != null) {
+    if (includeBoxables && from.getBoxables() != null) {
       dto.setItems(asBoxablesDtos(from.getBoxables()));
     }
+    dto.setTubeCount(from.getTubeCount());
     return dto;
   }
 
@@ -1215,7 +1218,7 @@ public class Dtos {
     dto.setDilutionUserName(from.getDilutionCreator());
     dto.setConcentration(from.getConcentration());
     if (from.getCreationDate() != null) {
-      dto.setCreationDate(dateFormatter.print(new DateTime(from.getCreationDate())));
+      dto.setCreationDate(getDateString(from.getCreationDate()));
     }
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
@@ -1244,7 +1247,7 @@ public class Dtos {
     dto.setDilutionUserName(from.getCreatorName());
     dto.setConcentration(from.getDilutionConcentration());
     if (from.getCreated() != null) {
-      dto.setCreationDate(dateFormatter.print(new DateTime(from.getCreated())));
+      dto.setCreationDate(getDateTimeString(from.getCreated()));
     }
     if (!isStringEmptyOrNull(from.getDilutionBarcode())) {
       dto.setIdentificationBarcode(from.getDilutionBarcode());
@@ -1288,7 +1291,7 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getDilutionUserName())) {
       to.setDilutionCreator(from.getDilutionUserName());
     }
-    to.setCreationDate(extractDate(from.getCreationDate()));
+    to.setCreationDate(extractDateOrNull(from.getCreationDate()));
     if (from.getTargetedSequencingId() != null) {
       to.setTargetedSequencing(new TargetedSequencing());
       to.getTargetedSequencing().setId(from.getTargetedSequencingId());
@@ -1296,14 +1299,32 @@ public class Dtos {
     return to;
   }
 
-  private static Date extractDate(String from) {
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      return df.parse(from);
-    } catch (ParseException e) {
-      // do nothing because this shouldn't cause it to fail, and the Dtos class does not have a logger
+  private static Date extractDateOrNull(String from) {
+    if (isStringEmptyOrNull(from)) {
       return null;
     }
+    return new Date(dateFormatter.parseMillis(from));
+  }
+
+  private static Date extractDateTimeOrNull(String from) {
+    if (isStringEmptyOrNull(from)) {
+      return null;
+    }
+    return new Date(dateTimeFormatter.parseMillis(from));
+  }
+
+  private static String getDateString(Date date) {
+    if (date == null) {
+      return null;
+    }
+    return dateFormatter.print(date.getTime());
+  }
+
+  private static String getDateTimeString(Date date) {
+    if (date == null) {
+      return null;
+    }
+    return dateTimeFormatter.print(date.getTime());
   }
 
   public static PoolDto asDto(Pool from, boolean includeContents) {
@@ -1317,7 +1338,7 @@ public class Dtos {
     dto.setConcentration(from.getConcentration());
     dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
-    dto.setCreationDate(getDateAsString(from.getCreationDate()));
+    dto.setCreationDate(getDateString(from.getCreationDate()));
     dto.setDiscarded(from.isDiscarded());
     dto.setVolume(from.getVolume());
     dto.setPlatformType(from.getPlatformType().name());
@@ -1361,9 +1382,8 @@ public class Dtos {
     } else {
       dto.setStatus("");
     }
-    if (from.getLastUpdated() != null) {
-      dto.setLastModified(getDateAsString(from.getLastUpdated()));
-
+    if (from.getLastModified() != null) {
+      dto.setLastModified(getDateAsString(from.getLastModified()));
     }
     if (from.getSequencerReference() != null) {
       dto.setPlatformType(from.getSequencerReference().getPlatform().getPlatformType().getKey());
@@ -1406,6 +1426,8 @@ public class Dtos {
     if (lastRun != null) {
       dto.setLastRunAlias(lastRun.getAlias());
       dto.setLastRunId(lastRun.getId());
+      dto.setLastSequencerId(lastRun.getSequencerReference().getId());
+      dto.setLastSequencerName(lastRun.getSequencerReference().getName());
     }
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
@@ -1448,7 +1470,7 @@ public class Dtos {
   private static SampleQcDto asDto(SampleQC from) {
     SampleQcDto dto = new SampleQcDto();
     dto.setId(from.getId());
-    dto.setQcDate(dateFormatter.print(new DateTime(from.getQcDate())));
+    dto.setQcDate(getDateString(from.getQcDate()));
     dto.setQcCreator(from.getQcCreator());
     dto.setQcType(asDto(from.getQcType()));
     dto.setResults(from.getResults());
@@ -1467,7 +1489,7 @@ public class Dtos {
   private static LibraryQcDto asDto(LibraryQC from) {
     LibraryQcDto dto = new LibraryQcDto();
     dto.setId(from.getId());
-    dto.setQcDate(dateFormatter.print(new DateTime(from.getQcDate())));
+    dto.setQcDate(getDateString(from.getQcDate()));
     dto.setQcCreator(from.getQcCreator());
     dto.setQcType(asDto(from.getQcType()));
     dto.setResults(from.getResults());
@@ -1511,7 +1533,7 @@ public class Dtos {
     PoolOrderCompletionDto dto = new PoolOrderCompletionDto();
     dto.setPool(asDto(from.getPool(), false));
     dto.setParameters(asDto(from.getSequencingParameters()));
-    dto.setLastUpdated(dateTimeFormatter.print(new DateTime(from.getLastUpdated())));
+    dto.setLastUpdated(getDateTimeString(from.getLastUpdated()));
     dto.setRemaining(from.getRemaining());
     dto.setCompleted(from.get(HealthType.Completed));
     dto.setFailed(from.get(HealthType.Failed));
@@ -1664,7 +1686,7 @@ public class Dtos {
     to.setId(dto.getId() == null ? PoolImpl.UNSAVED_ID : dto.getId());
     to.setAlias(dto.getAlias());
     to.setConcentration(dto.getConcentration());
-    to.setCreationDate(extractDate(dto.getCreationDate()));
+    to.setCreationDate(extractDateOrNull(dto.getCreationDate()));
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());
     to.setDiscarded(dto.isDiscarded());
@@ -1676,6 +1698,43 @@ public class Dtos {
       view.setDilutionName(dilution.getName());
       return view;
     }).collect(Collectors.toSet()));
+    return to;
+  }
+  public static PrinterBackendDto asDto(Backend from) {
+    PrinterBackendDto dto = new PrinterBackendDto();
+    dto.setId(from.ordinal());
+    dto.setName(from.name());
+    dto.setConfigurationKeys(from.getConfigurationKeys());
+    return dto;
+  }
+
+  public static PrinterDriverDto asDto(Driver from) {
+    PrinterDriverDto dto = new PrinterDriverDto();
+    dto.setId(from.ordinal());
+    dto.setName(from.name());
+    return dto;
+  }
+
+  public static PrinterDto asDto(Printer from) {
+    PrinterDto dto = new PrinterDto();
+    dto.setId(from.getId());
+    dto.setAvailable(from.isEnabled());
+    dto.setBackend(from.getBackend().name());
+    // We intentionally do not pass configuration to the front end since it has passwords in it.
+    dto.setDriver(from.getDriver().name());
+    dto.setName(from.getName());
+    return dto;
+  }
+
+  public static Printer to(PrinterDto dto) {
+    Printer to = new Printer();
+    to.setId(dto.getId());
+    to.setBackend(Backend.valueOf(dto.getBackend()));
+    to.setConfiguration(dto.getConfiguration().asText());
+    to.setDriver(Driver.valueOf(dto.getDriver()));
+    to.setEnabled(dto.isAvailable());
+    to.setName(dto.getName());
+
     return to;
   }
 }

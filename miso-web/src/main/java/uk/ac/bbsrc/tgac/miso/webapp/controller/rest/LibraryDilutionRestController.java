@@ -172,7 +172,7 @@ public class LibraryDilutionRestController extends RestController {
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
 
-    final Pool pool = poolService.getPoolById(poolId);
+    final Pool pool = poolService.get(poolId);
     return jQueryBackendSelect.get(request, response, null, PaginationFilter.platformType(pool.getPlatformType()));
   }
 

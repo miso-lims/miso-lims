@@ -8,7 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -28,11 +28,11 @@ public class SampleGroupImpl implements SampleGroupId {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long sampleGroupId;
 
-  @OneToOne(targetEntity = ProjectImpl.class)
+  @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "projectId", nullable = false)
   private Project project;
 
-  @OneToOne(targetEntity = SubprojectImpl.class)
+  @ManyToOne(targetEntity = SubprojectImpl.class)
   @JoinColumn(name = "subprojectId")
   private Subproject subproject;
 
@@ -42,7 +42,7 @@ public class SampleGroupImpl implements SampleGroupId {
   @Column(nullable = false)
   private String description;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
 
@@ -50,7 +50,7 @@ public class SampleGroupImpl implements SampleGroupId {
   @Temporal(TemporalType.TIMESTAMP)
   private Date creationDate;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
 

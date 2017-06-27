@@ -74,7 +74,7 @@ public class ListSamplesController {
 
   @RequestMapping(value = "/samples/rest/", method = RequestMethod.GET)
   public @ResponseBody Collection<Sample> jsonRest() throws IOException {
-    return sampleService.getAll();
+    return sampleService.list();
   }
 
   @RequestMapping("/samples")

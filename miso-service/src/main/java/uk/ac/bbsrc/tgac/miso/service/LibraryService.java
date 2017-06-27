@@ -87,4 +87,10 @@ public interface LibraryService extends PaginatedDataSource<Library> {
 
   void deleteQc(Library library, Long qcId) throws IOException;
 
+  QcType getLibraryQcType(long qcTypeId) throws IOException;
+
+  QcType getLibraryQcTypeByName(String qcTypeName) throws IOException;
+
+  LibraryQC getLibraryQC(long qcId) throws IOException;
+
 }

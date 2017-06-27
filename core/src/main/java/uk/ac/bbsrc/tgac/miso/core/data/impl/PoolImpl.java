@@ -77,9 +77,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
-import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
@@ -104,17 +101,15 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
 
-  @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool")
+  @OneToMany(targetEntity = PoolChangeLog.class, mappedBy = "pool", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Column(length = CONCENTRATION_LENGTH)
   private Double concentration;
 
   @Temporal(TemporalType.DATE)
-  private Date creationDate;
-  @OneToOne(targetEntity = PoolDerivedInfo.class)
-  @PrimaryKeyJoinColumn
-  private PoolDerivedInfo derivedInfo;
+  private Date creationDate = new Date();
+
   @Column(length = DESCRIPTION_LENGTH)
   private String description;
 
@@ -126,12 +121,20 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private String identificationBarcode;
 
   @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
-  // listeners
-  @Transient
-  private final transient Set<MisoListener> listeners = new HashSet<>();
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   @Column(length = NAME_LENGTH)
   private String name;
@@ -168,7 +171,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Column(name = "ready")
   private boolean readyToRun = false;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
@@ -203,11 +206,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
       experiments.add(experiment);
       experiment.setPool(this);
     }
-  }
-
-  @Override
-  public boolean addListener(MisoListener listener) {
-    return listeners.add(listener);
   }
 
   @Override
@@ -257,15 +255,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         .isEquals();
   }
 
-  protected void firePoolReadyEvent() {
-    if (this.getId() != 0L) {
-      PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool " + getName() + " ready to run");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(pe);
-      }
-    }
-  }
-
   @Override
   public Box getBox() {
     return boxPosition == null ? null : boxPosition.getBox();
@@ -288,7 +277,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public Date getCreationDate() {
-    return this.creationDate;
+    return creationDate;
   }
 
   @Override
@@ -324,21 +313,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public String getLabelText() {
     return getAlias();
-  }
-
-  @Override
-  public Date getLastModified() {
-    return (derivedInfo == null ? null : derivedInfo.getLastModified());
-  }
-
-  @Override
-  public User getLastModifier() {
-    return lastModifier;
-  }
-
-  @Override
-  public Set<MisoListener> getListeners() {
-    return this.listeners;
   }
 
   @Override
@@ -446,11 +420,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public boolean removeListener(MisoListener listener) {
-    return listeners.remove(listener);
-  }
-
-  @Override
   public void removeWatcher(User user) {
     watchUsers.remove(user);
   }
@@ -493,11 +462,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public void setLastModifier(User lastModifier) {
-    this.lastModifier = lastModifier;
-  }
-
-  @Override
   public void setName(String name) {
     this.name = name;
   }
@@ -519,12 +483,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public void setReadyToRun(boolean readyToRun) {
-    if (!getReadyToRun() && readyToRun) {
-      this.readyToRun = readyToRun;
-      firePoolReadyEvent();
-    } else {
-      this.readyToRun = readyToRun;
-    }
+    this.readyToRun = readyToRun;
   }
 
   @Override
@@ -595,6 +554,46 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public Set<PoolableElementView> getPoolableElementViews() {
     return this.pooledElementViews;
+  }
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return creationTime;
+  }
+
+  @Override
+  public void setCreationTime(Date created) {
+    this.creationTime = created;
   }
 
 }

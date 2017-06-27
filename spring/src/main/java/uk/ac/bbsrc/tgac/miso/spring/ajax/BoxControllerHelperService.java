@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
 
 import java.awt.image.RenderedImage;
@@ -40,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -49,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
@@ -63,7 +62,7 @@ public class BoxControllerHelperService {
   private AuthorizationManager authorizationManager;
 
   @Autowired
-  private RequestManager requestManager;
+  private BoxService boxService;
 
   @Autowired
   private MisoFilesManager misoFileManager;
@@ -73,41 +72,6 @@ public class BoxControllerHelperService {
 
   @Autowired
   private BoxScanner boxScanner;
-
-  /**
-   * Returns a JSONObject of HTML for making the /miso/boxes table
-   * 
-   * @param HttpSession
-   *          session
-   * @param JSONObject
-   *          json
-   * @return JSONObject data for all boxes
-   */
-  public JSONObject listAllBoxesTable(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      JSONArray jsonArray = new JSONArray();
-      for (Box box : requestManager.listAllBoxes()) {
-        JSONArray inner = new JSONArray();
-
-        inner.add(TableHelper.hyperLinkify("/miso/box/" + box.getId(), box.getName()));
-        inner.add(TableHelper.hyperLinkify("/miso/box/" + box.getId(), box.getAlias()));
-        inner.add(box.getLocationBarcode());
-        inner.add(box.getTubeCount() + "/" + box.getPositionCount());
-        inner.add(box.getSize().getRows() + "x" + box.getSize().getColumns());
-        inner.add(box.getUse().getAlias());
-        inner.add(isStringEmptyOrNull(box.getIdentificationBarcode()) ? "" : box.getIdentificationBarcode());
-        inner.add(box.getId());
-
-        jsonArray.add(inner);
-      }
-      j.put("array", jsonArray);
-      return j;
-    } catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-  }
 
   /**
    * Return one boxable associated with a particular barcode. json must contain the following entries: "barcode": barcode
@@ -124,7 +88,7 @@ public class BoxControllerHelperService {
       BoxableView boxable;
       String barcode = json.getString("barcode");
       try {
-        boxable = requestManager.getBoxableViewByBarcode(barcode);
+        boxable = boxService.getViewByBarcode(barcode);
       } catch (IOException e) {
         log.debug("Error getting boxable by barcode", e);
         return JSONUtils.SimpleJSONError("Error looking up barcode " + json.getString("barcode") + ": " + e.getMessage());
@@ -165,7 +129,7 @@ public class BoxControllerHelperService {
       if (json.has("boxId")) {
         Long boxId = json.getLong("boxId");
         try {
-          requestManager.deleteBox(requestManager.getBoxById(boxId));
+          boxService.deleteBox(boxService.get(boxId));
           return JSONUtils.SimpleJSONResponse("Box deleted");
         } catch (IOException e) {
           log.debug("Cannot delete box", e);
@@ -202,7 +166,7 @@ public class BoxControllerHelperService {
     Box box;
     long boxId = json.getLong("boxId");
     try {
-      box = requestManager.getBoxById(boxId);
+      box = boxService.get(boxId);
       if (box == null)
         return JSONUtils.SimpleJSONError("Cannot find box.");
     } catch (IOException e) {
@@ -218,7 +182,7 @@ public class BoxControllerHelperService {
     }
 
     try {
-      Map<String, BoxableView> barcodesToBoxables = requestManager.getBoxableViewsFromBarcodeList(positionToBarcode.values()).stream()
+      Map<String, BoxableView> barcodesToBoxables = boxService.getViewsFromBarcodeList(positionToBarcode.values()).stream()
           .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
       box.setBoxables(positionToBarcode.entrySet().stream()
           .collect(Collectors.toMap(Map.Entry::getKey, entry -> barcodesToBoxables.get(entry.getValue()))));
@@ -228,7 +192,7 @@ public class BoxControllerHelperService {
     }
 
     try {
-      requestManager.saveBox(box);
+      boxService.save(box);
     } catch (IOException e) {
       log.debug("Error saving box", e);
       return JSONUtils.SimpleJSONError("Error saving box contents: " + e.getMessage());
@@ -254,7 +218,7 @@ public class BoxControllerHelperService {
     Box box;
     long boxId = json.getLong("boxId");
     try {
-      box = requestManager.getBoxById(boxId);
+      box = boxService.get(boxId);
       if (box == null)
         return JSONUtils.SimpleJSONError("Cannot find box.");
     } catch (IOException e) {
@@ -275,7 +239,7 @@ public class BoxControllerHelperService {
       }
     }
     try {
-      Map<String, BoxableView> barcodesToBoxables = requestManager.getBoxableViewsFromBarcodeList(positionToBarcode.values()).stream()
+      Map<String, BoxableView> barcodesToBoxables = boxService.getViewsFromBarcodeList(positionToBarcode.values()).stream()
           .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
       box.setBoxables(positionToBarcode.entrySet().stream().filter(entry -> barcodesToBoxables.containsKey(entry.getValue()))
           .collect(Collectors.toMap(Map.Entry::getKey,
@@ -286,7 +250,7 @@ public class BoxControllerHelperService {
     }
 
     try {
-      requestManager.saveBox(box);
+      boxService.save(box);
     } catch (IOException e) {
       log.debug("Error saving box", e);
       return JSONUtils.SimpleJSONError("Error saving box contents: " + e.getMessage());
@@ -350,7 +314,7 @@ public class BoxControllerHelperService {
 
     Box box = null;
     try {
-      box = requestManager.getBoxById(boxId);
+      box = boxService.get(boxId);
       if (box == null) throw new IOException("Box not found");
     } catch (IOException e) {
       log.debug("Error getting box with ID " + boxId, e);
@@ -362,7 +326,7 @@ public class BoxControllerHelperService {
     // get the requested Sample/Library from the db
     BoxableView boxable = null;
     try {
-      boxable = requestManager.getBoxableViewByBarcode(barcode);
+      boxable = boxService.getViewByBarcode(barcode);
     } catch (IOException e) {
       log.debug("Error getting boxable", e);
       return JSONUtils.SimpleJSONError("Error finding item with barcode " + barcode + ": " + e.getMessage());
@@ -390,10 +354,10 @@ public class BoxControllerHelperService {
     Map<String, Object> response = new HashMap<>();
     try {
       box.setLastModifier(authorizationManager.getCurrentUser());
-      requestManager.saveBox(box);
+      boxService.save(box);
 
       ObjectMapper mapper = new ObjectMapper();
-      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
+      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
       response.put("addedToBox", boxable.getName() + " was successfully added to position " + position);
     } catch (IOException e) {
       log.debug("Error updating one boxable item", e);
@@ -424,7 +388,7 @@ public class BoxControllerHelperService {
     long boxId = json.getLong("boxId");
     Box box = null;
     try {
-      box = requestManager.getBoxById(boxId);
+      box = boxService.get(boxId);
       if (box == null) throw new IOException("Box not found");
     } catch (IOException e) {
       log.debug("Error getting box with ID " + boxId, e);
@@ -438,11 +402,11 @@ public class BoxControllerHelperService {
 
     try {
       box.setLastModifier(authorizationManager.getCurrentUser());
-      requestManager.saveBox(box);
+      boxService.save(box);
 
       Map<String, Object> response = new HashMap<>();
       ObjectMapper mapper = new ObjectMapper();
-      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
+      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
       return JSONUtils.JSONObjectResponse(response);
     } catch (IOException e) {
       log.debug("Error removing one boxable item", e);
@@ -476,7 +440,7 @@ public class BoxControllerHelperService {
         String position = json.getString("position");
         Long boxId = json.getLong("boxId");
         try {
-          box = requestManager.getBoxById(boxId);
+          box = boxService.get(boxId);
         } catch (IOException e) {
           log.debug("Error: ", e);
           return JSONUtils.SimpleJSONError("Cannot get the Box: " + e.getMessage());
@@ -490,10 +454,10 @@ public class BoxControllerHelperService {
         }
 
         try {
-          requestManager.discardSingleTube(box, position);
-          box = requestManager.getBoxById(boxId);
+          boxService.discardSingleTube(box, position);
+          box = boxService.get(boxId);
           ObjectMapper mapper = new ObjectMapper();
-          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
+          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
         } catch (IOException e) {
           log.debug("Failed to discard single tube", e);
           return JSONUtils.SimpleJSONError("Failed to discard single tube: " + e.getMessage());
@@ -531,17 +495,17 @@ public class BoxControllerHelperService {
       if (json.has("boxId")) {
         Long boxId = json.getLong("boxId");
         try {
-          box = requestManager.getBoxById(boxId);
+          box = boxService.get(boxId);
         } catch (IOException e) {
           log.debug("Error", e);
           return JSONUtils.SimpleJSONError("Error getting box: " + e.getMessage());
         }
 
         try {
-          requestManager.discardAllTubes(box); // box save is performed as part of this method
-          box = requestManager.getBoxById(boxId);
+          boxService.discardAllTubes(box); // box save is performed as part of this method
+          box = boxService.get(boxId);
           ObjectMapper mapper = new ObjectMapper();
-          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(requestManager.getBoxById(box.getId()))));
+          response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
           return response;
         } catch (IOException e) {
           log.debug("Error discarding box", e);
@@ -569,10 +533,10 @@ public class BoxControllerHelperService {
     try {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
       if (!"".equals(newLocation)) {
-        Box box = requestManager.getBoxById(boxId);
+        Box box = boxService.get(boxId);
         box.setLocationBarcode(newLocation);
         box.setLastModifier(authorizationManager.getCurrentUser());
-        requestManager.saveBox(box);
+        boxService.save(box);
       } else {
         return JSONUtils.SimpleJSONError("New location cannot be blank.");
       }
@@ -595,7 +559,7 @@ public class BoxControllerHelperService {
     Long boxId = json.getLong("boxId");
     File temploc = getBarcodeFileLocation(session);
     try {
-      Box box = requestManager.getBoxById(boxId);
+      Box box = boxService.get(boxId);
       BarcodeFactory barcodeFactory = new BarcodeFactory();
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
@@ -643,12 +607,12 @@ public class BoxControllerHelperService {
 
       @Override
       public Box fetch(long id) throws IOException {
-        return requestManager.getBoxById(id);
+        return boxService.get(id);
       }
 
       @Override
       public void store(Box item) throws IOException {
-        requestManager.saveBox(item);
+        boxService.save(item);
       }
 
       @Override
@@ -681,10 +645,10 @@ public class BoxControllerHelperService {
 
     try {
       if (!"".equals(idBarcode)) {
-        Box box = requestManager.getBoxById(boxId);
+        Box box = boxService.get(boxId);
         box.setIdentificationBarcode(idBarcode);
         box.setLastModifier(authorizationManager.getCurrentUser());
-        requestManager.saveBox(box);
+        boxService.save(box);
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode cannot be blank.");
       }
@@ -809,7 +773,7 @@ public class BoxControllerHelperService {
       // Extract the valid barcodes and build a barcode to item map
       Set<String> validBarcodes = barcodesByPosition.values().stream()
           .filter(position -> hasRealBarcode(scan, position)).collect(Collectors.toSet());
-      Map<String, BoxableView> boxablesByBarcode = requestManager.getBoxableViewsFromBarcodeList(validBarcodes).stream()
+      Map<String, BoxableView> boxablesByBarcode = boxService.getViewsFromBarcodeList(validBarcodes).stream()
           .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
 
       // For all the valid barcodes, build a list of DTOs with the updated positions
@@ -851,7 +815,7 @@ public class BoxControllerHelperService {
       List<DiffMessage> diffs = new ArrayList<>();
       Box box;
       try {
-        box = requestManager.getBoxById(json.getLong("boxId"));
+        box = boxService.get(json.getLong("boxId"));
       } catch (IOException e) {
         log.debug("Error: ", e);
         return JSONUtils.SimpleJSONError("Cannot get the Box: " + e.getMessage());
@@ -915,7 +879,7 @@ public class BoxControllerHelperService {
       try {
         ArrayList<String> array = new ArrayList<>();
 
-        Box box = requestManager.getBoxById(boxId);
+        Box box = boxService.get(boxId);
         array.add(box.getName() + ":" + box.getAlias());
         Map<String, BoxableView> boxableItems = new TreeMap<>(box.getBoxables()); // sorted by position
         for (Map.Entry<String, BoxableView> entry : boxableItems.entrySet()) {
@@ -933,11 +897,6 @@ public class BoxControllerHelperService {
     } else {
       return JSONUtils.SimpleJSONError("Missing boxId");
     }
-  }
-
-  @CoverageIgnore
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
   }
 
   @CoverageIgnore

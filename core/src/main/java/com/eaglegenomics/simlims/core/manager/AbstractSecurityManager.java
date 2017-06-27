@@ -11,10 +11,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
-
 /**
  * Copyright (C) 2009 The Genome Analysis Center, Norwich, UK.
  * <p>
@@ -26,13 +22,6 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 @Transactional(rollbackFor = Exception.class)
 public abstract class AbstractSecurityManager implements SecurityManager {
   private Collection<String> defaultRoles;
-  @Autowired
-  private PoolAlertManager poolAlertManager;
-  @Autowired
-  private ProjectAlertManager projectAlertManager;
-
-  @Autowired
-  private RunAlertManager runAlertManager;
 
   @Autowired
   protected SecurityStore securityStore;
@@ -125,10 +114,6 @@ public abstract class AbstractSecurityManager implements SecurityManager {
       }
       id = securityStore.saveUser(original);
     }
-
-    runAlertManager.updateGroupWatcher(user);
-    projectAlertManager.updateGroupWatcher(user);
-    poolAlertManager.updateGroupWatcher(user);
     return id;
   }
 

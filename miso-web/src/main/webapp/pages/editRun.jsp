@@ -280,7 +280,7 @@
             </c:otherwise>
           </c:choose>
           <td>
-            <fmt:formatDate value="${run.lastUpdated}" dateStyle="long" pattern="dd/MM/yyyy HH:mm:ss"/>
+            <fmt:formatDate value="${run.lastModified}" dateStyle="long" pattern="dd/MM/yyyy HH:mm:ss"/>
           </td>
         </tr>
         </tbody>
@@ -522,6 +522,9 @@
                         ${partition.pool.name}: <c:if test="${not empty partition.pool.alias}"><b>${partition.pool.alias}</b></c:if>
                       (${partition.pool.creationDate})
                     </a><br/>
+                    <c:if test="${partition.pool.hasDuplicateIndices()}">
+                      <span class="lowquality">DUPLICATE INDICES</span><img style="float:right; height:25px;" src="/styles/images/fail.png" /><br/>
+                    </c:if>
                     <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
                       <c:choose>
                         <c:when test="${not empty partition.pool.experiments}">

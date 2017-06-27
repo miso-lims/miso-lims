@@ -88,7 +88,6 @@ var HotUtils = {
         hotContainer,
         {
           debug : true,
-          preventOverflow : 'horizontal',
           fixedColumnsLeft : 1,
           manualColumnResize : true,
           rowHeaders : true,
@@ -469,7 +468,7 @@ var HotUtils = {
   },
   
   makeCellNSAlias : function(setCellMeta) {
-    setCellMeta('validator', HotUtils.validator.requiredText);
+    setCellMeta('validator', HotUtils.validator.requiredTextNoSpecialChars);
     setCellMeta('renderer', function(instance, td, row, col, prop, value,
         cellProperties) {
       Handsontable.renderers.TextRenderer.apply(this, arguments);

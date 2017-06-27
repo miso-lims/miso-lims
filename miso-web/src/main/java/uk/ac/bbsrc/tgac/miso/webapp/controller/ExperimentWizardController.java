@@ -46,8 +46,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
@@ -58,20 +58,13 @@ public class ExperimentWizardController {
   protected static final Logger log = LoggerFactory.getLogger(ExperimentWizardController.class);
 
   @Autowired
-  private RequestManager requestManager;
-
-  @Autowired
   private ExperimentService experimentService;
-
   @Autowired
   private StudyService studyService;
-
+  @Autowired
+  private PlatformService platformService;
   @Autowired
   private PoolService poolService;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   @ModelAttribute("studyTypes")
   public Collection<StudyType> populateStudyTypes() throws IOException {
@@ -85,14 +78,14 @@ public class ExperimentWizardController {
 
   @ModelAttribute("platforms")
   public Collection<Platform> populatePlatforms() throws IOException {
-    return requestManager.listAllPlatforms();
+    return platformService.list();
   }
 
   public Collection<? extends Pool> populateAvailablePools(Experiment experiment) throws IOException {
     if (experiment.getPlatform() != null) {
       PlatformType platformType = experiment.getPlatform().getPlatformType();
       ArrayList<Pool> pools = new ArrayList<>();
-      for (Pool p : poolService.listAllPoolsByPlatform(platformType)) {
+      for (Pool p : poolService.listByPlatform(platformType)) {
         if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
           pools.add(p);
         }
@@ -100,7 +93,7 @@ public class ExperimentWizardController {
       }
       return pools;
     }
-    return poolService.listAllPools();
+    return poolService.list();
   }
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)

@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -76,6 +77,12 @@ public class DefaultSampleClassService implements SampleClassService {
   public Set<SampleClass> getAll() throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return Sets.newHashSet(sampleClassDao.getSampleClass());
+  }
+
+  @Override
+  public List<SampleClass> listByCategory(String sampleCategory) throws IOException {
+    authorizationManager.throwIfUnauthenticated();
+    return sampleClassDao.listByCategory(sampleCategory);
   }
 
   @Override

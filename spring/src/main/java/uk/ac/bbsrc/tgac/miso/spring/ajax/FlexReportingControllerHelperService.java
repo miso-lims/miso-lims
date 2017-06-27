@@ -42,6 +42,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.google.common.collect.Sets;
 import com.google.json.JsonSanitizer;
@@ -67,6 +68,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -88,6 +91,8 @@ public class FlexReportingControllerHelperService {
   @Autowired
   private RequestManager requestManager;
   @Autowired
+  private ContainerService containerService;
+  @Autowired
   private ExperimentService experimentService;
   @Autowired
   private LibraryService libraryService;
@@ -97,6 +102,10 @@ public class FlexReportingControllerHelperService {
   private SampleService sampleService;
   @Autowired
   private StudyService studyService;
+
+  public void setContainerService(ContainerService containerService) {
+    this.containerService = containerService;
+  }
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -270,8 +279,7 @@ public class FlexReportingControllerHelperService {
       for (Project project : projects) {
         Set<Long> librariesInRun = new HashSet<>();
         for (Run run : runService.listByProjectId(project.getProjectId())) {
-          Collection<SequencerPartitionContainer> spcs = requestManager
-              .listSequencerPartitionContainersByRunId(run.getId());
+          Collection<SequencerPartitionContainer> spcs = containerService.listByRunId(run.getId());
           if (spcs.size() > 0) {
             for (SequencerPartitionContainer spc : spcs) {
 
@@ -376,8 +384,7 @@ public class FlexReportingControllerHelperService {
               "<input class=\"runsinproject" + project.getProjectId() + "\" id=\"" + run.getName()
                   + "\" type=\"checkbox\" name=\"runIds\" value=\"" + run.getId() + "\" />");
           sb.append(run.getName() + " - " + run.getHealth().getKey() + " - " + run.getAlias());
-          Collection<SequencerPartitionContainer> spcs = requestManager
-              .listSequencerPartitionContainersByRunId(run.getId());
+          Collection<SequencerPartitionContainer> spcs = containerService.listByRunId(run.getId());
           if (spcs.size() > 0) {
             sb.append("<ul>");
             for (SequencerPartitionContainer spc : spcs) {
@@ -451,8 +458,7 @@ public class FlexReportingControllerHelperService {
 
       Set<Long> librariesInRun = new HashSet<>();
       for (Run run : runs) {
-        Collection<SequencerPartitionContainer> spcs = requestManager
-            .listSequencerPartitionContainersByRunId(run.getId());
+        Collection<SequencerPartitionContainer> spcs = containerService.listByRunId(run.getId());
         if (spcs.size() > 0) {
           for (SequencerPartitionContainer spc : spcs) {
 
@@ -536,12 +542,16 @@ public class FlexReportingControllerHelperService {
     String qc = json.getString("qc");
     JSONArray jsonArray = new JSONArray();
     JSONObject jsonObject = new JSONObject();
+
     try {
-      Collection<Sample> samples = null;
+      Collection<Sample> samples;
       if (!isStringEmptyOrNull(searchStr)) {
-        samples = sampleService.listBySearch(searchStr);
+        samples = new ArrayList<>(sampleService.list(0, 0, true, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
       } else {
-        samples = sampleService.getAll();
+        samples = new ArrayList<>(sampleService.list(0, 250, true, "id"));
       }
       for (Sample sample : samples) {
         String sampleQC = "unknown";
@@ -717,9 +727,9 @@ public class FlexReportingControllerHelperService {
         if ((platform.equals("all") || platform.equals(library.getPlatformType()))
             && (qc.equals("all") || qc.equals(library.getQcPassed().toString()))) {
 
-          if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to) && library.getCreationDate() != null) {
+          if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to) && library.getCreationTime() != null) {
 
-            Date receivedDate = library.getCreationDate();
+            Date receivedDate = library.getCreationTime();
             if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate)
                 || receivedDate.equals(endDate)) {
               jsonArray.add(libraryFormRowBuilder(library));
@@ -862,7 +872,8 @@ public class FlexReportingControllerHelperService {
       jsonArray.add(
           "['" + library.getSample().getProject().getName() + "','" + library.getName() + "','" + library.getAlias() + "','"
               + library.getDescription() + "','" + library.getPlatformType() + "','" + library.getLibraryType().getDescription() + "','"
-              + qc + "','" + LimsUtils.getDateAsString(library.getCreationDate()) + "','" + library.getSample().getName() + "','" + sampleQC
+              + qc + "','" + LimsUtils.getDateAsString(library.getCreationTime()) + "','" + library.getSample().getName() + "','"
+              + sampleQC
               + "','" + scientificName + "']");
     }
     return jsonArray;
@@ -1034,8 +1045,7 @@ public class FlexReportingControllerHelperService {
     JSONArray jsonArray = new JSONArray();
     try {
       for (Run run : runs) {
-        Collection<SequencerPartitionContainer> spcs = requestManager
-            .listSequencerPartitionContainersByRunId(run.getId());
+        Collection<SequencerPartitionContainer> spcs = containerService.listByRunId(run.getId());
         if (spcs.size() > 0) {
           for (SequencerPartitionContainer spc : spcs) {
 

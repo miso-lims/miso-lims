@@ -5,6 +5,7 @@ import java.util.List;
 
 public class BoxDto {
   private String alias;
+  private String name;
   private Integer cols;
   private String description;
   private Long id;
@@ -15,6 +16,16 @@ public class BoxDto {
   private Long useId;
   private String useAlias;
   private String identificationBarcode;
+  private String locationBarcode;
+  private int tubeCount;
+
+  public int getTubeCount() {
+    return tubeCount;
+  }
+
+  public void setTubeCount(int tubeCount) {
+    this.tubeCount = tubeCount;
+  }
 
   public String getAlias() {
     return alias;
@@ -102,5 +113,21 @@ public class BoxDto {
 
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getLocationBarcode() {
+    return locationBarcode;
+  }
+
+  public void setLocationBarcode(String locationBarcode) {
+    this.locationBarcode = locationBarcode;
   }
 }

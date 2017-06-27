@@ -66,9 +66,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
@@ -81,19 +83,23 @@ public class ContainerControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
+  private ContainerService containerService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
-  private StudyService studyService;
+  private PlatformService platformService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
+  @Autowired
+  private StudyService studyService;
   @Autowired
   private RunService runService;
 
   public JSONObject getPlatformTypes(HttpSession session, JSONObject json) throws IOException {
     StringBuilder b = new StringBuilder();
-    for (String p : PlatformType.platformTypeNames(requestManager.listActivePlatformTypes())) {
+    for (String p : PlatformType.platformTypeNames(platformService.listActivePlatformTypes())) {
       b.append("<input type='radio' name='platformTypes' id='platformTypes" + p + "' value='" + p
           + "' onchange='Container.ui.changeContainerPlatformType(this);'/>");
       b.append("<label for='platformTypes" + p + "'>" + p + "</label>");
@@ -112,7 +118,7 @@ public class ContainerControllerHelperService {
         srb.append("<select name='platformSelect' id='platformSelect' onchange='Container.ui.populateContainerOptions(this);'>");
         srb.append("<option value='0' selected='selected'>Please select...</option>");
         Set<Platform> platforms = new TreeSet<>((a, b) -> a.getNameAndModel().compareTo(b.getNameAndModel()));
-        for (SequencerReference sr : requestManager.listSequencerReferencesByPlatformType(pt)) {
+        for (SequencerReference sr : sequencerReferenceService.listByPlatformType(pt)) {
           if (sr.isActive()) {
             platforms.add(sr.getPlatform());
           }
@@ -139,7 +145,7 @@ public class ContainerControllerHelperService {
       SequencerPartitionContainer lf = (SequencerPartitionContainer) session
           .getAttribute("container_" + json.getString("container_cId"));
 
-      Platform platform = requestManager.getPlatformById(platformId);
+      Platform platform = platformService.get(platformId);
       if (lf.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("partitions", getContainerOptions(platform));
@@ -173,7 +179,7 @@ public class ContainerControllerHelperService {
   public JSONObject changeContainer(HttpSession session, JSONObject json) {
     try {
       Long platformId = json.getLong("platformId");
-      Platform platform = requestManager.getPlatformById(platformId);
+      Platform platform = platformService.get(platformId);
       if (platform == null) {
         return JSONUtils.SimpleJSONError("No platform specified");
       }
@@ -398,10 +404,10 @@ public class ContainerControllerHelperService {
     int partition = json.getInt("partition");
 
     try {
-      Pool p = poolService.getPoolByBarcode(barcode);
+      Pool p = poolService.getByBarcode(barcode);
       // Base64-encoded string, most likely a barcode image beeped in. decode and search
       if (p == null) {
-        p = poolService.getPoolByBarcode(new String(Base64.decodeBase64(barcode)));
+        p = poolService.getByBarcode(new String(Base64.decodeBase64(barcode)));
       }
       // if pool still can't be found, return error
       if (p == null) {
@@ -424,7 +430,7 @@ public class ContainerControllerHelperService {
     try {
       String partition = json.getString("partition");
       Long poolId = json.getLong("poolId");
-      Pool p = poolService.getPoolById(poolId);
+      Pool p = poolService.get(poolId);
       StringBuilder sb = new StringBuilder();
 
       Set<Long> skipProjects = Sets.newHashSet();
@@ -539,7 +545,7 @@ public class ContainerControllerHelperService {
   public JSONObject selectStudyForPool(HttpSession session, JSONObject json) {
     try {
       Long poolId = json.getLong("poolId");
-      Pool p = poolService.getPoolById(poolId);
+      Pool p = poolService.get(poolId);
       if (p == null) {
         throw new Exception("Could not retrieve pool: " + poolId);
       }
@@ -551,7 +557,7 @@ public class ContainerControllerHelperService {
       }
 
       Long platformId = json.getLong("platformId");
-      Platform platform = requestManager.getPlatformById(platformId);
+      Platform platform = platformService.get(platformId);
       if (platform == null) {
         throw new Exception("Could not retrieve Platform:" + platformId);
       }
@@ -568,7 +574,6 @@ public class ContainerControllerHelperService {
       e.setSecurityProfile(s.getSecurityProfile());
 
       try {
-        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         p.addExperiment(e);
         experimentService.save(e);
       } catch (MalformedExperimentException e1) {
@@ -588,98 +593,92 @@ public class ContainerControllerHelperService {
     }
   }
 
-  public JSONObject lookupContainer(HttpSession session, JSONObject json) {
+  public JSONObject lookupContainer(HttpSession session, JSONObject json) throws IOException {
     if (json.has("barcode") && !isStringEmptyOrNull(json.getString("barcode"))) {
-      try {
-        String barcode = json.getString("barcode");
-        Collection<SequencerPartitionContainer> fs = requestManager
-            .listSequencerPartitionContainersByBarcode(barcode);
-        if (!fs.isEmpty()) {
-          JSONObject confirm = new JSONObject();
-          StringBuilder sb = new StringBuilder();
-          if (fs.size() == 1) {
-            // replace container div
-            SequencerPartitionContainer f = new ArrayList<>(fs).get(0);
-            sb.append("<table class='in'>");
-            sb.append("<th>Lane No.</th>");
-            sb.append("<th>Pool</th>");
+      String barcode = json.getString("barcode");
+      Collection<SequencerPartitionContainer> fs = containerService.listByBarcode(barcode);
+      if (!fs.isEmpty()) {
+        JSONObject confirm = new JSONObject();
+        StringBuilder sb = new StringBuilder();
+        if (fs.size() == 1) {
+          // replace container div
+          SequencerPartitionContainer f = new ArrayList<>(fs).get(0);
+          sb.append("<table class='in'>");
+          sb.append("<th>Lane No.</th>");
+          sb.append("<th>Pool</th>");
 
-            if (f.getPartitions().isEmpty()) {
-              // something went wrong previously. a saved container shouldn't have empty partitions - recreate
-              json.put("platform", f.getPlatform().getPlatformType().getKey());
+          if (f.getPartitions().isEmpty()) {
+            // something went wrong previously. a saved container shouldn't have empty partitions - recreate
+            json.put("platform", f.getPlatform().getPlatformType().getKey());
 
-              session.setAttribute("container_" + json.getString("container_cId"), f);
+            session.setAttribute("container_" + json.getString("container_cId"), f);
 
-              // reset container
-              changeContainer(session, json);
-            } else if (f.getPartitions() == null) {
-              // something went wrong previously. a saved container shouldn't have null partition set - recreate
-              f.setPartitions(new AutoPopulatingList<>(PartitionImpl.class));
-              json.put("platform", f.getPlatform().getPlatformType().getKey());
+            // reset container
+            changeContainer(session, json);
+          } else if (f.getPartitions() == null) {
+            // something went wrong previously. a saved container shouldn't have null partition set - recreate
+            f.setPartitions(new AutoPopulatingList<>(PartitionImpl.class));
+            json.put("platform", f.getPlatform().getPlatformType().getKey());
 
-              session.setAttribute("container_" + json.getString("container_cId"), f);
+            session.setAttribute("container_" + json.getString("container_cId"), f);
 
-              // reset container
-              changeContainer(session, json);
-            }
-
-            for (Partition p : f.getPartitions()) {
-              sb.append("<tr>");
-              sb.append("<td>" + p.getPartitionNumber() + "</td>");
-              sb.append("<td width='90%'>");
-              if (p.getPool() != null) {
-                confirm.put(p.getPartitionNumber(), p.getPool().getName());
-
-                sb.append("<ul partition='" + (p.getPartitionNumber() - 1) + "' bind='partitions[" + (p.getPartitionNumber() - 1)
-                    + "].pool' class='runPartitionDroppable'>");
-                sb.append("<div class='dashboard'>");
-                sb.append(p.getPool().getName());
-                sb.append("(" + p.getPool().getCreationDate() + ")<br/>");
-                sb.append("<span style='font-size:8pt'>");
-                if (!p.getPool().getExperiments().isEmpty()) {
-                  sb.append("<i>");
-                  for (Experiment e : p.getPool().getExperiments()) {
-                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": "
-                        + p.getPool().getPoolableElementViews().size()
-                        + " dilutions)<br/>");
-                  }
-                  sb.append("</i>");
-                  sb.append("<input type='hidden' name='partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId"
-                      + (p.getPartitionNumber() - 1) + "' value='" + p.getPool().getId() + "'/>");
-                } else {
-                  sb.append("<i>No experiment linked to this pool</i>");
-                }
-                sb.append("</span>");
-                sb.append("</div>");
-                sb.append("</ul>");
-              } else {
-                confirm.put(p.getPartitionNumber(), "Empty");
-
-                sb.append("<div id='p_div-" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
-                sb.append("<ul class='runPartitionDroppable' bind='partitions[" + (p.getPartitionNumber() - 1) + "].pool' partition='"
-                    + (p.getPartitionNumber() - 1) + "' ondblclick='Container.partition.populatePartition(this);'></ul>");
-                sb.append("</div>");
-              }
-              sb.append("</td>");
-              sb.append("</tr>");
-            }
-            sb.append("</table>");
-
-            Map<String, Object> responseMap = new HashMap<>();
-            responseMap.put("html", sb.toString());
-            responseMap.put("barcode", f.getIdentificationBarcode());
-            responseMap.put("containerId", f.getId());
-            responseMap.put("verify", confirm);
-            return JSONUtils.JSONObjectResponse(responseMap);
-          } else {
-            return JSONUtils.SimpleJSONError("Multiple containers found with serial number " + barcode);
+            // reset container
+            changeContainer(session, json);
           }
+
+          for (Partition p : f.getPartitions()) {
+            sb.append("<tr>");
+            sb.append("<td>" + p.getPartitionNumber() + "</td>");
+            sb.append("<td width='90%'>");
+            if (p.getPool() != null) {
+              confirm.put(p.getPartitionNumber(), p.getPool().getName());
+
+              sb.append("<ul partition='" + (p.getPartitionNumber() - 1) + "' bind='partitions[" + (p.getPartitionNumber() - 1)
+                  + "].pool' class='runPartitionDroppable'>");
+              sb.append("<div class='dashboard'>");
+              sb.append(p.getPool().getName());
+              sb.append("(" + p.getPool().getCreationDate() + ")<br/>");
+              sb.append("<span style='font-size:8pt'>");
+              if (!p.getPool().getExperiments().isEmpty()) {
+                sb.append("<i>");
+                for (Experiment e : p.getPool().getExperiments()) {
+                  sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": "
+                      + p.getPool().getPoolableElementViews().size()
+                      + " dilutions)<br/>");
+                }
+                sb.append("</i>");
+                sb.append("<input type='hidden' name='partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId"
+                    + (p.getPartitionNumber() - 1) + "' value='" + p.getPool().getId() + "'/>");
+              } else {
+                sb.append("<i>No experiment linked to this pool</i>");
+              }
+              sb.append("</span>");
+              sb.append("</div>");
+              sb.append("</ul>");
+            } else {
+              confirm.put(p.getPartitionNumber(), "Empty");
+
+              sb.append("<div id='p_div-" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
+              sb.append("<ul class='runPartitionDroppable' bind='partitions[" + (p.getPartitionNumber() - 1) + "].pool' partition='"
+                  + (p.getPartitionNumber() - 1) + "' ondblclick='Container.partition.populatePartition(this);'></ul>");
+              sb.append("</div>");
+            }
+            sb.append("</td>");
+            sb.append("</tr>");
+          }
+          sb.append("</table>");
+
+          Map<String, Object> responseMap = new HashMap<>();
+          responseMap.put("html", sb.toString());
+          responseMap.put("barcode", f.getIdentificationBarcode());
+          responseMap.put("containerId", f.getId());
+          responseMap.put("verify", confirm);
+          return JSONUtils.JSONObjectResponse(responseMap);
         } else {
-          return JSONUtils.JSONObjectResponse("unique", "No containers with this serial number exist yet.");
+          return JSONUtils.SimpleJSONError("Multiple containers found with serial number " + barcode);
         }
-      } catch (IOException e) {
-        log.error("unable to lookup serial number", e);
-        return JSONUtils.JSONObjectResponse("error", "Unable to lookup serial number.");
+      } else {
+        return JSONUtils.JSONObjectResponse("unique", "No containers with this serial number exist yet.");
       }
     } else {
       return JSONUtils.SimpleJSONError("Please supply a serial number to lookup.");
@@ -690,7 +689,7 @@ public class ContainerControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
-      for (SequencerPartitionContainer spc : requestManager.listAllSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer spc : containerService.list()) {
         String run = "";
         String sequencer = "";
         if (spc.getLastRun() != null) {
@@ -784,8 +783,8 @@ public class ContainerControllerHelperService {
       if (json.has("containerId")) {
         Long containerId = json.getLong("containerId");
         try {
-          SequencerPartitionContainer container = requestManager.getSequencerPartitionContainerById(containerId);
-          requestManager.deleteContainer(container);
+          SequencerPartitionContainer container = containerService.get(containerId);
+          containerService.delete(container.getId());
           return JSONUtils.SimpleJSONResponse("Sequencing Container deleted");
         } catch (IOException e) {
           log.error("cannot delete sequencing container", e);
@@ -803,8 +802,8 @@ public class ContainerControllerHelperService {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setContainerService(ContainerService containerService) {
+    this.containerService = containerService;
   }
 
   public void setRunService(RunService runService) {
@@ -820,8 +819,7 @@ public class ContainerControllerHelperService {
     String containerId = json.getString("containerId"); // Id of the container the serial number will be applied to. Might be null.
     Map<String, Object> responseMap = new HashMap<>();
     try {
-      Collection<SequencerPartitionContainer> containers = requestManager
-          .listSequencerPartitionContainersByBarcode(serialNumber);
+      Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(serialNumber);
       if (containers.isEmpty()) {
         responseMap.put("isSerialNumberUnique", true);
       } else {

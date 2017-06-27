@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -39,10 +40,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.store.PrinterStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernatePrinterDao implements PrinterStore {
+public class HibernatePrinterDao implements PrinterStore, HibernatePaginatedDataSource<Printer> {
   protected static final Logger log = LoggerFactory.getLogger(HibernatePrinterDao.class);
 
   @Autowired
@@ -54,7 +56,8 @@ public class HibernatePrinterDao implements PrinterStore {
     return (int) c;
   }
 
-  private Session currentSession() {
+  @Override
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 
@@ -63,8 +66,33 @@ public class HibernatePrinterDao implements PrinterStore {
     return (Printer) currentSession().get(Printer.class, id);
   }
 
+  @Override
+  public String getFriendlyName() {
+    return "Printer";
+  }
+
+  @Override
+  public String getProjectColumn() {
+    return null;
+  }
+
+  @Override
+  public Class<? extends Printer> getRealClass() {
+    return Printer.class;
+  }
+
+  @Override
+  public String[] getSearchProperties() {
+    return new String[] { "name" };
+  }
+
   public SessionFactory getSessionFactory() {
     return sessionFactory;
+  }
+
+  @Override
+  public Iterable<String> listAliases() {
+    return Collections.emptySet();
   }
 
   @Override
@@ -73,6 +101,21 @@ public class HibernatePrinterDao implements PrinterStore {
     @SuppressWarnings("unchecked")
     List<Printer> results = criteria.list();
     return results;
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, DateType type) {
+    return null;
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    return original;
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return null;
   }
 
   @Override

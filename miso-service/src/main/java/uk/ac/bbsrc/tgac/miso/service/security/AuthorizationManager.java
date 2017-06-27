@@ -49,7 +49,9 @@ public interface AuthorizationManager {
    * the user exists or is authenticated, but represents other errors occurring while checking these conditions
    */
   public boolean isAdminUser() throws IOException;
-  
+
+  public boolean isInternalUser() throws IOException;
+
   /**
    * Verifies that the current user is an admin and throws an AuthorizationException if not
    * 

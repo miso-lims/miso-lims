@@ -22,11 +22,12 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -56,8 +57,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
-  private PoolAlertManager poolAlertManager;
-  @Autowired
   private ChangeLogService changeLogService;
   @Autowired
   private SecurityManager securityManager;
@@ -84,10 +83,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     this.namingScheme = namingScheme;
   }
 
-  public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
-    this.poolAlertManager = poolAlertManager;
-  }
-
   public void setChangeLogService(ChangeLogService changeLogService) {
     this.changeLogService = changeLogService;
   }
@@ -107,31 +102,31 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public Collection<Pool> listAllPoolsBySearch(String query) throws IOException {
+  public Collection<Pool> listBySearch(String query) throws IOException {
     List<Pool> pools = poolStore.listAllByCriteria(null, query, null, false);
     return authorizationManager.filterUnreadable(pools);
   }
 
   @Override
-  public Collection<Pool> listAllPoolsWithLimit(int limit) throws IOException {
+  public Collection<Pool> listWithLimit(int limit) throws IOException {
     List<Pool> pools = poolStore.listAllByCriteria(null, null, limit, false);
     return authorizationManager.filterUnreadable(pools);
   }
 
   @Override
-  public Collection<Pool> listAllPools() throws IOException {
+  public Collection<Pool> list() throws IOException {
     Collection<Pool> pools = poolStore.listAll();
     return authorizationManager.filterUnreadable(pools);
   }
 
   @Override
-  public Collection<Pool> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<Pool> listByPlatform(PlatformType platformType) throws IOException {
     Collection<Pool> pools = poolStore.listAllByCriteria(platformType, null, null, false);
     return authorizationManager.filterUnreadable(pools);
   }
 
   @Override
-  public Collection<Pool> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
+  public Collection<Pool> listByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
     List<Pool> pools = poolStore.listAllByCriteria(platformType, query, null, false);
     return authorizationManager.filterUnreadable(pools);
   }
@@ -149,19 +144,19 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public Collection<Pool> listPoolsByProjectId(long projectId) throws IOException {
+  public Collection<Pool> listByProjectId(long projectId) throws IOException {
     Collection<Pool> pools = poolStore.listByProjectId(projectId);
     return authorizationManager.filterUnreadable(pools);
   }
 
   @Override
-  public Collection<Pool> listPoolsByLibraryId(long libraryId) throws IOException {
+  public Collection<Pool> listByLibraryId(long libraryId) throws IOException {
     Collection<Pool> pools = poolStore.listByLibraryId(libraryId);
     return authorizationManager.filterUnreadable(pools);
   }
 
   @Override
-  public void deletePool(Pool pool) throws IOException {
+  public void delete(Pool pool) throws IOException {
     authorizationManager.throwIfNonAdmin();
     if (!poolStore.remove(pool)) {
       throw new IOException("Unable to delete Pool.");
@@ -169,7 +164,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public void deletePoolNote(Pool pool, Long noteId) throws IOException {
+  public void deleteNote(Pool pool, Long noteId) throws IOException {
     if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
       throw new IllegalArgumentException("Cannot delete an unsaved Note");
     }
@@ -190,15 +185,15 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public long savePool(Pool pool) throws IOException {
+  public long save(Pool pool) throws IOException {
     if (pool.isDiscarded()) {
       pool.setVolume(0.0);
     }
-    pool.setLastModifier(authorizationManager.getCurrentUser());
 
     if (pool.getId() == PoolImpl.UNSAVED_ID) {
       pool.setName(generateTemporaryName());
       loadPooledElements(pool.getPoolableElementViews(), pool);
+      setChangeDetails(pool);
       poolStore.save(pool);
 
       if (autoGenerateIdBarcodes) {
@@ -245,10 +240,36 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
         changeLogService.create(changeLog);
       }
       pool = original;
+      setChangeDetails(pool);
     }
     long id = poolStore.save(pool);
-    if (poolAlertManager != null) poolAlertManager.update(pool);
     return id;
+  }
+
+  /**
+   * Updates all user data and timestamps associated with the change. Existing timestamps will be preserved
+   * if the Pool is unsaved, and they are already set
+   * 
+   * @param pool the Pool to update
+   * @param preserveTimestamps if true, the creationTime and lastModified date are not updated
+   * @throws IOException
+   */
+  private void setChangeDetails(Pool pool) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
+    pool.setLastModifier(user);
+
+    if (pool.getId() == Sample.UNSAVED_ID) {
+      pool.setCreator(user);
+      if (pool.getCreationTime() == null) {
+        pool.setCreationTime(now);
+      }
+      if (pool.getLastModified() == null) {
+        pool.setLastModified(now);
+      }
+    } else {
+      pool.setLastModified(now);
+    }
   }
 
   private void loadPooledElements(Collection<PoolableElementView> source, Pool target) throws IOException {
@@ -278,7 +299,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   @Override
   public long savePoolQC(PoolQC poolQC) throws IOException {
     if (poolQC.getId() != PoolImpl.UNSAVED_ID) {
-      PoolQC original = getPoolQCById(poolQC.getId());
+      PoolQC original = getPoolQC(poolQC.getId());
       authorizationManager.throwIfNotWritable(original.getPool());
       original.setResults(poolQC.getResults());
       poolQC = original;
@@ -287,7 +308,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public void savePoolNote(Pool pool, Note note) throws IOException {
+  public void saveNote(Pool pool, Note note) throws IOException {
     Pool managed = poolStore.get(pool.getId());
     authorizationManager.throwIfNotWritable(managed);
     note.setCreationDate(new Date());
@@ -297,21 +318,31 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public Pool getPoolById(long poolId) throws IOException {
+  public QcType getPoolQcType(long qcTypeId) throws IOException {
+    return poolQcStore.getPoolQcTypeById(qcTypeId);
+  }
+
+  @Override
+  public Collection<QcType> listPoolQcTypes() throws IOException {
+    return poolQcStore.listAllPoolQcTypes();
+  }
+
+  @Override
+  public Pool get(long poolId) throws IOException {
     Pool pool = poolStore.get(poolId);
     authorizationManager.throwIfNotReadable(pool);
     return pool;
   }
 
   @Override
-  public PoolQC getPoolQCById(long poolQcId) throws IOException {
+  public PoolQC getPoolQC(long poolQcId) throws IOException {
     PoolQC qc = poolQcStore.get(poolQcId);
     authorizationManager.throwIfNotReadable(qc.getPool());
     return qc;
   }
 
   @Override
-  public Pool getPoolByBarcode(String barcode) throws IOException {
+  public Pool getByBarcode(String barcode) throws IOException {
     Pool pool = poolStore.getByBarcode(barcode);
     authorizationManager.throwIfNotReadable(pool);
     return pool;
@@ -331,7 +362,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot see this pool.");
     }
     poolStore.addWatcher(pool, watcher);
-    if (poolAlertManager != null) poolAlertManager.addWatcher(pool, watcher);
   }
 
   @Override
@@ -339,11 +369,10 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     User managedWatcher = securityManager.getUserById(watcher.getUserId());
     authorizationManager.throwIfNonAdminOrMatchingOwner(managedWatcher);
     poolStore.removeWatcher(pool, managedWatcher);
-    if (poolAlertManager != null) poolAlertManager.removeWatcher(pool, watcher);
   }
 
   @Override
-  public Collection<Pool> listPoolsById(List<Long> poolIds) throws IOException {
+  public Collection<Pool> listByIdList(List<Long> poolIds) throws IOException {
     return authorizationManager.filterUnreadable(poolStore.listPoolsById(poolIds));
   }
 

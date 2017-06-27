@@ -49,6 +49,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
@@ -135,17 +136,37 @@ public class RunRestController extends RestController {
 
   @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<RunDto> getDTRuns(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder)
+  public DataTablesResponseDto<RunDto> dataTable(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder)
       throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
   @RequestMapping(value = "/dt/project/{id}", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<RunDto> getDTRunsByProject(@PathVariable("id") Long id, HttpServletRequest request,
+  public DataTablesResponseDto<RunDto> dataTableByProject(@PathVariable("id") Long id, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder)
       throws IOException {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
+  }
+
+  @RequestMapping(value = "/dt/platform/{platform}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<RunDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder)
+      throws IOException {
+    PlatformType platformType = PlatformType.valueOf(platform);
+    if (platformType == null) {
+      throw new RestException("Invalid platform type.", Status.BAD_REQUEST);
+    }
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
+  }
+
+  @RequestMapping(value = "/dt/sequencer/{id}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<RunDto> dataTableBySequencer(@PathVariable("id") Long id, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder)
+      throws IOException {
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.sequencer(id));
   }
 
   @ExceptionHandler(Exception.class)

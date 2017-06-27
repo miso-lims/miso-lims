@@ -29,7 +29,7 @@ ListTarget.dilution = {
   createBulkActions : function(config, projectId) {
     return HotTarget.dilution.bulkActions;
   },
-  createStaticActions : function(config, prodjectId) {
+  createStaticActions : function(config, projectId) {
     return [];
   },
   createColumns : function(config, projectId) {

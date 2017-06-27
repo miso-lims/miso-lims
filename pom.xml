@@ -991,6 +991,11 @@
           <version>2.0</version>
         </plugin>
         <plugin>
+          <groupId>org.codehaus.maven</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
+        <plugin>
           <groupId>org.flywaydb</groupId>
           <artifactId>flyway-maven-plugin</artifactId>
           <version>3.2.1</version>

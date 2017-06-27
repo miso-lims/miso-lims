@@ -115,7 +115,7 @@ public class EditSubmissionController {
 
   @ModelAttribute("samples")
   public Collection<Sample> populateSamples() throws IOException {
-    return sampleService.getAll();
+    return sampleService.list();
   }
 
   @ModelAttribute("runs")

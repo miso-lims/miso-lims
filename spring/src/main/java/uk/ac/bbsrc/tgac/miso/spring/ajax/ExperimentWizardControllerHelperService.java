@@ -35,9 +35,6 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -55,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
@@ -65,13 +63,13 @@ import uk.ac.bbsrc.tgac.miso.service.StudyService;
 public class ExperimentWizardControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(PoolControllerHelperService.class);
   @Autowired
-  private SecurityManager securityManager;
-  @Autowired
   private RequestManager requestManager;
   @Autowired
   private StudyService studyService;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private PlatformService platformService;
   @Autowired
   private PoolService poolService;
 
@@ -105,7 +103,6 @@ public class ExperimentWizardControllerHelperService {
       s.setDescription(p.getDescription());
       s.setSecurityProfile(p.getSecurityProfile());
       s.setStudyType(studyType);
-      s.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
       studyService.save(s);
 
       studyId = String.valueOf(s.getId());
@@ -137,11 +134,10 @@ public class ExperimentWizardControllerHelperService {
         e.setDescription(description);
         e.setAlias(alias);
         e.setTitle(title);
-        e.setPlatform(requestManager.getPlatformById(platformId));
+        e.setPlatform(platformService.get(platformId));
         if (poolId != null) {
-          e.setPool(poolService.getPoolById(poolId));
+          e.setPool(poolService.get(poolId));
         }
-        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         experimentService.save(e);
 
       }
@@ -179,7 +175,7 @@ public class ExperimentWizardControllerHelperService {
   public String populatePlatform() {
     StringBuilder a = new StringBuilder();
     try {
-      for (Platform platform : requestManager.listAllPlatforms()) {
+      for (Platform platform : platformService.list()) {
         a.append("<option value=\"" + platform.getId() + "\">" + platform.getNameAndModel() + "</option>");
       }
     } catch (IOException e) {
@@ -193,10 +189,10 @@ public class ExperimentWizardControllerHelperService {
     try {
       if (json.has("platformId") && !isStringEmptyOrNull(json.getString("platformId"))) {
         Long platformId = json.getLong("platformId");
-        Platform platform = requestManager.getPlatformById(platformId);
+        Platform platform = platformService.get(platformId);
         if (platform != null) {
           PlatformType pt = platform.getPlatformType();
-          List<Pool> pools = new ArrayList<>(poolService.listAllPoolsByPlatform(pt));
+          List<Pool> pools = new ArrayList<>(poolService.listByPlatform(pt));
           Collections.sort(pools);
           for (Pool p : pools) {
             a.append("<div bind='" + p.getId()
@@ -225,10 +221,6 @@ public class ExperimentWizardControllerHelperService {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed to load pools: " + e.getMessage());
     }
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   public void setRequestManager(RequestManager requestManager) {

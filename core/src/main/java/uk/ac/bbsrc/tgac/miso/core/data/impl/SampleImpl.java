@@ -88,14 +88,6 @@ public class SampleImpl extends AbstractSample {
     }
   }
 
-  /**
-   * Method buildReport ...
-   */
-  @Override
-  public void buildReport() {
-
-  }
-
   @Override
   public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
     SampleChangeLog changeLog = new SampleChangeLog();

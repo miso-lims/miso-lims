@@ -275,7 +275,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     return pool;
   }
 
-  private static final List<String> STANDARD_ALIASES = Arrays.asList("derivedInfo", "lastModifier", "derivedInfo.creator");
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator");
 
   @Override
   public String[] getSearchProperties() {
@@ -296,7 +296,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   public String propertyForSortColumn(String sortCol) {
     sortCol = sortCol.replaceAll("[^\\w]", "");
     if ("id".equals(sortCol)) sortCol = "poolId";
-    if ("lastModified".equals(sortCol)) sortCol = "derivedInfo.lastModified";
     return sortCol;
   }
 
@@ -315,9 +314,9 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
-      return "derivedInfo.created";
+      return "creationTime";
     case UPDATE:
-      return "derivedInfo.lastModified";
+      return "lastModified";
     default:
       return null;
     }

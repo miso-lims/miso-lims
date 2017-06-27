@@ -27,9 +27,11 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
@@ -82,7 +84,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetBoxById() throws IOException {
+  public void testGetBoxById() throws IOException, InterruptedException {
     Box box = dao.get(1);
     assertEquals("box1alias", box.getAlias());
     assertEquals("box1", box.getName());
@@ -90,6 +92,16 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     assertEquals("barcode1", box.getIdentificationBarcode());
     assertEquals(4, box.getSize().getRows());
     assertEquals("boxuse1", box.getUse().getAlias());
+    assertEquals(2, box.getTubeCount());
+    // Should be able to get the tube count without initializing boxables
+    assertFalse(Hibernate.isInitialized(box.getBoxables()));
+    BoxableView a1 = box.getBoxable("A01");
+    assertNotNull(a1);
+    assertEquals("SAM15", a1.getName());
+    BoxableView b2 = box.getBoxable("B02");
+    assertNotNull(b2);
+    assertEquals("SAM16", b2.getName());
+    assertTrue(Hibernate.isInitialized(box.getBoxables()));
   }
 
   @Test
@@ -119,7 +131,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void listALlBoxSizes() throws Exception {
+  public void testListAllBoxSizes() throws Exception {
     Collection<BoxSize> boxSizes = dao.listAllBoxSizes();
     assertTrue(boxSizes.size() == 1);
 
@@ -131,12 +143,6 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     assertTrue(2 == strings.size());
     assertTrue(strings.contains("boxuse1"));
     assertTrue(strings.contains("boxuse2"));
-  }
-
-  @Test
-  public void testListWithLimit() throws Exception {
-    Collection<Box> boxes = dao.listWithLimit(1);
-    assertTrue(boxes.size() == 1);
   }
 
   @Test
@@ -193,7 +199,11 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     Box box = new BoxImpl(new UserImpl());
     UserImpl user = new UserImpl();
     user.setId(1l);
+    Date now = new Date();
+    box.setCreator(user);
+    box.setCreationTime(now);
     box.setLastModifier(user);
+    box.setLastModified(now);
     box.setDescription("newboxdescription");
     box.setAlias("newboxalias");
     box.setName("newbox");
@@ -220,8 +230,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   @Test
   public void testGetBoxColumnSizes() throws Exception {
     Map<String, Integer> boxColumnSizes = dao.getBoxColumnSizes();
-
-    assertTrue(10 == boxColumnSizes.size());
+    assertEquals(13, boxColumnSizes.size());
   }
 
   @Test

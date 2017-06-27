@@ -1,12 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax.test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Arrays;
-
-import net.sf.json.JSONObject;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,13 +15,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.ServiceRecordControllerHelperService;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 public class ServiceRecordControllerHelperServiceTest {
   
@@ -32,6 +32,8 @@ public class ServiceRecordControllerHelperServiceTest {
   private SecurityManager securityManager;
   @Mock
   private RequestManager requestManager;
+  @Mock
+  private SequencerReferenceService sequencerReferenceService;
   @Mock
   private MisoFilesManager misoFileManager;
   
@@ -81,7 +83,7 @@ public class ServiceRecordControllerHelperServiceTest {
     JSONObject request = new JSONObject();
     request.put("recordId", 1L);
     
-    Mockito.doThrow(new IOException()).when(requestManager).deleteSequencerServiceRecord(Mockito.any(SequencerServiceRecord.class));
+    Mockito.doThrow(new IOException()).when(sequencerReferenceService).deleteServiceRecord(Mockito.anyLong());
     
     JSONObject result = chs.deleteServiceRecord(null, request);
     assertNotNull(result.get("error"));

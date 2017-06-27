@@ -74,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGeneratorResolverSe
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadJob;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
@@ -97,6 +98,8 @@ public class SubmissionControllerHelperService {
   private MisoFilesManager misoFileManager;
   @Autowired
   private FilePathGeneratorResolverService filePathGeneratorResolverService;
+  @Autowired
+  private ContainerService containerService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -145,7 +148,7 @@ public class SubmissionControllerHelperService {
             Long dilutionId = Long.parseLong(j.getString("name").replaceAll("\\D+", ""));
             Long partitionId = Long.parseLong(j.getString("value").replaceAll("\\D+", ""));
             LibraryDilution dilution = dilutionService.get(dilutionId);
-            Partition partition = requestManager.getPartitionById(partitionId);
+            Partition partition = containerService.getPartition(partitionId);
             newSubmission.getDilutions().put(dilution, partition);
           }
         }
@@ -415,8 +418,7 @@ public class SubmissionControllerHelperService {
             sb.append("<ul>");
 
             // creates HTML list of sequencing containers for each run
-            Collection<SequencerPartitionContainer> partitionContainers = requestManager
-                .listSequencerPartitionContainersByRunId(r.getId());
+            Collection<SequencerPartitionContainer> partitionContainers = containerService.listByRunId(r.getId());
             for (SequencerPartitionContainer partitionContainer : partitionContainers) {
               sb.append("<li>");
               sb.append("<b>" + partitionContainer.getIdentificationBarcode() + "</b> : " + partitionContainer.getId());
@@ -555,5 +557,9 @@ public class SubmissionControllerHelperService {
 
   public void setRunService(RunService runService) {
     this.runService = runService;
+  }
+
+  public void setContainerService(ContainerService containerService) {
+    this.containerService = containerService;
   }
 }

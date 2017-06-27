@@ -72,4 +72,8 @@ public class HibernatePoolOrderDao implements PoolOrderDao {
     return records;
   }
 
+  public void setSessionFactory(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
+
 }

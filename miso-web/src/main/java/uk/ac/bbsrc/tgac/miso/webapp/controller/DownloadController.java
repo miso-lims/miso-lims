@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -78,6 +79,8 @@ public class DownloadController {
 
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private SampleService sampleService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -144,7 +147,7 @@ public class DownloadController {
   protected void downloadSampleQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
       throws Exception {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    SampleQC qc = requestManager.getSampleQCById(id);
+    SampleQC qc = sampleService.getSampleQC(id);
     if (qc.userCanRead(user)) {
       lookupAndRetrieveFile(SampleQC.class, id.toString(), hashcode, response);
     } else {

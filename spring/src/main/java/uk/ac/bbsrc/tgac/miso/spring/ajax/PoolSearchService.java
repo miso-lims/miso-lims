@@ -89,12 +89,12 @@ public class PoolSearchService {
 
     @Override
     public Collection<Pool> all(PlatformType type) throws IOException {
-      return poolService.listAllPoolsByPlatform(type);
+      return poolService.listByPlatform(type);
     }
 
     @Override
     public Collection<Pool> search(PlatformType type, String query) throws IOException {
-      return poolService.listAllPoolsByPlatformAndSearch(type, query);
+      return poolService.listByPlatformAndSearch(type, query);
     }
 
   }
@@ -148,6 +148,10 @@ public class PoolSearchService {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationDate() + "</b><br/>");
     } else {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
+    }
+    if (p.hasDuplicateIndices()) {
+      b.append("<span class=\"lowquality\">DUPLICATE INDICES</span><br/>");
+      b.append("<img style=\"float:right; height:40px;\" src=\"/styles/images/fail.png\"/>");
     }
 
     List<PoolableElementView> ds = new ArrayList<>(p.getPoolableElementViews());

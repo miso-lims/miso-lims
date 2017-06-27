@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class DetailedSampleBuilder
@@ -312,6 +311,31 @@ public class DetailedSampleBuilder
   @Override
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  @Override
+  public User getCreator() {
+    return null;
+  }
+
+  @Override
+  public void setCreator(User user) {
+    throw new UnsupportedOperationException("Method not implemented on builder");
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return null;
+  }
+
+  @Override
+  public void setCreationTime(Date creationTime) {
+    throw new UnsupportedOperationException("Method not implemented on builder");
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override
@@ -639,11 +663,6 @@ public class DetailedSampleBuilder
   @Override
   public boolean userCanWrite(User arg0) {
     return true;
-  }
-
-  @Override
-  public void buildReport() throws ReportingException {
-    throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override

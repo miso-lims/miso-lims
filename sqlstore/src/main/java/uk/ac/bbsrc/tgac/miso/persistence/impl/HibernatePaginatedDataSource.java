@@ -18,6 +18,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -139,6 +140,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByBoxUse(Criteria criteria, long id, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " has no use.");
+  }
+
+  @Override
   public default void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " is exempt from class strugle.");
   }
@@ -177,6 +183,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByKitType(Criteria criteria, KitType type, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be filtered by pool.");
+  }
+
+  @Override
   default void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " is not platform-specific.");
   }
@@ -196,6 +207,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     if (!isStringBlankOrNull(query)) {
       criteria.add(DbUtils.searchRestrictions(query, getSearchProperties()));
     }
+  }
+
+  @Override
+  default void restrictPaginationBySequencerId(Criteria criteria, long id, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be filtered by sequencer.");
   }
 
   @Override

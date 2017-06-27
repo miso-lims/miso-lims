@@ -95,7 +95,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -108,8 +107,11 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
@@ -141,28 +143,27 @@ public class EditLibraryController {
   private SecurityManager securityManager;
 
   @Autowired
-  private RequestManager requestManager;
-
-  @Autowired
   private IndexService indexService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private LibraryDesignService libraryDesignService;
+  @Autowired
+  private LibraryDesignCodeService libraryDesignCodeService;
+  @Autowired
   private SampleService sampleService;
-
   @Autowired
   private ChangeLogService changeLogService;
-
   @Autowired
   private KitService kitService;
-
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
   private RunService runService;
   @Autowired
+  private PlatformService platformService;
+  @Autowired
   private PoolService poolService;
-
   @Autowired
   private LibraryDilutionService dilutionService;
 
@@ -172,10 +173,6 @@ public class EditLibraryController {
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -188,6 +185,10 @@ public class EditLibraryController {
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
+  }
+
+  public void setLibraryDesignService(LibraryDesignService libraryDesignService) {
+    this.libraryDesignService = libraryDesignService;
   }
 
   public void setSampleService(SampleService sampleService) {
@@ -246,7 +247,7 @@ public class EditLibraryController {
 
   public List<Pool> getPoolsByLibrary(Library l) throws IOException {
     if (!l.getLibraryDilutions().isEmpty()) {
-      List<Pool> pools = new ArrayList<>(poolService.listPoolsByLibraryId(l.getId()));
+      List<Pool> pools = new ArrayList<>(poolService.listByLibraryId(l.getId()));
       Collections.sort(pools);
       return pools;
     }
@@ -297,7 +298,7 @@ public class EditLibraryController {
   }
 
   private List<String> populatePlatformTypes(Collection<String> current) throws IOException {
-    Collection<PlatformType> base = requestManager.listActivePlatformTypes();
+    Collection<PlatformType> base = platformService.listActivePlatformTypes();
     if (base.isEmpty()) {
       base = Arrays.asList(PlatformType.values());
     }
@@ -404,11 +405,11 @@ public class EditLibraryController {
   }
 
   private void populateDesigns(ModelMap model, SampleClass sampleClass) throws IOException {
-    model.put("libraryDesigns", requestManager.listLibraryDesignByClass(sampleClass));
+    model.put("libraryDesigns", libraryDesignService.listByClass(sampleClass));
   }
 
   private void populateDesignCodes(ModelMap model) throws IOException {
-    model.put("libraryDesignCodes", requestManager.listLibraryDesignCodes());
+    model.put("libraryDesignCodes", libraryDesignCodeService.list());
   }
 
   /**
@@ -464,7 +465,7 @@ public class EditLibraryController {
       libraryTypes.add(libType);
     }
     JSONArray platformTypes = new JSONArray();
-    Collection<PlatformType> activePlatforms = requestManager.listActivePlatformTypes();
+    Collection<PlatformType> activePlatforms = platformService.listActivePlatformTypes();
     for (final PlatformType platformType : PlatformType.values()) {
       JSONObject platformTypeJson = new JSONObject();
       platformTypeJson.put("id", platformType.getKey());
@@ -521,7 +522,7 @@ public class EditLibraryController {
   public JSONObject indicesString() {
     final JSONObject io = new JSONObject();
     try {
-      for (String pfName : requestManager.listDistinctPlatformNames()) {
+      for (String pfName : platformService.listDistinctPlatformTypeNames()) {
         JSONObject pf = new JSONObject();
         io.put(pfName, pf);
         io.getJSONObject(pfName).put("No Index", nullIndexFamily());

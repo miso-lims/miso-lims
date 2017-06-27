@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -58,7 +59,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleDerivedInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
@@ -103,7 +103,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
           @JoinColumn(name = "notes_noteId") })
   private Collection<Note> notes = new HashSet<>();
 
-  @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample")
+  @OneToMany(targetEntity = SampleChangeLog.class, mappedBy = "sample", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @ManyToOne
@@ -123,14 +123,21 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private String identificationBarcode;
   private String locationBarcode;
 
-  @OneToOne(targetEntity = UserImpl.class)
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
+
+  @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
-  @JsonBackReference
   private User lastModifier;
 
-  @OneToOne(targetEntity = SampleDerivedInfo.class)
-  @PrimaryKeyJoinColumn
-  private SampleDerivedInfo derivedInfo;
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
 
   @OneToOne(optional = true)
   @PrimaryKeyJoinColumn
@@ -159,6 +166,36 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setLastModifier(User lastModifier) {
     this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return creationTime;
+  }
+
+  @Override
+  public void setCreationTime(Date created) {
+    this.creationTime = created;
   }
 
   @Override
@@ -369,14 +406,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
-  }
-
-  @Override
-  public abstract void buildReport();
-
-  @Override
-  public Date getLastModified() {
-    return (derivedInfo == null ? null : derivedInfo.getLastModified());
   }
 
   @Override

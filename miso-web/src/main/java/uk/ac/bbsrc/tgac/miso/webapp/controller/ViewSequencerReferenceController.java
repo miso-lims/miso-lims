@@ -37,10 +37,9 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
@@ -54,7 +53,6 @@ public class ViewSequencerReferenceController {
   private enum ModelKeys {
     
     SEQUENCER("sequencerReference"),
-    RUNS("sequencerRuns"),
     RECORDS("sequencerServiceRecords"),
     TRIMMED_IP("trimmedIpAddress");
     
@@ -74,19 +72,14 @@ public class ViewSequencerReferenceController {
   private SecurityManager securityManager;
   
   @Autowired
-  private RequestManager requestManager;
-  
-  @Autowired
   private EditServiceRecordController editServiceRecordController;
   @Autowired
   private RunService runService;
+  @Autowired
+  private SequencerReferenceService sequencerReferenceService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-  
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
   }
   
   public void setEditServiceRecordController(EditServiceRecordController editServiceRecordController) {
@@ -97,6 +90,10 @@ public class ViewSequencerReferenceController {
     this.runService = runService;
   }
 
+  public void setSequencerReferenceService(SequencerReferenceService sequencerReferenceService) {
+    this.sequencerReferenceService = sequencerReferenceService;
+  }
+
   @RequestMapping("/{referenceId}")
   public ModelAndView viewSequencer(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -104,13 +101,11 @@ public class ViewSequencerReferenceController {
       return new ModelAndView("redirect:/miso/stats/sequencer/" + referenceId);
     }
     else {
-      SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-      Collection<Run> runs = runService.listBySequencerId(referenceId);
-      Collection<SequencerServiceRecord> serviceRecords = requestManager.listSequencerServiceRecordsBySequencerId(referenceId);
+      SequencerReference sr = sequencerReferenceService.get(referenceId);
+      Collection<SequencerServiceRecord> serviceRecords = sequencerReferenceService.listServiceRecordsByInstrument(referenceId);
       
       if (sr != null) {
         model.put(ModelKeys.SEQUENCER.getKey(), sr);
-        model.put(ModelKeys.RUNS.getKey(), runs);
         model.put(ModelKeys.RECORDS.getKey(), serviceRecords);
         model.put("title", "Edit Sequencer");
         String ip = sr.getIpAddress() == null ? "" : sr.getIpAddress().toString();

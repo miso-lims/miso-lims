@@ -46,4 +46,12 @@ public class DefaultChangeLogService implements ChangeLogService {
     return changeLogDao.create(changeLog);
   }
 
+  public void setChangeLogDao(ChangeLogStore changeLogDao) {
+    this.changeLogDao = changeLogDao;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
+  }
+
 }

@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -42,9 +40,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScan;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -64,7 +62,7 @@ public class BoxControllerHelperServiceTest {
   @Mock
   private AuthorizationManager authorizationManager;
   @Mock
-  private RequestManager requestManager;
+  private BoxService boxService;
   @Mock
   private MisoFilesManager misoFileManager;
   @Mock
@@ -103,19 +101,19 @@ public class BoxControllerHelperServiceTest {
   @Test
   public final void testDeleteBox() throws Exception {
     final long id = 1L;
-    when(requestManager.getBoxById(anyLong())).thenReturn(mockBox);
+    when(boxService.get(anyLong())).thenReturn(mockBox);
     final JSONObject json = new JSONObject();
     json.put("boxId", id);
     final JSONObject response = boxControllerHelperService.deleteBox(null, json);
 
-    verify(requestManager).deleteBox(requestManager.getBoxById(id));
+    verify(boxService).deleteBox(boxService.get(id));
 
     assertEquals("Box+deleted", response.get("response"));
   }
 
   @Test
   public final void testDeleteBoxBadJson() throws Exception {
-    when(requestManager.getBoxById(anyLong())).thenReturn(mockBox);
+    when(boxService.get(anyLong())).thenReturn(mockBox);
     final JSONObject json = new JSONObject();
 
     final JSONObject response1 = boxControllerHelperService.deleteBox(null, json);
@@ -136,7 +134,7 @@ public class BoxControllerHelperServiceTest {
     when(scan.getColumnCount()).thenReturn(box.getSize().getColumns());
     when(boxScanner.getScan()).thenReturn(scan);
     when(scan.getReadErrorPositions()).thenReturn(Arrays.asList("A01"));
-    when(requestManager.getBoxById(1L)).thenReturn(box);
+    when(boxService.get(1L)).thenReturn(box);
 
     JSONObject json = new JSONObject();
     json.put("boxId", id);
@@ -145,7 +143,7 @@ public class BoxControllerHelperServiceTest {
 
   @Test
   public final void testExportBoxContentsFormNoBoxId() throws Exception {
-    when(requestManager.getBoxById(anyLong())).thenReturn(mockBox);
+    when(boxService.get(anyLong())).thenReturn(mockBox);
 
     final JSONObject json = new JSONObject();
     json.put("boxId", null);
@@ -165,7 +163,7 @@ public class BoxControllerHelperServiceTest {
     array.add("a:a:a");
     array.add("b:b:b");
     array.add("c:c:c");
-    when(requestManager.getBoxById(anyLong())).thenThrow(error);
+    when(boxService.get(anyLong())).thenThrow(error);
 
     final JSONObject json = new JSONObject();
     json.put("boxId", id);
@@ -179,11 +177,11 @@ public class BoxControllerHelperServiceTest {
     // mock lookups
     BoxableView sample = makeSampleView();
     BoxableView library = makeLibraryView();
-    when(requestManager.getBoxableViewsFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample, library));
+    when(boxService.getViewsFromBarcodeList(Mockito.any())).thenReturn(Arrays.asList(sample, library));
 
     // do not add sample/library to box. Testing verifies that this gets done by saveBoxContents by parsing the JSON
     Box box = makeEmptyBox();
-    when(requestManager.getBoxById(box.getId())).thenReturn(box);
+    when(boxService.get(box.getId())).thenReturn(box);
 
     // Create JSON:
     // {"boxId":1,
@@ -206,7 +204,7 @@ public class BoxControllerHelperServiceTest {
     assertTrue(response.has("response"));
     assertFalse(response.has("error"));
     ArgumentCaptor<Box> saveBox = ArgumentCaptor.forClass(Box.class);
-    verify(requestManager).saveBox(saveBox.capture());
+    verify(boxService).save(saveBox.capture());
     assertEquals(sample.getIdentificationBarcode(), saveBox.getValue().getBoxable("A01").getIdentificationBarcode());
     assertEquals(library.getIdentificationBarcode(), saveBox.getValue().getBoxable("A02").getIdentificationBarcode());
   }
@@ -214,10 +212,10 @@ public class BoxControllerHelperServiceTest {
   @Test
   public void testUpdateOneItem() throws Exception {
     Box box = makeEmptyBox();
-    when(requestManager.getBoxById(box.getId())).thenReturn(box);
+    when(boxService.get(box.getId())).thenReturn(box);
 
     BoxableView sample = makeSampleView();
-    when(requestManager.getBoxableViewByBarcode(Mockito.any())).thenReturn(sample);
+    when(boxService.getViewByBarcode(Mockito.any())).thenReturn(sample);
 
     JSONObject json = new JSONObject();
     json.put("boxId", box.getId());
@@ -230,7 +228,7 @@ public class BoxControllerHelperServiceTest {
     assertTrue(response.has("addedToBox"));
 
     ArgumentCaptor<Box> saveBox = ArgumentCaptor.forClass(Box.class);
-    verify(requestManager).saveBox(saveBox.capture());
+    verify(boxService).save(saveBox.capture());
     assertEquals(sample.getIdentificationBarcode(), saveBox.getValue().getBoxable("A01").getIdentificationBarcode());
   }
 
@@ -239,7 +237,7 @@ public class BoxControllerHelperServiceTest {
     Box box = makeEmptyBox();
     BoxableView sample = makeSampleView();
     box.setBoxable("A01", sample);
-    when(requestManager.getBoxById(box.getId())).thenReturn(box);
+    when(boxService.get(box.getId())).thenReturn(box);
 
     JSONObject json = new JSONObject();
     json.put("boxId", box.getId());
@@ -252,7 +250,7 @@ public class BoxControllerHelperServiceTest {
     assertTrue(response.has("boxJSON"));
 
     ArgumentCaptor<Box> saveBox = ArgumentCaptor.forClass(Box.class);
-    verify(requestManager).saveBox(saveBox.capture());
+    verify(boxService).save(saveBox.capture());
     assertNull(saveBox.getValue().getBoxable("A01"));
   }
 
@@ -261,7 +259,7 @@ public class BoxControllerHelperServiceTest {
     Box box = makeEmptyBox();
     BoxableView sample = makeSampleView();
     box.setBoxable("A01", sample);
-    when(requestManager.getBoxById(box.getId())).thenReturn(box);
+    when(boxService.get(box.getId())).thenReturn(box);
 
     JSONObject json = new JSONObject();
     json.put("boxId", box.getId());
@@ -273,29 +271,13 @@ public class BoxControllerHelperServiceTest {
     JSONObject response = boxControllerHelperService.discardSingleTube(null, json);
     assertFalse(response.has("error"));
     assertTrue(response.has("boxJSON"));
-    verify(requestManager).discardSingleTube(box, "A01");
-  }
-
-  @Test
-  public void testListAllBoxesTable() throws Exception {
-    Box box = makeEmptyBox();
-    Collection<Box> boxes = new HashSet<>();
-    boxes.add(box);
-    when(requestManager.listAllBoxes()).thenReturn(boxes);
-
-    JSONObject response = boxControllerHelperService.listAllBoxesTable(null, null);
-    assertTrue(response.has("array"));
-    JSONArray boxesJson = response.getJSONArray("array");
-    assertEquals(1, boxesJson.size());
-    JSONArray boxJson = boxesJson.getJSONArray(0);
-    // should contain 8 fields
-    assertEquals(8, boxJson.size());
+    verify(boxService).discardSingleTube(box, "A01");
   }
 
   @Test
   public void testLookupBoxableByBarcode() throws Exception {
     BoxableView sample = makeSampleView();
-    when(requestManager.getBoxableViewByBarcode(Mockito.any())).thenReturn(sample);
+    when(boxService.getViewByBarcode(Mockito.any())).thenReturn(sample);
 
     JSONObject json = new JSONObject();
     json.put("barcode", sample.getIdentificationBarcode());
@@ -311,7 +293,7 @@ public class BoxControllerHelperServiceTest {
   public void testLookupBoxableByBarcodeTrashed() throws Exception {
     BoxableView sample = makeSampleView();
     sample.setDiscarded(true);
-    when(requestManager.getBoxableViewByBarcode(Mockito.any())).thenReturn(sample);
+    when(boxService.getViewByBarcode(Mockito.any())).thenReturn(sample);
 
     JSONObject json = new JSONObject();
     json.put("barcode", sample.getIdentificationBarcode());
@@ -358,7 +340,7 @@ public class BoxControllerHelperServiceTest {
     assertEquals(2, box.getTubeCount());
     assertFalse(sample.isDiscarded());
     assertFalse(library.isDiscarded());
-    when(requestManager.getBoxById(box.getId())).thenReturn(box);
+    when(boxService.get(box.getId())).thenReturn(box);
 
     JSONObject json = new JSONObject();
     json.put("boxId", box.getId());
@@ -371,7 +353,7 @@ public class BoxControllerHelperServiceTest {
     System.out.println(response.toString(2));
     assertFalse(response.has("error"));
     assertTrue(response.has("boxJSON"));
-    verify(requestManager).discardAllTubes(box);
+    verify(boxService).discardAllTubes(box);
     // box DAO is responsible for actually emptying and removing the tubes
   }
 

@@ -36,6 +36,7 @@ ListUtils = {
       ListState[elementId] = [];
       columns.unshift(Utils.createToggleColumn('ListState.' + elementId));
     }
+    var errorMessage = document.createElement('DIV');
     var jqTable = jQuery('#' + elementId).html('');
     jqTable
         .dataTable(
@@ -61,7 +62,29 @@ ListUtils = {
                       'type' : 'GET',
                       'url' : sSource,
                       'data' : aoData,
-                      'success' : fnCallback
+                      'success' : function(data, textStatus, xhr) {
+                        errorMessage.innerText = data.sError;
+                        columns.forEach(function(column, index) {
+                          if (!column.visibilityFilter) {
+                            return;
+                          }
+                          jqTable.fnSetColumnVis(index, column
+                              .visibilityFilter(data.aaData.map(function(d) {
+                                return d[column.mData];
+                              })));
+                        });
+                        fnCallback(data, textStatus, xhr);
+                      },
+                      'error' : function(xhr, statusText, errorThrown) {
+                        errorMessage.innerText = errorThrown;
+                        fnCallback({
+                          iTotalRecords : 0,
+                          iTotalDisplayRecords : 0,
+                          sEcho : aoData.sEcho,
+                          aaData : []
+                        });
+                        
+                      }
                     });
                   },
                   'fnDrawCallback' : function(oSettings) {
@@ -70,13 +93,15 @@ ListUtils = {
                         .removeClass('fg-button');
                     var filterbox = jQuery('#' + elementId + '_filter :input');
                     filterbox.val(window.localStorage.getItem(searchKey));
-                    filterbox.on('change', function() {
+                    filterbox.on('change keyup paste', function() {
                       window.localStorage.setItem(searchKey, filterbox.val());
                     });
                   }
                 })).fnSetFilteringDelay(600);
+    var tableNode = document.getElementById(elementId + '_wrapper');
+    errorMessage.setAttribute('class', 'parsley-error');
+    tableNode.parentNode.insertBefore(errorMessage, tableNode);
     if (bulkActions.length > 0 || staticActions.length > 0) {
-      var tableNode = document.getElementById(elementId + '_wrapper');
       var toolbar = document.createElement('DIV');
       toolbar
           .setAttribute(
@@ -114,5 +139,20 @@ ListUtils = {
         toolbar.append(button);
       });
     }
+  },
+  render : {
+    booleanChecks : function(data, type, full) {
+      return data ? "✔" : "";
+    },
+    idHyperlink : function(urlFragment) {
+          return function (data, type, full) {
+            return "<a href=\"/miso/" + urlFragment + "/" + full.id + "\">" + data + "</a>";
+          };
+    },
+    textFromId : function(list, property) {
+          return function (data, type, full) {
+            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(data), list), property) || "Unknown";
+          };
+    },
   }
 };

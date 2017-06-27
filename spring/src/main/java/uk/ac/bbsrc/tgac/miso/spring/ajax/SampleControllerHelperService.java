@@ -76,6 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
@@ -137,6 +138,8 @@ public class SampleControllerHelperService {
   private PrinterService printerService;
   @Autowired
   private NamingScheme namingScheme;
+  @Autowired
+  private BoxService boxService;
 
   public JSONObject validateSampleAlias(HttpSession session, JSONObject json) {
     try {
@@ -235,7 +238,7 @@ public class SampleControllerHelperService {
         SampleQC newQc = new SampleQCImpl();
         newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
-        newQc.setQcType(requestManager.getSampleQcTypeById(json.getLong("qcType")));
+        newQc.setQcType(sampleService.getSampleQcType(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
         sample.addQc(newQc);
         sampleService.addQc(sample, newQc);
@@ -263,7 +266,7 @@ public class SampleControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       Long qcId = Long.parseLong(json.getString("qcId"));
-      SampleQC sampleQc = requestManager.getSampleQCById(qcId);
+      SampleQC sampleQc = sampleService.getSampleQC(qcId);
       response.put("results", "<input type='text' id='" + qcId + "' value='" + sampleQc.getResults() + "'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Sample.qc.editSampleQC(\"" + qcId + "\");'>Save</a>");
       return response;
@@ -277,7 +280,7 @@ public class SampleControllerHelperService {
     try {
       if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
         Long qcId = Long.parseLong(json.getString("qcId"));
-        SampleQC sampleQc = requestManager.getSampleQCById(qcId);
+        SampleQC sampleQc = sampleService.getSampleQC(qcId);
         sampleQc.setResults(Double.parseDouble(json.getString("result")));
         Sample sample = sampleQc.getSample();
         sampleService.addQc(sample, sampleQc);
@@ -496,7 +499,7 @@ public class SampleControllerHelperService {
         // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
         idBarcode = null;
       } else {
-        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(requestManager.getBoxableViewsFromBarcodeList(Arrays.asList(idBarcode)));
+        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays.asList(idBarcode)));
         if (!previouslyBarcodedItems.isEmpty() && (
             previouslyBarcodedItems.size() != 1
                 || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.SAMPLE
@@ -606,7 +609,7 @@ public class SampleControllerHelperService {
   public String getSampleLastQC(Long sampleId) {
     try {
       String sampleQCValue = "NA";
-      Collection<SampleQC> sampleQCs = requestManager.listAllSampleQCsBySampleId(sampleId);
+      Collection<SampleQC> sampleQCs = sampleService.listSampleQCsBySampleId(sampleId);
       if (sampleQCs.size() > 0) {
         List<SampleQC> list = new ArrayList<>(sampleQCs);
         Collections.sort(list, new Comparator<SampleQC>() {

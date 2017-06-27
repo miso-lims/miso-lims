@@ -108,7 +108,7 @@ public class PoolWizardControllerHelperService {
         s.setResults(Double.valueOf(q.getString("poolQcResults")));
         s.setQcCreator(SecurityContextHolder.getContext().getAuthentication().getName());
         s.setQcDate(df.parse(q.getString("poolQcDate")));
-        s.setQcType(requestManager.getPoolQcTypeById(q.getLong("poolQcType")));
+        s.setQcType(poolService.getPoolQcType(q.getLong("poolQcType")));
       } catch (IOException e) {
         log.error("add pool", e);
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
@@ -175,7 +175,7 @@ public class PoolWizardControllerHelperService {
           }
 
           pool.setLastModifier(user);
-          poolService.savePool(pool);
+          poolService.save(pool);
 
           sb.append(
               "<a class='dashboardresult' href='/miso/pool/" + pool.getId()

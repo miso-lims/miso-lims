@@ -1,17 +1,25 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -24,9 +32,13 @@ public class DefaultContainerService
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private SequencerPartitionContainerStore containerStore;
+  private SequencerPartitionContainerStore containerDao;
+  @Autowired
+  private PlatformService platformService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private SecurityProfileStore securityProfileDao;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -35,14 +47,60 @@ public class DefaultContainerService
 
   @Override
   public PaginatedDataSource<SequencerPartitionContainer> getBackingPaginationSource() {
-    return containerStore;
+    return containerDao;
+  }
+
+  @Override
+  public List<SequencerPartitionContainer> list() throws IOException {
+    Collection<SequencerPartitionContainer> containers = containerDao.listAll();
+    return authorizationManager.filterUnreadable(containers);
+  }
+
+  @Override
+  public Collection<SequencerPartitionContainer> listByBarcode(String barcode) throws IOException {
+    Collection<SequencerPartitionContainer> containers = containerDao.listSequencerPartitionContainersByBarcode(barcode);
+    for (SequencerPartitionContainer container : containers) {
+      authorizationManager.throwIfNotReadable(container);
+    }
+    return containers;
+  }
+
+  @Override
+  public Collection<SequencerPartitionContainer> listByRunId(long runId) throws IOException {
+    Collection<SequencerPartitionContainer> containers = containerDao.listAllSequencerPartitionContainersByRunId(runId);
+    return authorizationManager.filterUnreadable(containers);
   }
 
   @Override
   public SequencerPartitionContainer get(long containerId) throws IOException, AuthorizationException {
-    SequencerPartitionContainer container = containerStore.get(containerId);
+    SequencerPartitionContainer container = containerDao.get(containerId);
     authorizationManager.throwIfNotReadable(container);
     return container;
+  }
+
+  @Override
+  public Long create(SequencerPartitionContainer container) throws IOException {
+    loadChildEntities(container);
+    authorizationManager.throwIfNotWritable(container);
+    setChangeDetails(container);
+
+    container.setSecurityProfile(securityProfileDao.get(securityProfileDao.save(container.getSecurityProfile())));
+    return save(container).getId();
+  }
+
+  @Override
+  public void update(SequencerPartitionContainer container) throws IOException {
+    SequencerPartitionContainer managed = get(container.getId());
+    authorizationManager.throwIfNotWritable(managed);
+    applyChanges(managed, container);
+    setChangeDetails(managed);
+    loadChildEntities(managed);
+    save(managed);
+  }
+
+  private SequencerPartitionContainer save(SequencerPartitionContainer container) throws IOException {
+    Long id = containerDao.save(container);
+    return get(id);
   }
 
   @Override
@@ -50,6 +108,7 @@ public class DefaultContainerService
     managed.setIdentificationBarcode(source.getIdentificationBarcode());
     managed.setLocationBarcode(source.getLocationBarcode());
     managed.setValidationBarcode(source.getValidationBarcode());
+    managed.setPlatform(source.getPlatform());
 
     for (Partition sourcePartition : source.getPartitions()) {
       for (Partition managedPartition : managed.getPartitions()) {
@@ -63,14 +122,67 @@ public class DefaultContainerService
           if (sourcePool == null && managedPool != null) {
             managedPartition.setPool(null);
           } else if (sourcePool != null && managedPool == null) {
-            managedPartition.setPool(poolService.getPoolById(sourcePool.getId()));
+            managedPartition.setPool(poolService.get(sourcePool.getId()));
           } else if (sourcePool.getId() != managedPool.getId()) {
-            managedPartition.setPool(poolService.getPoolById(sourcePool.getId()));
+            managedPartition.setPool(poolService.get(sourcePool.getId()));
           }
           break;
         }
       }
     }
+  }
+
+  /**
+   * Loads persisted objects into container fields. Should be called before saving new containers. Loads all member objects <b>except</b>
+   * <ul>
+   * <li>creator/lastModifier User objects</li>
+   * </ul>
+   * 
+   * @param container the SequencerPartitionContainer to load entities into. Must contain at least the IDs of objects to load (e.g. to load
+   *          the persisted Project
+   *          into container.platform, container.platform.id must be set)
+   * @throws IOException
+   */
+  private void loadChildEntities(SequencerPartitionContainer container) throws IOException {
+    container.setPlatform(platformService.get(container.getPlatform().getId()));
+  }
+
+  /**
+   * Updates all user data associated with the change
+   * 
+   * @param container the SequencerPartitionContainer to update
+   * @throws IOException
+   */
+  private void setChangeDetails(SequencerPartitionContainer container) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
+    container.setLastModifier(user);
+
+    if (container.getId() == Sample.UNSAVED_ID) {
+      container.setCreator(user);
+      if (container.getCreationTime() == null) {
+        container.setCreationTime(now);
+        container.setLastModified(now);
+      } else if (container.getLastModified() == null) {
+        container.setLastModified(now);
+      }
+    } else {
+      container.setLastModified(now);
+    }
+  }
+
+  @Override
+  public void delete(Long containerId) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    SequencerPartitionContainer container = get(containerId);
+    containerDao.remove(container);
+  }
+
+  @Override
+  public Partition getPartition(long partitionId) throws IOException {
+    Partition partition = containerDao.getPartitionById(partitionId);
+    authorizationManager.throwIfNotReadable(partition.getSequencerPartitionContainer());
+    return partition;
   }
 
   public void setPoolService(PoolService poolService) {
@@ -81,8 +193,16 @@ public class DefaultContainerService
     this.authorizationManager = authorizationManager;
   }
 
-  public void setContainerStore(SequencerPartitionContainerStore containerStore) {
-    this.containerStore = containerStore;
+  public void setContainerDao(SequencerPartitionContainerStore containerStore) {
+    this.containerDao = containerStore;
+  }
+
+  public void setSecurityProfileDao(SecurityProfileStore securityProfileStore) {
+    this.securityProfileDao = securityProfileStore;
+  }
+
+  public void setPlatformService(PlatformService platformService) {
+    this.platformService = platformService;
   }
 
 }

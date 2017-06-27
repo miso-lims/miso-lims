@@ -37,8 +37,6 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 
 /**
@@ -55,41 +53,6 @@ public class PrinterControllerHelperService {
   @Autowired
   private PrinterService printerService;
 
-  public JSONObject addPrinter(HttpSession session, JSONObject json) {
-    try {
-      Printer printer = new Printer();
-      printer.setBackend(Backend.values()[json.getInt("backend")]);
-      printer.setDriver(Driver.values()[json.getInt("driver")]);
-      printer.setConfiguration(json.getJSONObject("configuration").toString());
-      printer.setName(json.getString("name"));
-      printer.setEnabled(true);
-      printerService.create(printer);
-      return JSONUtils.JSONObjectResponse("html", "OK");
-    } catch (IOException e) {
-      log.error("add printer", e);
-      return JSONUtils.SimpleJSONError("Cannot add printer." + e.getMessage());
-    }
-  }
-
-  public JSONObject deletePrinter(HttpSession session, JSONObject json) {
-    try {
-      if (!json.has("printerId")) {
-        return JSONUtils.SimpleJSONError("No printer name supplied.");
-      }
-      Printer printer = printerService.get(json.getLong("printerId"));
-      if (printer == null) {
-        return JSONUtils.SimpleJSONError("No such printer.");
-      }
-      printerService.remove(printer);
-      return JSONUtils.SimpleJSONResponse("done");
-    } catch (
-
-    IOException e) {
-      log.error("Failed to delete printer: ", e);
-      return JSONUtils.SimpleJSONError("Failed to edit printer service: " + e.getMessage());
-    }
-  }
-
   public JSONObject listAvailableServices(HttpSession session, JSONObject json) {
     try {
       StringBuilder sb = new StringBuilder();
@@ -104,25 +67,6 @@ public class PrinterControllerHelperService {
     } catch (IOException e) {
       log.error("list available services", e);
       return JSONUtils.SimpleJSONError("Cannot retrieve available print services");
-    }
-  }
-
-  public JSONObject setPrinterState(HttpSession session, JSONObject json) {
-    if (!json.has("printerId")) {
-      return JSONUtils.SimpleJSONError("No such printer, or no printer specified to disable.");
-    }
-    long id = json.getLong("printerId");
-    boolean state = json.getBoolean("state");
-    try {
-      Printer printer = printerService.get(id);
-      if (printer != null) {
-        printer.setEnabled(state);
-        printerService.update(printer);
-      }
-      return JSONUtils.SimpleJSONResponse("Printer " + (state ? "enabled" : "disabled"));
-    } catch (IOException e) {
-      log.error("change printer state", e);
-      return JSONUtils.SimpleJSONError("Cannot resolve printer with name: " + id + " : " + e.getMessage());
     }
   }
 

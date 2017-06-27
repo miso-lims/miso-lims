@@ -53,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
@@ -61,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
+import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
@@ -79,7 +79,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private SampleClassDao sampleClassDao;
+  private SampleClassService sampleClassService;
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
@@ -123,8 +123,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     this.authorizationManager = authorizationManager;
   }
 
-  public void setSampleClassDao(SampleClassDao sampleClassDao) {
-    this.sampleClassDao = sampleClassDao;
+  public void setSampleClassService(SampleClassService sampleClassService) {
+    this.sampleClassService = sampleClassService;
   }
 
   public void setSampleValidRelationshipService(SampleValidRelationshipService sampleValidRelationshipService) {
@@ -451,7 +451,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   private Identity createParentIdentity(DetailedSample sample) throws IOException, MisoNamingException, SQLException {
     log.debug("Creating a new Identity to use as a parent.");
-    List<SampleClass> identityClasses = sampleClassDao.listByCategory(Identity.CATEGORY_NAME);
+    List<SampleClass> identityClasses = sampleClassService.listByCategory(Identity.CATEGORY_NAME);
     if (identityClasses.size() != 1) {
       throw new IllegalStateException("Found more or less than one SampleClass of category " + Identity.CATEGORY_NAME
           + ". Cannot choose which to use as root sample class.");
@@ -495,7 +495,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     if (isDetailedSample(sample)) {
       DetailedSample sai = (DetailedSample) sample;
       if (sai.getSampleClass() != null && sai.getSampleClass().getId() != null) {
-        sai.setSampleClass(sampleClassDao.getSampleClass(sai.getSampleClass().getId()));
+        sai.setSampleClass(sampleClassService.get(sai.getSampleClass().getId()));
       }
       if (sai.getDetailedQcStatus() != null && sai.getDetailedQcStatus().getId() != null) {
         sai.setDetailedQcStatus(detailedQcStatusDao.getDetailedQcStatus(sai.getDetailedQcStatus().getId()));
@@ -546,14 +546,29 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   /**
-   * Updates all timestamps and user data associated with the change
+   * Updates all user data and timestamps associated with the change. Existing timestamps will be preserved
+   * if the Sample is unsaved, and they are already set
    * 
    * @param sample the Sample to update
+   * @param preserveTimestamps if true, the creationTime and lastModified date are not updated
    * @throws IOException
    */
   private void setChangeDetails(Sample sample) throws IOException {
     User user = authorizationManager.getCurrentUser();
+    Date now = new Date();
     sample.setLastModifier(user);
+
+    if (sample.getId() == Sample.UNSAVED_ID) {
+      sample.setCreator(user);
+      if (sample.getCreationTime() == null) {
+        sample.setCreationTime(now);
+        sample.setLastModified(now);
+      } else if (sample.getLastModified() == null) {
+        sample.setLastModified(now);
+      }
+    } else {
+      sample.setLastModified(now);
+    }
   }
 
   @Override
@@ -664,8 +679,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   @Override
-  public List<Sample> getAll() throws IOException {
-    Collection<Sample> allSamples = sampleDao.getSamples();
+  public List<Sample> list() throws IOException {
+    Collection<Sample> allSamples = sampleDao.list();
     return authorizationManager.filterUnreadable(allSamples);
   }
 
@@ -677,12 +692,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   @Override
   public Collection<Sample> listWithLimit(long limit) throws IOException {
     Collection<Sample> samples = sampleDao.listAllWithLimit(limit);
-    return authorizationManager.filterUnreadable(samples);
-  }
-
-  @Override
-  public Collection<Sample> listBySearch(String query) throws IOException {
-    Collection<Sample> samples = sampleDao.listBySearch(query);
     return authorizationManager.filterUnreadable(samples);
   }
 
@@ -712,13 +721,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     authorizationManager.throwIfNonAdmin();
     Sample sample = get(sampleId);
     sampleDao.deleteSample(sample);
-  }
-
-  @CoverageIgnore
-  @Override
-  public List<Sample> getBySearch(String querystr) throws IOException {
-    Collection<Sample> samples = sampleDao.listBySearch(querystr);
-    return authorizationManager.filterUnreadable(samples);
   }
 
   @Override
@@ -828,8 +830,35 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   @Override
+  public SampleQC getSampleQC(long sampleQcId) throws IOException {
+    SampleQC qc = sampleQcDao.get(sampleQcId);
+    authorizationManager.throwIfNotReadable(qc.getSample());
+    return qc;
+  }
+
+  @Override
   public Collection<QcType> listSampleQcTypes() throws IOException {
     return sampleQcDao.listAllSampleQcTypes();
+  }
+
+  @Override
+  public QcType getSampleQcType(long qcTypeId) throws IOException {
+    return sampleQcDao.getSampleQcTypeById(qcTypeId);
+  }
+
+  @Override
+  public QcType getSampleQcTypeByName(String qcTypeName) throws IOException {
+    return sampleQcDao.getSampleQcTypeByName(qcTypeName);
+  }
+
+  @Override
+  public Collection<SampleQC> listSampleQCsBySampleId(long sampleId) throws IOException {
+    Collection<SampleQC> qcs = new HashSet<>();
+    for (SampleQC qc : sampleQcDao.listBySampleId(sampleId)) {
+      if (qc.userCanRead(authorizationManager.getCurrentUser()))
+        qcs.add(qc);
+    }
+    return qcs;
   }
 
   @Override

@@ -90,7 +90,6 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
       dtResponse.setSEcho(new Long(request.getParameter("sEcho")));
       String errorMessage = errorBuffer.toString();
       if (errorMessage.length() > 0) {
-        // TODO: This makes it to the front end where it is promptly ignored. Make them get displayed somewhere.
         dtResponse.setSError(errorMessage);
       }
       return dtResponse;
