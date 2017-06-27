@@ -1,3 +1,9 @@
+# 0.2.74
+
+Changes:
+
+* Bug fix
+
 # 0.2.73
 
 Changes:
@@ -10,6 +16,10 @@ Changes:
  * Fixed sorting libraries by sample
  * Improved UI of Orders, Kits, Containers, Runs, Printers, and Boxes List pages
  * Improved performance of several pages
+
+Bad:
+
+* Saving Run fails, both through UI and via Notification Server
 
 # 0.2.72
 
