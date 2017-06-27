@@ -314,7 +314,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
-      return "created";
+      return "creationTime";
     case UPDATE:
       return "lastModified";
     default:

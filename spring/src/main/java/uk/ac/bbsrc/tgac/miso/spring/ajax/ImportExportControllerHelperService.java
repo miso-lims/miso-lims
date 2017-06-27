@@ -344,6 +344,7 @@ public class ImportExportControllerHelperService {
               library.setSample(s);
               library.setSecurityProfile(s.getSecurityProfile());
               library.setDescription(jsonArrayElement.getString(4));
+              library.setCreationDate(new Date());
               library.setPlatformType(pt.getKey());
               library.setLibraryType(lt);
               library.setLibrarySelectionType(ls);
@@ -498,6 +499,7 @@ public class ImportExportControllerHelperService {
                     pool.setAlias(poolName);
                     pool.setPlatformType(pt);
                     pool.setReadyToRun(true);
+                    pool.setCreationDate(new Date());
                     if (jsonArrayElement.get(13) != null && !isStringEmptyOrNull(jsonArrayElement.getString(13))) {
                       pool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
                     } else {

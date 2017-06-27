@@ -280,7 +280,7 @@
             </c:otherwise>
           </c:choose>
           <td>
-            <fmt:formatDate value="${run.lastUpdated}" dateStyle="long" pattern="dd/MM/yyyy HH:mm:ss"/>
+            <fmt:formatDate value="${run.lastModified}" dateStyle="long" pattern="dd/MM/yyyy HH:mm:ss"/>
           </td>
         </tr>
         </tbody>

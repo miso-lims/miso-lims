@@ -117,9 +117,9 @@ public class Run
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
 
-  @Column(nullable = false, updatable = false)
+  @Column(name = "created", nullable = false, updatable = false)
   @Temporal(TemporalType.TIMESTAMP)
-  private Date created;
+  private Date creationTime;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
@@ -299,11 +299,11 @@ public class Run
   }
 
   public Date getCreationTime() {
-    return created;
+    return creationTime;
   }
 
   public void setCreationTime(Date created) {
-    this.created = created;
+    this.creationTime = created;
   }
 
   public String getMetrics() {

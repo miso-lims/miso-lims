@@ -388,6 +388,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     if (isDetailedLibrary(library)) {
 
+      if (library.getCreationDate() == null) library.setCreationDate(timeStamp);
       if (library.getCreationTime() == null) library.setCreationTime(timeStamp);
       // Check for duplicate alias
       Collection<Library> dupes = serviceManager.getLibraryService().listByAlias(library.getAlias());
@@ -608,7 +609,10 @@ public class DefaultMigrationTarget implements MigrationTarget {
   }
 
   private void setPoolModifiedDetails(Pool pool) throws IOException {
-    if (pool.getId() == PoolImpl.UNSAVED_ID) pool.setCreationTime(timeStamp);
+    if (pool.getId() == PoolImpl.UNSAVED_ID) {
+      pool.setCreationTime(timeStamp);
+      pool.setCreationDate(timeStamp);
+    }
     pool.setCreator(migrationUser);
     pool.setLastModifier(migrationUser);
     pool.setLastModified(timeStamp);

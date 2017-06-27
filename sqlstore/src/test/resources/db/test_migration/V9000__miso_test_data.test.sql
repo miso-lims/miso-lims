@@ -247,21 +247,21 @@ VALUES (1,'WGS','Whole genome shotgun'),
 (14,'CTS','Concatenated Tag Sequencing');
 
 DELETE FROM `Library`;
-INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `securityProfile_profileId`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`)
-VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
-(2,'LIB2','Inherited from TEST_0001',NULL,1,2,'LIB2::TEST_0001_Bn_R_PE_300_WG','LIBRARY_INBOX_A02',3,0,'ILLUMINA','TEST_0001_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(3,'LIB3','Inherited from TEST_0002',NULL,1,3,'LIB3::TEST_0002_Bn_P_PE_300_WG','LIBRARY_INBOX_A03',3,0,'ILLUMINA','TEST_0002_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
-(4,'LIB4','Inherited from TEST_0002',NULL,1,4,'LIB4::TEST_0002_Bn_R_PE_300_WG','LIBRARY_INBOX_A04',3,0,'ILLUMINA','TEST_0002_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
-(5,'LIB5','Inherited from TEST_0003',NULL,1,5,'LIB5::TEST_0003_Bn_P_PE_300_WG','LIBRARY_INBOX_A05',3,0,'ILLUMINA','TEST_0003_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
-(6,'LIB6','Inherited from TEST_0003',NULL,1,6,'LIB6::TEST_0003_Bn_R_PE_300_WG','LIBRARY_INBOX_A06',3,0,'ILLUMINA','TEST_0003_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
-(7,'LIB7','Inherited from TEST_0004',NULL,1,7,'LIB7::TEST_0004_Bn_P_PE_300_WG','LIBRARY_INBOX_A07',3,0,'ILLUMINA','TEST_0004_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
-(8,'LIB8','Inherited from TEST_0004',NULL,1,8,'LIB8::TEST_0004_Bn_R_PE_300_WG','LIBRARY_INBOX_A08',3,0,'ILLUMINA','TEST_0004_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
-(9,'LIB9','Inherited from TEST_0005',NULL,1,9,'LIB9::TEST_0005_Bn_P_PE_300_WG','LIBRARY_INBOX_A09',3,0,'ILLUMINA','TEST_0005_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
-(10,'LIB10','Inherited from TEST_0005',NULL,1,10,'LIB10::TEST_0005_Bn_R_PE_300_WG','LIBRARY_INBOX_A10',3,0,'ILLUMINA','TEST_0005_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07'),
-(11,'LIB11','Inherited from TEST_0006',NULL,1,11,'LIB11::TEST_0006_Bn_P_PE_300_WG','LIBRARY_INBOX_B01',3,0,'ILLUMINA','TEST_0006_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09'),
-(12,'LIB12','Inherited from TEST_0006',NULL,1,12,'LIB12::TEST_0006_Bn_R_PE_300_WG','LIBRARY_INBOX_B02',3,0,'ILLUMINA','TEST_0006_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11'),
-(13,'LIB13','Inherited from TEST_0007',NULL,1,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'ILLUMINA','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13'),
-(14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15');
+INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `securityProfile_profileId`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`)
+VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
+(2,'LIB2','Inherited from TEST_0001',NULL,1,2,'LIB2::TEST_0001_Bn_R_PE_300_WG','LIBRARY_INBOX_A02',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
+(3,'LIB3','Inherited from TEST_0002',NULL,1,3,'LIB3::TEST_0002_Bn_P_PE_300_WG','LIBRARY_INBOX_A03',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
+(4,'LIB4','Inherited from TEST_0002',NULL,1,4,'LIB4::TEST_0002_Bn_R_PE_300_WG','LIBRARY_INBOX_A04',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
+(5,'LIB5','Inherited from TEST_0003',NULL,1,5,'LIB5::TEST_0003_Bn_P_PE_300_WG','LIBRARY_INBOX_A05',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
+(6,'LIB6','Inherited from TEST_0003',NULL,1,6,'LIB6::TEST_0003_Bn_R_PE_300_WG','LIBRARY_INBOX_A06',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
+(7,'LIB7','Inherited from TEST_0004',NULL,1,7,'LIB7::TEST_0004_Bn_P_PE_300_WG','LIBRARY_INBOX_A07',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
+(8,'LIB8','Inherited from TEST_0004',NULL,1,8,'LIB8::TEST_0004_Bn_R_PE_300_WG','LIBRARY_INBOX_A08',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
+(9,'LIB9','Inherited from TEST_0005',NULL,1,9,'LIB9::TEST_0005_Bn_P_PE_300_WG','LIBRARY_INBOX_A09',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
+(10,'LIB10','Inherited from TEST_0005',NULL,1,10,'LIB10::TEST_0005_Bn_R_PE_300_WG','LIBRARY_INBOX_A10',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07'),
+(11,'LIB11','Inherited from TEST_0006',NULL,1,11,'LIB11::TEST_0006_Bn_P_PE_300_WG','LIBRARY_INBOX_B01',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09'),
+(12,'LIB12','Inherited from TEST_0006',NULL,1,12,'LIB12::TEST_0006_Bn_R_PE_300_WG','LIBRARY_INBOX_B02',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11'),
+(13,'LIB13','Inherited from TEST_0007',NULL,1,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13'),
+(14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15');
 
 DELETE FROM LibraryChangeLog;
 INSERT INTO `LibraryChangeLog`(`libraryId`, `columnsChanged`, `userId`, `message`, `changeTime`)
@@ -336,17 +336,17 @@ INSERT INTO `Library_Index`
 VALUES (1,12),(2,11),(3,10),(4,9),(5,8),(6,7),(7,6),(8,5),(9,4),(10,3),(11,2),(12,1),(13,24),(14,23);
 
 DELETE FROM `Pool`;
-INSERT INTO `Pool`(`poolId`, `concentration`, `identificationBarcode`, `name`, `description`, `securityProfile_profileId`, `platformType`, `ready`, `alias`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`)
-VALUES (1,2,'IPO1::Illumina','IPO1','TEST',2,'ILLUMINA',1,'Pool 1',NULL,1,'2016-06-07 13:13:30',1,'2016-07-07 13:30:49'),
-(2,2,'IPO2::Illumina','IPO2','TEST',3,'ILLUMINA',1,'Pool 2',NULL,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(3,2,'IPO3::Illumina','IPO3','TEST',4,'ILLUMINA',1,'Pool 3',NULL,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
-(4,2,'IPO4::Illumina','IPO4','TEST',5,'ILLUMINA',1,'Pool 4',NULL,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
-(5,2,'IPO5::Illumina','IPO5','TEST',6,'ILLUMINA',1,'Pool 5',NULL,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
-(6,2,'IPO6::Illumina','IPO6','TEST',7,'ILLUMINA',0,'Pool 6',NULL,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
-(7,2,'IPO7::Illumina','IPO7','TEST',8,'ILLUMINA',0,'Pool 7',NULL,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
-(8,2,'IPO8::Illumina','IPO8','TEST',9,'ILLUMINA',0,'Pool 8',NULL,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
-(9,2,'IPO9::Illumina','IPO9','TEST',10,'ILLUMINA',0,'Pool 9',NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
-(10,2,'IPO10::Illumina','IPO10','TEST',11,'ILLUMINA',0,'Pool 10',NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07');
+INSERT INTO `Pool`(`poolId`, `concentration`, `identificationBarcode`, `name`, `description`, `creationDate`, `securityProfile_profileId`, `platformType`, `ready`, `alias`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`)
+VALUES (1,2,'IPO1::Illumina','IPO1','TEST','2015-08-27',2,'ILLUMINA',1,'Pool 1',NULL,1,'2016-06-07 13:13:30',1,'2016-07-07 13:30:49'),
+(2,2,'IPO2::Illumina','IPO2','TEST','2015-08-27',3,'ILLUMINA',1,'Pool 2',NULL,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
+(3,2,'IPO3::Illumina','IPO3','TEST','2015-08-27',4,'ILLUMINA',1,'Pool 3',NULL,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
+(4,2,'IPO4::Illumina','IPO4','TEST','2015-08-27',5,'ILLUMINA',1,'Pool 4',NULL,1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
+(5,2,'IPO5::Illumina','IPO5','TEST','2015-08-27',6,'ILLUMINA',1,'Pool 5',NULL,1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
+(6,2,'IPO6::Illumina','IPO6','TEST','2015-08-27',7,'ILLUMINA',0,'Pool 6',NULL,1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
+(7,2,'IPO7::Illumina','IPO7','TEST','2015-08-27',8,'ILLUMINA',0,'Pool 7',NULL,1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
+(8,2,'IPO8::Illumina','IPO8','TEST','2015-08-27',9,'ILLUMINA',0,'Pool 8',NULL,1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
+(9,2,'IPO9::Illumina','IPO9','TEST','2015-08-27',10,'ILLUMINA',0,'Pool 9',NULL,1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
+(10,2,'IPO10::Illumina','IPO10','TEST','2015-08-27',11,'ILLUMINA',0,'Pool 10',NULL,1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07');
 
 DELETE FROM `Pool_Dilution`;
 INSERT INTO `Pool_Dilution`(`pool_poolId`, `dilution_dilutionId`) 
