@@ -244,6 +244,18 @@ public interface Pool
   @Override
   void setWatchGroup(Group group);
 
+  /**
+   * @return the user-specified date that this Pool was created
+   */
+  public Date getCreationDate();
+
+  /**
+   * Sets the user-specified date that this Pool was created
+   * 
+   * @param creationDate
+   */
+  public void setCreationDate(Date creationDate);
+
   // TODO: remove below fields to ChangeLoggable interface
   /**
    * Returns the user who last modified this item.
@@ -264,8 +276,16 @@ public interface Pool
 
   public void setCreator(User user);
 
+  /**
+   * @return the time this entity was first persisted
+   */
   public Date getCreationTime();
 
+  /**
+   * Sets the time that this entity was first persisted
+   * 
+   * @param creationTime
+   */
   public void setCreationTime(Date creationTime);
 
 }

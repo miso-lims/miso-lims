@@ -108,7 +108,7 @@ public class ContainerRestController extends RestController {
         if (partition.getPool() != null) {
           sb.append("{");
           sb.append("\"poolName\":\"" + partition.getPool().getName() + "\",");
-          sb.append("\"poolDate\":\"" + partition.getPool().getCreationTime() + "\",");
+          sb.append("\"poolDate\":\"" + partition.getPool().getCreationDate() + "\",");
           // experiments
           sb.append("\"experiments\":[");
           int ie = 0;

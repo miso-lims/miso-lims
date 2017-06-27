@@ -1027,7 +1027,7 @@ public class Dtos {
     if (from.getSample() instanceof DetailedSample) {
       dto.setParentSampleClassId(((DetailedSample) from.getSample()).getSampleClass().getId());
     }
-    dto.setCreationDate(getDateTimeString(from.getCreationTime()));
+    dto.setCreationDate(getDateString(from.getCreationDate()));
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());
     dto.setConcentration(from.getInitialConcentration());
@@ -1144,7 +1144,7 @@ public class Dtos {
     to.setVolume(from.getVolume());
     to.setDnaSize(from.getDnaSize());
     to.setLocationBarcode(from.getLocationBarcode());
-    to.setCreationTime(extractDateTimeOrNull(from.getCreationDate()));
+    to.setCreationDate(extractDateOrNull(from.getCreationDate()));
 
     if (from.getQcs() != null && !from.getQcs().isEmpty()) {
       for (LibraryQcDto qcDto : from.getQcs()) {
@@ -1338,7 +1338,7 @@ public class Dtos {
     dto.setConcentration(from.getConcentration());
     dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
-    dto.setCreationDate(getDateTimeString(from.getCreationTime()));
+    dto.setCreationDate(getDateString(from.getCreationDate()));
     dto.setDiscarded(from.isDiscarded());
     dto.setVolume(from.getVolume());
     dto.setPlatformType(from.getPlatformType().name());
@@ -1686,7 +1686,7 @@ public class Dtos {
     to.setId(dto.getId() == null ? PoolImpl.UNSAVED_ID : dto.getId());
     to.setAlias(dto.getAlias());
     to.setConcentration(dto.getConcentration());
-    to.setCreationTime(extractDateTimeOrNull(dto.getCreationDate()));
+    to.setCreationDate(extractDateOrNull(dto.getCreationDate()));
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());
     to.setDiscarded(dto.isDiscarded());

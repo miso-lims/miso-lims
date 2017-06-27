@@ -127,9 +127,9 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
 
-  @Column(nullable = false, updatable = false)
+  @Column(name = "created", nullable = false, updatable = false)
   @Temporal(TemporalType.TIMESTAMP)
-  private Date created;
+  private Date creationTime;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
@@ -190,12 +190,12 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public Date getCreationTime() {
-    return created;
+    return creationTime;
   }
 
   @Override
   public void setCreationTime(Date created) {
-    this.created = created;
+    this.creationTime = created;
   }
 
   @Override

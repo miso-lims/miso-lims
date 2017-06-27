@@ -315,6 +315,18 @@ public interface Library
 
   void setDnaSize(Integer dnaSize);
 
+  /**
+   * @return the user-specified date that this Library was created
+   */
+  public Date getCreationDate();
+
+  /**
+   * Sets the user-specified date that this Library was created
+   * 
+   * @param creationDate
+   */
+  public void setCreationDate(Date creationDate);
+
   // TODO: remove below fields to ChangeLoggable interface
 
   /**
@@ -336,8 +348,16 @@ public interface Library
 
   public void setCreator(User user);
 
+  /**
+   * @return the time this entity was first persisted
+   */
   public Date getCreationTime();
 
+  /**
+   * Sets the time that this entity was first persisted
+   * 
+   * @param creationTime
+   */
   public void setCreationTime(Date creationTime);
 
 }

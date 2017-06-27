@@ -346,7 +346,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
-      return "created";
+      return "creationTime";
     case UPDATE:
       return "lastModified";
     case RECEIVE:
