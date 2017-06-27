@@ -23,8 +23,8 @@
 
 ListState = {};
 ListTarget = {};
-ListUtils = {
-  createTable : function(elementId, target, projectId, config) {
+ListUtils = (function() {
+  var initTable = function(elementId, target, projectId, config, optionModifier) {
     var searchKey = target.name + '_search';
     var lastSearch = window.localStorage.getItem(searchKey);
     var staticActions = target.createStaticActions(config, projectId);
@@ -38,66 +38,32 @@ ListUtils = {
     }
     var errorMessage = document.createElement('DIV');
     var jqTable = jQuery('#' + elementId).html('');
-    jqTable
-        .dataTable(
-            Utils
-                .setSortFromPriority({
-                  'aoColumns' : columns,
-                  'bJQueryUI' : true,
-                  'bAutoWidth' : false,
-                  'iDisplayLength' : 25,
-                  'iDisplayStart' : 0,
-                  'sDom' : '<lf>rt<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-                  'sPaginationType' : 'full_numbers',
-                  'bProcessing' : true,
-                  'bServerSide' : true,
-                  'sAjaxSource' : target.createUrl(config, projectId),
-                  'oSearch' : {
-                    'sSearch' : lastSearch || ""
-                  },
-                  'fnServerData' : function(sSource, aoData, fnCallback) {
-                    jqTable.addClass('disabled');
-                    jQuery.ajax({
-                      'dataType' : 'json',
-                      'type' : 'GET',
-                      'url' : sSource,
-                      'data' : aoData,
-                      'success' : function(data, textStatus, xhr) {
-                        errorMessage.innerText = data.sError;
-                        columns.forEach(function(column, index) {
-                          if (!column.visibilityFilter) {
-                            return;
-                          }
-                          jqTable.fnSetColumnVis(index, column
-                              .visibilityFilter(data.aaData.map(function(d) {
-                                return d[column.mData];
-                              })), false);
-                        });
-                        fnCallback(data, textStatus, xhr);
-                      },
-                      'error' : function(xhr, statusText, errorThrown) {
-                        errorMessage.innerText = errorThrown;
-                        fnCallback({
-                          iTotalRecords : 0,
-                          iTotalDisplayRecords : 0,
-                          sEcho : aoData.sEcho,
-                          aaData : []
-                        });
-                        
-                      }
-                    });
-                  },
-                  'fnDrawCallback' : function(oSettings) {
-                    jqTable.removeClass('disabled');
-                    jQuery('#' + elementId + '_paginate').find('.fg-button')
-                        .removeClass('fg-button');
-                    var filterbox = jQuery('#' + elementId + '_filter :input');
-                    filterbox.val(window.localStorage.getItem(searchKey));
-                    filterbox.on('change keyup paste', function() {
-                      window.localStorage.setItem(searchKey, filterbox.val());
-                    });
-                  }
-                })).fnSetFilteringDelay(600);
+    var options = Utils
+        .setSortFromPriority({
+          'aoColumns' : columns,
+          'bJQueryUI' : true,
+          'bAutoWidth' : false,
+          'iDisplayLength' : 25,
+          'iDisplayStart' : 0,
+          'sDom' : '<lf>rt<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+          'sPaginationType' : 'full_numbers',
+          'bProcessing' : true,
+          'oSearch' : {
+            'sSearch' : lastSearch || ""
+          },
+          'fnDrawCallback' : function(oSettings) {
+            jqTable.removeClass('disabled');
+            jQuery('#' + elementId + '_paginate').find('.fg-button')
+                .removeClass('fg-button');
+            var filterbox = jQuery('#' + elementId + '_filter :input');
+            filterbox.val(window.localStorage.getItem(searchKey));
+            filterbox.on('change keyup paste', function() {
+              window.localStorage.setItem(searchKey, filterbox.val());
+            });
+          }
+        });
+    optionModifier(options, jqTable, errorMessage, columns);
+    jqTable.dataTable(options).fnSetFilteringDelay(600);
     var tableNode = document.getElementById(elementId + '_wrapper');
     errorMessage.setAttribute('class', 'parsley-error');
     tableNode.parentNode.insertBefore(errorMessage, tableNode);
@@ -139,20 +105,70 @@ ListUtils = {
         toolbar.append(button);
       });
     }
-  },
-  render : {
-    booleanChecks : function(data, type, full) {
-      return data ? "✔" : "";
+  }
+  return {
+    createTable : function(elementId, target, projectId, config) {
+      initTable(elementId, target, projectId, config, function(options,
+          jqTable, errorMessage, columns) {
+        options.bServerSide = true;
+        options.sAjaxSource = target.createUrl(config, projectId);
+        options.fnServerData = function(sSource, aoData, fnCallback) {
+          jqTable.addClass('disabled');
+          jQuery.ajax({
+            'dataType' : 'json',
+            'type' : 'GET',
+            'url' : sSource,
+            'data' : aoData,
+            'success' : function(data, textStatus, xhr) {
+              errorMessage.innerText = data.sError;
+              columns.forEach(function(column, index) {
+                if (!column.visibilityFilter) {
+                  return;
+                }
+                jqTable.fnSetColumnVis(index, column
+                    .visibilityFilter(data.aaData.map(function(d) {
+                      return d[column.mData];
+                    })), false);
+              });
+              fnCallback(data, textStatus, xhr);
+            },
+            'error' : function(xhr, statusText, errorThrown) {
+              errorMessage.innerText = errorThrown;
+              fnCallback({
+                iTotalRecords : 0,
+                iTotalDisplayRecords : 0,
+                sEcho : aoData.sEcho,
+                aaData : []
+              });
+            }
+          });
+        };
+      });
     },
     idHyperlink : function(urlFragment) {
           return function (data, type, full) {
             return "<a href=\"/miso/" + urlFragment + "/" + full.id + "\">" + data + "</a>";
           };
     },
-    textFromId : function(list, property) {
-          return function (data, type, full) {
-            return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(data), list), property) || "Unknown";
-          };
-    },
-  }
-};
+    render : {
+      booleanChecks : function(data, type, full) {
+        if (typeof data == 'boolean') {
+          return data ? "✔" : "✘";
+        } else {
+          return "?";
+        }
+      },
+      idHyperlink : function(urlFragment) {
+        return function(data, type, full) {
+          return "<a href=\"/miso/" + urlFragment + "/" + full.id + "\">" + data + "</a>";
+        };
+      },
+      textFromId : function(list, property, unknown) {
+        return function(data, type, full) {
+          return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(
+              Utils.array.idPredicate(data), list), property) || unknown || "Unknown";
+        };
+      },
+    }
+  };
+})();
