@@ -10,7 +10,7 @@ jdk:
   - oraclejdk8
 
 before_script:
-  - export MAVEN_OPTS='-Xmx2g -XX:MaxPermSize=512m'
+  - export MAVEN_OPTS='-Xms1g -Xmx2g'
 script:
   - mvn clean -P external -Dmaven.javadoc.skip=true install
 
