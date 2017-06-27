@@ -93,7 +93,7 @@ ListUtils = {
                         .removeClass('fg-button');
                     var filterbox = jQuery('#' + elementId + '_filter :input');
                     filterbox.val(window.localStorage.getItem(searchKey));
-                    filterbox.on('change', function() {
+                    filterbox.on('change keyup paste', function() {
                       window.localStorage.setItem(searchKey, filterbox.val());
                     });
                   }
