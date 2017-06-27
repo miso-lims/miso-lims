@@ -1,6 +1,7 @@
 language: java
 git:
   depth: 3
+sudo: required
 addons:
   apt:
     packages:
