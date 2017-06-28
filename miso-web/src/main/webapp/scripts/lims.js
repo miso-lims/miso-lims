@@ -208,6 +208,35 @@ var Utils = Utils || {
           buttons: buttons
       });
     },
+  showWizardDialog: function(title, actions) {
+      var dialogArea = document.getElementById('dialog');
+      while (dialogArea.hasChildNodes()) {
+          dialogArea.removeChild(dialogArea.lastChild);
+      }
+
+      actions.forEach(function(action) {
+          var p = document.createElement('P');
+          var link = document.createElement('A');
+          link.appendChild(document.createTextNode("→ " + action.name));
+          link.href = '#';
+          link.onclick = function() {
+              dialog.dialog("close");
+              action.handler();
+              return false;
+          };
+          p.appendChild(link);
+          dialogArea.appendChild(p);
+      });
+
+      var dialog = jQuery('#dialog').dialog({
+          autoOpen: true,
+          height: 400,
+          width: 350,
+          title:title,
+          modal: true,
+          buttons: {"Cancel" : function () { dialog.dialog("close"); }}
+      });
+    },
     ajaxWithDialog: function(title, method, url, data, callback) {
         var dialogArea = document.getElementById('dialog');
         while (dialogArea.hasChildNodes()) {
