@@ -29,7 +29,7 @@ public class DetailedQcStatusImpl implements DetailedQcStatus {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long detailedQcStatusId;
 
-  @Column
+  @Column(nullable = true)
   private Boolean status;
 
   @Column(nullable = false)

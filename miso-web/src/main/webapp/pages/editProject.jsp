@@ -65,21 +65,21 @@
 <table class="in">
   <tr>
     <td class="h">Project ID:</td>
-    <td>
+    <td><span id="projectId">
       <c:choose>
         <c:when test="${project.id != 0}">${project.id}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
-    </td>
+    </span></td>
   </tr>
   <tr>
     <td class="h">Name:</td>
-    <td>
+    <td><span id="name">
       <c:choose>
         <c:when test="${project.id != 0}">${project.name}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
-    </td>
+    </span></td>
   </tr>
   <tr>
     <td class="h">Creation date:</td>
