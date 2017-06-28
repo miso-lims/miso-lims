@@ -149,7 +149,10 @@ ListUtils = (function() {
           button.href = '#';
           button.setAttribute('class', 'ui-button ui-state-default');
           button.setAttribute('title', buttonDescription.title || '');
-          button.onclick = buttonDescription.handler;
+          button.onclick = function() {
+            buttonDescription.handler();
+            return false;
+          }
         } else {
           button = document.createElement('SPAN');
           button.setAttribute('class', 'ui-state-default');
