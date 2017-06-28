@@ -540,6 +540,12 @@ Utils.array = {
   getAliasFromId: function (id, referenceCollection) {
     return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(id), referenceCollection), 'alias');
   },
+  deduplicateNumeric: function(input) {
+    return input.sort(function(a, b) { return a - b; }).filter(function(obj, index, arr) { return index == 0 || obj !== arr[index - 1]; });
+  },
+  deduplicateById: function(input) {
+    return input.sort(function(a, b) { return a.id - b.id; }).filter(function(obj, index, arr) { return index == 0 || obj.id != arr[index - 1].id; });
+  },
   
   /**
    * Sorts based on a given property.

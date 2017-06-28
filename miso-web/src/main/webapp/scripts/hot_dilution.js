@@ -105,24 +105,24 @@ HotTarget.dilution = {
   bulkActions : [
       {
         name : 'Edit',
-        action : function(ids) {
-          window.location = window.location.origin + '/miso/library/dilution/bulk/edit/' + ids
+        action : function(items) {
+          window.location = window.location.origin + '/miso/library/dilution/bulk/edit/' + items.map(Utils.array.getId)
               .join(',');
         }
       },
       {
         name : 'Pool together',
         title : 'Create one pool from many dilutions',
-        action : function(ids) {
-          window.location = window.location.origin + '/miso/library/dilution/bulk/merge/' + ids
+        action : function(items) {
+          window.location = window.location.origin + '/miso/library/dilution/bulk/merge/' + items.map(Utils.array.getId)
               .join(',');
         }
       },
       {
         name : 'Pool separately',
         title : 'Create a pool for each dilution',
-        action : function(ids) {
-          window.location = window.location.origin + '/miso/library/dilution/bulk/propagate/' + ids
+        action : function(items) {
+          window.location = window.location.origin + '/miso/library/dilution/bulk/propagate/' + items.map(Utils.array.getId)
               .join(',');
         }
       }, ],

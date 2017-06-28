@@ -32,9 +32,61 @@ ListUtils = (function() {
     var columns = target.createColumns(config, projectId).filter(function(x) {
       return x.include;
     });
+    ListState[elementId] = {
+      selected : [],
+      data : [],
+      lastId : -1
+    };
     if (bulkActions.length > 0) {
-      ListState[elementId] = [];
-      columns.unshift(Utils.createToggleColumn('ListState.' + elementId));
+      columns
+          .unshift({
+            "sTitle" : "",
+            "mData" : "id",
+            "include" : true,
+            "mRender" : function(data, type, full) {
+              var checked = ListState[elementId].selected.some(function(obj) {
+                return obj.id == data;
+              }) ? " checked=\"checked\"" : "";
+              
+              return "<input type=\"checkbox\" id=\"" + elementId + "_toggle" + data + "\" onclick=\"ListUtils._checkEventHandler(this.checked, event, " + data + ", '" + elementId + "')\"" + checked + ">";
+            }
+          });
+      if (staticActions.length > 0) {
+        staticActions.push(null);
+      }
+      staticActions.push({
+        "name" : "☑",
+        "title" : "Select all",
+        "handler" : function() {
+          var state = ListState[elementId];
+          state.lastId = -1;
+          state.selected = Utils.array.deduplicateById(state.selected
+              .concat(state.data));
+          state.data.forEach(function(item) {
+            var element = document
+                .getElementById(elementId + "_toggle" + item.id);
+            if (element) {
+              element.checked = true;
+            }
+          });
+        }
+      });
+      staticActions.push({
+        "name" : "☐",
+        "title" : "Deselect all",
+        "handler" : function() {
+          var state = ListState[elementId];
+          state.lastId = -1;
+          state.selected = [];
+          state.data.forEach(function(item) {
+            var element = document
+                .getElementById(elementId + "_toggle" + item.id);
+            if (element) {
+              element.checked = false;
+            }
+          });
+        }
+      });
     }
     var errorMessage = document.createElement('DIV');
     var jqTable = jQuery('#' + elementId).html('');
@@ -82,12 +134,11 @@ ListUtils = (function() {
         return {
           name : bulkAction.name,
           handler : function() {
-            var list = ListState[elementId];
-            if (list.length == 0) {
+            if (ListState[elementId].selected.length == 0) {
               alert('Nothing selected.');
               return;
             }
-            bulkAction.action(list);
+            bulkAction.action(ListState[elementId].selected);
           }
         };
       })).forEach(function(buttonDescription) {
@@ -101,6 +152,7 @@ ListUtils = (function() {
           button.onclick = buttonDescription.handler;
         } else {
           button = document.createElement('SPAN');
+          button.setAttribute('class', 'ui-state-default');
         }
         toolbar.append(button);
       });
@@ -121,6 +173,7 @@ ListUtils = (function() {
             'data' : aoData,
             'success' : function(data, textStatus, xhr) {
               errorMessage.innerText = data.sError;
+        	ListState[elementId].data = data.aaData;
               columns.forEach(function(column, index) {
                 if (!column.visibilityFilter) {
                   return;
@@ -134,6 +187,7 @@ ListUtils = (function() {
             },
             'error' : function(xhr, statusText, errorThrown) {
               errorMessage.innerText = errorThrown;
+        	ListState[elementId].data = [];
               fnCallback({
                 iTotalRecords : 0,
                 iTotalDisplayRecords : 0,
@@ -145,10 +199,59 @@ ListUtils = (function() {
         };
       });
     },
-    idHyperlink : function(urlFragment) {
-          return function (data, type, full) {
-            return "<a href=\"/miso/" + urlFragment + "/" + full.id + "\">" + data + "</a>";
-          };
+    createStaticTable : function(elementId, target, config, data) {
+      initTable(elementId, target, null, config, function(options, jqTable,
+          errorMessage, columns) {
+        options.aaData = data;
+        List[elementId].data = data;
+      });
+    },
+    _checkEventHandler : function(isChecked, ev, data, elementId) {
+      var state = ListState[elementId];
+      if (!ev.shiftKey) {
+        if (isChecked) {
+          state.lastId = data; // Record last click for range selection
+          if (!state.selected.some(function(obj) {
+            return obj.id == data;
+          })) {
+            Array.prototype.push.apply(state.selected, state.data
+                .filter(function(obj) {
+                  return obj.id == data;
+                }));
+          }
+        } else {
+          var index = state.selected.findIndex(function(obj) {
+            return obj.id == data;
+          });
+          if (index > -1) {
+            state.selected.splice(index, 1);
+          }
+        }
+      } else {
+        var selectedIndex = state.data.findIndex(function(obj) {
+          return obj.id == data;
+        });
+        var shiftIndex = state.lastId == -1 ? 0 : state.data
+            .findIndex(function(obj) {
+              return obj.id == state.lastId;
+            });
+        if (selectedIndex == -1 || shiftIndex == -1) {
+          return;
+        }
+        var newlySelected = state.data.slice(Math
+            .min(selectedIndex, shiftIndex), Math
+            .max(selectedIndex, shiftIndex));
+        newlySelected
+            .forEach(function(obj) {
+              var element = document
+                  .getElementById(elementId + "_toggle" + obj.id);
+              if (element) {
+                element.checked = true;
+              }
+            });
+        state.selected = Utils.array.deduplicateById(state.selected
+            .concat(newlySelected));
+      }
     },
     render : {
       booleanChecks : function(data, type, full) {
