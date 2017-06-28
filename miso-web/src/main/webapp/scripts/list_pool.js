@@ -31,8 +31,7 @@ ListTarget.pool = {
     }
   },
   createBulkActions : function(config, projectId) {
-    // TODO return HotTarget.pool.bulkActions;
-    return [];
+    return HotTarget.pool.bulkActions;
   },
   createStaticActions : function(config, prodjectId) {
     return [ {

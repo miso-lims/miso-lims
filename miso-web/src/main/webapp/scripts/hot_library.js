@@ -369,15 +369,15 @@ HotTarget.library = (function() {
     bulkActions : [
         {
           name : 'Edit',
-          action : function(ids) {
-            window.location = window.location.origin + '/miso/library/bulk/edit/' + ids
+          action : function(items) {
+            window.location = window.location.origin + '/miso/library/bulk/edit/' + items.map(Utils.array.getId)
                 .join(',');
           }
         },
         {
           name : 'Make dilutions',
-          action : function(ids) {
-            window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate/' + ids
+          action : function(items) {
+            window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate/' + items.map(Utils.array.getId)
                 .join(',');
           }
         }, ],

@@ -452,22 +452,27 @@ var HotUtils = {
                           if (allSaved) {
                             var bulkActionsDiv = document
                                 .getElementById('bulkactions');
-                            var ids = data.map(Utils.array.getId);
-                            target.bulkActions
-                                .forEach(function(bulkAction) {
-                                  var link = document.createElement('A');
-                                  link.href = '#';
-                                  link.setAttribute('class',
-                                      'ui-button ui-state-default');
-                                  link.setAttribute('title',
-                                      bulkAction.title || '');
-                                  link.onclick = function() {
-                                    bulkAction.action(ids);
-                                  };
-                                  link.appendChild(document
-                                      .createTextNode(bulkAction.name));
-                                  bulkActionsDiv.append(link);
-                                });
+                            target.bulkActions.forEach(function(bulkAction) {
+                              var button;
+                              if (bulkAction) {
+                                button = document.createElement('A');
+                                button.href = '#';
+                                button.setAttribute('class',
+                                    'ui-button ui-state-default');
+                                button.setAttribute('title',
+                                    bulkAction.title || '');
+                                button.onclick = function() {
+                                  bulkAction.action(data);
+                                };
+                                button.appendChild(document
+                                    .createTextNode(bulkAction.name));
+                              } else {
+                                button = document.createElement('SPAN');
+                                button
+                                    .setAttribute('class', 'ui-state-default');
+                              }
+                              bulkActionsDiv.append(button);
+                            });
                           }
                           saveSuccessesClasses.remove('hidden');
                         } else {
@@ -513,7 +518,6 @@ var HotUtils = {
                       xhr.send(JSON.stringify(data[index]));
                     };
                     invokeNext(0);
-                    
                   });
             });
     table.validateCells(function() {

@@ -62,8 +62,8 @@ HotTarget.pool = {
   bulkActions : [
       {
         name : 'Edit',
-        action : function(ids) {
-          window.location = window.location.origin + '/miso/pool/bulk/edit/' + ids
+        action : function(items) {
+          window.location = window.location.origin + '/miso/pool/bulk/edit/' + items.map(Utils.array.getId)
               .join(',');
         }
       }, ],
