@@ -437,8 +437,9 @@ CREATE PROCEDURE addIdentity(
     SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
   END IF;
 
-  INSERT INTO Sample(name, alias, description, sampleType, project_projectId, scientificName, lastModifier, securityProfile_profileId) VALUES 
-      ('TEMP_IDENT', iAlias, iDescription, iSampleType, (SELECT projectId FROM Project WHERE shortName = iProject), iScientificName, getAdminUserId(), (SELECT securityProfile_profileId FROM Project WHERE shortName = iProject));
+  INSERT INTO Sample(name, alias, description, sampleType, project_projectId, scientificName, securityProfile_profileId, lastModifier, creator, created, lastModified) VALUES 
+      ('TEMP_IDENT', iAlias, iDescription, iSampleType, (SELECT projectId FROM Project WHERE shortName = iProject), iScientificName, (SELECT securityProfile_profileId FROM Project WHERE shortName = iProject), 
+      getAdminUserId(), getAdminUserId(), CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
   SET newSampleId = LAST_INSERT_ID();
 
   UPDATE Sample SET name = CONCAT('SAM', sampleId) WHERE sampleId = newSampleId;
