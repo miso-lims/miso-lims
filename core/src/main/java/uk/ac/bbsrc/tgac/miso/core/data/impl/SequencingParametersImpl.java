@@ -161,4 +161,52 @@ public class SequencingParametersImpl implements SequencingParameters {
     this.xpath = xpath;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
+    result = prime * result + ((creationDate == null) ? 0 : creationDate.hashCode());
+    result = prime * result + ((lastUpdated == null) ? 0 : lastUpdated.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((parametersId == null) ? 0 : parametersId.hashCode());
+    result = prime * result + ((platform == null) ? 0 : platform.hashCode());
+    result = prime * result + ((updatedBy == null) ? 0 : updatedBy.hashCode());
+    result = prime * result + ((xpath == null) ? 0 : xpath.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    SequencingParametersImpl other = (SequencingParametersImpl) obj;
+    if (createdBy == null) {
+      if (other.createdBy != null) return false;
+    } else if (!createdBy.equals(other.createdBy)) return false;
+    if (creationDate == null) {
+      if (other.creationDate != null) return false;
+    } else if (!creationDate.equals(other.creationDate)) return false;
+    if (lastUpdated == null) {
+      if (other.lastUpdated != null) return false;
+    } else if (!lastUpdated.equals(other.lastUpdated)) return false;
+    if (name == null) {
+      if (other.name != null) return false;
+    } else if (!name.equals(other.name)) return false;
+    if (parametersId == null) {
+      if (other.parametersId != null) return false;
+    } else if (!parametersId.equals(other.parametersId)) return false;
+    if (platform == null) {
+      if (other.platform != null) return false;
+    } else if (!platform.equals(other.platform)) return false;
+    if (updatedBy == null) {
+      if (other.updatedBy != null) return false;
+    } else if (!updatedBy.equals(other.updatedBy)) return false;
+    if (xpath == null) {
+      if (other.xpath != null) return false;
+    } else if (!xpath.equals(other.xpath)) return false;
+    return true;
+  }
+
 }
