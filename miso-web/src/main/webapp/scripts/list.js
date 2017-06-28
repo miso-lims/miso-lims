@@ -71,7 +71,7 @@ ListUtils = {
                           jqTable.fnSetColumnVis(index, column
                               .visibilityFilter(data.aaData.map(function(d) {
                                 return d[column.mData];
-                              })));
+                              })), false);
                         });
                         fnCallback(data, textStatus, xhr);
                       },
