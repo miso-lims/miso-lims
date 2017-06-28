@@ -464,6 +464,7 @@
 	              </resources>
 	            </configuration>
 	          </execution>
+	          <!-- Reserve ports for Tomcat and H2 -->
 	          <execution>
 	            <id>reserve-network-port</id>
                 <phase>pre-integration-test</phase>
@@ -635,6 +636,7 @@
 	          </configuration>
 	        </configuration>
 	      </plugin>
+	      <!-- run integration tests -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
