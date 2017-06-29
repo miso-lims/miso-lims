@@ -38,15 +38,15 @@ import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 public class LibraryDilutionRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryDilutionRestController.class);
 
-  private final JQueryDataTableBackend<LibraryDilution, DilutionDto> jQueryBackend = new JQueryDataTableBackend<LibraryDilution, DilutionDto>() {
+  private final JQueryDataTableBackend<PoolableElementView, DilutionDto> jQueryBackend = new JQueryDataTableBackend<PoolableElementView, DilutionDto>() {
     @Override
-    protected DilutionDto asDto(LibraryDilution model) {
-      return Dtos.asMinimalDto(model);
+    protected DilutionDto asDto(PoolableElementView model) {
+      return Dtos.asDto(model);
     }
 
     @Override
-    protected PaginatedDataSource<LibraryDilution> getSource() throws IOException {
-      return dilutionService;
+    protected PaginatedDataSource<PoolableElementView> getSource() throws IOException {
+      return poolableElementViewService;
     }
   };
 
