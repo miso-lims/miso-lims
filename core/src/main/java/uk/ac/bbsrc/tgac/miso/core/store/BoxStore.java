@@ -70,4 +70,6 @@ public interface BoxStore extends Store<Box>, Remover<Box>, PaginatedDataSource<
 
   public List<BoxableView> getBoxableViewsByBarcodeList(Collection<String> barcodes) throws IOException;
 
+  public List<BoxableView> getBoxableViewsByIdList(Collection<BoxableId> ids) throws IOException;
+
 }

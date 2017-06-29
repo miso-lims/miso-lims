@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -238,6 +239,18 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   public List<BoxableView> getBoxableViewsByBarcodeList(Collection<String> barcodes) throws IOException {
     Criteria criteria = currentSession().createCriteria(BoxableView.class);
     criteria.add(Restrictions.in("identificationBarcode", barcodes));
+    @SuppressWarnings("unchecked")
+    List<BoxableView> results = criteria.list();
+    return results;
+  }
+
+  @Override
+  public List<BoxableView> getBoxableViewsByIdList(Collection<BoxableId> ids) throws IOException {
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Criteria criteria = currentSession().createCriteria(BoxableView.class);
+    criteria.add(Restrictions.in("id", ids));
     @SuppressWarnings("unchecked")
     List<BoxableView> results = criteria.list();
     return results;

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -175,6 +176,15 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       applyChanges(box, original);
       StringBuilder message = new StringBuilder();
 
+      // get persisted version of new box contents before change
+      List<BoxableId> ids = box.getBoxables().values()
+          .stream()
+          .map(b -> b.getId())
+          .collect(Collectors.toList());
+      Map<BoxableId, BoxableView> oldOccupants = boxStore.getBoxableViewsByIdList(ids)
+          .stream()
+          .collect(Collectors.toMap(BoxableView::getId, b -> b));
+
       // Process additions/moves
       Set<BoxableId> handled = Sets.newHashSet();
       for (Map.Entry<String, BoxableView> entry : box.getBoxables().entrySet()) {
@@ -190,7 +200,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
           message.append("\n");
         }
 
-        BoxableView oldOccupant = boxStore.getBoxableView(newOccupant.getId());
+        BoxableView oldOccupant = oldOccupants.get(newOccupant.getId());
         if (oldOccupant.getBoxId() != null) {
           if (oldOccupant.getBoxId().longValue() == box.getId()) {
             // Moved within same box
