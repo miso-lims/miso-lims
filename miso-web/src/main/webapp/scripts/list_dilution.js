@@ -36,11 +36,11 @@ ListTarget.dilution = {
     return [
         {
           "sTitle": "Dilution Name",
-          "mData": "name",
+          "mData": "id",
           "include": true,
           "iSortPriority": 1,
           "mRender": function (data, type, full) {
-            return "<a href=\"/miso/library/" + full.library.id + "\">" + data + "</a>";
+            return "<a href=\"/miso/library/" + full.library.id + "\">" + full.name + "</a>";
           }
         },
         {
