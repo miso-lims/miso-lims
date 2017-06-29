@@ -129,11 +129,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     return (Box) criteria.uniqueResult();
   }
 
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
-  public SessionFactory getSessionFactory() {
+  protected SessionFactory getSessionFactory() {
     return sessionFactory;
   }
 
@@ -191,10 +187,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   @Override
   public void removeBoxableFromBox(Boxable boxable) throws IOException {
-    if (boxable.getBox() == null) {
-      return;
-    }
-    removeBoxableFromBox(boxable.getBox().getId(), boxable.getBoxPosition());
+    Long boxId = boxable.getBox() == null ? null : boxable.getBox().getId();
+    removeBoxableFromBox(boxId, boxable.getBoxPosition());
   }
 
   @Override

@@ -511,8 +511,8 @@ VALUES
 DELETE FROM Box;
 INSERT INTO `Box` (`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `description`, `identificationBarcode`, `locationBarcode`, `securityProfile_profileId`, `lastModifier`, `lastModified`, `creator`, `created`)
 VALUES
-('1','1', '1', 'box1', 'box1alias', 'box1', 'barcode1','identificationbarcode1', '1', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00'),
-('2','1', '2', 'box2', 'box2alias', 'box2', 'barcode2','identificationbarcode2', '1', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00');
+('1','1', '1', 'box1', 'box1alias', 'box1','identificationbarcode1', 'location1', '1', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00'),
+('2','1', '2', 'box2', 'box2alias', 'box2','identificationbarcode2', 'location2', '1', '1', '2017-06-20 16:02:00', '1', '2017-06-20 16:02:00');
 
 DELETE FROM BoxChangeLog;
 INSERT INTO BoxChangeLog(boxChangeLogId, boxId, columnsChanged, userId, message, changeTime)
@@ -581,10 +581,10 @@ INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `library
 VALUES (1, 'DESIGN1', 1, 1, 1, 1), 
 (2, 'DESIGN2', 2, 1, 1, 1);
 
-INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`)
-VALUES (15,1,0,NULL,NULL),
-(16,2,0,15,1),
-(17,2,0,15,2);
+INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`)
+VALUES (15,1,0,NULL,NULL,NULL),
+(16,2,0,15,1,NULL),
+(17,2,0,15,2,1);
 
 DELETE FROM `Identity`;
 INSERT INTO `Identity` (`sampleId`, `externalName`,`donorSex`)
