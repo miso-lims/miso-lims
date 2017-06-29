@@ -102,6 +102,17 @@ HotTarget.library = (function() {
     createColumns : function(config, create, data) {
       return [
           {
+            header : 'Library Name',
+            data : 'name',
+            readOnly : true,
+            include : true,
+            unpack : function(lib, flat, setCellMeta) {
+              flat.name = lib.name;
+            },
+            pack : function(lib, flat, errorHandler) {
+            }
+          },
+          {
             header : 'Library Alias',
             data : 'alias',
             validator : function(value, callback) {
