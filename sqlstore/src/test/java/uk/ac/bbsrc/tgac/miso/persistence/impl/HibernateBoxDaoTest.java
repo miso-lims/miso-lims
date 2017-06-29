@@ -26,7 +26,9 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 
 public class HibernateBoxDaoTest extends AbstractDAOTest {
@@ -89,7 +92,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     assertEquals("box1alias", box.getAlias());
     assertEquals("box1", box.getName());
     assertEquals(1, box.getId());
-    assertEquals("barcode1", box.getIdentificationBarcode());
+    assertEquals("identificationbarcode1", box.getIdentificationBarcode());
     assertEquals(4, box.getSize().getRows());
     assertEquals("boxuse1", box.getUse().getAlias());
     assertEquals(2, box.getTubeCount());
@@ -111,9 +114,25 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   }
 
   @Test
+  public void testGetBoxByBarcode() throws Exception {
+    assertNull(dao.getByBarcode("this probably is not a barcode"));
+    Box box = dao.getByBarcode("identificationbarcode1");
+    assertNotNull(box);
+    assertEquals(1L, box.getId());
+  }
+
+  @Test
   public void testGetUseById() throws Exception {
     BoxUse boxUse = dao.getUseById(1);
     assertEquals("boxuse1", boxUse.getAlias());
+  }
+
+  @Test
+  public void testGetSizeById() throws Exception {
+    BoxSize boxSize = dao.getSizeById(1);
+    assertEquals(4, boxSize.getRows());
+    assertEquals(4, boxSize.getColumns());
+    assertFalse(boxSize.getScannable());
   }
 
   @Test
@@ -190,6 +209,20 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     assertEquals(s.getId(), item.getId().getTargetId());
 
     dao.removeBoxableFromBox(s);
+    Box again = dao.get(1);
+    assertFalse(again.getBoxables().containsValue(item));
+  }
+
+  @Test
+  public void testRemoveBoxableViewFromBox() throws Exception {
+    Sample s = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 15L);
+    Box box = dao.get(1);
+    BoxableView item = box.getBoxable("A01");
+    assertNotNull(item);
+    assertEquals(EntityType.SAMPLE, item.getId().getTargetType());
+    assertEquals(s.getId(), item.getId().getTargetId());
+
+    dao.removeBoxableFromBox(item);
     Box again = dao.get(1);
     assertFalse(again.getBoxables().containsValue(item));
   }
@@ -289,6 +322,86 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     Box original = dao.get(fromBoxId);
     assertNotNull(original);
     assertNull(original.getBoxable(fromPos));
+  }
+
+  @Test
+  public void testGetBoxableView() throws Exception {
+    BoxableId badId = new BoxableId(EntityType.SAMPLE, -1L);
+    assertNull(dao.getBoxableView(badId));
+
+    BoxableId goodSampleId = new BoxableId(EntityType.SAMPLE, 1L);
+    BoxableView sample = dao.getBoxableView(goodSampleId);
+    assertNotNull(sample);
+    assertEquals("SAM1", sample.getName());
+
+    BoxableId goodLibraryId = new BoxableId(EntityType.LIBRARY, 1L);
+    BoxableView library = dao.getBoxableView(goodLibraryId);
+    assertNotNull(library);
+    assertEquals("LIB1", library.getName());
+
+    BoxableId goodDilutionId = new BoxableId(EntityType.DILUTION, 1L);
+    BoxableView dilution = dao.getBoxableView(goodDilutionId);
+    assertNotNull(dilution);
+    assertEquals("LDI1", dilution.getName());
+
+    BoxableId goodPoolId = new BoxableId(EntityType.POOL, 1L);
+    BoxableView pool = dao.getBoxableView(goodPoolId);
+    assertNotNull(pool);
+    assertEquals("IPO1", pool.getName());
+  }
+
+  @Test
+  public void testGetBoxableViewByBarcode() throws Exception {
+    assertNull(dao.getBoxableViewByBarcode("probably not a barcode"));
+
+    BoxableView sample = dao.getBoxableViewByBarcode("SAM1::TEST_0001_Bn_P_nn_1-1_D_1");
+    assertNotNull(sample);
+    assertEquals(new BoxableId(EntityType.SAMPLE, 1L), sample.getId());
+
+    BoxableView library = dao.getBoxableViewByBarcode("LIB1::TEST_0001_Bn_P_PE_300_WG");
+    assertNotNull(library);
+    assertEquals(new BoxableId(EntityType.LIBRARY, 1L), library.getId());
+
+    BoxableView dilution = dao.getBoxableViewByBarcode("LDI1::TEST_0001_Bn_P_PE_300_WG");
+    assertNotNull(dilution);
+    assertEquals(new BoxableId(EntityType.DILUTION, 1L), dilution.getId());
+
+    BoxableView pool = dao.getBoxableViewByBarcode("IPO1::Illumina");
+    assertNotNull(pool);
+    assertEquals(new BoxableId(EntityType.POOL, 1L), pool.getId());
+  }
+
+  @Test
+  public void testGetBoxableViewByPreMigrationId() throws Exception {
+    assertNull(dao.getBoxableViewByPreMigrationId(32123L));
+
+    BoxableView sample = dao.getBoxableViewByPreMigrationId(1L);
+    assertNotNull(sample);
+    assertEquals(new BoxableId(EntityType.SAMPLE, 17L), sample.getId());
+  }
+
+  @Test
+  public void testGetBoxableViewsByBarcodeList() throws Exception {
+    List<BoxableView> empty = dao.getBoxableViewsByBarcodeList(Collections.emptyList());
+    assertNotNull(empty);
+    assertTrue(empty.isEmpty());
+
+    List<String> barcodes = Arrays.asList("SAM1::TEST_0001_Bn_P_nn_1-1_D_1", "LIB1::TEST_0001_Bn_P_PE_300_WG");
+    List<BoxableView> list = dao.getBoxableViewsByBarcodeList(barcodes);
+    assertNotNull(list);
+    assertEquals(2, list.size());
+  }
+
+  @Test
+  public void testGetBoxableViewsByIdList() throws Exception {
+    List<BoxableView> empty = dao.getBoxableViewsByIdList(Collections.emptyList());
+    assertNotNull(empty);
+    assertTrue(empty.isEmpty());
+
+    List<BoxableId> ids = Arrays.asList(new BoxableId(EntityType.DILUTION, 1L), new BoxableId(EntityType.POOL, 1L));
+    List<BoxableView> list = dao.getBoxableViewsByIdList(ids);
+    assertNotNull(list);
+    assertEquals(2, list.size());
   }
 
 }
