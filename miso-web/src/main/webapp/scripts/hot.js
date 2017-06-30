@@ -426,7 +426,7 @@ var HotUtils = {
                         return;
                       }
                       // If this item was previously saved, continue along.
-                      if (data[index].saved) {
+                      if (flatObjects[index].saved) {
                         invokeNext(index + 1);
                         return;
                       }
