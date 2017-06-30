@@ -90,10 +90,6 @@
     </dependency>
     <dependency>
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-      <artifactId>miso-dto</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>sqlstore</artifactId>
     </dependency>
   </dependencies>
