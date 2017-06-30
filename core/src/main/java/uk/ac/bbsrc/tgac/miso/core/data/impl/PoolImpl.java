@@ -596,4 +596,10 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     this.creationTime = created;
   }
 
+  @Override
+  public int getLongestIndex() {
+    return pooledElementViews.stream().flatMap(element -> element.getIndices().stream()).mapToInt(index -> index.getSequence().length())
+        .max().orElse(0);
+  }
+
 }

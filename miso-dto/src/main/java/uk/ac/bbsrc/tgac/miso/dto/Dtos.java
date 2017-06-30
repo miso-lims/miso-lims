@@ -1344,6 +1344,7 @@ public class Dtos {
     dto.setDiscarded(from.isDiscarded());
     dto.setVolume(from.getVolume());
     dto.setPlatformType(from.getPlatformType().name());
+    dto.setLongestIndex(from.getLongestIndex());
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
     }
