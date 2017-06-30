@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -40,7 +42,7 @@ public class ListStudiesController {
   private final ListItemsPage listStudies = new ListItemsPage("study") {
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.put("isAdmin", authorizationManager.isAdminUser());
     }
 
