@@ -750,18 +750,7 @@ public class EditLibraryController {
 
     @Override
     protected Iterable<Library> load(List<Long> ids) throws IOException {
-      List<Library> results = libraryService.listByIdList(ids);
-      SampleClass sampleClass = null;
-      for (Library library : results) {
-        if (isDetailedSampleEnabled()) {
-          if (sampleClass == null) {
-            sampleClass = ((DetailedSample) library.getSample()).getSampleClass();
-          } else if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) {
-            throw new IOException("Can only edit libraries when samples all have the same class.");
-          }
-        }
-      }
-      return results;
+      return libraryService.listByIdList(ids);
     }
 
     @Override
