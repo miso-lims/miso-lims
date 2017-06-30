@@ -12,8 +12,6 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
@@ -43,17 +41,16 @@ public class DefaultPoolOrderService implements PoolOrderService {
   }
 
   @Override
-  public Long create(PoolOrderDto poolOrderDto) throws IOException {
-    Pool pool = poolService.get(poolOrderDto.getPoolId());
+  public Long create(PoolOrder poolOrder) throws IOException {
+    Pool pool = poolService.get(poolOrder.getPoolId());
     authorizationManager.throwIfNotWritable(pool);
     if (pool == null) {
-      throw new IOException("No such pool: " + poolOrderDto.getPoolId());
+      throw new IOException("No such pool: " + poolOrder.getPoolId());
     }
 
     User user = authorizationManager.getCurrentUser();
-    PoolOrder poolOrder = Dtos.to(poolOrderDto);
     poolOrder.setPoolId(pool.getId());
-    poolOrder.setSequencingParameter(sequencingParametersService.get(poolOrderDto.getParameters().getId()));
+    poolOrder.setSequencingParameter(sequencingParametersService.get(poolOrder.getSequencingParameter().getId()));
     poolOrder.setCreatedBy(user);
     poolOrder.setUpdatedBy(user);
     return poolOrderDao.addPoolOrder(poolOrder);

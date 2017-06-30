@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -89,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
@@ -989,6 +991,8 @@ public class Dtos {
   public static PoolOrder to(PoolOrderDto from) {
     PoolOrder to = new PoolOrderImpl();
     if (from.getId() != null) to.setId(from.getId());
+    to.setPoolId(from.getPoolId());
+    to.setSequencingParameter(to(from.getParameters()));
     to.setPartitions(from.getPartitions());
     return to;
   }
@@ -999,6 +1003,16 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setPlatform(asDto(from.getPlatform()));
     return dto;
+  }
+
+  public static SequencingParameters to(SequencingParametersDto from) {
+    SequencingParameters to = new SequencingParametersImpl();
+    to.setId(from.getId());
+    to.setName(from.getName());
+    if (from.getPlatform() != null) {
+      to.setPlatform(to(from.getPlatform()));
+    }
+    return to;
   }
 
   public static List<SequencingParametersDto> asSequencingParametersDtos(Collection<SequencingParameters> from) {
@@ -1309,13 +1323,6 @@ public class Dtos {
     return new Date(dateFormatter.parseMillis(from));
   }
 
-  private static Date extractDateTimeOrNull(String from) {
-    if (isStringEmptyOrNull(from)) {
-      return null;
-    }
-    return new Date(dateTimeFormatter.parseMillis(from));
-  }
-
   private static String getDateString(Date date) {
     if (date == null) {
       return null;
@@ -1547,7 +1554,6 @@ public class Dtos {
     dto.setStopped(from.get(HealthType.Stopped));
     dto.setUnknown(from.get(HealthType.Unknown));
     return dto;
-
   }
 
   public static PlatformDto asDto(Platform from) {
@@ -1558,6 +1564,16 @@ public class Dtos {
     dto.setInstrumentModel(from.getInstrumentModel());
     dto.setNumContainers(from.getNumContainers());
     return dto;
+  }
+
+  public static Platform to(PlatformDto from) {
+    Platform to = new PlatformImpl();
+    to.setId(from.getId());
+    to.setPlatformType(PlatformType.get(from.getPlatformType()));
+    to.setDescription(from.getDescription());
+    to.setInstrumentModel(from.getInstrumentModel());
+    to.setNumContainers(from.getNumContainers());
+    return to;
   }
 
   public static ProjectDto asDto(Project from) {
