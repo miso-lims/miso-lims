@@ -67,6 +67,12 @@ ListTarget.completion = {
           "iSortPriority" : 0,
           "include" : true
         }, {
+          "sTitle" : "Longest Index",
+          "mData" : "pool.longestIndex",
+          "bSortable" : false,
+          "iSortPriority" : 0,
+          "include" : !config.poolId
+        }, {
           "sTitle" : "Sequencing Parameters",
           "mData" : "parameters.name",
           "iSortPriority" : 0,
