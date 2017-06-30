@@ -70,7 +70,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -597,7 +597,7 @@ public class LimsUtils {
 
   public static boolean isIdentitySample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
-    return sample instanceof Identity || safeCategoryCheck(sample, Identity.CATEGORY_NAME);
+    return sample instanceof SampleIdentity || safeCategoryCheck(sample, SampleIdentity.CATEGORY_NAME);
   }
 
   public static boolean isTissueSample(Sample sample) {

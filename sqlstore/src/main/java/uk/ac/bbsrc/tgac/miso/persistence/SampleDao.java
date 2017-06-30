@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
@@ -36,7 +36,7 @@ public interface SampleDao extends SampleStore {
    * @return Collection<Identity> set of Identities which have an external name which matches the input string
    * @throws IOException
    */
-  Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
+  Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
 
   /**
    * List all the identities associated with a given project which have at least one external name which exactly matches the input String.
@@ -47,6 +47,6 @@ public interface SampleDao extends SampleStore {
    * @return Collection<Sample> set of Identities belonging to a given project which have an external name that matches the input string
    * @throws IOException
    */
-  Collection<Identity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException;
+  Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException;
 
 }

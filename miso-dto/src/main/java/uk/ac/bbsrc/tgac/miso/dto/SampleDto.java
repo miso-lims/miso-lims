@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = SampleAliquotDto.class, name = SampleAliquot.CATEGORY_NAME),
-    @JsonSubTypes.Type(value = SampleIdentityDto.class, name = Identity.CATEGORY_NAME),
+    @JsonSubTypes.Type(value = SampleIdentityDto.class, name = SampleIdentity.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleStockDto.class, name = SampleStock.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleTissueDto.class, name = SampleTissue.CATEGORY_NAME),
     @JsonSubTypes.Type(value = SampleTissueProcessingDto.class, name = SampleTissueProcessing.CATEGORY_NAME),

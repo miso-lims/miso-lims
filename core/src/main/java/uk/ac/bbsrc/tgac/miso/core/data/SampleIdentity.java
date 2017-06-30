@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public interface Identity extends DetailedSample {
+public interface SampleIdentity extends DetailedSample {
   
   public static final String CATEGORY_NAME = "Identity";
 

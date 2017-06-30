@@ -21,7 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -46,11 +46,11 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class DetailedSampleBuilder
-    implements DetailedSample, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing, SampleSlide, SampleLCMTube, Identity {
+    implements DetailedSample, SampleAliquot, SampleStock, SampleTissue, SampleTissueProcessing, SampleSlide, SampleLCMTube, SampleIdentity {
 
   private static final long serialVersionUID = 1L;
 
-  private static final List<String> CATEGORY_ORDER = Arrays.asList(Identity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+  private static final List<String> CATEGORY_ORDER = Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
       SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
 
   // Sample attributes
@@ -799,8 +799,8 @@ public class DetailedSampleBuilder
     }
     DetailedSample sample = null;
     switch (sampleClass.getSampleCategory()) {
-    case Identity.CATEGORY_NAME:
-      Identity identity = buildIdentity();
+    case SampleIdentity.CATEGORY_NAME:
+      SampleIdentity identity = buildIdentity();
       sample = identity;
       break;
     case SampleTissue.CATEGORY_NAME:
@@ -848,7 +848,7 @@ public class DetailedSampleBuilder
         if (identityId == null && externalName != null) {
           parent = buildIdentity();
         } else if (identityId != null) {
-          parent = new IdentityImpl();
+          parent = new SampleIdentityImpl();
           parent.setId(identityId);
         }
       }
@@ -904,11 +904,11 @@ public class DetailedSampleBuilder
     return sample;
   }
 
-  private Identity buildIdentity() {
+  private SampleIdentity buildIdentity() {
     if (externalName == null) {
       throw new NullPointerException("Missing externalName");
     }
-    Identity identity = new IdentityImpl();
+    SampleIdentity identity = new SampleIdentityImpl();
     identity.setExternalName(externalName);
     identity.setDonorSex(donorSex);
     return identity;

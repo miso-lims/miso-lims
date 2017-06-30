@@ -8,7 +8,7 @@ import java.security.InvalidParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -47,14 +47,14 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
       }
       if (isIdentitySample(parent)) {
         if (!isTissueSample(detailed)) throw new IllegalArgumentException("Missing parent tissue");
-        return generateTissueAlias((SampleTissue) detailed, (Identity) parent);
+        return generateTissueAlias((SampleTissue) detailed, (SampleIdentity) parent);
       }
     }
     // Identity name generation requires access to SampleNumberPerProjectDao
     throw new IllegalArgumentException("Cannot generate alias for Identities");
   }
 
-  private String generateTissueAlias(SampleTissue tissue, Identity identity) {
+  private String generateTissueAlias(SampleTissue tissue, SampleIdentity identity) {
     StringBuilder sb = new StringBuilder();
 
     sb.append(identity.getAlias())

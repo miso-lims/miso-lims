@@ -55,7 +55,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;

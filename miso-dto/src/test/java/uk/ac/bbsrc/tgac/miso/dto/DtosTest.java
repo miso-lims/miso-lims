@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -43,7 +43,7 @@ public class DtosTest {
 
     assertNotNull(tissue.getParent());
     assertTrue(LimsUtils.isIdentitySample(tissue.getParent()));
-    Identity identity = (Identity) tissue.getParent();
+    SampleIdentity identity = (SampleIdentity) tissue.getParent();
     assertEquals("externalName", identity.getExternalName());
   }
 
@@ -82,7 +82,7 @@ public class DtosTest {
 
     assertNotNull(tissue.getParent());
     assertTrue(LimsUtils.isIdentitySample(tissue.getParent()));
-    Identity identity = (Identity) tissue.getParent();
+    SampleIdentity identity = (SampleIdentity) tissue.getParent();
     assertEquals("externalName", identity.getExternalName());
   }
 
@@ -127,7 +127,7 @@ public class DtosTest {
     SampleTissue tissue = (SampleTissue) sample;
     assertNotNull(tissue.getParent());
     assertTrue(LimsUtils.isIdentitySample(tissue.getParent()));
-    Identity identity = (Identity) tissue.getParent();
+    SampleIdentity identity = (SampleIdentity) tissue.getParent();
     assertEquals("externalName", identity.getExternalName());
   }
 

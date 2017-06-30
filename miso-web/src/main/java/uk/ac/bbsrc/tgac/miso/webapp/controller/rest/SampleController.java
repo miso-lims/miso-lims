@@ -53,11 +53,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -227,9 +227,9 @@ public class SampleController extends RestController {
     Integer requestCounter = (Integer) json.get("requestCounter");
     Set<SampleDto> matchingIdentities = new HashSet<>();
     String searchTerms = json.getString("identitiesSearches");
-    for (String term : IdentityImpl.getSetFromString(searchTerms.replaceAll(";", ","))) {
-      Collection<Identity> matches = sampleService.getIdentitiesByExternalNameOrAlias(term);
-      for (Identity identity : matches) {
+    for (String term : SampleIdentityImpl.getSetFromString(searchTerms.replaceAll(";", ","))) {
+      Collection<SampleIdentity> matches = sampleService.getIdentitiesByExternalNameOrAlias(term);
+      for (SampleIdentity identity : matches) {
         matchingIdentities.add(Dtos.asDto(identity));
       }
     }

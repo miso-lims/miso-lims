@@ -23,7 +23,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -45,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
@@ -67,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -79,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
@@ -311,7 +311,7 @@ public class Dtos {
   private static DetailedSampleDto asDetailedSampleDto(DetailedSample from) {
     DetailedSampleDto dto = null;
     if (isIdentitySample(from)) {
-      dto = asIdentitySampleDto((Identity) from);
+      dto = asIdentitySampleDto((SampleIdentity) from);
     } else if (isTissueSample(from)) {
       dto = asTissueSampleDto((SampleTissue) from);
     } else if (isTissueProcessingSample(from)) {
@@ -641,15 +641,15 @@ public class Dtos {
     return to;
   }
 
-  private static SampleIdentityDto asIdentitySampleDto(Identity from) {
+  private static SampleIdentityDto asIdentitySampleDto(SampleIdentity from) {
     SampleIdentityDto dto = new SampleIdentityDto();
     dto.setExternalName(from.getExternalName());
     dto.setDonorSex(from.getDonorSex().getLabel());
     return dto;
   }
 
-  private static Identity toIdentitySample(SampleIdentityDto from) {
-    Identity to = new IdentityImpl();
+  private static SampleIdentity toIdentitySample(SampleIdentityDto from) {
+    SampleIdentity to = new SampleIdentityImpl();
     to.setExternalName(from.getExternalName());
     if (from.getDonorSex() != null) {
       to.setDonorSex(from.getDonorSex());
