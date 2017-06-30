@@ -5,4 +5,5 @@ CALL addKitDescriptor('10X Single Cell RNA', 2,'10X Genomics', 0, 'LIBRARY', 'IL
 CALL addKitDescriptor('PacBio RS II',1,'PacBio',0,'LIBRARY','PACBIO',NULL);
 CALL addKitDescriptor('Lexogen SENSE Total RNA',1,'Lexogen',0,'LIBRARY','ILLUMINA',NULL);
 CALL addKitDescriptor('KAPA RNA Hyper Prep',1,'KAPA',0,'LIBRARY','ILLUMINA',NULL);
+CALL addKitDescriptor('NebNext Ultra II Directional RNA', 1, 'New England BioLabs', 'E7760S', 'LIBRARY', 'ILLUMINA', 'WT Library Prep for Illumina');
 -- EndNoTest
