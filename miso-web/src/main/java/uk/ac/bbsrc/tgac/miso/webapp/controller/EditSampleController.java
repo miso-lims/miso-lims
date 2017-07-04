@@ -1062,7 +1062,6 @@ public class EditSampleController {
         dto.setParentId(sample.getId());
         dto.setParentAlias(sample.getAlias());
         dto.setParentTissueSampleClassId(sample.getSampleClass().getId());
-        dto.setNonStandardAlias(sample.hasNonStandardAlias());
         dto.setProjectId(sample.getProject().getId());
         if (sample.getSubproject() != null) dto.setSubprojectId(sample.getSubproject().getId());
         dto.setGroupId(sample.getGroupId());

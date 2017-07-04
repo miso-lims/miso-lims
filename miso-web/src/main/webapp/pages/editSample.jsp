@@ -210,9 +210,6 @@
           <c:when test="${!aliasGenerationEnabled || sample.id != 0}">
             *
           </c:when>
-          <c:when test="${detailedSample && sample.parent.hasNonStandardAlias()}">
-            * (cannot auto-generate since parent has non-standard alias)
-          </c:when>
           <c:otherwise>
             (blank to auto-generate)
           </c:otherwise>
@@ -223,7 +220,7 @@
           <c:if test="${sample.hasNonStandardAlias() || sample.parent.hasNonStandardAlias()}">
 	          <ul class="parsley-errors-list filled" id="nonStandardAlias">
 	            <li class="parsley-custom-error-message">
-	            Double-check this alias -- it will be saved even if it (or the parent sample's alias) is duplicated or does not follow the naming standard!
+	            Double-check this alias -- it will be saved even if it is duplicated or does not follow the naming standard!
 	            </li>
 	          </ul>
 	        </c:if>
