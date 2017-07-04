@@ -648,14 +648,22 @@ var HotUtils = {
       'unpack' : function(obj, flat, setCellMeta) {
         flat[property] = obj[property];
       },
-      'validator' : required ? HotUtils.validator.requiredNumber : Handsontable.NumericValidator,
+      'validator' : required ? HotUtils.validator.requiredNumber
+          : Handsontable.NumericValidator,
       'pack' : function(obj, flat, errorHandler) {
-        var output = null;
-        var raw = flat[property];
-        var result = parseFloat(raw);
-        if (isNaN(result)) {
-          errorHandler(flat[property] + ' is not a number.');
+        var output;
+        if (Utils.validation.isEmpty(flat[property])) {
+          if (required) {
+            errorHandler(headerName + ' is required.');
+            return;
+          }
+          output = null;
         } else {
+          var result = parseFloat(flat[property]);
+          if (isNaN(result)) {
+            errorHandler(headerName + ' is not a number.');
+            return;
+          }
           output = result;
         }
         obj[property] = output;
@@ -677,7 +685,7 @@ var HotUtils = {
         if (!Utils.validation.isEmpty(flat[property])) {
           obj[property] = flat[property];
         } else {
-          obj[property] = undefined;
+          obj[property] = null;
         }
       }
     }
