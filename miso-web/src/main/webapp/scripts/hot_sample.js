@@ -171,9 +171,10 @@ HotTarget.sample = (function() {
                   }, config.projects), 'alias');
             },
             pack : function(sam, flat, errorHandler) {
+              var label = Constants.isDetailedSample ? 'shortName' : 'name';
               sam.projectId = Utils.array.maybeGetProperty(Utils.array
                   .findFirstOrNull(function(item) {
-                    return item.alias == flat.projectAlias;
+                    return item[label] == flat.projectAlias;
                   }, config.projects), 'id');
             },
             validator : HotUtils.validator.requiredAutocomplete,
