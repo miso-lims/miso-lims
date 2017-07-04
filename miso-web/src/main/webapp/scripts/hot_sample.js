@@ -69,7 +69,32 @@ HotTarget.sample = (function() {
           {
             header : 'Sample Alias',
             data : 'alias',
-            validator : HotUtils.validator.optionalTextNoSpecialChars,
+            validator : function(value, callback) {
+              (Constants.automaticSampleAlias
+                  ? HotUtils.validator.optionalTextNoSpecialChars
+                  : HotUtils.validator.requiredTextNoSpecialChars)(value,
+                  function(result) {
+                    if (!result) {
+                      callback(false);
+                      return;
+                    }
+                    if (!value) {
+                      return callback(Constants.automaticSampleAlias);
+                    }
+                    Fluxion.doAjax('sampleControllerHelperService',
+                        'validateSampleAlias', {
+                          'alias' : value,
+                          'url' : ajaxurl
+                        }, {
+                          'doOnSuccess' : function() {
+                            return callback(true);
+                          },
+                          'doOnError': function(json) {
+                            return callback(false);
+                          }
+                        });
+                  });
+            },
             type : 'text',
             unpack : function(sam, flat, setCellMeta) {
               flat.alias = sam.alias;
@@ -146,9 +171,10 @@ HotTarget.sample = (function() {
                   }, config.projects), 'alias');
             },
             pack : function(sam, flat, errorHandler) {
+              var label = Constants.isDetailedSample ? 'shortName' : 'name';
               sam.projectId = Utils.array.maybeGetProperty(Utils.array
                   .findFirstOrNull(function(item) {
-                    return item.alias == flat.projectAlias;
+                    return item[label] == flat.projectAlias;
                   }, config.projects), 'id');
             },
             validator : HotUtils.validator.requiredAutocomplete,
