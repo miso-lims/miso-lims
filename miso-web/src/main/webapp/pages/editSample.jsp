@@ -493,15 +493,8 @@
             <tr>
               <td class="h">Tissue Material:</td>
               <td>
-                <c:choose>
-                  <c:when test="${sample.id == 0}">
-                    <miso:select id="tissueMaterial" path="tissueMaterial" items="${tissueMaterials}" itemLabel="alias"
-                        itemValue="id" defaultLabel="SELECT" defaultValue=""/>
-                  </c:when>
-                  <c:otherwise>
-                    ${sample.tissueMaterial.alias}
-                  </c:otherwise>
-                </c:choose>
+                <miso:select id="tissueMaterial" path="tissueMaterial" items="${tissueMaterials}" itemLabel="alias"
+                    itemValue="id" defaultLabel="SELECT" defaultValue=""/>
               </td>
             </tr>
             <tr>
