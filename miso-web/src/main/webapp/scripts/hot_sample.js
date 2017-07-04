@@ -79,7 +79,7 @@ HotTarget.sample = (function() {
                       return;
                     }
                     if (!value) {
-                      return callback(Constnats.automaticSampleAlias);
+                      return callback(Constants.automaticSampleAlias);
                     }
                     Fluxion.doAjax('sampleControllerHelperService',
                         'validateSampleAlias', {
