@@ -69,7 +69,32 @@ HotTarget.sample = (function() {
           {
             header : 'Sample Alias',
             data : 'alias',
-            validator : HotUtils.validator.optionalTextNoSpecialChars,
+            validator : function(value, callback) {
+              (Constants.automaticSampleAlias
+                  ? HotUtils.validator.optionalTextNoSpecialChars
+                  : HotUtils.validator.requiredTextNoSpecialChars)(value,
+                  function(result) {
+                    if (!result) {
+                      callback(false);
+                      return;
+                    }
+                    if (!value) {
+                      return callback(Constnats.automaticSampleAlias);
+                    }
+                    Fluxion.doAjax('sampleControllerHelperService',
+                        'validateSampleAlias', {
+                          'alias' : value,
+                          'url' : ajaxurl
+                        }, {
+                          'doOnSuccess' : function() {
+                            return callback(true);
+                          },
+                          'doOnError': function(json) {
+                            return callback(false);
+                          }
+                        });
+                  });
+            },
             type : 'text',
             unpack : function(sam, flat, setCellMeta) {
               flat.alias = sam.alias;
