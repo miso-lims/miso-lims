@@ -37,8 +37,17 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @author Rob Davey
  * @since 0.1.6
  */
-public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer>,
-    Remover<SequencerPartitionContainer>, PaginatedDataSource<SequencerPartitionContainer> {
+public interface SequencerPartitionContainerStore extends Remover<SequencerPartitionContainer>,
+    PaginatedDataSource<SequencerPartitionContainer> {
+
+  public SequencerPartitionContainer save(SequencerPartitionContainer container) throws IOException;
+
+  public SequencerPartitionContainer get(long id) throws IOException;
+
+  public List<SequencerPartitionContainer> listAll() throws IOException;
+
+  public int count() throws IOException;
+
   /**
    * Get the SequencerPartitionContainer that contains a given {@link SequencerPoolPartition}
    * 

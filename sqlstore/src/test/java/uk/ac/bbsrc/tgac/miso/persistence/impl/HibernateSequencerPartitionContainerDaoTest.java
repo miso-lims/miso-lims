@@ -154,7 +154,8 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     Mockito.when(run.getId()).thenReturn(1L);
     spc.setIdentificationBarcode("ABCDEFXX");
 
-    assertEquals(4L, dao.save(spc));
+    dao.save(spc);
+    assertEquals(4L, spc.getId());
     SequencerPartitionContainer savedSPC = dao.get(4L);
     assertEquals(spc.getId(), savedSPC.getId());
     assertEquals("ABCDEFXX", savedSPC.getIdentificationBarcode());
@@ -170,18 +171,21 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
   public void testSaveNew() throws IOException {
     SequencerPartitionContainer newSPC = makeSPC("ABCDEFXX");
 
-    Long newId = dao.save(newSPC);
-    assertNotNull(newId);
+    assertEquals(SequencerPartitionContainerImpl.UNSAVED_ID.longValue(), newSPC.getId());
+    dao.save(newSPC);
+    assertNotEquals(SequencerPartitionContainerImpl.UNSAVED_ID.longValue(), newSPC.getId());
 
-    SequencerPartitionContainer savedSPC = dao.get(newId);
+    SequencerPartitionContainer savedSPC = dao.get(newSPC.getId());
     assertEquals(newSPC.getIdentificationBarcode(), savedSPC.getIdentificationBarcode());
   }
 
   @Test
   public void testRemove() throws IOException {
     SequencerPartitionContainer spc = makeSPC("ABCDEFXX");
-    long spcId = dao.save(spc);
-    SequencerPartitionContainer insertedSpc = dao.get(spcId);
+    assertEquals(SequencerPartitionContainerImpl.UNSAVED_ID.longValue(), spc.getId());
+    dao.save(spc);
+    assertNotEquals(SequencerPartitionContainerImpl.UNSAVED_ID.longValue(), spc.getId());
+    SequencerPartitionContainer insertedSpc = dao.get(spc.getId());
     assertNotNull(insertedSpc);
 
     assertTrue(dao.remove(spc));

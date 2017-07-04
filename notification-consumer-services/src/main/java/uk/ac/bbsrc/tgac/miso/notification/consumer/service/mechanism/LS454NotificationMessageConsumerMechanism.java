@@ -279,7 +279,7 @@ public class LS454NotificationMessageConsumerMechanism
                       }
                       if (isStringEmptyOrNull(f.getIdentificationBarcode())) {
                         f.setIdentificationBarcode(ptpId);
-                        long flowId = requestManager.saveSequencerPartitionContainer(f);
+                        long flowId = requestManager.saveSequencerPartitionContainer(f).getId();
                         f.setId(flowId);
                       }
                     }

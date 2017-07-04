@@ -48,9 +48,9 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.RunUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
@@ -285,7 +285,7 @@ public class SolidNotificationMessageConsumerMechanism
                   f.setIdentificationBarcode(run.getString("containerId"));
                 }
 
-                long flowId = requestManager.saveSequencerPartitionContainer(f);
+                long flowId = requestManager.saveSequencerPartitionContainer(f).getId();
                 f.setId(flowId);
               }
 

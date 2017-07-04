@@ -178,7 +178,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
+  public SequencerPartitionContainer saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (writeCheck(container)) {
       container.setLastModifier(getCurrentUser());
       return backingManager.saveSequencerPartitionContainer(container);
