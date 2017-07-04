@@ -99,6 +99,7 @@ HotTarget.library = (function() {
     },
     
     createColumns : function(config, create, data) {
+      var validationCache = {};
       return [
           {
             header : 'Library Name',
@@ -126,15 +127,20 @@ HotTarget.library = (function() {
                     if (!value) {
                       return callback(Constants.automaticLibraryAlias);
                     }
+                    if (validationCache.hasOwnProperty(value)) {
+                      return callback(validationCache[value]);
+                    }
                     Fluxion.doAjax('libraryControllerHelperService',
                         'validateLibraryAlias', {
                           'alias' : value,
                           'url' : ajaxurl
                         }, {
                           'doOnSuccess' : function() {
+                            validationCache[value] = true;
                             return callback(true);
                           },
                           'doOnError' : function(json) {
+                            validationCache[value] = false;
                             return callback(false);
                           }
                         });
@@ -143,6 +149,7 @@ HotTarget.library = (function() {
             type : 'text',
             include : config.showLibraryAlias,
             unpack : function(lib, flat, setCellMeta) {
+              validationCache[lib.alias] = true;
               flat.alias = lib.alias;
               if (lib.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
