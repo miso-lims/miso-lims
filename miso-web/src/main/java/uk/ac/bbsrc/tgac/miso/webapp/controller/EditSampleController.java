@@ -125,6 +125,9 @@ import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleSlideDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
@@ -910,6 +913,11 @@ public class EditSampleController {
       // need to instantiate the correct DetailedSampleDto class to get the correct fields
       final DetailedSampleDto detailedTemplate;
       switch (target.getSampleCategory()) {
+      case SampleIdentity.CATEGORY_NAME:
+        SampleIdentityDto iDto = new SampleIdentityDto();
+        iDto.setSampleClassId(sampleClassId);
+        bulkCreateSampleBackend = new BulkCreateSampleBackend(SampleIdentityDto.class, iDto, quantity);
+        break;
       case SampleTissue.CATEGORY_NAME:
         detailedTemplate = new SampleTissueDto();
         break;
@@ -1025,14 +1033,29 @@ public class EditSampleController {
         DetailedSample sample = (DetailedSample) item;
         if (targetSampleClass == null) {
           throw new IllegalArgumentException("Target sample class not set!");
-        } else if (targetSampleClass.getSampleCategory().equals(SampleTissue.CATEGORY_NAME)) {
-          dto = new SampleTissueDto();
-        } else if (targetSampleClass.getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
-          dto = new SampleStockDto();
-        } else if (targetSampleClass.getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
-          dto = new SampleAliquotDto();
         } else {
-          throw new IllegalArgumentException("Cannot determine sample category");
+          switch (targetSampleClass.getSampleCategory()) {
+          case SampleTissue.CATEGORY_NAME:
+            dto = new SampleTissueDto();
+            break;
+          case SampleTissueProcessing.CATEGORY_NAME:
+            if (targetSampleClass.getAlias().equals("Slide")) {
+              dto = new SampleSlideDto();
+            } else if (targetSampleClass.getAlias().equals("LCM Tube")) {
+              dto = new SampleLCMTubeDto();
+            } else {
+              dto = new SampleTissueProcessingDto();
+            }
+            break;
+          case SampleStock.CATEGORY_NAME:
+            dto = new SampleStockDto();
+            break;
+          case SampleAliquot.CATEGORY_NAME:
+            dto = new SampleAliquotDto();
+            break;
+          default:
+            throw new IllegalArgumentException("Cannot determine sample category");
+          }
         }
         dto.setScientificName(sample.getScientificName());
         dto.setSampleType(sample.getSampleType());

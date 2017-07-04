@@ -140,6 +140,18 @@ HotTarget.sample = (function() {
             },
             include : true
           },
+          {
+            header: 'NS Alias',
+            data: 'nonStandardAlias',
+            type: 'checkbox',
+            include: show['Identity'] && config.targetSampleClass.alias == 'Identity',
+            unpack: function (sam, flat, setCellMeta) {
+              flat.nonStandardAlias = sam.nonStandardAlias;
+            },
+            pack: function (sam, flat, errorHandler) {
+              sam.nonStandardAlias = flat.nonStandardAlias;
+            }
+          },
           HotUtils.makeColumnForText('Description', true, 'description', {
             validator : HotUtils.validator.optionalTextNoSpecialChars
           }),
@@ -261,7 +273,7 @@ HotTarget.sample = (function() {
             strict : true,
             source : [ '' ],
             validator : HotUtils.validator.requiredAutocomplete,
-            include : show['Identity'],
+            include : show['Identity'] && config.targetSampleClass.alias != 'Identity' && config.targetSampleClass.sampleCategory != 'Identity',
             depends : 'externalName',
             update : function(sam, flat, value, setReadOnly, setOptions,
                 setData) {

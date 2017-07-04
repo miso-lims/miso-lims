@@ -221,9 +221,10 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
           throw new IOException(e.getMessage(), e);
         }
         validateHierarchy(detailed);
+      } else {
+        sample.inheritPermissions(sample.getProject());
       }
     } else {
-      sample.setProject(projectStore.get(sample.getProject().getId()));
       sample.inheritPermissions(sample.getProject());
     }
 
