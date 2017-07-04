@@ -45,7 +45,9 @@ HotTarget.dilution = {
           pack : function(dil, flat, errorHandler) {
           }
         },
-        HotUtils.makeColumnForFloat('Conc. (' + Constants.libraryDilutionConcentrationUnits + ')', true, 'concentration', true),
+        HotUtils.makeColumnForFloat(
+            'Conc. (' + Constants.libraryDilutionConcentrationUnits + ')',
+            true, 'concentration', true),
         {
           header : 'Creation Date',
           data : 'creationDate',
@@ -92,12 +94,14 @@ HotTarget.dilution = {
           depends : '*start', // This is a dummy value that gets this run on
           // table creation only
           update : function(dil, flat, value, setReadOnly, setOptions, setData) {
-            setOptions({ source: [ '(None)' ].concat(Constants.targetedSequencings
-                .filter(
-                    function(targetedSequencing) {
-                      return targetedSequencing.kitDescriptorIds
-                          .indexOf(dil.library.kitDescriptorId) != -1;
-                    }).map(Utils.array.getAlias).sort()) });
+            setOptions({
+              source : [ '(None)' ].concat(Constants.targetedSequencings
+                  .filter(
+                      function(targetedSequencing) {
+                        return targetedSequencing.kitDescriptorIds
+                            .indexOf(dil.library.kitDescriptorId) != -1;
+                      }).map(Utils.array.getAlias).sort())
+            });
           }
         } ];
   },
@@ -106,24 +110,30 @@ HotTarget.dilution = {
       {
         name : 'Edit',
         action : function(items) {
-          window.location = window.location.origin + '/miso/library/dilution/bulk/edit/' + items.map(Utils.array.getId)
-              .join(',');
+          window.location = window.location.origin + '/miso/library/dilution/bulk/edit?' + jQuery
+              .param({
+                ids : items.map(Utils.array.getId).join(',')
+              });
         }
       },
       {
         name : 'Pool together',
         title : 'Create one pool from many dilutions',
         action : function(items) {
-          window.location = window.location.origin + '/miso/library/dilution/bulk/merge/' + items.map(Utils.array.getId)
-              .join(',');
+          window.location = window.location.origin + '/miso/library/dilution/bulk/merge?' + jQuery
+              .param({
+                ids : items.map(Utils.array.getId).join(',')
+              });
         }
       },
       {
         name : 'Pool separately',
         title : 'Create a pool for each dilution',
         action : function(items) {
-          window.location = window.location.origin + '/miso/library/dilution/bulk/propagate/' + items.map(Utils.array.getId)
-              .join(',');
+          window.location = window.location.origin + '/miso/library/dilution/bulk/propagate?' + jQuery
+              .param({
+                ids : items.map(Utils.array.getId).join(',')
+              });
         }
       }, ],
 

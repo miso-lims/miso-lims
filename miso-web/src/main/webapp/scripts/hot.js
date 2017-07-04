@@ -115,7 +115,7 @@ var HotUtils = {
           debug : true,
           fixedColumnsLeft : 1,
           manualColumnResize : true,
-          rowHeaders : true,
+          rowHeaders : false,
           colHeaders : columns.map(function(c) {
             return c.header;
           }),
@@ -607,7 +607,7 @@ var HotUtils = {
     };
     return baseobj;
   },
-  
+
   makeColumnForOptionalBoolean : function(headerName, include, property) {
     return {
       header : headerName,

@@ -40,6 +40,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -786,7 +787,7 @@ public class EditLibraryController {
     }
 
     @Override
-    protected Iterable<Sample> loadParents(List<Long> ids) throws IOException {
+    protected Stream<Sample> loadParents(List<Long> ids) throws IOException {
       Collection<Sample> results = sampleService.listByIdList(ids);
 
       SampleClass sampleClass = null;
@@ -806,7 +807,7 @@ public class EditLibraryController {
       if (hasPlain && sampleClass != null) {
         throw new IOException("Cannot mix plain and detailed samples.");
       }
-      return results;
+      return results.stream();
     }
 
     @Override
@@ -821,13 +822,14 @@ public class EditLibraryController {
     config.put("showLibraryAlias", showLibraryAlias);
   }
 
-  @RequestMapping(value = "/bulk/propagate/{sampleIds}", method = RequestMethod.GET)
-  public ModelAndView propagateFromSamples(@PathVariable String sampleIds, ModelMap model) throws IOException, MisoNamingException {
-    return libraryBulkPropagateBackend.propagate(sampleIds, model);
+  @RequestMapping(value = "/bulk/propagate", method = RequestMethod.GET)
+  public ModelAndView propagateFromSamples(@RequestParam("ids") String sampleIds, @RequestParam("replicates") int replicates,
+      ModelMap model) throws IOException, MisoNamingException {
+    return libraryBulkPropagateBackend.propagate(sampleIds, replicates, model);
   }
 
-  @RequestMapping(value = "/bulk/edit/{libraryIds}", method = RequestMethod.GET)
-  public ModelAndView editBulkLibraries(@PathVariable String libraryIds, ModelMap model) throws IOException {
+  @RequestMapping(value = "/bulk/edit", method = RequestMethod.GET)
+  public ModelAndView editBulkLibraries(@RequestParam("ids") String libraryIds, ModelMap model) throws IOException {
     return libraryBulkEditBackend.edit(libraryIds, model);
   }
 
@@ -842,8 +844,8 @@ public class EditLibraryController {
     }
 
     @Override
-    protected Iterable<Library> loadParents(List<Long> ids) throws IOException {
-      return libraryService.listByIdList(ids);
+    protected Stream<Library> loadParents(List<Long> ids) throws IOException {
+      return libraryService.listByIdList(ids).stream();
     }
 
     @Override
@@ -851,8 +853,8 @@ public class EditLibraryController {
     }
   };
 
-  @RequestMapping(value = "/dilutions/bulk/propagate/{libraryIds}", method = RequestMethod.GET)
-  public ModelAndView propagateDilutions(@PathVariable String libraryIds, ModelMap model) throws IOException {
+  @RequestMapping(value = "/dilutions/bulk/propagate", method = RequestMethod.GET)
+  public ModelAndView propagateDilutions(@RequestParam("ids") String libraryIds, ModelMap model) throws IOException {
     return dilutionBulkPropagateBackend.propagate(libraryIds, model);
   }
 
@@ -874,8 +876,8 @@ public class EditLibraryController {
     }
   };
 
-  @RequestMapping(value = "dilution/bulk/edit/{dilutionIds}", method = RequestMethod.GET)
-  public ModelAndView editDilutions(@PathVariable String dilutionIds, ModelMap model) throws IOException {
+  @RequestMapping(value = "dilution/bulk/edit", method = RequestMethod.GET)
+  public ModelAndView editDilutions(@RequestParam("ids") String dilutionIds, ModelMap model) throws IOException {
     return dilutionBulkEditBackend.edit(dilutionIds, model);
   }
 
@@ -940,8 +942,8 @@ public class EditLibraryController {
     }
 
     @Override
-    protected Iterable<LibraryDilution> loadParents(List<Long> ids) throws IOException {
-      return dilutionService.listByIdList(ids);
+    protected Stream<LibraryDilution> loadParents(List<Long> ids) throws IOException {
+      return dilutionService.listByIdList(ids).stream();
     }
 
     @Override
@@ -949,8 +951,8 @@ public class EditLibraryController {
     }
   };
 
-  @RequestMapping(value = "dilution/bulk/propagate/{dilutionIds}", method = RequestMethod.GET)
-  public ModelAndView propagatePoolsIndividual(@PathVariable String dilutionIds, ModelMap model) throws IOException {
+  @RequestMapping(value = "dilution/bulk/propagate", method = RequestMethod.GET)
+  public ModelAndView propagatePoolsIndividual(@RequestParam("ids") String dilutionIds, ModelMap model) throws IOException {
     return poolBulkPropagateBackend.propagate(dilutionIds, model);
   }
 
@@ -1019,8 +1021,8 @@ public class EditLibraryController {
     }
   };
 
-  @RequestMapping(value = "dilution/bulk/merge/{dilutionIds}", method = RequestMethod.GET)
-  public ModelAndView propagatePoolsMerged(@PathVariable String dilutionIds, ModelMap model) throws IOException {
+  @RequestMapping(value = "dilution/bulk/merge", method = RequestMethod.GET)
+  public ModelAndView propagatePoolsMerged(@RequestParam("ids") String dilutionIds, ModelMap model) throws IOException {
     return poolBulkMergeBackend.propagate(dilutionIds, model);
   }
 }

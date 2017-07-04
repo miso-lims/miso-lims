@@ -185,8 +185,10 @@ var Utils = Utils || {
             case 'int':
                 input = document.createElement('INPUT');
                 input.setAttribute('type', 'text');
+                input.value = field.value || 0;
+                output[field.property] = field.value || 0;
                 input.onchange = function() {
-                output[field.property] = parseInt(input.value);
+                    output[field.property] = parseInt(input.value);
                 };
                 break;
             default:
@@ -572,6 +574,9 @@ Utils.array = {
   deduplicateNumeric: function(input) {
     return input.sort(function(a, b) { return a - b; }).filter(function(obj, index, arr) { return index == 0 || obj !== arr[index - 1]; });
   },
+  deduplicateString: function(input) {
+    return input.sort(function(a, b) { return a.localeCompare(b); }).filter(function(obj, index, arr) { return index == 0 || obj !== arr[index - 1]; });
+  },
   deduplicateById: function(input) {
     return input.sort(function(a, b) { return a.id - b.id; }).filter(function(obj, index, arr) { return index == 0 || obj.id != arr[index - 1].id; });
   },
@@ -583,5 +588,8 @@ Utils.array = {
     return function (a, b) {
       return a[property].localeCompare(b[property]);
     };
-  }
+  },
+  sampleClassComparator: function(a, b) {
+    return (Constants.sampleCategories.indexOf(a.sampleCategory) - Constants.sampleCategories.indexOf(b.sampleCategory)) || a.alias.localeCompare(b.alias);
+  },
 };

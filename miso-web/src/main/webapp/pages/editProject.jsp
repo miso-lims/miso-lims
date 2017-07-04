@@ -144,6 +144,7 @@
 </script>
 
 <div id="printServiceSelectDialog" title="Select a Printer"></div>
+<div id="dialog"></div>
 
 <div id="projectoverviews">
 <c:if test="${project.id != 0}">
@@ -563,32 +564,6 @@
 
   <div id="sampletabs">
     <h1>Samples</h1>
-    <ul class="sddm">
-      <li>
-        <a onmouseover="mopen('samplemenu')" onmouseout="mclosetime()">Options
-          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-        </a>
-
-        <div id="samplemenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-          <a href='<c:url value="/miso/sample/new/${project.id}#tab-2"/>'>Add Samples</a>
-          <a href="javascript:void(0);" onclick="getBulkSampleInputForm(${project.id});">Get Bulk Sample Input Form</a>
-          <a href="javascript:void(0);" onclick="Project.ui.uploadBulkSampleInputForm();">Import Bulk Sample Input Form</a>
-          <c:if test="${not empty project.samples}">
-            <hr>
-            <a href='<c:url value="/miso/importexport/exportsamplesheet"/>'>Export Sample QC Sheet</a>
-            <a href='<c:url value="/miso/importexport/importsamplesheet"/>'>Import Sample QC Sheet</a>
-            <hr>
-            <a href="javascript:void(0);" onclick="Project.ui.processSampleDeliveryForm(${project.id}, false);">Get Information Form (Tubes)</a>
-            <a href="javascript:void(0);" onclick="Project.ui.processSampleDeliveryForm(${project.id}, true);">Get Information Form (Plate)</a>
-            <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm();">Import Information Form</a>
-           <hr>
-            <a href="javascript:void(0);" onclick="Project.ui.receiveSelectedSamples();">Receive Samples</a>
-            <a href='<c:url value="/miso/importexport/importlibrarypoolsheet"/>'>Import Library Sheet</a>
-            <a href="javascript:void(0);" onclick="Project.barcode.printSelectedSampleBarcodes();">Print Barcodes ...</a>
-          </c:if>
-        </div>
-      </li>
-    </ul>
 
     <div style="clear:both">
       <div id="deliveryformdiv" class="simplebox" style="display:none;">
@@ -645,7 +620,7 @@
 </div>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-  Project.ui.createSampleTable(${project.id});
+  ListUtils.createTable('sample_table', ListTarget.sample, ${project.id}, {});
   });
 </script>
 
