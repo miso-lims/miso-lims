@@ -59,7 +59,9 @@ HotTarget.library = (function() {
         } else {
           data = '';
         }
-        setOptions({ 'source' : indices });
+        setOptions({
+          'source' : indices
+        });
         setData(data);
       }
     };
@@ -170,12 +172,14 @@ HotTarget.library = (function() {
             pack : function(lib, flat, errorHandler) {
             }
           },
-          HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes, 'identificationBarcode',
-              { validator: HotUtils.validator.optionalTextNoSpecialChars }
-          ),
-          HotUtils.makeColumnForText('Description', config.showDescription, 'description',
-              { validator: HotUtils.validator.optionalTextNoSpecialChars }
-          ),
+          HotUtils.makeColumnForText('Matrix Barcode',
+              !Constants.automaticBarcodes, 'identificationBarcode', {
+                validator : HotUtils.validator.optionalTextNoSpecialChars
+              }),
+          HotUtils.makeColumnForText('Description', config.showDescription,
+              'description', {
+                validator : HotUtils.validator.optionalTextNoSpecialChars
+              }),
           {
             header : 'Design',
             data : 'libraryDesignAlias',
@@ -185,9 +189,9 @@ HotTarget.library = (function() {
             source : [ '' ],
             include : Constants.isDetailedSample,
             unpack : function(lib, flat, setCellMeta) {
-              flat.libraryDesignAlias = Utils.array.maybeGetProperty(Utils.array
-                  .findFirstOrNull(
-                      Utils.array.idPredicate(lib.libraryDesignId),
+              flat.libraryDesignAlias = Utils.array.maybeGetProperty(
+                  Utils.array.findFirstOrNull(Utils.array
+                      .idPredicate(lib.libraryDesignId),
                       Constants.libraryDesigns), 'name') || '(None)';
             },
             pack : function(lib, flat, errorHandler) {
@@ -210,10 +214,11 @@ HotTarget.library = (function() {
             // creation only
             update : function(lib, flat, value, setReadOnly, setOptions,
                 setData) {
-              setOptions({ 'source' : [ '(None)' ].concat(Constants.libraryDesigns.filter(
-                  function(design) {
-                    return design.sampleClassId == lib.parentSampleClassId;
-                  }).map(Utils.array.getName).sort())
+              setOptions({
+                'source' : [ '(None)' ].concat(Constants.libraryDesigns.filter(
+                    function(design) {
+                      return design.sampleClassId == lib.parentSampleClassId;
+                    }).map(Utils.array.getName).sort())
               });
             }
           },
@@ -268,13 +273,14 @@ HotTarget.library = (function() {
             },
             update : function(lib, flat, value, setReadOnly, setOptions) {
               var pt = getPlatformType(value);
-              setOptions({ 'source' : Constants.libraryTypes
-                  .filter(
-                      function(lt) {
-                        return lt.platform == pt && (!lt.archived || lib.libraryTypeId == lt.id);
-                      }).map(function(lt) {
-                    return lt.alias;
-                  }).sort()
+              setOptions({
+                'source' : Constants.libraryTypes
+                    .filter(
+                        function(lt) {
+                          return lt.platform == pt && (!lt.archived || lib.libraryTypeId == lt.id);
+                        }).map(function(lt) {
+                      return lt.alias;
+                    }).sort()
               });
             }
           
@@ -316,14 +322,17 @@ HotTarget.library = (function() {
                     return platformType.key == value;
                   }, Constants.platformTypes), 'name');
               if (!pt) {
-                setOptions({ 'source' : [ '' ] });
+                setOptions({
+                  'source' : [ '' ]
+                });
               } else {
-                setOptions({ 'source': [ 'No indices' ].concat(Constants.indexFamilies
-                    .filter(function(family) {
-                      return family.platformType == pt;
-                    }).map(function(family) {
-                      return family.name;
-                    }).sort())
+                setOptions({
+                  'source' : [ 'No indices' ].concat(Constants.indexFamilies
+                      .filter(function(family) {
+                        return family.platformType == pt;
+                      }).map(function(family) {
+                        return family.name;
+                      }).sort())
                 });
               }
             }
@@ -356,12 +365,13 @@ HotTarget.library = (function() {
             },
             depends : 'platformType',
             update : function(lib, flat, value, setReadOnly, setOptions) {
-              setOptions({ 'source' : Constants.kitDescriptors
-                  .filter(
-                      function(kit) {
-                        return kit.platformType == flat.platformType && kit.kitType == 'Library';
-                      }).map(Utils.array.getName).sort()
-              }); 
+              setOptions({
+                'source' : Constants.kitDescriptors
+                    .filter(
+                        function(kit) {
+                          return kit.platformType == flat.platformType && kit.kitType == 'Library';
+                        }).map(Utils.array.getName).sort()
+              });
             }
           },
           HotUtils.makeColumnForOptionalBoolean('QC Passed?', true, 'qcPassed'),
@@ -381,15 +391,19 @@ HotTarget.library = (function() {
         {
           name : 'Edit',
           action : function(items) {
-            window.location = window.location.origin + '/miso/library/bulk/edit/' + items.map(Utils.array.getId)
-                .join(',');
+            window.location = window.location.origin + '/miso/library/bulk/edit?' + jQuery
+                .param({
+                  ids : items.map(Utils.array.getId).join(',')
+                });
           }
         },
         {
           name : 'Make dilutions',
           action : function(items) {
-            window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate/' + items.map(Utils.array.getId)
-                .join(',');
+            window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery
+                .param({
+                  ids : items.map(Utils.array.getId).join(',')
+                });
           }
         }, ],
   

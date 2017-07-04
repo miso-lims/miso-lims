@@ -218,14 +218,14 @@ Project.ui = {
     );
   },
 
-  processSampleDeliveryForm: function (projectId, plate) {
+  processSampleDeliveryForm: function (projectId, plate, ids) {
     Fluxion.doAjax(
       'projectControllerHelperService',
       'generateSampleDeliveryForm',
       {
         'plate':plate,
         'projectId': projectId,
-        'samples': Project.ui.selectedSamples,
+        'samples': ids,
         'url': ajaxurl
       },
       {
@@ -391,47 +391,6 @@ Project.ui = {
     }
   },
 
-  saveBulkEmPcrs: function () {
-    var self = this;
-    Utils.ui.disableButton('bulkEmPcrButton');
-    DatatableUtils.collapseInputs('#librarydils_table');
-
-    var table = jQuery('#librarydils_table').dataTable();
-    var aReturn = [];
-    var aTrs = DatatableUtils.fnGetSelected(table);
-    for (var i = 0; i < aTrs.length; i++) {
-      var obj = {};
-      jQuery(aTrs[i]).find("td:gt(0)").each(function () {
-        var at = jQuery(this).attr("name");
-        obj[at] = jQuery(this).text();
-      });
-      obj.pcrCreator = jQuery('#currentUser').text();
-      obj.dilutionId = obj.dilName.substring(3);
-      aReturn.push(obj);
-    }
-    if (aReturn.length > 0) {
-      if (Project.validate_empcrs(aReturn)) {
-        Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'bulkAddEmPcrs',
-          {
-            'pcrs': aReturn,
-            'url': ajaxurl
-          },
-          {
-            'doOnSuccess': self.processBulkEmPcrTable
-          }
-        );
-      } else {
-        alert("The results field can only contain integers or decimals.");
-        Utils.ui.reenableButton('bulkEmPcrButton', "Save EmPCRs");
-      }
-    } else {
-      alert("You have not selected any EmPCR rows to save!\nPlease click the Select column cells in the rows you wish to save.");
-      Utils.ui.reenableButton('bulkEmPcrButton', "Save EmPCRs");
-    }
-  },
-
   processBulkEmPcrTable: function (json) {
     Utils.ui.reenableButton('bulkEmPcrButton', "Save EmPCRs");
 
@@ -471,96 +430,13 @@ Project.ui = {
     }
   },
 
-  saveBulkEmPcrDilutions: function () {
-    var self = this;
-    Utils.ui.disableButton('bulkEmPcrDilutionButton');
-    DatatableUtils.collapseInputs('#empcrs_table');
-
-    var table = jQuery('#empcrs_table').dataTable();
-    var aReturn = [];
-    var aTrs = DatatableUtils.fnGetSelected(table);
-    for (var i = 0; i < aTrs.length; i++) {
-      var obj = {};
-      jQuery(aTrs[i]).find("td:gt(0)").each(function () {
-        var at = jQuery(this).attr("name");
-        obj[at] = jQuery(this).text();
-      });
-      obj.pcrDilutionCreator= jQuery('#currentUser').text();
-      obj.pcrId= obj.pcrName.substring(3);
-      aReturn.push(obj);
-    }
-
-    if (aReturn.length > 0) {
-      if (Project.validate_empcr_dilutions(aReturn)) {
-        Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'bulkAddEmPcrDilutions',
-          {
-            'dilutions': aReturn,
-            'url': ajaxurl
-          },
-          {
-            'doOnSuccess': self.processBulkEmPcrDilutionTable
-          }
-        );
-      } else {
-        alert("The results field can only contain integers or decimals.");
-        Utils.ui.reenableButton('bulkEmPcrDilutionButton', "Save Dilutions");
-      }
-    } else {
-      alert("You have not selected any EmPCR Dilution rows to save!\nPlease click the Select column cells in the rows you wish to save.");
-      Utils.ui.reenableButton('bulkEmPcrDilutionButton', "Save Dilutions");
-    }
-  },
-
-  processBulkEmPcrDilutionTable: function (json) {
-    Utils.ui.reenableButton('bulkEmPcrDilutionButton', "Save Dilutions");
-
-    var a = json.saved;
-    for (var i = 0; i < a.length; i++) {
-      jQuery('#empcrs_table').find("tr:gt(0)").each(function () {
-        if (jQuery(this).attr("pcrId") === a[i].pcrId) {
-          jQuery(this).removeClass('row_selected');
-          jQuery(this).addClass('row_saved');
-          jQuery(this).find("td").each(function () {
-            jQuery(this).css('background', '#CCFF99');
-            if (jQuery(this).hasClass('rowSelect')) {
-              jQuery(this).removeClass('rowSelect');
-              jQuery(this).removeAttr('name');
-            }
-          });
-        }
-      });
-    }
-
-    if (json.errors) {
-      var errors = json.errors;
-      var errorStr = "";
-      for (var j = 0; j < errors.length; j++) {
-        errorStr += errors[j].error + "\n";
-        jQuery('#empcrs_table').find("tr:gt(0)").each(function () {
-          if (jQuery(this).attr("pcrId") === errors[j].pcrId) {
-            jQuery(this).find("td").each(function () {
-              jQuery(this).css('background', '#EE9966');
-            });
-          }
-        });
-      }
-      alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
-    } else {
-      Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
-    }
-  },
-
-  receiveSelectedSamples: function () {
-    if (Project.ui.selectedSamples.length == 0) {
-      alert("No samples selected");
-    } else if (confirm("Are you sure you want to receive selected samples?")) {
+  receiveSelectedSamples: function (ids) {
+    if (confirm("Are you sure you want to receive selected samples?")) {
       Fluxion.doAjax(
         'sampleControllerHelperService',
         'setSampleReceivedDateByBarcode',
         {
-          'samples': Project.ui.selectedSamples,
+          'samples': ids,
           'url': ajaxurl
         },
         {
@@ -572,84 +448,6 @@ Project.ui = {
       );
     }
   },
-  createSampleTable: function (projectId) {
-    jQuery('#sample_table').html("");
-    jQuery('#sample_table').dataTable(Utils.setSortFromPriority({
-      "aoColumns": [
-        Utils.createToggleColumn("Project.ui.selectedSamples"),
-        {
-          "sTitle": "Sample Name",
-          "mData": "id",
-          "iSortPriority": 1,
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/sample/" + data + "\">" + full.name + "</a>";
-          }
-        },
-        {
-          "sTitle": "Alias",
-          "mData": "alias",
-          "iSortPriority": 0,
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/sample/" + full.id + "\">" + data + "</a>";
-          }
-        },
-        {
-          "sTitle": "Type", 
-          "mData": "sampleType" ,
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "QC Passed",
-          "mData": "qcPassed",
-          "mRender": function (data, type, full) {
-            // data is returned as "true", "false", or "null"
-            return (data != null ? (data ? "True" : "False") : "Unknown");
-          },
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Barcode",
-          "mData": "identificationBarcode",
-          "iSortPriority": 0,
-          "bVisible": false
-        }
-      ],
-      "bJQueryUI": true,
-      "bAutoWidth": false,
-      "iDisplayLength": 25,
-      "iDisplayStart": 0,
-      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-      "sPaginationType": "full_numbers",
-      "bProcessing": true,
-      "bServerSide": true,
-      "sAjaxSource": "/miso/rest/tree/samples/dt/project/" + projectId,
-      "fnServerData": function (sSource, aoData, fnCallback) {
-        jQuery('#sample_table').addClass('disabled');
-        jQuery.ajax({
-          "dataType": "json",
-          "type": "GET",
-          "url": sSource,
-          "data": aoData,
-          "success": fnCallback
-        });
-      },
-      "fnDrawCallback": function (oSettings) {
-        jQuery('#sample_table').removeClass('disabled');
-        jQuery('#sample_table_paginate').find('.fg-button').removeClass('fg-button');
-      }
-    })).fnSetFilteringDelay();
-  },
-  toggleSample: function(state, id) {
-    if (state) {
-      Project.ui.selectedSamples.push(id);
-    } else {
-      var index = Project.ui.selectedSamples.indexOf(id);
-      if (index > -1) {
-        Project.ui.selectedSamples.splice(index, 1);
-      }
-    }
-  },
-  selectedSamples: []
 };
 
 Project.overview = {

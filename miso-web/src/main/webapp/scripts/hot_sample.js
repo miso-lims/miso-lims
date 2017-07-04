@@ -3,6 +3,32 @@
  */
 HotTarget.sample = (function() {
   
+  var getSampleClasses = function(samples) {
+    var classIds = Utils.array.deduplicateNumeric(samples.map(function(sample) {
+      return sample.sampleClassId || -1;
+    }));
+    return Constants.sampleClasses.filter(function(sampleClass) {
+      return classIds.indexOf(sampleClass.id) != -1;
+    });
+  };
+  
+  /**
+   * Returns an array of sample classes that correspond to given sample class
+   * IDs (of parent samples)
+   */
+  var getChildSampleClasses = function(sampleClasses) {
+    return Constants.sampleClasses
+        .filter(function(childClass) {
+          return sampleClasses
+              .every(function(parentClass) {
+                return Constants.sampleValidRelationships
+                    .some(function(svr) {
+                      return svr.parentId == parentClass.id && svr.childId == childClass.id && !svr.archived;
+                    });
+              });
+        });
+  };
+  
   return {
     
     createUrl : '/miso/rest/tree/sample/',
@@ -149,18 +175,17 @@ HotTarget.sample = (function() {
             data : 'projectAlias',
             type : 'dropdown',
             source : (function() {
-              if ((!config.projects || config.projects.length == 0) && config.create && !config.propagate) {
+              if ((!config.projects || config.projects.length == 0) && config.create && !config.propagate && !config.hasProject) {
                 // projects list failed to generate when it should have, and we
                 // can't proceed. Notify the user.
                 var serverErrorMessages = document
                     .getElementById('serverErrors');
                 serverErrorMessages.innerHTML = '<p>Failed to generate list of projects. Please notify your MISO administrators.</p>';
                 document.getElementById('errors').classList.remove('hidden');
-                throw 'Server error generating list of projects'; // throw an
-                                                                  // error to
-                                                                  // keep the
-                                                                  // table from
-                                                                  // generating
+                /*
+                 * throw an error to keep the table from generating
+                 */
+                throw 'Server error generating list of projects';
               }
               var comparator = Constants.isDetailedSample ? 'shortName' : 'id';
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
@@ -168,7 +193,7 @@ HotTarget.sample = (function() {
                   Utils.array.standardSort(comparator)).map(function(item) {
                 return item[label];
               }) : []); // use empty array if projects are not provided (should
-                        // only happen during propagate or edit)
+              // only happen during propagate or edit)
               return projectLabels;
             })(),
             unpack : function(sam, flat, setCellMeta) {
@@ -185,7 +210,7 @@ HotTarget.sample = (function() {
                   }, config.projects), 'id');
             },
             validator : HotUtils.validator.requiredAutocomplete,
-            include : config.create
+            include : config.create && !config.hasProject
           },
           
           // Detailed Sample
@@ -343,10 +368,10 @@ HotTarget.sample = (function() {
           
           // Tissue columns
           HotUtils.makeColumnForConstantsList('Tissue Origin', show['Tissue'],
-              'tissueOriginAlias', 'tissueOriginId', 'id', 'alias',
+              'tissueOriginAlias', 'tissueOriginId', 'id', 'label',
               Constants.tissueOrigins, true),
           HotUtils.makeColumnForConstantsList('Tissue Type', show['Tissue'],
-              'tissueTypeAlias', 'tissueTypeId', 'id', 'alias',
+              'tissueTypeAlias', 'tissueTypeId', 'id', 'label',
               Constants.tissueTypes, true),
           HotUtils.makeColumnForInt('Passage #', show['Tissue'],
               'passageNumber', null),
@@ -517,8 +542,8 @@ HotTarget.sample = (function() {
                 return s.description;
               });
               statuses.unshift('Not Ready'); // can't chain this because
-                                              // unshift returns the length of
-                                              // the array
+              // unshift returns the length of
+              // the array
               return statuses;
             })(),
             validator : HotUtils.validator.requiredText,
@@ -586,41 +611,102 @@ HotTarget.sample = (function() {
     
     bulkActions : [
         {
-          name : 'New single sample',
-          action : function() {
-            window.location = window.location.origin + '/miso/sample/new';
+          name : "Edit",
+          action : function(samples) {
+            
+            if (samples.some(function(sample) {
+              return sample.sampleClassId;
+            }) && !Constants.isDetailedSample) {
+              alert("There's detailed samples, but MISO is not configured for this.");
+              return;
+            }
+            
+            var classes = getSampleClasses(samples);
+            var categories = Utils.array.deduplicateString(classes
+                .map(function(sampleClass) {
+                  return sampleClass.sampleCategory;
+                }));
+            if (categories.length > 1) {
+              alert("You have selected samples of categories " + categories
+                  .join(" & ") + ". Please select samples from only one category.");
+              return;
+            }
+            
+            if (categories[0] == 'Tissue Processing' && classes.length > 0) {
+              alert("You have selected samples of classes " + classes.map(
+                  Utils.array.getAlias).join(" & ") + ". Please select samples from only one tissue processing class.");
+              return;
+            }
+            
+            window.location = "/miso/sample/bulk/edit?" + jQuery.param({
+              ids : samples.map(Utils.array.getId).join(',')
+            });
           }
+        
         },
         {
-          name : 'New bulk samples',
-          action : function() {
-            // TODO @apmasell: add input/dialog for quantity and dropdown/dialog
-            // for sample classes if detailed sample
-            window.location = window.location.origin + '/miso/sample/bulk/new?quantity=' + QUANTITY + (SAMPLECLASSID
-                ? '&sampleClassId=' + SAMPLECLASSID : '');
+          name : "Propagate",
+          action : function(samples) {
+            var idsString = samples.map(Utils.array.getId).join(",");
+            var classes = getSampleClasses(samples);
+            
+            // In the case of plain samples, this will be empty, which is fine.
+            var targets = getChildSampleClasses(classes).sort(
+                Utils.array.sampleClassComparator).map(
+                function(sampleClass) {
+                  
+                  return {
+                    name : sampleClass.alias,
+                    action : function(replicates) {
+                      window.location = "/miso/sample/bulk/propagate?" + jQuery
+                          .param({
+                            parentIds : idsString,
+                            replicates : replicates,
+                            sampleClassId : sampleClass.id
+                          });
+                    }
+                  };
+                  
+                });
+            if (!Constants.isDetailedSample || classes.every(function(
+                sampleClass) {
+              return sampleClass.sampleCategory == "Aliquot";
+            })) {
+              targets.push({
+                name : "Library",
+                action : function(replicates) {
+                  window.location = "/miso/library/bulk/propagate?" + jQuery
+                      .param({
+                        ids : idsString,
+                        replicates : replicates
+                      });
+                }
+              });
+            }
+            
+            if (targets.length == 0) {
+              alert("No propagation is possible from the samples.");
+              return;
+            }
+            
+            Utils.showDialog(targets.length > 1 ? 'Propagate Samples'
+                : ('Propagate to ' + targets[0].name), 'Propagate', [ {
+              property : 'replicates',
+              type : 'int',
+              label : 'Replicates',
+              value : 1
+            }, targets.length > 1 ? {
+              property : 'target',
+              type : 'select',
+              label : 'To',
+              values : targets,
+              getLabel : Utils.array.getName
+            } : null ].filter(function(x) {
+              return !!x;
+            }), function(result) {
+              (result.target || targets[0]).action(result.replicates);
+            });
           }
-        },
-        {
-          name : 'Edit',
-          action : function(ids) {
-            window.location = window.location.origin + '/miso/sample/bulk/edit/' + ids
-                .join(',');
-          }
-        },
-        {
-          name : 'Propagate samples',
-          action : function(ids) {
-            // TODO @apmasell: add dropdown/dialog for sample classes
-            window.location = window.location.origin + '/miso/sample/bulk/propagate?parentIds=' + ids
-                .join(',') + '&sampleClassId=' + sampleClassId;
-          }
-        },
-        {
-          name : 'Make libraries',
-          action : function(ids) {
-            window.location = window.location.origin + '/miso/library/bulk/propagate/' + ids
-                .join(',');
-          }
-        } ]
+        }, ]
   };
 })();

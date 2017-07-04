@@ -1,8 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
@@ -31,7 +32,7 @@ public abstract class BulkPropagateTableBackend<ParentModel, Dto> extends BulkTa
   /**
    * Read all the specified parents from the database by their IDs.
    */
-  protected abstract Iterable<ParentModel> loadParents(List<Long> parentIds) throws IOException;
+  protected abstract Stream<ParentModel> loadParents(List<Long> parentIds) throws IOException;
 
   /**
    * Create a view to propagate parents to new entities.
@@ -39,11 +40,20 @@ public abstract class BulkPropagateTableBackend<ParentModel, Dto> extends BulkTa
    * @param idString a comma-delimited list of parent IDs
    */
   public final ModelAndView propagate(String idString, ModelMap model) throws IOException {
+    return propagate(idString, 1, model);
+  }
+
+  /**
+   * Create a view to propagate parents to new entities.
+   * 
+   * @param idString a comma-delimited list of parent IDs
+   * @param replicates the number of copies of each target that should be provided for parent
+   */
+  public final ModelAndView propagate(String idString, int replicates, ModelMap model) throws IOException {
+      if (replicates < 1) throw new IllegalArgumentException("Invalid number of replicates.");
     List<Long> ids = parseIds(idString);
-    List<Dto> dtos = new ArrayList<>();
-    for (ParentModel item : loadParents(ids)) {
-      dtos.add(createDtoFromParent(item));
-    }
+    List<Dto> dtos = loadParents(ids).map(this::createDtoFromParent).flatMap(dto -> Stream.generate(() -> dto).limit(replicates))
+        .collect(Collectors.toList());
     return prepare(model, true, "Create " + name + " from " + parentName, dtos);
   }
 

@@ -6,15 +6,12 @@ import java.util.Collections;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Create a Handsontable for creating a particular entity type that has no parent
  *
  * @param <Dto> The DTO for the entity being edited
  */
-public class BulkCreateTableBackend<Dto> extends BulkTableBackend<Dto> {
+public abstract class BulkCreateTableBackend<Dto> extends BulkTableBackend<Dto> {
   private final String name;
   private final Dto dto;
   private final Integer quantity;
@@ -28,11 +25,6 @@ public class BulkCreateTableBackend<Dto> extends BulkTableBackend<Dto> {
 
   public final ModelAndView create(ModelMap model) throws IOException {
     return prepare(model, true, "Create " + name, Collections.nCopies(quantity, dto));
-  }
-
-  @Override
-  protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-
   }
 
 }

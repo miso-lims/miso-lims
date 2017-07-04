@@ -313,6 +313,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "boxSizes", boxService.listSizes(), Function.identity());
     createArray(mapper, baseUri, node, "boxUses", boxService.listUses(), Function.identity());
     createArray(mapper, baseUri, node, "studyTypes", studyService.listTypes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "sampleCategories", EditSampleController.CATEGORIES, Function.identity());
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

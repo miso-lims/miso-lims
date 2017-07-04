@@ -56,15 +56,18 @@ HotTarget.pool = {
             'concentration', true),
         HotUtils.makeColumnForFloat('Volume (&#181;l)', true, 'volume'),
         HotUtils.makeColumnForOptionalBoolean('QC Passed?', true, 'qcPassed'),
-        HotUtils.makeColumnForOptionalBoolean('Ready to Run?', true, 'readyToRun') ];
+        HotUtils.makeColumnForOptionalBoolean('Ready to Run?', true,
+            'readyToRun') ];
   },
   
   bulkActions : [
       {
         name : 'Edit',
         action : function(items) {
-          window.location = window.location.origin + '/miso/pool/bulk/edit/' + items.map(Utils.array.getId)
-              .join(',');
+          window.location = window.location.origin + '/miso/pool/bulk/edit?' + jQuery
+              .param({
+                ids : items.map(Utils.array.getId).join(',')
+              });
         }
       }, ],
 

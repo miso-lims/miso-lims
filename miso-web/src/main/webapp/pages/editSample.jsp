@@ -35,6 +35,7 @@
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 <link href="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.css'/>" rel="stylesheet" type="text/css" />
 <script src="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/handsontable/dist/moment/moment.js'/>" type="text/javascript"></script>
@@ -852,13 +853,7 @@
       </table>
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          jQuery('#relations_table').dataTable({
-            "aoColumns": Sample.ui.standardColumns,
-            "aaData": ${sampleRelations},
-            "iDisplayLength": 50,
-            "bJQueryUI": true,
-            "bRetrieve": true
-          });
+          ListUtils.createStaticTable('relations_table', ListTarget.sample, {}, ${sampleRelations});
         });
       </script>
     </div>

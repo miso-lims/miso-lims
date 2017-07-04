@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
@@ -65,7 +66,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.sf.json.JSONArray;
@@ -475,16 +475,13 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
 
-  private static final List<String> CATEGORIES = Arrays.asList(Identity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+  public static final List<String> CATEGORIES = Arrays.asList(Identity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
       SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
 
-  private static final Comparator<SampleClass> SAMPLECLASS_CATEGORY_ALIAS = new Comparator<SampleClass>() {
-    @Override
-    public int compare(SampleClass o1, SampleClass o2) {
-      int categoryOrder = CATEGORIES.indexOf(o1.getSampleCategory()) - CATEGORIES.indexOf(o2.getSampleCategory());
-      if (categoryOrder != 0) return categoryOrder;
-      return o1.getAlias().compareTo(o2.getAlias());
-    }
+  private static final Comparator<SampleClass> SAMPLECLASS_CATEGORY_ALIAS = (SampleClass o1, SampleClass o2) -> {
+    int categoryOrder = CATEGORIES.indexOf(o1.getSampleCategory()) - CATEGORIES.indexOf(o2.getSampleCategory());
+    if (categoryOrder != 0) return categoryOrder;
+    return o1.getAlias().compareTo(o2.getAlias());
   };
 
   private void populateSampleClasses(ModelMap model) throws IOException {
@@ -868,8 +865,8 @@ public class EditSampleController {
    * Used to edit samples with ids from given {sampleIds}.
    * Sends Dtos objects which will then be used for editing in grid.
    */
-  @RequestMapping(value = "/bulk/edit/{sampleIds}", method = RequestMethod.GET)
-  public ModelAndView editBulkSamples(@PathVariable String sampleIds, ModelMap model) throws IOException {
+  @RequestMapping(value = "/bulk/edit", method = RequestMethod.GET)
+  public ModelAndView editBulkSamples(@RequestParam("ids") String sampleIds, ModelMap model) throws IOException {
     return new BulkEditSampleBackend().edit(sampleIds, model);
   }
 
@@ -880,9 +877,10 @@ public class EditSampleController {
    */
   @RequestMapping(value = "/bulk/propagate", method = RequestMethod.GET)
   public ModelAndView propagateBulkSamples(@RequestParam("parentIds") String parentIds, @RequestParam("sampleClassId") Long sampleClassId,
+      @RequestParam("replicates") int replicates,
       ModelMap model) throws IOException {
     BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(sampleClassService.get(sampleClassId));
-    return bulkPropagateSampleBackend.propagate(parentIds, model);
+    return bulkPropagateSampleBackend.propagate(parentIds, replicates, model);
   }
 
   /**
@@ -895,49 +893,53 @@ public class EditSampleController {
    */
   @RequestMapping(value = "/bulk/new", method = RequestMethod.GET)
   public ModelAndView createBulkSamples(@RequestParam("quantity") Integer quantity,
-      @RequestParam(value = "sampleClassId", required = false) Long sampleClassId, ModelMap model) throws IOException {
+      @RequestParam(value = "sampleClassId", required = false) Long sampleClassId,
+      @RequestParam(value = "projectId", required = false) Long projectId, ModelMap model) throws IOException {
     if (quantity == null || quantity <= 0) throw new RestException("Must specify quantity of samples to create", Status.BAD_REQUEST);
-    
-    BulkCreateSampleBackend bulkCreateSampleBackend;
+
+    final SampleDto template;
+    final SampleClass target;
+
     if (sampleClassId != null) {
       // create new detailed samples
-      SampleClass target = sampleClassService.get(sampleClassId);
+      target = sampleClassService.get(sampleClassId);
       if (target == null || target.getSampleCategory() == null) {
         throw new RestException("Cannot find sample class with ID " + sampleClassId, Status.NOT_FOUND);
       }
       // need to instantiate the correct DetailedSampleDto class to get the correct fields
+      final DetailedSampleDto detailedTemplate;
       switch (target.getSampleCategory()) {
       case SampleTissue.CATEGORY_NAME:
-        SampleTissueDto stDto = new SampleTissueDto();
-        stDto.setSampleClassId(sampleClassId);
-        bulkCreateSampleBackend = new BulkCreateSampleBackend(SampleTissueDto.class, stDto, quantity);
+        detailedTemplate = new SampleTissueDto();
         break;
       case SampleTissueProcessing.CATEGORY_NAME:
-        SampleTissueProcessingDto stpDto = new SampleTissueProcessingDto();
-        stpDto.setSampleClassId(sampleClassId);
-        bulkCreateSampleBackend = new BulkCreateSampleBackend(SampleTissueProcessingDto.class, stpDto, quantity);
+        detailedTemplate = new SampleTissueProcessingDto();
         break;
       case SampleStock.CATEGORY_NAME:
-        SampleStockDto ssDto = new SampleStockDto();
-        ssDto.setSampleClassId(sampleClassId);
-        bulkCreateSampleBackend = new BulkCreateSampleBackend(SampleStockDto.class, ssDto, quantity);
+        detailedTemplate = new SampleStockDto();
         break;
       case SampleAliquot.CATEGORY_NAME:
-        SampleAliquotDto saDto = new SampleAliquotDto();
-        saDto.setSampleClassId(sampleClassId);
-        bulkCreateSampleBackend = new BulkCreateSampleBackend(SampleAliquotDto.class, saDto, quantity);
+        detailedTemplate = new SampleAliquotDto();
         break;
       default:
         throw new RestException("Unknown category for sample class with ID " + sampleClassId, Status.BAD_REQUEST);
       }
-      bulkCreateSampleBackend.setTargetSampleClass(target);
-      return bulkCreateSampleBackend.create(model);
+      detailedTemplate.setSampleClassId(sampleClassId);
+      template = detailedTemplate;
     } else {
       if (detailedSample) throw new RestException("Must specify sample class of samples to create", Status.BAD_REQUEST);
-      // create new plain samples
-      bulkCreateSampleBackend = new BulkCreateSampleBackend(SampleDto.class, new SampleDto(), quantity);
-      return bulkCreateSampleBackend.create(model);
+      template = new SampleDto();
+      target = null;
     }
+    final Project project;
+    if (projectId == null) {
+      project = null;
+    } else {
+      project = requestManager.getProjectById(projectId);
+      template.setProjectId(projectId);
+    }
+
+    return new BulkCreateSampleBackend(template.getClass(), template, quantity, project, target).create(model);
   }
 
   @RequestMapping(method = RequestMethod.POST)
@@ -1051,8 +1053,8 @@ public class EditSampleController {
     }
 
     @Override
-    protected Iterable<Sample> loadParents(List<Long> parentIds) throws IOException {
-      return sampleService.listByIdList(parentIds);
+    protected Stream<Sample> loadParents(List<Long> parentIds) throws IOException {
+      return sampleService.listByIdList(parentIds).stream();
     }
 
     @Override
@@ -1066,27 +1068,23 @@ public class EditSampleController {
   };
 
   private final class BulkCreateSampleBackend extends BulkCreateTableBackend<SampleDto> {
-    private SampleClass targetSampleClass;
+    private final SampleClass targetSampleClass;
+    private final boolean hasProject;
 
-    public BulkCreateSampleBackend(Class<? extends SampleDto> dtoClass, SampleDto dto, Integer quantity) {
+    public BulkCreateSampleBackend(Class<? extends SampleDto> dtoClass, SampleDto dto, Integer quantity, Project project,
+        SampleClass sampleClass) {
       super("sample", dtoClass, "Samples", dto, quantity);
-    }
-
-    private void setTargetSampleClass(SampleClass sampleClass) throws IOException {
       targetSampleClass = sampleClass;
+      this.hasProject = project != null;
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       if (targetSampleClass != null) config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
       config.put("create", true);
-      ArrayNode projects = config.putArray("projects");
-      try {
-        for (Project p : requestManager.listAllProjects()) {
-          projects.add(mapper.valueToTree(Dtos.asDto(p)));
-        }
-      } catch (IOException e) {
-        log.debug("Failed to get projects list");
+      config.put("hasProject", hasProject);
+      if (!hasProject) {
+        requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
       }
     }
   };

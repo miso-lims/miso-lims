@@ -177,7 +177,7 @@ ListUtils = (function() {
             'data' : aoData,
             'success' : function(data, textStatus, xhr) {
               errorMessage.innerText = data.sError;
-        	ListState[elementId].data = data.aaData;
+              ListState[elementId].data = data.aaData;
               columns.forEach(function(column, index) {
                 if (!column.visibilityFilter) {
                   return;
@@ -191,7 +191,7 @@ ListUtils = (function() {
             },
             'error' : function(xhr, statusText, errorThrown) {
               errorMessage.innerText = errorThrown;
-        	ListState[elementId].data = [];
+              ListState[elementId].data = [];
               fnCallback({
                 iTotalRecords : 0,
                 iTotalDisplayRecords : 0,
