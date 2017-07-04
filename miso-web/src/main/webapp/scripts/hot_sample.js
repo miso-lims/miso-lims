@@ -19,6 +19,7 @@ HotTarget.sample = (function() {
     },
     
     createColumns : function(config, create, data) {
+      var validationCache = {};
       var targetCategory = (config.targetSampleClass
           ? config.targetSampleClass.sampleCategory : null);
       var sourceCategory = (config.sourceSampleClass
@@ -81,15 +82,20 @@ HotTarget.sample = (function() {
                     if (!value) {
                       return callback(Constants.automaticSampleAlias);
                     }
+                    if (validationCache.hasOwnProperty(value)) {
+                      return callback(validationCache[value]);
+                    }
                     Fluxion.doAjax('sampleControllerHelperService',
                         'validateSampleAlias', {
                           'alias' : value,
                           'url' : ajaxurl
                         }, {
                           'doOnSuccess' : function() {
+                            validationCache[value] = true;
                             return callback(true);
                           },
-                          'doOnError': function(json) {
+                          'doOnError' : function(json) {
+                            validationCache[value] = false;
                             return callback(false);
                           }
                         });
@@ -97,6 +103,7 @@ HotTarget.sample = (function() {
             },
             type : 'text',
             unpack : function(sam, flat, setCellMeta) {
+              validationCache[sam.alias] = true;
               flat.alias = sam.alias;
               if (sam.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
