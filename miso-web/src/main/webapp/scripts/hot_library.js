@@ -358,12 +358,16 @@ HotTarget.library = (function() {
             }
           },
           HotUtils.makeColumnForOptionalBoolean('QC Passed?', true, 'qcPassed'),
-          HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize'),
-          HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume, 'volume'),
-          HotUtils.makeColumnForFloat('Conc.*', true, 'concentration'),
-          HotUtils.makeColumnForFloat('Qubit (ng/&#181;l)', !create, 'qcQubit'),
-          HotUtils.makeColumnForFloat('TapeStation (bp)', !create, 'qcTapeStation'),
-          HotUtils.makeColumnForFloat('qPCR (mol/&#181;l)', !create, 'qcQPcr'), ];
+          HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
+          HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume,
+              'volume', false),
+          HotUtils.makeColumnForFloat('Conc.*', true, 'concentration', false),
+          HotUtils.makeColumnForFloat('Qubit (ng/&#181;l)', !create, 'qcQubit',
+              false),
+          HotUtils.makeColumnForFloat('TapeStation (bp)', !create,
+              'qcTapeStation', false),
+          HotUtils.makeColumnForFloat('qPCR (mol/&#181;l)', !create, 'qcQPcr',
+              false), ];
     },
     
     bulkActions : [
