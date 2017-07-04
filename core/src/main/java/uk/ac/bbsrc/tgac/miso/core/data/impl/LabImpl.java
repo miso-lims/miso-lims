@@ -123,9 +123,7 @@ public class LabImpl implements Lab {
     this.lastUpdated = lastUpdated;
   }
 
-  /**
-   * Get custom label for dropdown options
-   */
+  @Override
   public String getItemLabel() {
     String label = getAlias() + " (" + getInstitute().getAlias() + ")";
     return (label.length() < 51 ? label : label.substring(0, 49) + "\u2026");

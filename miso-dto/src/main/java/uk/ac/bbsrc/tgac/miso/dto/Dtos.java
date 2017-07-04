@@ -742,6 +742,7 @@ public class Dtos {
     dto.setInstituteId(from.getInstitute().getId());
     dto.setInstituteAlias(from.getInstitute().getAlias());
     dto.setAlias(from.getAlias());
+    dto.setLabel(from.getItemLabel());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());

@@ -391,38 +391,9 @@ HotTarget.sample = (function() {
               'timesReceived', HotUtils.validator.requiredNumber),
           HotUtils.makeColumnForInt('Tube Number', show['Tissue'],
               'tubeNumber', HotUtils.validator.requiredNumber),
-          {
-            header : 'Lab',
-            data : 'labComposite',
-            type : 'dropdown',
-            trimDropdown : false,
-            source : (function() {
-              var labs = Constants.labs.map(function(lab) {
-                return lab.alias + ' - ' + lab.instituteAlias;
-              }).sort();
-              labs.unshift('(None)');
-              return labs;
-            })(),
-            unpack : function(sam, flat, setCellMeta) {
-              var lab = Utils.array.findFirstOrNull(Utils.array
-                  .idPredicate(sam.labId), Constants.labs);
-              if (lab == null) {
-                flat.labComposite = ('(None)');
-              } else {
-                flat.labComposite = lab.alias + ' - ' + lab.instituteAlias;
-              }
-            },
-            pack : function(sam, flat, errorHandler) {
-              sam.labId = Utils.array
-                  .maybeGetProperty(
-                      Utils.array
-                          .findFirstOrNull(
-                              function(lab) {
-                                return lab.alias + ' - ' + lab.instituteAlias == flat.labComposite;
-                              }, Constants.labs), 'id');
-            },
-            include : show['Tissue']
-          },
+          HotUtils.makeColumnForConstantsList('Lab', show['Tissue'],
+              'labComposite', 'labId', 'id', 'label',
+              Constants.labs, false),
           HotUtils.makeColumnForText('Ext. Inst. Identifier', show['Tissue'],
               'externalInstituteIdentifier', {
                 validator : HotUtils.validator.optionalTextNoSpecialChars

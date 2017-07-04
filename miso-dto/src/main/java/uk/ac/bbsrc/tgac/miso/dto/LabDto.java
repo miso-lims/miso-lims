@@ -11,6 +11,7 @@ public class LabDto {
   private String instituteUrl;
   private String instituteAlias;
   private String alias;
+  private String label;
   private Long createdById;
   private String createdByUrl;
   private String creationDate;
@@ -66,6 +67,14 @@ public class LabDto {
     this.alias = alias;
   }
   
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
   public Long getCreatedById() {
     return createdById;
   }
