@@ -648,7 +648,7 @@ var HotUtils = {
       'unpack' : function(obj, flat, setCellMeta) {
         flat[property] = obj[property];
       },
-      'validator' : required ? HotUtils.validator.requiredNumber : null,
+      'validator' : required ? HotUtils.validator.requiredNumber : Handsontable.NumericValidator,
       'pack' : function(obj, flat, errorHandler) {
         var output = null;
         var raw = flat[property];
