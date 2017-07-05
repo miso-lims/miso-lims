@@ -108,6 +108,7 @@ HotTarget.library = (function() {
             data : 'name',
             readOnly : true,
             include : true,
+            unpackAfterSave : true,
             unpack : function(lib, flat, setCellMeta) {
               flat.name = lib.name;
             },
@@ -150,6 +151,7 @@ HotTarget.library = (function() {
             },
             type : 'text',
             include : config.showLibraryAlias,
+            unpackAfterSave : true,
             unpack : function(lib, flat, setCellMeta) {
               validationCache[lib.alias] = true;
               flat.alias = lib.alias;

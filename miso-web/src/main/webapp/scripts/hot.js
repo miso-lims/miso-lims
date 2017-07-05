@@ -384,14 +384,14 @@ var HotUtils = {
                 }
               }
               
-              function toFlatObj(item) {
-                var flatObj = {};
+              function updateFlatObjAfterSave(flatObj, item) {
                 columns.forEach(function(c, colIndex) {
-                  c.unpack(item, flatObj, function(key, val) {
-                    // Do nothing. We're unpacking only - not setting cell meta
-                  });
+                  if (c.unpackAfterSave) {
+                    c.unpack(item, flatObj, function(key, val) {
+                      // Do nothing. We're unpacking only - not setting cell meta
+                    });
+                  }
                 });
-                return flatObj;
               }
               
               save.disabled = true;
@@ -495,7 +495,7 @@ var HotUtils = {
                         if (xhr.readyState === XMLHttpRequest.DONE) {
                           if (xhr.status === 200 || xhr.status === 201) {
                             data[index] = JSON.parse(xhr.response);
-                            flatObjects[index] = toFlatObj(data[index]);
+                            updateFlatObjAfterSave(flatObjects[index], data[index]);
                             flatObjects[index].saved = true;
                           } else {
                             try {

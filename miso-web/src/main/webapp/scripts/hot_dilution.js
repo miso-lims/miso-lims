@@ -14,6 +14,7 @@ HotTarget.dilution = {
           readOnly : true,
           include : true,
           validator : HotUtils.validator.optionalTextNoSpecialChars,
+          unpackAfterSave : true,
           unpack : function(dil, flat, setCellMeta) {
             flat.name = dil.name;
           },

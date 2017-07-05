@@ -94,6 +94,18 @@ HotTarget.sample = (function() {
       
       return [
           {
+            header : 'Sample Name',
+            data : 'name',
+            readOnly : true,
+            include : true,
+            unpackAfterSave : true,
+            unpack : function(sam, flat, setCellMeta) {
+              flat.name = sam.name;
+            },
+            pack : function(sam, flat, errorHandler) {
+            }
+          },
+          {
             header : 'Sample Alias',
             data : 'alias',
             validator : function(value, callback) {
@@ -128,6 +140,7 @@ HotTarget.sample = (function() {
                   });
             },
             type : 'text',
+            unpackAfterSave : true,
             unpack : function(sam, flat, setCellMeta) {
               validationCache[sam.alias] = true;
               flat.alias = sam.alias;
