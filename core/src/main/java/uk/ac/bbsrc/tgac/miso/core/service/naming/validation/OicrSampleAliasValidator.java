@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.validation;
 
 public class OicrSampleAliasValidator extends RegexValidator {
 
-  private static final String IDENTITY_REGEX_PART = "([A-Z\\d]{3,5})_(\\d{3,5})";
+  private static final String IDENTITY_REGEX_PART = "([A-Z\\d]{3,5})_(\\d{3,})";
   private static final String TISSUE_ORIGIN_REGEX = "([A-Z][a-z]|nn)";
   private static final String TISSUE_TYPE_REGEX = "[A-Zn]";
   private static final String TISSUE_REGEX_PART = TISSUE_ORIGIN_REGEX + "_" + TISSUE_TYPE_REGEX + "_(nn|\\d{2})_(\\d{1,2})-(\\d{1,2})";

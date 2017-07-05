@@ -140,18 +140,6 @@ HotTarget.sample = (function() {
             },
             include : true
           },
-          {
-            header: 'NS Alias',
-            data: 'nonStandardAlias',
-            type: 'checkbox',
-            include: show['Identity'] && config.targetSampleClass.alias == 'Identity',
-            unpack: function (sam, flat, setCellMeta) {
-              flat.nonStandardAlias = sam.nonStandardAlias;
-            },
-            pack: function (sam, flat, errorHandler) {
-              sam.nonStandardAlias = flat.nonStandardAlias;
-            }
-          },
           HotUtils.makeColumnForText('Description', true, 'description', {
             validator : HotUtils.validator.optionalTextNoSpecialChars
           }),
