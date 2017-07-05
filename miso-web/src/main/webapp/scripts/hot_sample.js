@@ -257,7 +257,7 @@ HotTarget.sample = (function() {
           {
             header : 'External Name',
             data : 'externalName',
-            validator : HotUtils.validator.optionalTextNoSpecialChars,
+            validator : HotUtils.validator.requiredTextNoSpecialChars,
             include : show['Identity'],
             unpack : function(sam, flat, setCellMeta) {
               // Do nothing; this never comes from the server
