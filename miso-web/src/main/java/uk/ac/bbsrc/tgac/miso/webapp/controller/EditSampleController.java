@@ -66,7 +66,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.sf.json.JSONArray;
@@ -479,7 +478,7 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
 
-  public static final List<String> CATEGORIES = Arrays.asList(Identity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+  public static final List<String> CATEGORIES = Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
       SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
 
   private static final Comparator<SampleClass> SAMPLECLASS_CATEGORY_ALIAS = (SampleClass o1, SampleClass o2) -> {
@@ -914,9 +913,7 @@ public class EditSampleController {
       final DetailedSampleDto detailedTemplate;
       switch (target.getSampleCategory()) {
       case SampleIdentity.CATEGORY_NAME:
-        SampleIdentityDto iDto = new SampleIdentityDto();
-        iDto.setSampleClassId(sampleClassId);
-        bulkCreateSampleBackend = new BulkCreateSampleBackend(SampleIdentityDto.class, iDto, quantity);
+        detailedTemplate = new SampleIdentityDto();
         break;
       case SampleTissue.CATEGORY_NAME:
         detailedTemplate = new SampleTissueDto();
