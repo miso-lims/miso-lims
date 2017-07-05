@@ -349,7 +349,7 @@ HotTarget.sample = (function() {
               sam.parentAlias = flat.identityAlias;
             }
           },
-          HotUtils.makeColumnForEnum('Sex', show['Identity'], false,
+          HotUtils.makeColumnForEnum('Sex', show['Identity'], true,
               'donorSex', Constants.donorSexes),
           
           // Detailed sample columns
