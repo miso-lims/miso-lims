@@ -76,8 +76,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -86,6 +84,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -124,6 +124,9 @@ import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleSlideDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
@@ -475,7 +478,7 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
 
-  public static final List<String> CATEGORIES = Arrays.asList(Identity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+  public static final List<String> CATEGORIES = Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
       SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
 
   private static final Comparator<SampleClass> SAMPLECLASS_CATEGORY_ALIAS = (SampleClass o1, SampleClass o2) -> {
@@ -909,6 +912,9 @@ public class EditSampleController {
       // need to instantiate the correct DetailedSampleDto class to get the correct fields
       final DetailedSampleDto detailedTemplate;
       switch (target.getSampleCategory()) {
+      case SampleIdentity.CATEGORY_NAME:
+        detailedTemplate = new SampleIdentityDto();
+        break;
       case SampleTissue.CATEGORY_NAME:
         detailedTemplate = new SampleTissueDto();
         break;
@@ -1024,21 +1030,35 @@ public class EditSampleController {
         DetailedSample sample = (DetailedSample) item;
         if (targetSampleClass == null) {
           throw new IllegalArgumentException("Target sample class not set!");
-        } else if (targetSampleClass.getSampleCategory().equals(SampleTissue.CATEGORY_NAME)) {
-          dto = new SampleTissueDto();
-        } else if (targetSampleClass.getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
-          dto = new SampleStockDto();
-        } else if (targetSampleClass.getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
-          dto = new SampleAliquotDto();
         } else {
-          throw new IllegalArgumentException("Cannot determine sample category");
+          switch (targetSampleClass.getSampleCategory()) {
+          case SampleTissue.CATEGORY_NAME:
+            dto = new SampleTissueDto();
+            break;
+          case SampleTissueProcessing.CATEGORY_NAME:
+            if (targetSampleClass.getAlias().equals("Slide")) {
+              dto = new SampleSlideDto();
+            } else if (targetSampleClass.getAlias().equals("LCM Tube")) {
+              dto = new SampleLCMTubeDto();
+            } else {
+              dto = new SampleTissueProcessingDto();
+            }
+            break;
+          case SampleStock.CATEGORY_NAME:
+            dto = new SampleStockDto();
+            break;
+          case SampleAliquot.CATEGORY_NAME:
+            dto = new SampleAliquotDto();
+            break;
+          default:
+            throw new IllegalArgumentException("Cannot determine sample category");
+          }
         }
         dto.setScientificName(sample.getScientificName());
         dto.setSampleType(sample.getSampleType());
         dto.setParentId(sample.getId());
         dto.setParentAlias(sample.getAlias());
         dto.setParentTissueSampleClassId(sample.getSampleClass().getId());
-        dto.setNonStandardAlias(sample.hasNonStandardAlias());
         dto.setProjectId(sample.getProject().getId());
         if (sample.getSubproject() != null) dto.setSubprojectId(sample.getSubproject().getId());
         dto.setGroupId(sample.getGroupId());

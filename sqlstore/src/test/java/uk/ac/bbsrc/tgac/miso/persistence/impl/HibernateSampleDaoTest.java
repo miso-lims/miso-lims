@@ -25,7 +25,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -190,7 +190,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     Sample sample = dao.get(15L);
     assertTrue(LimsUtils.isDetailedSample(sample));
     assertTrue(LimsUtils.isIdentitySample(sample));
-    Identity identity = (Identity) sample;
+    SampleIdentity identity = (SampleIdentity) sample;
     assertEquals("15_EXT15,EXT15", identity.getExternalName());
   }
 
@@ -288,26 +288,26 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
 
   @Test
   public void testGetIdentityByExternalName() throws IOException {
-    List<Identity> identity = (List<Identity>) dao.getIdentitiesByExternalNameOrAlias("EXT15");
+    List<SampleIdentity> identity = (List<SampleIdentity>) dao.getIdentitiesByExternalNameOrAlias("EXT15");
     assertTrue(identity.get(0).getExternalName().contains("EXT15"));
   }
 
   @Test
   public void getIdentityByAlias() throws IOException {
-    Collection<Identity> identities = dao.getIdentitiesByExternalNameOrAlias("TEST_0001_IDENTITY_1");
+    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAlias("TEST_0001_IDENTITY_1");
     assertEquals(1, identities.size());
     assertEquals("TEST_0001_IDENTITY_1", identities.iterator().next().getAlias());
   }
 
   @Test
   public void getIdentityByNullAlias() throws IOException {
-    Collection<Identity> identities = dao.getIdentitiesByExternalNameOrAlias(null);
+    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAlias(null);
     assertTrue(identities.isEmpty());
   }
 
   @Test
   public void getIdentityByNonIdentityAlias() throws IOException {
-    Collection<Identity> identities = dao.getIdentitiesByExternalNameOrAlias("TEST_0001_Bn_P_nn_1-1_D_1");
+    Collection<SampleIdentity> identities = dao.getIdentitiesByExternalNameOrAlias("TEST_0001_Bn_P_nn_1-1_D_1");
     assertTrue(identities.isEmpty());
   }
 

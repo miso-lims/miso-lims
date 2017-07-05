@@ -29,10 +29,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
@@ -230,7 +230,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
     // TODO: this should extends to the children of the entity with this external name (including libraries and dilutions)
     String query = DbUtils.convertStringToSearchQuery(name);
     Disjunction or = Restrictions.disjunction();
-    or.add(externalNameCheck(IdentityImpl.class, "externalName", query));
+    or.add(externalNameCheck(SampleIdentityImpl.class, "externalName", query));
     or.add(externalNameCheck(SampleTissueImpl.class, "externalInstituteIdentifier", query));
     criteria.add(or);
   }
@@ -290,26 +290,26 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
   }
 
   @Override
-  public Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
+  public Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
     if (isStringEmptyOrNull(externalName)) return Collections.emptySet();
     String str = DbUtils.convertStringToSearchQuery(externalName);
-    Criteria criteria = currentSession().createCriteria(IdentityImpl.class);
+    Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
     criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
     @SuppressWarnings("unchecked")
-    Collection<Identity> records = criteria.list();
+    Collection<SampleIdentity> records = criteria.list();
     return records;
   }
 
   @Override
-  public Collection<Identity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException {
+  public Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException {
     if (isStringEmptyOrNull(externalName)) return Collections.emptySet();
     if (projectId == null) throw new IllegalArgumentException("Must provide a projectId in search");
     String str = DbUtils.convertStringToSearchQuery(externalName);
-    Criteria criteria = currentSession().createCriteria(IdentityImpl.class);
+    Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
     criteria.add(Restrictions.eq("project.id", projectId));
     criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
     @SuppressWarnings("unchecked")
-    Collection<Identity> records = criteria.list();
+    Collection<SampleIdentity> records = criteria.list();
     return records;
   }
 

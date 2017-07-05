@@ -9,7 +9,7 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -31,11 +31,11 @@ public interface SampleService extends PaginatedDataSource<Sample> {
 
   Long countAll() throws IOException;
 
-  Collection<Identity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
+  Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;
 
   void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException, ConstraintViolationException;
 
-  Collection<Identity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException;
+  Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException;
 
   public void addNote(Sample sample, Note note) throws IOException;
 

@@ -60,7 +60,7 @@
 
  <div id="HOTbulkForm">
    <div id="nonStandardAliasNote" class="table-note hidden">
-      <p>Highlighted aliases must be filled in because they cannot be auto-generated. Any value you give them will be saved, provided it does not contain special characters.</p>
+      <p>Double-check highlighted aliases, as they will be saved even if they are duplicated or do not follow the naming standard!</p>
     </div>
 
    <div id="ctrlV" class="note">

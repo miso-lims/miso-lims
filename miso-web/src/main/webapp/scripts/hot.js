@@ -562,7 +562,6 @@ var HotUtils = {
   },
   
   makeCellNSAlias : function(setCellMeta) {
-    setCellMeta('validator', HotUtils.validator.requiredTextNoSpecialChars);
     setCellMeta('renderer', function(instance, td, row, col, prop, value,
         cellProperties) {
       Handsontable.renderers.TextRenderer.apply(this, arguments);
