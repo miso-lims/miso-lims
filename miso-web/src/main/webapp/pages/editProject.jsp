@@ -442,6 +442,7 @@
 </c:forEach>
 </c:when>
 </c:choose>
+</div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#issues_arrowclick'), 'issuesdiv');">
   Tracked Issues
@@ -546,7 +547,7 @@
 <div id="studiesdiv" style="display:none;">
   <h1>Studies</h1>
   <div style="clear:both">
-    <table class="list" id="study_table">
+    <table id="study_table">
     </table>
   </div>
 </div>
@@ -614,7 +615,7 @@
         </table>
       </div>
 
-      <table class="list" id="sample_table"></table>
+      <table id="sample_table"></table>
     </div>
   </div>
 </div>
@@ -733,7 +734,6 @@ jQuery(document).ready(function () {
     </script>
 </c:if>
 
-</div>
 </div>
 </div>
 
