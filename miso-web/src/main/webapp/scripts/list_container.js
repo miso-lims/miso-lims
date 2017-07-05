@@ -31,53 +31,39 @@ ListTarget.container = {
     return [];
   },
   createStaticActions : function(config, projectId) {
-    return [{ "name":"Add", "handler": function() { window.location = "/miso/container/new"; }}];
+    return [ {
+      "name" : "Add",
+      "handler" : function() {
+        window.location = "/miso/container/new";
+      }
+    } ];
   },
   createColumns : function(config, projectId) {
-return [
+    return [
+        ListUtils.labelHyperlinkColumn("Serial Number", "container",
+            Utils.array.getId, "identificationBarcode", 1),
         {
-          "sTitle": "Serial Number",
-          "mData": "identificationBarcode",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/container/" + full.id + "\">" + data + "</a>";
-          },
-          "include" : true,
-          "iSortPriority" : 0
-        },
-        {
-          "sTitle": "Platform",
-          "mData": "platform",
+          "sTitle" : "Platform",
+          "mData" : "platform",
           "include" : !config.platformType,
           "iSortPriority" : 0
         },
-        {
-          "sTitle": "Last Associated Run",
-          "include" : true,
-          "mData": "lastRunAlias",
-          "mRender": function (data, type, full) {
-            return (data ? "<a href=\"/miso/run/" + full.lastRunId + "\">" + data + "</a>" : "");
-          },
-          "bSortable": false,
-          "include" : true,
-          "iSortPriority" : 0
-        },
-        {
-          "sTitle": "Last Sequencer Used",
-          "include" : true,
-          "mData": "lastSequencerName",
-          "bSortable": false ,
-          "include" : true,
-          "iSortPriority" : 0,
-          "mRender": function (data, type, full) {
-            return (data ? "<a href=\"/miso/sequencer/" + full.lastSequencerId + "\">" + data + "</a>" : "");
-          },
-        },
-        {
-          "sTitle": "Last Modified",
-          "mData": "lastModified",
+        ListUtils.idHyperlinkColumn("Last Run Name", "run", "lastRunId",
+            function(container) {
+              return "RUN" + container.lastRunId;
+            }, -1),
+        ListUtils.labelHyperlinkColumn("Last Run Alias", "run", function(
+            container) {
+          return container.lastRunId;
+        }, "lastRunAlias", -1),
+        ListUtils.labelHyperlinkColumn("Last Sequencer Used", "sequencer",
+            function(container) {
+              return container.lastSequencerId;
+            }, "lastSequencerName", -1), {
+          "sTitle" : "Last Modified",
+          "mData" : "lastModified",
           "include" : true,
           "iSortPriority" : 0
-        }
-      ];
-}
+        } ];
+  }
 };

@@ -43,24 +43,13 @@ ListTarget.completion = {
       });
     }
     return [
-        {
-          "sTitle" : "Name",
-          "mData" : "pool.id",
-          "mRender" : function(data, type, full) {
-            return "<a href=\"/miso/pool/" + data + "\">" + full.pool.name + "</a>";
-          },
-          "iSortPriority" : 1,
-          "include" : !config.poolId
-        },
-        {
-          "sTitle" : "Alias",
-          "mData" : "pool.alias",
-          "mRender" : function(data, type, full) {
-            return "<a href=\"/miso/pool/" + full.pool.id + "\">" + data + "</a>";
-          },
-          "iSortPriority" : 0,
-          "include" : !config.poolId
-        }, {
+        ListUtils.idHyperlinkColumn("Name", "pool", "pool.id", function(
+            completion) {
+          return completion.pool.name;
+        }, 1),
+        ListUtils.labelHyperlinkColumn("Alias", "pool", function(completion) {
+          return completion.pool.id;
+        }, "pool.alias", 0), {
           "sTitle" : "Description",
           "mData" : "pool.description",
           "bSortable" : false,

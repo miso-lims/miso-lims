@@ -166,20 +166,10 @@ ListTarget.sample = {
   },
   createColumns : function(config, projectId) {
     return [
-        {
-          "sTitle" : "Sample Name",
-          "mData" : "name",
-          "mRender" : ListUtils.render.idHyperlink('sample'),
-          "include" : true,
-          "iSortPriority" : 1
-        },
-        {
-          "sTitle" : "Alias",
-          "mData" : "alias",
-          "mRender" : ListUtils.render.idHyperlink('sample'),
-          "include" : true,
-          "iSortPriority" : 1
-        },
+        ListUtils.idHyperlinkColumn("Name", "sample", "id",
+            Utils.array.getName, 1),
+        ListUtils.labelHyperlinkColumn("Alias", "sample", Utils.array.getId,
+            "alias", 0),
         {
           "sTitle" : "Sample Class",
           "mData" : "sampleClassId",
