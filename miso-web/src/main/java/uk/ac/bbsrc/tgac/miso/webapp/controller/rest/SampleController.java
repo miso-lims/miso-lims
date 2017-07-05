@@ -57,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -64,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
@@ -167,6 +169,23 @@ public class SampleController extends RestController {
           }
           SampleClass stockClass = sampleClassService.inferStockFromAliquot(sampleClass);
           dto.setStockClassId(stockClass.getId());
+        }
+      } else if (sampleDto instanceof SampleStockDto) {
+        SampleStockDto dto = (SampleStockDto) sampleDto;
+        if (dto.getParentId() != null) {
+          // Pass
+        } else if (dto.getSampleClassId() == null) {
+          throw new RestException("No parent and no target sample class.", Status.BAD_REQUEST);
+        } else {
+          SampleClass sampleClass = sampleClassService.get(dto.getSampleClassId());
+          if (sampleClass == null) {
+            throw new RestException("Cannot find sample class: " + dto.getSampleClassId(), Status.BAD_REQUEST);
+          }
+          if (!sampleClass.getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
+            throw new RestException("Class and type mismatch.", Status.BAD_REQUEST);
+          }
+          SampleClass tissueClass = sampleClassService.inferTissueFromStock(sampleClass);
+          dto.setParentTissueSampleClassId(tissueClass.getId());
         }
       }
       Sample sample = Dtos.to(sampleDto);

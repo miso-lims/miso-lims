@@ -16,6 +16,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleValidRelationshipDao;
@@ -111,6 +112,27 @@ public class DefaultSampleClassService implements SampleClassService {
     }
     if (stockClass == null) throw new IllegalStateException("Aliquot class " + sampleClass.getId() + " has no stock class.");
     return stockClass;
+  }
+
+  @Override
+  public SampleClass inferTissueFromStock(SampleClass sampleClass) {
+    SampleClass stockClass = sampleClassDao.getSampleClass(sampleClass.getId());
+    if (stockClass == null || !stockClass.getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
+      throw new IllegalArgumentException("Sample class " + sampleClass.getId() + " is not a valid stock class.");
+    }
+    SampleClass tissueClass = null;
+    for (SampleValidRelationship relationship : sampleValidRelationshipDao.getSampleValidRelationship()) {
+      if (!relationship.getArchived() && relationship.getChild().getId() == stockClass.getId()
+          && relationship.getParent().getSampleCategory().equals(SampleTissue.CATEGORY_NAME)) {
+        if (tissueClass == null) {
+          tissueClass = relationship.getParent();
+        } else {
+          throw new IllegalStateException("Stock class " + sampleClass.getId() + " has multiple tissue class parents.");
+        }
+      }
+    }
+    if (tissueClass == null) throw new IllegalStateException("Stock class" + sampleClass.getId() + " has no stock class.");
+    return tissueClass;
   }
 
 }

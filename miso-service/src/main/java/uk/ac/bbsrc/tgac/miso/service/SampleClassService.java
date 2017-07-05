@@ -22,4 +22,6 @@ public interface SampleClassService {
 
   List<SampleClass> listByCategory(String sampleCategory) throws IOException;
 
+  SampleClass inferTissueFromStock(SampleClass sampleClass);
+
 }
