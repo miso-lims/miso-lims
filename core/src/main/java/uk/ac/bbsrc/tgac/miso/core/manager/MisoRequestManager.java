@@ -548,7 +548,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
+  public SequencerPartitionContainer saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       if (container.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
         container.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(container.getSecurityProfile())));

@@ -290,22 +290,6 @@ public class UserAuthMisoRequestManagerTest {
    * .
    */
   @Test
-  public void testSaveSequencerPartitionContainer() throws IOException {
-    final long expectedReturn = 1L;
-
-    when(sequencerPartitionContainer.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveSequencerPartitionContainer(sequencerPartitionContainer)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveSequencerPartitionContainer(sequencerPartitionContainer));
-    verify(backingManager).saveSequencerPartitionContainer(sequencerPartitionContainer);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSequencerPartitionContainer(uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer)}
-   * .
-   */
-  @Test
   public void testSaveSequencerPartitionContainerThrows() throws IOException {
     when(sequencerPartitionContainer.userCanWrite(any(User.class))).thenReturn(false);
 

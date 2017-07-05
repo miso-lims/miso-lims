@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
@@ -265,12 +265,14 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
   @Override
   public Long create(Run run) throws IOException {
-    loadChildEntities(run);
     authorizationManager.throwIfNotWritable(run);
+    saveContainers(run);
     setChangeDetails(run);
+    loadChildEntities(run);
 
     run.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(run.getSecurityProfile())));
     run.setName(generateTemporaryName());
+
     return save(run).getId();
   }
 
@@ -278,6 +280,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   public void update(Run run) throws IOException {
     Run updatedRun = get(run.getId());
     authorizationManager.throwIfNotWritable(updatedRun);
+    saveContainers(run);
     if (!run.getRunQCs().isEmpty()) bulkAddQcs(run);
     applyChanges(updatedRun, run);
     setChangeDetails(updatedRun);
@@ -311,6 +314,17 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     }
   }
 
+  private void saveContainers(Run run) throws IOException {
+    List<SequencerPartitionContainer> containers = run.getSequencerPartitionContainers();
+    if (containers != null && !containers.isEmpty()) {
+      List<SequencerPartitionContainer> savedContainers = Lists.newArrayList();
+      for (SequencerPartitionContainer container : containers) {
+        savedContainers.add(containerService.save(container));
+      }
+      run.setSequencerPartitionContainers(savedContainers);
+    }
+  }
+
   @Override
   public void saveRuns(Collection<Run> runs) throws IOException {
     for (Run run : runs) {
@@ -339,20 +353,9 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
    * @throws IOException
    */
   private void loadChildEntities(Run run) throws IOException {
-    if (!run.getSequencerPartitionContainers().isEmpty()) {
-      List<SequencerPartitionContainer> containersToSave = new ArrayList<>();
-      for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
-        SequencerPartitionContainer managedContainer = containerService.get(container.getId());
-        if (managedContainer == null) {
-          containersToSave.add(container);
-        } else {
-          containerService.applyChanges(container, managedContainer);
-          containersToSave.add(managedContainer);
-        }
-      }
-      run.setSequencerPartitionContainers(containersToSave);
+    if (run.getSequencingParameters() != null) {
+      run.setSequencingParameters(sequencingParametersService.get(run.getSequencingParameters().getId()));
     }
-    run.setSequencingParameters(sequencingParametersService.get(run.getSequencingParameters().getId()));
     run.setSequencerReference(sequencerReferenceService.get(run.getSequencerReference().getId()));
   }
 
@@ -366,14 +369,8 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setCompletionDate(source.getCompletionDate());
     target.setMetrics(source.getMetrics());
 
-    List<SequencerPartitionContainer> saveContainers = new ArrayList<>();
-    for (SequencerPartitionContainer container : source.getSequencerPartitionContainers()) {
-      SequencerPartitionContainer managedContainer = containerService.get(container.getId());
-      containerService.applyChanges(container, managedContainer);
-      saveContainers.add(managedContainer);
-    }
-    makeContainerChangesChangeLog(target, saveContainers);
-    target.setSequencerPartitionContainers(saveContainers);
+    makeContainerChangesChangeLog(target, source.getSequencerPartitionContainers());
+    target.setSequencerPartitionContainers(source.getSequencerPartitionContainers());
 
     target.setSequencingParameters(source.getSequencingParameters());
     target.setSequencerReference(source.getSequencerReference());

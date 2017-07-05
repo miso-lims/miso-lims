@@ -57,7 +57,7 @@ public interface RequestManager {
 
   /** TODO: delete after refactoring NotificationConsumerMechanisms. Use containerService.save() instead */
   @Deprecated
-  public long saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException;
+  public SequencerPartitionContainer saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException;
 
   public long saveSubmission(Submission submission) throws IOException;
 
