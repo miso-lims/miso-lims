@@ -62,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
+import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
@@ -160,6 +161,7 @@ public class SampleController extends RestController {
         } else if (dto.getSampleClassId() == null) {
           throw new RestException("No parent and no target sample class.", Status.BAD_REQUEST);
         } else {
+          // infer parent stock class
           SampleClass sampleClass = sampleClassService.get(dto.getSampleClassId());
           if (sampleClass == null) {
             throw new RestException("Cannot find sample class: " + dto.getSampleClassId(), Status.BAD_REQUEST);
@@ -169,14 +171,19 @@ public class SampleController extends RestController {
           }
           SampleClass stockClass = sampleClassService.inferStockFromAliquot(sampleClass);
           dto.setStockClassId(stockClass.getId());
+
+          // infer grandparent tissue class
+          SampleClass tissueClass = sampleClassService.inferTissueFromStock(stockClass);
+          dto.setParentTissueSampleClassId(tissueClass.getId());
         }
       } else if (sampleDto instanceof SampleStockDto) {
-        SampleStockDto dto = (SampleStockDto) sampleDto;
+        DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
         if (dto.getParentId() != null) {
           // Pass
         } else if (dto.getSampleClassId() == null) {
           throw new RestException("No parent and no target sample class.", Status.BAD_REQUEST);
         } else {
+          // infer parent tissue class
           SampleClass sampleClass = sampleClassService.get(dto.getSampleClassId());
           if (sampleClass == null) {
             throw new RestException("Cannot find sample class: " + dto.getSampleClassId(), Status.BAD_REQUEST);

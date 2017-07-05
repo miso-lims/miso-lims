@@ -5,7 +5,13 @@ import java.net.URI;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonTypeName(value = SampleAliquot.CATEGORY_NAME)
 public class SampleAliquotDto extends SampleStockDto {
 
   private Long samplePurposeId;
