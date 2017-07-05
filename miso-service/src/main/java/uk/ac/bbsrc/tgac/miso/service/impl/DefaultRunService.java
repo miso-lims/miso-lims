@@ -353,7 +353,9 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
    * @throws IOException
    */
   private void loadChildEntities(Run run) throws IOException {
-    run.setSequencingParameters(sequencingParametersService.get(run.getSequencingParameters().getId()));
+    if (run.getSequencingParameters() != null) {
+      run.setSequencingParameters(sequencingParametersService.get(run.getSequencingParameters().getId()));
+    }
     run.setSequencerReference(sequencerReferenceService.get(run.getSequencerReference().getId()));
   }
 
