@@ -179,7 +179,7 @@ HotTarget.sample = (function() {
                 validator : HotUtils.validator.optionalTextNoSpecialChars
               }),
           HotUtils.makeColumnForEnum('Sample Type', true, true, 'sampleType',
-              Constants.sampleTypes),
+              Constants.sampleTypes, null),
           HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
             validator : HotUtils.validator.requiredTextNoSpecialChars
           }),
@@ -349,8 +349,8 @@ HotTarget.sample = (function() {
               sam.parentAlias = flat.identityAlias;
             }
           },
-          HotUtils.makeColumnForEnum('Sex', show['Identity'], true,
-              'donorSex', Constants.donorSexes),
+          HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;', show['Identity'], true,
+              'donorSex', Constants.donorSexes, 'Unknown'),
           
           // Detailed sample columns
           {
@@ -459,7 +459,7 @@ HotTarget.sample = (function() {
           
           // Stock columns
           HotUtils.makeColumnForEnum('STR Status', show['Stock'], true,
-              'strStatus', Constants.strStatuses),
+              'strStatus', Constants.strStatuses, null),
           {
             header : 'DNAse',
             data : 'dnaseTreated',

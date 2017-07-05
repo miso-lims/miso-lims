@@ -708,7 +708,7 @@ var HotUtils = {
     return baseobj;
   },
   
-  makeColumnForEnum : function(headerName, include, required, property, source) {
+  makeColumnForEnum : function(headerName, include, required, property, source, defaultValue) {
     return {
       'header' : headerName,
       'data' : property,
@@ -719,7 +719,7 @@ var HotUtils = {
       'validator' : (required ? HotUtils.validator.requiredAutocomplete
           : Handsontable.AutocompleteValidator),
       'unpack' : function(obj, flat, setCellMeta) {
-        flat[property] = obj[property];
+        flat[property] = obj[property] || defaultValue;
       },
       'pack' : function(obj, flat, errorHandler) {
         obj[property] = flat[property];
