@@ -24,6 +24,16 @@
 ListState = {};
 ListTarget = {};
 ListUtils = (function() {
+  var updateSelectedLabel = function(state) {
+    var hidden = state.selected.reduce(function(acc, item) {
+      return acc + (state.data.every(function(d) {
+        return d.id != item.id;
+      }) ? 1 : 0);
+    }, 0);
+    state.element.innerText = (state.selected.length
+        ? (' ' + state.selected.length + ' selected') : '') + (hidden
+        ? ' (' + hidden + ' on other pages)' : '');
+  };
   var initTable = function(elementId, target, projectId, config, optionModifier) {
     var searchKey = target.name + '_search';
     var lastSearch = window.localStorage.getItem(searchKey);
@@ -35,7 +45,8 @@ ListUtils = (function() {
     ListState[elementId] = {
       selected : [],
       data : [],
-      lastId : -1
+      lastId : -1,
+      element : document.createElement('SPAN')
     };
     if (bulkActions.length > 0) {
       columns
@@ -70,6 +81,7 @@ ListUtils = (function() {
               element.checked = true;
             }
           });
+          updateSelectedLabel(state);
         }
       });
       staticActions.push({
@@ -86,6 +98,7 @@ ListUtils = (function() {
               element.checked = false;
             }
           });
+          updateSelectedLabel(state);
         }
       });
     }
@@ -161,6 +174,9 @@ ListUtils = (function() {
         }
         toolbar.append(button);
       });
+      if (bulkActions.length > 0) {
+        toolbar.append(ListState[elementId].element);
+      }
     }
   }
   return {
@@ -188,11 +204,13 @@ ListUtils = (function() {
                       return d[column.mData];
                     })), false);
               });
+              updateSelectedLabel(ListState[elementId]);
               fnCallback(data, textStatus, xhr);
             },
             'error' : function(xhr, statusText, errorThrown) {
               errorMessage.innerText = errorThrown;
               ListState[elementId].data = [];
+              updateSelectedLabel(ListState[elementId]);
               fnCallback({
                 iTotalRecords : 0,
                 iTotalDisplayRecords : 0,
@@ -257,6 +275,7 @@ ListUtils = (function() {
         state.selected = Utils.array.deduplicateById(state.selected
             .concat(newlySelected));
       }
+      updateSelectedLabel(state);
     },
     idHyperlinkColumn : function(headerName, urlFragment, id, getLabel,
         priority) {
