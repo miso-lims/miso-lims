@@ -272,13 +272,14 @@ HotTarget.sample = (function() {
             type : 'dropdown',
             trimDropdown : false,
             strict : true,
-            source : [ '' ],
+            source : [],
             validator : HotUtils.validator.requiredAutocomplete,
             include : show['Identity'] && config.targetSampleClass.alias != 'Identity' && config.targetSampleClass.sampleCategory != 'Identity',
             depends : 'externalName',
             update : function(sam, flat, value, setReadOnly, setOptions,
                 setData) {
               if (!Utils.validation.isEmpty(flat.externalName)) {
+                setData('(...searching...)');
                 getIdentities(HotUtils.counter);
               }
               
@@ -293,9 +294,6 @@ HotTarget.sample = (function() {
                       contentType : "application/json; charset=utf8",
                       dataType : "json",
                       type : "POST"
-                    })
-                    .complete(function(data) {
-                      console.log(data); // TODO: remove
                     })
                     .success(
                         function(data) {
@@ -330,9 +328,9 @@ HotTarget.sample = (function() {
                             if (!hasIdentityInProject) {
                               identitiesSources
                                   .unshift("First Receipt (" + flat.projectAlias + ")");
-                              setData(identitiesSources[0]);
                             }
                             requestCounter++;
+                            setData(identitiesSources[0]);
                             setOptions({
                               'source' : identitiesSources
                             });

@@ -309,6 +309,12 @@ var HotUtils = {
               }, function(value) {
                 flatObjects[currentChange[0]][column.data] = value;
                 needsRender = true;
+                
+                if (needsRender && !synchronous && !initialSetup) {
+                  table.validateCells(function() {
+                    table.render();
+                  })
+                }
               });
             });
       }
@@ -316,9 +322,9 @@ var HotUtils = {
       if (needsRender) {
         table.validateCells(function() {
           table.render();
-          synchronous = false;
         });
       }
+      synchronous = false;
     });
     
     // For cells that have change notifiers, we have to call them to set up the
