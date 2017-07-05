@@ -260,21 +260,8 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @Override
   public Run getLastRun() {
-    Run lastRun = null;
-    for (Run thisRun : getRuns()) {
-      if (lastRun == null) {
-        lastRun = thisRun;
-      } else if (lastRun.getStartDate() == null && thisRun.getStartDate() == null) {
-        if (thisRun.getLastModified().after(lastRun.getLastModified())) lastRun = thisRun;
-      } else if (lastRun.getStartDate() == null && thisRun.getStartDate() != null) {
-        lastRun = thisRun;
-      } else if (lastRun.getStartDate() != null && thisRun.getStartDate() == null) {
-        continue;
-      } else if (thisRun.getStartDate().after(lastRun.getStartDate())) {
-        lastRun = thisRun;
-      }
-    }
-    return lastRun;
+    return getRuns().stream().filter(r -> r.getStartDate() != null).max((a, b) -> a.getStartDate().compareTo(b.getStartDate()))
+        .orElse(null);
   }
 
   @Override

@@ -74,29 +74,21 @@ ListTarget.study = {
     }
   },
   createColumns : function(config, projectId) {
-    return [ {
-      "sTitle" : "Name",
-      "mData" : "name",
-      "include" : true,
-      "iSortPriority" : 1,
-      "mRender" : ListUtils.render.idHyperlink('study')
-    }, {
-      "sTitle" : "Alias",
-      "mData" : "alias",
-      "include" : true,
-      "iSortPriority" : 0,
-      "mRender" : ListUtils.render.idHyperlink('study')
-    }, {
-      "sTitle" : "Description",
-      "mData" : "description",
-      "include" : true,
-      "iSortPriority" : 0
-    }, {
-      "sTitle" : "Type",
-      "mData" : "studyTypeId",
-      "include" : true,
-      "iSortPriority" : 0,
-      "mRender" : ListUtils.render.textFromId(Constants.studyTypes, 'name')
-    } ];
+    return [
+        ListUtils.idHyperlinkColumn("Name", "study", "id", Utils.array.getName,
+            1),
+        ListUtils.labelHyperlinkColumn("Alias", "study", Utils.array.getId,
+            "alias", 0), {
+          "sTitle" : "Description",
+          "mData" : "description",
+          "include" : true,
+          "iSortPriority" : 0
+        }, {
+          "sTitle" : "Type",
+          "mData" : "studyTypeId",
+          "include" : true,
+          "iSortPriority" : 0,
+          "mRender" : ListUtils.render.textFromId(Constants.studyTypes, 'name')
+        } ];
   }
 };

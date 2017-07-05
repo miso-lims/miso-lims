@@ -43,6 +43,7 @@ ListUtils = (function() {
             "sTitle" : "",
             "mData" : "id",
             "include" : true,
+            "bSortable" : false,
             "mRender" : function(data, type, full) {
               var checked = ListState[elementId].selected.some(function(obj) {
                 return obj.id == data;
@@ -257,6 +258,32 @@ ListUtils = (function() {
             .concat(newlySelected));
       }
     },
+    idHyperlinkColumn : function(headerName, urlFragment, id, getLabel,
+        priority) {
+      return {
+        "sTitle" : headerName,
+        "mData" : id,
+        "include" : true,
+        "iSortPriority" : priority,
+        "bSortable" : priority >= 0,
+        "mRender" : function(data, type, full) {
+          return "<a href=\"/miso/" + urlFragment + "/" + data + "\">" + getLabel(full) + "</a>";
+        }
+      };
+    },
+    labelHyperlinkColumn : function(headerName, urlFragment, getId, label,
+        priority) {
+      return {
+        "sTitle" : headerName,
+        "mData" : label,
+        "include" : true,
+        "iSortPriority" : priority,
+        "bSortable" : priority >= 0,
+        "mRender" : function(data, type, full) {
+          return "<a href=\"/miso/" + urlFragment + "/" + getId(full) + "\">" + data + "</a>";
+        }
+      };
+    },
     render : {
       booleanChecks : function(data, type, full) {
         if (typeof data == 'boolean') {
@@ -264,11 +291,6 @@ ListUtils = (function() {
         } else {
           return "?";
         }
-      },
-      idHyperlink : function(urlFragment) {
-        return function(data, type, full) {
-          return "<a href=\"/miso/" + urlFragment + "/" + full.id + "\">" + data + "</a>";
-        };
       },
       textFromId : function(list, property, unknown) {
         return function(data, type, full) {

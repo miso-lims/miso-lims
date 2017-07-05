@@ -41,15 +41,8 @@ ListTarget.kit = {
   },
   createColumns : function(config, projectId) {
     return [
-        {
-          "sTitle" : "Name",
-          "include" : true,
-          "iSortPriority" : 1,
-          "mData" : "name",
-          "mRender" : function(data, type, full) {
-            return "<a href=\"/miso/kitdescriptor/" + full.id + "\">" + data + "</a>";
-          }
-        }, {
+        ListUtils.labelHyperlinkColumn("Name", "kitdescriptor",
+            Utils.array.getId, "name", 1), {
           "sTitle" : "Version",
           "include" : true,
           "iSortPriority" : 0,

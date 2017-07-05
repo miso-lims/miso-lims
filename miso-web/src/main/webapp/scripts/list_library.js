@@ -34,43 +34,24 @@ ListTarget.library = {
   },
   createColumns : function(config, projectId) {
     return [
-        {
-          "sTitle" : "Library Name",
-          "mData" : "id",
-          "include" : true,
-          "iSortPriority" : 1,
-          "mRender" : function(data, type, full) {
-            return "<a href=\"/miso/library/" + data + "\">" + full.name + "</a>";
-          }
-        },
-        {
-          "sTitle" : "Alias",
-          "mData" : "alias",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mRender" : function(data, type, full) {
-            return "<a href=\"/miso/library/" + full.id + "\">" + data + "</a>";
-          }
-        },
-        {
-          "sTitle" : "Sample Name",
-          "sType" : "no-sam",
-          "mData" : "parentSampleId",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mRender" : function(data, type, full) {
-            return "<a href=\"/miso/sample/" + data + "\">" + full.parentSampleAlias + " (SAM" + data + ")</a>";
-          }
-        },
+        ListUtils.idHyperlinkColumn("Name", "library", "id",
+            Utils.array.getName, 1),
+        ListUtils.labelHyperlinkColumn("Alias", "library", Utils.array.getId,
+            "alias", 0),
+        ListUtils.idHyperlinkColumn("Sample Name", "sample", "parentSampleId",
+            function(library) {
+              return "SAM" + library.parentSampleId;
+            }, 0),
+        ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(
+            library) {
+          return library.parentSampleId;
+        }, "parentSampleAlias", 0),
         {
           "sTitle" : "QC Passed",
           "mData" : "qcPassed",
           "include" : true,
           "iSortPriority" : 0,
-          "mRender" : function(data, type, full) {
-            // data is returned as "true", "false", or "null"
-            return (data != null ? (data ? "True" : "False") : "Unknown");
-          }
+          "mRender" : ListUtils.render.booleanChecks
         },
         {
           "sTitle" : "Index(es)",
