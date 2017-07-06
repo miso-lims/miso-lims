@@ -302,20 +302,18 @@ HotTarget.sample = (function() {
                           if (data.requestCounter == requestCounter) {
                             var label = Constants.isDetailedSample
                                 ? 'shortName' : 'name';
-                            var selectedProjectId = Utils.array
-                                .maybeGetProperty(
-                                    Utils.array
-                                        .findFirstOrNull(
-                                            function(project) {
-                                              return project[label] == flat.projectAlias;
-                                            }, config.projects), 'id');
+                            var selectedProject = config.project || Utils.array
+                                    .findFirstOrNull(
+                                        function(project) {
+                                          return project[label] == flat.projectAlias;
+                                        }, config.projects);
                             // sort with identities from selected project on top
                             var identitiesSources = [];
                             if (data.matchingIdentities.length > 0) {
                               data.matchingIdentities.sort(function(a, b) {
-                                var aSortId = a.projectId == selectedProjectId
+                                var aSortId = a.projectId == selectedProject.id
                                     ? 0 : a.projectId;
-                                var bSortId = b.projectId == selectedProjectId
+                                var bSortId = b.projectId == selectedProject.id
                                     ? 0 : b.projectId;
                                 return aSortId - bSortId;
                               })
@@ -324,10 +322,10 @@ HotTarget.sample = (function() {
                                     return sam.alias + " -- " + sam.externalName;
                                   });
                             }
-                            var hasIdentityInProject = (identitiesSources.length > 0 && data.matchingIdentities[0].projectId == selectedProjectId);
+                            var hasIdentityInProject = (identitiesSources.length > 0 && data.matchingIdentities[0].projectId == selectedProject.id);
                             if (!hasIdentityInProject) {
                               identitiesSources
-                                  .unshift("First Receipt (" + flat.projectAlias + ")");
+                                  .unshift("First Receipt (" + (flat.projectAlias || selectedProject[label]) + ")");
                             }
                             requestCounter++;
                             setData(identitiesSources[0]);
