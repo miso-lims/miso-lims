@@ -298,6 +298,7 @@ ListUtils = (function() {
         "mData" : label,
         "include" : true,
         "iSortPriority" : priority,
+        "bSortDirection" : true,
         "bSortable" : priority >= 0,
         "mRender" : function(data, type, full) {
           return "<a href=\"/miso/" + urlFragment + "/" + getId(full) + "\">" + data + "</a>";
