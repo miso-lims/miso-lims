@@ -144,7 +144,7 @@ public class EditUserController {
   public ModelAndView adminSetupForm(@PathVariable Long userId, ModelMap model, HttpServletRequest request) throws IOException {
     try {
       model.put("user", userId == UserImpl.UNSAVED_ID ? new UserImpl() : securityManager.getUserById(userId));
-
+      model.put("title", userId == UserImpl.UNSAVED_ID ? "New User" : ("User " + userId));
       return new ModelAndView("/pages/editUser.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
