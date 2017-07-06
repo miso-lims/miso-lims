@@ -226,7 +226,7 @@ ListUtils = (function() {
       initTable(elementId, target, null, config, function(options, jqTable,
           errorMessage, columns) {
         options.aaData = data;
-        List[elementId].data = data;
+        ListState[elementId].data = data;
       });
     },
     _checkEventHandler : function(isChecked, ev, data, elementId) {
