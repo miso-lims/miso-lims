@@ -1,12 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "StainCategory")
-public class StainCategory {
+public class StainCategory implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   @Id
   private Long stainCategoryId;
   private String name;
