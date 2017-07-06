@@ -618,7 +618,7 @@ HotTarget.sample = (function() {
               return;
             }
             
-            if (categories[0] == 'Tissue Processing' && classes.length > 0) {
+            if (categories[0] == 'Tissue Processing' && classes.length > 1) {
               alert("You have selected samples of classes " + classes.map(
                   Utils.array.getAlias).join(" & ") + ". Please select samples from only one tissue processing class.");
               return;
