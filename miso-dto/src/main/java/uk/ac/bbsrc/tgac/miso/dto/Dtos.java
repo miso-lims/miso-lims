@@ -18,6 +18,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
@@ -1812,6 +1813,27 @@ public class Dtos {
     dto.setSummary(from.getSummary());
     dto.setTime(getDateTimeString(from.getTime()));
     dto.setUserName(from.getUser().getFullName());
+    return dto;
+  }
+
+  public static UserDto asDto(User from) {
+    UserDto dto = new UserDto();
+    dto.setId(from.getUserId());
+    dto.setActive(from.isActive());
+    dto.setAdmin(from.isAdmin());
+    dto.setEmail(from.getEmail());
+    dto.setExternal(from.isExternal());
+    dto.setFullName(from.getFullName());
+    dto.setInternal(from.isInternal());
+    dto.setLoginName(from.getLoginName());
+    return dto;
+  }
+
+  public static GroupDto asDto(Group from) {
+    GroupDto dto = new GroupDto();
+    dto.setId(from.getGroupId());
+    dto.setDescription(from.getDescription());
+    dto.setName(from.getName());
     return dto;
   }
 }

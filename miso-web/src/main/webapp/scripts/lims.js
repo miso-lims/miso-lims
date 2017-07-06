@@ -61,7 +61,8 @@ var Utils = Utils || {
   },
 
   setSortFromPriority: function (table) {
-    table.aaSorting = [ [ table.aoColumns.reduce(function(acc, curr, index) { return acc.iSortPriority > curr.iSortPriority ? acc : { iSortPriority : curr.iSortPriority, iPos : index }; }, { iSortPriority : -1, iPos : 0 }).iPos  , "desc" ] ];
+    var info = table.aoColumns.reduce(function(acc, curr, index) { return acc.iSortPriority > curr.iSortPriority ? acc : { iSortPriority : curr.iSortPriority, bSortDirection : !!curr.bSortDirection, iPos : index }; }, { iSortPriority : -1, bSortDirection : false, iPos : 0 })
+    table.aaSorting = [ [ info.iPos, info.bSortDirection ? "asc" : "desc" ] ];
     return table;
   },
 

@@ -101,6 +101,7 @@ public class EditGroupController {
   public ModelAndView adminSetupForm(@PathVariable Long groupId, ModelMap model) throws IOException {
     try {
       model.put("group", groupId == Group.UNSAVED_ID ? new Group() : securityManager.getGroupById(groupId));
+      model.put("title", groupId == Group.UNSAVED_ID ? "New Group" : ("Group " + groupId));
       return new ModelAndView("/pages/editGroup.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
