@@ -25,12 +25,11 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -45,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 @Controller
 @SessionAttributes("printer")
 public class PrinterController {
-  protected static final Logger log = LoggerFactory.getLogger(PrinterController.class);
 
   @Autowired
   private SecurityManager securityManager;
@@ -58,6 +56,11 @@ public class PrinterController {
     }
 
   };
+
+  @ModelAttribute("title")
+  public String title() {
+    return "printers";
+  }
 
   @RequestMapping(value = "/printers", method = RequestMethod.GET)
   public ModelAndView view(ModelMap model) throws IOException {

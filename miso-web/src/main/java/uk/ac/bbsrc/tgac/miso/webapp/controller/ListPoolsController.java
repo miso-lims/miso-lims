@@ -28,6 +28,7 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -47,6 +48,10 @@ public class ListPoolsController {
   @Autowired
   private RequestManager requestManager;
 
+  @ModelAttribute("title")
+  public String title() {
+    return "Pools";
+  }
   @RequestMapping("/pools")
   public ModelAndView listPools(ModelMap model) throws IOException {
     return TabbedListItemsPage.createForPlatformType("pool", requestManager)
