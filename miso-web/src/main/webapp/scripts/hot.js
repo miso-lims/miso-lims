@@ -309,6 +309,12 @@ var HotUtils = {
               }, function(value) {
                 flatObjects[currentChange[0]][column.data] = value;
                 needsRender = true;
+                
+                if (needsRender && !synchronous && !initialSetup) {
+                  table.validateCells(function() {
+                    table.render();
+                  })
+                }
               });
             });
       }
@@ -316,9 +322,9 @@ var HotUtils = {
       if (needsRender) {
         table.validateCells(function() {
           table.render();
-          synchronous = false;
         });
       }
+      synchronous = false;
     });
     
     // For cells that have change notifiers, we have to call them to set up the
@@ -384,14 +390,14 @@ var HotUtils = {
                 }
               }
               
-              function toFlatObj(item) {
-                var flatObj = {};
+              function updateFlatObjAfterSave(flatObj, item) {
                 columns.forEach(function(c, colIndex) {
-                  c.unpack(item, flatObj, function(key, val) {
-                    // Do nothing. We're unpacking only - not setting cell meta
-                  });
+                  if (c.unpackAfterSave) {
+                    c.unpack(item, flatObj, function(key, val) {
+                      // Do nothing. We're unpacking only - not setting cell meta
+                    });
+                  }
                 });
-                return flatObj;
               }
               
               save.disabled = true;
@@ -495,7 +501,7 @@ var HotUtils = {
                         if (xhr.readyState === XMLHttpRequest.DONE) {
                           if (xhr.status === 200 || xhr.status === 201) {
                             data[index] = JSON.parse(xhr.response);
-                            flatObjects[index] = toFlatObj(data[index]);
+                            updateFlatObjAfterSave(flatObjects[index], data[index]);
                             flatObjects[index].saved = true;
                           } else {
                             try {
@@ -708,7 +714,7 @@ var HotUtils = {
     return baseobj;
   },
   
-  makeColumnForEnum : function(headerName, include, required, property, source) {
+  makeColumnForEnum : function(headerName, include, required, property, source, defaultValue) {
     return {
       'header' : headerName,
       'data' : property,
@@ -719,7 +725,7 @@ var HotUtils = {
       'validator' : (required ? HotUtils.validator.requiredAutocomplete
           : Handsontable.AutocompleteValidator),
       'unpack' : function(obj, flat, setCellMeta) {
-        flat[property] = obj[property];
+        flat[property] = obj[property] || defaultValue;
       },
       'pack' : function(obj, flat, errorHandler) {
         obj[property] = flat[property];

@@ -94,6 +94,18 @@ HotTarget.sample = (function() {
       
       return [
           {
+            header : 'Sample Name',
+            data : 'name',
+            readOnly : true,
+            include : true,
+            unpackAfterSave : true,
+            unpack : function(sam, flat, setCellMeta) {
+              flat.name = sam.name;
+            },
+            pack : function(sam, flat, errorHandler) {
+            }
+          },
+          {
             header : 'Sample Alias',
             data : 'alias',
             validator : function(value, callback) {
@@ -128,6 +140,7 @@ HotTarget.sample = (function() {
                   });
             },
             type : 'text',
+            unpackAfterSave : true,
             unpack : function(sam, flat, setCellMeta) {
               validationCache[sam.alias] = true;
               flat.alias = sam.alias;
@@ -166,7 +179,7 @@ HotTarget.sample = (function() {
                 validator : HotUtils.validator.optionalTextNoSpecialChars
               }),
           HotUtils.makeColumnForEnum('Sample Type', true, true, 'sampleType',
-              Constants.sampleTypes),
+              Constants.sampleTypes, null),
           HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
             validator : HotUtils.validator.requiredTextNoSpecialChars
           }),
@@ -244,7 +257,7 @@ HotTarget.sample = (function() {
           {
             header : 'External Name',
             data : 'externalName',
-            validator : HotUtils.validator.optionalTextNoSpecialChars,
+            validator : HotUtils.validator.requiredTextNoSpecialChars,
             include : show['Identity'],
             unpack : function(sam, flat, setCellMeta) {
               // Do nothing; this never comes from the server
@@ -259,13 +272,14 @@ HotTarget.sample = (function() {
             type : 'dropdown',
             trimDropdown : false,
             strict : true,
-            source : [ '' ],
+            source : [],
             validator : HotUtils.validator.requiredAutocomplete,
             include : show['Identity'] && config.targetSampleClass.alias != 'Identity' && config.targetSampleClass.sampleCategory != 'Identity',
             depends : 'externalName',
             update : function(sam, flat, value, setReadOnly, setOptions,
                 setData) {
               if (!Utils.validation.isEmpty(flat.externalName)) {
+                setData('(...searching...)');
                 getIdentities(HotUtils.counter);
               }
               
@@ -280,9 +294,6 @@ HotTarget.sample = (function() {
                       contentType : "application/json; charset=utf8",
                       dataType : "json",
                       type : "POST"
-                    })
-                    .complete(function(data) {
-                      console.log(data); // TODO: remove
                     })
                     .success(
                         function(data) {
@@ -317,9 +328,9 @@ HotTarget.sample = (function() {
                             if (!hasIdentityInProject) {
                               identitiesSources
                                   .unshift("First Receipt (" + flat.projectAlias + ")");
-                              setData(identitiesSources[0]);
                             }
                             requestCounter++;
+                            setData(identitiesSources[0]);
                             setOptions({
                               'source' : identitiesSources
                             });
@@ -336,8 +347,8 @@ HotTarget.sample = (function() {
               sam.parentAlias = flat.identityAlias;
             }
           },
-          HotUtils.makeColumnForEnum('Sex', show['Identity'], false,
-              'donorSex', Constants.donorSexes),
+          HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;', show['Identity'], true,
+              'donorSex', Constants.donorSexes, 'Unknown'),
           
           // Detailed sample columns
           {
@@ -446,7 +457,7 @@ HotTarget.sample = (function() {
           
           // Stock columns
           HotUtils.makeColumnForEnum('STR Status', show['Stock'], true,
-              'strStatus', Constants.strStatuses),
+              'strStatus', Constants.strStatuses, null),
           {
             header : 'DNAse',
             data : 'dnaseTreated',

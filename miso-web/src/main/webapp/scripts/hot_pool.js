@@ -13,6 +13,7 @@ HotTarget.pool = {
           data : 'alias',
           include : true,
           validator : HotUtils.validator.requiredText,
+          unpackAfterSave : true,
           unpack : function(dil, flat, setCellMeta) {
             flat.alias = dil.alias;
           },

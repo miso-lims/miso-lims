@@ -14,6 +14,7 @@ HotTarget.dilution = {
           readOnly : true,
           include : true,
           validator : HotUtils.validator.optionalTextNoSpecialChars,
+          unpackAfterSave : true,
           unpack : function(dil, flat, setCellMeta) {
             flat.name = dil.name;
           },
@@ -22,18 +23,10 @@ HotTarget.dilution = {
           }
         
         },
-        {
-          header : 'Matrix Barcode',
-          data : 'identificationBarcode',
-          validator : HotUtils.validator.optionalTextNoSpecialChars,
-          include : !Constants.automaticBarcodes,
-          unpack : function(dil, flat, setCellMeta) {
-            flat.identificationBarcode = dil.identificationBarcode;
-          },
-          pack : function(dil, flat, errorHandler) {
-            dil.identificationBarcode = flat.identificationBarcode;
-          }
-        },
+        HotUtils.makeColumnForText('Matrix Barcode',
+            !Constants.automaticBarcodes, 'identificationBarcode', {
+              validator : HotUtils.validator.optionalTextNoSpecialChars
+            }),
         {
           header : 'Library Alias',
           data : 'libraryAlias',
