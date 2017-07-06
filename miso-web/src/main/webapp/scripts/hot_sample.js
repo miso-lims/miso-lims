@@ -440,6 +440,7 @@ HotTarget.sample = (function() {
             },
             pack : function(sam, flat, errorHandler) {
               if (!Utils.validation.isEmpty(flat.stainName)) {
+                sam.stain = {};
                 sam.stain.id = Utils.array.maybeGetProperty(Utils.array
                     .findFirstOrNull(Utils.array.namePredicate(flat.stainName),
                         Constants.stains), 'id');
