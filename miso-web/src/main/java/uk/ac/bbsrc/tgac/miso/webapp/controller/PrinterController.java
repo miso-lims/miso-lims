@@ -53,14 +53,8 @@ public class PrinterController {
   private final ListItemsPage listPage = new ListItemsPage("printer") {
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      boolean isAdmin = false;
-      try {
-        isAdmin = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()).isAdmin();
-      } catch (Exception e) {
-        log.error("Failed to get user's admin status", e);
-      }
-      config.put("isAdmin", isAdmin);
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      config.put("isAdmin", securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()).isAdmin());
     }
 
   };
