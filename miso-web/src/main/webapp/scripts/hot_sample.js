@@ -302,7 +302,7 @@ HotTarget.sample = (function() {
                           if (data.requestCounter == requestCounter) {
                             var label = Constants.isDetailedSample
                                 ? 'shortName' : 'name';
-                            var selectedProjectId = Utils.array
+                            var selectedProjectId = sam.projectId || Utils.array
                                 .maybeGetProperty(
                                     Utils.array
                                         .findFirstOrNull(
