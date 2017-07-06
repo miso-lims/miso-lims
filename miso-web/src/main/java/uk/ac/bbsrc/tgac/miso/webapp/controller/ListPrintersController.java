@@ -43,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 @Controller
 @SessionAttributes("printer")
-public class PrinterController {
+public class ListPrintersController {
 
   @Autowired
   private SecurityManager securityManager;
