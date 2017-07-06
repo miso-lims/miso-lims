@@ -325,7 +325,7 @@ HotTarget.sample = (function() {
                             var hasIdentityInProject = (identitiesSources.length > 0 && data.matchingIdentities[0].projectId == selectedProject.id);
                             if (!hasIdentityInProject) {
                               identitiesSources
-                                  .unshift("First Receipt (" + (flat.projectAlias || selectedProject[label]) + ")");
+                                  .unshift("First Receipt (" + selectedProject[label] + ")");
                             }
                             requestCounter++;
                             setData(identitiesSources[0]);
