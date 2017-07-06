@@ -1103,6 +1103,7 @@ public class EditSampleController {
       if (targetSampleClass != null) config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
       config.put("create", true);
       config.put("hasProject", hasProject);
+      config.put("showReceivedDate", true);
       if (!hasProject) {
         requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
       }
