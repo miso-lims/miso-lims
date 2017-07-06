@@ -636,6 +636,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
           confirmExternalNameUniqueForProjectIfRequired(iSource.getExternalName(), iTarget);
         }
         iTarget.setExternalName(iSource.getExternalName());
+        iTarget.setDonorSex(iSource.getDonorSex());
       }
       if (isTissueSample(target)) {
         applyTissueChanges((SampleTissue) target, (SampleTissue) source);
