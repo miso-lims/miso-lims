@@ -23,10 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,8 +33,10 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 @Controller
 public class ListDilutionsController {
-  protected static final Logger log = LoggerFactory.getLogger(ListDilutionsController.class);
-
+  @ModelAttribute("title")
+  public String title() {
+    return "Dilutions";
+  }
   @RequestMapping("/dilutions")
   public ModelAndView listDilutions(ModelMap model) throws Exception {
     return new ListItemsPage("dilution").list(model);

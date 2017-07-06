@@ -11,7 +11,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "Identity")
-public class IdentityImpl extends DetailedSampleImpl implements Identity {
+public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIdentity {
 
   private static final long serialVersionUID = 1L;
 
@@ -149,7 +149,7 @@ public class IdentityImpl extends DetailedSampleImpl implements Identity {
       checkArgument(rootSampleClass != null, "A root SampleClass must be provided to create an Identity Sample.");
       log.debug("Create an Identity Sample.");
 
-      IdentityImpl i = new IdentityImpl();
+      SampleIdentityImpl i = new SampleIdentityImpl();
       i.setName(name);
       i.setAlias(alias);
       i.setSampleClass(rootSampleClass);

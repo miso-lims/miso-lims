@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
@@ -288,8 +289,8 @@ public class EditPoolController {
     }
   };
 
-  @RequestMapping(value = "/bulk/edit/{poolIds}", method = RequestMethod.GET)
-  public ModelAndView editDilutions(@PathVariable String poolIds, ModelMap model) throws IOException {
+  @RequestMapping(value = "/bulk/edit", method = RequestMethod.GET)
+  public ModelAndView editPools(@RequestParam("ids") String poolIds, ModelMap model) throws IOException {
     return bulkEditBackend.edit(poolIds, model);
   }
 }

@@ -10,7 +10,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public interface PaginationFilterSink<T> {
 
+  public void restrictPaginationByArchived(T item, boolean isArchived, Consumer<String> errorHandler);
+
   public void restrictPaginationByBox(T item, String name, Consumer<String> errorHandler);
+
+  public void restrictPaginationByBoxUse(T item, long id, Consumer<String> errorHandler);
 
   public void restrictPaginationByClass(T item, String name, Consumer<String> errorHandler);
 
@@ -39,7 +43,5 @@ public interface PaginationFilterSink<T> {
   public void restrictPaginationBySequencerId(T item, long id, Consumer<String> errorHandler);
 
   public void restrictPaginationByUser(T item, String userName, boolean creator, Consumer<String> errorHandler);
-
-  public void restrictPaginationByBoxUse(T item, long id, Consumer<String> errorHandler);
 
 }

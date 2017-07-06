@@ -56,8 +56,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
@@ -76,8 +74,6 @@ public class EditRunController {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
-  @Autowired
   private ChangeLogService changeLogService;
   @Autowired
   private RunService runService;
@@ -89,10 +85,6 @@ public class EditRunController {
   private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -278,26 +270,27 @@ public class EditRunController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("run") Run run, ModelMap model, SessionStatus session)
-      throws IOException, MalformedRunException {
+  public String processSubmit(@ModelAttribute("run") Run run, ModelMap model, SessionStatus session) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!run.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-
       for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
-        if (container != null) {
-          container.setLastModifier(user);
-          for (Partition partition : container.getPartitions()) {
-            if (partition.getPool() != null) partition.getPool().setLastModifier(user);
+        for (Partition partition : container.getPartitions()) {
+          if (partition.getPool() != null) {
+            partition.getPool().setLastModifier(user);
           }
         }
       }
-      requestManager.saveRun(run);
+
+      long runId = run.getId();
+      if (run.getId() == Run.UNSAVED_ID) {
+        runId = runService.create(run);
+      } else {
+        runService.update(run);
+      }
+
       session.setComplete();
       model.clear();
-      return "redirect:/miso/run/" + run.getId();
+      return "redirect:/miso/run/" + runId;
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save run", ex);

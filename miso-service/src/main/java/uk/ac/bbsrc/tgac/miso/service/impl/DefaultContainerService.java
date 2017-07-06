@@ -15,6 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -79,28 +80,32 @@ public class DefaultContainerService
   }
 
   @Override
-  public Long create(SequencerPartitionContainer container) throws IOException {
+  public SequencerPartitionContainer create(SequencerPartitionContainer container) throws IOException {
     loadChildEntities(container);
     authorizationManager.throwIfNotWritable(container);
     setChangeDetails(container);
 
     container.setSecurityProfile(securityProfileDao.get(securityProfileDao.save(container.getSecurityProfile())));
-    return save(container).getId();
+    return containerDao.save(container);
   }
 
   @Override
-  public void update(SequencerPartitionContainer container) throws IOException {
+  public SequencerPartitionContainer update(SequencerPartitionContainer container) throws IOException {
     SequencerPartitionContainer managed = get(container.getId());
     authorizationManager.throwIfNotWritable(managed);
-    applyChanges(managed, container);
+    applyChanges(container, managed);
     setChangeDetails(managed);
     loadChildEntities(managed);
-    save(managed);
+    return containerDao.save(managed);
   }
 
-  private SequencerPartitionContainer save(SequencerPartitionContainer container) throws IOException {
-    Long id = containerDao.save(container);
-    return get(id);
+  @Override
+  public SequencerPartitionContainer save(SequencerPartitionContainer container) throws IOException {
+    if (container.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
+      return create(container);
+    } else {
+      return update(container);
+    }
   }
 
   @Override

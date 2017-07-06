@@ -54,7 +54,8 @@ public interface SampleClass extends Serializable {
   void setDNAseTreatable(Boolean treatable);
 
   default boolean canCreateNew(Iterable<SampleValidRelationship> relationships) {
-    return (getSampleCategory().equals(SampleTissue.CATEGORY_NAME)
+    return (getSampleCategory().equals(SampleIdentity.CATEGORY_NAME)
+        || getSampleCategory().equals(SampleTissue.CATEGORY_NAME)
         || getSampleCategory().equals(SampleTissueProcessing.CATEGORY_NAME)
         || getSampleCategory().equals(SampleStock.CATEGORY_NAME)
         || getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)

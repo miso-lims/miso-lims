@@ -98,7 +98,8 @@ public class PoolOrderRestController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createPoolOrder(@RequestBody PoolOrderDto poolOrderDto, UriComponentsBuilder b, HttpServletResponse response)
       throws IOException {
-    Long id = poolOrderService.create(poolOrderDto);
+    PoolOrder poolOrder = Dtos.to(poolOrderDto);
+    Long id = poolOrderService.create(poolOrder);
     UriComponents uriComponents = b.path("/poolorder/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());

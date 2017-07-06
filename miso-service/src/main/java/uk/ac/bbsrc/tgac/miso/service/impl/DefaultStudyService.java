@@ -16,12 +16,14 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultStudyService implements StudyService {
+public class DefaultStudyService implements StudyService, AuthorizedPaginatedDataSource<Study> {
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -47,6 +49,7 @@ public class DefaultStudyService implements StudyService {
     return s;
   }
 
+  @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
   }
@@ -67,11 +70,6 @@ public class DefaultStudyService implements StudyService {
   @Override
   public StudyType getType(long id) {
     return studyStore.getType(id);
-  }
-
-  @Override
-  public Collection<Study> list() throws IOException {
-    return authorizationManager.filterUnreadable(studyStore.listAll());
   }
 
   @Override
@@ -137,6 +135,11 @@ public class DefaultStudyService implements StudyService {
 
   public void setStudyStore(StudyStore studyStore) {
     this.studyStore = studyStore;
+  }
+
+  @Override
+  public PaginatedDataSource<Study> getBackingPaginationSource() {
+    return studyStore;
   }
 
 }

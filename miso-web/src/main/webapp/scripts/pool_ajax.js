@@ -979,8 +979,8 @@ Pool.orders = Pool.orders || {
           "sTitle": "Sequencing Parameters",
           "mData": "parameters.id",
           "mRender": function (data, type, full) {
-            return Hot.maybeGetProperty(
-              Hot.findFirstOrNull(Hot.idPredicate(data), Defaults.all.sequencingParameters),
+            return Utils.array.maybeGetProperty(
+              Utils.array.findFirstOrNull(Utils.array.idPredicate(data), Constants.sequencingParameters),
               'name');
           }
         },
@@ -1031,7 +1031,7 @@ Pool.orders = Pool.orders || {
 
   'setOptionsForPlatform': function(platformId, selectedParameterId) {
 	document.getElementById('orderPlatformId').value = platformId;
-    var options = Defaults.all.sequencingParameters.filter(function(parameter) {
+    var options = Constants.sequencingParameters.filter(function(parameter) {
       return parameter.platform.id == platformId;
     }).sort(function(a, b) {
          return a.name < b.name ? -1 : (a.name == b.name ? 0 : 1);

@@ -31,27 +31,27 @@ ListTarget.printer = {
         {
           "name" : "Enable",
           "include" : config.isInternal || config.isAdmin,
-          "action" : function(ids) {
+          "action" : function(items) {
             Utils.ajaxWithDialog('Enabling Printer', 'PUT',
-                '/miso/rest/printer/enable', ids, Utils.page.pageReload);
+                '/miso/rest/printer/enable', items.map(Utils.array.getId), Utils.page.pageReload);
             
           }
         },
         {
           "name" : "Disable",
           "include" : config.isInternal || config.isAdmin,
-          "action" : function(ids) {
+          "action" : function(items) {
             Utils.ajaxWithDialog('Disabling Printer', 'PUT',
-                '/miso/rest/printer/disable', ids, Utils.page.pageReload);
+                '/miso/rest/printer/disable', items.map(Utils.array.getId), Utils.page.pageReload);
             
           }
         },
         {
           "name" : "Delete",
           "include" : config.isAdmin,
-          "action" : function(ids) {
+          "action" : function(items) {
             Utils.ajaxWithDialog('Deleting Printer', 'DELETE',
-                '/miso/rest/printer', ids, Utils.page.pageReload);
+                '/miso/rest/printer', items.map(Utils.array.getId), Utils.page.pageReload);
           }
         } ].filter(function(action) {
       return action.include;

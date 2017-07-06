@@ -1,8 +1,36 @@
+# 0.2.75
+
+Changes:
+
+ * Put titles on all list pages
+ * Harmonize actions at top of list and bulk edit pages
+ * Show count of selected items
+ * Allow users to add custom-named identities
+ * Support replicates during propagation
+ * Remove restriction that all libraries be of the same sample class during propagate and edit
+ * Cache alias validation results to speed up bulk saving
+ * Fixed run save failing
+ * Allow horizontal scrolling of data tables
+ * Create a wizard options dialog during bulk actions from list page
+ * Refactor Handsontable for samples
+ * Add library name column to bulk create/edit table
+ * Rename Completion to Status on pool page
+ * Add pool description to orders page
+ * Show longest index on Orders page
+ * Unit tests
+ * Improved performance of box save
+ * Speed up list pages
+ * Bug fixes 
+
 # 0.2.74
 
 Changes:
 
-* Bug fix
+ * Bug fix
+
+Bad:
+
+ * Saving Run fails, both through UI and via Notification Server
 
 # 0.2.73
 

@@ -1,11 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 public class IndexDto {
+  private IndexFamilyDto family;
   private long id;
   private String label;
   private String name;
   private int position;
   private String sequence;
+
+  public IndexFamilyDto getFamily() {
+    return family;
+  }
 
   public long getId() {
     return id;
@@ -25,6 +30,10 @@ public class IndexDto {
 
   public String getSequence() {
     return sequence;
+  }
+
+  public void setFamily(IndexFamilyDto family) {
+    this.family = family;
   }
 
   public void setId(long id) {

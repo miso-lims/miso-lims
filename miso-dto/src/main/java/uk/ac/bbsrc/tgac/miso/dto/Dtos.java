@@ -23,7 +23,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -45,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
@@ -57,6 +57,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -65,18 +67,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
@@ -87,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
@@ -309,7 +313,7 @@ public class Dtos {
   private static DetailedSampleDto asDetailedSampleDto(DetailedSample from) {
     DetailedSampleDto dto = null;
     if (isIdentitySample(from)) {
-      dto = asIdentitySampleDto((Identity) from);
+      dto = asIdentitySampleDto((SampleIdentity) from);
     } else if (isTissueSample(from)) {
       dto = asTissueSampleDto((SampleTissue) from);
     } else if (isTissueProcessingSample(from)) {
@@ -639,15 +643,15 @@ public class Dtos {
     return to;
   }
 
-  private static SampleIdentityDto asIdentitySampleDto(Identity from) {
+  private static SampleIdentityDto asIdentitySampleDto(SampleIdentity from) {
     SampleIdentityDto dto = new SampleIdentityDto();
     dto.setExternalName(from.getExternalName());
     dto.setDonorSex(from.getDonorSex().getLabel());
     return dto;
   }
 
-  private static Identity toIdentitySample(SampleIdentityDto from) {
-    Identity to = new IdentityImpl();
+  private static SampleIdentity toIdentitySample(SampleIdentityDto from) {
+    SampleIdentity to = new SampleIdentityImpl();
     to.setExternalName(from.getExternalName());
     if (from.getDonorSex() != null) {
       to.setDonorSex(from.getDonorSex());
@@ -740,6 +744,7 @@ public class Dtos {
     dto.setInstituteId(from.getInstitute().getId());
     dto.setInstituteAlias(from.getInstitute().getAlias());
     dto.setAlias(from.getAlias());
+    dto.setLabel(from.getItemLabel());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(getDateTimeString(from.getCreationDate()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -986,6 +991,8 @@ public class Dtos {
   public static PoolOrder to(PoolOrderDto from) {
     PoolOrder to = new PoolOrderImpl();
     if (from.getId() != null) to.setId(from.getId());
+    to.setPoolId(from.getPoolId());
+    to.setSequencingParameter(to(from.getParameters()));
     to.setPartitions(from.getPartitions());
     return to;
   }
@@ -996,6 +1003,16 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setPlatform(asDto(from.getPlatform()));
     return dto;
+  }
+
+  public static SequencingParameters to(SequencingParametersDto from) {
+    SequencingParameters to = new SequencingParametersImpl();
+    to.setId(from.getId());
+    to.setName(from.getName());
+    if (from.getPlatform() != null) {
+      to.setPlatform(to(from.getPlatform()));
+    }
+    return to;
   }
 
   public static List<SequencingParametersDto> asSequencingParametersDtos(Collection<SequencingParameters> from) {
@@ -1306,13 +1323,6 @@ public class Dtos {
     return new Date(dateFormatter.parseMillis(from));
   }
 
-  private static Date extractDateTimeOrNull(String from) {
-    if (isStringEmptyOrNull(from)) {
-      return null;
-    }
-    return new Date(dateTimeFormatter.parseMillis(from));
-  }
-
   private static String getDateString(Date date) {
     if (date == null) {
       return null;
@@ -1342,6 +1352,7 @@ public class Dtos {
     dto.setDiscarded(from.isDiscarded());
     dto.setVolume(from.getVolume());
     dto.setPlatformType(from.getPlatformType().name());
+    dto.setLongestIndex(from.getLongestIndex());
     if (from.getLastModified() != null) {
       dto.setLastModified(getDateAsString(from.getLastModified()));
     }
@@ -1443,7 +1454,7 @@ public class Dtos {
     return dtoList;
   }
 
-  private static QcTypeDto asDto(QcType from) {
+  public static QcTypeDto asDto(QcType from) {
     QcTypeDto dto = new QcTypeDto();
     dto.setId(from.getQcTypeId());
     dto.setName(from.getName());
@@ -1455,7 +1466,7 @@ public class Dtos {
     return dto;
   }
 
-  private static QcType to(QcTypeDto from) {
+  public static QcType to(QcTypeDto from) {
     QcType to = new QcType();
     if (from.getId() != null) to.setQcTypeId(from.getId());
     to.setName(from.getName());
@@ -1467,7 +1478,7 @@ public class Dtos {
     return to;
   }
 
-  private static SampleQcDto asDto(SampleQC from) {
+  public static SampleQcDto asDto(SampleQC from) {
     SampleQcDto dto = new SampleQcDto();
     dto.setId(from.getId());
     dto.setQcDate(getDateString(from.getQcDate()));
@@ -1478,7 +1489,7 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleQC to(SampleQcDto from) {
+  public static SampleQC to(SampleQcDto from) {
     SampleQC to = new SampleQCImpl();
     if (from.getId() != null) to.setId(from.getId());
     to.setQcType(to(from.getQcType()));
@@ -1486,7 +1497,7 @@ public class Dtos {
     return to;
   }
 
-  private static LibraryQcDto asDto(LibraryQC from) {
+  public static LibraryQcDto asDto(LibraryQC from) {
     LibraryQcDto dto = new LibraryQcDto();
     dto.setId(from.getId());
     dto.setQcDate(getDateString(from.getQcDate()));
@@ -1497,7 +1508,7 @@ public class Dtos {
     return dto;
   }
 
-  private static LibraryQC to(LibraryQcDto from) {
+  public static LibraryQC to(LibraryQcDto from) {
     LibraryQC to = new LibraryQCImpl();
     if (from.getId() != null) to.setId(from.getId());
     to.setQcType(to(from.getQcType()));
@@ -1543,7 +1554,6 @@ public class Dtos {
     dto.setStopped(from.get(HealthType.Stopped));
     dto.setUnknown(from.get(HealthType.Unknown));
     return dto;
-
   }
 
   public static PlatformDto asDto(Platform from) {
@@ -1556,11 +1566,22 @@ public class Dtos {
     return dto;
   }
 
+  public static Platform to(PlatformDto from) {
+    Platform to = new PlatformImpl();
+    to.setId(from.getId());
+    to.setPlatformType(PlatformType.get(from.getPlatformType()));
+    to.setDescription(from.getDescription());
+    to.setInstrumentModel(from.getInstrumentModel());
+    to.setNumContainers(from.getNumContainers());
+    return to;
+  }
+
   public static ProjectDto asDto(Project from) {
     ProjectDto dto = new ProjectDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setAlias(from.getAlias());
+    dto.setShortName(from.getShortName());
     return dto;
   }
 
@@ -1609,21 +1630,34 @@ public class Dtos {
   }
 
   public static IndexDto asDto(Index from) {
+    return asDto(from, true);
+  }
+
+  public static IndexDto asDto(Index from, boolean includeFamily) {
     IndexDto dto = new IndexDto();
     dto.setId(from.getId());
     dto.setLabel(from.getLabel());
     dto.setName(from.getName());
     dto.setPosition(from.getPosition());
     dto.setSequence(from.getSequence());
+    if (includeFamily) {
+      dto.setFamily(asDto(from.getFamily(), false));
+    }
     return dto;
   }
 
   public static IndexFamilyDto asDto(IndexFamily from) {
+    return asDto(from, true);
+  }
+
+  private static IndexFamilyDto asDto(IndexFamily from, boolean includeChildren) {
     IndexFamilyDto dto = new IndexFamilyDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setArchived(from.getArchived());
-    dto.setIndices(from.getIndices().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    if (includeChildren) {
+      dto.setIndices(from.getIndices().stream().map(x -> asDto(x, false)).collect(Collectors.toList()));
+    }
     dto.setMaximumNumber(from.getMaximumNumber());
     dto.setPlatformType(from.getPlatformType() == null ? null : from.getPlatformType().name());
     return dto;
@@ -1700,6 +1734,7 @@ public class Dtos {
     }).collect(Collectors.toSet()));
     return to;
   }
+
   public static PrinterBackendDto asDto(Backend from) {
     PrinterBackendDto dto = new PrinterBackendDto();
     dto.setId(from.ordinal());
@@ -1736,5 +1771,24 @@ public class Dtos {
     to.setName(dto.getName());
 
     return to;
+  }
+
+  public static StudyDto asDto(Study from) {
+    StudyDto dto = new StudyDto();
+    dto.setId(from.getId());
+    dto.setAccession(from.getAccession());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    dto.setName(from.getName());
+    dto.setProjectId(from.getProject().getId());
+    dto.setStudyTypeId(from.getStudyType().getId());
+    return dto;
+  }
+
+  public static StudyTypeDto asDto(StudyType from) {
+    StudyTypeDto dto = new StudyTypeDto();
+    dto.setId(from.getId());
+    dto.setName(from.getName());
+    return dto;
   }
 }

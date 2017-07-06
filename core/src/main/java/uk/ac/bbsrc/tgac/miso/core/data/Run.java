@@ -100,7 +100,7 @@ public class Run
   @Temporal(TemporalType.DATE)
   private Date completionDate;
 
-  @ManyToMany(targetEntity = SequencerPartitionContainerImpl.class, cascade = CascadeType.ALL)
+  @ManyToMany(targetEntity = SequencerPartitionContainerImpl.class)
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
       @JoinColumn(name = "Run_runId") }, inverseJoinColumns = {
           @JoinColumn(name = "containers_containerId") })

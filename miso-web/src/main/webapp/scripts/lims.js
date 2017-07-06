@@ -185,8 +185,10 @@ var Utils = Utils || {
             case 'int':
                 input = document.createElement('INPUT');
                 input.setAttribute('type', 'text');
+                input.value = field.value || 0;
+                output[field.property] = field.value || 0;
                 input.onchange = function() {
-                output[field.property] = parseInt(input.value);
+                    output[field.property] = parseInt(input.value);
                 };
                 break;
             default:
@@ -206,6 +208,35 @@ var Utils = Utils || {
           title:title,
           modal: true,
           buttons: buttons
+      });
+    },
+  showWizardDialog: function(title, actions) {
+      var dialogArea = document.getElementById('dialog');
+      while (dialogArea.hasChildNodes()) {
+          dialogArea.removeChild(dialogArea.lastChild);
+      }
+
+      actions.forEach(function(action) {
+          var p = document.createElement('P');
+          var link = document.createElement('A');
+          link.appendChild(document.createTextNode("→ " + action.name));
+          link.href = '#';
+          link.onclick = function() {
+              dialog.dialog("close");
+              action.handler();
+              return false;
+          };
+          p.appendChild(link);
+          dialogArea.appendChild(p);
+      });
+
+      var dialog = jQuery('#dialog').dialog({
+          autoOpen: true,
+          height: 400,
+          width: 350,
+          title:title,
+          modal: true,
+          buttons: {"Cancel" : function () { dialog.dialog("close"); }}
       });
     },
     ajaxWithDialog: function(title, method, url, data, callback) {
@@ -492,15 +523,6 @@ Utils.array = {
     return objArr.map(function (obj) { return obj[key]; });
   },
 
-  /**
-   * Sorts by a given property
-   */
-  sortByProperty: function (array, propertyName) {
-    return array.sort(function (a, b) {
-      return a[propertyName] > b[propertyName] ? 1 : ((b[propertyName] > a[propertyName]) ? -1 : 0);
-    });
-  },
-
   findFirstOrNull: function (predicate, referenceCollection) {
     var results = referenceCollection.filter(predicate);
     return results.length > 0 ? results[0] : null;
@@ -548,5 +570,26 @@ Utils.array = {
    */
   getAliasFromId: function (id, referenceCollection) {
     return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(id), referenceCollection), 'alias');
+  },
+  deduplicateNumeric: function(input) {
+    return input.sort(function(a, b) { return a - b; }).filter(function(obj, index, arr) { return index == 0 || obj !== arr[index - 1]; });
+  },
+  deduplicateString: function(input) {
+    return input.sort(function(a, b) { return a.localeCompare(b); }).filter(function(obj, index, arr) { return index == 0 || obj !== arr[index - 1]; });
+  },
+  deduplicateById: function(input) {
+    return input.sort(function(a, b) { return a.id - b.id; }).filter(function(obj, index, arr) { return index == 0 || obj.id != arr[index - 1].id; });
+  },
+  
+  /**
+   * Sorts based on a given property.
+   */
+  standardSort: function (property) {
+    return function (a, b) {
+      return a[property].localeCompare(b[property]);
+    };
+  },
+  sampleClassComparator: function(a, b) {
+    return (Constants.sampleCategories.indexOf(a.sampleCategory) - Constants.sampleCategories.indexOf(b.sampleCategory)) || a.alias.localeCompare(b.alias);
   },
 };

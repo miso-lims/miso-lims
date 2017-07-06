@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +37,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -47,24 +46,27 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
+import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
@@ -81,6 +83,13 @@ public class SampleController extends RestController {
   @Autowired
   private SampleClassService sampleClassService;
 
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
+
+  public Boolean isDetailedSampleEnabled() {
+    return detailedSample;
+  }
+
   private final JQueryDataTableBackend<Sample, SampleDto> jQueryBackend = new JQueryDataTableBackend<Sample, SampleDto>() {
 
     @Override
@@ -96,7 +105,7 @@ public class SampleController extends RestController {
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public SampleDto getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
+  public SampleDto getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder)
       throws IOException {
     Sample sample = sampleService.get(id);
     if (sample == null) {
@@ -136,8 +145,9 @@ public class SampleController extends RestController {
   }
 
   @RequestMapping(value = "/sample", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public ResponseEntity<?> createSample(@RequestBody SampleDto sampleDto, UriComponentsBuilder b) throws IOException {
+  public SampleDto createSample(@RequestBody SampleDto sampleDto, UriComponentsBuilder b, HttpServletResponse response) throws IOException {
     if (sampleDto == null) {
       log.error("Received null sampleDto from front end; cannot convert to Sample. Something likely went wrong in the JS DTO conversion.");
       throw new RestException("Cannot convert null to Sample", Status.BAD_REQUEST);
@@ -151,6 +161,7 @@ public class SampleController extends RestController {
         } else if (dto.getSampleClassId() == null) {
           throw new RestException("No parent and no target sample class.", Status.BAD_REQUEST);
         } else {
+          // infer parent stock class
           SampleClass sampleClass = sampleClassService.get(dto.getSampleClassId());
           if (sampleClass == null) {
             throw new RestException("Cannot find sample class: " + dto.getSampleClassId(), Status.BAD_REQUEST);
@@ -160,10 +171,33 @@ public class SampleController extends RestController {
           }
           SampleClass stockClass = sampleClassService.inferStockFromAliquot(sampleClass);
           dto.setStockClassId(stockClass.getId());
+
+          // infer grandparent tissue class
+          SampleClass tissueClass = sampleClassService.inferTissueFromStock(stockClass);
+          dto.setParentTissueSampleClassId(tissueClass.getId());
+        }
+      } else if (sampleDto instanceof SampleStockDto) {
+        DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
+        if (dto.getParentId() != null) {
+          // Pass
+        } else if (dto.getSampleClassId() == null) {
+          throw new RestException("No parent and no target sample class.", Status.BAD_REQUEST);
+        } else {
+          // infer parent tissue class
+          SampleClass sampleClass = sampleClassService.get(dto.getSampleClassId());
+          if (sampleClass == null) {
+            throw new RestException("Cannot find sample class: " + dto.getSampleClassId(), Status.BAD_REQUEST);
+          }
+          if (!sampleClass.getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
+            throw new RestException("Class and type mismatch.", Status.BAD_REQUEST);
+          }
+          SampleClass tissueClass = sampleClassService.inferTissueFromStock(sampleClass);
+          dto.setParentTissueSampleClassId(tissueClass.getId());
         }
       }
       Sample sample = Dtos.to(sampleDto);
       id = sampleService.create(sample);
+
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating sample. ", e);
       RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
@@ -172,15 +206,18 @@ public class SampleController extends RestController {
       }
       throw restException;
     }
+
+    SampleDto created = Dtos.asDto(sampleService.get(id));
     UriComponents uriComponents = b.path("/sample/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    created.setUrl(uriComponents.toUri().toString());
+    response.setHeader("Location", uriComponents.toUri().toString());
+    return created;
   }
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateSample(@PathVariable("id") Long id, @RequestBody SampleDto sampleDto) throws IOException {
+  @ResponseStatus(HttpStatus.OK)
+  public SampleDto updateSample(@PathVariable("id") Long id, @RequestBody SampleDto sampleDto, UriComponentsBuilder b) throws IOException {
     if (sampleDto == null) {
       log.error("Received null sampleDto from front end; cannot convert to Sample. Something likely went wrong in the JS DTO conversion.");
       throw new RestException("Cannot convert null to Sample", Status.BAD_REQUEST);
@@ -188,7 +225,7 @@ public class SampleController extends RestController {
     Sample sample = Dtos.to(sampleDto);
     sample.setId(id);
     sampleService.update(sample);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return getSample(id, b);
   }
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.DELETE)
@@ -208,35 +245,23 @@ public class SampleController extends RestController {
    */
   @RequestMapping(value = "/identities", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public JSONObject getIdentitiesBySearch(@RequestBody JSONObject identitiesSearches,
+  public JSONObject getIdentitiesBySearch(@RequestBody JSONObject json,
       HttpServletResponse response) throws IOException {
-    if (identitiesSearches.size() == 0) {
-      throw new RestException("Must give search terms to look up identities");
+    if (json.getString("identitiesSearches").length() == 0) {
+      throw new RestException("Must give search terms to look up identities", Status.BAD_REQUEST);
     }
-    Integer requestCounter = (Integer) identitiesSearches.get("requestCounter");
-    List<Set<SampleDto>> identitiesResults = new ArrayList<>();
-
-    JSONArray searchTerms = JSONArray.fromObject(identitiesSearches.get("identitiesSearches"));
-    for (int i = 0; i < searchTerms.size(); i++) {
-      Set<Sample> resultsForOneParent = new HashSet<>();
-      Set<SampleDto> resultsForOneParentDtos = new HashSet<>();
-
-      for (String term : IdentityImpl.getSetFromString(((String) searchTerms.get(i)).replaceAll(";", ","))) {
-        Collection<Identity> selectedIdentities = sampleService.getIdentitiesByExternalNameOrAlias(term);
-        for (Identity selectedIdentity : selectedIdentities) {
-          if (resultsForOneParent.contains(selectedIdentity)) {
-            continue;
-          } else {
-            resultsForOneParentDtos.add(Dtos.asDto(selectedIdentity));
-            resultsForOneParent.add(selectedIdentity);
-          }
-        }
+    Integer requestCounter = (Integer) json.get("requestCounter");
+    Set<SampleDto> matchingIdentities = new HashSet<>();
+    String searchTerms = json.getString("identitiesSearches");
+    for (String term : SampleIdentityImpl.getSetFromString(searchTerms.replaceAll(";", ","))) {
+      Collection<SampleIdentity> matches = sampleService.getIdentitiesByExternalNameOrAlias(term);
+      for (SampleIdentity identity : matches) {
+        matchingIdentities.add(Dtos.asDto(identity));
       }
-      identitiesResults.add(resultsForOneParentDtos);
     }
     JSONObject allIdentities = new JSONObject();
     allIdentities.put("requestCounter", requestCounter);
-    allIdentities.put("identitiesResults", identitiesResults);
+    allIdentities.put("matchingIdentities", matchingIdentities);
     return allIdentities;
   }
 

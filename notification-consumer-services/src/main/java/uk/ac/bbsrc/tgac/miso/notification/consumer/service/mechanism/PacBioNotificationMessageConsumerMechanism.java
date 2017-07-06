@@ -271,7 +271,7 @@ public class PacBioNotificationMessageConsumerMechanism
                           f.setPlatform(r.getSequencerReference().getPlatform());
                         }
                         log.info("\\_ Created new container with " + f.getPartitions().size() + " partitions");
-                        long flowId = requestManager.saveSequencerPartitionContainer(f);
+                        long flowId = requestManager.saveSequencerPartitionContainer(f).getId();
                         f.setId(flowId);
                         r.addSequencerPartitionContainer(f);
                       }

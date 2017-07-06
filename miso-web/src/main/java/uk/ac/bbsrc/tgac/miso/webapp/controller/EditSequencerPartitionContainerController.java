@@ -151,10 +151,10 @@ public class EditSequencerPartitionContainerController {
           pool.setLastModifier(user);
         }
       }
-      long containerId = containerService.create(container);
+      SequencerPartitionContainer saved = containerService.create(container);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/container/" + containerId;
+      return "redirect:/miso/container/" + saved.getId();
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save container", ex);

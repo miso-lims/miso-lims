@@ -110,7 +110,7 @@ public class EditSubmissionController {
 
   @ModelAttribute("studies")
   public Collection<Study> populateStudies() throws IOException {
-    return studyService.list();
+    return studyService.list(0, 0, true, "id");
   }
 
   @ModelAttribute("samples")

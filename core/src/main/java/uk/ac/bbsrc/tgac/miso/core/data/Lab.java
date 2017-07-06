@@ -46,4 +46,9 @@ public interface Lab extends Serializable {
 
   void setLastUpdated(Date lastUpdated);
 
+  /**
+   * Get custom label for dropdown options
+   */
+  String getItemLabel();
+
 }

@@ -24,7 +24,8 @@
 ListTarget.dilution = {
   name : "Library Dilutions",
   createUrl : function(config, projectId) {
-    return "/miso/rest/librarydilution/dt" + (projectId ? "/project/" + projectId : "");
+    return "/miso/rest/librarydilution/dt" + (projectId
+        ? "/project/" + projectId : "");
   },
   createBulkActions : function(config, projectId) {
     return HotTarget.dilution.bulkActions;
@@ -35,47 +36,41 @@ ListTarget.dilution = {
   createColumns : function(config, projectId) {
     return [
         {
-          "sTitle": "Dilution Name",
-          "mData": "name",
-          "include": true,
-          "iSortPriority": 1,
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/library/" + full.library.id + "\">" + data + "</a>";
+          "sTitle" : "Name",
+          "mData" : "id",
+          "include" : true,
+          "iSortPriority" : 1,
+          "mRender" : function(data, type, full) {
+            return "<a href=\"/miso/library/" + full.library.id + "\">" + full.name + "</a>";
           }
         },
-        {
-          "sTitle": "Parent Library",
-          "mData": "library.alias",
-          "include": true,
-          "iSortPriority": 0,
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/library/" + full.library.id + "\">" + data + "</a>";
-          }
-        },
-        {
-          "sTitle": "Creator",
-          "mData": "dilutionUserName" ,
-          "include": true,
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Creation Date",
-          "mData": "creationDate",
-          "include": true,
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Platform",
-          "mData": "library.platformType",
-          "include": true,
-          "iSortPriority": 0
-        },
-        {
-          "sTitle": "Concentration",
-          "mData": "concentration",
-          "include": true,
-          "iSortPriority": 0
-        }
-      ];
-    }
+        ListUtils.idHyperlinkColumn("Library Name", "library", "library.id",
+            function(dilution) {
+              return dilution.library.name;
+            }, 0),
+        ListUtils.labelHyperlinkColumn("Library Alias", "library", function(
+            dilution) {
+          return dilution.library.id;
+        }, "library.alias", 0), {
+          "sTitle" : "Creator",
+          "mData" : "dilutionUserName",
+          "include" : true,
+          "iSortPriority" : 0
+        }, {
+          "sTitle" : "Creation Date",
+          "mData" : "creationDate",
+          "include" : true,
+          "iSortPriority" : 0
+        }, {
+          "sTitle" : "Platform",
+          "mData" : "library.platformType",
+          "include" : true,
+          "iSortPriority" : 0
+        }, {
+          "sTitle" : "Concentration",
+          "mData" : "concentration",
+          "include" : true,
+          "iSortPriority" : 0
+        } ];
+  }
 };

@@ -42,15 +42,13 @@ public class HibernateSequencerPartitionContainerDao
   }
 
   @Override
-  public long save(SequencerPartitionContainer spc) throws IOException {
-    long id;
+  public SequencerPartitionContainer save(SequencerPartitionContainer spc) throws IOException {
     if (spc.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
-      id = (Long) currentSession().save(spc);
+      currentSession().save(spc);
     } else {
       currentSession().update(spc);
-      id = spc.getId();
     }
-    return id;
+    return spc;
   }
 
   @Override
@@ -59,7 +57,7 @@ public class HibernateSequencerPartitionContainerDao
   }
 
   @Override
-  public Collection<SequencerPartitionContainer> listAll() throws IOException {
+  public List<SequencerPartitionContainer> listAll() throws IOException {
     Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
     @SuppressWarnings("unchecked")
     List<SequencerPartitionContainer> results = criteria.list();

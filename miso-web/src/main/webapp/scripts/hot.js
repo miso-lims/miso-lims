@@ -2,19 +2,27 @@
  * Module for Handsontable code which is shared between multiple instances
  */
 var HotUtils = {
+  /** Request counter for AJAX calls */
+  counter : 0,
+  serverErrors : [],
+  
   validator : {
     /**
-     * Custom validator for fields that must contain data
+     * Custom validator for text fields that must contain data
      */
     requiredText : function(value, callback) {
       return callback(!Utils.validation.isEmpty(value));
     },
     
     /**
-     * Custom validator for fields that may remain empty
+     * Custom validator for dropdown fields that may remain empty
      */
-    permitEmpty : function(value, callback) {
-      return callback(true);
+    permitEmptyDropdown : function(value, callback) {
+      if (Utils.validation.isEmpty(value)) {
+        return callback(true);
+      } else {
+        return Handsontable.AutocompleteValidator.call(this, value, callback)
+      }
     },
     
     /**
@@ -39,6 +47,11 @@ var HotUtils = {
       return callback(!Utils.validation.isEmpty(value) && Utils.validation
           .hasNoSpecialChars(value));
     },
+    
+    /**
+     * Custom validator for text fields that fails on empty or extra-special
+     * characters, but passes if text is empty
+     */
     optionalTextNoSpecialChars : function(value, callback) {
       return callback(Utils.validation.isEmpty(value) || Utils.validation
           .hasNoSpecialChars(value))
@@ -51,6 +64,18 @@ var HotUtils = {
       var regex = new RegExp(Utils.validation.alphanumRegex);
       return callback(Utils.validation.isEmpty(value) || regex.test(value));
     },
+    
+    /**
+     * Custom validator for dropdown fields that fail on empty or if the value
+     * is not a member of the source array
+     */
+    requiredAutocomplete : function(value, callback) {
+      if (Utils.validation.isEmpty(value)) {
+        callback(false);
+      } else {
+        Handsontable.AutocompleteValidator.call(this, value, callback);
+      }
+    }
   },
   /**
    * Create a Handsontables for our data. This involves a “target” that knows
@@ -90,10 +115,11 @@ var HotUtils = {
           debug : true,
           fixedColumnsLeft : 1,
           manualColumnResize : true,
-          rowHeaders : true,
+          rowHeaders : false,
           colHeaders : columns.map(function(c) {
             return c.header;
           }),
+          preventOverflow : 'horizontal',
           contextMenu : false,
           columns : columns,
           data : flatObjects,
@@ -240,8 +266,10 @@ var HotUtils = {
     cellMetaData.forEach(function(data) {
       table.setCellMeta(data.row, data.col, data.key, data.val);
     });
+    var initialSetup = true;
     table.addHook('afterChange', function(changes, source) {
       var needsRender = false;
+      var synchronous = true;
       // 'changes' is a variable-length array of arrays. Each inner array has
       // the following structure:
       // [rowIndex, colName, oldValue, newValue]
@@ -257,20 +285,36 @@ var HotUtils = {
           return column.depends == changes[i][1];
         }).forEach(
             function(column) {
-              var flat = flatObjects[changes[i][0]];
-              var obj = data[changes[i][0]];
+              var currentChange = changes[i];
+              var flat = flatObjects[currentChange[0]];
+              var obj = data[currentChange[0]];
               flat[column.data] = '';
-              column.update(obj, flat, changes[i][3], function(readOnly) {
-                table.setCellMeta(changes[i][0], column.hotIndex, 'readOnly',
-                    readOnly);
+              column.update(obj, flat, currentChange[3], function(readOnly) {
+                table.setCellMeta(currentChange[0], column.hotIndex,
+                    'readOnly', readOnly);
                 needsRender = true;
-              }, function(values) {
-                table.setCellMeta(changes[i][0], column.hotIndex, 'source',
-                    values);
-                needsRender = true;
+              }, function(optionsObj) {
+                for (prop in optionsObj) {
+                  if (optionsObj.hasOwnProperty(prop)) {
+                    table.setCellMeta(currentChange[0], column.hotIndex, prop,
+                        optionsObj[prop]);
+                    needsRender = true;
+                  }
+                }
+                if (needsRender && !synchronous && !initialSetup) {
+                  table.validateCells(function() {
+                    table.render();
+                  })
+                }
               }, function(value) {
-                flatObjects[changes[i][0]][column.data] = value;
+                flatObjects[currentChange[0]][column.data] = value;
                 needsRender = true;
+                
+                if (needsRender && !synchronous && !initialSetup) {
+                  table.validateCells(function() {
+                    table.render();
+                  })
+                }
               });
             });
       }
@@ -280,6 +324,7 @@ var HotUtils = {
           table.render();
         });
       }
+      synchronous = false;
     });
     
     // For cells that have change notifiers, we have to call them to set up the
@@ -293,9 +338,13 @@ var HotUtils = {
         column.update(obj, flat, flat[column.depends], function(readOnly) {
           table.setCellMeta(i, column.hotIndex, 'readOnly', readOnly);
           needsRender = true;
-        }, function(values) {
-          table.setCellMeta(i, column.hotIndex, 'source', values);
-          needsRender = true;
+        }, function(optionsObj) {
+          for (prop in optionsObj) {
+            if (optionsObj.hasOwnProperty(prop)) {
+              table.setCellMeta(i, column.hotIndex, prop, optionsObj[prop]);
+              needsRender = true;
+            }
+          }
         }, function(value) {
           // Ignore any attempts to change the data thus far.
         });
@@ -307,6 +356,8 @@ var HotUtils = {
         .addEventListener(
             'click',
             function() {
+              // reset server error messages
+              HotUtils.serverErrors = [];
               // We are now saving the contents of the table. This can be called
               // multiple times if the save was unsuccessful
               var failed = [];
@@ -314,30 +365,39 @@ var HotUtils = {
               // This is called when there might be errors to display on the
               // page.
               function renderErrors() {
-                var saveErrorClasses = document.getElementById('saveErrors').classList;
+                var errorClasses = document.getElementById('errors').classList;
                 
                 if (failed.length) {
-                  var errorMessages = document.getElementById('errorMessages');
-                  errorMessages.innerHTML = '<ul>' + failed.map(function(msg) {
-                    return '<li>' + msg + '</li>';
-                  }).join('') + '</ul>';
                   
-                  saveErrorClasses.remove('hidden');
+                  var saveErrorMessages = document.getElementById('saveErrors');
+                  if (!document.getElementById('failedToSave')) {
+                    // add "failed to save" if not already present
+                    var failedToSave = document.createElement('P');
+                    failedToSave.id = 'failedToSave';
+                    failedToSave.innerText = 'The following rows failed to save:';
+                    saveErrorMessages.parentNode.insertBefore(failedToSave,
+                        saveErrorMessages);
+                  }
+                  saveErrorMessages.innerHTML = '<ul>' + failed.map(
+                      function(msg) {
+                        return '<li>' + msg + '</li>';
+                      }).join('') + '</ul>';
+                  errorClasses.remove('hidden');
                 } else {
-                  if (!saveErrorClasses.contains('hidden')) {
-                    saveErrorClasses.add('hidden');
+                  if (!errorClasses.contains('hidden')) {
+                    errorClasses.add('hidden');
                   }
                 }
               }
               
-              function toFlatObj(item) {
-                var flatObj = {};
+              function updateFlatObjAfterSave(flatObj, item) {
                 columns.forEach(function(c, colIndex) {
-                  c.unpack(item, flatObj, function(key, val) {
-                    // Do nothing. We're unpacking only - not setting cell meta
-                  });
+                  if (c.unpackAfterSave) {
+                    c.unpack(item, flatObj, function(key, val) {
+                      // Do nothing. We're unpacking only - not setting cell meta
+                    });
+                  }
                 });
-                return flatObj;
               }
               
               save.disabled = true;
@@ -362,7 +422,7 @@ var HotUtils = {
                       };
                       columns.forEach(function(c) {
                         c.pack(data[i], flatObjects[i], function(errorMessage) {
-                          table.setCellMeta(i, c.holIndex, 'valid', false);
+                          table.setCellMeta(i, c.hotIndex, 'valid', false);
                           errorHandler(errorMessage);
                         });
                       });
@@ -398,22 +458,27 @@ var HotUtils = {
                           if (allSaved) {
                             var bulkActionsDiv = document
                                 .getElementById('bulkactions');
-                            var ids = data.map(Utils.array.getId);
-                            target.bulkActions
-                                .forEach(function(bulkAction) {
-                                  var link = document.createElement('A');
-                                  link.href = '#';
-                                  link.setAttribute('class',
-                                      'ui-button ui-state-default');
-                                  link.setAttribute('title',
-                                      bulkAction.title || '');
-                                  link.onclick = function() {
-                                    bulkAction.action(ids);
-                                  };
-                                  link.appendChild(document
-                                      .createTextNode(bulkAction.name));
-                                  bulkActionsDiv.append(link);
-                                });
+                            target.bulkActions.forEach(function(bulkAction) {
+                              var button;
+                              if (bulkAction) {
+                                button = document.createElement('A');
+                                button.href = '#';
+                                button.setAttribute('class',
+                                    'ui-button ui-state-default');
+                                button.setAttribute('title',
+                                    bulkAction.title || '');
+                                button.onclick = function() {
+                                  bulkAction.action(data);
+                                };
+                                button.appendChild(document
+                                    .createTextNode(bulkAction.name));
+                              } else {
+                                button = document.createElement('SPAN');
+                                button
+                                    .setAttribute('class', 'ui-state-default');
+                              }
+                              bulkActionsDiv.append(button);
+                            });
                           }
                           saveSuccessesClasses.remove('hidden');
                         } else {
@@ -426,7 +491,7 @@ var HotUtils = {
                         return;
                       }
                       // If this item was previously saved, continue along.
-                      if (data[index].saved) {
+                      if (flatObjects[index].saved) {
                         invokeNext(index + 1);
                         return;
                       }
@@ -436,7 +501,7 @@ var HotUtils = {
                         if (xhr.readyState === XMLHttpRequest.DONE) {
                           if (xhr.status === 200 || xhr.status === 201) {
                             data[index] = JSON.parse(xhr.response);
-                            flatObjects[index] = toFlatObj(data[index]);
+                            updateFlatObjAfterSave(flatObjects[index], data[index]);
                             flatObjects[index].saved = true;
                           } else {
                             try {
@@ -459,16 +524,50 @@ var HotUtils = {
                       xhr.send(JSON.stringify(data[index]));
                     };
                     invokeNext(0);
-                    
                   });
             });
     table.validateCells(function() {
       table.render();
+      initialSetup = false;
     });
   },
   
+  showServerErrors : function(response, serverStatus) {
+    var responseText = JSON.parse(response.responseText);
+    var alreadyShown = HotUtils.serverErrors
+        .filter(function(error) {
+          if (error.status == serverStatus && error.message == responseText.detail) {
+            // if it exists, update the number
+            error.rows++;
+            return true;
+          } else {
+            return false;
+          }
+        });
+    if (!alreadyShown.length) {
+      // add this response to the server errors to display
+      HotUtils.serverErrors.push({
+        rows : 1,
+        message : responseText.detail,
+        status : serverStatus
+      });
+    }
+    
+    if (HotUtils.serverErrors.length) {
+      var serverErrorMessages = document.getElementById('serverErrors');
+      
+      serverErrorMessages.innerHTML = '<ul>' + HotUtils.serverErrors
+          .map(
+              function(error) {
+                return '<li>' + error.rows + ' ' + error.status + ' error' + (error.rows == 1
+                    ? '' : 's') + '. ' + error.message + '</li>';
+              }).join('') + '</ul>';
+      
+      document.getElementById('errors').classList.remove('hidden');
+    }
+  },
+  
   makeCellNSAlias : function(setCellMeta) {
-    setCellMeta('validator', HotUtils.validator.requiredTextNoSpecialChars);
     setCellMeta('renderer', function(instance, td, row, col, prop, value,
         cellProperties) {
       Handsontable.renderers.TextRenderer.apply(this, arguments);
@@ -479,22 +578,31 @@ var HotUtils = {
   },
   
   makeColumnForConstantsList : function(headerName, include, flatProperty,
-      modelProperty, id, name, items, baseobj) {
+      modelProperty, id, name, items, required, baseobj, sortFunc) {
+    var labels = items.sort(sortFunc || Utils.array.standardSort(name)).map(
+        function(item) {
+          return item[name];
+        });
+    if (!required)
+      labels.unshift('(None)');
+    if (!baseobj)
+      baseobj = {};
     baseobj.header = headerName;
     baseobj.include = include;
     baseobj.data = flatProperty;
     baseobj.type = 'dropdown';
     baseobj.trimDropdown = false;
-    baseobj.source = items.map(function(item) {
-      return item[name];
-    }).sort();
-    baseobj.validator = HotUtils.validator.requiredText;
-    baseobj.include = include;
+    baseobj.source = labels;
+    /*
+     * if it's not a required field, '(None)' will be present in the list and
+     * selected by default
+     */
+    baseobj.validator = HotUtils.validator.requiredAutocomplete;
     baseobj.unpack = function(obj, flat, setCellMeta) {
       flat[flatProperty] = Utils.array.maybeGetProperty(Utils.array
           .findFirstOrNull(function(item) {
             return item[id] == obj[modelProperty];
-          }, items), name);
+          }, items), name) || (required ? '' : '(None)');
     };
     baseobj.pack = function(obj, flat, errorHandler) {
       obj[modelProperty] = Utils.array.maybeGetProperty(Utils.array
@@ -504,7 +612,7 @@ var HotUtils = {
     };
     return baseobj;
   },
-  
+
   makeColumnForOptionalBoolean : function(headerName, include, property) {
     return {
       header : headerName,
@@ -541,26 +649,89 @@ var HotUtils = {
       'header' : headerName,
       'data' : property,
       'type' : 'numeric',
-      'include' : true,
+      'include' : include,
       'unpack' : function(obj, flat, setCellMeta) {
         flat[property] = obj[property];
       },
-      'validator' : required ? HotUtils.validator.requiredNumber : null,
+      'validator' : required ? HotUtils.validator.requiredNumber
+          : Handsontable.NumericValidator,
       'pack' : function(obj, flat, errorHandler) {
-        var output = null;
-        var raw = flat[property];
-        if (raw) {
-          var result = parseFloat(raw);
-          if (isNaN(result)) {
-            errorHandler(flat.dnaSize + ' is not a number.');
-          } else {
-            output = result;
+        var output;
+        if (Utils.validation.isEmpty(flat[property])) {
+          if (required) {
+            errorHandler(headerName + ' is required.');
+            return;
           }
+          output = null;
+        } else {
+          var result = parseFloat(flat[property]);
+          if (isNaN(result)) {
+            errorHandler(headerName + ' is not a number.');
+            return;
+          }
+          output = result;
         }
         obj[property] = output;
       }
     };
   },
+  
+  makeColumnForInt : function(headerName, include, property, validator) {
+    return {
+      'header' : headerName,
+      'data' : property,
+      'type' : 'numeric',
+      'include' : include,
+      'validator' : validator,
+      'unpack' : function(obj, flat, setCellMeta) {
+        flat[property] = obj[property];
+      },
+      'pack' : function(obj, flat, errorHandler) {
+        if (!Utils.validation.isEmpty(flat[property])) {
+          obj[property] = flat[property];
+        } else {
+          obj[property] = null;
+        }
+      }
+    }
+  },
+  
+  makeColumnForText : function(headerName, include, property, baseobj) {
+    baseobj.header = headerName;
+    baseobj.data = property;
+    baseobj.type = 'text';
+    baseobj.include = include;
+    baseobj.unpack = function(obj, flat, setCellMeta) {
+      flat[property] = obj[property];
+    };
+    baseobj.pack = function(obj, flat, errorHandler) {
+      if (!Utils.validation.isEmpty(flat[property])) {
+        obj[property] = flat[property];
+      } else {
+        obj[property] = undefined;
+      }
+    };
+    return baseobj;
+  },
+  
+  makeColumnForEnum : function(headerName, include, required, property, source, defaultValue) {
+    return {
+      'header' : headerName,
+      'data' : property,
+      'type' : 'dropdown',
+      'trimDropdown' : false,
+      'source' : source,
+      'include' : include,
+      'validator' : (required ? HotUtils.validator.requiredAutocomplete
+          : Handsontable.AutocompleteValidator),
+      'unpack' : function(obj, flat, setCellMeta) {
+        flat[property] = obj[property] || defaultValue;
+      },
+      'pack' : function(obj, flat, errorHandler) {
+        obj[property] = flat[property];
+      }
+    }
+  }
 
 };
 

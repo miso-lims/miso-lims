@@ -95,7 +95,7 @@
     </c:choose>
   </div>
   <div class="barcodeArea ui-corner-all">
-    <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
+    <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Barcode</span>
     <c:if test="${box.id != 0}">
 	    <ul class="barcode-ddm">
 	      <li>

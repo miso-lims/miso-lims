@@ -19,9 +19,11 @@ public interface ContainerService extends PaginatedDataSource<SequencerPartition
 
   Collection<SequencerPartitionContainer> listByBarcode(String barcode) throws IOException;
 
-  Long create(SequencerPartitionContainer container) throws IOException;
+  SequencerPartitionContainer save(SequencerPartitionContainer container) throws IOException;
 
-  void update(SequencerPartitionContainer container) throws IOException;
+  SequencerPartitionContainer create(SequencerPartitionContainer container) throws IOException;
+
+  SequencerPartitionContainer update(SequencerPartitionContainer container) throws IOException;
 
   void delete(Long containerId) throws IOException;
 

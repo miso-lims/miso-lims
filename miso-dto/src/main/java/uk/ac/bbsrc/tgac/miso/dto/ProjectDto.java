@@ -4,6 +4,7 @@ public class ProjectDto {
   private long id;
   private String alias;
   private String name;
+  private String shortName;
 
   public long getId() {
     return id;
@@ -27,5 +28,13 @@ public class ProjectDto {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getShortName() {
+    return shortName;
+  }
+
+  public void setShortName(String shortName) {
+    this.shortName = shortName;
   }
 }

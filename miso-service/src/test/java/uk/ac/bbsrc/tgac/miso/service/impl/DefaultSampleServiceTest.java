@@ -27,7 +27,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -35,7 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -225,9 +225,9 @@ public class DefaultSampleServiceTest {
 
   @Test
   public void testCreateDetailedSampleExistingParentById() throws Exception {
-    Identity parent = makeParentIdentityWithLookup();
+    SampleIdentity parent = makeParentIdentityWithLookup();
     SampleTissue child = makeUnsavedChildTissue();
-    child.setParent(new IdentityImpl());
+    child.setParent(new SampleIdentityImpl());
     child.getParent().setId(parent.getId());
 
     Long newId = 89L;
@@ -251,10 +251,10 @@ public class DefaultSampleServiceTest {
 
   @Test
   public void testCreateDetailedSampleExistingParentByExternalName() throws Exception {
-    Identity parent = makeParentIdentityWithLookup();
+    SampleIdentity parent = makeParentIdentityWithLookup();
     SampleTissue child = makeUnsavedChildTissue();
 
-    Identity shellParent = new IdentityImpl();
+    SampleIdentity shellParent = new SampleIdentityImpl();
     shellParent.setExternalName(parent.getExternalName());
     shellParent.setSecurityProfile(parent.getSecurityProfile());
     shellParent.getSecurityProfile().setOwner(mockUser());
@@ -287,7 +287,7 @@ public class DefaultSampleServiceTest {
     SampleTissue sample = new SampleTissueImpl();
     sample.setSampleClass(new SampleClassImpl());
     sample.getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
-    Mockito.when(sampleClassService.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
+    Mockito.when(sampleClassService.listByCategory(Mockito.eq(SampleIdentity.CATEGORY_NAME)))
         .thenReturn(Lists.newArrayList(sample.getSampleClass()));
     exception.expect(IllegalArgumentException.class);
     sut.create(sample);
@@ -296,7 +296,7 @@ public class DefaultSampleServiceTest {
   @Test
   public void testCreateDetailedSampleNoParent() throws Exception {
     SampleTissue sample = makeUnsavedChildTissue();
-    Identity fakeParent = new IdentityImpl();
+    SampleIdentity fakeParent = new SampleIdentityImpl();
     fakeParent.setExternalName("non-existing");
     fakeParent.setSecurityProfile(new SecurityProfile(mockUser()));
     fakeParent.getSecurityProfile().setOwner(mockUser());
@@ -306,7 +306,7 @@ public class DefaultSampleServiceTest {
 
     // because of mocked dao, we can't actually continue with the same parent sample that should be created, but the partial
     // parent sample that gets created is caught and examined below
-    Identity parent = makeParentIdentityWithLookup();
+    SampleIdentity parent = makeParentIdentityWithLookup();
     Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(parent.getId());
     mockValidRelationship(parent.getSampleClass(), sample.getSampleClass());
 
@@ -336,10 +336,10 @@ public class DefaultSampleServiceTest {
 
   @Test
   public void testCreateDetailedSampleNoTissue() throws Exception {
-    Identity identity = makeParentIdentityWithLookup();
+    SampleIdentity identity = makeParentIdentityWithLookup();
     SampleTissue tissue = makeUnsavedParentTissue();
 
-    Identity shellIdentity = new IdentityImpl();
+    SampleIdentity shellIdentity = new SampleIdentityImpl();
     shellIdentity.setExternalName(identity.getExternalName());
     shellIdentity.setId(identity.getId());
     tissue.setParent(shellIdentity);
@@ -365,19 +365,19 @@ public class DefaultSampleServiceTest {
 
   @Test
   public void testCreateDetailedSampleNoTissueOrIdentity() throws Exception {
-    Identity identity = makeUnsavedParentIdentity();
-    Mockito.when(sampleClassService.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
+    SampleIdentity identity = makeUnsavedParentIdentity();
+    Mockito.when(sampleClassService.listByCategory(Mockito.eq(SampleIdentity.CATEGORY_NAME)))
         .thenReturn(Lists.newArrayList(identity.getSampleClass()));
     SampleTissue tissue = makeUnsavedParentTissue();
 
-    Identity shellIdentity = new IdentityImpl();
+    SampleIdentity shellIdentity = new SampleIdentityImpl();
     shellIdentity.setExternalName(identity.getExternalName());
     tissue.setParent(shellIdentity);
 
     SampleStock analyte = makeUnsavedChildStock();
     analyte.setParent(tissue);
 
-    Identity identityPostCreate = makeUnsavedParentIdentity();
+    SampleIdentity identityPostCreate = makeUnsavedParentIdentity();
     identityPostCreate.setId(39L);
     Mockito.when(sampleDao.addSample(Mockito.any(Sample.class))).thenReturn(identityPostCreate.getId());
     Mockito.when(sampleDao.getSample(39L)).thenReturn(identityPostCreate);
@@ -449,8 +449,8 @@ public class DefaultSampleServiceTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     project.setReferenceGenome(humanReferenceGenome());
-    Set<Identity> idList = new HashSet<>();
-    Identity id1 = new IdentityImpl();
+    Set<SampleIdentity> idList = new HashSet<>();
+    SampleIdentity id1 = new SampleIdentityImpl();
     id1.setExternalName("String1,String2");
     id1.setProject(project);
     idList.add(id1);
@@ -465,8 +465,8 @@ public class DefaultSampleServiceTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     project.setReferenceGenome(humanReferenceGenome());
-    Set<Identity> idList = new HashSet<>();
-    Identity id1 = new IdentityImpl();
+    Set<SampleIdentity> idList = new HashSet<>();
+    SampleIdentity id1 = new SampleIdentityImpl();
     id1.setExternalName("String1,String2");
     id1.setProject(project);
     idList.add(id1);
@@ -482,8 +482,8 @@ public class DefaultSampleServiceTest {
     Project project = new ProjectImpl();
     project.setId(1L);
     project.setReferenceGenome(humanReferenceGenome());
-    Set<Identity> idList = new HashSet<>();
-    Identity id1 = new IdentityImpl();
+    Set<SampleIdentity> idList = new HashSet<>();
+    SampleIdentity id1 = new SampleIdentityImpl();
     id1.setExternalName("String1,String2");
     id1.setProject(project);
     idList.add(id1);
@@ -550,21 +550,21 @@ public class DefaultSampleServiceTest {
     return sample;
   }
 
-  private Identity makeParentIdentityWithLookup() throws IOException {
-    Identity sample = makeUnsavedParentIdentity();
+  private SampleIdentity makeParentIdentityWithLookup() throws IOException {
+    SampleIdentity sample = makeUnsavedParentIdentity();
     Mockito.when(sampleDao.getSample(sample.getId())).thenReturn(sample);
-    Mockito.when(sampleClassService.listByCategory(Mockito.eq(Identity.CATEGORY_NAME)))
+    Mockito.when(sampleClassService.listByCategory(Mockito.eq(SampleIdentity.CATEGORY_NAME)))
         .thenReturn(Lists.newArrayList(sample.getSampleClass()));
     return sample;
   }
 
-  private Identity makeUnsavedParentIdentity() throws IOException {
-    Identity sample = new IdentityImpl();
+  private SampleIdentity makeUnsavedParentIdentity() throws IOException {
+    SampleIdentity sample = new SampleIdentityImpl();
     sample.setId(63L);
     sample.setSampleClass(new SampleClassImpl());
     sample.getSampleClass().setId(51L);
     sample.getSampleClass().setAlias("identity");
-    sample.getSampleClass().setSampleCategory(Identity.CATEGORY_NAME);
+    sample.getSampleClass().setSampleCategory(SampleIdentity.CATEGORY_NAME);
     sample.setExternalName("external");
     sample.setSecurityProfile(new SecurityProfile(mockUser()));
     sample.getSecurityProfile().setOwner(mockUser());

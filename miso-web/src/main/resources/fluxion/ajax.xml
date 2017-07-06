@@ -55,9 +55,6 @@
   <bean id="statsControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.StatsControllerHelperService">
   </bean>
 
-  <bean id="studyControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.StudyControllerHelperService">
-  </bean>
-
   <bean id="sampleControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.SampleControllerHelperService">
   </bean>
 

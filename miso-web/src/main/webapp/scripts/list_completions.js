@@ -43,29 +43,30 @@ ListTarget.completion = {
       });
     }
     return [
-        {
-          "sTitle" : "Name",
-          "mData" : "pool.id",
-          "mRender" : function(data, type, full) {
-            return "<a href=\"/miso/pool/" + data + "\">" + full.pool.name + "</a>";
-          },
-          "iSortPriority" : 1,
-          "include" : !config.poolId
-        },
-        {
-          "sTitle" : "Alias",
-          "mData" : "pool.alias",
-          "mRender" : function(data, type, full) {
-            return "<a href=\"/miso/pool/" + full.pool.id + "\">" + data + "</a>";
-          },
+        ListUtils.idHyperlinkColumn("Name", "pool", "pool.id", function(
+            completion) {
+          return completion.pool.name;
+        }, 1),
+        ListUtils.labelHyperlinkColumn("Alias", "pool", function(completion) {
+          return completion.pool.id;
+        }, "pool.alias", 0), {
+          "sTitle" : "Description",
+          "mData" : "pool.description",
+          "bSortable" : false,
           "iSortPriority" : 0,
-          "include" : !config.poolId
+          "include" : true
         }, {
           "sTitle" : "Platform",
           "mData" : "parameters.platform.instrumentModel",
           "bSortable" : false,
           "iSortPriority" : 0,
           "include" : true
+        }, {
+          "sTitle" : "Longest Index",
+          "mData" : "pool.longestIndex",
+          "bSortable" : false,
+          "iSortPriority" : 0,
+          "include" : !config.poolId
         }, {
           "sTitle" : "Sequencing Parameters",
           "mData" : "parameters.name",

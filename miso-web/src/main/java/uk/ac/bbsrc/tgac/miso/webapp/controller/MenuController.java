@@ -55,11 +55,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
@@ -71,16 +73,24 @@ import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
+import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
+import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
+import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
+import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -98,12 +108,19 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private IndexService indexService;
   @Autowired
+  private LabService labService;
+  @Autowired
   private SampleClassService sampleClassService;
   @Autowired
   private DetailedQcStatusService detailedQcStatusService;
   @Autowired
   private StainService stainService;
-
+  @Autowired
+  private TissueMaterialService tissueMaterialService;
+  @Autowired
+  private TissueOriginService tissueOriginService;
+  @Autowired
+  private TissueTypeService tissueTypeService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -116,14 +133,21 @@ public class MenuController implements ServletContextAware {
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
   private SubprojectService subprojectService;
-
+  @Autowired
+  private SampleService sampleService;
   @Autowired
   private SampleGroupService sampleGroupService;
   @Autowired
+  private SamplePurposeService samplePurposeService;
+  @Autowired
+  private SequencingParametersService sequencingParametersService;
+  @Autowired
   private TargetedSequencingService targetedSequencingService;
-
   @Autowired
   private BoxService boxService;
+
+  @Autowired
+  private StudyService studyService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -276,16 +300,26 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "subprojects", subprojectService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "labs", labService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "tissueOrigins", tissueOriginService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "tissueTypes", tissueTypeService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "tissueMaterials", tissueMaterialService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "stains", stainService.list(), Dtos::asDto);
     createArray(mapper, baseUri, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "samplePurposes", samplePurposeService.getAll(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "sequencingParameters", sequencingParametersService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "printerBackends", Arrays.asList(Backend.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "printerDrivers", Arrays.asList(Driver.values()), Dtos::asDto);
     createArray(mapper, baseUri, node, "boxSizes", boxService.listSizes(), Function.identity());
     createArray(mapper, baseUri, node, "boxUses", boxService.listUses(), Function.identity());
+    createArray(mapper, baseUri, node, "studyTypes", studyService.listTypes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "sampleCategories", EditSampleController.CATEGORIES, Function.identity());
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);
     createArray(mapper, baseUri, node, "indexFamilies", indexFamilies, Dtos::asDto);
+    createArray(mapper, baseUri, node, "sampleQcTypes", sampleService.listSampleQcTypes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "libraryQcTypes", libraryService.listLibraryQcTypes(), Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");
     Collection<PlatformType> activePlatformTypes = platformService.listActivePlatformTypes();
@@ -297,6 +331,18 @@ public class MenuController implements ServletContextAware {
       dto.put("libraryConcentrationUnits", platformType.getLibraryConcentrationUnits());
       dto.put("active", activePlatformTypes.contains(platformType));
       dto.put("partitionName", platformType.getPartitionName());
+    }
+    ArrayNode sampleTypes = node.putArray("sampleTypes");
+    for (String sampleType : sampleService.listSampleTypes()) {
+      sampleTypes.add(sampleType);
+    }
+    ArrayNode donorSexes = node.putArray("donorSexes");
+    for (String label : DonorSex.getLabels()) {
+      donorSexes.add(label);
+    }
+    ArrayNode strStatuses = node.putArray("strStatuses");
+    for (String label : StrStatus.getLabels()) {
+      strStatuses.add(label);
     }
 
     // Save the regenerated file in cache. This has a race condition where multiple concurrent requests could results in regenerating this

@@ -31,8 +31,7 @@ ListTarget.pool = {
     }
   },
   createBulkActions : function(config, projectId) {
-    // TODO return HotTarget.pool.bulkActions;
-    return [];
+    return HotTarget.pool.bulkActions;
   },
   createStaticActions : function(config, prodjectId) {
     return [ {
@@ -44,24 +43,10 @@ ListTarget.pool = {
   },
   createColumns : function(config, projectId) {
     return [
-        {
-          "sTitle" : "Name",
-          "mData" : "id",
-          "mRender" : function(data, type, full) {
-            return "<a href=\"/miso/pool/" + data + "\">" + full.name + "</a>";
-          },
-          "include" : true,
-          "iSortPriority" : 1
-        },
-        {
-          "sTitle" : "Alias",
-          "mData" : "alias",
-          "mRender" : function(data, type, full) {
-            return "<a href=\"/miso/pool/" + full.id + "\">" + data + "</a>";
-          },
-          "include" : true,
-          "iSortPriority" : 0
-        },
+        ListUtils.idHyperlinkColumn("Name", "pool", "id", Utils.array.getName,
+            1),
+        ListUtils.labelHyperlinkColumn("Alias", "pool", Utils.array.getId,
+            "alias", 0),
         {
           "sTitle" : "Description",
           "mData" : "description",

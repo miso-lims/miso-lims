@@ -26,7 +26,7 @@ public class PoolDto implements WritableUrls {
   private boolean discarded;
   private Double volume;
   private String platformType;
-
+  private int longestIndex;
 
   public String getAlias() {
     return alias;
@@ -182,5 +182,13 @@ public class PoolDto implements WritableUrls {
 
   public void setPlatformType(String platformType) {
     this.platformType = platformType;
+  }
+
+  public int getLongestIndex() {
+    return longestIndex;
+  }
+
+  public void setLongestIndex(int longestIndex) {
+    this.longestIndex = longestIndex;
   }
 }

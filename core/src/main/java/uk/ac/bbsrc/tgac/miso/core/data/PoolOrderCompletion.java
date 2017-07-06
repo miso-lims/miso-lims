@@ -10,6 +10,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
@@ -20,6 +21,9 @@ import javax.persistence.MapKeyEnumerated;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion.PoolOrderCompletionId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -63,6 +67,30 @@ public class PoolOrderCompletion implements Serializable {
       this.pool = pool;
     }
 
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+      result = prime * result + ((pool == null) ? 0 : pool.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (obj == null) return false;
+      if (getClass() != obj.getClass()) return false;
+      PoolOrderCompletionId other = (PoolOrderCompletionId) obj;
+      if (parameters == null) {
+        if (other.parameters != null) return false;
+      } else if (!parameters.equals(other.parameters)) return false;
+      if (pool == null) {
+        if (other.pool != null) return false;
+      } else if (!pool.equals(other.pool)) return false;
+      return true;
+    }
+
   }
 
   private static final long serialVersionUID = 1L;
@@ -72,13 +100,14 @@ public class PoolOrderCompletion implements Serializable {
   @Id
   private SequencingParameters parameters;
 
-  @ElementCollection(targetClass = Integer.class)
+  @ElementCollection(targetClass = Integer.class, fetch = FetchType.EAGER)
   @CollectionTable(name = "OrderCompletion_Items", joinColumns = { @JoinColumn(name = "poolId", referencedColumnName = "poolId"),
       @JoinColumn(name = "parametersId", referencedColumnName = "parametersId") })
   @Column(name = "num_partitions")
   @MapKeyClass(HealthType.class)
   @MapKeyColumn(name = "health", unique = true)
   @MapKeyEnumerated(EnumType.STRING)
+  @Fetch(FetchMode.SUBSELECT)
   private Map<HealthType, Integer> items;
 
   @Temporal(TemporalType.TIMESTAMP)

@@ -144,6 +144,7 @@
 </script>
 
 <div id="printServiceSelectDialog" title="Select a Printer"></div>
+<div id="dialog"></div>
 
 <div id="projectoverviews">
 <c:if test="${project.id != 0}">
@@ -539,74 +540,21 @@
 <br/>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#studies_arrowclick'), 'studiesdiv');">
-  ${fn:length(project.studies)} Studies
+  Studies
   <div id="studies_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="studiesdiv" style="display:none;">
-  <h1>${fn:length(project.studies)} Studies</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('studymenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="studymenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <a href='<c:url value="/miso/study/new/${project.id}"/> '>Add new Study</a>
-        <a href='<c:url value="/miso/experimentwizard/new/${project.id}"/> '>Create Experiments</a>
-        <a href='<c:url value="/miso/poolwizard/new/${project.id}"/> '>Create Pools</a>
-      </div>
-    </li>
-  </ul>
+  <h1>Studies</h1>
   <div style="clear:both">
     <table class="list" id="study_table">
-      <thead>
-      <tr>
-        <th>Study Name</th>
-        <th>Study Alias</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${project.studies}" var="study">
-        <tr studyId="${study.id}" onMouseOver="this.className='highlightrow'"
-            onMouseOut="this.className='normalrow'">
-          <td><b><a href="<c:url value='/miso/study/${study.id}'/>">${study.name}</a></b></td>
-          <td><a href="<c:url value='/miso/study/${study.id}'/>">${study.alias}</a></td>
-
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Study.deleteStudy(${study.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"></span>
-            </td>
-          </sec:authorize>
-        </tr>
-      </c:forEach>
-      </tbody>
     </table>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#study_table').dataTable({
-          "aaSorting": [
-            [1, 'asc']
-          ],
-          "aoColumns": [
-            null,
-            { "sType": 'natural' }
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true,
-          "sPaginationType": "full_numbers",
-          "fnDrawCallback": function (oSettings) {
-            jQuery('#study_table_paginate').find('.fg-button').addClass('dataTables_paginate_numbers').removeClass('fg-button ui-button');
-          }
-        });
-      });
-    </script>
   </div>
 </div>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    ListUtils.createTable('study_table', ListTarget.study, ${project.id}, { "isAdmin" : ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')} });
+  });
+</script>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_arrowclick'), 'samplesdiv');">
   Samples
@@ -616,32 +564,6 @@
 
   <div id="sampletabs">
     <h1>Samples</h1>
-    <ul class="sddm">
-      <li>
-        <a onmouseover="mopen('samplemenu')" onmouseout="mclosetime()">Options
-          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-        </a>
-
-        <div id="samplemenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-          <a href='<c:url value="/miso/sample/new/${project.id}#tab-2"/>'>Add Samples</a>
-          <a href="javascript:void(0);" onclick="getBulkSampleInputForm(${project.id});">Get Bulk Sample Input Form</a>
-          <a href="javascript:void(0);" onclick="Project.ui.uploadBulkSampleInputForm();">Import Bulk Sample Input Form</a>
-          <c:if test="${not empty project.samples}">
-            <hr>
-            <a href='<c:url value="/miso/importexport/exportsamplesheet"/>'>Export Sample QC Sheet</a>
-            <a href='<c:url value="/miso/importexport/importsamplesheet"/>'>Import Sample QC Sheet</a>
-            <hr>
-            <a href="javascript:void(0);" onclick="Project.ui.processSampleDeliveryForm(${project.id}, false);">Get Information Form (Tubes)</a>
-            <a href="javascript:void(0);" onclick="Project.ui.processSampleDeliveryForm(${project.id}, true);">Get Information Form (Plate)</a>
-            <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm();">Import Information Form</a>
-           <hr>
-            <a href="javascript:void(0);" onclick="Project.ui.receiveSelectedSamples();">Receive Samples</a>
-            <a href='<c:url value="/miso/importexport/importlibrarypoolsheet"/>'>Import Library Sheet</a>
-            <a href="javascript:void(0);" onclick="Project.barcode.printSelectedSampleBarcodes();">Print Barcodes ...</a>
-          </c:if>
-        </div>
-      </li>
-    </ul>
 
     <div style="clear:both">
       <div id="deliveryformdiv" class="simplebox" style="display:none;">
@@ -698,7 +620,7 @@
 </div>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-  Project.ui.createSampleTable(${project.id});
+  ListUtils.createTable('sample_table', ListTarget.sample, ${project.id}, {});
   });
 </script>
 

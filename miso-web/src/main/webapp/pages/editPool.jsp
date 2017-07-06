@@ -391,7 +391,7 @@
   <table class="display no-border" id="edit-order-table"></table>
 
   <br/>
-  <h1>Order Completion</h1>
+  <h1>Order Status</h1>
   <table class="display no-border" id="order-completion-table"></table>
 </div>
   <br/>

@@ -76,7 +76,26 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
 
   @Override
   public String propertyForSortColumn(String original) {
+    switch (original) {
+    case "id":
+      return "dilutionId";
+    case "name":
+      return "dilutionName";
+    case "library.id":
+      return "libraryId";
+    case "library.alias":
+      return "libraryAlias";
+    case "dilutionUserName":
+      return "creatorName";
+    case "creationDate":
+      return "created";
+    case "library.platformType":
+      return "platformType";
+    case "concentration":
+      return "dilutionConcentration";
+    default:
     return original;
+    }
   }
 
   @Override

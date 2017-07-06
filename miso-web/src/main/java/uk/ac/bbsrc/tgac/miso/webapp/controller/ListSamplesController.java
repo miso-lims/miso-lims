@@ -29,8 +29,8 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,6 +39,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 /**
  * com.eaglegenomics.miso.web
@@ -59,14 +60,6 @@ public class ListSamplesController {
     this.sampleService = sampleService;
   }
 
-  @Value("${miso.detailed.sample.enabled}")
-  private Boolean detailedSample;
-  
-  @ModelAttribute("detailedSample")
-  public Boolean isDetailedSampleEnabled() {
-    return detailedSample;
-  }
-
   @ModelAttribute("title")
   public String title() {
     return "Samples";
@@ -78,7 +71,7 @@ public class ListSamplesController {
   }
 
   @RequestMapping("/samples")
-  public ModelAndView listSamples() throws Exception {
-    return new ModelAndView("/pages/listSamples.jsp");
+  public ModelAndView listSamples(ModelMap model) throws Exception {
+    return new ListItemsPage("sample").list(model);
   }
 }

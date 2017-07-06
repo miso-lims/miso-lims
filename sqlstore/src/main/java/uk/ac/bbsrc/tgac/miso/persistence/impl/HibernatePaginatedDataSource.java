@@ -154,6 +154,8 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     String property = propertyForDate(criteria, type);
     if (property != null) {
       criteria.add(Restrictions.between(property, start, end));
+    } else {
+      errorHandler.accept(getFriendlyName() + " has no " + type.name().toLowerCase() + " date.");
     }
   }
 
@@ -199,7 +201,12 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
   @Override
   default void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq(getProjectColumn(), projectId));
+    String column = getProjectColumn();
+    if (column != null) {
+      criteria.add(Restrictions.eq(column, projectId));
+    } else {
+      errorHandler.accept(getFriendlyName() + " cannot be filtered by project.");
+    }
   }
 
   @Override
@@ -222,6 +229,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     } else {
       errorHandler.accept(getFriendlyName() + " has no " + (creator ? "creator" : "modifier") + ".");
     }
+  }
+
+  @Override
+  default void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " is not archivable.");
   }
 
 }

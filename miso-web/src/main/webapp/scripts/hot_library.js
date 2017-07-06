@@ -59,7 +59,9 @@ HotTarget.library = (function() {
         } else {
           data = '';
         }
-        setOptions(indices);
+        setOptions({
+          'source' : indices
+        });
         setData(data);
       }
     };
@@ -90,8 +92,7 @@ HotTarget.library = (function() {
       }, lib.paired);
       if (Constants.isDetailedSample) {
         // if any members are null, fill them with empty objects otherwise
-        // things
-        // go poorly
+        // things go poorly
         if (!lib.kitDescriptorId) {
           lib.kitDescriptorId = '';
           lib.kitDescriptorName = '';
@@ -100,7 +101,20 @@ HotTarget.library = (function() {
     },
     
     createColumns : function(config, create, data) {
+      var validationCache = {};
       return [
+          {
+            header : 'Library Name',
+            data : 'name',
+            readOnly : true,
+            include : true,
+            unpackAfterSave : true,
+            unpack : function(lib, flat, setCellMeta) {
+              flat.name = lib.name;
+            },
+            pack : function(lib, flat, errorHandler) {
+            }
+          },
           {
             header : 'Library Alias',
             data : 'alias',
@@ -116,15 +130,20 @@ HotTarget.library = (function() {
                     if (!value) {
                       return callback(Constants.automaticLibraryAlias);
                     }
+                    if (validationCache.hasOwnProperty(value)) {
+                      return callback(validationCache[value]);
+                    }
                     Fluxion.doAjax('libraryControllerHelperService',
                         'validateLibraryAlias', {
                           'alias' : value,
                           'url' : ajaxurl
                         }, {
                           'doOnSuccess' : function() {
+                            validationCache[value] = true;
                             return callback(true);
                           },
                           'doOnError' : function(json) {
+                            validationCache[value] = false;
                             return callback(false);
                           }
                         });
@@ -132,7 +151,9 @@ HotTarget.library = (function() {
             },
             type : 'text',
             include : config.showLibraryAlias,
+            unpackAfterSave : true,
             unpack : function(lib, flat, setCellMeta) {
+              validationCache[lib.alias] = true;
               flat.alias = lib.alias;
               if (lib.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
@@ -153,45 +174,26 @@ HotTarget.library = (function() {
             pack : function(lib, flat, errorHandler) {
             }
           },
-          {
-            header : 'Matrix Barcode',
-            data : 'identificationBarcode',
-            type : 'text',
-            validator : HotUtils.validator.optionalTextNoSpecialChars,
-            include : !Constants.automaticBarcodes,
-            unpack : function(lib, flat, setCellMeta) {
-              flat.identificationBarcode = lib.identificationBarcode;
-            },
-            pack : function(lib, flat, errorHandler) {
-              if (flat.identificationBarcode) {
-                lib.identificationBarcode = flat.identificationBarcode;
-              }
-            }
-          },
-          {
-            header : 'Description',
-            data : 'description',
-            include : config.showDescription,
-            validator : HotUtils.validator.optionalTextNoSpecialChars,
-            unpack : function(lib, flat, setCellMeta) {
-              flat.description = lib.description;
-            },
-            pack : function(lib, flat, errorHandler) {
-              lib.description = flat.description;
-            }
-          },
+          HotUtils.makeColumnForText('Matrix Barcode',
+              !Constants.automaticBarcodes, 'identificationBarcode', {
+                validator : HotUtils.validator.optionalTextNoSpecialChars
+              }),
+          HotUtils.makeColumnForText('Description', config.showDescription,
+              'description', {
+                validator : HotUtils.validator.optionalTextNoSpecialChars
+              }),
           {
             header : 'Design',
             data : 'libraryDesignAlias',
             type : 'dropdown',
             trimDropdown : false,
-            validator : HotUtils.validator.permitEmpty,
+            validator : Handsontable.AutocompleteValidator,
             source : [ '' ],
             include : Constants.isDetailedSample,
             unpack : function(lib, flat, setCellMeta) {
-              flat.libraryDesignAlias = Hot.maybeGetProperty(Utils.array
-                  .findFirstOrNull(
-                      Utils.array.idPredicate(lib.libraryDesignId),
+              flat.libraryDesignAlias = Utils.array.maybeGetProperty(
+                  Utils.array.findFirstOrNull(Utils.array
+                      .idPredicate(lib.libraryDesignId),
                       Constants.libraryDesigns), 'name') || '(None)';
             },
             pack : function(lib, flat, errorHandler) {
@@ -214,16 +216,18 @@ HotTarget.library = (function() {
             // creation only
             update : function(lib, flat, value, setReadOnly, setOptions,
                 setData) {
-              setOptions([ '(None)' ].concat(Constants.libraryDesigns.filter(
-                  function(design) {
-                    return design.sampleClassId == lib.parentSampleClassId;
-                  }).map(Utils.array.getName).sort()));
+              setOptions({
+                'source' : [ '(None)' ].concat(Constants.libraryDesigns.filter(
+                    function(design) {
+                      return design.sampleClassId == lib.parentSampleClassId;
+                    }).map(Utils.array.getName).sort())
+              });
             }
           },
           HotUtils.makeColumnForConstantsList('Code',
               Constants.isDetailedSample, 'libraryDesignCode',
               'libraryDesignCodeId', 'id', 'code',
-              Constants.libraryDesignCodes, {
+              Constants.libraryDesignCodes, true, {
                 depends : 'libraryDesignAlias',
                 update : makeDesignUpdate('designCodeId', 'code', 'WG',
                     Constants.libraryDesignCodes)
@@ -263,27 +267,29 @@ HotTarget.library = (function() {
                   .findFirstOrNull(Utils.array.idPredicate(lib.libraryTypeId),
                       Constants.libraryTypes), 'alias');
             },
-            'pack' : function(obj, flat, errorHander) {
-              obj.libraryTypeId = Utils.array.maybeGetProperty(Utils.array
+            'pack' : function(lib, flat, errorHander) {
+              lib.libraryTypeId = Utils.array.maybeGetProperty(Utils.array
                   .findFirstOrNull(Utils.array
                       .aliasPredicate(flat.libraryTypeAlias),
                       Constants.libraryTypes), 'id');
             },
             update : function(lib, flat, value, setReadOnly, setOptions) {
               var pt = getPlatformType(value);
-              setOptions(Constants.libraryTypes
-                  .filter(
-                      function(lt) {
-                        return lt.platform == pt && (!lt.archived || lib.libraryTypeId == lt.id);
-                      }).map(function(lt) {
-                    return lt.alias;
-                  }).sort());
+              setOptions({
+                'source' : Constants.libraryTypes
+                    .filter(
+                        function(lt) {
+                          return lt.platform == pt && (!lt.archived || lib.libraryTypeId == lt.id);
+                        }).map(function(lt) {
+                      return lt.alias;
+                    }).sort()
+              });
             }
           
           },
           HotUtils.makeColumnForConstantsList('Selection', true,
               'librarySelectionTypeAlias', 'librarySelectionTypeId', 'id',
-              'name', Constants.librarySelections, {
+              'name', Constants.librarySelections, true, {
                 depends : 'libraryDesignAlias',
                 update : makeDesignUpdate('selectionId', 'name', '(None)',
                     Constants.librarySelections)
@@ -291,7 +297,7 @@ HotTarget.library = (function() {
               }),
           HotUtils.makeColumnForConstantsList('Strategy', true,
               'libraryStrategyTypeAlias', 'libraryStrategyTypeId', 'id',
-              'name', Constants.libraryStrategies, {
+              'name', Constants.libraryStrategies, true, {
                 depends : 'libraryDesignAlias',
                 update : makeDesignUpdate('strategyId', 'name', '(None)',
                     Constants.libraryStrategies)
@@ -318,14 +324,18 @@ HotTarget.library = (function() {
                     return platformType.key == value;
                   }, Constants.platformTypes), 'name');
               if (!pt) {
-                setOptions([ '' ]);
+                setOptions({
+                  'source' : [ '' ]
+                });
               } else {
-                setOptions([ 'No indices' ].concat(Constants.indexFamilies
-                    .filter(function(family) {
-                      return family.platformType == pt;
-                    }).map(function(family) {
-                      return family.name;
-                    }).sort()));
+                setOptions({
+                  'source' : [ 'No indices' ].concat(Constants.indexFamilies
+                      .filter(function(family) {
+                        return family.platformType == pt;
+                      }).map(function(family) {
+                        return family.name;
+                      }).sort())
+                });
               }
             }
           
@@ -337,14 +347,14 @@ HotTarget.library = (function() {
             data : 'kitDescriptorName',
             type : 'dropdown',
             trimDropdown : false,
-            validator : HotUtils.validator.requiredText,
+            validator : HotUtils.validator.requiredAutocomplete,
             source : [ '' ],
             include : true,
             unpack : function(lib, flat, setCellMeta) {
               flat.kitDescriptorName = Utils.array.maybeGetProperty(Utils.array
                   .findFirstOrNull(
                       Utils.array.idPredicate(lib.kitDescriptorId),
-                      Constants.kitDescriptors), 'name') || 'None';
+                      Constants.kitDescriptors), 'name');
             },
             pack : function(lib, flat, errorHandler) {
               lib.kitDescriptorId = Utils.array
@@ -357,35 +367,45 @@ HotTarget.library = (function() {
             },
             depends : 'platformType',
             update : function(lib, flat, value, setReadOnly, setOptions) {
-              setOptions(Constants.kitDescriptors
-                  .filter(
-                      function(kit) {
-                        return kit.platformType == flat.platformType && kit.kitType == 'Library';
-                      }).map(Utils.array.getName).sort());
+              setOptions({
+                'source' : Constants.kitDescriptors
+                    .filter(
+                        function(kit) {
+                          return kit.platformType == flat.platformType && kit.kitType == 'Library';
+                        }).map(Utils.array.getName).sort()
+              });
             }
           },
           HotUtils.makeColumnForOptionalBoolean('QC Passed?', true, 'qcPassed'),
-          HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize'),
-          HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume, 'volume'),
-          HotUtils.makeColumnForFloat('Conc.*', true, 'concentration'),
-          HotUtils.makeColumnForFloat('Qubit (ng/&#181;l)', !create, 'qcQubit'),
-          HotUtils.makeColumnForFloat('TapeStation (bp)', !create, 'qcTapeStation'),
-          HotUtils.makeColumnForFloat('qPCR (mol/&#181;l)', !create, 'qcQPcr'), ];
+          HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
+          HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume,
+              'volume', false),
+          HotUtils.makeColumnForFloat('Conc.*', true, 'concentration', false),
+          HotUtils.makeColumnForFloat('Qubit (ng/&#181;l)', !create, 'qcQubit',
+              false),
+          HotUtils.makeColumnForFloat('TapeStation (bp)', !create,
+              'qcTapeStation', false),
+          HotUtils.makeColumnForFloat('qPCR (mol/&#181;l)', !create, 'qcQPcr',
+              false), ];
     },
     
     bulkActions : [
         {
           name : 'Edit',
-          action : function(ids) {
-            window.location = window.location.origin + '/miso/library/bulk/edit/' + ids
-                .join(',');
+          action : function(items) {
+            window.location = window.location.origin + '/miso/library/bulk/edit?' + jQuery
+                .param({
+                  ids : items.map(Utils.array.getId).join(',')
+                });
           }
         },
         {
           name : 'Make dilutions',
-          action : function(ids) {
-            window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate/' + ids
-                .join(',');
+          action : function(items) {
+            window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery
+                .param({
+                  ids : items.map(Utils.array.getId).join(',')
+                });
           }
         }, ],
   

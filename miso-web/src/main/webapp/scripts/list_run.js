@@ -53,55 +53,44 @@ ListTarget.run = {
     }
   },
   createColumns : function(config, projectId) {
-    return [ {
-      "sTitle" : "Run Name",
-      "mData" : "id",
-      "mRender" : function(data, type, full) {
-        return "<a href=\"/miso/run/" + data + "\">" + full.name + "</a>";
-      },
-      "iSortPriority" : 1
-    }, {
-      "sTitle" : "Alias",
-      "mData" : "alias",
-      "mRender" : function(data, type, full) {
-        return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
-      },
-      "include" : true,
-      "iSortPriority" : 0
-    }, {
-      "sTitle" : "Status",
-      "mData" : "status",
-      "mRender" : function(data, type, full) {
-        return data || "";
-      },
-      "include" : true,
-      "iSortPriority" : 0
-    }, {
-      "sTitle" : "Start Date",
-      "mData" : "startDate",
-      "mRender" : function(data, type, full) {
-        return data || "";
-      },
-      "include" : true,
-      "iSortPriority" : 2
-    }, {
-      "sTitle" : "End Date",
-      "mData" : "endDate",
-      "mRender" : function(data, type, full) {
-        return data || "";
-      },
-      "include" : true,
-      "iSortPriority" : 0
-    }, {
-      "sTitle" : "Type",
-      "mData" : "platformType",
-      "include" : !config.platformType,
-      "iSortPriority" : 0
-    }, {
-      "sTitle" : "Last Modified",
-      "mData" : "lastModified",
-      "include" : Constants.isDetailedSample,
-      "iSortPriority" : 0
-    } ];
+    return [
+        ListUtils
+            .idHyperlinkColumn("Name", "run", "id", Utils.array.getName, 1),
+        ListUtils.labelHyperlinkColumn("Alias", "run", Utils.array.getId,
+            "alias", 0), {
+          "sTitle" : "Status",
+          "mData" : "status",
+          "mRender" : function(data, type, full) {
+            return data || "";
+          },
+          "include" : true,
+          "iSortPriority" : 0
+        }, {
+          "sTitle" : "Start Date",
+          "mData" : "startDate",
+          "mRender" : function(data, type, full) {
+            return data || "";
+          },
+          "include" : true,
+          "iSortPriority" : 2
+        }, {
+          "sTitle" : "End Date",
+          "mData" : "endDate",
+          "mRender" : function(data, type, full) {
+            return data || "";
+          },
+          "include" : true,
+          "iSortPriority" : 0
+        }, {
+          "sTitle" : "Type",
+          "mData" : "platformType",
+          "include" : !config.platformType,
+          "iSortPriority" : 0
+        }, {
+          "sTitle" : "Last Modified",
+          "mData" : "lastModified",
+          "include" : Constants.isDetailedSample,
+          "iSortPriority" : 0
+        } ];
   }
 };

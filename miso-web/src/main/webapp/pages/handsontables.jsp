@@ -60,7 +60,7 @@
 
  <div id="HOTbulkForm">
    <div id="nonStandardAliasNote" class="table-note hidden">
-      <p>Highlighted aliases must be filled in because they cannot be auto-generated. Any value you give them will be saved, provided it does not contain special characters.</p>
+      <p>Double-check highlighted aliases, as they will be saved even if they are duplicated or do not follow the naming standard!</p>
     </div>
 
    <div id="ctrlV" class="note">
@@ -70,10 +70,10 @@
    <div id="saveSuccesses"  class="parsley-success hidden">
      <p id="successMessages"></p>
    </div>
-     <div id="saveErrors" class="bs-callout bs-callout-warning hidden">
+     <div id="errors" class="bs-callout bs-callout-warning hidden">
        <h2>Oh snap!</h2>
-       <p>The following rows failed to save:</p>
-       <p id="errorMessages"></p>
+       <div id="serverErrors"></div>
+       <div id="saveErrors"></div>
      </div>
 
    <div id="bulkactions" class="fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix paging_full_numbers"></div>
@@ -87,6 +87,7 @@
       target.requestConfiguration(${config}, function(config) { HotUtils.makeTable(target, ${create}, ${input}, config); });
     });
   </script>
+  <div id="dialog"></div>
 
 </div>
 </div>

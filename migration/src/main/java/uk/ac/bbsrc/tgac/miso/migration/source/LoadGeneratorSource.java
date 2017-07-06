@@ -15,7 +15,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
@@ -206,7 +206,7 @@ public class LoadGeneratorSource implements MigrationSource {
               projectCount,
               sampleCount));
 
-      SampleClass identityClass = makeSampleClass(rootSampleClassId, Identity.CATEGORY_NAME);
+      SampleClass identityClass = makeSampleClass(rootSampleClassId, SampleIdentity.CATEGORY_NAME);
       SampleClass tissueClass = makeSampleClass(tissueSampleClassId, SampleTissue.CATEGORY_NAME);
       SampleClass stockClass = makeSampleClass(stockSampleClassId, SampleStock.CATEGORY_NAME);
       SampleClass aliquotClass = makeSampleClass(aliquotSampleClassId, SampleAliquot.CATEGORY_NAME);
@@ -214,7 +214,7 @@ public class LoadGeneratorSource implements MigrationSource {
       List<Sample> samples = new ArrayList<>();
       for (Project project : getProjects()) {
         for (int identitiesCreated = 0; identitiesCreated < identitiesPerProject && samples.size() < sampleCount; identitiesCreated++) {
-          Identity identity = createIdentity(identityClass, project, identitiesCreated + 1);
+          SampleIdentity identity = createIdentity(identityClass, project, identitiesCreated + 1);
           samples.add(identity);
           for (int tissuesCreated = 0; tissuesCreated < tissuesPerIdentity && samples.size() < sampleCount; tissuesCreated++) {
             SampleTissue tissue = createTissue(tissueClass, project, identity, tissuesCreated + 1);
@@ -247,8 +247,8 @@ public class LoadGeneratorSource implements MigrationSource {
   private static final String IDENTITY_DESC = "identity";
   private static final String SCIENTIFIC_NAME = "test";
 
-  private Identity createIdentity(SampleClass sampleClass, Project project, int identityNum) {
-    Identity sample = new IdentityImpl();
+  private SampleIdentity createIdentity(SampleClass sampleClass, Project project, int identityNum) {
+    SampleIdentity sample = new SampleIdentityImpl();
     String identityNumString = String.valueOf(identityNum);
     while (identityNumString.length() < 4) {
       identityNumString = ZERO_STRING + identityNumString;

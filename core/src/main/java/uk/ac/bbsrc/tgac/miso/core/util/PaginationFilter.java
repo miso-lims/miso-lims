@@ -6,6 +6,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 import org.joda.time.DateTime;
 
@@ -18,6 +19,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 public abstract interface PaginationFilter {
   public final static List<AgoMatcher> AGO_MATCHERS = Arrays.asList(new AgoMatcher("h(|ours?)", 3600),
       new AgoMatcher("d(|ays?)", 3600 * 24));
+
+  public static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
+  public static PaginationFilter archived(boolean isArchived) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByArchived(item, isArchived, errorHandler);
+      }
+    };
+  }
 
   public static PaginationFilter box(String name) {
     return new PaginationFilter() {
@@ -102,6 +115,7 @@ public abstract interface PaginationFilter {
       }
     };
   }
+
   public static PaginationFilter kitType(KitType type) {
     return new PaginationFilter() {
 
@@ -113,7 +127,8 @@ public abstract interface PaginationFilter {
   }
 
   public static PaginationFilter[] parse(String request, String currentUser, Consumer<String> errorHandler) {
-    return Arrays.stream(request.split("\\s+")).<PaginationFilter> map(x -> {
+    return WHITESPACE.splitAsStream(request).map(x -> {
+      if (x.isEmpty()) return null;
       if (x.contains(":")) {
         String[] parts = x.split(":", 2);
         switch (parts[0]) {

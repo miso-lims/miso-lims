@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -204,12 +204,12 @@ public class OicrSampleAliasGeneratorTest {
     return tissue;
   }
 
-  private Identity makeIdentity() {
-    Identity identity = new IdentityImpl();
+  private SampleIdentity makeIdentity() {
+    SampleIdentity identity = new SampleIdentityImpl();
     identity.setId(1L);
     identity.setAlias("PROJ_0001");
     SampleClass sc = new SampleClassImpl();
-    sc.setSampleCategory(Identity.CATEGORY_NAME);
+    sc.setSampleCategory(SampleIdentity.CATEGORY_NAME);
     identity.setSampleClass(sc);
 
     Project proj = new ProjectImpl();

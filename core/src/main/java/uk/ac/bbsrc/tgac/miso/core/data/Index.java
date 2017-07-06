@@ -25,12 +25,10 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -64,15 +62,10 @@ public class Index implements Nameable, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
   public static void sort(final List<Index> indices) {
-    Collections.sort(indices, new Comparator<Index>() {
-      @Override
-      public int compare(Index o1, Index o2) {
-        return o1.getPosition() - o2.getPosition();
-      }
-    });
+    Collections.sort(indices, (o1, o2) -> o1.getPosition() - o2.getPosition());
   }
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne
   @JoinColumn(name = "indexFamilyId", nullable = false)
   @JsonBackReference
   private IndexFamily family;
