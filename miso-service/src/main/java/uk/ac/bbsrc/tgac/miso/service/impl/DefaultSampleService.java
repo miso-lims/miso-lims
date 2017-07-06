@@ -223,6 +223,10 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
         validateHierarchy(detailed);
       } else {
         sample.inheritPermissions(sample.getProject());
+        if (isExternalNameDuplicatedInProject(sample)) {
+          throw new IllegalArgumentException("Sample with external name '" + ((SampleIdentity) sample).getExternalName()
+              + "' already exists in project " + sample.getProject().getShortName());
+        }
       }
     } else {
       sample.inheritPermissions(sample.getProject());
@@ -677,6 +681,18 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     } else if (source instanceof SampleLCMTube) {
       ((SampleLCMTube) target).setSlidesConsumed(((SampleLCMTube) source).getSlidesConsumed());
     }
+  }
+
+  /**
+   * Returns true if another sample with same external name and project exists in database
+   * 
+   * @param sample
+   * @return boolean
+   * @throws IOException
+   */
+  private boolean isExternalNameDuplicatedInProject(Sample sample) throws IOException {
+    SampleIdentity identity = (SampleIdentity) sample;
+    return getIdentitiesByExternalNameAndProject(identity.getExternalName(), identity.getProject().getId()).size() > 0;
   }
 
   @Override
