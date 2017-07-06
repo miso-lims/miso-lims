@@ -43,9 +43,9 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
         return addSiblingTag(parent.getAlias(), detailed);
       }
       if (isTissueSample(parent)) {
-        if (isTissueSample(detailed) && isIdentitySample(parent.getParent())) {
+        if (isTissueSample(detailed)) {
           // tissues parented to tissues
-          return generateTissueAlias((SampleTissue) detailed, (SampleIdentity) LimsUtils.deproxify(parent.getParent()));
+          return generateTissueAlias((SampleTissue) detailed, LimsUtils.getParent(SampleIdentity.class, parent));
         } else {
           return addSiblingTag(parent.getAlias(), detailed);
         }
