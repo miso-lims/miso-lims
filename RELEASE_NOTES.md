@@ -1,3 +1,9 @@
+# 0.2.76
+
+Changes:
+
+ * bug fixes
+
 # 0.2.75
 
 Changes:
@@ -21,6 +27,11 @@ Changes:
  * Improved performance of box save
  * Speed up list pages
  * Bug fixes 
+
+Bad:
+
+ * Selecting a different tab on a list page displayed it at half width
+ * Received Date was not showing for bulk create samples
 
 # 0.2.74
 
