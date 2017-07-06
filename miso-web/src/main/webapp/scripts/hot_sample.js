@@ -425,25 +425,29 @@ HotTarget.sample = (function() {
             data : 'stainName',
             type : 'dropdown',
             trimDropdown : false,
-            source : Constants.stains.sort(function(a, b) {
-              return (a.category || '').localeCompare(b.category || '');
-            }).map(function(s) {
-              return s.name;
-            }),
+            source : function () {
+              var stains = Constants.stains.sort(function(a, b) {
+                return (a.category || '').localeCompare(b.category || '');
+              }).map(function(s) {
+                return s.name;
+              });
+              stains.unshift('(None)');
+              return stains;
+            }(),
             validator : Handsontable.AutocompleteValidator,
             unpack : function(sam, flat, setCellMeta) {
               if (sam.stain) {
                 flat.stainName = Utils.array.maybeGetProperty(Utils.array
                     .findFirstOrNull(Utils.array.idPredicate(sam.stain.id),
                         Constants.stains), 'name');
+              } else {
+                flat.stainName = '(None)';
               }
             },
             pack : function(sam, flat, errorHandler) {
-              if (!Utils.validation.isEmpty(flat.stainName)) {
-                sam.stain.id = Utils.array.maybeGetProperty(Utils.array
-                    .findFirstOrNull(Utils.array.namePredicate(flat.stainName),
-                        Constants.stains), 'id');
-              }
+              sam.stain = Utils.array.findFirstOrNull(Utils.array
+                  .namePredicate(flat.stainName), 
+                      Constants.stains);
             },
             include : show['Tissue Processing'] && config.targetSampleClass.alias == 'Slide'
           },
@@ -614,7 +618,7 @@ HotTarget.sample = (function() {
               return;
             }
             
-            if (categories[0] == 'Tissue Processing' && classes.length > 0) {
+            if (categories[0] == 'Tissue Processing' && classes.length > 1) {
               alert("You have selected samples of classes " + classes.map(
                   Utils.array.getAlias).join(" & ") + ". Please select samples from only one tissue processing class.");
               return;
