@@ -1592,6 +1592,8 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setAlias(from.getAlias());
     dto.setShortName(from.getShortName());
+    dto.setDescription(from.getDescription());
+    dto.setProgress(from.getProgress().getKey());
     return dto;
   }
 

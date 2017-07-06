@@ -5,6 +5,8 @@ public class ProjectDto {
   private String alias;
   private String name;
   private String shortName;
+  private String description;
+  private String progress;
 
   public long getId() {
     return id;
@@ -36,5 +38,21 @@ public class ProjectDto {
 
   public void setShortName(String shortName) {
     this.shortName = shortName;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getProgress() {
+    return progress;
+  }
+
+  public void setProgress(String progress) {
+    this.progress = progress;
   }
 }
