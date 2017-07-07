@@ -839,7 +839,7 @@ public class EditLibraryController {
     @Override
     protected DilutionDto createDtoFromParent(Library item) {
       DilutionDto dto = new DilutionDto();
-      dto.setLibrary(Dtos.asMinimalDto(item));
+      dto.setLibrary(Dtos.asDto(item));
       return dto;
     }
 
