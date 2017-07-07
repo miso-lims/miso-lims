@@ -13,7 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 
 public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
 
-  private static final String sampleRegex = "^([A-Z\\d]{3,5}_\\d{3,5}_(?:[A-Z][a-z]|nn)_[A-Zn])_.*";
+  private static final String sampleRegex = "^([A-Z\\d]{3,5}_\\d{3,6}_(?:[A-Z][a-z]|nn)_[A-Zn])_.*";
   private static final Pattern samplePattern = Pattern.compile(sampleRegex);
 
   @Override
