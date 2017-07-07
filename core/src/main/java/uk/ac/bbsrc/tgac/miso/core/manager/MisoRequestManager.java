@@ -557,6 +557,7 @@ public class MisoRequestManager implements RequestManager {
         Date now = new Date();
         if (container.getCreationTime() == null) {
           container.setCreationTime(now);
+          container.setCreator(securityStore.getUserById(getCurrentUser().getUserId()));
           container.setLastModified(now);
         } else if (container.getLastModified() == null) {
           container.setLastModified(now);
