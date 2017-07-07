@@ -1732,6 +1732,8 @@ public class Dtos {
       view.setDilutionName(dilution.getName());
       return view;
     }).collect(Collectors.toSet()));
+    to.setQcPassed(dto.getQcPassed());
+    to.setReadyToRun(dto.getReadyToRun());
     return to;
   }
 

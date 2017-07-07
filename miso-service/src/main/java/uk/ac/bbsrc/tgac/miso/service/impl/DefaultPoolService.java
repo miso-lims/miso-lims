@@ -215,6 +215,8 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       original.setPlatformType(pool.getPlatformType());
       original.setQcPassed(pool.getQcPassed());
       original.setReadyToRun(pool.getReadyToRun());
+      original.setVolume(pool.getVolume());
+      original.setCreationDate(pool.getCreationDate());
 
       Set<String> originalItems = extractDilutionNames(original.getPoolableElementViews());
       loadPooledElements(pool, original);
