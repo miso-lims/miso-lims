@@ -376,7 +376,7 @@ HotTarget.library = (function() {
               });
             }
           },
-          HotUtils.makeColumnForOptionalBoolean('QC Passed?', true, 'qcPassed'),
+          HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
           HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume,
               'volume', false),

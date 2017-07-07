@@ -55,10 +55,9 @@ HotTarget.pool = {
         HotUtils.makeColumnForFloat(
             'Concentration (' + Constants.poolConcentrationUnits + ')', true,
             'concentration', true),
-        HotUtils.makeColumnForFloat('Volume (&#181;l)', true, 'volume'),
-        HotUtils.makeColumnForOptionalBoolean('QC Passed?', true, 'qcPassed'),
-        HotUtils.makeColumnForOptionalBoolean('Ready to Run?', true,
-            'readyToRun') ];
+        HotUtils.makeColumnForFloat('Volume (&#181;l)', true, 'volume', false),
+        HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
+        HotUtils.makeColumnForBoolean('Ready to Run?', true, 'readyToRun', true) ];
   },
   
   bulkActions : [

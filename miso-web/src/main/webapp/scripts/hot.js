@@ -613,13 +613,13 @@ var HotUtils = {
     return baseobj;
   },
 
-  makeColumnForOptionalBoolean : function(headerName, include, property) {
+  makeColumnForBoolean : function(headerName, include, property, required) {
     return {
       header : headerName,
       data : property,
       type : 'dropdown',
       trimDropdown : false,
-      source : [ 'Unknown', 'True', 'False' ],
+      source : required ? [ 'True', 'False' ] : [ 'Unknown', 'True', 'False' ],
       include : include,
       unpack : function(obj, flat, setCellMeta) {
         var result;
@@ -627,6 +627,9 @@ var HotUtils = {
           result = 'True';
         } else if (obj[property] === false) {
           result = 'False';
+        } else if (required) {
+          errorHandler(headerName + ' is missing');
+          return;
         } else {
           result = 'Unknown';
         }
@@ -637,6 +640,9 @@ var HotUtils = {
           obj[property] = true;
         } else if (flat[property] === 'False') {
           obj[property] = false;
+        } else if (required) {
+          errorHandler(headerName + ' is missing');
+          return;
         } else {
           obj[property] = null;
         }
