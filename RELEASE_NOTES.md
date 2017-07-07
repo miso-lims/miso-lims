@@ -1,9 +1,18 @@
+# 0.2.78
+
+Changes:
+
+ * Bug fixes
+
 # 0.2.77
 
 Changes:
 
  * generate aliases for tissues propagated from tissues
  * bug fixes
+
+Bad:
+ * Bugs (fixes in 0.2.78)
 
 # 0.2.76
 
