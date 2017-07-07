@@ -1,8 +1,20 @@
+# 0.2.77
+
+Changes:
+
+ * generate aliases for tissues propagated from tissues
+ * bug fixes
+
 # 0.2.76
 
 Changes:
 
  * bug fixes
+
+Bad:
+
+ * Identity lookup doesn't work when bulk creating samples from project page
+ * Indices dropdown not showing up when changing Index Family on edit singe library page
 
 # 0.2.75
 
