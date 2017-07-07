@@ -8,10 +8,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
@@ -54,6 +54,8 @@ public class SampleDto implements WritableUrls {
   private Long updatedById;
   private String updatedByUrl;
   private String lastModified;
+  private Double qcDV200;
+  private Double qcRIN;
   private List<SampleQcDto> qcs;
 
   public Long getId() {
@@ -241,6 +243,22 @@ public class SampleDto implements WritableUrls {
 
   public void setBoxId(Long boxId) {
     this.boxId = boxId;
+  }
+
+  public Double getQcDV200() {
+    return qcDV200;
+  }
+
+  public void setQcDV200(Double qcDV200) {
+    this.qcDV200 = qcDV200;
+  }
+
+  public Double getQcRIN() {
+    return qcRIN;
+  }
+
+  public void setQcRIN(Double qcRIN) {
+    this.qcRIN = qcRIN;
   }
 
   public List<SampleQcDto> getQcs() {
