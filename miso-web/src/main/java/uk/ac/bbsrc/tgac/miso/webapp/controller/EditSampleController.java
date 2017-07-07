@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
@@ -77,10 +77,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -122,6 +120,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
@@ -374,30 +373,6 @@ public class EditSampleController {
       }
       throw ex;
     }
-  }
-
-  private Set<Pool> getPoolsBySample(Sample s) throws IOException {
-    if (!s.getLibraries().isEmpty()) {
-      Set<Pool> pools = new TreeSet<>();
-      for (Library l : s.getLibraries()) {
-        List<Pool> prs = new ArrayList<>(poolService.listByLibraryId(l.getId()));
-        pools.addAll(prs);
-      }
-      return pools;
-    }
-    return Collections.emptySet();
-  }
-
-  private Set<Run> getRunsBySamplePools(Set<Pool> pools) throws IOException {
-    if (!pools.isEmpty()) {
-      Set<Run> runs = new TreeSet<>();
-      for (Pool pool : pools) {
-        Collection<Run> prs = runService.listByPoolId(pool.getId());
-        runs.addAll(prs);
-      }
-      return runs;
-    }
-    return Collections.emptySet();
   }
 
   @ModelAttribute("maxLengths")
@@ -808,14 +783,15 @@ public class EditSampleController {
         }
         model.put("projectsDtos", "[]");
 
-        Set<Pool> pools = getPoolsBySample(sample);
-        Map<Long, Sample> poolSampleMap = new HashMap<>();
-        for (Pool pool : pools) {
-          poolSampleMap.put(pool.getId(), sample);
-        }
-        model.put("poolSampleMap", poolSampleMap);
-        model.put("samplePools", pools);
-        model.put("sampleRuns", getRunsBySamplePools(pools));
+        model.put("sampleLibraries", sample.getLibraries().stream().map(Dtos::asDto).collect(Collectors.toList()));
+        Set<Pool> pools = sample.getLibraries().stream()
+            .flatMap(LimsUtils.logWhining(log, library -> poolService.listByLibraryId(library.getId())))
+            .distinct().collect(Collectors.toSet());
+        List<RunDto> runDtos = pools.stream().flatMap(LimsUtils.logWhining(log, pool -> runService.listByPoolId(pool.getId())))
+            .map(Dtos::asDto)
+            .collect(Collectors.toList());
+        model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
+        model.put("sampleRuns", runDtos);
         List<SampleDto> relations = new ArrayList<>();
         if (LimsUtils.isDetailedSample(sample)) {
           DetailedSample detailed = (DetailedSample) sample;
@@ -824,7 +800,7 @@ public class EditSampleController {
           }
           addChildren(relations, detailed.getChildren());
         }
-        model.put("sampleRelations", mapper.writeValueAsString(relations));
+        model.put("sampleRelations", relations);
       }
 
       if (sample != null && !sample.userCanWrite(user)) {

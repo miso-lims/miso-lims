@@ -55,8 +55,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -762,6 +764,17 @@ public class LimsUtils {
 
   public static Date toBadDate(LocalDate localDate) {
     return toBadDate(localDate, ZoneId.systemDefault());
+  }
+
+  public static <T, R> Function<T, Stream<R>> logWhining(Logger log, WhineyFunction<? super T, R> action) {
+    return input -> {
+      try {
+        return action.apply(input).stream();
+      } catch (IOException e) {
+        log.error("Exception during flatMap", e);
+      }
+      return Stream.empty();
+    };
   }
 
 }
