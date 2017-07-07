@@ -166,7 +166,7 @@ HotTarget.sample = (function() {
               numberOfMonths : 1
             },
             allowEmpty : true,
-            include : config.showReceivedDate,
+            include : true,
             unpack : function(sam, flat, setCellMeta) {
               flat.receivedDate = sam.receivedDate;
             },

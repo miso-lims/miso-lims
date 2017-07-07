@@ -1009,7 +1009,6 @@ public class EditSampleController {
       config.putPOJO("targetSampleClass", Dtos.asDto(sampleClass));
       config.putPOJO("sourceSampleClass", Dtos.asDto(sampleClass));
       config.put("propagate", false);
-      config.put("showReceivedDate", true);
       config.put("edit", true);
     }
   };
@@ -1081,7 +1080,6 @@ public class EditSampleController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put("propagate", true);
       config.put("edit", false);
-      config.put("showReceivedDate", false);
       config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
       config.putPOJO("sourceSampleClass", Dtos.asDto(sourceSampleClass));
     }
@@ -1103,7 +1101,6 @@ public class EditSampleController {
       if (targetSampleClass != null) config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
       config.put("create", true);
       config.put("hasProject", project != null);
-      config.put("showReceivedDate", true);
       if (project == null) {
         requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
       } else {
