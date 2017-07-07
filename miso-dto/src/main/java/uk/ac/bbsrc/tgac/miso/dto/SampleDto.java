@@ -54,8 +54,8 @@ public class SampleDto implements WritableUrls {
   private Long updatedById;
   private String updatedByUrl;
   private String lastModified;
-  private Double qcDV200;
-  private Double qcRIN;
+  private Double qcDv200;
+  private Double qcRin;
   private List<SampleQcDto> qcs;
 
   public Long getId() {
@@ -245,20 +245,20 @@ public class SampleDto implements WritableUrls {
     this.boxId = boxId;
   }
 
-  public Double getQcDV200() {
-    return qcDV200;
+  public Double getQcDv200() {
+    return qcDv200;
   }
 
-  public void setQcDV200(Double qcDV200) {
-    this.qcDV200 = qcDV200;
+  public void setQcDv200(Double qcDv200) {
+    this.qcDv200 = qcDv200;
   }
 
-  public Double getQcRIN() {
-    return qcRIN;
+  public Double getQcRin() {
+    return qcRin;
   }
 
-  public void setQcRIN(Double qcRIN) {
-    this.qcRIN = qcRIN;
+  public void setQcRin(Double qcRin) {
+    this.qcRin = qcRin;
   }
 
   public List<SampleQcDto> getQcs() {

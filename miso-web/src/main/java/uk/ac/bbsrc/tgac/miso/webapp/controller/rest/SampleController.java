@@ -271,16 +271,16 @@ public class SampleController extends RestController {
   }
 
   private void addAnyQCs(SampleDto sampleDto, Sample sample) throws IOException {
-    if (sampleDto.getQcRIN() != null) {
+    if (sampleDto.getQcRin() != null) {
       SampleQC qc = new SampleQCImpl();
       qc.setQcType(sampleService.getSampleQcTypeByName("RIN"));
-      qc.setResults(sampleDto.getQcRIN());
+      qc.setResults(sampleDto.getQcRin());
       sampleService.addQc(sample, qc);
     }
-    if (sampleDto.getQcDV200() != null) {
+    if (sampleDto.getQcDv200() != null) {
       SampleQC qc = new SampleQCImpl();
       qc.setQcType(sampleService.getSampleQcTypeByName("DV200"));
-      qc.setResults(sampleDto.getQcDV200());
+      qc.setResults(sampleDto.getQcDv200());
       sampleService.addQc(sample, qc);
     }
   }
