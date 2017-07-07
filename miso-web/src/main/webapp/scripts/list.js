@@ -111,7 +111,7 @@ ListUtils = (function() {
           'bAutoWidth' : false,
           'iDisplayLength' : 25,
           'iDisplayStart' : 0,
-          'sDom' : '<lf>rt<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+          'sDom' : '<"H"lf>r<"datatable-scroll"t><"F"ip>',
           'sPaginationType' : 'full_numbers',
           'bProcessing' : true,
           'oSearch' : {

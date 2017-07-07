@@ -8,21 +8,21 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
@@ -53,6 +53,11 @@ public class OicrSampleAliasGeneratorTest {
   public void generateForTissueTest() throws Exception {
     assertEquals("PROJ_0001_nn_n_nn_1-1", sut.generate(makeMinimalTissue()));
     assertEquals("PROJ_0001_Bn_P_32_2-3", sut.generate(makeFullTissue()));
+  }
+
+  @Test
+  public void generateForTissueFromTissueTest() throws Exception {
+    assertEquals("PROJ_0001_Bn_O_nn_1-1", sut.generate(makeTissueFromTissue()));
   }
 
   @Test
@@ -162,6 +167,26 @@ public class OicrSampleAliasGeneratorTest {
     stock.setSampleClass(sc);
     stock.setSiblingNumber(4);
     return stock;
+  }
+
+  private SampleTissue makeTissueFromTissue() throws Exception {
+    SampleTissue parent = (SampleTissue) makeFullTissue();
+    parent.setAlias("PROJ_0001_Bn_P_nn_1-1");
+    parent.setParent(makeIdentity());
+    SampleTissue child = new SampleTissueImpl();
+    SampleClass sc = new SampleClassImpl();
+    sc.setSampleCategory(SampleTissue.CATEGORY_NAME);
+    child.setSampleClass(sc);
+    child.setParent(parent);
+    child.setTimesReceived(1);
+    child.setTubeNumber(1);
+    TissueOrigin to = new TissueOriginImpl();
+    to.setAlias("Bn");
+    child.setTissueOrigin(to);
+    TissueType tt = new TissueTypeImpl();
+    tt.setAlias("O");
+    child.setTissueType(tt);
+    return child;
   }
 
   private SampleLCMTube makeLcmTube() {

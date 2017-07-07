@@ -72,6 +72,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
+    to.setLocationBarcode(from.getLocationBarcode());
     to.setUse(boxStore.getUseById(from.getUse().getId()));
   }
 

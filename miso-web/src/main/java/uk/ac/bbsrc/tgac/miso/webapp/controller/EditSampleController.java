@@ -1089,23 +1089,25 @@ public class EditSampleController {
 
   private final class BulkCreateSampleBackend extends BulkCreateTableBackend<SampleDto> {
     private final SampleClass targetSampleClass;
-    private final boolean hasProject;
+    private final Project project;
 
     public BulkCreateSampleBackend(Class<? extends SampleDto> dtoClass, SampleDto dto, Integer quantity, Project project,
         SampleClass sampleClass) {
       super("sample", dtoClass, "Samples", dto, quantity);
       targetSampleClass = sampleClass;
-      this.hasProject = project != null;
+      this.project = project;
     }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       if (targetSampleClass != null) config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
       config.put("create", true);
-      config.put("hasProject", hasProject);
+      config.put("hasProject", project != null);
       config.put("showReceivedDate", true);
-      if (!hasProject) {
+      if (project == null) {
         requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
+      } else {
+        config.putPOJO("project", Dtos.asDto(project));
       }
     }
   };

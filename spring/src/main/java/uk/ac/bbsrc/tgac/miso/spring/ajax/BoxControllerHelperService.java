@@ -520,35 +520,6 @@ public class BoxControllerHelperService {
   }
 
   /**
-   * Changes the Box's location to a user-entered value.
-   * 
-   * @param HttpSession
-   *          session, JSONObject json
-   * @return JSON message indicating success or error
-   */
-  public JSONObject changeBoxLocation(HttpSession session, JSONObject json) {
-    Long boxId = json.getLong("boxId");
-    String locationBarcode = json.getString("locationBarcode");
-
-    try {
-      String newLocation = LimsUtils.lookupLocation(locationBarcode);
-      if (!"".equals(newLocation)) {
-        Box box = boxService.get(boxId);
-        box.setLocationBarcode(newLocation);
-        box.setLastModifier(authorizationManager.getCurrentUser());
-        boxService.save(box);
-      } else {
-        return JSONUtils.SimpleJSONError("New location cannot be blank.");
-      }
-    } catch (IOException e) {
-      log.debug("Failed to save new box location", e);
-      return JSONUtils.SimpleJSONError("Error saving new location. Please try again.");
-    }
-
-    return JSONUtils.SimpleJSONResponse("Box successfully moved.");
-  }
-
-  /**
    * Generates the printable 2D identificationBarcode for the Box.
    * 
    * @param HttpSession

@@ -683,7 +683,7 @@ Library.ui = {
   createIndexNextBox: function() {
     var family = Library.ui.getCurrentIndexFamily();
     var max = Library.ui.maxIndexPositionInFamily(family);
-    if (Library.lastIndexPosition < max - 1) {
+    if (Library.lastIndexPosition < max) {
       Library.ui.createIndexSelect(max, null);
     } else if (Library.lastIndexPosition == 0) {
       var container = jQuery('#indicesDiv');

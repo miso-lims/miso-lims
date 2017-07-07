@@ -70,7 +70,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -80,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
@@ -636,6 +636,15 @@ public class LimsUtils {
 
   public static boolean isSolidRun(Run run) {
     return run instanceof SolidRun;
+  }
+
+  public static <T extends DetailedSample> T getParent(Class<T> targetParentClass, DetailedSample start) {
+    for (DetailedSample current = start.getParent(); current != null; current = deproxify(current.getParent())) {
+      if (targetParentClass.isInstance(current)) {
+        return (T) current;
+      }
+    }
+    return null;
   }
 
   public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) {

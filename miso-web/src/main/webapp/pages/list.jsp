@@ -27,7 +27,7 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1 id="tableTitle"></h1>
-    <table class="display no-border" id="listingTable">
+    <table class="display no-border ui-widget-content" id="listingTable">
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {

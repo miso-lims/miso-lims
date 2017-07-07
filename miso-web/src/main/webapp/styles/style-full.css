@@ -1065,10 +1065,6 @@ td.headertable img {
     width: 300px;
 }
 
-.trigger {
-    /*position: absolute;*/
-}
-
 .popup {
     position: absolute;
     display: none;
@@ -1420,16 +1416,6 @@ path.link {
 }
 
 #externalProjectsListing {
-    /*border: 1px solid lightgray;
-padding-top: 0px;
-padding-left: 5px;
-padding-right: 5px;
-padding-bottom: 5px;
-margin-top: 0px;
-margin-left: 5px;
-margin-right: 5px;
-margin-bottom: 5px;
-width: 380px;      */
     height: 500px;
     overflow: auto;
 }
@@ -1923,4 +1909,9 @@ button.disabled {
 
 .handsontable td.nonStandardAlias.htInvalid {
   background-color: #F5E5DA !important;
+}
+
+.datatable-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
 }
