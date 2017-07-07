@@ -370,52 +370,6 @@ Box.ui = {
     );
   },
 
-  editBoxLocationBarcode: function (span) {
-    var v = span.find('a').text();
-    span.html("<input type='text' value='" + v + "' name='locationBarcode' id='locationBarcode'>");
-  },
-
-  showBoxLocationChangeDialog: function (boxId, boxLocationBarcode) {
-    var self = this;
-    jQuery('#changeBoxLocationDialog')
-      .html("<form>" +
-            "<fieldset class='dialog'>" +
-            "<strong><label>Current Location: </label></strong>" + boxLocationBarcode +
-            "<br/><strong><label for='notetext'>New Location:</label>" +
-            "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
-            "</fieldset></form>");
-
-    jQuery('#changeBoxLocationDialog').dialog({
-      width: 400,
-      modal: true,
-      resizable: false,
-      buttons: {
-        "Save": function () {
-          self.changeBoxLocation(boxId, jQuery('#locationBarcodeInput').val());
-          jQuery(this).dialog('close');
-        },
-        "Cancel": function () {
-          jQuery(this).dialog('close');
-        }
-      }
-    });
-  },
-
-  changeBoxLocation: function (boxId, barcode) {
-    Fluxion.doAjax(
-      'boxControllerHelperService',
-      'changeBoxLocation',
-      {
-        'boxId': boxId,
-        'locationBarcode': barcode,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': Utils.page.pageReload
-      }
-    );
-  },
-
   exportBox: function (boxId) {
     Fluxion.doAjax(
       'boxControllerHelperService',

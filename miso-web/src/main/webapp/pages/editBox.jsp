@@ -68,33 +68,6 @@
 
 <div class="barcodes">
   <div class="barcodeArea ui-corner-all">
-    <c:choose>
-      <c:when test="${empty box.locationBarcode}">
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span><form:input path="locationBarcode" size="8"/>
-      </c:when>
-      <c:otherwise>
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span>
-        <ul class="barcode-ddm">
-          <li>
-            <a onmouseover="mopen('locationBarcodeMenu')" onmouseout="mclosetime()">
-              <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-              <span id="locationBarcode" style="float:right; margin-top:6px; padding-bottom: 11px;">${box.locationBarcode}</span>
-            </a>
-
-            <div id="locationBarcodeMenu"
-                 onmouseover="mcancelclosetime()"
-                 onmouseout="mclosetime()">
-              <a href="javascript:void(0);"
-                 onclick="Box.ui.showBoxLocationChangeDialog(${box.id}, '${box.locationBarcode}');">Change
-                location</a>
-            </div>
-          </li>
-        </ul>
-        <div id="changeBoxLocationDialog" title="Change Box Location"></div>
-      </c:otherwise>
-    </c:choose>
-  </div>
-  <div class="barcodeArea ui-corner-all">
     <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Barcode</span>
     <c:if test="${box.id != 0}">
 	    <ul class="barcode-ddm">
@@ -135,7 +108,6 @@
 	      });
 	    </script>
     </c:if>
-    <div id="changeBoxLocationBarcodeDialog" title="Change Box Location"></div>
   </div>
   <div id="printServiceSelectDialog" title="Select a Printer"></div>
 </div>
@@ -188,6 +160,10 @@
         </c:when>
         <c:otherwise><td>${box.size.getRowsByColumns()} <c:choose><c:when test="${scannerEnabled}">(can ${box.size.scannable ? '':'not '}be scanned by your lab's bulk scanner)</c:when></c:choose></td></c:otherwise>
       </c:choose>
+    </tr>
+    <tr>
+      <td>Location:</td>
+      <td><form:input id="location" path="locationBarcode"/></td>
     </tr>
   </table>
 </div>
