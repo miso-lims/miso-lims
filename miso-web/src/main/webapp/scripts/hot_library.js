@@ -381,11 +381,11 @@ HotTarget.library = (function() {
           HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume,
               'volume', false),
           HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false),
-          HotUtils.makeColumnForFloat('Qubit (ng/&#181;l)', !create, 'qcQubit',
+          HotUtils.makeColumnForFloat('New Qubit (ng/&#181;l)', !create, 'qcQubit',
               false),
-          HotUtils.makeColumnForFloat('TapeStation (bp)', !create,
+          HotUtils.makeColumnForFloat('New TapeStation (bp)', !create,
               'qcTapeStation', false),
-          HotUtils.makeColumnForFloat('qPCR (mol/&#181;l)', !create, 'qcQPcr',
+          HotUtils.makeColumnForFloat('New qPCR (mol/&#181;l)', !create, 'qcQPcr',
               false), ];
     },
     
