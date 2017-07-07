@@ -554,11 +554,19 @@ public class MisoRequestManager implements RequestManager {
         container.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(container.getSecurityProfile())));
         container.setPlatform(platformStore.get(container.getPlatform().getId()));
         container.setLastModifier(securityStore.getUserById(getCurrentUser().getUserId()));
+        Date now = new Date();
+        if (container.getCreationTime() == null) {
+          container.setCreationTime(now);
+          container.setLastModified(now);
+        } else if (container.getLastModified() == null) {
+          container.setLastModified(now);
+        }
         return sequencerPartitionContainerStore.save(container);
       } else {
         SequencerPartitionContainer managed = getSequencerPartitionContainerById(container.getId());
         updateContainer(container, managed);
         managed.setLastModifier(securityStore.getUserById(getCurrentUser().getUserId()));
+        managed.setLastModified(new Date());
         return sequencerPartitionContainerStore.save(managed);
       }
     } else {
