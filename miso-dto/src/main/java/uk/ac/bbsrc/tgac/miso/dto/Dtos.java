@@ -22,6 +22,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -1803,6 +1804,14 @@ public class Dtos {
     StudyTypeDto dto = new StudyTypeDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
+    return dto;
+  }
+
+  public static ChangeLogDto asDto(ChangeLog from) {
+    ChangeLogDto dto = new ChangeLogDto();
+    dto.setSummary(from.getSummary());
+    dto.setTime(getDateTimeString(from.getTime()));
+    dto.setUserName(from.getUser().getFullName());
     return dto;
   }
 }

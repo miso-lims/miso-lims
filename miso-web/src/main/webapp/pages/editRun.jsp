@@ -29,6 +29,9 @@
 
 --%>
 <%@ include file="../header.jsp" %>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent" class="${not empty run.health ? 'run.health.key' : ''}">
 
@@ -697,30 +700,7 @@
 
 <br/>
 </form:form>
-<c:if test="${not empty run.changeLog}">
-  <br/>
-  <h1>Changes</h1>
-  <div style="clear:both">
-    <table class="list" id="changelog_table">
-      <thead>
-      <tr>
-        <th>Editor</th>
-        <th>Summary</th>
-        <th>Time</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${run.changeLog}" var="change">
-        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${change.user.fullName} (${change.user.loginName})</td>
-          <td><b>${change.summary}</b></td>
-          <td>${change.time}</td>
-        </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-  </div>
-</c:if>
+<miso:changelog item="${run}"/>
 </div>
 </div>
 
