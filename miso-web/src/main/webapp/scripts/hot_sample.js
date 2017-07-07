@@ -260,7 +260,7 @@ HotTarget.sample = (function() {
             validator : HotUtils.validator.requiredTextNoSpecialChars,
             include : show['Identity'],
             unpack : function(sam, flat, setCellMeta) {
-              // Do nothing; this never comes from the server
+              flat.externalName = sam.externalName;
             },
             pack : function(sam, flat, errorHandler) {
               sam.externalName = flat.externalName;
