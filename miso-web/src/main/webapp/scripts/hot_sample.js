@@ -479,8 +479,8 @@ HotTarget.sample = (function() {
               (show['Stock'] || show['Aliquot']), 'volume'),
           HotUtils.makeColumnForFloat('Conc. (ng/&#181;l)',
               (show['Stock'] || show['Aliquot']), 'concentration'),
-          HotUtils.makeColumnForFloat('New RIN', config.rnaSamples, 'qcRIN'),
-          HotUtils.makeColumnForFloat('New DV200', config.rnaSamples, 'qcDV200'),
+          HotUtils.makeColumnForFloat('New RIN', config.rnaSamples, 'qcRin'),
+          HotUtils.makeColumnForFloat('New DV200', config.rnaSamples, 'qcDv200'),
           
           // QC status columns for detailed and non-detailed samples
           {
