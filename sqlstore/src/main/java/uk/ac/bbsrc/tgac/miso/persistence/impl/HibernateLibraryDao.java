@@ -413,9 +413,12 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
 
   @Override
   public String propertyForSortColumn(String original) {
-    if ("parentSampleId".equals(original)) {
+    switch (original) {
+    case "parentSampleId":
       return "sample.id";
-    } else {
+    case "parentSampleAlias":
+      return "sample.alias";
+    default:
       return original;
     }
   }
