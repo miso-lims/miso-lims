@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -eu
+
+cd $(dirname $0)
+rm -rf interop-build
+mkdir interop-build
+cd interop-build
+cmake -D ENABLE_BACKWARDS_COMPATIBILITY=false -D ENABLE_DOCS=false -D ENABLE_SWIG=false -D ENABLE_TEST=false -D ENABLE_APPS=false -D ENABLE_EXAMPLES=false -D ENABLE_STATIC=false -D ENABLE_CSHARP=false -D ENABLE_PYTHON=false -D DISABLE_PACKAGE_SUBDIR=true -D ENABLE_STATIC=true -D ENABLE_PORTABLE=true ../interop
+make
