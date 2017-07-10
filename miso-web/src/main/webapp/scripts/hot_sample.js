@@ -322,16 +322,11 @@ HotTarget.sample = (function() {
                                     return sam.alias + " -- " + sam.externalName;
                                   });
                             }
-                            var indexOfMatchingIdentityInProject = function () {
-                              var match = -1;
-                              data.matchingIdentities.some(function (id, index) {
-                                if (id.projectId == selectedProject.id && id.externalName == flat.externalName) {
-                                  match = index;
-                                  return true;
-                                }
-                              });
-                              return match;
-                            }();
+                            
+                            function hasExternalNameInProject(identity) {
+                              return identity.projectId == selectedProject.id && identity.externalName == flat.externalName;
+                            }
+                            var indexOfMatchingIdentityInProject = data.matchingIdentities.findIndex(hasExternalNameInProject);
                             if (indexOfMatchingIdentityInProject < 0) {
                               identitiesSources
                                   .unshift("First Receipt (" + selectedProject[label] + ")");
