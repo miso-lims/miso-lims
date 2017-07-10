@@ -262,7 +262,7 @@ ListUtils = (function() {
         }
         var newlySelected = state.data.slice(Math
             .min(selectedIndex, shiftIndex), Math
-            .max(selectedIndex, shiftIndex));
+            .max(selectedIndex, shiftIndex) + 1);
         newlySelected
             .forEach(function(obj) {
               var element = document

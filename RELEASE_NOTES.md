@@ -1,8 +1,18 @@
-# 0.2.79
+# 0.2.80
 
 Changes:
 
  * Bug fixes 
+
+# 0.2.79
+
+Changes:
+
+ * Bug fixes
+
+Bad:
+
+ * Bugs (fixes in 0.2.80)
 
 # 0.2.78
 

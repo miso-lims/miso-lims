@@ -127,8 +127,7 @@ ListTarget.completion = {
           "sTitle" : "Remaining",
           "mData" : "remaining",
           "iSortPriority" : 0,
-          "include" : true,
-          "visibilityFilter" : nonZero
+          "include" : true
         }, {
           "sTitle" : "Last Updated",
           "mData" : "lastUpdated",
