@@ -322,15 +322,24 @@ HotTarget.sample = (function() {
                                     return sam.alias + " -- " + sam.externalName;
                                   });
                             }
-                            var hasIdentityInProject = (identitiesSources.length > 0 
-                                && data.matchingIdentities[0].projectId == selectedProject.id
-                                && data.matchingIdentities[0].externalName == flat.externalName);
-                            if (!hasIdentityInProject) {
+                            var indexOfMatchingIdentityInProject = function () {
+                              var match = -1;
+                              data.matchingIdentities.some(function (id, index) {
+                                if (id.projectId == selectedProject.id && id.externalName == flat.externalName) {
+                                  match = index;
+                                  return true;
+                                }
+                              });
+                              return match;
+                            }();
+                            if (indexOfMatchingIdentityInProject < 0) {
                               identitiesSources
                                   .unshift("First Receipt (" + selectedProject[label] + ")");
+                              setData(identitiesSources[0]);
+                            } else {
+                              setData(identitiesSources[indexOfMatchingIdentityInProject]);
                             }
                             requestCounter++;
-                            setData(identitiesSources[0]);
                             setOptions({
                               'source' : identitiesSources
                             });

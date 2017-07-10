@@ -29,8 +29,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -307,7 +307,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
     String str = DbUtils.convertStringToSearchQuery(externalName);
     Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
     criteria.add(Restrictions.eq("project.id", projectId));
-    criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
+    criteria.add(Restrictions.or(Restrictions.ilike("externalName", str)));
     @SuppressWarnings("unchecked")
     Collection<SampleIdentity> records = criteria.list();
     return records;
