@@ -307,7 +307,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
     String str = DbUtils.convertStringToSearchQuery(externalName);
     Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
     criteria.add(Restrictions.eq("project.id", projectId));
-    criteria.add(Restrictions.or(Restrictions.ilike("externalName", str)));
+    criteria.add(Restrictions.eq("externalName", str).ignoreCase());
     @SuppressWarnings("unchecked")
     Collection<SampleIdentity> records = criteria.list();
     return records;
