@@ -2,28 +2,33 @@ package uk.ac.bbsrc.tgac.miso.runscanner;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
+import uk.ac.bbsrc.tgac.miso.runscanner.processor.StandardIllumina;
 import uk.ac.bbsrc.tgac.miso.runscanner.processors.Testing;
 
 public abstract class RunProcessor {
 
-  public static final Iterable<RunProcessor> INSTANCES;
-  static {
-    List<RunProcessor> processors = new ArrayList<>();
-    // TODO add run processors as you create them
-    for (PlatformType type : PlatformType.values()) {
-      processors.add(new Testing(type));
-    }
-    INSTANCES = processors;
-  }
+  // TODO add run processors as you create them
+  public static final Iterable<RunProcessor> INSTANCES = Stream
+      .concat(Stream.of(new StandardIllumina()), Arrays.stream(PlatformType.values()).map(Testing::new)).collect(Collectors.toList());
 
+  public static ObjectMapper createObjectMapper() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule())
+        .setDateFormat(new ISO8601DateFormat());
+
+    return mapper;
+  }
   private final String name;
 
   private final PlatformType platformType;
@@ -34,11 +39,11 @@ public abstract class RunProcessor {
     this.name = name;
   }
 
-  public String getName() {
+  public final String getName() {
     return name;
   }
 
-  public PlatformType getPlatformType() {
+  public final PlatformType getPlatformType() {
     return platformType;
   }
 

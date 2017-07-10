@@ -10,17 +10,13 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 
 public class ParseNotificationJson {
 
   public static void main(String[] args) throws JsonGenerationException, JsonMappingException, IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule())
-        .setDateFormat(new ISO8601DateFormat());
+    ObjectMapper mapper = RunProcessor.createObjectMapper();
 
     List<NotificationDto> dtos = Arrays.stream(args).map(File::new).map(f -> {
       try {
