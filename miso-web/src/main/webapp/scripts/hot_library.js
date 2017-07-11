@@ -230,7 +230,8 @@ HotTarget.library = (function() {
               Constants.libraryDesignCodes, true, {
                 depends : 'libraryDesignAlias',
                 update : makeDesignUpdate('designCodeId', 'code', 'WG',
-                    Constants.libraryDesignCodes)
+                    Constants.libraryDesignCodes),
+                validator : HotUtils.validator.requiredAutocomplete
               }),
           {
             header : 'Platform',
@@ -244,7 +245,7 @@ HotTarget.library = (function() {
             }).map(function(pt) {
               return pt.key;
             }),
-            validator : HotUtils.validator.requiredText,
+            validator : HotUtils.validator.requiredAutocomplete,
             include : true,
             unpack : function(lib, flat, setCellMeta) {
               flat.platformType = lib.platformType;
@@ -259,7 +260,7 @@ HotTarget.library = (function() {
             'type' : 'dropdown',
             'trimDropdown' : false,
             'source' : [ '' ],
-            'validator' : HotUtils.validator.requiredText,
+            'validator' : HotUtils.validator.requiredAutocomplete,
             'include' : true,
             'depends' : 'platformType',
             'unpack' : function(lib, flat, setCellMeta) {
@@ -308,7 +309,7 @@ HotTarget.library = (function() {
             data : 'indexFamilyName',
             type : 'dropdown',
             trimDropdown : false,
-            validator : HotUtils.validator.requiredText,
+            validator : HotUtils.validator.requiredAutocomplete,
             source : [ '' ],
             include : true,
             unpack : function(lib, flat, setCellMeta) {
