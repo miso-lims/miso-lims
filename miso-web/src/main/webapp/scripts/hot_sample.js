@@ -263,7 +263,13 @@ HotTarget.sample = (function() {
               flat.externalName = sam.externalName;
             },
             pack : function(sam, flat, errorHandler) {
-              sam.externalName = flat.externalName;
+              if (flat.potentialIdentities) {
+                var selectedIdentity = Utils.array.findFirstOrNull(function(item) {
+                  return item.label == flat.identityAlias}, flat.potentialIdentities);
+                if (!selectedIdentity) {
+                  sam.externalName = flat.externalName;
+                }
+              }
             }
           },
           {
@@ -300,6 +306,7 @@ HotTarget.sample = (function() {
                           // make sure the counter lines up with the one from
                           // the original request
                           if (data.requestCounter == requestCounter) {
+                            var potentialIdentities = [];
                             var label = Constants.isDetailedSample
                                 ? 'shortName' : 'name';
                             var selectedProject = config.project || Utils.array
@@ -317,10 +324,12 @@ HotTarget.sample = (function() {
                                     ? 0 : b.projectId;
                                 return aSortId - bSortId;
                               })
-                              identitiesSources = data.matchingIdentities
-                                  .map(function(sam) {
-                                    return sam.alias + " -- " + sam.externalName;
-                                  });
+                              potentialIdentities = data.matchingIdentities;
+                              for (var i = 0; i < potentialIdentities.length; i++) {
+                                var identityLabel = potentialIdentities[i].alias + " -- " + potentialIdentities[i].externalName;
+                                potentialIdentities[i].label = identityLabel;
+                                identitiesSources.push(identityLabel);
+                              }
                             }
                             
                             function hasExternalNameInProject(identity) {
@@ -335,6 +344,7 @@ HotTarget.sample = (function() {
                               setData(identitiesSources[indexOfMatchingIdentityInProject]);
                             }
                             requestCounter++;
+                            flat.potentialIdentities = potentialIdentities;
                             setOptions({
                               'source' : identitiesSources
                             });
@@ -348,7 +358,14 @@ HotTarget.sample = (function() {
               // Do nothing; this never comes from the server
             },
             pack : function(sam, flat, errorHandler) {
-              sam.parentAlias = flat.identityAlias;
+              if (flat.potentialIdentities) {
+                var selectedIdentity = Utils.array.findFirstOrNull(function(item) {
+                  return item.label == flat.identityAlias}, flat.potentialIdentities);
+                if (selectedIdentity) {
+                  sam.parentAlias = selectedIdentity.alias;
+                  sam.externalName = selectedIdentity.externalName;
+                }
+              }
             }
           },
           HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;', show['Identity'], true,
