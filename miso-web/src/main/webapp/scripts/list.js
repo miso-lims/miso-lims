@@ -129,7 +129,7 @@ ListUtils = (function() {
           }
         });
     optionModifier(options, jqTable, errorMessage, columns);
-    jqTable.dataTable(options).fnSetFilteringDelay(600);
+    jqTable.dataTable(options).fnSetFilteringDelay(1300);
     var tableNode = document.getElementById(elementId + '_wrapper');
     errorMessage.setAttribute('class', 'parsley-error');
     tableNode.parentNode.insertBefore(errorMessage, tableNode);
@@ -186,6 +186,8 @@ ListUtils = (function() {
         options.sAjaxSource = target.createUrl(config, projectId);
         options.fnServerData = function(sSource, aoData, fnCallback) {
           jqTable.addClass('disabled');
+          var filterbox = jQuery('#' + elementId + '_filter :input');
+          filterbox.prop('disabled', true);
           jQuery.ajax({
             'dataType' : 'json',
             'type' : 'GET',
@@ -205,6 +207,7 @@ ListUtils = (function() {
               });
               updateSelectedLabel(ListState[elementId]);
               fnCallback(data, textStatus, xhr);
+              filterbox.prop('disabled', false);
             },
             'error' : function(xhr, statusText, errorThrown) {
               errorMessage.innerText = errorThrown;
@@ -216,6 +219,7 @@ ListUtils = (function() {
                 sEcho : aoData.sEcho,
                 aaData : []
               });
+              filterbox.prop('disabled', false);
             }
           });
         };
