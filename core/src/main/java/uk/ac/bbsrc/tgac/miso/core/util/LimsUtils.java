@@ -649,16 +649,6 @@ public class LimsUtils {
     return null;
   }
 
-  public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) {
-    for (SampleValidRelationship relationship : relationships) {
-      if (!relationship.getArchived() && relationship.getChild().getId() == id
-          && relationship.getParent().getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
     ValidationResult val = namingScheme.validateName(object.getName());
     if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
@@ -769,7 +759,7 @@ public class LimsUtils {
   public static Date toBadDate(LocalDate localDate, ZoneId timezone) {
     return Date.from(localDate.atStartOfDay(timezone).toInstant());
   }
-  
+
   public static Date toBadDate(LocalDate localDate) {
     return toBadDate(localDate, ZoneId.systemDefault());
   }

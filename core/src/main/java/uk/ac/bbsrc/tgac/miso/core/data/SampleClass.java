@@ -1,13 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasStockParent;
-
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import com.eaglegenomics.simlims.core.User;
 
 public interface SampleClass extends Serializable {
+
+  List<String> CATEGORIES = Collections.unmodifiableList(Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
+  SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME));
 
   Long getId();
 
@@ -53,12 +58,13 @@ public interface SampleClass extends Serializable {
 
   void setDNAseTreatable(Boolean treatable);
 
-  default boolean canCreateNew(Iterable<SampleValidRelationship> relationships) {
-    return (getSampleCategory().equals(SampleIdentity.CATEGORY_NAME)
-        || getSampleCategory().equals(SampleTissue.CATEGORY_NAME)
-        || getSampleCategory().equals(SampleTissueProcessing.CATEGORY_NAME)
-        || getSampleCategory().equals(SampleStock.CATEGORY_NAME)
-        || getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)
-            && hasStockParent(getId(), relationships));
+  default boolean hasPathToIdentity(Collection<SampleValidRelationship> relationships) {
+    if (getSampleCategory().equals(SampleIdentity.CATEGORY_NAME)) {
+      return true;
+    }
+    return relationships.stream()
+        .filter(relationship -> !relationship.getArchived() && relationship.getChild().getId() == getId()
+            && !relationship.getParent().getSampleCategory().equals(getSampleCategory()))
+        .anyMatch(relationship -> relationship.getParent().hasPathToIdentity(relationships));
   }
 }
