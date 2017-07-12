@@ -29,6 +29,15 @@ HotTarget.sample = (function() {
         });
   };
   
+  var getSelectedIdentity = function(flatObj) {
+	if (!flatObj.potentialIdentities) {
+      return null;
+	}
+    return Utils.array.findFirstOrNull(function(item) {
+      return item.label == flatObj.identityAlias;
+    }, flatObj.potentialIdentities);
+  }
+  
   return {
     
     createUrl : '/miso/rest/tree/sample/',
@@ -263,13 +272,9 @@ HotTarget.sample = (function() {
               flat.externalName = sam.externalName;
             },
             pack : function(sam, flat, errorHandler) {
-              if (flat.potentialIdentities) {
-                var selectedIdentity = Utils.array.findFirstOrNull(function(item) {
-                  return item.label == flat.identityAlias}, flat.potentialIdentities);
-                if (!selectedIdentity) {
-                  sam.externalName = flat.externalName;
-                }
-              }
+              if (!getSelectedIdentity(flat)) {
+                sam.externalName = flat.externalName;
+              } // else externalName will come from an existing Identity via the Identity Alias column
             }
           },
           {
@@ -358,14 +363,11 @@ HotTarget.sample = (function() {
               // Do nothing; this never comes from the server
             },
             pack : function(sam, flat, errorHandler) {
-              if (flat.potentialIdentities) {
-                var selectedIdentity = Utils.array.findFirstOrNull(function(item) {
-                  return item.label == flat.identityAlias}, flat.potentialIdentities);
-                if (selectedIdentity) {
-                  sam.parentAlias = selectedIdentity.alias;
-                  sam.externalName = selectedIdentity.externalName;
-                }
-              }
+              var selectedIdentity = getSelectedIdentity(flat);
+              if (selectedIdentity) {
+                sam.parentAlias = selectedIdentity.alias;
+                sam.externalName = selectedIdentity.externalName;
+              } // else externalName is for a new Identity and will come from the External Name column
             }
           },
           HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;', show['Identity'], true,
