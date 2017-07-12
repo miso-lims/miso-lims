@@ -18,10 +18,8 @@ public interface SampleClassService {
 
   void delete(Long sampleClassId) throws IOException;
 
-  public SampleClass inferStockFromAliquot(SampleClass sampleClass);
+  public SampleClass inferParentFromChild(long childClassId, String childCategory, String parentCategory);
 
   List<SampleClass> listByCategory(String sampleCategory) throws IOException;
-
-  SampleClass inferTissueFromStock(SampleClass sampleClass);
 
 }

@@ -478,11 +478,8 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
 
-  public static final List<String> CATEGORIES = Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
-      SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
-
   private static final Comparator<SampleClass> SAMPLECLASS_CATEGORY_ALIAS = (SampleClass o1, SampleClass o2) -> {
-    int categoryOrder = CATEGORIES.indexOf(o1.getSampleCategory()) - CATEGORIES.indexOf(o2.getSampleCategory());
+    int categoryOrder = SampleClass.CATEGORIES.indexOf(o1.getSampleCategory()) - SampleClass.CATEGORIES.indexOf(o2.getSampleCategory());
     if (categoryOrder != 0) return categoryOrder;
     return o1.getAlias().compareTo(o2.getAlias());
   };
@@ -496,7 +493,7 @@ public class EditSampleController {
       if (SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory())) {
         tissueClasses.add(sc);
       }
-      if (sc.canCreateNew(relationships)) {
+      if (sc.hasPathToIdentity(relationships)) {
         sampleClasses.add(sc);
       }
     }
@@ -958,7 +955,8 @@ public class EditSampleController {
         builder.setTissueClass(sampleClassService.get(builder.getTissueClass().getId()));
       }
       if (builder.getParent() == null && builder.getSampleClass().getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
-        builder.setStockClass(sampleClassService.inferStockFromAliquot(builder.getSampleClass()));
+        builder.setStockClass(sampleClassService.inferParentFromChild(builder.getSampleClass().getId(), SampleAliquot.CATEGORY_NAME,
+            SampleStock.CATEGORY_NAME));
       }
       sample = builder.build();
     }

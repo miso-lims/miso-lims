@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -59,6 +59,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -69,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
@@ -158,44 +161,22 @@ public class SampleController extends RestController {
     try {
       if (sampleDto instanceof SampleAliquotDto) {
         SampleAliquotDto dto = (SampleAliquotDto) sampleDto;
-        if (dto.getParentId() != null) {
-          // Pass
-        } else if (dto.getSampleClassId() == null) {
-          throw new RestException("No parent and no target sample class.", Status.BAD_REQUEST);
-        } else {
-          // infer parent stock class
-          SampleClass sampleClass = sampleClassService.get(dto.getSampleClassId());
-          if (sampleClass == null) {
-            throw new RestException("Cannot find sample class: " + dto.getSampleClassId(), Status.BAD_REQUEST);
-          }
-          if (!sampleClass.getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
-            throw new RestException("Class and type mismatch.", Status.BAD_REQUEST);
-          }
-          SampleClass stockClass = sampleClassService.inferStockFromAliquot(sampleClass);
-          dto.setStockClassId(stockClass.getId());
-
-          // infer grandparent tissue class
-          SampleClass tissueClass = sampleClassService.inferTissueFromStock(stockClass);
-          dto.setParentTissueSampleClassId(tissueClass.getId());
-        }
+        dto.setStockClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
+            SampleStock.CATEGORY_NAME));
+        // infer grandparent tissue class
+        dto.setParentTissueSampleClassId(inferIntermediateSampleClassId(dto, dto.getStockClassId(),
+            SampleStock.CATEGORY_NAME, SampleTissue.CATEGORY_NAME));
       } else if (sampleDto instanceof SampleStockDto) {
         DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
-        if (dto.getParentId() != null) {
-          // Pass
-        } else if (dto.getSampleClassId() == null) {
-          throw new RestException("No parent and no target sample class.", Status.BAD_REQUEST);
-        } else {
-          // infer parent tissue class
-          SampleClass sampleClass = sampleClassService.get(dto.getSampleClassId());
-          if (sampleClass == null) {
-            throw new RestException("Cannot find sample class: " + dto.getSampleClassId(), Status.BAD_REQUEST);
-          }
-          if (!sampleClass.getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
-            throw new RestException("Class and type mismatch.", Status.BAD_REQUEST);
-          }
-          SampleClass tissueClass = sampleClassService.inferTissueFromStock(sampleClass);
-          dto.setParentTissueSampleClassId(tissueClass.getId());
-        }
+        dto.setParentTissueSampleClassId(
+            inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleStock.CATEGORY_NAME,
+                SampleTissue.CATEGORY_NAME));
+      } else if (sampleDto instanceof SampleTissueProcessingDto) {
+        DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
+        dto.setParentTissueSampleClassId(
+            inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleTissueProcessing.CATEGORY_NAME,
+                SampleTissue.CATEGORY_NAME));
+
       }
       Sample sample = Dtos.to(sampleDto);
       id = sampleService.create(sample);
@@ -216,6 +197,19 @@ public class SampleController extends RestController {
     created.setUrl(uriComponents.toUri().toString());
     response.setHeader("Location", uriComponents.toUri().toString());
     return created;
+  }
+
+  private Long inferIntermediateSampleClassId(DetailedSampleDto dto, Long childClassId,
+      String childClassCategory, String parentCategory) {
+    if (dto.getParentId() != null) {
+      return null;
+    }
+    if (childClassId == null) {
+      throw new RestException("No parent and no target sample class.", Status.BAD_REQUEST);
+    }
+    // infer parent class
+    SampleClass parentClass = sampleClassService.inferParentFromChild(childClassId, childClassCategory, parentCategory);
+    return parentClass.getId();
   }
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })

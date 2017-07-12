@@ -62,7 +62,6 @@ public interface Sample
   public static final Long UNSAVED_ID = 0L;
   /** Field PREFIX */
   public static final String PREFIX = "SAM";
-
   public void setId(long id);
 
   /**
