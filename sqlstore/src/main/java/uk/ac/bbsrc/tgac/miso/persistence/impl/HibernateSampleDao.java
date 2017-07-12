@@ -304,10 +304,9 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
   public Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException {
     if (isStringEmptyOrNull(externalName)) return Collections.emptySet();
     if (projectId == null) throw new IllegalArgumentException("Must provide a projectId in search");
-    String str = DbUtils.convertStringToSearchQuery(externalName);
     Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
     criteria.add(Restrictions.eq("project.id", projectId));
-    criteria.add(Restrictions.eq("externalName", str).ignoreCase());
+    criteria.add(Restrictions.eq("externalName", externalName).ignoreCase());
     @SuppressWarnings("unchecked")
     Collection<SampleIdentity> records = criteria.list();
     return records;
