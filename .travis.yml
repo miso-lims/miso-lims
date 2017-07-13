@@ -12,7 +12,7 @@ jdk:
 before_script:
   - export MAVEN_OPTS='-Xms1g -Xmx2g'
 script:
-  - mvn clean -P external -Dmaven.javadoc.skip=true install
+  - mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false install
 
 cache:
   directories:

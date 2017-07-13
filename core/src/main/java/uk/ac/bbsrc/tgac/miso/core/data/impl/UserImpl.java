@@ -152,7 +152,7 @@ public class UserImpl implements User, Serializable {
 
   @Override
   public String[] getRoles() {
-    return roles.split(",");
+    return roles == null ? new String[0] : roles.split(",");
   }
 
   @Override
