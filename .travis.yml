@@ -29,7 +29,7 @@ before_script:
 
 script:
   - mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false install
-  - if [ ${TRAVIS_PULL_REQUEST_SLUG} == "TGAC/miso-lims" ]; then mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar; fi
+  - if [ ${TRAVIS_PULL_REQUEST_SLUG} == "TGAC/miso-lims" ]; then mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar; else echo "[WARN] SonarCloud cannot run on pull requests from forks." fi
 
 cache:
   directories:
