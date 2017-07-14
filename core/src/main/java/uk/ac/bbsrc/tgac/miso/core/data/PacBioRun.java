@@ -35,22 +35,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 public class PacBioRun extends Run {
   private static final long serialVersionUID = 1L;
 
-  private Integer movieDuration;
-
   public PacBioRun(User user) {
     super(user);
   }
 
   public PacBioRun() {
     super();
-  }
-
-  public Integer getMovieDuration() {
-    return movieDuration;
-  }
-
-  public void setMovieDuration(Integer movieDuration) {
-    this.movieDuration = movieDuration;
   }
 
   @Override

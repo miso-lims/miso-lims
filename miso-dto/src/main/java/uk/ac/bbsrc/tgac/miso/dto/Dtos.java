@@ -1724,7 +1724,6 @@ public class Dtos {
   }
 
   private static void setPacBioRunValues(PacBioNotificationDto from, PacBioRun to) {
-    to.setMovieDuration(from.getMovieDurationInSec());
   }
 
   private static void setIlluminaRunValues(IlluminaNotificationDto from, IlluminaRun to) {
@@ -1733,7 +1732,7 @@ public class Dtos {
 
   private static void setCommonRunValues(NotificationDto from, Run to) {
     to.setAlias(from.getRunAlias());
-    to.setFilePath(from.getSequencerFolderPath().toString());
+    to.setFilePath(from.getSequencerFolderPath());
     to.setHealth(from.getHealthType());
     to.setStartDate(LimsUtils.toBadDate(from.getStartDate()));
     to.setCompletionDate(LimsUtils.toBadDate(from.getCompletionDate()));

@@ -98,6 +98,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -638,7 +639,7 @@ public class EditLibraryController {
 
     Collection<Pool> pools = poolService.listByLibraryId(library.getId());
     model.put("libraryPools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
-    model.put("libraryRuns", pools.stream().flatMap(LimsUtils.logWhining(log, p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
+    model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatLog(log, p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
 
     populateDesigns(model,

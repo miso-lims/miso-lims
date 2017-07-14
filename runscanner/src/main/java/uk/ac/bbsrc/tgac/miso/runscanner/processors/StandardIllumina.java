@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.runscanner.processors;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.TimeZone;
@@ -12,8 +11,9 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
@@ -28,20 +28,22 @@ public final class StandardIllumina extends RunProcessor {
 
   private static final Logger log = LoggerFactory.getLogger(StandardIllumina.class);
 
-  public StandardIllumina() {
-    super(PlatformType.ILLUMINA, "default");
+  public static StandardIllumina create(Builder builder, ObjectNode parameters) {
+    return new StandardIllumina(builder);
+  }
+
+  public StandardIllumina(Builder builder) {
+    super(builder);
   }
 
   @Override
   public NotificationDto process(File runDirectory, TimeZone tz) throws IOException {
-    Path runPath = runDirectory.toPath().toAbsolutePath();
-
     // Call the C++ program to do the real work and write a notification DTO to standard output. The C++ object has no direct binding to the
     // DTO, so any changes to the DTO must be manually changed in the C++ code.
     Process process = new ProcessBuilder("runscanner-illumina", runDirectory.getAbsolutePath()).directory(runDirectory).start();
 
     IlluminaNotificationDto dto = createObjectMapper().readValue(process.getInputStream(), IlluminaNotificationDto.class);
-    dto.setSequencerFolderPath(runPath);
+    dto.setSequencerFolderPath(runDirectory.getAbsolutePath());
     try {
       if (process.waitFor() != 0) {
         throw new IOException("Illumina run processor did not exit cleanly: " + runDirectory.getAbsolutePath());

@@ -42,6 +42,22 @@ var RunGraph = (function() {
       
     });
   };
+  var externalLink = function(metrics) {
+    return metrics.filter(function(metric) {
+      return metric.type == 'link';
+    }).map(function(metric) {
+      var link = document.createElement('A');
+      link.innerText = metric.name;
+      link.href = metric.href;
+      link.target = "_blank";
+      return {
+        dom : link,
+        priority : 0,
+        render : function() {
+        }
+      };
+    });
+  };
   
   return {
     // Takes a list of metrics and renders them to #metricsdiv
@@ -52,7 +68,7 @@ var RunGraph = (function() {
       }
       // Start with graphs we know how to make (see the example for a template).
       // Then filter them as appropriate for the data we have.
-      var graphs = [ example, ].map(function(graph) {
+      var graphs = [ example, externalLink, ].map(function(graph) {
         return graph(metrics);
       }).reduce(function(a, b) {
         return a.concat(b);

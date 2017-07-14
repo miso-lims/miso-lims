@@ -32,7 +32,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -129,21 +128,6 @@ public class EditRunController {
       }
     }
     return false;
-  }
-
-  @Value("${miso.pacbio.dashboard.connected}")
-  private Boolean isPacBioDashboardConnected;
-
-  @Value("${miso.pacbio.dashboard.url}")
-  private String pacBioDashboardUrl;
-
-  @ModelAttribute("pacBioDashboardUrl")
-  public String getPacBioDashboardUrl() {
-    if (isPacBioDashboardConnected) {
-      return pacBioDashboardUrl + (pacBioDashboardUrl.endsWith("/") ? "" : "/") + "Metrics/RSRunReport";
-    } else {
-      return null;
-    }
   }
 
   public Boolean hasOperationsQcPassed(Run run) throws IOException {

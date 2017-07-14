@@ -8,9 +8,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -18,6 +20,8 @@ import java.util.stream.IntStream;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,8 +56,10 @@ import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
@@ -63,6 +69,8 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultRunService implements RunService, AuthorizedPaginatedDataSource<Run> {
+
+  private static final Logger log = LoggerFactory.getLogger(DefaultRunService.class);
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -84,6 +92,8 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
+  @Autowired
+  private PoolService poolService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -405,7 +415,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private void applyPacBioChanges(PacBioRun target, PacBioRun source) throws IOException {
-    target.setMovieDuration(source.getMovieDuration());
   }
 
   private void applyLS454Changes(LS454Run target, LS454Run source) throws IOException {
@@ -516,7 +525,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
   @Override
   public boolean processNotification(Run source, int laneCount, String containerSerialNumber, String sequencerName,
-      Predicate<SequencingParameters> filterParameters)
+      Predicate<SequencingParameters> filterParameters, IntFunction<Optional<String>> getLaneContents)
       throws IOException, MisoNamingException {
     final Date now = new Date();
     User user = securityManager.getUserByLoginName("notification");
@@ -555,7 +564,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     }
     target.setSequencerReference(sequencer);
 
-    isMutated |= updateContainerFromNotification(target, user, laneCount, containerSerialNumber, sequencer);
+    isMutated |= updateContainerFromNotification(target, user, laneCount, containerSerialNumber, sequencer, getLaneContents);
     isMutated |= updateHealthFromNotification(source, target, user);
 
     switch (source.getPlatformType()) {
@@ -573,8 +582,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     case OXFORDNANOPORE:
       throw new NotImplementedException();
     case PACBIO:
-      isMutated |= updateField(((PacBioRun) source).getMovieDuration(), ((PacBioRun) target).getMovieDuration(),
-          v -> ((PacBioRun) target).setMovieDuration(v));
+      // Nothing to do
       break;
     case SOLID:
       // Nothing to do
@@ -625,7 +633,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private boolean updateContainerFromNotification(final Run target, User user, int laneCount, String containerSerialNumber,
-      final SequencerReference sequencer) throws IOException {
+      final SequencerReference sequencer, final IntFunction<Optional<String>> getLaneContents) throws IOException {
     final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
     switch (containers.size()) {
     case 0:
@@ -637,6 +645,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       newContainer
           .setPartitions(
               IntStream.range(0, laneCount).mapToObj((i) -> new PartitionImpl(newContainer, i)).collect(Collectors.toList()));
+      updatePartitionContents(getLaneContents, newContainer);
       target.setSequencerPartitionContainers(Collections.singletonList(containerService.create(newContainer)));
       return true;
     case 1:
@@ -647,6 +656,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       }
       if (target.getSequencerPartitionContainers().stream().noneMatch(c -> c.getId() == container.getId())) {
         target.getSequencerPartitionContainers().add(container);
+        updatePartitionContents(getLaneContents, container);
         return true;
       }
       break;
@@ -654,6 +664,12 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       throw new IllegalArgumentException("Multiple containers with same identifier: " + containerSerialNumber);
     }
     return false;
+  }
+
+  private void updatePartitionContents(final IntFunction<Optional<String>> getLaneContents, SequencerPartitionContainer newContainer) {
+    newContainer.getPartitions().stream().filter(partition -> partition.getPool() == null)
+        .forEach(partition -> getLaneContents.apply(partition.getPartitionNumber())
+            .map(WhineyFunction.log(log, poolService::getByBarcode)).ifPresent(partition::setPool));
   }
 
   private boolean updateHealthFromNotification(Run source, final Run target, User user) {

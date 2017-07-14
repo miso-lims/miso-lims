@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -62,8 +63,11 @@ public class UserInterfaceController {
   }
 
   @ModelAttribute("processors")
-  public Iterable<RunProcessor> populateProcessors() {
-    return RunProcessor.INSTANCES;
+  public Iterable<RunProcessor.Builder> populateProcessors() {
+    return RunProcessor.builders().sorted((a, b) -> {
+      int c = a.getPlatformType().ordinal() - b.getPlatformType().ordinal();
+      return c == 0 ? a.getName().compareTo(b.getName()) : c;
+    }).collect(Collectors.toList());
   }
 
   @ModelAttribute("uptime")

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
@@ -65,12 +66,17 @@ public class Scheduler {
   public static class SuppliedDirectoryConfig {
 
     private String name;
+    private ObjectNode parameters;
     private String path;
     private PlatformType platformType;
     private String timeZone;
 
     public String getName() {
       return name;
+    }
+
+    public ObjectNode getParameters() {
+      return parameters;
     }
 
     public String getPath() {
@@ -87,6 +93,10 @@ public class Scheduler {
 
     public void setName(String name) {
       this.name = name;
+    }
+
+    public void setParameters(ObjectNode parameters) {
+      this.parameters = parameters;
     }
 
     public void setPath(String path) {
@@ -165,12 +175,12 @@ public class Scheduler {
   // The paths that need to be processed (and the corresponding processor).
   private final Set<File> workToDo = new ConcurrentSkipListSet<>();
 
-  public Stream<Pair<File, NotificationDto>> finished() {
-    return finishedWork.entrySet().stream().map(x -> new Pair<>(x.getKey(), x.getValue().dto));
+  public Stream<NotificationDto> finished() {
+    return finishedWork.values().stream().map(x -> x.dto);
   }
 
-  public Stream<Pair<File, NotificationDto>> finished(long epoch) {
-    return finishedWork.entrySet().stream().filter(x -> x.getValue().epoch >= epoch).map(x -> new Pair<>(x.getKey(), x.getValue().dto));
+  public Stream<NotificationDto> finished(long epoch) {
+    return finishedWork.values().stream().filter(x -> x.epoch >= epoch).map(x -> x.dto);
   }
 
   public Iterable<Configuration> getConfiguration() {
@@ -285,12 +295,8 @@ public class Scheduler {
         Configuration destination = new Configuration();
         destination.setPath(new File(source.getPath()));
         destination.setTimeZone(TimeZone.getTimeZone(source.getTimeZone()));
-        for (RunProcessor processor : RunProcessor.INSTANCES) {
-          if (processor.getName().equals(source.getName()) && processor.getPlatformType() == source.getPlatformType()) {
-            destination.setProcessor(processor);
-            break;
-          }
-        }
+        destination.setProcessor(RunProcessor.processorFor(source.getPlatformType(), source.getName(), source.getParameters())
+            .orElse(null));
         return destination;
       }).collect(Collectors.toList());
       configurationEntries.set(roots.size());
