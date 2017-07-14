@@ -649,10 +649,10 @@ public class BoxControllerHelperService {
       try {
         boxScanner.prepareScan(rows, columns);
       } catch (IntegrationException e) {
-        log.debug("Integration error preparing scanner", e);
+        log.error("Integration error preparing scanner", e);
         return JSONUtils.SimpleJSONError("Error: could not find the scanner");
       } catch (Exception e) {
-        log.debug("General error preparing scanner", e);
+        log.error("General error preparing scanner", e);
         return JSONUtils.SimpleJSONError("Error: could not find the scanner");
       }
       return JSONUtils.SimpleJSONResponse("OK");
@@ -829,7 +829,7 @@ public class BoxControllerHelperService {
       scanResults.put("cols", scan.getColumnCount());
       return scanResults;
     } catch (IntegrationException | IOException e) {
-      log.info(e.getMessage());
+      log.error(e.getMessage());
       return JSONUtils.SimpleJSONError("Error scanning box: " + e.getMessage());
     }
   }
