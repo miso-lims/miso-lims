@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.runscanner;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ public class RestController {
   @RequestMapping(value = "/run/{name}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public NotificationDto getByName(@PathVariable("name") String id) {
-    return scheduler.finished().filter(entry -> entry.getValue().getRunAlias().equals(id)).map(Map.Entry::getValue).findAny().orElse(null);
+    return scheduler.finished().filter(dto -> dto.getRunAlias().equals(id)).findAny().orElse(null);
   }
 
   /**
@@ -54,7 +53,7 @@ public class RestController {
   @RequestMapping(value = "/runs/all", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public List<NotificationDto> list() {
-    return scheduler.finished().map(Map.Entry::getValue).collect(Collectors.toList());
+    return scheduler.finished().collect(Collectors.toList());
   }
 
   /**
@@ -84,7 +83,7 @@ public class RestController {
     response.setEpoch(scheduler.getEpoch());
     try (AutoCloseable timer = progressiveLatency.start()) {
       response.setUpdates((request.getToken() == token ? scheduler.finished(request.getEpoch()) : scheduler.finished())
-          .map(Map.Entry::getValue).collect(Collectors.toList()));
+          .collect(Collectors.toList()));
     } catch (Exception e) {
       log.error("Error during progressive run", e);
       response.setUpdates(Collections.emptyList());

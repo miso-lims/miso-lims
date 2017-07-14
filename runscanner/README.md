@@ -15,7 +15,8 @@ In `/etc/runscanner.json`, or another path of your choosing, put JSON data descr
       "path": "/some/directory/where/sequencer/writes",
       "platformType": "ILLUMINA",
       "name": "default",
-      "timeZone": "America/Toronto"
+      "timeZone": "America/Toronto",
+      "parameters": {}
     }
 
 The JSON file then contains a list of instruments:
@@ -25,17 +26,21 @@ The JSON file then contains a list of instruments:
         "path": "/srv/sequencer/hiseq2500_1",
         "platformType": "ILLUMINA",
         "name": "default",
-        "timeZone": "America/Toronto"
+        "timeZone": "America/Toronto",
+        "parameters": {}
       },
       {
         "path": "/srv/sequencer/hiseq2500_2",
         "platformType": "ILLUMINA",
         "name": "default",
-        "timeZone": "America/Toronto"
+        "timeZone": "America/Toronto",
+        "parameters": {}
       }
     ]
 
 The name/platform-type combination decide what scanner is used to interpret the sequencer's results. A list of supported scanners can be found on the status page or the debugging interface below.
+
+The parameters are set based on the processor. Currently, PACBIO/default requires `address` to be set to the URL of the PacBio machine.
 
 ## Debugging
 For troublesome runs, you can see the output for a particular run directory using:

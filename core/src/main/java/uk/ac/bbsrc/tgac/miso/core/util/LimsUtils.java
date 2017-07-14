@@ -48,6 +48,7 @@ import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,10 +56,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -766,15 +765,11 @@ public class LimsUtils {
     return toBadDate(localDate, ZoneId.systemDefault());
   }
 
-  public static <T, R> Function<T, Stream<R>> logWhining(Logger log, WhineyFunction<? super T, R> action) {
-    return input -> {
-      try {
-        return action.apply(input).stream();
-      } catch (IOException e) {
-        log.error("Exception during flatMap", e);
-      }
-      return Stream.empty();
-    };
+  public static Date toBadDate(LocalDateTime localDate, ZoneId timezone) {
+    return toBadDate(localDate.toLocalDate());
   }
 
+  public static Date toBadDate(LocalDateTime localDate) {
+    return toBadDate(localDate, ZoneId.systemDefault());
+  }
 }

@@ -118,6 +118,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
@@ -780,9 +781,9 @@ public class EditSampleController {
 
         model.put("sampleLibraries", sample.getLibraries().stream().map(Dtos::asDto).collect(Collectors.toList()));
         Set<Pool> pools = sample.getLibraries().stream()
-            .flatMap(LimsUtils.logWhining(log, library -> poolService.listByLibraryId(library.getId())))
+            .flatMap(WhineyFunction.flatLog(log, library -> poolService.listByLibraryId(library.getId())))
             .distinct().collect(Collectors.toSet());
-        List<RunDto> runDtos = pools.stream().flatMap(LimsUtils.logWhining(log, pool -> runService.listByPoolId(pool.getId())))
+        List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatLog(log, pool -> runService.listByPoolId(pool.getId())))
             .map(Dtos::asDto)
             .collect(Collectors.toList());
         model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));

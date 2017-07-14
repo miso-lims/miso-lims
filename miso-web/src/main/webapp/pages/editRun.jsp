@@ -183,23 +183,6 @@
       </c:choose>
     </td>
   </tr>
-  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.PacBioRun')}">
-    <c:if test="${pacBioDashboardUrl != null && run.id != 0}">
-      <tr>
-        <td>PacBio Dashboard:</td>
-        <td><span id="pbDashLink"></span></td>
-        <script type="text/javascript">
-          jQuery(document).ready(function() {
-            Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.startDate}', '${run.sequencerReference.name}');
-          });
-        </script>
-      </tr>
-    </c:if>
-    <tr>
-      <td>Movie Duration (minutes):</td>
-      <td><form:input path="movieDuration" class="validateable"/></td>
-    </tr>
-  </c:if>
   <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
     <tr>
       <td>Number of Cycles:</td>

@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import java.nio.file.Path;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -16,13 +16,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 public abstract class NotificationDto {
 
   private String runAlias;
-  private Path sequencerFolderPath;
+  private String sequencerFolderPath;
   private String sequencerName;
   private String containerSerialNumber;
   private int laneCount;
   private HealthType healthType;
-  private LocalDate startDate;
-  private LocalDate completionDate;
+  private LocalDateTime startDate;
+  private LocalDateTime completionDate;
   private boolean pairedEndRun;
   private String software;
   private ArrayNode metrics;
@@ -67,11 +67,11 @@ public abstract class NotificationDto {
     this.healthType = healthType;
   }
 
-  public Path getSequencerFolderPath() {
+  public String getSequencerFolderPath() {
     return sequencerFolderPath;
   }
 
-  public void setSequencerFolderPath(Path sequencerFolderPath) {
+  public void setSequencerFolderPath(String sequencerFolderPath) {
     this.sequencerFolderPath = sequencerFolderPath;
   }
 
@@ -91,19 +91,19 @@ public abstract class NotificationDto {
     this.software = software;
   }
 
-  public LocalDate getStartDate() {
+  public LocalDateTime getStartDate() {
     return startDate;
   }
 
-  public void setStartDate(LocalDate startDate) {
+  public void setStartDate(LocalDateTime startDate) {
     this.startDate = startDate;
   }
 
-  public LocalDate getCompletionDate() {
+  public LocalDateTime getCompletionDate() {
     return completionDate;
   }
 
-  public void setCompletionDate(LocalDate completionDate) {
+  public void setCompletionDate(LocalDateTime completionDate) {
     this.completionDate = completionDate;
   }
 
@@ -177,5 +177,9 @@ public abstract class NotificationDto {
       if (other.startDate != null) return false;
     } else if (!startDate.equals(other.startDate)) return false;
     return true;
+  }
+  
+  public Optional<String> getLaneContents(int lane) {
+    return Optional.empty();
   }
 }

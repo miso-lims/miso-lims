@@ -3,16 +3,20 @@ package uk.ac.bbsrc.tgac.miso.runscanner;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
+import uk.ac.bbsrc.tgac.miso.runscanner.processors.PacBioProcessor;
 import uk.ac.bbsrc.tgac.miso.runscanner.processors.StandardIllumina;
 import uk.ac.bbsrc.tgac.miso.runscanner.processors.Testing;
 
@@ -28,10 +32,55 @@ import uk.ac.bbsrc.tgac.miso.runscanner.processors.Testing;
  * incomplete.
  */
 public abstract class RunProcessor {
+  /**
+   * Factory for building a particular {@link RunProcessor}
+   */
+  public static final class Builder implements Function<ObjectNode, RunProcessor> {
+    private final BiFunction<Builder, ObjectNode, RunProcessor> create;
 
-  // TODO add run processors as you create them
-  public static final Iterable<RunProcessor> INSTANCES = Stream
-      .concat(Stream.of(new StandardIllumina()), Arrays.stream(PlatformType.values()).map(Testing::new)).collect(Collectors.toList());
+    private final String name;
+    private final PlatformType platformType;
+
+    public Builder(PlatformType platformType, String name, BiFunction<Builder, ObjectNode, RunProcessor> create) {
+      this.platformType = platformType;
+      this.name = name;
+      this.create = create;
+    }
+
+    @Override
+    public RunProcessor apply(ObjectNode parameters) {
+      return create.apply(this, parameters);
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public PlatformType getPlatformType() {
+      return platformType;
+    }
+  }
+
+  /**
+   * Find the builder that matches the requested parameters.
+   * 
+   * @param pt the platform type of the processor
+   * @param name the name of the processor
+   * @return a builder if one exists
+   */
+  public static Optional<Builder> builderFor(PlatformType pt, String name) {
+    return builders().filter(builder -> builder.getPlatformType() == pt && builder.getName().equals(name)).findAny();
+  }
+
+  /**
+   * Produce a stream of all known builders of run processors.
+   */
+  public static Stream<Builder> builders() {
+    Stream<Builder> standard = Stream.of(new Builder(PlatformType.ILLUMINA, "default", StandardIllumina::create),
+        new Builder(PlatformType.PACBIO, "default", PacBioProcessor::create));
+    return Stream.concat(standard,
+        Arrays.stream(PlatformType.values()).map(type -> new Builder(type, "testing", (builder, config) -> new Testing(builder))));
+  }
 
   /**
    * Creates a JSON mapper that is configured to handle the dates in {@link NotificationDto}.
@@ -44,14 +93,26 @@ public abstract class RunProcessor {
     return mapper;
   }
 
+  /**
+   * Create a run processor for the request configuration, if one exists.
+   * 
+   * @param pt the platform type of the processor
+   * @param name the name of the processor
+   * @param parameters a JSON object containing any other configuration parameters
+   * @return
+   */
+  public static Optional<RunProcessor> processorFor(PlatformType pt, String name, ObjectNode parameters) {
+    return builderFor(pt, name).map(builder -> builder.apply(parameters));
+  }
+
   private final String name;
 
   private final PlatformType platformType;
 
-  public RunProcessor(PlatformType platformType, String name) {
+  public RunProcessor(Builder builder) {
     super();
-    this.platformType = platformType;
-    this.name = name;
+    platformType = builder.getPlatformType();
+    name = builder.getName();
   }
 
   /**

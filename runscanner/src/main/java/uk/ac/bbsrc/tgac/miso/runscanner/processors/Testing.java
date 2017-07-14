@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.PacBioNotificationDto;
@@ -24,8 +23,8 @@ import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
 public class Testing extends RunProcessor {
   private static final Pattern INTEGER_TAIL = Pattern.compile("-(\\d+)s$");
 
-  public Testing(PlatformType platformType) {
-    super(platformType, "testing");
+  public Testing(Builder builder) {
+    super(builder);
   }
 
   /**

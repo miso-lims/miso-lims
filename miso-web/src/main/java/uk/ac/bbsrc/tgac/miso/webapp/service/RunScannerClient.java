@@ -103,7 +103,7 @@ public class RunScannerClient {
           // TODO Get parameter filter for each run type
           Predicate<SequencingParameters> filterParameters = sp -> true;
           (runService.processNotification(Dtos.to(dto, user), dto.getLaneCount(), dto.getContainerSerialNumber(), dto.getSequencerName(),
-              filterParameters) ? saveNew : saveUpdate).inc();
+              filterParameters, dto::getLaneContents) ? saveNew : saveUpdate).inc();
           saveCount.inc();
         } catch (Exception e) {
           log.error("Failed to save run: " + dto.getRunAlias(), e);
