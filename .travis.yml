@@ -33,7 +33,7 @@ script:
   - 'if [ ${TRAVIS_PULL_REQUEST_SLUG} == ${TRAVIS_REPO_SLUG} ]; then 
         mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar;
      else 
-        echo "[WARN] SonarCloud cannot run on pull requests from forks." 
+        echo "[WARN] SonarCloud cannot run on pull requests from forks."; 
      fi'
 
 cache:
