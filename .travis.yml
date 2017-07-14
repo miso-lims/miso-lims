@@ -23,13 +23,13 @@ addons:
 before_install:
     - git clone https://github.com/oicr-gsi/gsi-config.git "${MAVEN_SETTINGS}"
     - cp "${MAVEN_SETTINGS}/settings.xml" "${HOME}/.m2/settings.xml"
-    - echo "branch: ${TRAVIS_BRANCH} ; pr branch ${TRAVIS_PULL_REQUEST_BRANCH}; pr slug ${TRAVIS_PULL_REQUEST_SLUG}"
 
 before_script:
   - export MAVEN_OPTS='-Xms1g -Xmx2g'
 
 script:
-  - mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+  - mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false install
+  - if [ ${TRAVIS_PULL_REQUEST_SLUG} == "TGAC/miso-lims" ]; then mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar; fi
 
 cache:
   directories:
