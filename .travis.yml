@@ -23,6 +23,7 @@ addons:
 before_install:
     - git clone https://github.com/oicr-gsi/gsi-config.git "${MAVEN_SETTINGS}"
     - cp "${MAVEN_SETTINGS}/settings.xml" "${HOME}/.m2/settings.xml"
+    - echo "branch: ${TRAVIS_BRANCH} ; pr branch ${TRAVIS_PULL_REQUEST_BRANCH}; pr slug ${TRAVIS_PULL_REQUEST_SLUG}"
 
 before_script:
   - export MAVEN_OPTS='-Xms1g -Xmx2g'
