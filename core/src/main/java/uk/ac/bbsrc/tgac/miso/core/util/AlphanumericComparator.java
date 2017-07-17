@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -34,12 +34,10 @@ import java.util.Comparator;
  * @date 01/12/11
  * @since 0.1.3
  */
-public abstract class AlphanumericComparator<T> implements Comparator<T> {
-  protected abstract String getProperty(T object);
+public final class AlphanumericComparator implements Comparator<String> {
+  public static final AlphanumericComparator INSTANCE = new AlphanumericComparator();
   @Override
-  public final int compare(T firstObjToCompare, T secondObjToCompare) {
-    String firstString = getProperty(firstObjToCompare);
-    String secondString = getProperty(secondObjToCompare);
+  public final int compare(String firstString, String secondString) {
 
     if (secondString == null && firstString == null) {
       return 0;

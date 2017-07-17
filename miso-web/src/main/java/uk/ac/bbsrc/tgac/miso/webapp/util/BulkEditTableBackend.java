@@ -1,8 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
@@ -33,16 +34,12 @@ public abstract class BulkEditTableBackend<Model, Dto> extends BulkTableBackend<
    */
   public final ModelAndView edit(String idString, ModelMap model) throws IOException {
     List<Long> ids = parseIds(idString);
-    List<Dto> dtos = new ArrayList<>();
-    for (Model item : load(ids)) {
-      dtos.add(asDto(item));
-    }
-    return prepare(model, false, "Edit " + name, dtos);
+    return prepare(model, false, "Edit " + name, load(ids).map(this::asDto).collect(Collectors.toList()));
   }
 
   /**
    * Read all the specified models from the database by their IDs.
    */
-  protected abstract Iterable<Model> load(List<Long> modelIds) throws IOException;
+  protected abstract Stream<Model> load(List<Long> modelIds) throws IOException;
 
 }
