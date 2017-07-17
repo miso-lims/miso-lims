@@ -104,32 +104,38 @@ ListUtils = (function() {
     }
     var errorMessage = document.createElement('DIV');
     var jqTable = jQuery('#' + elementId).html('');
-    var options = Utils
-        .setSortFromPriority({
-          'aoColumns' : columns,
-          'bJQueryUI' : true,
-          'bAutoWidth' : false,
-          'iDisplayLength' : 25,
-          'iDisplayStart' : 0,
-          'sDom' : '<"H"lf>r<"datatable-scroll"t><"F"ip>',
-          'sPaginationType' : 'full_numbers',
-          'bProcessing' : true,
-          'oSearch' : {
-            'sSearch' : lastSearch || ""
-          },
-          'fnDrawCallback' : function(oSettings) {
-            jqTable.removeClass('disabled');
-            jQuery('#' + elementId + '_paginate').find('.fg-button')
-                .removeClass('fg-button');
-            var filterbox = jQuery('#' + elementId + '_filter :input');
-            filterbox.val(window.localStorage.getItem(searchKey));
-            filterbox.on('change keyup paste', function() {
-              window.localStorage.setItem(searchKey, filterbox.val());
-            });
-          }
+    var options = Utils.setSortFromPriority({
+      'aoColumns' : columns,
+      'bJQueryUI' : true,
+      'bAutoWidth' : false,
+      'iDisplayLength' : 25,
+      'iDisplayStart' : 0,
+      'sDom' : '<"H"lf>r<"datatable-scroll"t><"F"ip>',
+      'sPaginationType' : 'full_numbers',
+      'bProcessing' : true,
+      'oSearch' : {
+        'sSearch' : lastSearch || ""
+      },
+      'fnDrawCallback' : function(oSettings) {
+        jqTable.removeClass('disabled');
+        jQuery('#' + elementId + '_paginate').find('.fg-button').removeClass(
+            'fg-button');
+        var filterbox = jQuery('#' + elementId + '_filter :input');
+        filterbox.val(window.localStorage.getItem(searchKey));
+        filterbox.on('change keyup paste', function() {
+          window.localStorage.setItem(searchKey, filterbox.val());
         });
+      }
+    });
     optionModifier(options, jqTable, errorMessage, columns);
-    jqTable.dataTable(options).fnSetFilteringDelay(1300);
+    jqTable.dataTable(options);
+    var filterbox = jQuery('#' + elementId + '_filter :input');
+    filterbox.unbind();
+    filterbox.bind('keyup', function(e) {
+      if (e.keyCode == 13) {
+        jqTable.fnFilter(this.value);
+      }
+    });
     var tableNode = document.getElementById(elementId + '_wrapper');
     errorMessage.setAttribute('class', 'parsley-error');
     tableNode.parentNode.insertBefore(errorMessage, tableNode);
