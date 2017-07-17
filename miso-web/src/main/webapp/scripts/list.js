@@ -36,7 +36,6 @@ ListUtils = (function() {
   };
   var initTable = function(elementId, target, projectId, config, optionModifier) {
     var searchKey = target.name + '_search';
-    var lastSearch = window.localStorage.getItem(searchKey);
     var staticActions = target.createStaticActions(config, projectId);
     var bulkActions = target.createBulkActions(config, projectId);
     var columns = target.createColumns(config, projectId).filter(function(x) {
@@ -112,19 +111,12 @@ ListUtils = (function() {
       'iDisplayStart' : 0,
       'sDom' : '<"H"lf>r<"datatable-scroll"t><"F"ip>',
       'sPaginationType' : 'full_numbers',
+      'bStateSave' : true,
       'bProcessing' : true,
-      'oSearch' : {
-        'sSearch' : lastSearch || ""
-      },
       'fnDrawCallback' : function(oSettings) {
         jqTable.removeClass('disabled');
         jQuery('#' + elementId + '_paginate').find('.fg-button').removeClass(
             'fg-button');
-        var filterbox = jQuery('#' + elementId + '_filter :input');
-        filterbox.val(window.localStorage.getItem(searchKey));
-        filterbox.on('change keyup paste', function() {
-          window.localStorage.setItem(searchKey, filterbox.val());
-        });
       }
     });
     optionModifier(options, jqTable, errorMessage, columns);
