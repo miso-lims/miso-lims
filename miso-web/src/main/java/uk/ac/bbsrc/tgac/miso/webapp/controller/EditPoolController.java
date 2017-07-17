@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -65,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
@@ -280,8 +282,8 @@ public class EditPoolController {
     }
 
     @Override
-    protected Iterable<Pool> load(List<Long> modelIds) throws IOException {
-      return poolService.listByIdList(modelIds);
+    protected Stream<Pool> load(List<Long> modelIds) throws IOException {
+      return poolService.listByIdList(modelIds).stream().sorted(new AliasComparator<>());
     }
 
     @Override

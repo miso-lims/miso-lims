@@ -95,6 +95,8 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
@@ -130,6 +132,11 @@ public class EditLibraryController {
   protected static final Logger log = LoggerFactory.getLogger(EditLibraryController.class);
 
   private static final IndexFamily INDEX_FAMILY_NEEDS_PLATFORM = new IndexFamily();
+
+  protected static final Comparator<LibraryDilution> DILUTION_COMPARATOR = (a, b) -> {
+    int nameComparison = AlphanumericComparator.INSTANCE.compare(a.getName(), b.getName());
+    return nameComparison == 0 ? new AliasComparator<>().compare(a.getLibrary(), b.getLibrary()) : nameComparison;
+  };
 
   static {
     INDEX_FAMILY_NEEDS_PLATFORM.setName("Please select a platform...");
@@ -655,8 +662,8 @@ public class EditLibraryController {
       "library", LibraryDto.class, "Libraries") {
 
     @Override
-    protected Iterable<Library> load(List<Long> ids) throws IOException {
-      return libraryService.listByIdList(ids);
+    protected Stream<Library> load(List<Long> ids) throws IOException {
+      return libraryService.listByIdList(ids).stream().sorted(new AliasComparator<>());
     }
 
     @Override
@@ -712,7 +719,7 @@ public class EditLibraryController {
       if (hasPlain && sampleClass != null) {
         throw new IOException("Cannot mix plain and detailed samples.");
       }
-      return results.stream();
+      return results.stream().sorted(new AliasComparator<>());
     }
 
     @Override
@@ -772,8 +779,8 @@ public class EditLibraryController {
     }
 
     @Override
-    protected Iterable<LibraryDilution> load(List<Long> modelIds) throws IOException {
-      return dilutionService.listByIdList(modelIds);
+    protected Stream<LibraryDilution> load(List<Long> modelIds) throws IOException {
+      return dilutionService.listByIdList(modelIds).stream().sorted(DILUTION_COMPARATOR);
     }
 
     @Override
@@ -848,7 +855,7 @@ public class EditLibraryController {
 
     @Override
     protected Stream<LibraryDilution> loadParents(List<Long> ids) throws IOException {
-      return dilutionService.listByIdList(ids).stream();
+      return dilutionService.listByIdList(ids).stream().sorted(DILUTION_COMPARATOR);
     }
 
     @Override

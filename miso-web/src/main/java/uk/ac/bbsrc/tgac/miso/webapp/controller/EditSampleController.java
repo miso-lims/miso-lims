@@ -116,6 +116,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -969,7 +970,7 @@ public class EditSampleController {
     }
 
     @Override
-    protected Iterable<Sample> load(List<Long> modelIds) throws IOException {
+    protected Stream<Sample> load(List<Long> modelIds) throws IOException {
       List<Sample> results = (List<Sample>) sampleService.listByIdList(modelIds);
       for (Sample sample : results) {
         if (isDetailedSampleEnabled()) {
@@ -980,7 +981,7 @@ public class EditSampleController {
           }
         }
       }
-      return results;
+      return results.stream().sorted(new AliasComparator<>());
     }
 
     @Override
@@ -1052,7 +1053,7 @@ public class EditSampleController {
 
     @Override
     protected Stream<Sample> loadParents(List<Long> parentIds) throws IOException {
-      return sampleService.listByIdList(parentIds).stream();
+      return sampleService.listByIdList(parentIds).stream().sorted(new AliasComparator<>());
     }
 
     @Override
