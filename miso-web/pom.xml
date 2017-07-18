@@ -197,6 +197,11 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
     </dependency>
     <dependency>
@@ -651,8 +656,9 @@
             </executions>
             <configuration>
               <systemPropertyVariables>
-                <!-- Make baseUrl available for tests -->
+                <!-- Make URLs available for tests -->
                 <miso.it.baseUrl>http://localhost:${miso.it.tomcat.servlet.port}/</miso.it.baseUrl>
+                <miso.it.h2.url>jdbc:h2:tcp://localhost:${miso.it.h2.port}/mem:miso-it;mode=mysql;DB_CLOSE_DELAY=-1;</miso.it.h2.url>
               </systemPropertyVariables>
             </configuration>
           </plugin>
