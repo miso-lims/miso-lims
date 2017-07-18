@@ -6,8 +6,8 @@ import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 
 public class LimsUtilsTest {
 
@@ -22,8 +22,8 @@ public class LimsUtilsTest {
 
   @Test
   public void testInstanceOfSampleTissueProcessing() throws Exception {
-    SampleSlide cvSlide = new SampleSlideImpl();
-    assertTrue("CV Slide is a type of Tissue Processing", LimsUtils.isTissueProcessingSample(cvSlide));
+    SampleSlide slide = new SampleSlideImpl();
+    assertTrue("Slide is a type of Tissue Processing", LimsUtils.isTissueProcessingSample(slide));
   }
 
   @Test
