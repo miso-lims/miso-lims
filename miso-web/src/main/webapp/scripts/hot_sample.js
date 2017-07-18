@@ -437,7 +437,7 @@ HotTarget.sample = (function() {
               .makeColumnForInt(
                   'Discards',
                   (show['Tissue Processing'] && config.targetSampleClass.alias == 'Slide'),
-                  'discards', null),
+                  'discards', HotUtils.validator.requiredNumber),
           HotUtils
               .makeColumnForInt(
                   'Thickness',
