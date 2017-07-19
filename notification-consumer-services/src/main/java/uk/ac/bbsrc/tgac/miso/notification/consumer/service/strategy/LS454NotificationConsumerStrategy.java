@@ -28,12 +28,15 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.messaging.Message;
 
 import net.sourceforge.fluxion.spi.ServiceProvider;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationConsumerStrategy;
+import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism.LS454NotificationMessageConsumerMechanism;
 
 /**
@@ -56,7 +59,10 @@ public class LS454NotificationConsumerStrategy implements NotificationConsumerSt
 
   @Override
   public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
-    new LS454NotificationMessageConsumerMechanism().consume(m);
+    LS454NotificationMessageConsumerMechanism mechanism = new LS454NotificationMessageConsumerMechanism();
+    ApplicationContext ctxt = ApplicationContextProvider.getApplicationContext();
+    ctxt.getAutowireCapableBeanFactory().autowireBean(mechanism);
+    mechanism.consume(m);
   }
 
   @Override

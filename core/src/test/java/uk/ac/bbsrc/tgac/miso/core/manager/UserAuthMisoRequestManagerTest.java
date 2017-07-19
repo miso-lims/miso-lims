@@ -251,56 +251,6 @@ public class UserAuthMisoRequestManagerTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveRun(uk.ac.bbsrc.tgac.miso.core.data.Run)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveRun() throws IOException {
-    final long expectedReturn = 1L;
-
-    when(run.userCanWrite(any(User.class))).thenReturn(true);
-    when(backingManager.saveRun(run)).thenReturn(expectedReturn);
-
-    assertEquals(expectedReturn, userAuthMisoRequestManager.saveRun(run));
-
-    verify(backingManager).saveRun(run);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveRun(uk.ac.bbsrc.tgac.miso.core.data.Run)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testSaveRunThrows() throws IOException {
-
-    when(run.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this Run");
-    userAuthMisoRequestManager.saveRun(run);
-
-    verify(backingManager, never()).saveRun(run);
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSequencerPartitionContainer(uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer)}
-   * .
-   */
-  @Test
-  public void testSaveSequencerPartitionContainerThrows() throws IOException {
-    when(sequencerPartitionContainer.userCanWrite(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot write to this SequencerPartitionContainer");
-    userAuthMisoRequestManager.saveSequencerPartitionContainer(sequencerPartitionContainer);
-
-    verify(backingManager, never()).saveSequencerPartitionContainer(sequencerPartitionContainer);
-  }
-
-  /**
    * Test method for
    * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSubmission(uk.ac.bbsrc.tgac.miso.core.data.Submission)} .
    */
@@ -409,37 +359,6 @@ public class UserAuthMisoRequestManagerTest {
     userAuthMisoRequestManager.getProjectOverviewById(projectOverviewId);
 
     verify(backingManager).getProjectOverviewById(projectOverviewId);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunByAlias(java.lang.String)} .
-   */
-  @Test
-  public void testGetRunByAlias() throws IOException {
-    String alias = "alias";
-    when(backingManager.getRunByAlias(alias)).thenReturn(run);
-    when(run.userCanRead(any(User.class))).thenReturn(true);
-
-    assertEquals(run, userAuthMisoRequestManager.getRunByAlias(alias));
-
-    verify(backingManager).getRunByAlias(alias);
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunByAlias(java.lang.String)} .
-   */
-  @Test
-  public void testGetRunByAliasThrows() throws IOException {
-    String alias = "alias";
-    when(backingManager.getRunByAlias(alias)).thenReturn(run);
-    when(run.userCanRead(any(User.class))).thenReturn(false);
-
-    thrown.expect(IOException.class);
-    thrown.expectMessage("User null cannot read Run ");
-
-    userAuthMisoRequestManager.getRunByAlias(alias);
-
-    verify(backingManager).getProjectByAlias(alias);
   }
 
   /**
