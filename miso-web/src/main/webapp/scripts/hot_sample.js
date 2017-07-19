@@ -337,16 +337,20 @@ HotTarget.sample = (function() {
                               }
                             }
                             
-                            function hasExternalNameInProject(identity) {
-                              return identity.projectId == selectedProject.id && identity.externalName == flat.externalName;
+                            var indexOfMatchingIdentityInProject = -1;
+                            for (var i = 0; i < data.matchingIdentities.length; i++) {
+                              if (data.matchingIdentities[i].projectId == selectedProject.id 
+                                  && data.matchingIdentities[i].externalName == flat.externalName) {
+                                indexOfMatchingIdentityInProject = i;
+                                break;
+                              }
                             }
-                            var indexOfMatchingIdentityInProject = data.matchingIdentities.findIndex(hasExternalNameInProject);
-                            if (indexOfMatchingIdentityInProject < 0) {
+                            if (indexOfMatchingIdentityInProject >= 0) {
+                              setData(identitiesSources[indexOfMatchingIdentityInProject]);
+                            } else {
                               identitiesSources
                                   .unshift("First Receipt (" + selectedProject[label] + ")");
                               setData(identitiesSources[0]);
-                            } else {
-                              setData(identitiesSources[indexOfMatchingIdentityInProject]);
                             }
                             requestCounter++;
                             flat.potentialIdentities = potentialIdentities;
