@@ -6,9 +6,11 @@ import java.util.function.Function;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidArgumentException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -70,4 +72,31 @@ public abstract class AbstractPage {
     }
   }
 
+  public void setText(String input, WebElement element) {
+    element.click();
+    element.clear();
+    element.sendKeys(input);
+    element.sendKeys(Keys.ESCAPE);
+  }
+
+  public void setDropdown(String input, WebElement element) {
+    element.click();
+    ((Select) element).selectByVisibleText(input);
+    element.sendKeys(Keys.ESCAPE);
+  }
+
+  public void setCheckbox(Boolean value, WebElement element) {
+    // only change if given value and element value differ
+    if (value && "false".equals(element.getAttribute("value"))) {
+      element.click();
+    }
+    if (!value && "true".equals(element.getAttribute("value"))) {
+      element.click();
+    }
+  }
+
+  public String getSelectedDropdownText(WebElement element) {
+    Select dropdown = new Select(element);
+    return dropdown.getFirstSelectedOption().getText();
+  }
 }
