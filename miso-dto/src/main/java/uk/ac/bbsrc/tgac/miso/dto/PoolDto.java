@@ -12,7 +12,7 @@ public class PoolDto implements WritableUrls {
   private String url;
   private String name;
   private String alias;
-  private Double concentration;
+  private String concentration;
   private String identificationBarcode;
   private String locationLabel;
   private Boolean readyToRun;
@@ -24,7 +24,7 @@ public class PoolDto implements WritableUrls {
   private String description;
   private Long boxId;
   private boolean discarded;
-  private Double volume;
+  private String volume;
   private String platformType;
   private int longestIndex;
 
@@ -40,7 +40,7 @@ public class PoolDto implements WritableUrls {
     return boxId;
   }
 
-  public Double getConcentration() {
+  public String getConcentration() {
     return concentration;
   }
 
@@ -100,7 +100,7 @@ public class PoolDto implements WritableUrls {
     this.boxId = boxId;
   }
 
-  public void setConcentration(Double concentration) {
+  public void setConcentration(String concentration) {
     this.concentration = concentration;
   }
 
@@ -168,11 +168,11 @@ public class PoolDto implements WritableUrls {
     this.discarded = isDiscarded;
   }
 
-  public Double getVolume() {
+  public String getVolume() {
     return volume;
   }
 
-  public void setVolume(Double volume) {
+  public void setVolume(String volume) {
     this.volume = volume;
   }
 

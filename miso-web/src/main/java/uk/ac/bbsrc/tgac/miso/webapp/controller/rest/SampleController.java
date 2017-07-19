@@ -268,13 +268,15 @@ public class SampleController extends RestController {
     if (sampleDto.getQcRin() != null) {
       SampleQC qc = new SampleQCImpl();
       qc.setQcType(sampleService.getSampleQcTypeByName("RIN"));
-      qc.setResults(sampleDto.getQcRin());
+      if (sampleDto.getQcRin() == null) throw new IllegalArgumentException("Cannot create QC with null results");
+      qc.setResults(Double.valueOf(sampleDto.getQcRin()));
       sampleService.addQc(sample, qc);
     }
     if (sampleDto.getQcDv200() != null) {
       SampleQC qc = new SampleQCImpl();
       qc.setQcType(sampleService.getSampleQcTypeByName("DV200"));
-      qc.setResults(sampleDto.getQcDv200());
+      if (sampleDto.getQcDv200() == null) throw new IllegalArgumentException("Cannot create QC with null results");
+      qc.setResults(Double.valueOf(sampleDto.getQcDv200()));
       sampleService.addQc(sample, qc);
     }
   }

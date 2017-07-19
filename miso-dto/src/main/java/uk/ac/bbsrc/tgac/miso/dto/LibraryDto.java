@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class LibraryDto implements WritableUrls {
 
   private String alias;
-  private Double concentration;
+  private String concentration;
   private String creationDate;
   private String description;
   private String identificationBarcode;
@@ -43,13 +43,13 @@ public class LibraryDto implements WritableUrls {
   private String index2Label;
   private String indexFamilyName;
   private String url;
-  private Double volume;
+  private String volume;
   private Long boxId;
   private List<LibraryQcDto> qcs;
   private Integer dnaSize;
-  private Double qcQubit;
-  private Double qcTapeStation;
-  private Double qcQPcr;
+  private String qcQubit;
+  private String qcTapeStation;
+  private String qcQPcr;
 
   public String getAlias() {
     return alias;
@@ -59,7 +59,7 @@ public class LibraryDto implements WritableUrls {
     return boxId;
   }
 
-  public Double getConcentration() {
+  public String getConcentration() {
     return concentration;
   }
 
@@ -171,7 +171,7 @@ public class LibraryDto implements WritableUrls {
     return url;
   }
 
-  public Double getVolume() {
+  public String getVolume() {
     return volume;
   }
 
@@ -183,7 +183,7 @@ public class LibraryDto implements WritableUrls {
     this.boxId = boxId;
   }
 
-  public void setConcentration(Double concentration) {
+  public void setConcentration(String concentration) {
     this.concentration = concentration;
   }
 
@@ -296,7 +296,7 @@ public class LibraryDto implements WritableUrls {
     this.url = url;
   }
 
-  public void setVolume(Double volume) {
+  public void setVolume(String volume) {
     this.volume = volume;
   }
 
@@ -313,27 +313,27 @@ public class LibraryDto implements WritableUrls {
     setUrl(WritableUrls.buildUriPath(baseUri, "/rest/library/{id}", getId()));
   }
 
-  public Double getQcQubit() {
+  public String getQcQubit() {
     return qcQubit;
   }
 
-  public void setQcQubit(Double qcQubit) {
+  public void setQcQubit(String qcQubit) {
     this.qcQubit = qcQubit;
   }
 
-  public Double getQcTapeStation() {
+  public String getQcTapeStation() {
     return qcTapeStation;
   }
 
-  public void setQcTapeStation(Double qcTapeStation) {
+  public void setQcTapeStation(String qcTapeStation) {
     this.qcTapeStation = qcTapeStation;
   }
 
-  public Double getQcQPcr() {
+  public String getQcQPcr() {
     return qcQPcr;
   }
 
-  public void setQcQPcr(Double qcQPcr) {
+  public void setQcQPcr(String qcQPcr) {
     this.qcQPcr = qcQPcr;
   }
 }
