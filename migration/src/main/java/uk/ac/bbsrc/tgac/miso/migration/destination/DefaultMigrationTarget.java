@@ -630,16 +630,19 @@ public class DefaultMigrationTarget implements MigrationTarget {
       Run run = serviceManager.getRunDao().getByAlias(newRun.getAlias());
       if (run == null) {
         run = newRun;
-
       } else {
         updateRun(newRun, run);
       }
       for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
         container.setLastModifier(migrationUser);
-        container.setId(serviceManager.getRequestManager().saveSequencerPartitionContainer(container).getId());
+        container.setId(serviceManager.getContainerService().save(container).getId());
       }
       run.setLastModifier(migrationUser);
-      run.setId(serviceManager.getRequestManager().saveRun(run));
+      if (run.getId() == Run.UNSAVED_ID) {
+        run.setId(serviceManager.getRunService().create(run));
+      } else {
+        serviceManager.getRunService().update(run);
+      }
       log.debug("Saved run " + run.getAlias());
     }
     log.info(runs.size() + " runs migrated.");

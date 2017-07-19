@@ -37,7 +37,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.integration.NotificationQueryService;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
@@ -55,8 +54,6 @@ import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 @Ajaxified
 public class StatsControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(StatsControllerHelperService.class);
-  @Autowired
-  private RequestManager requestManager;
 
   private RunStatsManager runStatsManager;
   @Autowired
@@ -64,10 +61,6 @@ public class StatsControllerHelperService {
 
   @Autowired
   private NotificationQueryService notificationQueryService;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   public void setRunStatsManager(RunStatsManager runStatsManager) {
     this.runStatsManager = runStatsManager;
@@ -164,7 +157,7 @@ public class StatsControllerHelperService {
           HealthType progress = HealthType.valueOf(response.getString("progress"));
           if (run.getHealth() != progress) {
             run.setHealth(progress);
-            requestManager.saveRun(run);
+            runService.update(run);
             return response;
           }
           return JSONUtils.SimpleJSONResponse("No run progress change necessary for run " + runAlias);

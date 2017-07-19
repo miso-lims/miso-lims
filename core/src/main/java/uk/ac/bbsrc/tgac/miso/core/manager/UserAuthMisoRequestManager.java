@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -40,9 +39,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -169,39 +165,11 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveRun(Run run) throws IOException {
-    if (writeCheck(run)) {
-      return backingManager.saveRun(run);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this Run");
-    }
-  }
-
-  @Override
-  public SequencerPartitionContainer saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
-    if (writeCheck(container)) {
-      container.setLastModifier(getCurrentUser());
-      return backingManager.saveSequencerPartitionContainer(container);
-    } else {
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot write to this SequencerPartitionContainer");
-    }
-  }
-
-  @Override
   public long saveSubmission(Submission submission) throws IOException {
     return backingManager.saveSubmission(submission);
   }
 
   // gets
-
-  @Override
-  public SequencerPartitionContainer getSequencerPartitionContainerById(long containerId) throws IOException {
-    SequencerPartitionContainer o = backingManager.getSequencerPartitionContainerById(containerId);
-    if (readCheck(o))
-      return o;
-    else
-      throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read SequencerPartitionContainer " + containerId);
-  }
 
   @Override
   public Project getProjectById(long projectId) throws IOException {
@@ -223,13 +191,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     if (readCheck(o.getProject())) return o;
     else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read parent Project " + o.getProject().getId()
         + " for ProjectOverview " + overviewId);
-  }
-
-  @Override
-  public Run getRunByAlias(String alias) throws IOException {
-    Run o = backingManager.getRunByAlias(alias);
-    if (readCheck(o)) return o;
-    else throw new AuthorizationIOException("User " + getCurrentUsername() + " cannot read Run " + o.getId());
   }
 
   @Override
@@ -288,19 +249,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode)
-      throws IOException {
-    User user = getCurrentUser();
-    Collection<SequencerPartitionContainer> accessibles = new HashSet<>();
-    for (SequencerPartitionContainer container : backingManager.listSequencerPartitionContainersByBarcode(barcode)) {
-      if (container.userCanRead(user)) {
-        accessibles.add(container);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<Submission> listAllSubmissions() throws IOException {
     Collection<Submission> accessibles = new HashSet<>();
     for (Submission submission : backingManager.listAllSubmissions()) {
@@ -316,31 +264,6 @@ public class UserAuthMisoRequestManager implements RequestManager {
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot delete this note");
     }
-  }
-
-  @Override
-  public void saveRuns(Collection<Run> runs) throws IOException {
-    User user = getCurrentUser();
-    for (Run run : runs) {
-      if (!writeCheck(run)) {
-        throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Run");
-      } else {
-        run.setLastModifier(user);
-        List<SequencerPartitionContainer> containers = run.getSequencerPartitionContainers();
-        if (run.getSequencerPartitionContainers() != null) {
-          for (SequencerPartitionContainer container : containers) {
-            container.setLastModifier(user);
-          }
-        }
-      }
-    }
-    backingManager.saveRuns(runs);
-  }
-
-
-  @Override
-  public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException {
-    return backingManager.getSequencerReferenceByName(referenceName);
   }
 
   @Override

@@ -31,9 +31,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -47,26 +44,10 @@ public interface RequestManager {
 
   public void saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException;
 
-  /** TODO: delete after refactoring NotificationConsumerMechanisms. Use runService.saveRuns() instead */
-  @Deprecated
-  public long saveRun(Run run) throws IOException;
-
-  /** TODO: delete after refactoring NotificationConsumerMechanisms. Use runService.saveRuns() instead */
-  @Deprecated
-  public void saveRuns(Collection<Run> runs) throws IOException;
-
-  /** TODO: delete after refactoring NotificationConsumerMechanisms. Use containerService.save() instead */
-  @Deprecated
-  public SequencerPartitionContainer saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException;
-
   public long saveSubmission(Submission submission) throws IOException;
 
 
   // GETS
-
-  /** TODO: delete after refactoring NotificationConsumerMechanisms. Use containerService.get(containerId) instead */
-  @Deprecated
-  public SequencerPartitionContainer getSequencerPartitionContainerById(long containerId) throws IOException;
 
   public Project getProjectById(long projectId) throws IOException;
 
@@ -74,15 +55,7 @@ public interface RequestManager {
 
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException;
 
-  /** TODO: delete after refactoring NotificationConsumerMechanisms. Use runService.getByAlias() instead */
-  @Deprecated
-  public Run getRunByAlias(String alias) throws IOException;
-
   public Submission getSubmissionById(long submissionId) throws IOException;
-
-  /** TODO: delete after refactoring NotificationConsumerMechanisms. Use sequencerReferenceService.getByName instead */
-  @Deprecated
-  public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException;
 
   // LISTS
   /**
@@ -95,12 +68,6 @@ public interface RequestManager {
   public Collection<Project> listAllProjectsBySearch(String query) throws IOException;
 
   public Collection<ProjectOverview> listAllOverviewsByProjectId(long projectId) throws IOException;
-
-  /** TODO: delete after refactoring NotificationConsumerMechanisms. Use containerService.listByBarcode instead */
-  @Deprecated
-  public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode)
-      throws IOException;
-
 
   public Collection<Submission> listAllSubmissions() throws IOException;
 

@@ -41,8 +41,8 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
-import org.springframework.util.Assert;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -54,8 +54,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 /**
@@ -71,6 +73,15 @@ public class SolidNotificationMessageConsumerMechanism
     implements NotificationMessageConsumerMechanism<Message<Map<String, List<String>>>, Set<Run>> {
   protected static final Logger log = LoggerFactory.getLogger(SolidNotificationMessageConsumerMechanism.class);
 
+  @Autowired
+  private RunService runService;
+
+  @Autowired
+  private SequencerReferenceService sequencerService;
+
+  @Autowired
+  private ContainerService containerService;
+
   public boolean attemptRunPopulation = true;
 
   public void setAttemptRunPopulation(boolean attemptRunPopulation) {
@@ -82,14 +93,12 @@ public class SolidNotificationMessageConsumerMechanism
 
   @Override
   public Set<Run> consume(Message<Map<String, List<String>>> message) throws InterrogationException {
-    RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
-    Assert.notNull(requestManager, "Cannot consume MISO notification messages without a RequestManager.");
     Map<String, List<String>> statuses = message.getPayload();
     Set<Run> output = new HashSet<>();
     for (String key : statuses.keySet()) {
       HealthType ht = HealthType.valueOf(key);
       JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
-      Map<String, Run> map = processRunJSON(ht, runs, requestManager);
+      Map<String, Run> map = processRunJSON(ht, runs);
       for (Run r : map.values()) {
         output.add(r);
       }
@@ -97,7 +106,7 @@ public class SolidNotificationMessageConsumerMechanism
     return output;
   }
 
-  private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
+  private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs) {
     Map<String, Run> updatedRuns = new HashMap<>();
     List<Run> runsToSave = new ArrayList<>();
     // 2011-01-25 15:37:27.093
@@ -116,7 +125,7 @@ public class SolidNotificationMessageConsumerMechanism
         String xml = run.getString("status");
         Run is = RunUtils.createFromSolidXml(xml, t -> {
           try {
-            return requestManager.getSequencerReferenceByName(t);
+            return sequencerService.getByName(t);
           } catch (IOException e) {
             log.warn("No sequencer: " + t, e);
           }
@@ -129,7 +138,7 @@ public class SolidNotificationMessageConsumerMechanism
         Matcher m = p.matcher(runName);
         if (m.matches()) {
           try {
-            r = requestManager.getRunByAlias(runName);
+            r = runService.getRunByAlias(runName);
           } catch (IOException ioe) {
             log.warn(
                 "Cannot find run by this alias. This usually means the run hasn't been previously imported. If attemptRunPopulation is false, processing will not take place for this run!");
@@ -147,11 +156,11 @@ public class SolidNotificationMessageConsumerMechanism
 
               SequencerReference sr = null;
               if (run.has("sequencerName")) {
-                sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
+                sr = sequencerService.getByName(run.getString("sequencerName"));
                 r.setSequencerReference(sr);
               }
               if (r.getSequencerReference() == null) {
-                sr = requestManager.getSequencerReferenceByName(m.group(1));
+                sr = sequencerService.getByName(m.group(1));
                 r.setSequencerReference(sr);
               }
 
@@ -192,11 +201,11 @@ public class SolidNotificationMessageConsumerMechanism
               if (r.getSequencerReference() == null) {
                 SequencerReference sr = null;
                 if (run.has("sequencerName")) {
-                  sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
+                  sr = sequencerService.getByName(run.getString("sequencerName"));
                   r.setSequencerReference(sr);
                 }
                 if (r.getSequencerReference() == null) {
-                  sr = requestManager.getSequencerReferenceByName(m.group(1));
+                  sr = sequencerService.getByName(m.group(1));
                   r.setSequencerReference(sr);
                 }
               }
@@ -245,8 +254,7 @@ public class SolidNotificationMessageConsumerMechanism
               List<SequencerPartitionContainer> fs = r.getSequencerPartitionContainers();
               if (fs.isEmpty()) {
                 if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
-                  Collection<SequencerPartitionContainer> pfs = requestManager
-                      .listSequencerPartitionContainersByBarcode(run.getString("containerId"));
+                  Collection<SequencerPartitionContainer> pfs = containerService.listByBarcode(run.getString("containerId"));
                   if (!pfs.isEmpty()) {
                     if (pfs.size() == 1) {
                       SequencerPartitionContainer lf = new ArrayList<>(pfs).get(0);
@@ -285,7 +293,7 @@ public class SolidNotificationMessageConsumerMechanism
                   f.setIdentificationBarcode(run.getString("containerId"));
                 }
 
-                long flowId = requestManager.saveSequencerPartitionContainer(f).getId();
+                long flowId = containerService.save(f).getId();
                 f.setId(flowId);
               }
 
@@ -301,7 +309,7 @@ public class SolidNotificationMessageConsumerMechanism
 
     try {
       if (runsToSave.size() > 0) {
-        requestManager.saveRuns(runsToSave);
+        runService.saveRuns(runsToSave);
         log.info("Batch saved " + runsToSave.size() + " runs");
       }
     } catch (IOException e) {
