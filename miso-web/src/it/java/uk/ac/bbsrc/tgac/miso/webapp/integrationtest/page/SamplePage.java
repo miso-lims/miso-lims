@@ -113,23 +113,23 @@ public class SamplePage extends HeaderFooterPage {
     return new SamplePage(driver);
   }
 
-  public String getSampleId() {
+  public String getId() {
     return idLabel.getText();
   }
 
-  public void setSampleId() {
+  public void setId() {
     throw new UnsupportedOperationException();
   }
 
-  public String getSampleName() {
+  public String getName() {
     return nameLabel.getText();
   }
 
-  public void setSampleName() {
+  public void setName() {
     throw new UnsupportedOperationException();
   }
 
-  public String getSampleAlias() {
+  public String getAlias() {
     return aliasLabel.getAttribute("value");
   }
 
@@ -145,11 +145,11 @@ public class SamplePage extends HeaderFooterPage {
     setDropdown(project, projectDropdownForCreateLabel);
   }
 
-  public String getSampleProjectForCreate(String project) {
+  public String getProjectForCreate(String project) {
     throw new UnsupportedOperationException();
   }
 
-  public void setSampleProjectForCreate(String project) {
+  public void setProjectForCreate(String project) {
     if ("select".equals(projectDropdownForCreateLabel.getTagName())) {
       setDropdown(project, projectDropdownForCreateLabel);
     }
@@ -163,19 +163,19 @@ public class SamplePage extends HeaderFooterPage {
     throw new UnsupportedOperationException();
   }
 
-  public String getSampleDescription() {
+  public String getDescription() {
     return descriptionLabel.getAttribute("value");
   }
 
-  public void setSampleDescription(String description) {
+  public void setDescription(String description) {
     setText(description, descriptionLabel);
   }
 
-  public String getSampleReceivedDate() {
+  public String getReceivedDate() {
     return receivedDateInput.getAttribute("value");
   }
 
-  public void setSampleReceivedDate(String receivedDate) {
+  public void setReceivedDate(String receivedDate) {
     Pattern dateFormat = Pattern.compile("[0-3]\\d/[0-1]\\d/\\d{4}");
     if (dateFormat.matcher(receivedDate).matches()) {
       setText(receivedDate, receivedDateInput);
@@ -184,11 +184,11 @@ public class SamplePage extends HeaderFooterPage {
     }
   }
 
-  public String getSampleScientificName() {
+  public String getScientificName() {
     return scientificNameLabel.getAttribute("value");
   }
 
-  public void setSampleScientificName(String scientificName) {
+  public void setScientificName(String scientificName) {
     setText(scientificName, scientificNameLabel);
   }
 
@@ -200,47 +200,47 @@ public class SamplePage extends HeaderFooterPage {
     setDropdown(sampleType, sampleTypeLabel);
   }
 
-  public String getSampleQcStatus() {
+  public String getQcStatus() {
     return getSelectedDropdownText(qcStatusLabel);
   }
 
-  public void setSampleQcStatus(String qcStatus) {
+  public void setQcStatus(String qcStatus) {
     setDropdown(qcStatus, qcStatusLabel);
   }
 
-  public String getSampleQcNote() {
+  public String getQcNote() {
     return qcNoteLabel.getAttribute("value");
   }
 
-  public void setSampleQcNote(String qcNote) {
+  public void setQcNote(String qcNote) {
     setText(qcNote, qcNoteLabel);
   }
 
-  public String getSampleVolume() {
+  public String getVolume() {
     return volumeLabel.getAttribute("value");
   }
 
-  public void setSampleVolume(String volume) {
+  public void setVolume(String volume) {
     setText(volume, volumeLabel);
   }
 
-  public boolean getSampleDiscarded() {
+  public boolean getDiscarded() {
     return Boolean.valueOf(discardedLabel.getAttribute("value"));
   }
 
-  public void setSampleDiscarded(boolean discarded) {
+  public void setDiscarded(boolean discarded) {
     setCheckbox(discarded, discardedLabel);
   }
 
-  public String getSampleIdentityId() {
+  public String getIdentityId() {
     return identityIdLabel.getAttribute("value");
   }
 
-  public void setSampleIdentityId(String identityId) {
+  public void setIdentityId(String identityId) {
     setText(identityId, identityIdLabel);
   }
 
-  public String getSampleExternalName() {
+  public String getExternalName() {
     if ("input".equals(externalNameLabel.getTagName())) {
       return externalNameLabel.getAttribute("value");
     } else {
@@ -248,11 +248,11 @@ public class SamplePage extends HeaderFooterPage {
     }
   }
 
-  public void setSampleExternalName(String externalName) {
+  public void setExternalName(String externalName) {
     setText(externalName, externalNameLabel);
   }
 
-  public String getSampleDonorSex() {
+  public String getDonorSex() {
     if (donorSexLabel instanceof Select) {
       return getSelectedDropdownText(donorSexLabel);
     } else {
@@ -260,11 +260,11 @@ public class SamplePage extends HeaderFooterPage {
     }
   }
 
-  public void setSampleDonorSex(String donorSex) {
+  public void setDonorSex(String donorSex) {
     setDropdown(donorSex, donorSexLabel);
   }
 
-  public String getSampleParentAlias() {
+  public String getParentAlias() {
     return parentAliasLabel.getText();
   }
 
@@ -284,44 +284,44 @@ public class SamplePage extends HeaderFooterPage {
     Select sampleClassSelect = (Select) sampleClassLabel;
     WebElement matches = sampleClassSelect.getOptions().stream().filter(option -> sampleClass.equals(option.getText())).findAny()
         .orElse(null);
-    if (matches == null) throw new IllegalArgumentException("Sample class " + sampleClass + " not available for sample " + getSampleId());
+    if (matches == null) throw new IllegalArgumentException("Sample class " + sampleClass + " not available for sample " + getId());
 
     setDropdown(sampleClass, sampleClassLabel);
   }
 
-  public String getSampleSubProject() {
+  public String getSubProject() {
     return getSelectedDropdownText(subProjectLabel);
   }
 
-  public void setSampleSubProject(String subProject) {
+  public void setSubProject(String subProject) {
     setDropdown(subProject, this.subProjectLabel);
   }
 
-  public String getSampleGroupId() {
+  public String getGroupId() {
     return groupIdLabel.getAttribute("value");
   }
 
-  public void setSampleGroupId(String groupId) {
+  public void setGroupId(String groupId) {
     setText(groupId, groupIdLabel);
   }
 
-  public String getSampleGroupDescription() {
+  public String getGroupDescription() {
     return groupDescriptionLabel.getAttribute("value");
   }
 
-  public void setSampleGroupDescription(String groupDescription) {
+  public void setGroupDescription(String groupDescription) {
     setText(groupDescription, groupDescriptionLabel);
   }
 
-  public String getSampleConcentration() {
+  public String getConcentration() {
     return concentrationLabel.getAttribute("value");
   }
 
-  public void setSampleConcentration(String concentration) {
+  public void setConcentration(String concentration) {
     setText(concentration, concentrationLabel);
   }
 
-  public String getSampleTissueClass() {
+  public String getTissueClass() {
     if (tissueClassLabel instanceof Select) {
       return getSelectedDropdownText(tissueClassLabel);
     } else {
@@ -329,27 +329,27 @@ public class SamplePage extends HeaderFooterPage {
     }
   }
 
-  public void setSampleTissueClass(String tissueClass) {
+  public void setTissueClass(String tissueClass) {
     setDropdown(tissueClass, tissueClassLabel);
   }
 
-  public String getSampleTissueOrigin() {
+  public String getTissueOrigin() {
     return getSelectedDropdownText(tissueOriginLabel);
   }
 
-  public void setSampleTissueOrigin(String tissueOrigin) {
+  public void setTissueOrigin(String tissueOrigin) {
     setDropdown(tissueOrigin, tissueOriginLabel);
   }
 
-  public String getSampleTissueType() {
+  public String getTissueType() {
     return getSelectedDropdownText(tissueTypeLabel);
   }
 
-  public void setSampleTissueType(String tissueType) {
+  public void setTissueType(String tissueType) {
     setDropdown(tissueType, tissueTypeLabel);
   }
 
-  public String getSamplePassageNumber() {
+  public String getPassageNumber() {
     if ("input".equals(passageNumberLabel.getTagName())) {
       return passageNumberLabel.getAttribute("value");
     } else {
@@ -357,11 +357,11 @@ public class SamplePage extends HeaderFooterPage {
     }
   }
 
-  public void setSamplePassageNumber(String passageNumber) {
+  public void setPassageNumber(String passageNumber) {
     setText(passageNumber, passageNumberLabel);
   }
 
-  public String getSampleTimesReceived() {
+  public String getTimesReceived() {
     if ("input".equals(timesReceivedLabel.getTagName())) {
       return timesReceivedLabel.getAttribute("value");
     } else {
@@ -369,11 +369,11 @@ public class SamplePage extends HeaderFooterPage {
     }
   }
 
-  public void setSampleTimesReceived(String timesReceived) {
+  public void setTimesReceived(String timesReceived) {
     setText(timesReceived, timesReceivedLabel);
   }
 
-  public String getSampleTubeNumber() {
+  public String getTubeNumber() {
     if ("input".equals(tubeNumberLabel.getTagName())) {
       return tubeNumberLabel.getAttribute("value");
     } else {
@@ -381,111 +381,111 @@ public class SamplePage extends HeaderFooterPage {
     }
   }
 
-  public void setSampleTubeNumber(String tubeNumber) {
+  public void setTubeNumber(String tubeNumber) {
     setText(tubeNumber, tubeNumberLabel);
   }
 
-  public String getSampleTissueMaterial() {
+  public String getTissueMaterial() {
     return getSelectedDropdownText(tissueMaterialLabel);
   }
 
-  public void setSampleTissueMaterial(String tissueMaterial) {
+  public void setTissueMaterial(String tissueMaterial) {
     setDropdown(tissueMaterial, tissueMaterialLabel);
   }
 
-  public String getSampleRegion() {
+  public String getRegion() {
     return regionLabel.getAttribute("value");
   }
 
-  public void setSampleRegion(String region) {
+  public void setRegion(String region) {
     setText(region, regionLabel);
   }
 
-  public String getSampleExternalInstituteIdentifier() {
+  public String getExternalInstituteIdentifier() {
     return externalInstituteIdentifierLabel.getAttribute("value");
   }
 
-  public void setSampleExternalInstituteIdentifier(String externalInstituteIdentifier) {
+  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
     setText(externalInstituteIdentifier, externalInstituteIdentifierLabel);
   }
 
-  public String getSampleLab() {
+  public String getLab() {
     return getSelectedDropdownText(labLabel);
   }
 
-  public void setSampleLab(String lab) {
+  public void setLab(String lab) {
     setDropdown(lab, labLabel);
   }
 
-  public String getSampleSlidesRemaining() {
+  public String getSlidesRemaining() {
     return slidesRemainingLabel.getText();
   }
 
-  public void setSampleSlidesRemaining(String slidesRemaining) {
+  public void setSlidesRemaining(String slidesRemaining) {
     setText(slidesRemaining, slidesRemainingLabel);
   }
 
-  public String getSampleSlides() {
+  public String getSlides() {
     return slidesLabel.getAttribute("value");
   }
 
-  public void setSampleSlides(String slides) {
+  public void setSlides(String slides) {
     setText(slides, slidesLabel);
   }
 
-  public String getSampleSlideDiscards() {
+  public String getSlideDiscards() {
     return discardsLabel.getAttribute("value");
   }
 
-  public void setSampleSlideDiscards(String discards) {
+  public void setSlideDiscards(String discards) {
     setText(discards, discardsLabel);
   }
 
-  public String getSampleSlideThickness() {
+  public String getSlideThickness() {
     return thicknessLabel.getAttribute("value");
   }
 
-  public void setSampleSlideThickness(String thickness) {
+  public void setSlideThickness(String thickness) {
     setText(thickness, thicknessLabel);
   }
 
-  public String getSampleSlideStain() {
+  public String getSlideStain() {
     return getSelectedDropdownText(stainLabel);
   }
 
-  public void setSampleSlideStain(String stain) {
+  public void setSlideStain(String stain) {
     setDropdown(stain, stainLabel);
   }
 
-  public String getSampleSlidesConsumed() {
+  public String getSlidesConsumed() {
     return slidesConsumedLabel.getAttribute("value");
   }
 
-  public void setSampleSlidesConsumed(String slidesConsumed) {
+  public void setSlidesConsumed(String slidesConsumed) {
     setText(slidesConsumed, slidesConsumedLabel);
   }
 
-  public String getSampleStrStatus() {
-    return getSelectedDropdownText(strStatusLabel);
+  public String getStrStatus() {
+    return getSelectedDropdownText(strStatusLabel).trim();
   }
 
-  public void setSampleStrStatus(String strStatus) {
+  public void setStrStatus(String strStatus) {
     setDropdown(strStatus, strStatusLabel);
   }
 
-  public String getSampleDnaseTreated() {
+  public String getDnaseTreated() {
     return dnaseTreatedLabel.getAttribute("value");
   }
 
-  public void setSampleDnaseTreated(Boolean dnaseTreated) {
+  public void setDnaseTreated(Boolean dnaseTreated) {
     setCheckbox(dnaseTreated, dnaseTreatedLabel);
   }
 
-  public String getSampleSamplePurpose() {
+  public String getSamplePurpose() {
     return getSelectedDropdownText(samplePurposeLabel);
   }
 
-  public void setSampleSamplePurpose(String samplePurpose) {
+  public void setSamplePurpose(String samplePurpose) {
     setDropdown(samplePurpose, samplePurposeLabel);
   }
 
