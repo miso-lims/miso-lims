@@ -50,7 +50,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -85,9 +84,6 @@ public class LibraryRestController extends RestController {
 
   @Autowired
   private LibraryService libraryService;
-
-  @Autowired
-  private RequestManager requestManager;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -157,19 +153,22 @@ public class LibraryRestController extends RestController {
     if (libraryDto.getQcQubit() != null) {
       LibraryQC qc = new LibraryQCImpl();
       qc.setQcType(libraryService.getLibraryQcTypeByName("Qubit"));
-      qc.setResults(libraryDto.getQcQubit());
+      if (libraryDto.getQcQubit() == null) throw new IllegalArgumentException("Cannot create QC with null results");
+      qc.setResults(Double.valueOf(libraryDto.getQcQubit()));
       libraryService.addQc(library, qc);
     }
     if (libraryDto.getQcTapeStation() != null) {
       LibraryQC qc = new LibraryQCImpl();
       qc.setQcType(libraryService.getLibraryQcTypeByName("Tape Station"));
-      qc.setResults(libraryDto.getQcTapeStation());
+      if (libraryDto.getQcTapeStation() == null) throw new IllegalArgumentException("Cannot create QC with null results");
+      qc.setResults(Double.valueOf(libraryDto.getQcTapeStation()));
       libraryService.addQc(library, qc);
     }
     if (libraryDto.getQcQPcr() != null) {
       LibraryQC qc = new LibraryQCImpl();
       qc.setQcType(libraryService.getLibraryQcTypeByName("qPCR"));
-      qc.setResults(libraryDto.getQcQPcr());
+      if (libraryDto.getQcQPcr() == null) throw new IllegalArgumentException("Cannot create QC with null results");
+      qc.setResults(Double.valueOf(libraryDto.getQcQPcr()));
       libraryService.addQc(library, qc);
     }
     libraryService.update(library);

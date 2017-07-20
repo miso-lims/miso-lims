@@ -34,6 +34,14 @@ var HotUtils = {
     },
     
     /**
+     * Custom validator for optional numeric fields
+     */
+    optionalNumber : function(value, callback) {
+      return callback(Utils.validation.isEmpty(value) || Handsontable.helper
+    	  .isNumeric(value));
+    },
+    
+    /**
      * Custom validator for text fields that fails on extra-special characters
      */
     noSpecialChars : function(value, callback) {
@@ -654,13 +662,13 @@ var HotUtils = {
     return {
       'header' : headerName,
       'data' : property,
-      'type' : 'numeric',
+      'type' : 'text',
       'include' : include,
       'unpack' : function(obj, flat, setCellMeta) {
         flat[property] = obj[property];
       },
       'validator' : required ? HotUtils.validator.requiredNumber
-          : Handsontable.NumericValidator,
+          : HotUtils.validator.optionalNumber,
       'pack' : function(obj, flat, errorHandler) {
         var output;
         if (Utils.validation.isEmpty(flat[property])) {

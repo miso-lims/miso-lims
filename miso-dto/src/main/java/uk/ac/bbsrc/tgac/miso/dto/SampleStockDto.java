@@ -9,11 +9,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 @JsonTypeName(value = SampleStock.CATEGORY_NAME)
 public class SampleStockDto extends SampleTissueDto {
 
-  private Double concentration;
+  private String concentration;
   private String strStatus;
   private Boolean dnaseTreated;
 
-  public Double getConcentration() {
+  @Override
+  public String getConcentration() {
     return concentration;
   }
 
@@ -21,7 +22,8 @@ public class SampleStockDto extends SampleTissueDto {
     return strStatus;
   }
 
-  public void setConcentration(Double concentration) {
+  @Override
+  public void setConcentration(String concentration) {
     this.concentration = concentration;
   }
 

@@ -307,7 +307,9 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getTaxonIdentifier())) {
       dto.setTaxonIdentifier(from.getTaxonIdentifier());
     }
-    dto.setVolume(from.getVolume());
+    if (from.getVolume() != null) {
+      dto.setVolume(from.getVolume().toString());
+    }
     dto.setDiscarded(from.isDiscarded());
     dto.setLastModified(getDateAsString(from.getLastModified()));
 
@@ -352,7 +354,7 @@ public class Dtos {
       dto.setSynthetic(from.isSynthetic());
     }
     if (from.getConcentration() != null) {
-      dto.setConcentration(from.getConcentration());
+      dto.setConcentration(from.getConcentration().toString());
     }
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     if (from.getDetailedQcStatus() != null) {
@@ -405,7 +407,7 @@ public class Dtos {
       to.setSynthetic(from.getSynthetic());
     }
     if (from.getConcentration() != null) {
-      to.setConcentration(from.getConcentration());
+      to.setConcentration(Double.valueOf(from.getConcentration()));
     }
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
@@ -633,7 +635,9 @@ public class Dtos {
     }
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
-    to.setVolume(from.getVolume());
+    if (from.getVolume() != null) {
+      to.setVolume(Double.valueOf(from.getVolume()));
+    }
     if (from.getDiscarded() != null) to.setDiscarded(from.getDiscarded());
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());
@@ -1052,7 +1056,9 @@ public class Dtos {
     dto.setCreationDate(getDateString(from.getCreationDate()));
     dto.setDescription(from.getDescription());
     dto.setId(from.getId());
-    dto.setConcentration(from.getInitialConcentration());
+    if (from.getInitialConcentration() != null) {
+      dto.setConcentration(from.getInitialConcentration().toString());
+    }
     if (from.getLibrarySelectionType() != null) {
       dto.setLibrarySelectionTypeId(from.getLibrarySelectionType().getId());
     }
@@ -1089,7 +1095,9 @@ public class Dtos {
         }
       }
     }
-    dto.setVolume(from.getVolume());
+    if (from.getVolume() != null) {
+      dto.setVolume(from.getVolume().toString());
+    }
     dto.setDnaSize(from.getDnaSize());
     if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
       dto.setIdentificationBarcode(from.getIdentificationBarcode());
@@ -1124,7 +1132,9 @@ public class Dtos {
     to.setName(from.getName());
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
-    to.setInitialConcentration(from.getConcentration());
+    if (from.getConcentration() != null) {
+      to.setInitialConcentration(Double.valueOf(from.getConcentration()));
+    }
     to.setLowQuality(from.getLowQuality());
     if (from.getPaired() != null) {
       to.setPaired(from.getPaired());
@@ -1163,7 +1173,9 @@ public class Dtos {
       }
       to.setIndices(indices);
     }
-    to.setVolume(from.getVolume());
+    if (from.getVolume() != null) {
+      to.setVolume(Double.valueOf(from.getVolume()));
+    }
     to.setDnaSize(from.getDnaSize());
     to.setLocationBarcode(from.getLocationBarcode());
     to.setCreationDate(extractDateOrNull(from.getCreationDate()));
@@ -1355,12 +1367,16 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getDescription())) {
       dto.setDescription(from.getDescription());
     }
-    dto.setConcentration(from.getConcentration());
+    if (from.getConcentration() != null) {
+      dto.setConcentration(from.getConcentration().toString());
+    }
     dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(getDateString(from.getCreationDate()));
     dto.setDiscarded(from.isDiscarded());
-    dto.setVolume(from.getVolume());
+    if (from.getVolume() != null) {
+      dto.setVolume(from.getVolume().toString());
+    }
     dto.setPlatformType(from.getPlatformType().name());
     dto.setLongestIndex(from.getLongestIndex());
     if (from.getLastModified() != null) {
@@ -1735,12 +1751,16 @@ public class Dtos {
     PoolImpl to = new PoolImpl();
     to.setId(dto.getId() == null ? PoolImpl.UNSAVED_ID : dto.getId());
     to.setAlias(dto.getAlias());
-    to.setConcentration(dto.getConcentration());
+    if (dto.getConcentration() != null) {
+      to.setConcentration(Double.valueOf(dto.getConcentration()));
+    }
     to.setCreationDate(extractDateOrNull(dto.getCreationDate()));
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());
     to.setDiscarded(dto.isDiscarded());
-    to.setVolume(dto.getVolume());
+    if (dto.getVolume() != null) {
+      to.setVolume(Double.valueOf(dto.getVolume()));
+    }
     to.setPlatformType(PlatformType.valueOf(dto.getPlatformType()));
     to.setPoolableElementViews(dto.getPooledElements().stream().map(dilution -> {
       PoolableElementView view = new PoolableElementView();
