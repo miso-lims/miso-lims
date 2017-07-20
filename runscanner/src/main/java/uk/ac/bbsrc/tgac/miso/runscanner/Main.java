@@ -14,6 +14,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 
+/**
+ * Attempts to process run directories, provided on the command line, through a particular processor and display the results. This is for
+ * debugging purposes.
+ *
+ */
 public final class Main {
 
   public static void main(String[] args) {

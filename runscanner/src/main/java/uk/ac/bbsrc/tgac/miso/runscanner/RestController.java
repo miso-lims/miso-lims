@@ -20,6 +20,9 @@ import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProgressiveRequestDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProgressiveResponseDto;
 
+/**
+ * Provide information about the run scanner's current run cache via a REST interface.
+ */
 @Controller
 public class RestController {
   private static final Logger log = LoggerFactory.getLogger(RestController.class);
@@ -32,15 +35,25 @@ public class RestController {
   // of the server
   private final long token = System.currentTimeMillis();
 
+  /**
+   * Given a known run name.
+   * If no run is found, null is returned. If there are multiple runs with the same name that are from different sequencers, one is randomly
+   * selected.
+   */
   @RequestMapping(value = "/run/{name}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public NotificationDto getByName(@PathVariable("name") String id) {
     return scheduler.finished().filter(entry -> entry.getValue().getRunAlias().equals(id)).map(Map.Entry::getValue).findAny().orElse(null);
   }
 
+  /**
+   * Provide all the runs current cache as an array.
+   * 
+   * Runs are not guaranteed to have unique names.
+   */
   @RequestMapping(value = "/runs/all", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public List<NotificationDto> list(@PathVariable("name") String id) {
+  public List<NotificationDto> list() {
     return scheduler.finished().map(Map.Entry::getValue).collect(Collectors.toList());
   }
 
@@ -53,7 +66,7 @@ public class RestController {
    * this instance of the server for the life time of its run. If the token doesn't match, we send the client all the data we know about and
    * give them the new token.
    * 
-   * We also need to track time. Rather than keep track of wall time, we use an incrementing counter (epoch) that we increment whenver we
+   * We also need to track time. Rather than keep track of wall time, we use an incrementing counter (epoch) that we increment whenever we
    * finish processing a run. If the client sends us a valid token, we will tell them the new epoch and give them only the work done since
    * the last epoch.
    * 

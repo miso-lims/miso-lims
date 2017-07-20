@@ -35,11 +35,11 @@ The JSON file then contains a list of instruments:
       }
     ]
 
-The name/platform-type combination decide what scanner is used to interpret the sequencer's results. A list of supported scanners can be found on the status page.
+The name/platform-type combination decide what scanner is used to interpret the sequencer's results. A list of supported scanners can be found on the status page or the debugging interface below.
 
 ## Debugging
 For troublesome runs, you can see the output for a particular run directory using:
 
-    CLASSPATH=runscanner.war java uk.ac.bbsrc.tgac.miso.runscanner.Main
+    java -cp $RUN_SCANNER_HOME/WEB-INF/classes:$RUN_SCANNER_HOME/WEB-INF/lib/'*' uk.ac.bbsrc.tgac.miso.runscanner.Main
 
-It will display instructions on how to use it.
+It will display instructions on how to use it. You will have to set the `RUN_SCANNER_HOME` to the path containing an unpacked version of the WAR.

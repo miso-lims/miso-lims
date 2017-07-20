@@ -37,13 +37,26 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 
+/**
+ * Periodically scan the run directories and cache the results.
+ */
 @Service
 public class Scheduler {
+  /**
+   * Holder for a run that has been scanned.
+   */
   private static class FinishedWork {
     Instant created = Instant.now();
     NotificationDto dto;
     int epoch;
 
+    /**
+     * Determine if the run should be scanned again.
+     * 
+     * This only happens if the run is not marked as done by the processor and 10 minutes have past since the last process. The automatic
+     * rerunning done by scheduler is not sufficient to determine if the run needs to be reprocessed since it isn't clear how long the run
+     * waited in the processing queue.
+     */
     public boolean shouldRerun() {
       return !dto.getHealthType().isDone() && Duration.between(created, Instant.now()).toMinutes() > 10;
     }
@@ -212,11 +225,20 @@ public class Scheduler {
     return scanningNow;
   }
 
+  /**
+   * Determine if a run directory is in need of processing.
+   * 
+   * This means that is is not in a processing queue, failed processing last time, nor needs reprocessing (for runs still active on the
+   * sequencer)
+   */
   private boolean isUnprocessed(File directory) {
     return !workToDo.contains(directory) && !processing.contains(directory) && !failed.contains(directory)
         && (!finishedWork.containsKey(directory) || finishedWork.get(directory).shouldRerun());
   }
 
+  /**
+   * Push a run directory into the processing queue.
+   */
   private void queueDirectory(final File directory, final RunProcessor processor, final TimeZone tz) {
     workToDo.add(directory);
     workPool.submit(() -> {
@@ -245,6 +267,15 @@ public class Scheduler {
     });
   }
 
+  /**
+   * Rebuild the set of sequencer directories to scan from the configuration file.
+   * 
+   * If the configuration file is unreadable or contains no entries, the configuration is bad. The configuration file may still contain
+   * defective/invalid entries and those directories will not be scanned.
+   * 
+   * Changing the configuration does not clear the cache. So if a sequencer's configuration is changed from valid to invalid to valid again,
+   * it will not trigger re-processing of the previous output, even if the timezone or processor is changed.
+   */
   private void readConfiguration() {
     ObjectMapper mapper = new ObjectMapper();
     configurationLastRead = Instant.now();
@@ -277,6 +308,9 @@ public class Scheduler {
     readConfiguration();
   }
 
+  /**
+   * Initiate scanning every 15 minutes until stopped.
+   */
   public synchronized void start() {
     if (scanDirectoriesFuture == null) {
       scanDirectoriesFuture = scheduler.scheduleAtFixedRate(() -> {
@@ -300,7 +334,8 @@ public class Scheduler {
               .peek(attempted)//
               .filter(entry -> isAcceptable(entry.getKey()))//
               .peek(accepted)//
-              .filter(entry -> isUnprocessed(entry.getKey())).peek(newRuns)//
+              .filter(entry -> isUnprocessed(entry.getKey()))//
+              .peek(newRuns)//
               .forEach(entry -> {
                 queueDirectory(entry.getKey(), entry.getValue().getProcessor(), entry.getValue().getTimeZone());
               });
@@ -312,6 +347,9 @@ public class Scheduler {
     }
   }
 
+  /**
+   * Stop scanning. Queued run directories will still be processed.
+   */
   public synchronized void stop() {
     if (scanDirectoriesFuture != null) {
       scanDirectoriesFuture.cancel(false);
