@@ -56,8 +56,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
-import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
@@ -79,7 +77,6 @@ public class EditRunController {
   @Autowired
   private PlatformService platformService;
 
-  private RunStatsManager runStatsManager;
   @Autowired
   private SequencerReferenceService sequencerReferenceService;
   @Autowired
@@ -91,10 +88,6 @@ public class EditRunController {
 
   public void setRunService(RunService runService) {
     this.runService = runService;
-  }
-
-  public void setRunStatsManager(RunStatsManager runStatsManager) {
-    this.runStatsManager = runStatsManager;
   }
 
   @ModelAttribute("maxLengths")
@@ -200,15 +193,6 @@ public class EditRunController {
       } else {
         model.put("title", "Run " + run.getId());
         model.put("multiplexed", isMultiplexed(run));
-        try {
-          if (runStatsManager != null) {
-            model.put("statsAvailable", runStatsManager.hasStatsForRun(run));
-          }
-          model.put("operationsQcPassed", hasOperationsQcPassed(run));
-          model.put("informaticsQcPassed", hasInformaticsQcPassed(run));
-        } catch (RunStatsException e) {
-          log.error("setup run form", e);
-        }
       }
 
       if (!run.userCanRead(user)) {
