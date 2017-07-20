@@ -16,7 +16,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public abstract class AbstractPage {
 
-  private static final long DEFAULT_WAIT = 10;
+  private static final long DEFAULT_WAIT = 15;
 
   private final WebDriver driver;
 
@@ -72,20 +72,20 @@ public abstract class AbstractPage {
     }
   }
 
-  public void setText(String input, WebElement element) {
+  protected void setText(String input, WebElement element) {
     element.click();
     element.clear();
     element.sendKeys(input);
     element.sendKeys(Keys.ESCAPE);
   }
 
-  public void setDropdown(String input, WebElement element) {
+  protected void setDropdown(String input, WebElement element) {
     element.click();
     ((Select) element).selectByVisibleText(input);
     element.sendKeys(Keys.ESCAPE);
   }
 
-  public void setCheckbox(Boolean value, WebElement element) {
+  protected void setCheckbox(Boolean value, WebElement element) {
     // only change if given value and element value differ
     if (value && "false".equals(element.getAttribute("value"))) {
       element.click();
@@ -95,7 +95,7 @@ public abstract class AbstractPage {
     }
   }
 
-  public String getSelectedDropdownText(WebElement element) {
+  protected String getSelectedDropdownText(WebElement element) {
     Select dropdown = new Select(element);
     return dropdown.getFirstSelectedOption().getText();
   }

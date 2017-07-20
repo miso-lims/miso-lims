@@ -1209,21 +1209,17 @@ public class SampleBulkCreateIT extends AbstractIT {
   }
 
   @Test
-  /**
-   * Need to run these tests after the other sample creates, because sample alias generation
-   * (specifically, SampleNumberPerProject tracking) gets screwed up with manual identity creation.
-   */
   public void testCreateOneIdentityNoProject() throws Exception {
     // Goal: ensure one identity can be saved
     BulkSamplePage page = getCreatePage(1, null, identityClassId);
     HandsOnTable table = page.getTable();
 
     Map<String, String> identity = new HashMap<>();
-    identity.put(Columns.ALIAS, "PRO1_1001");
+    identity.put(Columns.ALIAS, "PRO2_1001");
     identity.put(Columns.SAMPLE_TYPE, "GENOMIC");
     identity.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
-    identity.put(Columns.PROJECT, "PRO1");
-    identity.put(Columns.EXTERNAL_NAME, "ext1001"); // increment
+    identity.put(Columns.PROJECT, "PRO2"); // different project so as not to mess with the SampleNumberPerProject generator
+    identity.put(Columns.EXTERNAL_NAME, "ext2001"); // increment
     identity.put(Columns.DONOR_SEX, "Female");
     identity.put(Columns.QC_STATUS, "Ready");
 
@@ -1245,20 +1241,17 @@ public class SampleBulkCreateIT extends AbstractIT {
   }
 
   @Test
-  /**
-   * Need to run these tests after the other sample creates, because sample alias generation
-   * (specifically, SampleNumberPerProject tracking) gets screwed up with manual identity creation.
-   */
   public void testCreateOneIdentityWithProject() throws Exception {
     // Goal: ensure one identity associated with a predefined project can be saved
-    BulkSamplePage page = getCreatePage(1, projectId, identityClassId);
+    BulkSamplePage page = getCreatePage(1, 2L, identityClassId);
+    // different project so as not to mess with the SampleNumberPerProject generator
     HandsOnTable table = page.getTable();
 
     Map<String, String> identity = new HashMap<>();
-    identity.put(Columns.ALIAS, "PRO1_1002");
+    identity.put(Columns.ALIAS, "PRO2_1002");
     identity.put(Columns.SAMPLE_TYPE, "GENOMIC");
     identity.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
-    identity.put(Columns.EXTERNAL_NAME, "ext1002"); // increment
+    identity.put(Columns.EXTERNAL_NAME, "ext2002"); // increment
     identity.put(Columns.QC_STATUS, "Ready");
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
@@ -1270,7 +1263,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes on the Edit single Sample page
-    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
+    Project predefined = (Project) getSession().get(ProjectImpl.class, 2L);
     SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, Long.valueOf(newId));
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());

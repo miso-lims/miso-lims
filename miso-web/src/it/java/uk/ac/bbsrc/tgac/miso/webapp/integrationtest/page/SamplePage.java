@@ -114,23 +114,15 @@ public class SamplePage extends HeaderFooterPage {
     return idLabel.getText();
   }
 
-  public void setId() {
-    throw new UnsupportedOperationException();
-  }
-
   public String getName() {
     return nameLabel.getText();
-  }
-
-  public void setName() {
-    throw new UnsupportedOperationException();
   }
 
   public String getAlias() {
     return aliasLabel.getAttribute("value");
   }
 
-  public void setSampleAlias(String alias) {
+  public void setAlias(String alias) {
     setText(alias, aliasLabel);
   }
 
@@ -142,10 +134,6 @@ public class SamplePage extends HeaderFooterPage {
     setDropdown(project, projectDropdownForCreateLabel);
   }
 
-  public String getProjectForCreate(String project) {
-    throw new UnsupportedOperationException();
-  }
-
   public void setProjectForCreate(String project) {
     if ("select".equals(projectDropdownForCreateLabel.getTagName())) {
       setDropdown(project, projectDropdownForCreateLabel);
@@ -154,10 +142,6 @@ public class SamplePage extends HeaderFooterPage {
 
   public String getProjectNameForEditLabel() {
     return projectNameForEditLabel.getText();
-  }
-
-  public void setProjectNameForEditLabel() {
-    throw new UnsupportedOperationException();
   }
 
   public String getDescription() {
@@ -263,10 +247,6 @@ public class SamplePage extends HeaderFooterPage {
 
   public String getParentAlias() {
     return parentAliasLabel.getText();
-  }
-
-  public void setSampleParentAlias() {
-    throw new UnsupportedOperationException();
   }
 
   public String getSampleClass() {

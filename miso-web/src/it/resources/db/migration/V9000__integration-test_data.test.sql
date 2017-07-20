@@ -161,4 +161,5 @@ DELETE FROM ProjectOverview;
 DELETE FROM Project;
 INSERT INTO Project(projectId, name, alias, shortName, creationDate, description, securityProfile_profileId,
   progress, referenceGenomeId, lastUpdated) VALUES
-  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 1, 'ACTIVE', 1, '2017-06-27 14:11:00');
+  (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 1, 'ACTIVE', 1, '2017-06-27 14:11:00'),
+  (2, 'PRO2', 'Project Two', 'PRO2', '2017-07-20', 'integration test project for custom identities', 2, 'ACTIVE', 1, '2017-07-20 16:55:00');
