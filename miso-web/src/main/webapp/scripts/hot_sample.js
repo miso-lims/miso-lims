@@ -518,7 +518,7 @@ HotTarget.sample = (function() {
             pack : function(sam, flat, errorHandler) {
               sam.dnaseTreated = flat.dnaseTreated === 'True';
             },
-            include : show['Stock'] && (config.targetSampleClass.dnaseTreatable || (config.create && show['Aliquot']))
+            include : Constants.isDetailedSample && config.dnaseTreatable
           },
           HotUtils.makeColumnForFloat('Vol. (&#181;l)',
               (show['Stock'] || show['Aliquot']), 'volume'),

@@ -102,9 +102,6 @@ public class SamplePage extends HeaderFooterPage {
   public SamplePage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    // oh this looks awful:
-    // https://stackoverflow.com/questions/18206578/java-lang-classcastexception-com-sun-proxy-proxy8-cannot-be-cast-to-org-openqa
-      
     waitWithTimeout().until(titleContains("Sample "));
   }
 

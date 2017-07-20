@@ -84,7 +84,7 @@ public class SampleBulkCreateIT extends AbstractIT {
       Columns.EXTERNAL_NAME, Columns.IDENTITY_ALIAS, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
       Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER, Columns.TIMES_RECEIVED,
       Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
-      Columns.DNASE_TREATED, Columns.VOLUME, Columns.CONCENTRATION, Columns.QC_STATUS, Columns.QC_NOTE, Columns.PURPOSE);
+      Columns.VOLUME, Columns.CONCENTRATION, Columns.QC_STATUS, Columns.QC_NOTE, Columns.PURPOSE);
 
   private static final Set<String> rnaAliquotColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT,
@@ -917,7 +917,6 @@ public class SampleBulkCreateIT extends AbstractIT {
     gDnaAliquot.put(Columns.TISSUE_MATERIAL, "FFPE");
     gDnaAliquot.put(Columns.REGION, "Medulla oblongata");
     gDnaAliquot.put(Columns.STR_STATUS, "Submitted");
-    gDnaAliquot.put(Columns.DNASE_TREATED, "True");
     gDnaAliquot.put(Columns.VOLUME, "10.0");
     gDnaAliquot.put(Columns.CONCENTRATION, "3.75");
     gDnaAliquot.put(Columns.QC_STATUS, "Ready");
@@ -977,7 +976,6 @@ public class SampleBulkCreateIT extends AbstractIT {
     gDnaAliquot.put(Columns.TISSUE_MATERIAL, "FFPE");
     gDnaAliquot.put(Columns.REGION, "Medulla oblongata");
     gDnaAliquot.put(Columns.STR_STATUS, "Submitted");
-    gDnaAliquot.put(Columns.DNASE_TREATED, "True");
     gDnaAliquot.put(Columns.VOLUME, "10.0");
     gDnaAliquot.put(Columns.CONCENTRATION, "3.75");
     gDnaAliquot.put(Columns.QC_STATUS, "Ready");
