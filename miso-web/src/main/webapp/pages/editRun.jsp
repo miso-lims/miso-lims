@@ -286,17 +286,6 @@
 
 <%@ include file="permissions.jsp" %>
 <c:if test="${run.id != 0}">
-  <c:if test="${statsAvailable}">
-    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#stats_arrowclick'), 'stats');">Statistics
-      <div id="stats_arrowclick" class="toggleLeft"></div>
-    </div>
-    <div id="stats">
-      <h1>Statistics</h1>
-
-      <div id="summarydiv"></div>
-    </div>
-  </c:if>
-
   <c:if test="${run.id != 0}">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
@@ -489,9 +478,6 @@
         <tr>
             <th>${platformType.partitionName} No.</th>
             <th>Pool</th>
-            <c:if test="${statsAvailable}">
-              <th>Stats</th>
-            </c:if>
           </tr>
         <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
           <tr>
@@ -545,12 +531,6 @@
                 </c:otherwise>
               </c:choose>
             </td>
-            <c:if test="${statsAvailable}">
-              <td><img id="charttrigger" src="<c:url value='/styles/images/chart-bar-icon.png'/>"
-                       border="0"
-                       onclick="Stats.getPartitionStats(${run.id}, ${partition.partitionNumber}); checkstats(${run.id}, ${partition.partitionNumber}); ">
-              </td>
-            </c:if>
           </tr>
         </c:forEach>
       </table>
@@ -582,23 +562,6 @@
 </div>
 
 <script type="text/javascript">
-  jQuery("#charttrigger").colorbox({
-    width: "90%",
-    html: "<div style='display:none'> " +
-          "<div id=\"graphpanel\"> " +
-          "<div id=\"statresultgraph\">" +
-          "<center><h2>Sample <span id=chartSample></span> Partition <span id=chartPartition></span> Statistics</h2></center> " +
-          "<div id=\"statstable\"></div> " +
-          "<div style=\"width: 45%; left: 10px; position: absolute;\"><h2>Quality Profile</h2>  " +
-          "<div id=\"statschartqualityprofile\" style=\"width: 100%; height:650px; position: absolute; overflow-x: scroll; overflow-y: hidden; \"></div>" +
-          "</div> " +
-          "<div style=\"width: 45%; right: 10px; position: absolute;\"><h2>Per Base Content</h2>    " +
-          "<div id=\"statschartperbasecontent\" style=\"width: 100%; right: 10px; position: absolute;\"></div>" +
-          "</div>" +
-          "<div id=\"statschartmessage\"></div> " +
-          "</div>" +
-          "</div>" +
-          "</div>"});
 
   jQuery(document).ready(function () {
     jQuery('#alias').simplyCountable({
@@ -616,68 +579,8 @@
     });
 
     Run.pool.poolSearch("", '${platformType.key}');
-    <c:if test="${run.id != 0 and metrixEnabled}">
-      Stats.checkRunProgress('${run.alias}', '${platformType.key}');
-    </c:if>
-
-
-    <c:if test="${statsAvailable}">
-      Stats.getRunStats(${run.id});
-    </c:if>
   });
 
-  function checkstats(runId, lane) {
-    jQuery('#statschartmessage').html("");
-    jQuery('#statschartqualityprofile').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
-
-    Fluxion.doAjax(
-      'statsControllerHelperService',
-      'getSummaryRunstatsDiagram',
-      {'runId': runId, 'lane': lane, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery('#statschartqualityprofile').html("");
-        readStats(json);
-      }
-      }
-    );
-
-    jQuery('#statschartmessage').html("");
-    jQuery('#statschartperbasecontent').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
-
-    Fluxion.doAjax(
-      'statsControllerHelperService',
-      'getPerPositionBaseContentDiagram',
-      {'runId': runId, 'lane': lane, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        readStatsperbasecontent(json);
-      }
-      }
-    );
-  }
-
-  function readStats(json) {
-    readStatsdb(json);
-  }
-
-  function checkstatsperbasecontent(runId, lane) {
-    jQuery('#statschartmessage').html("");
-    jQuery('#chartheader').html("Per Base Percentage");
-    jQuery('#statschart').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
-
-    Fluxion.doAjax(
-      'statsControllerHelperService',
-      'getPerPositionBaseContentDiagram',
-      {'runId': runId, 'lane': lane, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        readStatsperbasecontent(json);
-      }
-      }
-    );
-  }
-
-  function readStatsperbasecontent(json) {
-    readStatsdbperbasecontent(json);
-  }
 </script>
 
 <br/>

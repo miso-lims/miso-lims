@@ -30,21 +30,15 @@ import java.util.Date;
 import java.util.Map;
 
 import javax.management.MalformedObjectNameException;
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.sql.DataSource;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor;
-import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
@@ -60,7 +54,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.NamingSchemeResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -136,33 +129,6 @@ public class MisoAppListener implements ServletContextListener {
         } else {
           log.error("No such issue tracker available with given type: " + trackerType);
         }
-      }
-    }
-
-    if ("true".equals(misoProperties.get("miso.statsdb.enabled"))) {
-      try {
-        JndiObjectFactoryBean jndiBean = new JndiObjectFactoryBean();
-        jndiBean.setLookupOnStartup(true);
-        jndiBean.setResourceRef(true);
-        jndiBean.setJndiName("jdbc/STATSDB");
-        jndiBean.setExpectedType(javax.sql.DataSource.class);
-        jndiBean.afterPropertiesSet();
-
-        DataSource datasource = (DataSource) jndiBean.getObject();
-
-        JdbcTemplate template = new JdbcTemplate();
-        template.setDataSource(datasource);
-        template.setNativeJdbcExtractor(new CommonsDbcpNativeJdbcExtractor());
-        context.getBeanFactory().registerSingleton("statsInterfaceTemplate", template);
-
-        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(datasource);
-        context.getBeanFactory().registerSingleton("statsTransactionManager", transactionManager);
-
-        RunStatsManager rsm = new RunStatsManager(template);
-        context.getBeanFactory().registerSingleton("runStatsManager", rsm);
-      } catch (NamingException e) {
-        log.error("Cannot initiate statsdb connection", e);
       }
     }
   }
