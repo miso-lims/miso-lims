@@ -7,8 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto;
@@ -30,6 +28,9 @@ public class Testing extends RunProcessor {
     super(platformType, "testing");
   }
 
+  /**
+   * Determine the right DTO class to parse as based on the platform type.
+   */
   private Class<? extends NotificationDto> classForPlatform() {
     switch (getPlatformType()) {
     case ILLUMINA:
@@ -43,9 +44,7 @@ public class Testing extends RunProcessor {
 
   @Override
   public NotificationDto process(File runDirectory, TimeZone tz) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule())
-        .setDateFormat(new ISO8601DateFormat());
+    ObjectMapper mapper = createObjectMapper();
 
     Matcher m = INTEGER_TAIL.matcher(runDirectory.getName());
     if (m.matches()) {

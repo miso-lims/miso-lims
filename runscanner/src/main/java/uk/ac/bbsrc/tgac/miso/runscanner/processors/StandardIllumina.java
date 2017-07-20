@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.runscanner.processor;
+package uk.ac.bbsrc.tgac.miso.runscanner.processors;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,6 +18,11 @@ import uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
 
+/**
+ * Scan an Illumina sequener's output using the Illumina Interop C++ library.
+ *
+ * This should work for all sequencer execept the Genome Analyzer and Genome Analyzer II.
+ */
 public final class StandardIllumina extends RunProcessor {
   private static final Pattern FAILED_MESSAGE = Pattern.compile("Application\\sexited\\sbefore\\scompletion");
 
@@ -31,6 +36,8 @@ public final class StandardIllumina extends RunProcessor {
   public NotificationDto process(File runDirectory, TimeZone tz) throws IOException {
     Path runPath = runDirectory.toPath().toAbsolutePath();
 
+    // Call the C++ program to do the real work and write a notification DTO to standard output. The C++ object has no direct binding to the
+    // DTO, so any changes to the DTO must be manually changed in the C++ code.
     Process process = new ProcessBuilder("runscanner-illumina", runDirectory.getAbsolutePath()).directory(runDirectory).start();
 
     IlluminaNotificationDto dto = createObjectMapper().readValue(process.getInputStream(), IlluminaNotificationDto.class);
@@ -42,6 +49,9 @@ public final class StandardIllumina extends RunProcessor {
     } catch (InterruptedException e) {
       throw new IOException(e);
     }
+
+    // The Illumina library can't distinguish between a failed run and one that either finished or is still going. Scan the logs, if
+    // available to determine if the run failed.
     File rtaLogDir = new File(runDirectory, "/Data/RTALogs");
     boolean failed = rtaLogDir.exists()
         ? Arrays.stream(rtaLogDir.listFiles(file -> file.getName().endsWith("Log.txt") || file.getName().endsWith("Log_00.txt")))

@@ -2,6 +2,10 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
 
+/**
+ * Results from a run scanner. After this is received, the next request should be set up using
+ * {@link ProgressiveRequestDto#update(ProgressiveResponseDto)}.
+ */
 public class ProgressiveResponseDto {
   private int epoch;
   private long token;
@@ -15,6 +19,15 @@ public class ProgressiveResponseDto {
     return token;
   }
 
+  /**
+   * This recent DTOs found by the run scanner.
+   * 
+   * The run scanner is designed to over-deliver, so runs previously seen maybe delivered. Additionally, the run scanner will re-probe
+   * unfinished runs, resulting in runs with the same run name but different content.
+   *
+   * There may also be multiple runs with the same name that are from different sequencers depending on the user configuration of run
+   * scanner.
+   */
   public List<NotificationDto> getUpdates() {
     return updates;
   }

@@ -1,5 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+/**
+ * Request incremental results from a run scanner.
+ * 
+ * The goal of the progressive requests is to avoid sending unchanged data from a run scanner to a client. That being said, the run scanner
+ * has no qualms about sending duplicate information to the client and the client must deal with that.
+ * 
+ * After a request is made, the next request should use the {@link #update(ProgressiveResponseDto)} method to request only the subsequent
+ * data.
+ * 
+ * Otherwise, the epoch and token value should be initialised to zero.
+ */
 public class ProgressiveRequestDto {
   private int epoch;
   private long token;

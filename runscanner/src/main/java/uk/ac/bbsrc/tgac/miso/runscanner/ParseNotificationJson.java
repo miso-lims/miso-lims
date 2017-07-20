@@ -13,6 +13,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 
+/**
+ * Parses a notification DTO stored in a file and outputs it to the console, for debugging purposes.
+ *
+ */
 public class ParseNotificationJson {
 
   public static void main(String[] args) throws JsonGenerationException, JsonMappingException, IOException {

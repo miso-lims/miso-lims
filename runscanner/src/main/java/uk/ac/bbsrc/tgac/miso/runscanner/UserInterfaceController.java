@@ -19,8 +19,14 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.google.common.collect.ImmutableSortedMap;
 
+/**
+ * Front-end status monitoring for run scanner
+ */
 @Controller
 public class UserInterfaceController {
+  /**
+   * These are all the collections of files that the scheduler can report.s
+   */
   private static final Map<String, Function<Scheduler, Iterable<File>>> COLLECTIONS = ImmutableSortedMap
       .<String, Function<Scheduler, Iterable<File>>> naturalOrder().put("Finished", Scheduler::getFinishedDirectories)
       .put("Scheduled", Scheduler::getScheduledWork).put("Processing", Scheduler::getCurrentWork).put("Instruments", Scheduler::getRoots)
@@ -30,6 +36,9 @@ public class UserInterfaceController {
   private Scheduler scheduler;
   private final Instant startTime = Instant.now();
 
+  /**
+   * List a collection of files
+   */
   @RequestMapping(value = "/list/{collection}", method = RequestMethod.GET)
   public ModelAndView listPaths(@PathVariable String collection, ModelMap model) throws IOException {
     model.put("runs", COLLECTIONS.containsKey(collection) ? COLLECTIONS.get(collection).apply(scheduler) : Collections.emptyList());
@@ -62,6 +71,9 @@ public class UserInterfaceController {
     return Duration.between(startTime, Instant.now()).toString();
   }
 
+  /**
+   * Show the main status page
+   */
   @RequestMapping(value = "/", method = RequestMethod.GET)
   public ModelAndView showStatus(ModelMap model) throws IOException {
     model.put("finished", scheduler.getFinishedDirectories().size());

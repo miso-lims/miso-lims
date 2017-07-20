@@ -13,6 +13,8 @@ int main(int argc, const char **argv) {
 
   Json::Value result(Json::objectValue);
 
+  /* Jackson expects the class to be embedded as an attribute, so we provided it
+   * here. */
   result["class"] = "uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto";
 
   auto is_complete = true;
@@ -23,6 +25,8 @@ int main(int argc, const char **argv) {
   } catch (illumina::interop::io::incomplete_file_exception e) {
     is_complete = false;
   } catch (...) {
+    /* We are really unable to recover from any other exceptions, so just bail
+     * out. */
     return 2;
   }
 
@@ -32,13 +36,14 @@ int main(int argc, const char **argv) {
   result["software"] = buffer.str();
 
   /* The Illumina start date associated with a run is a "yymmdd" string, not a
-   * time_t. Reformat it as "YYYY-mm-dd".*/
+   * time_t. Reformat it as "YYYY-mm-dd". */
   std::stringstream start_date;
   start_date << "20" << run.run_info().date().substr(0, 2) << "-"
              << run.run_info().date().substr(2, 2) << "-"
              << run.run_info().date().substr(4, 2);
   result["startDate"] = start_date.str();
 
+  /* Copy all the trivial values from the run information.  */
   result["containerSerialNumber"] = run.run_info().flowcell_id();
   result["numCycles"] = (Json::Value::Int)run.run_info().total_cycles();
   result["pairedEndRun"] = run.run_info().is_paired_end();
@@ -61,7 +66,8 @@ int main(int argc, const char **argv) {
                             .last_cycle();
 
   /* If there's an extraction metric with a end date, use that, reformatted as a
-   * "YYYY-mm-dd" string.*/
+   * "YYYY-mm-dd" string. There can be multiple extractions, so pick on
+   * basically at random. */
   auto has_extraction = false;
   for (const auto &extraction_metric :
        run.get<illumina::interop::model::metrics::extraction_metric>()) {
@@ -74,13 +80,14 @@ int main(int argc, const char **argv) {
   is_complete &= has_extraction;
 
   /* We can't tell the difference between the stopped or running states, so we
-   * just assume running if it isn't finished.*/
+   * just assume running if it isn't finished. */
   result["healthType"] = is_complete ? "Completed" : "Running";
 
   Json::Value metrics_results(Json::arrayValue);
   // TODO add metrics using metrics_results::append
   result["metrics"] = metrics_results;
 
+  /* Write everything to standard output from consumption by Java. */
   std::cout << result << std::endl;
   return 0;
 }
