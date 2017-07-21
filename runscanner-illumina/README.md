@@ -3,12 +3,16 @@ To use the Illumina support in Run Scanner, this additional package must be buil
 
 You will need a copy of [jsoncpp](https://github.com/open-source-parsers/jsoncpp) and an AutoTools-capable build environment. On Debian/Ubuntu:
 
-    sudo apt-get install libjsoncpp-dev autoconf libtool build-essentials
+    sudo apt-get install cmake libjsoncpp-dev autoconf libtool build-essential
 
 On Fedora/Red Hat:
 
     sudo yum groupinstall "Development Tools"
-    sudo yum install jsoncpp-devel libtool autoconf
+    sudo yum install cmake jsoncpp-devel libtool autoconf
+
+Pull the Illumina Interop code via:
+
+    git submodule init && git submodule update
 
 Then:
 

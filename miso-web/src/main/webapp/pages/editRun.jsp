@@ -280,7 +280,6 @@
 	jQuery(document).ready(function () {
 	  // Attaches a Parsley form validator.
 	  Validate.attachParsley('#run-form');
-	  Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.startDate}', '${run.sequencerReference.name}');
 	});
 </script>
 
@@ -296,7 +295,7 @@
   </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      RunGraph.renderMetrics(<c:out value="${run.metrics}" default="[]"/>);
+      RunGraph.renderMetrics(${run.metrics});
     });
   </script>
   </c:if>
