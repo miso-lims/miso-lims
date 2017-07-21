@@ -33,7 +33,6 @@ var RunGraph = (function() {
       var node = document.createElement('P');
       return {
         dom : node,
-        priority : 7, // The sorting order. Lowest is first.
         render : function() {
           // Callback to render the graph after the DOM node is inserted.
           node.innerText = 'Look at me. I am gorgeous.';
@@ -52,11 +51,163 @@ var RunGraph = (function() {
       link.target = "_blank";
       return {
         dom : link,
-        priority : 0,
         render : function() {
         }
       };
     });
+  };
+  
+  var chart = function(metrics) {
+    return metrics.filter(function(metric) {
+      return metric.type == 'chart';
+    }).map(function(metric) {
+      var node = document.createElement('TABLE');
+      return {
+        dom : node,
+        render : function() {
+          jQuery(node).dataTable({
+            'bJQueryUI' : true,
+            'aoColumns' : [ {
+              "sTitle" : "Name",
+              "mData" : "name",
+            }, {
+              "sTitle" : "Value",
+              "mData" : "value",
+            }, ],
+            'aaData' : metric.values,
+            'sDom' : 't',
+            'fnDrawCallback' : function() {
+              jQuery(node).find("thead").remove();
+            }
+          });
+        }
+      };
+    });
+  };
+  var summaryTable = function(metrics) {
+    return metrics.filter(function(metric) {
+      return metric.type == 'table';
+    }).map(function(metric) {
+      var node = document.createElement('TABLE');
+      return {
+        dom : node,
+        render : function() {
+          jQuery(node).dataTable({
+            'bJQueryUI' : true,
+            'aoColumns' : metric.columns.map(function(column) {
+              return {
+                "sTitle" : column.name,
+                "mData" : column.property,
+              };
+            }),
+            'sDom' : '<"datatable-scroll"t><"F"ip>',
+            'aaData' : metric.rows
+          });
+        }
+      };
+    });
+  };
+  var lineGraph = function(typeName, title, yLabel) {
+    return function(metrics) {
+      return metrics.filter(function(metric) {
+        return metric.type == typeName;
+      }).map(function(metric) {
+        metric.series.forEach(function(series) {
+          series.visible = !series.name.includes("Lane");
+        });
+        var node = document.createElement('DIV');
+        return {
+          dom : node,
+          render : function() {
+            new Highcharts.Chart({
+              chart : {
+                type : 'line',
+                renderTo : node,
+                zoomType : 'x',
+                spacingRight : 20
+              },
+              title : {
+                text : title
+              },
+              xAxis : {},
+              yAxis : {
+                title : {
+                  text : yLabel
+                }
+              },
+              plotOptions : {
+                line : {
+                  lineWidth : 1,
+                  marker : {
+                    enabled : false
+                  },
+                  shadow : false
+                }
+              },
+              series : metric.series
+            });
+          }
+        };
+      });
+    };
+  };
+  
+  var boxPlot = function(metric, title, yLabel) {
+    var node = document.createElement('DIV');
+    return {
+      dom : node,
+      render : function() {
+        new Highcharts.Chart({
+          chart : {
+            type : 'boxplot',
+            renderTo : node,
+            zoomType : 'x',
+            spacingRight : 20
+          },
+          title : {
+            text : title
+          },
+          xAxis : {},
+          yAxis : {
+            title : {
+              text : yLabel
+            }
+          },
+          plotOptions : {
+            boxplot : {
+              medianColor : 'red'
+            }
+          },
+          series : metric.series
+        });
+      }
+    };
+  };
+  
+  var illuminaPerCyclePlot = function(typeName, title, yLabel) {
+    return function(metrics) {
+      return metrics.filter(function(metric) {
+        return metric.type == typeName;
+      }).map(function(metric) {
+        metric.series.forEach(function(series) {
+          series.tooltip = {
+            headerFormat : '<em>Cycle {point.key}</em><br/>'
+          };
+          series.visible = !series.name.includes("Lane");
+        });
+        return boxPlot(metric, title, yLabel);
+      });
+    };
+  };
+  
+  var illuminaPerLanePlot = function(typeName, title, yLabel) {
+    return function(metrics) {
+      return metrics.filter(function(metric) {
+        return metric.type == typeName;
+      }).map(function(metric) {
+        return boxPlot(metric, title, yLabel);
+      });
+    };
   };
   
   return {
@@ -68,29 +219,39 @@ var RunGraph = (function() {
       }
       // Start with graphs we know how to make (see the example for a template).
       // Then filter them as appropriate for the data we have.
-      var graphs = [ example, externalLink, ].map(function(graph) {
+      var graphs = metrics ? [
+          example,
+          externalLink,
+          chart,
+          summaryTable,
+          illuminaPerCyclePlot('illumina-q30-by-cycle', '> Q30', '% Bases >Q30'),
+          lineGraph('illumina-called-intensity-by-cycle', 'Called Intensity',
+              'Average Intensity per Cycle'),
+          lineGraph('illumina-base-percent-by-cycle', 'Base %', 'Percentage'),
+          illuminaPerLanePlot('illumina-cluster-density-by-lane',
+              'Cluster Density', 'Density (K/mm²)') ].map(function(graph) {
         return graph(metrics);
       }).reduce(function(a, b) {
         return a.concat(b);
-      }, []).filter(function(x) {
-        return x;
-      }).sort(function(a, b) {
-        return a.priority - b.priority;
-      });
+      }) : [];
       if (graphs.length == 0) {
         container.innerText = "No graphs available.";
         return;
       }
+      var css = "width: " + (jQuery(container).width() / 2) + "px";
       var table = document.createElement('TABLE');
       container.appendChild(table);
       var row = null;
       graphs.forEach(function(graph) {
+        var cell = document.createElement('TD');
+        cell.style.cssText = css;
+        cell.appendChild(graph.dom);
         if (row == null) {
           row = document.createElement('TR');
-          row.appendChild(graph.dom);
-          container.appendChild(row);
+          row.appendChild(cell);
+          table.appendChild(row);
         } else {
-          row.appendChild(graph.dom);
+          row.appendChild(cell);
           row = null;
         }
       });

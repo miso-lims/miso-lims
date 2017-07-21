@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -29,6 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
@@ -69,7 +74,6 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultRunService implements RunService, AuthorizedPaginatedDataSource<Run> {
-
   private static final Logger log = LoggerFactory.getLogger(DefaultRunService.class);
 
   @Autowired
@@ -554,7 +558,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setLastModifier(user);
     boolean isMutated = false;
     isMutated |= updateField(source.getCompletionDate(), target.getCompletionDate(), target::setCompletionDate);
-    isMutated |= updateField(source.getMetrics().toString(), target.getMetrics(), target::setMetrics);
+    isMutated |= updateMetricsFromNotification(source, target);
     isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
     isMutated |= updateField(source.getStartDate(), target.getCompletionDate(), target::setCompletionDate);
 
@@ -603,6 +607,57 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       save(target);
     }
     return isNew;
+  }
+
+  private boolean updateMetricsFromNotification(Run source, Run target) {
+    if (source.getMetrics() != null && source.getMetrics().equals(target.getMetrics())) return false;
+    if (source.getMetrics() == null) {
+      return false;
+    }
+    if (source.getMetrics() != null && target.getMetrics() == null) {
+      target.setMetrics(source.getMetrics());
+      return true;
+    }
+
+    ObjectMapper mapper = new ObjectMapper();
+    ArrayNode sourceMetrics;
+    try {
+      sourceMetrics = mapper.readValue(source.getMetrics(), ArrayNode.class);
+    } catch (IOException e) {
+      log.error("Impossible junk metrics were passed in for run " + target.getId(), e);
+      return false;
+    }
+    ArrayNode targetMetrics;
+    try {
+      targetMetrics = mapper.readValue(target.getMetrics(), ArrayNode.class);
+    } catch (IOException e) {
+      log.error("The database is full of garbage metrics for run " + target.getId(), e);
+      return false;
+    }
+    Map<String, JsonNode> sourceMetricsMap = parseMetrics(sourceMetrics);
+    Map<String, JsonNode> targetMetricsMap = parseMetrics(targetMetrics);
+    if (sourceMetricsMap.equals(targetMetricsMap))
+      return false;
+    targetMetricsMap.putAll(sourceMetricsMap);
+    ArrayNode combinedMetrics = mapper.createArrayNode();
+    combinedMetrics.addAll(targetMetricsMap.values());
+    try {
+      target.setMetrics(mapper.writeValueAsString(combinedMetrics));
+    } catch (JsonProcessingException e) {
+      log.error("Failed to save data just unserialised.", e);
+      return false;
+    }
+    return true;
+  }
+
+  private Map<String, JsonNode> parseMetrics(ArrayNode metrics) {
+    Map<String, JsonNode> results = new TreeMap<>();
+    for (JsonNode node : metrics) {
+      if (node.isObject()) {
+        results.put(node.get("type").textValue(), node);
+      }
+    }
+    return null;
   }
 
   private boolean updateIlluminaRunFromNotification(IlluminaRun source, final IlluminaRun target) {
