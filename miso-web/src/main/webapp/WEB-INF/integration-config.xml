@@ -37,16 +37,6 @@
     <property name="analysisServerPort" value="${miso.analysis.server.port}" />
   </bean>
 
-  <bean name="notificationQueryService" class="uk.ac.bbsrc.tgac.miso.integration.NotificationQueryService">
-    <property name="notificationServerHost" value="${miso.notification.server.host}" />
-    <property name="notificationServerPort" value="${miso.notification.server.port}" />
-  </bean>
-
-  <bean name="notificationConsumerService" class="uk.ac.bbsrc.tgac.miso.core.service.integration.MisoNotificationConsumerService" />
-  <bean name="notificationGatewayService" class="uk.ac.bbsrc.tgac.miso.core.service.integration.MisoNotificationGatewayService">
-    <constructor-arg index="0" ref="notificationConsumerService" />
-  </bean>
-
   <!-- box scanner -->
   <bean name="boxScanner" class="uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScanner">
     <constructor-arg index="0" value="${miso.visionmate.server.host}" />

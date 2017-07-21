@@ -52,9 +52,6 @@
     <property name="issueTrackerManager" ref="issueTrackerManager" />
   </bean>
 
-  <bean id="statsControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.StatsControllerHelperService">
-  </bean>
-
   <bean id="sampleControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.SampleControllerHelperService">
   </bean>
 

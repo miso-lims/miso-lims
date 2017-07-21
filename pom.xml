@@ -123,11 +123,8 @@
     <module>miso-service</module>
     <module>sqlstore</module>
     <module>miso-dto</module>
-    <module>notification-server</module>
     <module>runscanner</module>
-    <module>notification-consumer-services</module>
     <module>miso-external-web</module>
-    <module>demo-notification-client</module>
   </modules>
   <!-- SVN connection -->
   <scm>
@@ -693,17 +690,7 @@
       </dependency>
       <dependency>
         <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>notification-consumer-services</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
         <artifactId>runscanner</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>notification-server</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -1124,9 +1111,6 @@
       </activation>
       <modules>
         <module>sqlstore</module>
-        <module>notification-consumer-services</module>
-        <module>notification-server</module>
-        <module>demo-notification-client</module>
         <module>migration</module>
       </modules>
     </profile>
