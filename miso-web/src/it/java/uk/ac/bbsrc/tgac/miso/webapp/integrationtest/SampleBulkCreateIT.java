@@ -114,6 +114,58 @@ public class SampleBulkCreateIT extends AbstractIT {
   }
 
   @Test
+  public void testCreateOneRnaAliquotWithProject() throws Exception {
+    // Goal: ensure one whole RNA (aliquot) associated with a predefined project can be saved
+    BulkSamplePage page = getCreatePage(1, projectId, rAliquotClassId);
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> rnaAliquot = new HashMap<>();
+    rnaAliquot.put(Columns.DESCRIPTION, "Description");
+    rnaAliquot.put(Columns.RECEIVE_DATE, "2017-07-17");
+    rnaAliquot.put(Columns.ID_BARCODE, "114"); // increment
+    rnaAliquot.put(Columns.SAMPLE_TYPE, "GENOMIC");
+    rnaAliquot.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
+    rnaAliquot.put(Columns.GROUP_ID, "1");
+    rnaAliquot.put(Columns.GROUP_DESCRIPTION, "Test one");
+    rnaAliquot.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
+    rnaAliquot.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    rnaAliquot.put(Columns.TIMES_RECEIVED, "1");
+    rnaAliquot.put(Columns.TUBE_NUMBER, "1");
+    rnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
+    rnaAliquot.put(Columns.EXT_INST_ID, "tube id 1");
+    rnaAliquot.put(Columns.TISSUE_MATERIAL, "FFPE");
+    rnaAliquot.put(Columns.REGION, "Medulla oblongata");
+    rnaAliquot.put(Columns.STR_STATUS, "Submitted");
+    rnaAliquot.put(Columns.DNASE_TREATED, "True");
+    rnaAliquot.put(Columns.VOLUME, "10.0");
+    rnaAliquot.put(Columns.CONCENTRATION, "3.75");
+    rnaAliquot.put(Columns.QC_STATUS, "Ready");
+    rnaAliquot.put(Columns.PURPOSE, "Library");
+
+    rnaAliquot.forEach((k, v) -> table.enterText(k, 0, v));
+    // need to enter this here, after project is entered otherwise identity lookup fails
+    rnaAliquot.put(Columns.EXTERNAL_NAME, "ext14"); // increment
+    table.enterText(Columns.EXTERNAL_NAME, 0, rnaAliquot.get(Columns.EXTERNAL_NAME));
+
+    assertIdentityLookupWasSuccessful(page, table);
+
+    page.clickSaveButton();
+
+    assertSaveWasSuccessful(page, table);
+
+    rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
+    rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
+
+    // verify attributes against what got saved to the database
+    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
+    SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, Long.valueOf(newId));
+
+    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    // everything else should be the same as in testCreateOneRnaAliquotNoProject
+  }
+
+  @Test
   public void testCreateTissueSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     BulkSamplePage page = getCreatePage(1, null, tissueClassId);
@@ -1089,58 +1141,6 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, created);
     assertTissueAttributes(rnaAliquot, tissueParent);
-  }
-
-  @Test
-  public void testCreateOneRnaAliquotWithProject() throws Exception {
-    // Goal: ensure one whole RNA (aliquot) associated with a predefined project can be saved
-    BulkSamplePage page = getCreatePage(1, projectId, rAliquotClassId);
-    HandsOnTable table = page.getTable();
-
-    Map<String, String> rnaAliquot = new HashMap<>();
-    rnaAliquot.put(Columns.DESCRIPTION, "Description");
-    rnaAliquot.put(Columns.RECEIVE_DATE, "2017-07-17");
-    rnaAliquot.put(Columns.ID_BARCODE, "114"); // increment
-    rnaAliquot.put(Columns.SAMPLE_TYPE, "GENOMIC");
-    rnaAliquot.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
-    rnaAliquot.put(Columns.GROUP_ID, "1");
-    rnaAliquot.put(Columns.GROUP_DESCRIPTION, "Test one");
-    rnaAliquot.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
-    rnaAliquot.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
-    rnaAliquot.put(Columns.TIMES_RECEIVED, "1");
-    rnaAliquot.put(Columns.TUBE_NUMBER, "1");
-    rnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
-    rnaAliquot.put(Columns.EXT_INST_ID, "tube id 1");
-    rnaAliquot.put(Columns.TISSUE_MATERIAL, "FFPE");
-    rnaAliquot.put(Columns.REGION, "Medulla oblongata");
-    rnaAliquot.put(Columns.STR_STATUS, "Submitted");
-    rnaAliquot.put(Columns.DNASE_TREATED, "True");
-    rnaAliquot.put(Columns.VOLUME, "10.0");
-    rnaAliquot.put(Columns.CONCENTRATION, "3.75");
-    rnaAliquot.put(Columns.QC_STATUS, "Ready");
-    rnaAliquot.put(Columns.PURPOSE, "Library");
-
-    rnaAliquot.forEach((k, v) -> table.enterText(k, 0, v));
-    // need to enter this here, after project is entered otherwise identity lookup fails
-    rnaAliquot.put(Columns.EXTERNAL_NAME, "ext14"); // increment
-    table.enterText(Columns.EXTERNAL_NAME, 0, rnaAliquot.get(Columns.EXTERNAL_NAME));
-
-    assertIdentityLookupWasSuccessful(page, table);
-
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
-
-    rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
-
-    // verify attributes against what got saved to the database
-    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, Long.valueOf(newId));
-
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
-    // everything else should be the same as in testCreateOneRnaAliquotNoProject
   }
 
   @Test
