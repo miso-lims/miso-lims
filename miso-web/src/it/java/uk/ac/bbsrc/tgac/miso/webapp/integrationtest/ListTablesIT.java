@@ -54,16 +54,15 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> projectsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.SHORT_NAME, Columns.DESCRIPTION,
       Columns.PROGRESS);
 
-  private static final Set<String> poolsTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.LS454, Tabs.PACBIO, Tabs.SOLID, Tabs.OXFORD_NANOPORE);
+  private static final Set<String> poolsTabs = Sets.newHashSet(Tabs.ILLUMINA);
   private static final Set<String> ordersTabs = Sets.newHashSet(Tabs.ACTIVE, Tabs.ALL);
-  private static final Set<String> containersTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.LS454, Tabs.PACBIO, Tabs.SOLID,
-      Tabs.OXFORD_NANOPORE);
-  private static final Set<String> runsTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.LS454, Tabs.PACBIO, Tabs.SOLID, Tabs.OXFORD_NANOPORE);
+  private static final Set<String> containersTabs = Sets.newHashSet(Tabs.ILLUMINA);
+  private static final Set<String> runsTabs = Sets.newHashSet(Tabs.ILLUMINA);
   private static final Set<String> boxesTabs = Sets.newHashSet(Tabs.DNA, Tabs.LIBRARIES, Tabs.RNA, Tabs.SEQUENCING, Tabs.STORAGE,
       Tabs.TISSUE);
   private static final Set<String> kitsTabs = Sets.newHashSet(Tabs.CLUSTERING, Tabs.EXTRACTION, Tabs.LIBRARY, Tabs.MULTIPLEXING,
       Tabs.SEQUENCING);
-  private static final Set<String> indicesTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.LS454, Tabs.PACBIO, Tabs.SOLID, Tabs.OXFORD_NANOPORE);
+  private static final Set<String> indicesTabs = Sets.newHashSet(Tabs.ILLUMINA);
 
   private static final Map<String, Set<String>> tabsForTarget;
   static {
