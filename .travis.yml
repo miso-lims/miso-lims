@@ -29,7 +29,7 @@ before_script:
   - export MAVEN_OPTS='-Xms1g -Xmx2g'
 
 script:
-  - mvn clean -P external -Dmaven.javadoc.skip=true -DskipUTs=true -DskipITs=false install
+  - mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false install
   - 'if [[ ${TRAVIS_PULL_REQUEST_SLUG} == ${TRAVIS_REPO_SLUG} ]] ; then 
         mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar ;
      else 
