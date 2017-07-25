@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -701,246 +703,246 @@ public class SampleBulkCreateIT extends AbstractIT {
     assertTissueAttributes(gDnaStock, tissueParent);
   }
 
-  // @Test
-  // public void testCreateOneGdnaStockWithProject() throws Exception {
-  // // Goal: ensure one gDNA (stock) associated with a predefined project can be saved
-  // BulkSamplePage page = getCreatePage(1, projectId, gStockClassId);
-  // HandsOnTable table = page.getTable();
-  //
-  // Map<String, String> gDnaStock = new HashMap<>();
-  // gDnaStock.put(Columns.DESCRIPTION, "Description");
-  // gDnaStock.put(Columns.RECEIVE_DATE, "2017-07-17");
-  // gDnaStock.put(Columns.ID_BARCODE, "108"); // increment
-  // gDnaStock.put(Columns.SAMPLE_TYPE, "GENOMIC");
-  // gDnaStock.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
-  // gDnaStock.put(Columns.GROUP_ID, "1");
-  // gDnaStock.put(Columns.GROUP_DESCRIPTION, "Test one");
-  // gDnaStock.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
-  // gDnaStock.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
-  // gDnaStock.put(Columns.TIMES_RECEIVED, "1");
-  // gDnaStock.put(Columns.TUBE_NUMBER, "1");
-  // gDnaStock.put(Columns.LAB, "BioBank (University Health Network)");
-  // gDnaStock.put(Columns.EXT_INST_ID, "tube id 1");
-  // gDnaStock.put(Columns.TISSUE_MATERIAL, "FFPE");
-  // gDnaStock.put(Columns.REGION, "Medulla oblongata");
-  // gDnaStock.put(Columns.STR_STATUS, "Submitted");
-  // gDnaStock.put(Columns.VOLUME, "10.0");
-  // gDnaStock.put(Columns.CONCENTRATION, "3.75");
-  // gDnaStock.put(Columns.QC_STATUS, "Ready");
-  //
-  // gDnaStock.forEach((k, v) -> table.enterText(k, 0, v));
-  // // need to enter this here, after project is entered otherwise identity lookup fails
-  // gDnaStock.put(Columns.EXTERNAL_NAME, "ext8"); // increment
-  // table.enterText(Columns.EXTERNAL_NAME, 0, gDnaStock.get(Columns.EXTERNAL_NAME));
-  //
-  // assertIdentityLookupWasSuccessful(page, table);
-  //
-  // page.clickSaveButton();
-  //
-  // assertSaveWasSuccessful(page, table);
-  //
-  // gDnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-  // gDnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
-  // String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
-  //
-  // // verify attributes against what got saved to the database
-  // Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-  // SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(newId));
-  //
-  // assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
-  // // everything else should be the same as in testCreateOneGdnaStockNoProject
-  // }
-  //
-  // @Test
-  // public void testCreateRnaStockSetup() throws Exception {
-  // // Goal: ensure all expected fields are present and no extra
-  // BulkSamplePage page = getCreatePage(1, null, rStockClassId);
-  // HandsOnTable table = page.getTable();
-  // List<String> headings = table.getColumnHeadings();
-  // assertEquals(rnaStockColumns.size(), headings.size());
-  // for (String col : rnaStockColumns) {
-  // assertTrue("Check for column: '" + col + "'", headings.contains(col));
-  // }
-  // assertEquals(1, table.getRowCount());
-  // }
-  //
-  // @Test
-  // public void testCreateRnaStockDropdowns() throws Exception {
-  // // Goal: ensure dropdowns unique to this class are created correctly and values can be selected
-  // BulkSamplePage page = getCreatePage(1, null, rStockClassId);
-  // HandsOnTable table = page.getTable();
-  //
-  // List<String> dnaseTreated = table.getDropdownOptions(Columns.DNASE_TREATED, 0);
-  // assertEquals(2, dnaseTreated.size());
-  // assertTrue(dnaseTreated.contains("True"));
-  // assertTrue(dnaseTreated.contains("False"));
-  // }
-  //
-  // @Test
-  // public void testCreateRnaStockDependencyCells() throws Exception {
-  // // none unique to this class at this time
-  // }
-  //
-  // @Test
-  // public void testCreateOneRnaStockNoProject() throws Exception {
-  // // Goal: ensure whole RNA (stock) can be saved
-  // BulkSamplePage page = getCreatePage(1, null, rStockClassId);
-  // HandsOnTable table = page.getTable();
-  //
-  // Map<String, String> rnaStock = new HashMap<>();
-  // rnaStock.put(Columns.DESCRIPTION, "Description");
-  // rnaStock.put(Columns.RECEIVE_DATE, "2017-07-17");
-  // rnaStock.put(Columns.ID_BARCODE, "109"); // increment
-  // rnaStock.put(Columns.SAMPLE_TYPE, "GENOMIC");
-  // rnaStock.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
-  // rnaStock.put(Columns.PROJECT, "PRO1");
-  // rnaStock.put(Columns.GROUP_ID, "1");
-  // rnaStock.put(Columns.GROUP_DESCRIPTION, "Test one");
-  // rnaStock.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
-  // rnaStock.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
-  // rnaStock.put(Columns.TIMES_RECEIVED, "1");
-  // rnaStock.put(Columns.TUBE_NUMBER, "1");
-  // rnaStock.put(Columns.LAB, "BioBank (University Health Network)");
-  // rnaStock.put(Columns.EXT_INST_ID, "tube id 1");
-  // rnaStock.put(Columns.TISSUE_MATERIAL, "FFPE");
-  // rnaStock.put(Columns.REGION, "Medulla oblongata");
-  // rnaStock.put(Columns.STR_STATUS, "Submitted");
-  // rnaStock.put(Columns.DNASE_TREATED, "True");
-  // rnaStock.put(Columns.VOLUME, "10.0");
-  // rnaStock.put(Columns.CONCENTRATION, "3.75");
-  // rnaStock.put(Columns.NEW_RIN, "2.7");
-  // rnaStock.put(Columns.NEW_DV200, "92.55");
-  // rnaStock.put(Columns.QC_STATUS, "Ready");
-  //
-  // rnaStock.forEach((k, v) -> table.enterText(k, 0, v));
-  // // need to enter this here, after project is entered otherwise identity lookup fails
-  // rnaStock.put(Columns.EXTERNAL_NAME, "ext9"); // increment
-  // table.enterText(Columns.EXTERNAL_NAME, 0, rnaStock.get(Columns.EXTERNAL_NAME));
-  //
-  // assertIdentityLookupWasSuccessful(page, table);
-  //
-  // page.clickSaveButton();
-  //
-  // assertSaveWasSuccessful(page, table);
-  //
-  // rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-  // rnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
-  // String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
-  //
-  // // verify attributes against what got saved to the database
-  // SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(newId));
-  //
-  // assertPlainSampleAttributes(rnaStock, created);
-  // assertDetailedSampleAttributes(rnaStock, created);
-  // assertSampleClass("whole RNA (stock)", created);
-  // assertStockAttributes(rnaStock, created);
-  // assertAnalyteAttributes(rnaStock, created);
-  // assertRnaSampleAttributes(rnaStock, created);
-  //
-  // SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, created);
-  // assertTissueAttributes(rnaStock, tissueParent);
-  //
-  // // verify QCs
-  // Collection<SampleQC> sampleQcs = created.getSampleQCs();
-  // assertEquals(2, sampleQcs.size());
-  // for (SampleQC qc : sampleQcs) {
-  // switch (qc.getQcType().getName()) {
-  // case "RIN":
-  // assertEquals(rnaStock.get(Columns.NEW_RIN).toString(), qc.getResults().toString());
-  // break;
-  // case "DV200":
-  // assertEquals(rnaStock.get(Columns.NEW_DV200).toString(), qc.getResults().toString());
-  // break;
-  // default:
-  // throw new IllegalArgumentException("Found unexpected QC of type " + qc.getQcType().getName());
-  // }
-  // }
-  // }
-  //
-  // @Test
-  // public void testCreateOneRnaStockWithProject() throws Exception {
-  // // Goal: ensure one whole RNA (stock) associated with a predefined project can be saved
-  // BulkSamplePage page = getCreatePage(1, projectId, rStockClassId);
-  // HandsOnTable table = page.getTable();
-  //
-  // Map<String, String> rnaStock = new HashMap<>();
-  // rnaStock.put(Columns.DESCRIPTION, "Description");
-  // rnaStock.put(Columns.RECEIVE_DATE, "2017-07-17");
-  // rnaStock.put(Columns.ID_BARCODE, "110"); // increment
-  // rnaStock.put(Columns.SAMPLE_TYPE, "GENOMIC");
-  // rnaStock.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
-  // rnaStock.put(Columns.GROUP_ID, "1");
-  // rnaStock.put(Columns.GROUP_DESCRIPTION, "Test one");
-  // rnaStock.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
-  // rnaStock.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
-  // rnaStock.put(Columns.TIMES_RECEIVED, "1");
-  // rnaStock.put(Columns.TUBE_NUMBER, "1");
-  // rnaStock.put(Columns.LAB, "BioBank (University Health Network)");
-  // rnaStock.put(Columns.EXT_INST_ID, "tube id 1");
-  // rnaStock.put(Columns.TISSUE_MATERIAL, "FFPE");
-  // rnaStock.put(Columns.REGION, "Medulla oblongata");
-  // rnaStock.put(Columns.STR_STATUS, "Submitted");
-  // rnaStock.put(Columns.DNASE_TREATED, "True");
-  // rnaStock.put(Columns.VOLUME, "10.0");
-  // rnaStock.put(Columns.CONCENTRATION, "3.75");
-  // rnaStock.put(Columns.NEW_RIN, "2.7");
-  // rnaStock.put(Columns.QC_STATUS, "Ready");
-  //
-  // rnaStock.forEach((k, v) -> table.enterText(k, 0, v));
-  // // need to enter this here, after project is entered otherwise identity lookup fails
-  // rnaStock.put(Columns.EXTERNAL_NAME, "ext10"); // increment
-  // table.enterText(Columns.EXTERNAL_NAME, 0, rnaStock.get(Columns.EXTERNAL_NAME));
-  //
-  // assertIdentityLookupWasSuccessful(page, table);
-  //
-  // page.clickSaveButton();
-  //
-  // assertSaveWasSuccessful(page, table);
-  //
-  // rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-  // rnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
-  // String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
-  //
-  // // verify attributes against what got saved to the database
-  // Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-  // SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(newId));
-  //
-  // assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
-  // // everything else should be the same as in testCreateOneRnaStockNoProject
-  // }
-  //
-  // @Test
-  // public void testCreateGdnaAliquotSetup() throws Exception {
-  // // Goal: ensure all expected fields are present and no extra
-  // BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
-  // HandsOnTable table = page.getTable();
-  // List<String> headings = table.getColumnHeadings();
-  // assertEquals(gDnaAliquotColumns.size(), headings.size());
-  // for (String col : gDnaAliquotColumns) {
-  // assertTrue("Check for column: '" + col + "'", headings.contains(col));
-  // }
-  // assertEquals(1, table.getRowCount());
-  // }
-  //
-  // @Test
-  // public void testCreateGdnaAliquotDropdowns() throws Exception {
-  // // Goal: ensure dropdowns unique to this class are created correctly and values can be selected
-  // BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
-  // HandsOnTable table = page.getTable();
-  //
-  // List<String> purposes = table.getDropdownOptions(Columns.PURPOSE, 0);
-  // assertEquals(11, purposes.size());
-  // assertTrue(purposes.contains("Library"));
-  // assertTrue(purposes.contains("Validation"));
-  //
-  // table.enterText(Columns.PURPOSE, 0, "Vali");
-  // assertEquals("Validation", table.getText(Columns.PURPOSE, 0));
-  // }
-  //
-  // @Test
-  // public void testCreateGdnaAliquotDependencyCells() throws Exception {
-  // // none unique to this class at this time
-  // }
+  @Test
+  public void testCreateOneGdnaStockWithProject() throws Exception {
+    // Goal: ensure one gDNA (stock) associated with a predefined project can be saved
+    BulkSamplePage page = getCreatePage(1, projectId, gStockClassId);
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> gDnaStock = new HashMap<>();
+    gDnaStock.put(Columns.DESCRIPTION, "Description");
+    gDnaStock.put(Columns.RECEIVE_DATE, "2017-07-17");
+    gDnaStock.put(Columns.ID_BARCODE, "108"); // increment
+    gDnaStock.put(Columns.SAMPLE_TYPE, "GENOMIC");
+    gDnaStock.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
+    gDnaStock.put(Columns.GROUP_ID, "1");
+    gDnaStock.put(Columns.GROUP_DESCRIPTION, "Test one");
+    gDnaStock.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
+    gDnaStock.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    gDnaStock.put(Columns.TIMES_RECEIVED, "1");
+    gDnaStock.put(Columns.TUBE_NUMBER, "1");
+    gDnaStock.put(Columns.LAB, "BioBank (University Health Network)");
+    gDnaStock.put(Columns.EXT_INST_ID, "tube id 1");
+    gDnaStock.put(Columns.TISSUE_MATERIAL, "FFPE");
+    gDnaStock.put(Columns.REGION, "Medulla oblongata");
+    gDnaStock.put(Columns.STR_STATUS, "Submitted");
+    gDnaStock.put(Columns.VOLUME, "10.0");
+    gDnaStock.put(Columns.CONCENTRATION, "3.75");
+    gDnaStock.put(Columns.QC_STATUS, "Ready");
+
+    gDnaStock.forEach((k, v) -> table.enterText(k, 0, v));
+    // need to enter this here, after project is entered otherwise identity lookup fails
+    gDnaStock.put(Columns.EXTERNAL_NAME, "ext8"); // increment
+    table.enterText(Columns.EXTERNAL_NAME, 0, gDnaStock.get(Columns.EXTERNAL_NAME));
+
+    assertIdentityLookupWasSuccessful(page, table);
+
+    page.clickSaveButton();
+
+    assertSaveWasSuccessful(page, table);
+
+    gDnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
+    gDnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
+
+    // verify attributes against what got saved to the database
+    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
+    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(newId));
+
+    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    // everything else should be the same as in testCreateOneGdnaStockNoProject
+  }
+
+  @Test
+  public void testCreateRnaStockSetup() throws Exception {
+    // Goal: ensure all expected fields are present and no extra
+    BulkSamplePage page = getCreatePage(1, null, rStockClassId);
+    HandsOnTable table = page.getTable();
+    List<String> headings = table.getColumnHeadings();
+    assertEquals(rnaStockColumns.size(), headings.size());
+    for (String col : rnaStockColumns) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+    assertEquals(1, table.getRowCount());
+  }
+
+  @Test
+  public void testCreateRnaStockDropdowns() throws Exception {
+    // Goal: ensure dropdowns unique to this class are created correctly and values can be selected
+    BulkSamplePage page = getCreatePage(1, null, rStockClassId);
+    HandsOnTable table = page.getTable();
+
+    List<String> dnaseTreated = table.getDropdownOptions(Columns.DNASE_TREATED, 0);
+    assertEquals(2, dnaseTreated.size());
+    assertTrue(dnaseTreated.contains("True"));
+    assertTrue(dnaseTreated.contains("False"));
+  }
+
+  @Test
+  public void testCreateRnaStockDependencyCells() throws Exception {
+    // none unique to this class at this time
+  }
+
+  @Test
+  public void testCreateOneRnaStockNoProject() throws Exception {
+    // Goal: ensure whole RNA (stock) can be saved
+    BulkSamplePage page = getCreatePage(1, null, rStockClassId);
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> rnaStock = new HashMap<>();
+    rnaStock.put(Columns.DESCRIPTION, "Description");
+    rnaStock.put(Columns.RECEIVE_DATE, "2017-07-17");
+    rnaStock.put(Columns.ID_BARCODE, "109"); // increment
+    rnaStock.put(Columns.SAMPLE_TYPE, "GENOMIC");
+    rnaStock.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
+    rnaStock.put(Columns.PROJECT, "PRO1");
+    rnaStock.put(Columns.GROUP_ID, "1");
+    rnaStock.put(Columns.GROUP_DESCRIPTION, "Test one");
+    rnaStock.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
+    rnaStock.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    rnaStock.put(Columns.TIMES_RECEIVED, "1");
+    rnaStock.put(Columns.TUBE_NUMBER, "1");
+    rnaStock.put(Columns.LAB, "BioBank (University Health Network)");
+    rnaStock.put(Columns.EXT_INST_ID, "tube id 1");
+    rnaStock.put(Columns.TISSUE_MATERIAL, "FFPE");
+    rnaStock.put(Columns.REGION, "Medulla oblongata");
+    rnaStock.put(Columns.STR_STATUS, "Submitted");
+    rnaStock.put(Columns.DNASE_TREATED, "True");
+    rnaStock.put(Columns.VOLUME, "10.0");
+    rnaStock.put(Columns.CONCENTRATION, "3.75");
+    rnaStock.put(Columns.NEW_RIN, "2.7");
+    rnaStock.put(Columns.NEW_DV200, "92.55");
+    rnaStock.put(Columns.QC_STATUS, "Ready");
+
+    rnaStock.forEach((k, v) -> table.enterText(k, 0, v));
+    // need to enter this here, after project is entered otherwise identity lookup fails
+    rnaStock.put(Columns.EXTERNAL_NAME, "ext9"); // increment
+    table.enterText(Columns.EXTERNAL_NAME, 0, rnaStock.get(Columns.EXTERNAL_NAME));
+
+    assertIdentityLookupWasSuccessful(page, table);
+
+    page.clickSaveButton();
+
+    assertSaveWasSuccessful(page, table);
+
+    rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
+    rnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
+
+    // verify attributes against what got saved to the database
+    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(newId));
+
+    assertPlainSampleAttributes(rnaStock, created);
+    assertDetailedSampleAttributes(rnaStock, created);
+    assertSampleClass("whole RNA (stock)", created);
+    assertStockAttributes(rnaStock, created);
+    assertAnalyteAttributes(rnaStock, created);
+    assertRnaSampleAttributes(rnaStock, created);
+
+    SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, created);
+    assertTissueAttributes(rnaStock, tissueParent);
+
+    // verify QCs
+    Collection<SampleQC> sampleQcs = created.getSampleQCs();
+    assertEquals(2, sampleQcs.size());
+    for (SampleQC qc : sampleQcs) {
+      switch (qc.getQcType().getName()) {
+      case "RIN":
+        assertEquals(rnaStock.get(Columns.NEW_RIN).toString(), qc.getResults().toString());
+        break;
+      case "DV200":
+        assertEquals(rnaStock.get(Columns.NEW_DV200).toString(), qc.getResults().toString());
+        break;
+      default:
+        throw new IllegalArgumentException("Found unexpected QC of type " + qc.getQcType().getName());
+      }
+    }
+  }
+
+  @Test
+  public void testCreateOneRnaStockWithProject() throws Exception {
+    // Goal: ensure one whole RNA (stock) associated with a predefined project can be saved
+    BulkSamplePage page = getCreatePage(1, projectId, rStockClassId);
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> rnaStock = new HashMap<>();
+    rnaStock.put(Columns.DESCRIPTION, "Description");
+    rnaStock.put(Columns.RECEIVE_DATE, "2017-07-17");
+    rnaStock.put(Columns.ID_BARCODE, "110"); // increment
+    rnaStock.put(Columns.SAMPLE_TYPE, "GENOMIC");
+    rnaStock.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
+    rnaStock.put(Columns.GROUP_ID, "1");
+    rnaStock.put(Columns.GROUP_DESCRIPTION, "Test one");
+    rnaStock.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
+    rnaStock.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    rnaStock.put(Columns.TIMES_RECEIVED, "1");
+    rnaStock.put(Columns.TUBE_NUMBER, "1");
+    rnaStock.put(Columns.LAB, "BioBank (University Health Network)");
+    rnaStock.put(Columns.EXT_INST_ID, "tube id 1");
+    rnaStock.put(Columns.TISSUE_MATERIAL, "FFPE");
+    rnaStock.put(Columns.REGION, "Medulla oblongata");
+    rnaStock.put(Columns.STR_STATUS, "Submitted");
+    rnaStock.put(Columns.DNASE_TREATED, "True");
+    rnaStock.put(Columns.VOLUME, "10.0");
+    rnaStock.put(Columns.CONCENTRATION, "3.75");
+    rnaStock.put(Columns.NEW_RIN, "2.7");
+    rnaStock.put(Columns.QC_STATUS, "Ready");
+
+    rnaStock.forEach((k, v) -> table.enterText(k, 0, v));
+    // need to enter this here, after project is entered otherwise identity lookup fails
+    rnaStock.put(Columns.EXTERNAL_NAME, "ext10"); // increment
+    table.enterText(Columns.EXTERNAL_NAME, 0, rnaStock.get(Columns.EXTERNAL_NAME));
+
+    assertIdentityLookupWasSuccessful(page, table);
+
+    page.clickSaveButton();
+
+    assertSaveWasSuccessful(page, table);
+
+    rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
+    rnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
+
+    // verify attributes against what got saved to the database
+    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
+    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(newId));
+
+    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    // everything else should be the same as in testCreateOneRnaStockNoProject
+  }
+
+  @Test
+  public void testCreateGdnaAliquotSetup() throws Exception {
+    // Goal: ensure all expected fields are present and no extra
+    BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
+    HandsOnTable table = page.getTable();
+    List<String> headings = table.getColumnHeadings();
+    assertEquals(gDnaAliquotColumns.size(), headings.size());
+    for (String col : gDnaAliquotColumns) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+    assertEquals(1, table.getRowCount());
+  }
+
+  @Test
+  public void testCreateGdnaAliquotDropdowns() throws Exception {
+    // Goal: ensure dropdowns unique to this class are created correctly and values can be selected
+    BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
+    HandsOnTable table = page.getTable();
+
+    List<String> purposes = table.getDropdownOptions(Columns.PURPOSE, 0);
+    assertEquals(11, purposes.size());
+    assertTrue(purposes.contains("Library"));
+    assertTrue(purposes.contains("Validation"));
+
+    table.enterText(Columns.PURPOSE, 0, "Vali");
+    assertEquals("Validation", table.getText(Columns.PURPOSE, 0));
+  }
+
+  @Test
+  public void testCreateGdnaAliquotDependencyCells() throws Exception {
+    // none unique to this class at this time
+  }
   //
   // @Test
   // public void testCreateOneGdnaAliquotNoProject() throws Exception {
