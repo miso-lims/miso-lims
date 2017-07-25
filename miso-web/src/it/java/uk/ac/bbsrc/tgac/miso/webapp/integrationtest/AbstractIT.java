@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.assertNotNull;
+import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,8 +20,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HomePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LoginPage;
-
-import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/it-context.xml")
@@ -41,8 +40,9 @@ public abstract class AbstractIT {
   public final void setupAbstractTest() {
     driver = new PhantomJSDriver();
     // don't allow page load or script execution to take longer than 10 seconds
-    driver.manage().timeouts().pageLoadTimeout(15, TimeUnit.SECONDS);
-    driver.manage().timeouts().setScriptTimeout(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().pageLoadTimeout(300, TimeUnit.SECONDS);
+    driver.manage().timeouts().setScriptTimeout(300, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(300, TimeUnit.SECONDS);
     // large width is important so that all columns of handsontables get rendered
     driver.manage().window().setSize(new Dimension(2560, 1440));
   }
