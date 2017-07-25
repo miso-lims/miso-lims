@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,11 +39,13 @@ public abstract class AbstractIT {
 
   @Before
   public final void setupAbstractTest() {
-    driver = new PhantomJSDriver();
+    DesiredCapabilities capabilities = new DesiredCapabilities();
+    capabilities.setCapability("takesScreenshot", false);
+    driver = new PhantomJSDriver(capabilities);
     // don't allow page load or script execution to take longer than 10 seconds
-    driver.manage().timeouts().pageLoadTimeout(300, TimeUnit.SECONDS);
-    driver.manage().timeouts().setScriptTimeout(300, TimeUnit.SECONDS);
-    driver.manage().timeouts().implicitlyWait(300, TimeUnit.SECONDS);
+    driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+    driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
     // large width is important so that all columns of handsontables get rendered
     driver.manage().window().setSize(new Dimension(2560, 1440));
   }
