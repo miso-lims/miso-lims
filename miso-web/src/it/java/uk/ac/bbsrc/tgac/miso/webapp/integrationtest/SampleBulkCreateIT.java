@@ -26,7 +26,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
@@ -1142,133 +1141,133 @@ public class SampleBulkCreateIT extends AbstractIT {
   // SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, created);
   // assertTissueAttributes(rnaAliquot, tissueParent);
   // } // TODO: end error zone
-
-  @Test
-  public void testCreateIdentitySetup() throws Exception {
-    // Goal: ensure all expected fields are present and no extra
-    BulkSamplePage page = getCreatePage(1, null, identityClassId);
-    HandsOnTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    assertEquals(identityColumns.size(), headings.size());
-    for (String col : identityColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    assertEquals(1, table.getRowCount());
-  }
-
-  @Test
-  public void testCreateIdentityDropdowns() throws Exception {
-    // Goal: ensure dropdowns are created correctly and values can be selected
-    BulkSamplePage page = getCreatePage(1, null, identityClassId);
-    HandsOnTable table = page.getTable();
-
-    List<String> sampleTypes = table.getDropdownOptions(Columns.SAMPLE_TYPE, 0);
-    assertEquals(8, sampleTypes.size());
-    assertTrue(sampleTypes.contains("GENOMIC"));
-    assertTrue(sampleTypes.contains("TRANSCRIPTOMIC"));
-
-    table.enterText(Columns.SAMPLE_TYPE, 0, "GENOM");
-    assertEquals("GENOMIC", table.getText(Columns.SAMPLE_TYPE, 0));
-
-    List<String> projects = table.getDropdownOptions(Columns.PROJECT, 0);
-    assertTrue(projects.size() > 0);
-    assertTrue(projects.contains("PRO1"));
-
-    table.enterText(Columns.PROJECT, 0, "PRO1");
-    assertEquals("PRO1", table.getText(Columns.PROJECT, 0));
-
-    List<String> donorSexes = table.getDropdownOptions(Columns.DONOR_SEX, 0);
-    assertEquals(5, donorSexes.size());
-    assertTrue(donorSexes.contains("Female"));
-    assertTrue(donorSexes.contains("Unspecified"));
-
-    table.enterText(Columns.DONOR_SEX, 0, "Unspe");
-    assertEquals("Unspecified", table.getText(Columns.DONOR_SEX, 0));
-
-    List<String> qcStatuses = table.getDropdownOptions(Columns.QC_STATUS, 0);
-    assertEquals(10, qcStatuses.size());
-    assertTrue(qcStatuses.contains("Ready"));
-    assertTrue(qcStatuses.contains("Refused Consent"));
-
-    table.enterText(Columns.QC_STATUS, 0, "Rea");
-    assertEquals("Ready", table.getText(Columns.QC_STATUS, 0));
-  }
-
-  @Test
-  public void testCreateIdentityDependencyCells() throws Exception {
-    // Goal: ensure that cells which depend on other columns are updated once the other columns are updated
-    BulkSamplePage page = getCreatePage(1, null, identityClassId);
-    HandsOnTable table = page.getTable();
-
-    table.enterText(Columns.QC_NOTE, 0, "invisible");
-    assertTrue("note is read-only", isStringEmptyOrNull(table.getText(Columns.QC_NOTE, 0)));
-
-    table.enterText(Columns.QC_STATUS, 0, "Okd by Collaborator");
-    table.enterText(Columns.QC_NOTE, 0, "writable note");
-    assertEquals("note is writable", "writable note", table.getText(Columns.QC_NOTE, 0));
-  }
-
-  @Test
-  public void testCreateOneIdentityNoProject() throws Exception {
-    // Goal: ensure one identity can be saved
-    BulkSamplePage page = getCreatePage(1, null, identityClassId);
-    HandsOnTable table = page.getTable();
-
-    Map<String, String> identity = new HashMap<>();
-    identity.put(Columns.ALIAS, "PRO2_1001");
-    identity.put(Columns.SAMPLE_TYPE, "GENOMIC");
-    identity.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
-    identity.put(Columns.PROJECT, "PRO2"); // different project so as not to mess with the SampleNumberPerProject generator
-    identity.put(Columns.EXTERNAL_NAME, "ext2001"); // increment
-    identity.put(Columns.DONOR_SEX, "Female");
-    identity.put(Columns.QC_STATUS, "Ready");
-
-    identity.forEach((k, v) -> table.enterText(k, 0, v));
-
-    page.clickSaveButton();
-    assertSaveWasSuccessful(page, table);
-
-    identity.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
-
-    // verify attributes against what got saved to the database
-    SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, Long.valueOf(newId));
-
-    assertPlainSampleAttributes(identity, created);
-    assertDetailedSampleAttributes(identity, created);
-    assertSampleClass("Identity", created);
-    assertIdentityAttributes(identity, created);
-  }
-
-  @Test
-  public void testCreateOneIdentityWithProject() throws Exception {
-    // Goal: ensure one identity associated with a predefined project can be saved
-    BulkSamplePage page = getCreatePage(1, 2L, identityClassId);
-    // different project so as not to mess with the SampleNumberPerProject generator
-    HandsOnTable table = page.getTable();
-
-    Map<String, String> identity = new HashMap<>();
-    identity.put(Columns.ALIAS, "PRO2_1002");
-    identity.put(Columns.SAMPLE_TYPE, "GENOMIC");
-    identity.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
-    identity.put(Columns.EXTERNAL_NAME, "ext2002"); // increment
-    identity.put(Columns.QC_STATUS, "Ready");
-
-    identity.forEach((k, v) -> table.enterText(k, 0, v));
-
-    page.clickSaveButton();
-    assertSaveWasSuccessful(page, table);
-
-    identity.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
-
-    // verify attributes on the Edit single Sample page
-    Project predefined = (Project) getSession().get(ProjectImpl.class, 2L);
-    SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, Long.valueOf(newId));
-
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
-    // everything else should be identical to testCreateOneIdentityNoProject
-  }
+  //
+  // @Test // TODO: begin second error zone
+  // public void testCreateIdentitySetup() throws Exception {
+  // // Goal: ensure all expected fields are present and no extra
+  // BulkSamplePage page = getCreatePage(1, null, identityClassId);
+  // HandsOnTable table = page.getTable();
+  // List<String> headings = table.getColumnHeadings();
+  // assertEquals(identityColumns.size(), headings.size());
+  // for (String col : identityColumns) {
+  // assertTrue("Check for column: '" + col + "'", headings.contains(col));
+  // }
+  // assertEquals(1, table.getRowCount());
+  // }
+  //
+  // @Test
+  // public void testCreateIdentityDropdowns() throws Exception {
+  // // Goal: ensure dropdowns are created correctly and values can be selected
+  // BulkSamplePage page = getCreatePage(1, null, identityClassId);
+  // HandsOnTable table = page.getTable();
+  //
+  // List<String> sampleTypes = table.getDropdownOptions(Columns.SAMPLE_TYPE, 0);
+  // assertEquals(8, sampleTypes.size());
+  // assertTrue(sampleTypes.contains("GENOMIC"));
+  // assertTrue(sampleTypes.contains("TRANSCRIPTOMIC"));
+  //
+  // table.enterText(Columns.SAMPLE_TYPE, 0, "GENOM");
+  // assertEquals("GENOMIC", table.getText(Columns.SAMPLE_TYPE, 0));
+  //
+  // List<String> projects = table.getDropdownOptions(Columns.PROJECT, 0);
+  // assertTrue(projects.size() > 0);
+  // assertTrue(projects.contains("PRO1"));
+  //
+  // table.enterText(Columns.PROJECT, 0, "PRO1");
+  // assertEquals("PRO1", table.getText(Columns.PROJECT, 0));
+  //
+  // List<String> donorSexes = table.getDropdownOptions(Columns.DONOR_SEX, 0);
+  // assertEquals(5, donorSexes.size());
+  // assertTrue(donorSexes.contains("Female"));
+  // assertTrue(donorSexes.contains("Unspecified"));
+  //
+  // table.enterText(Columns.DONOR_SEX, 0, "Unspe");
+  // assertEquals("Unspecified", table.getText(Columns.DONOR_SEX, 0));
+  //
+  // List<String> qcStatuses = table.getDropdownOptions(Columns.QC_STATUS, 0);
+  // assertEquals(10, qcStatuses.size());
+  // assertTrue(qcStatuses.contains("Ready"));
+  // assertTrue(qcStatuses.contains("Refused Consent"));
+  //
+  // table.enterText(Columns.QC_STATUS, 0, "Rea");
+  // assertEquals("Ready", table.getText(Columns.QC_STATUS, 0));
+  // }
+  //
+  // @Test
+  // public void testCreateIdentityDependencyCells() throws Exception {
+  // // Goal: ensure that cells which depend on other columns are updated once the other columns are updated
+  // BulkSamplePage page = getCreatePage(1, null, identityClassId);
+  // HandsOnTable table = page.getTable();
+  //
+  // table.enterText(Columns.QC_NOTE, 0, "invisible");
+  // assertTrue("note is read-only", isStringEmptyOrNull(table.getText(Columns.QC_NOTE, 0)));
+  //
+  // table.enterText(Columns.QC_STATUS, 0, "Okd by Collaborator");
+  // table.enterText(Columns.QC_NOTE, 0, "writable note");
+  // assertEquals("note is writable", "writable note", table.getText(Columns.QC_NOTE, 0));
+  // }
+  //
+  // @Test
+  // public void testCreateOneIdentityNoProject() throws Exception {
+  // // Goal: ensure one identity can be saved
+  // BulkSamplePage page = getCreatePage(1, null, identityClassId);
+  // HandsOnTable table = page.getTable();
+  //
+  // Map<String, String> identity = new HashMap<>();
+  // identity.put(Columns.ALIAS, "PRO2_1001");
+  // identity.put(Columns.SAMPLE_TYPE, "GENOMIC");
+  // identity.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
+  // identity.put(Columns.PROJECT, "PRO2"); // different project so as not to mess with the SampleNumberPerProject generator
+  // identity.put(Columns.EXTERNAL_NAME, "ext2001"); // increment
+  // identity.put(Columns.DONOR_SEX, "Female");
+  // identity.put(Columns.QC_STATUS, "Ready");
+  //
+  // identity.forEach((k, v) -> table.enterText(k, 0, v));
+  //
+  // page.clickSaveButton();
+  // assertSaveWasSuccessful(page, table);
+  //
+  // identity.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+  // String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
+  //
+  // // verify attributes against what got saved to the database
+  // SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, Long.valueOf(newId));
+  //
+  // assertPlainSampleAttributes(identity, created);
+  // assertDetailedSampleAttributes(identity, created);
+  // assertSampleClass("Identity", created);
+  // assertIdentityAttributes(identity, created);
+  // }
+  //
+  // @Test
+  // public void testCreateOneIdentityWithProject() throws Exception {
+  // // Goal: ensure one identity associated with a predefined project can be saved
+  // BulkSamplePage page = getCreatePage(1, 2L, identityClassId);
+  // // different project so as not to mess with the SampleNumberPerProject generator
+  // HandsOnTable table = page.getTable();
+  //
+  // Map<String, String> identity = new HashMap<>();
+  // identity.put(Columns.ALIAS, "PRO2_1002");
+  // identity.put(Columns.SAMPLE_TYPE, "GENOMIC");
+  // identity.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
+  // identity.put(Columns.EXTERNAL_NAME, "ext2002"); // increment
+  // identity.put(Columns.QC_STATUS, "Ready");
+  //
+  // identity.forEach((k, v) -> table.enterText(k, 0, v));
+  //
+  // page.clickSaveButton();
+  // assertSaveWasSuccessful(page, table);
+  //
+  // identity.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+  // String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
+  //
+  // // verify attributes on the Edit single Sample page
+  // Project predefined = (Project) getSession().get(ProjectImpl.class, 2L);
+  // SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, Long.valueOf(newId));
+  //
+  // assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+  // // everything else should be identical to testCreateOneIdentityNoProject
+  // } // TODO: end second error zone
 
   private void assertPlainSampleAttributes(Map<String, String> hotAttributes, Sample fromDb) {
     assertEquals("confirm project", hotAttributes.get(Columns.PROJECT), fromDb.getProject().getShortName());
