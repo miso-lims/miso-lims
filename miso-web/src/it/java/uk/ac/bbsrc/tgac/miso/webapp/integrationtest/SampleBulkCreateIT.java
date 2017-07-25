@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 
 public class SampleBulkCreateIT extends AbstractIT {
 
@@ -114,6 +115,16 @@ public class SampleBulkCreateIT extends AbstractIT {
   }
 
   @Test
+  public void testSaveEmptyFail() throws Exception {
+    // Goal: ensure save fails and error message is shown when trying to save with required fields empty
+    BulkSamplePage page = getCreatePage(1, projectId, rAliquotClassId);
+    HandsOnTable table = page.getTable();
+    HandsOnTableSaveResult result = table.save();
+    assertEquals(0, result.getItemsSaved());
+    assertFalse(result.getSaveErrors().isEmpty());
+  }
+
+  @Test
   public void testCreateOneRnaAliquotWithProject() throws Exception {
     // Goal: ensure one whole RNA (aliquot) associated with a predefined project can be saved
     BulkSamplePage page = getCreatePage(1, projectId, rAliquotClassId);
@@ -149,9 +160,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -292,9 +301,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     tissue.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     tissue.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -340,9 +347,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     tissue.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
@@ -424,9 +429,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     slide.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     slide.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -479,9 +482,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     slide.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
@@ -550,9 +551,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     curls.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     curls.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -600,9 +599,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     curls.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
@@ -683,9 +680,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     gDnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     gDnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -738,9 +733,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     gDnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     gDnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -822,9 +815,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     rnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -896,9 +887,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     rnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -981,9 +970,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     gDnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     gDnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -1040,9 +1027,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     gDnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     gDnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -1118,9 +1103,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     assertIdentityLookupWasSuccessful(page, table);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
@@ -1225,8 +1208,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
 
-    page.clickSaveButton();
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     identity.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
@@ -1256,8 +1238,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
 
-    page.clickSaveButton();
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     identity.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
@@ -1340,9 +1321,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     assertEquals("identity lookup was successful", "First Receipt (PRO1)", table.getText(Columns.IDENTITY_ALIAS, 0));
   }
 
-  private void assertSaveWasSuccessful(BulkSamplePage page, HandsOnTable table) {
-    assertTrue("Sample was saved", page.getSuccessMessages().contains("Saved"));
-    assertTrue("No errors are present", page.areErrorsHidden());
+  private void saveSingleAndAssertSuccess(HandsOnTable table) {
+    HandsOnTableSaveResult result = table.save();
+
+    assertTrue("Sample was saved", result.getItemsSaved() == 1);
+    assertTrue("No errors are present", result.getServerErrors().isEmpty());
+    assertTrue("No errors are present", result.getSaveErrors().isEmpty());
 
     assertTrue("Sample name has been generated", table.getText(Columns.NAME, 0).contains("SAM"));
     assertTrue("Sample alias has been generated", !isStringEmptyOrNull(table.getText(Columns.ALIAS, 0)));
