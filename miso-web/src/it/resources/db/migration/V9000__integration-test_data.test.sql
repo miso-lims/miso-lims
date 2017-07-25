@@ -141,6 +141,13 @@ INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfter
 ('QuBit', 'QuBit', 'Library', 'ng/ul', 0, 2),
 ('qPCR', 'qPCR', 'Library', 'mol/ul', 0, 2);
 
+DELETE FROM BoxUse;
+INSERT INTO BoxUse (alias) VALUES ('Samples'), ('Libraries'), ('Dilutions'), ('Sequencing');
+
+DELETE FROM `_Group`;
+INSERT INTO `_Group` (description, name) VALUES
+('TestGroup1', 'TestGroup1'), ('TestGroup2', 'TestGroup2');
+
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(3,2),(1,1);
 

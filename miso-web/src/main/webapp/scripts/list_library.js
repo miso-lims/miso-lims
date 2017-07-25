@@ -76,7 +76,7 @@ ListTarget.library = {
           },
           "bSortable" : false
         }, {
-          "sTitle" : "Last Updated",
+          "sTitle" : "Last Modified",
           "mData" : "lastModified",
           "include" : true,
           "iSortPriority" : 2,

@@ -205,7 +205,7 @@ ListTarget.sample = {
           "include" : true,
           "iSortPriority" : 0
         }, {
-          "sTitle" : "Last Updated",
+          "sTitle" : "Last Modified",
           "mData" : "lastModified",
           "include" : Constants.isDetailedSample,
           "iSortPriority" : 2
