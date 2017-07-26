@@ -27,8 +27,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +82,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
 @RequestMapping("/run")
 @SessionAttributes("run")
 public class EditRunController {
+
+  private static final ServiceLoader<RunMetricsSource> METRICS = ServiceLoader.load(RunMetricsSource.class);
+
   protected static final Logger log = LoggerFactory.getLogger(EditRunController.class);
 
   /**
@@ -88,7 +93,7 @@ public class EditRunController {
    * Normally, metrics collected by run scanner are stored in the MISO database, but it is possible to provide others here.
    */
   public Stream<RunMetricsSource> getSources() {
-    return Stream.of(Run::getMetrics);
+    return Stream.concat(Stream.of(Run::getMetrics), StreamSupport.stream(METRICS.spliterator(), false));
   }
 
   @Autowired
