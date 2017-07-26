@@ -27,7 +27,6 @@ import org.hibernate.annotations.FetchMode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion.PoolOrderCompletionId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 
 /**
@@ -41,7 +40,7 @@ public class PoolOrderCompletion implements Serializable {
   @Embeddable
   public static class PoolOrderCompletionId implements Serializable {
     private static final long serialVersionUID = -2890725144995338712L;
-    @ManyToOne(targetEntity = SequencingParametersImpl.class)
+    @ManyToOne
     @JoinColumn(name = "parametersId", nullable = false)
     SequencingParameters parameters;
     @ManyToOne(targetEntity = PoolImpl.class)

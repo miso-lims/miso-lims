@@ -8,11 +8,17 @@ import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
@@ -50,6 +56,16 @@ public final class StandardIllumina extends RunProcessor {
       }
     } catch (InterruptedException e) {
       throw new IOException(e);
+    }
+
+    // See if we can figure out the chemistry
+
+    try {
+      Document parameters = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(runDirectory, "runParameters.xml"));
+      dto.setChemistry(Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(parameters)).findFirst()
+          .orElse(IlluminaChemistry.UNKNOWN));
+    } catch (SAXException | ParserConfigurationException e) {
+      log.error("Failed to parse parameters", e);
     }
 
     // The Illumina library can't distinguish between a failed run and one that either finished or is still going. Scan the logs, if

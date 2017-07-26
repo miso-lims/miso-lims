@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -22,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
 import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -46,7 +44,6 @@ public class RunScannerClient {
       .name("miso_runscanner_client_save_errors").help("The number of times a run failed to be saved.").register();
   private static final Counter saveNew = Counter.build()
       .name("miso_runscanner_client_save_new").help("The number of times a new run was found.").register();
-
 
   private static final LatencyHistogram saveTime = new LatencyHistogram("miso_runscanner_client_save_time",
       "Time to save a run (in seconds).");
@@ -100,10 +97,8 @@ public class RunScannerClient {
       }
       for (NotificationDto dto : results) {
         try (AutoCloseable timer = saveTime.start()) {
-          // TODO Get parameter filter for each run type
-          Predicate<SequencingParameters> filterParameters = sp -> true;
           (runService.processNotification(Dtos.to(dto, user), dto.getLaneCount(), dto.getContainerSerialNumber(), dto.getSequencerName(),
-              filterParameters, dto::getLaneContents) ? saveNew : saveUpdate).inc();
+              dto, dto::getLaneContents) ? saveNew : saveUpdate).inc();
           saveCount.inc();
         } catch (Exception e) {
           log.error("Failed to save run: " + dto.getRunAlias(), e);

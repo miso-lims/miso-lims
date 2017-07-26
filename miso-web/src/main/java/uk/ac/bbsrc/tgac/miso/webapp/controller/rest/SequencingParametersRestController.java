@@ -23,7 +23,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
@@ -69,7 +68,7 @@ public class SequencingParametersRestController extends RestController {
     if (platform == null) {
       throw new RestException("No platform found with ID: " + sequencingParamtersDto.getPlatform().getId(), Status.BAD_REQUEST);
     }
-    SequencingParameters sp = new SequencingParametersImpl();
+    SequencingParameters sp = new SequencingParameters();
     sp.setName(sequencingParamtersDto.getName());
     sp.setPlatform(platform);
     Long id = sequencingParametersService.create(sp);
