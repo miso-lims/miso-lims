@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.assertNotNull;
+import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,14 +14,14 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HomePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LoginPage;
-
-import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/it-context.xml")
@@ -39,10 +40,15 @@ public abstract class AbstractIT {
 
   @Before
   public final void setupAbstractTest() {
-    driver = new PhantomJSDriver();
+    DesiredCapabilities cap = new DesiredCapabilities();
+    cap.setCapability("takesscreenshot", false);
+    cap.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, new String[] { "--webdriver-loglevel=NONE" });
+    cap.setCapability(PhantomJSDriverService.PHANTOMJS_GHOSTDRIVER_CLI_ARGS, new String[] { "--webdriver-loglevel=NONE" });
+    driver = new PhantomJSDriver(cap);
     // don't allow page load or script execution to take longer than 10 seconds
-    driver.manage().timeouts().pageLoadTimeout(15, TimeUnit.SECONDS);
-    driver.manage().timeouts().setScriptTimeout(15, TimeUnit.SECONDS);
+    driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+    driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
     // large width is important so that all columns of handsontables get rendered
     driver.manage().window().setSize(new Dimension(2560, 1440));
   }
