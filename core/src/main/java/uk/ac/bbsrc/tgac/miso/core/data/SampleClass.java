@@ -67,4 +67,18 @@ public interface SampleClass extends Serializable {
             && !relationship.getParent().getSampleCategory().equals(getSampleCategory()))
         .anyMatch(relationship -> relationship.getParent().hasPathToIdentity(relationships));
   }
+
+  default boolean hasPathToDnaseTreatable(Collection<SampleValidRelationship> relationships) {
+    if (getDNAseTreatable()) {
+      return true;
+    }
+    if (getSampleCategory().equals(SampleTissue.CATEGORY_NAME)) {
+      return false;
+    }
+    return relationships.stream()
+        .filter(relationship -> !relationship.getArchived() && relationship.getChild().getId() == getId()
+            && !relationship.getParent().getSampleCategory().equals(getSampleCategory()))
+        .anyMatch(relationship -> relationship.getParent().hasPathToDnaseTreatable(relationships));
+  }
+
 }

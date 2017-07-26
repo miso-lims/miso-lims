@@ -5,7 +5,7 @@ jdk:
 sudo: required
 env: > 
       MAVEN_SETTINGS="${TRAVIS_BUILD_DIR}/gsi-config"
-      MAVEN_OPTS="-Xms1g -Xmx2g" 
+      MAVEN_OPTS="-Xms1g -Xmx4g" 
 
 git:
   depth: 3
@@ -26,7 +26,7 @@ before_install:
     - 'echo pr slug ${TRAVIS_PULL_REQUEST_SLUG} && echo repo slug ${TRAVIS_REPO_SLUG}'
 
 before_script:
-  - export MAVEN_OPTS='-Xms1g -Xmx2g'
+  - export MAVEN_OPTS='-Xms1g -Xmx4g'
 
 script:
   - mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false install
