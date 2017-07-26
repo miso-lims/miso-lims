@@ -485,7 +485,7 @@ var HotUtils = {
                                 button
                                     .setAttribute('class', 'ui-state-default');
                               }
-                              bulkActionsDiv.append(button);
+                              bulkActionsDiv.appendChild(button);
                             });
                           }
                           saveSuccessesClasses.remove('hidden');

@@ -981,6 +981,7 @@ public class EditSampleController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("targetSampleClass", Dtos.asDto(sampleClass));
       config.putPOJO("sourceSampleClass", Dtos.asDto(sampleClass));
+      config.put("dnaseTreatable", sampleClass.getDNAseTreatable());
       config.put("propagate", false);
       config.put("edit", true);
     }
@@ -1053,6 +1054,7 @@ public class EditSampleController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put("propagate", true);
       config.put("edit", false);
+      config.put("dnaseTreatable", targetSampleClass.getDNAseTreatable());
       config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
       config.putPOJO("sourceSampleClass", Dtos.asDto(sourceSampleClass));
     }
@@ -1074,6 +1076,7 @@ public class EditSampleController {
       if (targetSampleClass != null) config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
       config.put("create", true);
       config.put("hasProject", project != null);
+      config.put("dnaseTreatable", targetSampleClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
       if (project == null) {
         requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
       } else {

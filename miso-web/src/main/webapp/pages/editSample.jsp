@@ -160,12 +160,12 @@
   <table class="in" <c:if test="${detailedSample && sample.isSynthetic()}">style="background-color: #ddd"</c:if>>
     <tr>
       <td class="h">Sample ID:</td>
-      <td>
+      <td><span id="sampleId">
         <c:choose>
           <c:when test="${sample.id != 0}">${sample.id}</c:when>
           <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
-      </td>
+      </span></td>
     </tr>
     <c:if test="${detailedSample && sample.isSynthetic()}"><tr><td colspan="2" style="font-size: 200%; font-weight:bold;">This entity does not exist except for sample tracking purposes!</td></tr></c:if>
     <tr>
@@ -189,19 +189,19 @@
         <c:otherwise>
           <td>
             <input type="hidden" value="${sample.project.id}" name="project" id="project"/>
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name} (${sample.project.alias})</a>
+            <a href='<c:url value="/miso/project/${sample.project.id}"/>'><span id="projectName">${sample.project.name} (<c:if test="${detailedSample}">${sample.project.shortName} &#8212; </c:if>${sample.project.alias})</span></a>
           </td>
         </c:otherwise>
       </c:choose>
     </tr>
     <tr>
       <td>Name:</td>
-      <td>
+      <td><span id="name">
         <c:choose>
           <c:when test="${sample.id != 0}">${sample.name}</c:when>
           <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
-      </td>
+      </span></td>
     </tr>
     <tr>
       <td class="h">
@@ -345,7 +345,7 @@
                     <form:input type="hidden" id="externalName" path="externalName"/>
                   </c:when>
                   <c:otherwise>
-                    ${sample.externalName}
+                    <span id="externalName">${sample.externalName}</span>
                   </c:otherwise>
                 </c:choose>
               </td>
@@ -384,7 +384,7 @@
                 <td>n/a</td>
               </c:when>
               <c:otherwise>
-                <td><a href='<c:url value="/miso/sample/${sample.parent.id}"/>'>${sample.parent.alias}</a></td>
+                <td><a href='<c:url value="/miso/sample/${sample.parent.id}"/>'><span id="parentAlias">${sample.parent.alias}</span></a></td>
               </c:otherwise>
             </c:choose>
           </tr>
@@ -468,7 +468,7 @@
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}"><form:input id="passageNumber" path="passageNumber"/></c:when>
-                  <c:otherwise>${!empty sample.passageNumber ? sample.passageNumber : 'n/a'}</c:otherwise>
+                  <c:otherwise><span id="passageNumber">${!empty sample.passageNumber ? sample.passageNumber : 'n/a'}</span></c:otherwise>
                 </c:choose>
               </td>
             </tr>
@@ -477,7 +477,7 @@
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}"><form:input id="timesReceived" path="timesReceived"/></c:when>
-                  <c:otherwise>${!empty sample.timesReceived ? sample.timesReceived : 'n/a'}</c:otherwise>
+                  <c:otherwise><span id="timesReceived">${!empty sample.timesReceived ? sample.timesReceived : 'n/a'}</span></c:otherwise>
                 </c:choose>
               </td>
             </tr>
@@ -486,7 +486,7 @@
               <td>
                 <c:choose>
                   <c:when test="${sample.id == 0}"><form:input id="tubeNumber" path="tubeNumber"/></c:when>
-                  <c:otherwise>${!empty sample.tubeNumber ? sample.tubeNumber : 'n/a'}</c:otherwise>
+                  <c:otherwise><span id="tubeNumber">${!empty sample.tubeNumber ? sample.tubeNumber : 'n/a'}</span></c:otherwise>
                 </c:choose>
               </td>
             </tr>

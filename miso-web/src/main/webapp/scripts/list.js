@@ -157,7 +157,7 @@ ListUtils = (function() {
         var button;
         if (buttonDescription) {
           button = document.createElement('A');
-          button.append(document.createTextNode(buttonDescription.name));
+          button.appendChild(document.createTextNode(buttonDescription.name));
           button.href = '#';
           button.setAttribute('class', 'ui-button ui-state-default');
           button.setAttribute('title', buttonDescription.title || '');
@@ -169,10 +169,10 @@ ListUtils = (function() {
           button = document.createElement('SPAN');
           button.setAttribute('class', 'ui-state-default');
         }
-        toolbar.append(button);
+        toolbar.appendChild(button);
       });
       if (bulkActions.length > 0) {
-        toolbar.append(ListState[elementId].element);
+        toolbar.appendChild(ListState[elementId].element);
       }
     }
   }

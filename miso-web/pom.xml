@@ -579,6 +579,28 @@
 	          <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
 	        </configuration>
 	      </plugin>
+          <plugin>
+            <!-- start up Xvfb to run webdrivers headlessly -->
+            <groupId>com.github.zetten</groupId>
+            <artifactId>xvfb-maven-plugin</artifactId>
+            <version>1.4.0</version>
+            <executions>
+              <execution>
+                <id>start-xvfb</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop-xvfb</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
 	      <plugin>
 	        <!-- launch standalone Tomcat server and deploy MISO -->
 	        <groupId>org.codehaus.cargo</groupId>
@@ -659,6 +681,7 @@
                 <!-- Make URLs available for tests -->
                 <miso.it.baseUrl>http://localhost:${miso.it.tomcat.servlet.port}/</miso.it.baseUrl>
                 <miso.it.h2.url>jdbc:h2:tcp://localhost:${miso.it.h2.port}/mem:miso-it;mode=mysql;DB_CLOSE_DELAY=-1;</miso.it.h2.url>
+                <miso.it.xvfb.display>${xvfb.display}</miso.it.xvfb.display>
               </systemPropertyVariables>
             </configuration>
           </plugin>

@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.assertNotNull;
-import io.github.bonigarcia.wdm.PhantomJsDriverManager;
+import io.github.bonigarcia.wdm.FirefoxDriverManager;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,7 +13,9 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -29,19 +31,29 @@ public abstract class AbstractIT {
   private SessionFactory sessionFactory;
 
   private WebDriver driver;
-  private static final String baseUrl = System.getProperty("miso.it.baseUrl");
+  private static final String BASE_URL = System.getProperty("miso.it.baseUrl");
+  private static final DesiredCapabilities CAPABILITIES;
+
+  static {
+    FirefoxOptions opts = new FirefoxOptions();
+    opts.addArguments("--display=" + System.getProperty("miso.it.xvfb.display"));
+    DesiredCapabilities capabilities = new DesiredCapabilities();
+    capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, opts);
+    CAPABILITIES = capabilities;
+  }
 
   @BeforeClass
   public static final void setupAbstractClass() {
-    PhantomJsDriverManager.getInstance().setup();
+    FirefoxDriverManager.getInstance().setup();
   }
 
   @Before
   public final void setupAbstractTest() {
-    driver = new PhantomJSDriver();
+    driver = new FirefoxDriver(CAPABILITIES);
     // don't allow page load or script execution to take longer than 10 seconds
-    driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-    driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
+    driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+    driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+    driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
     // large width is important so that all columns of handsontables get rendered
     driver.manage().window().setSize(new Dimension(2560, 1440));
   }
@@ -58,7 +70,7 @@ public abstract class AbstractIT {
   }
 
   protected final String getBaseUrl() {
-    return baseUrl;
+    return BASE_URL;
   }
 
   protected final Session getSession() {
