@@ -44,6 +44,11 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.kohsuke.metainf-services</groupId>
+      <artifactId>metainf-services</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>aopalliance</groupId>
       <artifactId>aopalliance</artifactId>
     </dependency>
@@ -267,6 +272,11 @@
       <groupId>uk.ac.tgac.fluxion.ajax</groupId>
       <artifactId>fluxion-ajax-3</artifactId>
     </dependency>
+    <dependency>
+      <groupId>uk.ac.tgac.statsdb</groupId>
+      <artifactId>statsdb-api</artifactId>
+    </dependency>
+
     <dependency>
       <!-- Do not remove - used by container -->
       <groupId>xml-apis</groupId>
