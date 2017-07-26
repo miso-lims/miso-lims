@@ -113,8 +113,8 @@ public class ListTabbedPage extends HeaderFooterPage {
     setSelectedTable();
   }
 
-  public List<String> getTabs() {
-    List<WebElement> tabs = getDriver().findElements(By.className("ui-tabs-panel"));
+  public List<String> getTabHeadings() {
+    List<WebElement> tabs = getDriver().findElements(By.className("ui-tabs-anchor"));
     if (tabs.size() > 0) {
       return tabs.stream()
           .map(tab -> tab.getText().trim())

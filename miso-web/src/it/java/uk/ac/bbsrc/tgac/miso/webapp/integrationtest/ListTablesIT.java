@@ -243,17 +243,18 @@ public class ListTablesIT extends AbstractIT {
     ListTabbedPage page = getTabbedList(listTarget);
     DataTable table = page.getSelectedTable();
     List<String> headings = table.getColumnHeadings();
-    // List<String> tabs = page.getTabs();
-    // tabs.forEach(tab -> {
-    // page.clickTab(tab);
-      headings.forEach(heading -> {
-        // sort one way
-        page.sortByColumn(heading);
-        assertTrue("sort once on column '" + heading + "' without errors", LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
-        // sort the other way
-        page.sortByColumn(heading);
-        assertTrue("sort twice on column '" + heading + "' without errors", LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
-      });
-    // });
+    List<String> tabHeadings = page.getTabHeadings();
+    headings.forEach(heading -> {
+      // sort one way
+      page.sortByColumn(heading);
+      assertTrue("sort once on column '" + heading + "' without errors", LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
+      // sort the other way
+      page.sortByColumn(heading);
+      assertTrue("sort twice on column '" + heading + "' without errors", LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
+    });
+    tabHeadings.forEach(tabHeading -> {
+      page.clickTab(tabHeading);
+      assertTrue("clicked tab without errors", LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
+    });
   }
 }
