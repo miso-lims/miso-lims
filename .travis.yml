@@ -5,7 +5,7 @@ jdk:
 sudo: required
 env: > 
       MAVEN_SETTINGS="${TRAVIS_BUILD_DIR}/gsi-config"
-      MAVEN_OPTS="-Xms1g -Xmx2g" 
+      MAVEN_OPTS="-Xms1g -Xmx4g" 
 
 git:
   depth: 3
