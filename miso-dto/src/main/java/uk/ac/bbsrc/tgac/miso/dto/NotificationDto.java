@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -9,11 +10,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "class")
-public abstract class NotificationDto {
+public abstract class NotificationDto implements Predicate<SequencingParameters> {
 
   private String runAlias;
   private String sequencerFolderPath;
@@ -181,5 +183,10 @@ public abstract class NotificationDto {
   
   public Optional<String> getLaneContents(int lane) {
     return Optional.empty();
+  }
+
+  @Override
+  public boolean test(SequencingParameters params) {
+    return params.getPlatform().getPlatformType() == getPlatformType();
   }
 }

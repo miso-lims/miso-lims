@@ -347,6 +347,13 @@ int main(int argc, const char **argv) {
   is_complete &= run_summary.cycle_state().called_cycle_range().last_cycle() ==
                  run.run_info().total_cycles();
 
+  for (const auto &read : run.run_info().reads()) {
+    if (!read.is_index()) {
+      result["readLength"] = length(read);
+      break;
+    }
+  }
+
   /* We can't tell the difference between the stopped or running states, so we
    * just assume running if it isn't finished. */
   result["healthType"] = is_complete ? "Completed" : "Running";

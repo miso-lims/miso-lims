@@ -35,7 +35,7 @@ public class PoolOrderImpl implements PoolOrder, Serializable {
   @Column(nullable = false)
   private Integer partitions;
 
-  @ManyToOne(targetEntity = SequencingParametersImpl.class)
+  @ManyToOne
   @JoinColumn(name = "parametersId", nullable = true)
   private SequencingParameters parameters;
 

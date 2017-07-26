@@ -61,7 +61,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -154,7 +153,7 @@ public abstract class Run
   @JoinColumn(name = "sequencerReference_sequencerReferenceId", nullable = false)
   private SequencerReference sequencerReference;
 
-  @ManyToOne(targetEntity = SequencingParametersImpl.class)
+  @ManyToOne
   @JoinColumn(name = "sequencingParameters_parametersId")
   private SequencingParameters sequencingParameters;
   @Temporal(TemporalType.DATE)

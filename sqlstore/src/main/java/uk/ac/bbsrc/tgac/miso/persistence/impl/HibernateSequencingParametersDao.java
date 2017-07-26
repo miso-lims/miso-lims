@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
 
 @Repository
@@ -34,7 +33,7 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
 
   @Override
   public List<SequencingParameters> getSequencingParameters() throws IOException {
-    Query query = currentSession().createQuery("from SequencingParametersImpl sp");
+    Criteria query = currentSession().createCriteria(SequencingParameters.class);
     @SuppressWarnings("unchecked")
     List<SequencingParameters> records = query.list();
     return records;
@@ -46,7 +45,7 @@ public class HibernateSequencingParametersDao implements SequencingParametersDao
     if (id == null) {
       return null;
     }
-    return (SequencingParameters) currentSession().get(SequencingParametersImpl.class, id);
+    return (SequencingParameters) currentSession().get(SequencingParameters.class, id);
   }
 
   @Override

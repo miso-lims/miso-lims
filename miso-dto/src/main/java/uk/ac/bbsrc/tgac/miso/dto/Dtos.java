@@ -37,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
@@ -97,7 +96,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
@@ -1017,7 +1015,7 @@ public class Dtos {
   }
 
   public static SequencingParameters to(SequencingParametersDto from) {
-    SequencingParameters to = new SequencingParametersImpl();
+    SequencingParameters to = new SequencingParameters();
     to.setId(from.getId());
     to.setName(from.getName());
     if (from.getPlatform() != null) {
@@ -1707,7 +1705,6 @@ public class Dtos {
 
     switch (to.getPlatformType()) {
     case PACBIO:
-      setPacBioRunValues((PacBioNotificationDto) from, (PacBioRun) to);
       break;
     case ILLUMINA:
       setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
@@ -1723,9 +1720,6 @@ public class Dtos {
       throw new NotImplementedException();
     }
     return to;
-  }
-
-  private static void setPacBioRunValues(PacBioNotificationDto from, PacBioRun to) {
   }
 
   private static void setIlluminaRunValues(IlluminaNotificationDto from, IlluminaRun to) {

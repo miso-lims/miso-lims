@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,17 +39,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -59,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
@@ -216,7 +207,6 @@ public class IlluminaNotificationMessageConsumerMechanism
                 }
               }
 
-              processRunParams(run, r);
             }
           } else {
             log.debug("Updating existing run and status: " + runName);
@@ -298,7 +288,6 @@ public class IlluminaNotificationMessageConsumerMechanism
           }
 
           if (r.getSequencerReference() != null) {
-            processRunParams(run, r);
             Collection<SequencerPartitionContainer> fs = r.getSequencerPartitionContainers();
             if (fs.isEmpty()) {
               if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
@@ -414,30 +403,6 @@ public class IlluminaNotificationMessageConsumerMechanism
     }
 
     return updatedRuns;
-  }
-
-  public void processRunParams(JSONObject run, Run r) {
-    if (run.has(IlluminaTransformer.JSON_RUN_PARAMS) && r.getSequencingParameters() == null) {
-      Document document;
-      try {
-        document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-            .parse(new InputSource(new StringReader(run.getString(IlluminaTransformer.JSON_RUN_PARAMS))));
-
-        for (SequencingParameters parameters : getParameterSet()) {
-          log.debug("Checking run " + run.getString(IlluminaTransformer.JSON_RUN_NAME) + " against parameters " + parameters.getName());
-
-          if (parameters.getPlatform().getId() == r.getSequencerReference().getPlatform().getId() && parameters.matches(document)) {
-            log.debug("Matched run " + run.getString(IlluminaTransformer.JSON_RUN_NAME) + " to parameters " + parameters.getName());
-            r.setSequencingParameters(parameters);
-            break;
-          }
-        }
-      } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
-        log.error("Error parsing runparams", e);
-      }
-    } else {
-      log.debug("No run parameters: " + run.getString(IlluminaTransformer.JSON_RUN_NAME));
-    }
   }
 
   public SequencingParametersCollection getParameterSet() {
