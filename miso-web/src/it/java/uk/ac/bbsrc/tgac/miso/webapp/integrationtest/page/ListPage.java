@@ -8,33 +8,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
-public class ListPage extends HeaderFooterPage {
-
-  public static class Columns {
-    public static final String SORT = "";
-    public static final String NAME = "Name";
-    public static final String ALIAS = "Alias";
-    public static final String SAMPLE_CLASS = "Sample Class";
-    public static final String SAMPLE_TYPE = "Type";
-    public static final String QC_PASSED = "QC Passed";
-    public static final String LOCATION = "Location";
-    public static final String LAST_MODIFIED = "Last Modified";
-    public static final String SAMPLE_NAME = "Sample Name";
-    public static final String SAMPLE_ALIAS = "Sample Alias";
-    public static final String INDICES = "Index(es)";
-    public static final String LIBRARY_NAME = "Library Name";
-    public static final String LIBRARY_ALIAS = "Library Alias";
-    public static final String CREATOR = "Creator";
-    public static final String CREATION_DATE = "Creation Date";
-    public static final String PLATFORM = "Platform";
-    public static final String DIL_CONCENTRATION = "Concentration";
-    public static final String DESCRIPTION = "Description";
-    public static final String TYPE = "Type";
-    public static final String PRINTER = "Printer";
-    public static final String DRIVER = "Driver";
-    public static final String BACKEND = "Backend";
-    public static final String AVAILABLE = "Available";
-  }
+public class ListPage extends HeaderFooterPage implements AbstractListPage {
 
   @FindBy(id = "listingTable")
   private WebElement listingTable;
@@ -48,8 +22,8 @@ public class ListPage extends HeaderFooterPage {
   public ListPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    waitWithTimeout().until(ExpectedConditions.visibilityOf(listingTable)); // TODO: make this better
-    table = new DataTable(listingTable, "listingTable");
+    waitWithTimeout().until(ExpectedConditions.visibilityOf(listingTable));
+    table = new DataTable(listingTable);
   }
 
   public static ListPage getListPage(WebDriver driver, String baseUrl, String listTarget) {
@@ -58,14 +32,17 @@ public class ListPage extends HeaderFooterPage {
     return new ListPage(driver);
   }
 
+  @Override
   public DataTable getTable() {
     return table;
   }
 
+  @Override
   public WebElement getErrors() {
     return errors;
   }
 
+  @Override
   public void sortByColumn(String columnHeading) {
     table.clickToSort(columnHeading);
     waitWithTimeout().until(ExpectedConditions.invisibilityOf(processing));

@@ -142,7 +142,7 @@ INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfter
 ('qPCR', 'qPCR', 'Library', 'mol/ul', 0, 2);
 
 DELETE FROM BoxUse;
-INSERT INTO BoxUse (alias) VALUES ('Samples'), ('Libraries'), ('Dilutions'), ('Sequencing');
+INSERT INTO BoxUse (alias) VALUES ('DNA'), ('RNA'), ('Libraries'), ('Sequencing'), ('Storage'), ('Tissue');
 
 DELETE FROM `_Group`;
 INSERT INTO `_Group` (description, name) VALUES
@@ -170,3 +170,4 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   progress, referenceGenomeId, lastUpdated) VALUES
   (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 1, 'ACTIVE', 1, '2017-06-27 14:11:00'),
   (2, 'PRO2', 'Project Two', 'PRO2', '2017-07-20', 'integration test project for custom identities', 2, 'ACTIVE', 1, '2017-07-20 16:55:00');
+  
