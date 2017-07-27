@@ -14,9 +14,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
@@ -31,19 +29,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
-public class SampleBulkCreateIT extends AbstractIT {
+public class SampleBulkCreateIT extends SampleBulkITUtils {
 
   private static final Set<String> identityColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
-      Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT,
-      Columns.EXTERNAL_NAME, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID, Columns.GROUP_DESCRIPTION,
-      Columns.QC_STATUS, Columns.QC_NOTE);
+      Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT, Columns.EXTERNAL_NAME,
+      Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID, Columns.GROUP_DESCRIPTION, Columns.QC_STATUS,
+      Columns.QC_NOTE);
 
   private static final Set<String> tissueColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT,
@@ -123,56 +120,6 @@ public class SampleBulkCreateIT extends AbstractIT {
     HandsOnTableSaveResult result = table.save();
     assertEquals(0, result.getItemsSaved());
     assertFalse(result.getSaveErrors().isEmpty());
-  }
-
-  @Test
-  public void testCreateOneRnaAliquotWithProject() throws Exception {
-    // Goal: ensure one whole RNA (aliquot) associated with a predefined project can be saved
-    BulkSamplePage page = getCreatePage(1, projectId, rAliquotClassId);
-    SampleHandsOnTable table = page.getTable();
-
-    Map<String, String> rnaAliquot = new HashMap<>();
-    rnaAliquot.put(Columns.DESCRIPTION, "Description");
-    rnaAliquot.put(Columns.RECEIVE_DATE, "2017-07-17");
-    rnaAliquot.put(Columns.ID_BARCODE, "114"); // increment
-    rnaAliquot.put(Columns.SAMPLE_TYPE, "GENOMIC");
-    rnaAliquot.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
-    rnaAliquot.put(Columns.GROUP_ID, "1");
-    rnaAliquot.put(Columns.GROUP_DESCRIPTION, "Test one");
-    rnaAliquot.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
-    rnaAliquot.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
-    rnaAliquot.put(Columns.TIMES_RECEIVED, "1");
-    rnaAliquot.put(Columns.TUBE_NUMBER, "1");
-    rnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
-    rnaAliquot.put(Columns.EXT_INST_ID, "tube id 1");
-    rnaAliquot.put(Columns.TISSUE_MATERIAL, "FFPE");
-    rnaAliquot.put(Columns.REGION, "Medulla oblongata");
-    rnaAliquot.put(Columns.STR_STATUS, "Submitted");
-    rnaAliquot.put(Columns.DNASE_TREATED, "True");
-    rnaAliquot.put(Columns.VOLUME, "10.0");
-    rnaAliquot.put(Columns.CONCENTRATION, "3.75");
-    rnaAliquot.put(Columns.QC_STATUS, "Ready");
-    rnaAliquot.put(Columns.PURPOSE, "Library");
-
-    rnaAliquot.forEach((k, v) -> table.enterText(k, 0, v));
-    // need to enter this here, after project is entered otherwise identity lookup fails
-    rnaAliquot.put(Columns.EXTERNAL_NAME, "ext14"); // increment
-    table.enterText(Columns.EXTERNAL_NAME, 0, rnaAliquot.get(Columns.EXTERNAL_NAME));
-
-    assertIdentityLookupWasSuccessful(table, 0);
-
-    saveSingleAndAssertSuccess(table);
-
-    rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
-
-    // verify attributes against what got saved to the database
-    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, Long.valueOf(newId));
-
-    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
-    // everything else should be the same as in testCreateOneRnaAliquotNoProject
   }
 
   @Test
@@ -287,6 +234,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     tissue.put(Columns.GROUP_DESCRIPTION, "Test one");
     tissue.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     tissue.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    tissue.put(Columns.PASSAGE_NUMBER, "");
     tissue.put(Columns.TIMES_RECEIVED, "1");
     tissue.put(Columns.TUBE_NUMBER, "1");
     tissue.put(Columns.LAB, "BioBank (University Health Network)");
@@ -306,15 +254,8 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     tissue.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     tissue.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
-
     // verify attributes against what got saved to the database
-    SampleTissue created = (SampleTissue) getSession().get(SampleTissueImpl.class, Long.valueOf(newId));
-
-    assertPlainSampleAttributes(tissue, created);
-    assertDetailedSampleAttributes(tissue, created);
-    assertSampleClass("Tissue", created);
-    assertTissueAttributes(tissue, created);
+    assertAllForTissue(tissue, getIdForRow(table, 0), true);
   }
 
   @Test
@@ -333,6 +274,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     tissue.put(Columns.GROUP_DESCRIPTION, "Test one");
     tissue.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     tissue.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    tissue.put(Columns.PASSAGE_NUMBER, "");
     tissue.put(Columns.TIMES_RECEIVED, "1");
     tissue.put(Columns.TUBE_NUMBER, "1");
     tissue.put(Columns.LAB, "BioBank (University Health Network)");
@@ -411,6 +353,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     slide.put(Columns.GROUP_DESCRIPTION, "Test one");
     slide.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     slide.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    slide.put(Columns.PASSAGE_NUMBER, "");
     slide.put(Columns.TIMES_RECEIVED, "1");
     slide.put(Columns.TUBE_NUMBER, "1");
     slide.put(Columns.LAB, "BioBank (University Health Network)");
@@ -434,18 +377,9 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     slide.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     slide.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
-    SampleSlide created = (SampleSlide) getSession().get(SampleSlideImpl.class, Long.valueOf(newId));
-
-    assertPlainSampleAttributes(slide, created);
-    assertDetailedSampleAttributes(slide, created);
-    assertSampleClass("Slide", created);
-    assertSlideSampleAttributes(slide, created);
-
-    SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, created);
-    assertTissueAttributes(slide, tissueParent);
+    assertAllForSlide(slide, getIdForRow(table, 0), true);
   }
 
   @Test
@@ -464,6 +398,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     slide.put(Columns.GROUP_DESCRIPTION, "Test one");
     slide.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     slide.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    slide.put(Columns.PASSAGE_NUMBER, "");
     slide.put(Columns.TIMES_RECEIVED, "1");
     slide.put(Columns.TUBE_NUMBER, "1");
     slide.put(Columns.LAB, "BioBank (University Health Network)");
@@ -537,6 +472,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     curls.put(Columns.GROUP_DESCRIPTION, "Test one");
     curls.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     curls.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    curls.put(Columns.PASSAGE_NUMBER, "");
     curls.put(Columns.TIMES_RECEIVED, "1");
     curls.put(Columns.TUBE_NUMBER, "1");
     curls.put(Columns.LAB, "BioBank (University Health Network)");
@@ -556,17 +492,9 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     curls.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     curls.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
-    SampleTissueProcessing created = (SampleTissueProcessing) getSession().get(SampleTissueProcessingImpl.class, Long.valueOf(newId));
-
-    assertPlainSampleAttributes(curls, created);
-    assertDetailedSampleAttributes(curls, created);
-    assertSampleClass("Curls", created);
-
-    SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, created);
-    assertTissueAttributes(curls, tissueParent);
+    assertAllForTissueProcessing(curls, getIdForRow(table, 0), true);
   }
 
   @Test
@@ -585,6 +513,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     curls.put(Columns.GROUP_DESCRIPTION, "Test one");
     curls.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     curls.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    curls.put(Columns.PASSAGE_NUMBER, "");
     curls.put(Columns.TIMES_RECEIVED, "1");
     curls.put(Columns.TUBE_NUMBER, "1");
     curls.put(Columns.LAB, "BioBank (University Health Network)");
@@ -663,6 +592,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     gDnaStock.put(Columns.GROUP_DESCRIPTION, "Test one");
     gDnaStock.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     gDnaStock.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    gDnaStock.put(Columns.PASSAGE_NUMBER, "");
     gDnaStock.put(Columns.TIMES_RECEIVED, "1");
     gDnaStock.put(Columns.TUBE_NUMBER, "1");
     gDnaStock.put(Columns.LAB, "BioBank (University Health Network)");
@@ -685,19 +615,9 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     gDnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     gDnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
-    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(newId));
-
-    assertPlainSampleAttributes(gDnaStock, created);
-    assertDetailedSampleAttributes(gDnaStock, created);
-    assertSampleClass("gDNA (stock)", created);
-    assertStockAttributes(gDnaStock, created);
-    assertAnalyteAttributes(gDnaStock, created);
-
-    SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, created);
-    assertTissueAttributes(gDnaStock, tissueParent);
+    assertAllForStock(gDnaStock, getIdForRow(table, 0), true, false);
   }
 
   @Test
@@ -716,6 +636,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     gDnaStock.put(Columns.GROUP_DESCRIPTION, "Test one");
     gDnaStock.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     gDnaStock.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    gDnaStock.put(Columns.PASSAGE_NUMBER, "");
     gDnaStock.put(Columns.TIMES_RECEIVED, "1");
     gDnaStock.put(Columns.TUBE_NUMBER, "1");
     gDnaStock.put(Columns.LAB, "BioBank (University Health Network)");
@@ -738,11 +659,10 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     gDnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     gDnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
     Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(newId));
+    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(getIdForRow(table, 0)));
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
     // everything else should be the same as in testCreateOneGdnaStockNoProject
@@ -795,6 +715,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     rnaStock.put(Columns.GROUP_DESCRIPTION, "Test one");
     rnaStock.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     rnaStock.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    rnaStock.put(Columns.PASSAGE_NUMBER, "");
     rnaStock.put(Columns.TIMES_RECEIVED, "1");
     rnaStock.put(Columns.TUBE_NUMBER, "1");
     rnaStock.put(Columns.LAB, "BioBank (University Health Network)");
@@ -820,20 +741,12 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     rnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
-    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(newId));
+    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, getIdForRow(table, 0));
 
-    assertPlainSampleAttributes(rnaStock, created);
-    assertDetailedSampleAttributes(rnaStock, created);
-    assertSampleClass("whole RNA (stock)", created);
-    assertStockAttributes(rnaStock, created);
-    assertAnalyteAttributes(rnaStock, created);
-    assertRnaSampleAttributes(rnaStock, created);
-
-    SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, created);
-    assertTissueAttributes(rnaStock, tissueParent);
+    assertAllForStock(rnaStock, getIdForRow(table, 0), true, true);
+    assertRnaStockSampleAttributes(rnaStock, created);
 
     // verify QCs
     Collection<SampleQC> sampleQcs = created.getSampleQCs();
@@ -868,6 +781,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     rnaStock.put(Columns.GROUP_DESCRIPTION, "Test one");
     rnaStock.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     rnaStock.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    rnaStock.put(Columns.PASSAGE_NUMBER, "");
     rnaStock.put(Columns.TIMES_RECEIVED, "1");
     rnaStock.put(Columns.TUBE_NUMBER, "1");
     rnaStock.put(Columns.LAB, "BioBank (University Health Network)");
@@ -952,6 +866,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     gDnaAliquot.put(Columns.GROUP_DESCRIPTION, "Test one");
     gDnaAliquot.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     gDnaAliquot.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    gDnaAliquot.put(Columns.PASSAGE_NUMBER, "");
     gDnaAliquot.put(Columns.TIMES_RECEIVED, "1");
     gDnaAliquot.put(Columns.TUBE_NUMBER, "1");
     gDnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
@@ -975,22 +890,10 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     gDnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
     gDnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
-    SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, Long.valueOf(newId));
+    assertAllForAliquot(gDnaAliquot, getIdForRow(table, 0), true, false);
 
-    assertPlainSampleAttributes(gDnaAliquot, created);
-    assertDetailedSampleAttributes(gDnaAliquot, created);
-    assertSampleClass("gDNA (aliquot)", created);
-    assertAnalyteAttributes(gDnaAliquot, created);
-    assertAliquotAttributes(gDnaAliquot, created);
-
-    SampleStock stockParent = LimsUtils.getParent(SampleStock.class, created);
-    assertStockAttributes(gDnaAliquot, stockParent);
-
-    SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, created);
-    assertTissueAttributes(gDnaAliquot, tissueParent);
   }
 
   @Test
@@ -1009,6 +912,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     gDnaAliquot.put(Columns.GROUP_DESCRIPTION, "Test one");
     gDnaAliquot.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     gDnaAliquot.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    gDnaAliquot.put(Columns.PASSAGE_NUMBER, "");
     gDnaAliquot.put(Columns.TIMES_RECEIVED, "1");
     gDnaAliquot.put(Columns.TUBE_NUMBER, "1");
     gDnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
@@ -1082,6 +986,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     rnaAliquot.put(Columns.GROUP_DESCRIPTION, "Test one");
     rnaAliquot.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
     rnaAliquot.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    rnaAliquot.put(Columns.PASSAGE_NUMBER, "");
     rnaAliquot.put(Columns.TIMES_RECEIVED, "1");
     rnaAliquot.put(Columns.TUBE_NUMBER, "1");
     rnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
@@ -1107,24 +1012,61 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
+    rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+
+    // verify attributes against what got saved to the database
+    assertAllForAliquot(rnaAliquot, getIdForRow(table, 0), true, true);
+  }
+
+  @Test
+  public void testCreateOneRnaAliquotWithProject() throws Exception {
+    // Goal: ensure one whole RNA (aliquot) associated with a predefined project can be saved
+    BulkSamplePage page = getCreatePage(1, projectId, rAliquotClassId);
+    SampleHandsOnTable table = page.getTable();
+
+    Map<String, String> rnaAliquot = new HashMap<>();
+    rnaAliquot.put(Columns.DESCRIPTION, "Description");
+    rnaAliquot.put(Columns.RECEIVE_DATE, "2017-07-17");
+    rnaAliquot.put(Columns.ID_BARCODE, "114"); // increment
+    rnaAliquot.put(Columns.SAMPLE_TYPE, "GENOMIC");
+    rnaAliquot.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
+    rnaAliquot.put(Columns.GROUP_ID, "1");
+    rnaAliquot.put(Columns.GROUP_DESCRIPTION, "Test one");
+    rnaAliquot.put(Columns.TISSUE_ORIGIN, "Bn (Brain)");
+    rnaAliquot.put(Columns.TISSUE_TYPE, "P (Primary tumour)");
+    rnaAliquot.put(Columns.PASSAGE_NUMBER, "");
+    rnaAliquot.put(Columns.TIMES_RECEIVED, "1");
+    rnaAliquot.put(Columns.TUBE_NUMBER, "1");
+    rnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
+    rnaAliquot.put(Columns.EXT_INST_ID, "tube id 1");
+    rnaAliquot.put(Columns.TISSUE_MATERIAL, "FFPE");
+    rnaAliquot.put(Columns.REGION, "Medulla oblongata");
+    rnaAliquot.put(Columns.STR_STATUS, "Submitted");
+    rnaAliquot.put(Columns.DNASE_TREATED, "True");
+    rnaAliquot.put(Columns.VOLUME, "10.0");
+    rnaAliquot.put(Columns.CONCENTRATION, "3.75");
+    rnaAliquot.put(Columns.QC_STATUS, "Ready");
+    rnaAliquot.put(Columns.PURPOSE, "Library");
+
+    rnaAliquot.forEach((k, v) -> table.enterText(k, 0, v));
+    // need to enter this here, after project is entered otherwise identity lookup fails
+    rnaAliquot.put(Columns.EXTERNAL_NAME, "ext14"); // increment
+    table.enterText(Columns.EXTERNAL_NAME, 0, rnaAliquot.get(Columns.EXTERNAL_NAME));
+
+    assertIdentityLookupWasSuccessful(table, 0);
+
+    saveSingleAndAssertSuccess(table);
+
+    rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
+    rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
+    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
     SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, Long.valueOf(newId));
 
-    assertPlainSampleAttributes(rnaAliquot, created);
-    assertDetailedSampleAttributes(rnaAliquot, created);
-    assertSampleClass("whole RNA (aliquot)", created);
-    assertAnalyteAttributes(rnaAliquot, created);
-    assertAliquotAttributes(rnaAliquot, created);
-
-    SampleStock stockParent = LimsUtils.getParent(SampleStock.class, created);
-    assertStockAttributes(rnaAliquot, stockParent);
-    assertRnaSampleAttributes(rnaAliquot, stockParent);
-
-    SampleTissue tissueParent = LimsUtils.getParent(SampleTissue.class, created);
-    assertTissueAttributes(rnaAliquot, tissueParent);
+    assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
+    // everything else should be the same as in testCreateOneRnaAliquotNoProject
   }
 
   @Test
@@ -1196,15 +1138,19 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneIdentityNoProject() throws Exception {
     // Goal: ensure one identity can be saved
     BulkSamplePage page = getCreatePage(1, null, identityClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> identity = new HashMap<>();
     identity.put(Columns.ALIAS, "PRO2_1001");
+    identity.put(Columns.DESCRIPTION, "");
+    identity.put(Columns.ID_BARCODE, "");
     identity.put(Columns.SAMPLE_TYPE, "GENOMIC");
     identity.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
     identity.put(Columns.PROJECT, "PRO2"); // different project so as not to mess with the SampleNumberPerProject generator
     identity.put(Columns.EXTERNAL_NAME, "ext2001"); // increment
     identity.put(Columns.DONOR_SEX, "Female");
+    identity.put(Columns.GROUP_ID, "");
+    identity.put(Columns.GROUP_DESCRIPTION, "");
     identity.put(Columns.QC_STATUS, "Ready");
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
@@ -1215,15 +1161,9 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     identity.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
-    String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
-    SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, Long.valueOf(newId));
-
-    assertPlainSampleAttributes(identity, created);
-    assertDetailedSampleAttributes(identity, created);
-    assertSampleClass("Identity", created);
-    assertIdentityAttributes(identity, created);
+    assertAllForIdentity(identity, getIdForRow(table, 0), true);
   }
 
   @Test
@@ -1231,13 +1171,17 @@ public class SampleBulkCreateIT extends AbstractIT {
     // Goal: ensure one identity associated with a predefined project can be saved
     BulkSamplePage page = getCreatePage(1, 2L, identityClassId);
     // different project so as not to mess with the SampleNumberPerProject generator
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> identity = new HashMap<>();
     identity.put(Columns.ALIAS, "PRO2_1002");
+    identity.put(Columns.DESCRIPTION, "");
+    identity.put(Columns.ID_BARCODE, "");
     identity.put(Columns.SAMPLE_TYPE, "GENOMIC");
     identity.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
     identity.put(Columns.EXTERNAL_NAME, "ext2002"); // increment
+    identity.put(Columns.GROUP_ID, "");
+    identity.put(Columns.GROUP_DESCRIPTION, "");
     identity.put(Columns.QC_STATUS, "Ready");
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
@@ -1252,89 +1196,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, Long.valueOf(newId));
 
     assertEquals("confirm project", predefined.getShortName(), created.getProject().getShortName());
-    // everything else should be identical to testCreateOneIdentityNoProject
-  }
-
-  private void assertPlainSampleAttributes(Map<String, String> hotAttributes, Sample fromDb) {
-    assertEquals("confirm project", hotAttributes.get(Columns.PROJECT), fromDb.getProject().getShortName());
-    assertEquals("confirm alias", hotAttributes.get(Columns.ALIAS), fromDb.getAlias());
-    assertEquals("confirm sample type", hotAttributes.get(Columns.SAMPLE_TYPE), fromDb.getSampleType());
-    assertEquals("confirm scientific name", hotAttributes.get(Columns.SCIENTIFIC_NAME), fromDb.getScientificName());
-    if (!LimsUtils.isIdentitySample(fromDb)) {
-      assertEquals("confirm received date", hotAttributes.get(Columns.RECEIVE_DATE),
-        LimsUtils.getDateAsString(fromDb.getReceivedDate()));
-    }
-  }
-
-  private void assertDetailedSampleAttributes(Map<String, String> hotAttributes, DetailedSample fromDb) {
-    assertEquals("confirm QC status", hotAttributes.get(Columns.QC_STATUS), fromDb.getDetailedQcStatus().getDescription());
-    assertNotNull("parent is not null", fromDb.getAlias());
-    assertEquals("confirm group ID", hotAttributes.get(Columns.GROUP_ID), fromDb.getGroupId());
-    assertEquals("confirm group description", hotAttributes.get(Columns.GROUP_DESCRIPTION), fromDb.getGroupDescription());
-  }
-
-  private void assertSampleClass(String sampleClass, DetailedSample fromDb) {
-    assertEquals("confirm sample class", sampleClass, fromDb.getSampleClass().getAlias());
-  }
-
-  private void assertIdentityAttributes(Map<String, String> hotAttributes, SampleIdentity fromDb) {
-    assertEquals("confirm external name", hotAttributes.get(Columns.EXTERNAL_NAME), fromDb.getExternalName());
-    assertEquals("confirm donor sex", hotAttributes.get(Columns.DONOR_SEX), fromDb.getDonorSex().getLabel());
-  }
-
-  private void assertTissueAttributes(Map<String, String> hotAttributes, SampleTissue fromDb) {
-    assertEquals("confirm tissue material", hotAttributes.get(Columns.TISSUE_MATERIAL), fromDb.getTissueMaterial().getAlias());
-    assertEquals("confirm region", hotAttributes.get(Columns.REGION), fromDb.getRegion());
-    assertEquals("confirm ext inst id", hotAttributes.get(Columns.EXT_INST_ID), fromDb.getExternalInstituteIdentifier());
-    assertEquals("confirm lab", hotAttributes.get(Columns.LAB), fromDb.getLab().getItemLabel());
-    assertEquals("confirm tissue origin", hotAttributes.get(Columns.TISSUE_ORIGIN), fromDb.getTissueOrigin().getItemLabel());
-    assertEquals("confirm tissue type", hotAttributes.get(Columns.TISSUE_TYPE), fromDb.getTissueType().getItemLabel());
-    assertEquals("confirm passage number", hotAttributes.get(Columns.PASSAGE_NUMBER), fromDb.getPassageNumber());
-    assertEquals("confirm times received", Integer.parseInt(hotAttributes.get(Columns.TIMES_RECEIVED)),
-        fromDb.getTimesReceived().intValue());
-    assertEquals("confirm tube number", Integer.parseInt(hotAttributes.get(Columns.TUBE_NUMBER)), fromDb.getTubeNumber().intValue());
-  }
-
-  private void assertSlideSampleAttributes(Map<String, String> hotAttributes, SampleSlide fromDb) {
-    assertEquals("confirm slides", Integer.parseInt(hotAttributes.get(Columns.SLIDES)), fromDb.getSlides().intValue());
-    assertEquals("confirm discards", Integer.parseInt(hotAttributes.get(Columns.DISCARDS)), fromDb.getDiscards().intValue());
-    assertEquals("confirm thickness", Integer.parseInt(hotAttributes.get(Columns.THICKNESS)), fromDb.getThickness().intValue());
-    assertEquals("confirm stain", hotAttributes.get(Columns.STAIN), fromDb.getStain().getName());
-  }
-
-  private void assertAnalyteAttributes(Map<String, String> hotAttributes, DetailedSample fromDb) {
-    assertEquals("confirm volume", hotAttributes.get(Columns.VOLUME).toString(), fromDb.getVolume().toString());
-    assertEquals("confirm concentration", hotAttributes.get(Columns.CONCENTRATION).toString(), fromDb.getConcentration().toString());
-  }
-
-  private void assertStockAttributes(Map<String, String> hotAttributes, SampleStock fromDb) {
-    assertEquals("confirm STR Status", hotAttributes.get(Columns.STR_STATUS), fromDb.getStrStatus().getLabel());
-  }
-
-  private void assertRnaSampleAttributes(Map<String, String> hotAttributes, SampleStock fromDb) {
-    assertEquals("confirm DNAse Treated", Boolean.valueOf(hotAttributes.get(Columns.DNASE_TREATED)),
-        Boolean.valueOf(fromDb.getDNAseTreated()));
-  }
-
-  private void assertAliquotAttributes(Map<String, String> hotAttributes, SampleAliquot fromDb) {
-    assertEquals("confirm purpose", hotAttributes.get(Columns.PURPOSE), fromDb.getSamplePurpose().getAlias());
+    // rest should be same as testCreateOneIdentityNoProject
   }
 
   private void assertIdentityLookupWasSuccessful(SampleHandsOnTable table, int rowNum) {
     table.waitForIdentityLookup(rowNum);
     assertEquals("identity lookup was successful", "First Receipt (PRO1)", table.getText(Columns.IDENTITY_ALIAS, 0));
-  }
-
-  private void saveSingleAndAssertSuccess(HandsOnTable table) {
-    HandsOnTableSaveResult result = table.save();
-
-    assertTrue("Sample was saved", result.getItemsSaved() == 1);
-    assertTrue("No errors are present", result.getServerErrors().isEmpty());
-    assertTrue("No errors are present", result.getSaveErrors().isEmpty());
-
-    assertTrue("Sample name has been generated", table.getText(Columns.NAME, 0).contains("SAM"));
-    assertTrue("Sample alias has been generated", !isStringEmptyOrNull(table.getText(Columns.ALIAS, 0)));
-
   }
 
 }

@@ -722,7 +722,7 @@ var HotUtils = {
       if (!Utils.validation.isEmpty(flat[property])) {
         obj[property] = flat[property];
       } else {
-        obj[property] = undefined;
+        obj[property] = null;
       }
     };
     return baseobj;

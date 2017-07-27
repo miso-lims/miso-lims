@@ -11,7 +11,7 @@ public class DilutionDto implements WritableUrls {
   private String name;
   private String identificationBarcode;
   private String locationLabel;
-  private Double concentration;
+  private String concentration;
   private String creationDate;
   private String dilutionCreatorName;
   private Long targetedSequencingId;
@@ -54,11 +54,11 @@ public class DilutionDto implements WritableUrls {
     this.locationLabel = locationLabel;
   }
 
-  public Double getConcentration() {
+  public String getConcentration() {
     return concentration;
   }
 
-  public void setConcentration(Double concentration) {
+  public void setConcentration(String concentration) {
     this.concentration = concentration;
   }
 
