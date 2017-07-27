@@ -164,7 +164,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    rnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -305,7 +305,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     tissue.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    tissue.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    tissue.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -350,7 +350,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     saveSingleAndAssertSuccess(table);
 
-    tissue.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    tissue.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -433,7 +433,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     slide.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    slide.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    slide.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -485,7 +485,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     saveSingleAndAssertSuccess(table);
 
-    slide.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    slide.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -555,7 +555,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     curls.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    curls.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    curls.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -602,7 +602,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     saveSingleAndAssertSuccess(table);
 
-    curls.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    curls.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -684,7 +684,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     gDnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    gDnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    gDnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -737,7 +737,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     gDnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    gDnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    gDnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -819,7 +819,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    rnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -891,7 +891,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    rnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -974,7 +974,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     gDnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    gDnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    gDnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -1031,7 +1031,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     gDnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    gDnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    gDnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -1107,7 +1107,7 @@ public class SampleBulkCreateIT extends AbstractIT {
     saveSingleAndAssertSuccess(table);
 
     rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    rnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -1211,7 +1211,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     saveSingleAndAssertSuccess(table);
 
-    identity.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    identity.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -1241,7 +1241,7 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     saveSingleAndAssertSuccess(table);
 
-    identity.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    identity.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes on the Edit single Sample page
