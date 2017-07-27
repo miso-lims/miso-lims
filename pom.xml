@@ -156,6 +156,7 @@
     <downloadUrl>http://repos.tgac.ac.uk/maven/repo</downloadUrl>
   </distributionManagement>
   <properties>
+    <skipUTs>${skipTests}</skipUTs>
     <spring-version>4.3.6.RELEASE</spring-version>
     <spring-security-version>4.2.1.RELEASE</spring-security-version>
     <spring-integration-version>4.3.6.RELEASE</spring-integration-version>
@@ -1048,6 +1049,7 @@
             <include>**/*Test.java</include>
             <include>**/*Tests.java</include>
           </includes>
+          <skipTests>${skipUTs}</skipTests>
         </configuration>
       </plugin>
       <plugin>
