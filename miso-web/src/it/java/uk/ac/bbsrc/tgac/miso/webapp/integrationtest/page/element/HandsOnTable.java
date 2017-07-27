@@ -105,7 +105,7 @@ public class HandsOnTable extends AbstractElement {
         .trim();
   }
 
-  private WebElement getCell(String columnHeading, int rowNum) {
+  protected WebElement getCell(String columnHeading, int rowNum) {
     int colNum = columnHeadings.indexOf(columnHeading);
     if (colNum == -1) {
       throw new IllegalArgumentException("Column " + columnHeading + " doesn't exist");

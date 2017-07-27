@@ -11,7 +11,7 @@ import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.base.Joiner;
 
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
 public class BulkSamplePage extends HeaderFooterPage {
 
@@ -58,13 +58,13 @@ public class BulkSamplePage extends HeaderFooterPage {
   private static final String CREATE_URL_FORMAT = "%smiso/sample/bulk/new?quantity=%d&projectId=%s&sampleClassId=%d";
   private static final String EDIT_URL_FORMAT = "%smiso/sample/bulk/edit?ids=%s";
 
-  private final HandsOnTable table;
+  private final SampleHandsOnTable table;
 
   public BulkSamplePage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains("Create Samples "), titleContains("Edit Samples ")));
-    table = new HandsOnTable(driver);
+    table = new SampleHandsOnTable(driver);
   }
 
   public static BulkSamplePage getForCreate(WebDriver driver, String baseUrl, Integer quantity, Long projectId, Long sampleClassId) {
@@ -81,12 +81,8 @@ public class BulkSamplePage extends HeaderFooterPage {
     return new BulkSamplePage(driver);
   }
 
-  public HandsOnTable getTable() {
+  public SampleHandsOnTable getTable() {
     return table;
-  }
-
-  public void waitForIdentityLookup() {
-    waitExplicitly(3000);
   }
 
   public String getSensibleDate(String date) {
