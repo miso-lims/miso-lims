@@ -5,12 +5,14 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.Lists;
 
-public class HandsOnTable {
+public class HandsOnTable extends AbstractElement {
 
   private static final By columnHeadingsSelector = By.cssSelector("div.ht_master table.htCore span.colHeader");
   private static final By inputRowsSelector = By.cssSelector("div.ht_master table.htCore tbody tr");
@@ -23,7 +25,8 @@ public class HandsOnTable {
   private final List<String> columnHeadings;
   private final List<WebElement> inputRows;
 
-  public HandsOnTable(WebElement hotContainer) {
+  public HandsOnTable(WebDriver driver, WebElement hotContainer) {
+    super(driver);
     this.hotContainer = hotContainer;
     this.columnHeadings = hotContainer.findElements(columnHeadingsSelector).stream()
         .map(element -> element.getText().trim())
@@ -46,14 +49,16 @@ public class HandsOnTable {
 
   public void enterText(String columnHeading, int rowNum, String text) {
     WebElement cell = getCell(columnHeading, rowNum);
-    cell.click();
-    cell.sendKeys(text);
-    cell.sendKeys(Keys.ENTER);
+    new Actions(getDriver())
+        .click(cell)
+        .sendKeys(text)
+        .sendKeys(Keys.ENTER)
+        .build().perform();
   }
 
   public List<String> getDropdownOptions(String columnHeading, int rowNum) {
     WebElement cell = getCell(columnHeading, rowNum);
-    cell.sendKeys(Keys.ESCAPE);
+    cancelEditing();
     WebElement dropdownArrow = cell.findElement(dropdownArrowSelector);
     dropdownArrow.click();
     WebElement dropdown = hotContainer.findElement(activeDropdownSelector);
@@ -61,8 +66,14 @@ public class HandsOnTable {
     List<String> singleColumnsOptions = optionRows.stream()
         .map(element -> cleanOptionLabel(element.findElement(By.tagName("td")).getText()))
         .collect(Collectors.toList());
-    cell.sendKeys(Keys.ESCAPE);
+    cancelEditing();
     return singleColumnsOptions;
+  }
+
+  private void cancelEditing() {
+    new Actions(getDriver())
+        .sendKeys(Keys.ESCAPE)
+        .build().perform();
   }
 
   /**
