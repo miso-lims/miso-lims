@@ -11,7 +11,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -41,6 +40,7 @@ public abstract class AbstractIT {
   @Before
   public final void setupAbstractTest() {
     ChromeOptions opts = new ChromeOptions();
+    // large width is important so that all columns of handsontables get rendered
     opts.addArguments("--headless", "--disable-gpu", "--window-size=2560x1440");
 
     DesiredCapabilities caps = new DesiredCapabilities();
@@ -51,8 +51,6 @@ public abstract class AbstractIT {
     // don't allow page load or script execution to take longer than 10 seconds
     driver.manage().timeouts().pageLoadTimeout(15, TimeUnit.SECONDS);
     driver.manage().timeouts().setScriptTimeout(15, TimeUnit.SECONDS);
-    // large width is important so that all columns of handsontables get rendered
-    driver.manage().window().setSize(new Dimension(2560, 1440));
   }
 
   @After
