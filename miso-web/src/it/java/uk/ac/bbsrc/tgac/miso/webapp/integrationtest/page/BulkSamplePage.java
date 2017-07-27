@@ -76,7 +76,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     super(driver);
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains("Create Samples "), titleContains("Edit Samples ")));
-    table = new HandsOnTable(hotContainer);
+    table = new HandsOnTable(driver, hotContainer);
   }
 
   public static BulkSamplePage getForCreate(WebDriver driver, String baseUrl, Integer quantity, Long projectId, Long sampleClassId) {
