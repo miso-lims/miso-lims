@@ -656,6 +656,7 @@
                 <miso.it.baseUrl>http://localhost:${miso.it.tomcat.servlet.port}/</miso.it.baseUrl>
                 <miso.it.h2.url>jdbc:h2:tcp://localhost:${miso.it.h2.port}/mem:miso-it;mode=mysql;DB_CLOSE_DELAY=-1;</miso.it.h2.url>
               </systemPropertyVariables>
+              <skipTests>${skipITs}</skipTests>
             </configuration>
           </plugin>
         </plugins>

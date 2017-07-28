@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOf;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,6 +10,8 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.Lists;
@@ -20,14 +24,22 @@ public class HandsOnTable extends AbstractElement {
   private static final By dropdownArrowSelector = By.className("htAutocompleteArrow");
   private static final By activeDropdownSelector = By.cssSelector("div.handsontableInputHolder[style*='block']");
   private static final By dropdownOptionRowsSelector = By.cssSelector("div.ht_master table.htCore > tbody > tr");
-
-  private final WebElement hotContainer;
   private final List<String> columnHeadings;
   private final List<WebElement> inputRows;
 
-  public HandsOnTable(WebDriver driver, WebElement hotContainer) {
+
+  @FindBy(id = "hotContainer")
+  private WebElement hotContainer;
+
+  @FindBy(id = "save")
+  private WebElement saveButton;
+
+  @FindBy(id = "ajaxLoader")
+  private WebElement ajaxLoader;
+
+  public HandsOnTable(WebDriver driver) {
     super(driver);
-    this.hotContainer = hotContainer;
+    PageFactory.initElements(driver, this);
     this.columnHeadings = hotContainer.findElements(columnHeadingsSelector).stream()
         .map(element -> element.getText().trim())
         .collect(Collectors.toList());
@@ -76,6 +88,12 @@ public class HandsOnTable extends AbstractElement {
         .build().perform();
   }
 
+  public HandsOnTableSaveResult save() {
+    saveButton.click();
+    waitUntil(invisibilityOf(ajaxLoader));
+    return new HandsOnTableSaveResult(getDriver());
+  }
+
   /**
    * Remove non-ASCII characters from a String. This is mainly to get rid of the dropdown arrow that becomes part of the text
    * 
@@ -87,7 +105,7 @@ public class HandsOnTable extends AbstractElement {
         .trim();
   }
 
-  private WebElement getCell(String columnHeading, int rowNum) {
+  protected WebElement getCell(String columnHeading, int rowNum) {
     int colNum = columnHeadings.indexOf(columnHeading);
     if (colNum == -1) {
       throw new IllegalArgumentException("Column " + columnHeading + " doesn't exist");

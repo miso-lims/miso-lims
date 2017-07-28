@@ -35,6 +35,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
 public class SampleBulkCreateIT extends AbstractIT {
 
@@ -114,10 +116,20 @@ public class SampleBulkCreateIT extends AbstractIT {
   }
 
   @Test
+  public void testSaveEmptyFail() throws Exception {
+    // Goal: ensure save fails and error message is shown when trying to save with required fields empty
+    BulkSamplePage page = getCreatePage(1, projectId, rAliquotClassId);
+    HandsOnTable table = page.getTable();
+    HandsOnTableSaveResult result = table.save();
+    assertEquals(0, result.getItemsSaved());
+    assertFalse(result.getSaveErrors().isEmpty());
+  }
+
+  @Test
   public void testCreateOneRnaAliquotWithProject() throws Exception {
     // Goal: ensure one whole RNA (aliquot) associated with a predefined project can be saved
     BulkSamplePage page = getCreatePage(1, projectId, rAliquotClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> rnaAliquot = new HashMap<>();
     rnaAliquot.put(Columns.DESCRIPTION, "Description");
@@ -147,14 +159,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     rnaAliquot.put(Columns.EXTERNAL_NAME, "ext14"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, rnaAliquot.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    rnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -252,11 +262,11 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateTissueDependencyCells() throws Exception {
     // Goal: ensure that changing the external name value causes the identity alias dropdown to be populated
     BulkSamplePage page = getCreatePage(1, null, 23L);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     assertTrue("identity alias is empty", isStringEmptyOrNull(table.getText(Columns.IDENTITY_ALIAS, 0)));
     table.enterText(Columns.IDENTITY_ALIAS, 0, "Identity 1");
-    page.waitForIdentityLookup();
+    table.waitForIdentityLookup(0);
     assertTrue("identity alias no longer empty", !isStringEmptyOrNull(table.getText(Columns.IDENTITY_ALIAS, 0)));
   }
 
@@ -264,7 +274,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneTissueNoProject() throws Exception {
     // Goal: ensure one tissue can be saved
     BulkSamplePage page = getCreatePage(1, null, tissueClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> tissue = new HashMap<>();
     tissue.put(Columns.DESCRIPTION, "Description");
@@ -290,14 +300,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     tissue.put(Columns.EXTERNAL_NAME, "ext1"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, tissue.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     tissue.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    tissue.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    tissue.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -313,7 +321,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneTissueWithProject() throws Exception {
     // Goal: ensure one tissue associated with a predefined project can be saved
     BulkSamplePage page = getCreatePage(1, projectId, tissueClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> tissue = new HashMap<>();
     tissue.put(Columns.DESCRIPTION, "Description");
@@ -338,13 +346,11 @@ public class SampleBulkCreateIT extends AbstractIT {
     tissue.put(Columns.EXTERNAL_NAME, "ext2"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, tissue.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
+    saveSingleAndAssertSuccess(table);
 
-    assertSaveWasSuccessful(page, table);
-
-    tissue.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    tissue.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -392,7 +398,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneSlideNoProject() throws Exception {
     // Goal: ensure one slide can be saved
     BulkSamplePage page = getCreatePage(1, null, slideClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> slide = new HashMap<>();
     slide.put(Columns.DESCRIPTION, "Description");
@@ -422,14 +428,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     slide.put(Columns.EXTERNAL_NAME, "ext3"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, slide.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     slide.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    slide.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    slide.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -448,7 +452,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneSlideWithProject() throws Exception {
     // Goal: ensure one slide with predefined project can be saved
     BulkSamplePage page = getCreatePage(1, projectId, slideClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> slide = new HashMap<>();
     slide.put(Columns.DESCRIPTION, "Description");
@@ -477,13 +481,11 @@ public class SampleBulkCreateIT extends AbstractIT {
     slide.put(Columns.EXTERNAL_NAME, "ext4"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, slide.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
+    saveSingleAndAssertSuccess(table);
 
-    assertSaveWasSuccessful(page, table);
-
-    slide.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    slide.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -521,7 +523,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneCurlsNoProject() throws Exception {
     // Goal: ensure one Curls can be saved
     BulkSamplePage page = getCreatePage(1, null, curlsClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> curls = new HashMap<>();
     curls.put(Columns.DESCRIPTION, "Description");
@@ -548,14 +550,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     curls.put(Columns.EXTERNAL_NAME, "ext5"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, curls.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     curls.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    curls.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    curls.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -573,7 +573,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneCurlsWithProject() throws Exception {
     // Goal: ensure one Curls associated with a predefined project can be saved
     BulkSamplePage page = getCreatePage(1, projectId, curlsClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> curls = new HashMap<>();
     curls.put(Columns.DESCRIPTION, "Description");
@@ -598,13 +598,11 @@ public class SampleBulkCreateIT extends AbstractIT {
     curls.put(Columns.EXTERNAL_NAME, "ext6"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, curls.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
+    saveSingleAndAssertSuccess(table);
 
-    assertSaveWasSuccessful(page, table);
-
-    curls.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    curls.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -652,7 +650,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneGdnaStockNoProject() throws Exception {
     // Goal: ensure one gDNA (stock) can be saved
     BulkSamplePage page = getCreatePage(1, null, gStockClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> gDnaStock = new HashMap<>();
     gDnaStock.put(Columns.DESCRIPTION, "Description");
@@ -681,14 +679,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     gDnaStock.put(Columns.EXTERNAL_NAME, "ext7"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, gDnaStock.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     gDnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    gDnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    gDnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -708,7 +704,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneGdnaStockWithProject() throws Exception {
     // Goal: ensure one gDNA (stock) associated with a predefined project can be saved
     BulkSamplePage page = getCreatePage(1, projectId, gStockClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> gDnaStock = new HashMap<>();
     gDnaStock.put(Columns.DESCRIPTION, "Description");
@@ -736,14 +732,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     gDnaStock.put(Columns.EXTERNAL_NAME, "ext8"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, gDnaStock.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     gDnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    gDnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    gDnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -788,7 +782,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneRnaStockNoProject() throws Exception {
     // Goal: ensure whole RNA (stock) can be saved
     BulkSamplePage page = getCreatePage(1, null, rStockClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> rnaStock = new HashMap<>();
     rnaStock.put(Columns.DESCRIPTION, "Description");
@@ -820,14 +814,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     rnaStock.put(Columns.EXTERNAL_NAME, "ext9"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, rnaStock.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    rnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -864,7 +856,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneRnaStockWithProject() throws Exception {
     // Goal: ensure one whole RNA (stock) associated with a predefined project can be saved
     BulkSamplePage page = getCreatePage(1, projectId, rStockClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> rnaStock = new HashMap<>();
     rnaStock.put(Columns.DESCRIPTION, "Description");
@@ -894,14 +886,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     rnaStock.put(Columns.EXTERNAL_NAME, "ext10"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, rnaStock.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     rnaStock.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaStock.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    rnaStock.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -949,7 +939,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneGdnaAliquotNoProject() throws Exception {
     // Goal: ensure one gDNA (aliquot) can be saved
     BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> gDnaAliquot = new HashMap<>();
     gDnaAliquot.put(Columns.DESCRIPTION, "Description");
@@ -979,14 +969,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     gDnaAliquot.put(Columns.EXTERNAL_NAME, "ext11"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, gDnaAliquot.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     gDnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    gDnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    gDnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -1009,7 +997,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneGdnaAliquotWithProject() throws Exception {
     // Goal: ensure one gDNA (aliquot) associated with a predefined project can be saved
     BulkSamplePage page = getCreatePage(1, projectId, gAliquotClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> gDnaAliquot = new HashMap<>();
     gDnaAliquot.put(Columns.DESCRIPTION, "Description");
@@ -1038,14 +1026,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     gDnaAliquot.put(Columns.EXTERNAL_NAME, "ext12"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, gDnaAliquot.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     gDnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    gDnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    gDnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -1083,7 +1069,7 @@ public class SampleBulkCreateIT extends AbstractIT {
   public void testCreateOneRnaAliquotNoProject() throws Exception {
     // Goal: ensure one whole RNA (aliquot) can be saved
     BulkSamplePage page = getCreatePage(1, null, rAliquotClassId);
-    HandsOnTable table = page.getTable();
+    SampleHandsOnTable table = page.getTable();
 
     Map<String, String> rnaAliquot = new HashMap<>();
     rnaAliquot.put(Columns.DESCRIPTION, "Description");
@@ -1116,14 +1102,12 @@ public class SampleBulkCreateIT extends AbstractIT {
     rnaAliquot.put(Columns.EXTERNAL_NAME, "ext13"); // increment
     table.enterText(Columns.EXTERNAL_NAME, 0, rnaAliquot.get(Columns.EXTERNAL_NAME));
 
-    assertIdentityLookupWasSuccessful(page, table);
+    assertIdentityLookupWasSuccessful(table, 0);
 
-    page.clickSaveButton();
-
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
     rnaAliquot.put(Columns.ALIAS, table.getText(Columns.ALIAS, 0));
-    rnaAliquot.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    rnaAliquot.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -1224,11 +1208,13 @@ public class SampleBulkCreateIT extends AbstractIT {
     identity.put(Columns.QC_STATUS, "Ready");
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
+    // Setting project a second time because of odd case where it is not set correctly the first time
+    // (Happened on Travis CI branch build, but not on the PR build or outside of Travis CI)
+    table.enterText(Columns.PROJECT, 0, "PRO2");
 
-    page.clickSaveButton();
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
-    identity.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    identity.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes against what got saved to the database
@@ -1256,10 +1242,9 @@ public class SampleBulkCreateIT extends AbstractIT {
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
 
-    page.clickSaveButton();
-    assertSaveWasSuccessful(page, table);
+    saveSingleAndAssertSuccess(table);
 
-    identity.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
+    identity.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, table.getText(k, 0)));
     String newId = table.getText(Columns.NAME, 0).substring(3, table.getText(Columns.NAME, 0).length());
 
     // verify attributes on the Edit single Sample page
@@ -1335,14 +1320,17 @@ public class SampleBulkCreateIT extends AbstractIT {
     assertEquals("confirm purpose", hotAttributes.get(Columns.PURPOSE), fromDb.getSamplePurpose().getAlias());
   }
 
-  private void assertIdentityLookupWasSuccessful(BulkSamplePage page, HandsOnTable table) {
-    page.waitForIdentityLookup();
+  private void assertIdentityLookupWasSuccessful(SampleHandsOnTable table, int rowNum) {
+    table.waitForIdentityLookup(rowNum);
     assertEquals("identity lookup was successful", "First Receipt (PRO1)", table.getText(Columns.IDENTITY_ALIAS, 0));
   }
 
-  private void assertSaveWasSuccessful(BulkSamplePage page, HandsOnTable table) {
-    assertTrue("Sample was saved", page.getSuccessMessages().contains("Saved"));
-    assertTrue("No errors are present", page.areErrorsHidden());
+  private void saveSingleAndAssertSuccess(HandsOnTable table) {
+    HandsOnTableSaveResult result = table.save();
+
+    assertTrue("Sample was saved", result.getItemsSaved() == 1);
+    assertTrue("No errors are present", result.getServerErrors().isEmpty());
+    assertTrue("No errors are present", result.getSaveErrors().isEmpty());
 
     assertTrue("Sample name has been generated", table.getText(Columns.NAME, 0).contains("SAM"));
     assertTrue("Sample alias has been generated", !isStringEmptyOrNull(table.getText(Columns.ALIAS, 0)));

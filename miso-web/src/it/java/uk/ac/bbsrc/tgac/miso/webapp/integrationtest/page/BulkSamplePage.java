@@ -5,14 +5,13 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.List;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
+import com.google.common.base.Joiner;
+
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
 public class BulkSamplePage extends HeaderFooterPage {
 
@@ -59,24 +58,13 @@ public class BulkSamplePage extends HeaderFooterPage {
   private static final String CREATE_URL_FORMAT = "%smiso/sample/bulk/new?quantity=%d&projectId=%s&sampleClassId=%d";
   private static final String EDIT_URL_FORMAT = "%smiso/sample/bulk/edit?ids=%s";
 
-  @FindBy(id = "hotContainer")
-  private WebElement hotContainer;
-  @FindBy(id = "save")
-  private WebElement saveButton;
-  @FindBy(id = "successMessages")
-  private WebElement successMessages;
-  @FindBy(id = "errors")
-  private WebElement errors;
-  @FindBy(id = "ajaxLoader")
-  private WebElement ajaxSpinner;
-
-  private final HandsOnTable table;
+  private final SampleHandsOnTable table;
 
   public BulkSamplePage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(or(titleContains("Create Samples "), titleContains("Edit Samples ")));
-    table = new HandsOnTable(driver, hotContainer);
+    table = new SampleHandsOnTable(driver);
   }
 
   public static BulkSamplePage getForCreate(WebDriver driver, String baseUrl, Integer quantity, Long projectId, Long sampleClassId) {
@@ -86,47 +74,15 @@ public class BulkSamplePage extends HeaderFooterPage {
     return new BulkSamplePage(driver);
   }
 
-  public static BulkSamplePage getForEdit(WebDriver driver, String baseUrl, List<Long> sampleIds) {
-    String ids = makeCommaSeparatedString(sampleIds);
+  public static BulkSamplePage getForEdit(WebDriver driver, String baseUrl, Collection<Long> sampleIds) {
+    String ids = Joiner.on(',').join(sampleIds);
     String url = String.format(EDIT_URL_FORMAT, baseUrl, ids);
     driver.get(url);
     return new BulkSamplePage(driver);
   }
 
-  private static String makeCommaSeparatedString(Collection<Long> longs) {
-    StringBuilder sb = new StringBuilder();
-    for (Long l : longs) {
-      sb.append(l).append(",");
-    }
-    sb.deleteCharAt(sb.length() - 1);
-    return sb.toString();
-  }
-
-  public HandsOnTable getTable() {
+  public SampleHandsOnTable getTable() {
     return table;
-  }
-
-  public void clickSaveButton() {
-    saveButton.click();
-    // give time for spinner to appear, then wait for it to be hidden again
-    waitExplicitly(1000);
-    waitWithTimeout().until(invisibilityOf(ajaxSpinner));
-  }
-
-  public String getSuccessMessages() {
-    return successMessages.getText();
-  }
-
-  public String getErrorMessages() {
-    return errors.getText();
-  }
-
-  public boolean areErrorsHidden() {
-    return errors.getAttribute("class").contains("hidden");
-  }
-
-  public void waitForIdentityLookup() {
-    waitExplicitly(3000);
   }
 
   public String getSensibleDate(String date) {
