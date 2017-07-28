@@ -333,23 +333,6 @@ FOR EACH ROW
   END IF;
   END//
 
-DROP TRIGGER IF EXISTS RunChangePacBio//
-CREATE TRIGGER RunChangePacBio BEFORE UPDATE ON RunPacBio
-FOR EACH ROW
-  BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
-  SET log_message = CONCAT_WS(', ',
-        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN CONCAT('movie duration: ', COALESCE(OLD.movieDuration, 'n/a'), ' → ', COALESCE(NEW.movieDuration, 'n/a')) END);
-  IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
-      NEW.runId,
-      COALESCE(CONCAT_WS(',',
-        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN 'movieDuration' END), ''),
-      (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
-      log_message);
-  END IF;
-  END//
-
 DROP TRIGGER IF EXISTS RunChangeIllumina//
 CREATE TRIGGER RunChangeIllumina BEFORE UPDATE ON RunIllumina
 FOR EACH ROW
