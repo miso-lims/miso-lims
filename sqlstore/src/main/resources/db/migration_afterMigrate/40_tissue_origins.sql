@@ -21,4 +21,8 @@ CALL addTissueOrigin('Sb', 'Small Bowel');
 CALL addTissueOrigin('Te', 'Testes');
 CALL addTissueOrigin('Ty', 'Thyroid');
 CALL addTissueOrigin('Vg', 'Vagina');
+CALL addTissueOrigin('Bi', 'Biliary');
+CALL addTissueOrigin('En', 'Endometrial');
+CALL addTissueOrigin('Cr', 'Colorectal');
+CALL addTissueOrigin('Sr', 'Serosa');
 -- EndNoTest
