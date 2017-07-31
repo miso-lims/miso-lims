@@ -26,6 +26,7 @@ before_install:
     - 'echo pr slug ${TRAVIS_PULL_REQUEST_SLUG} && echo repo slug ${TRAVIS_REPO_SLUG}'
 
 before_script:
+  - localectl status
   - export MAVEN_OPTS='-Xms1g -Xmx2g'
 
 script:
