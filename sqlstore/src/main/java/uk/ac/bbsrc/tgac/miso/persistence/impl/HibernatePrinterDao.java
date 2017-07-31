@@ -110,7 +110,12 @@ public class HibernatePrinterDao implements PrinterStore, HibernatePaginatedData
 
   @Override
   public String propertyForSortColumn(String original) {
-    return original;
+    switch (original) {
+    case "available":
+      return "enabled";
+    default:
+      return original;
+    }
   }
 
   @Override
