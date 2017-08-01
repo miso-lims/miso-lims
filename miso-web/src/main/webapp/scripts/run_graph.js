@@ -24,7 +24,7 @@
 var RunGraph = (function() {
   // This is an example metric graph. It should never occur in real data coming
   // from run scanner.
-  var example = function(metrics) {
+  var example = function(metrics, width) {
     // Scan the metrics for anything we can graph
     return metrics.filter(function(metric) {
       return metric.type == 'example';
@@ -41,7 +41,7 @@ var RunGraph = (function() {
       
     });
   };
-  var externalLink = function(metrics) {
+  var externalLink = function(metrics, width) {
     return metrics.filter(function(metric) {
       return metric.type == 'link';
     }).map(function(metric) {
@@ -57,7 +57,7 @@ var RunGraph = (function() {
     });
   };
   
-  var chart = function(metrics) {
+  var chart = function(metrics, width) {
     return metrics.filter(function(metric) {
       return metric.type == 'chart';
     }).map(function(metric) {
@@ -67,6 +67,7 @@ var RunGraph = (function() {
         render : function() {
           jQuery(node).dataTable({
             'bJQueryUI' : true,
+            'bAutoWidth' : false,
             'aoColumns' : [ {
               "sTitle" : "Name",
               "mData" : "name",
@@ -84,7 +85,7 @@ var RunGraph = (function() {
       };
     });
   };
-  var summaryTable = function(metrics) {
+  var summaryTable = function(metrics, width) {
     return metrics.filter(function(metric) {
       return metric.type == 'table';
     }).map(function(metric) {
@@ -92,7 +93,7 @@ var RunGraph = (function() {
       return {
         dom : node,
         render : function() {
-          jQuery(node).dataTable({
+          var dt = jQuery(node).dataTable({
             'bJQueryUI' : true,
             'aoColumns' : metric.columns.map(function(column) {
               return {
@@ -103,12 +104,13 @@ var RunGraph = (function() {
             'sDom' : '<"datatable-scroll"t><"F"ip>',
             'aaData' : metric.rows
           });
+          dt.parents("div.dataTables_wrapper").css("width", width + "px");
         }
       };
     });
   };
   var lineGraph = function(typeName, title, yLabel) {
-    return function(metrics) {
+    return function(metrics, width) {
       return metrics.filter(function(metric) {
         return metric.type == typeName;
       }).map(function(metric) {
@@ -124,7 +126,8 @@ var RunGraph = (function() {
                 type : 'line',
                 renderTo : node,
                 zoomType : 'x',
-                spacingRight : 20
+                spacingRight : 20,
+                width : width
               },
               title : {
                 text : title
@@ -142,6 +145,9 @@ var RunGraph = (function() {
                     enabled : false
                   },
                   shadow : false
+                },
+                series : {
+                  animation : false
                 }
               },
               series : metric.series
@@ -152,7 +158,7 @@ var RunGraph = (function() {
     };
   };
   
-  var boxPlot = function(metric, title, yLabel) {
+  var boxPlot = function(metric, title, yLabel, width) {
     var node = document.createElement('DIV');
     return {
       dom : node,
@@ -162,7 +168,8 @@ var RunGraph = (function() {
             type : 'boxplot',
             renderTo : node,
             zoomType : 'x',
-            spacingRight : 20
+            spacingRight : 20,
+            width : width
           },
           title : {
             text : title
@@ -176,6 +183,9 @@ var RunGraph = (function() {
           plotOptions : {
             boxplot : {
               medianColor : 'red'
+            },
+            series : {
+              animation : false
             }
           },
           series : metric.series
@@ -185,7 +195,7 @@ var RunGraph = (function() {
   };
   
   var illuminaPerCyclePlot = function(typeName, title, yLabel) {
-    return function(metrics) {
+    return function(metrics, width) {
       return metrics.filter(function(metric) {
         return metric.type == typeName;
       }).map(function(metric) {
@@ -195,7 +205,7 @@ var RunGraph = (function() {
           };
           series.visible = !series.name.includes("Lane");
         });
-        return boxPlot(metric, title, yLabel);
+        return boxPlot(metric, title, yLabel, width);
       });
     };
   };
@@ -214,50 +224,68 @@ var RunGraph = (function() {
     // Takes a list of metrics and renders them to #metricsdiv
     renderMetrics : function(metrics) {
       var container = document.getElementById('metricsdiv');
-      while (container.hasChildNodes()) {
-        container.removeChild(container.lastChild);
-      }
-      // Start with graphs we know how to make (see the example for a template).
-      // Then filter them as appropriate for the data we have.
-      var graphs = metrics ? [
-          example,
-          externalLink,
-          chart,
-          summaryTable,
-          illuminaPerCyclePlot('illumina-q30-by-cycle', '> Q30', '% Bases >Q30'),
-          lineGraph('illumina-called-intensity-by-cycle', 'Called Intensity',
-              'Average Intensity per Cycle'),
-          lineGraph('illumina-base-percent-by-cycle', 'Base %', 'Percentage'),
-          illuminaPerLanePlot('illumina-cluster-density-by-lane',
-              'Cluster Density', 'Density (K/mm²)') ].map(function(graph) {
-        return graph(metrics);
-      }).reduce(function(a, b) {
-        return a.concat(b);
-      }) : [];
-      if (graphs.length == 0) {
-        container.innerText = "No graphs available.";
-        return;
-      }
-      var css = "width: " + (jQuery(container).width() / 2) + "px";
-      var table = document.createElement('TABLE');
-      container.appendChild(table);
-      var row = null;
-      graphs.forEach(function(graph) {
-        var cell = document.createElement('TD');
-        cell.style.cssText = css;
-        cell.appendChild(graph.dom);
-        if (row == null) {
-          row = document.createElement('TR');
-          row.appendChild(cell);
-          table.appendChild(row);
-        } else {
-          row.appendChild(cell);
-          row = null;
+      
+      var renderAll = function() {
+        while (container.hasChildNodes()) {
+          container.removeChild(container.lastChild);
         }
+        var width = Math.round(jQuery(container).width() * 0.49);
+        // Start with graphs we know how to make (see the example for a
+        // template).
+        // Then filter them as appropriate for the data we have.
+        var graphs = metrics
+            ? [
+                example,
+                externalLink,
+                chart,
+                summaryTable,
+                illuminaPerCyclePlot('illumina-q30-by-cycle', '> Q30',
+                    '% Bases >Q30'),
+                lineGraph('illumina-called-intensity-by-cycle',
+                    'Called Intensity', 'Average Intensity per Cycle'),
+                lineGraph('illumina-base-percent-by-cycle', 'Base %',
+                    'Percentage'),
+                illuminaPerLanePlot('illumina-cluster-density-by-lane',
+                    'Cluster Density', 'Density (K/mm²)') ].map(
+                function(graph) {
+                  return graph(metrics, width);
+                }).reduce(function(a, b) {
+              return a.concat(b);
+            }) : [];
+        if (graphs.length == 0) {
+          container.innerText = "No graphs available.";
+          return;
+        }
+        var css = "width: " + width + "px";
+        var table = document.createElement('TABLE');
+        container.appendChild(table);
+        var row = null;
+        graphs.forEach(function(graph) {
+          var cell = document.createElement('TD');
+          cell.style.cssText = css;
+          cell.appendChild(graph.dom);
+          if (row == null) {
+            row = document.createElement('TR');
+            row.appendChild(cell);
+            table.appendChild(row);
+          } else {
+            row.appendChild(cell);
+            row = null;
+          }
+        });
+        graphs.forEach(function(graph) {
+          graph.render();
+        });
+      };
+      
+      var timer_id;
+      jQuery(window).resize(function() {
+        clearTimeout(timer_id);
+        timer_id = setTimeout(function() {
+          renderAll();
+        }, 300);
       });
-      graphs.forEach(function(graph) {
-        graph.render();
-      });
+      renderAll();
     }
   };
 })();
