@@ -127,7 +127,7 @@ void add_plot(const illumina::interop::constants::metric_type metric_name,
       dataset;
   try {
     for (auto lane = include_combined ? 0 : 1;
-         lane <= include_lanes ? run.run_info().flowcell().lane_count() : 0;
+         lane <= (include_lanes ? run.run_info().flowcell().lane_count() : 0);
          lane++) {
       illumina::interop::model::plot::plot_data<
           illumina::interop::model::plot::candle_stick_point> data;
@@ -369,8 +369,8 @@ int main(int argc, const char **argv) {
       illumina::interop::constants::BasePercent,
       "illumina-base-percent-by-cycle", true, true, run, metrics_results);
   add_plot<plot_by_lane_wrapper>(illumina::interop::constants::Clusters,
-                                 "illumina-cluster-count-by-lane", true, false,
-                                 run, metrics_results);
+                                 "illumina-cluster-density-by-lane", true,
+                                 false, run, metrics_results);
   add_read_bin_plot(run, run_summary, metrics_results);
   add_global_chart(run, run_summary, metrics_results);
   add_lane_charts(run, run_summary, metrics_results);
