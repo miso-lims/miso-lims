@@ -286,7 +286,7 @@
 <%@ include file="permissions.jsp" %>
 <c:if test="${run.id != 0}">
   <c:if test="${run.id != 0}">
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>
   <div id="metrix">
