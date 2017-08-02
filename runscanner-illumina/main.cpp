@@ -225,7 +225,9 @@ void add_lane_charts(
 
   Json::Value columns(Json::arrayValue);
   add_table_column(columns, "Lane", "lane");
+  add_table_column(columns, "Density %", "densityPct");
   add_table_column(columns, "Density", "density");
+  add_table_column(columns, "Density PF", "densityPf");
   add_table_column(columns, "% > Q30", "q30");
   auto index = 0;
   for (auto read = 0; read < run_summary.size(); read++) {
@@ -252,7 +254,14 @@ void add_lane_charts(
   for (auto lane = 0; lane < run_summary.lane_count(); lane++) {
     Json::Value row(Json::objectValue);
     row["lane"] = lane + 1;
+    std::stringstream density_pct;
+    density_pct << std::fixed << std::setprecision(2)
+                << (run_summary[0][lane].density_pf().mean() /
+                    run_summary[0][lane].density().mean()) *
+                       100 << " %";
+    row["densityPct"] = density_pct.str();
     row["density"] = format(run_summary[0][lane].density(), 1e3);
+    row["densityPf"] = format(run_summary[0][lane].density_pf(), 1e3);
     row["q30"] = format(run_summary[0][lane].percent_gt_q30());
     for (auto read = 0; read < run_summary.size(); read++) {
       row["errors" + std::to_string(read)] =
