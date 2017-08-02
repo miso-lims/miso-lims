@@ -589,8 +589,6 @@ public class Dtos {
     return dtoSet;
   }
 
-  // ignore cognitive complexity warning from SonarQube
-  @SuppressWarnings("squid:S3776")
   public static Sample to(SampleDto from) {
     Sample to = null;
     if (from instanceof DetailedSampleDto) {
@@ -600,19 +598,14 @@ public class Dtos {
     }
 
     if (from.getId() != null) to.setId(from.getId());
-    if (!isStringEmptyOrNull(from.getAccession())) {
-      to.setAccession(from.getAccession());
-    }
+    to.setAccession(nullifyStringIfBlank(from.getAccession()));
     to.setName(from.getName());
-    to.setDescription(isStringEmptyOrNull(from.getDescription()) ? null : from.getDescription());
-    to.setIdentificationBarcode(isStringEmptyOrNull(from.getIdentificationBarcode()) ? null : from.getIdentificationBarcode());
-    to.setLocationBarcode(isStringEmptyOrNull(from.getLocationBarcode()) ? null : from.getLocationBarcode());
+    to.setDescription(nullifyStringIfBlank(from.getDescription()));
+    to.setIdentificationBarcode(nullifyStringIfBlank(from.getIdentificationBarcode()));
+    to.setLocationBarcode(nullifyStringIfBlank(from.getLocationBarcode()));
     to.setSampleType(from.getSampleType());
-    to.setReceivedDate(isStringEmptyOrNull(from.getReceivedDate()) ? null : extractDateOrNull(from.getReceivedDate()));
+    to.setReceivedDate(extractDateOrNull(from.getReceivedDate()));
     to.setQcPassed(from.getQcPassed());
-    if (!isStringEmptyOrNull(from.getAlias())) {
-      to.setAlias(from.getAlias());
-    }
     to.setScientificName(from.getScientificName());
     if (!isStringEmptyOrNull(from.getTaxonIdentifier())) {
       to.setTaxonIdentifier(from.getTaxonIdentifier());
@@ -784,7 +777,7 @@ public class Dtos {
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
-    to.setRegion((isStringEmptyOrNull(from.getRegion()) ? null : from.getRegion()));
+    to.setRegion(nullifyStringIfBlank(from.getRegion()));
     to.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
     if (from.getTissueOriginId() != null) {
       TissueOrigin tissueOrigin = new TissueOriginImpl();
