@@ -312,7 +312,7 @@ int main(int argc, const char **argv) {
   std::stringstream start_date;
   start_date << "20" << run.run_info().date().substr(0, 2) << "-"
              << run.run_info().date().substr(2, 2) << "-"
-             << run.run_info().date().substr(4, 2);
+             << run.run_info().date().substr(4, 2) << "T00:00:00";
   result["startDate"] = start_date.str();
 
   /* Copy all the trivial values from the run information.  */
@@ -342,7 +342,7 @@ int main(int argc, const char **argv) {
        run.get<illumina::interop::model::metrics::extraction_metric>()) {
     std::time_t t = extraction_metric.date_time();
     std::stringstream date_buffer;
-    date_buffer << std::put_time(std::localtime(&t), "%Y-%m-%d");
+    date_buffer << std::put_time(std::localtime(&t), "%Y-%m-%dT00:00:00");
     result["completionDate"] = date_buffer.str();
     has_extraction = true;
   }
