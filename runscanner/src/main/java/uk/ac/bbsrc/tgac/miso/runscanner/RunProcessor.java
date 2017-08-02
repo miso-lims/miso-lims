@@ -143,9 +143,7 @@ public abstract class RunProcessor {
    * @param root The directory as specified by the user.
    * @return a stream of directories to process
    */
-  public Stream<File> getRunsFromRoot(File root) {
-    return Arrays.stream(root.listFiles(File::isDirectory));
-  }
+  public abstract Stream<File> getRunsFromRoot(File root);
 
   /**
    * Read a run directory and compute a result that can be sent to MISO.

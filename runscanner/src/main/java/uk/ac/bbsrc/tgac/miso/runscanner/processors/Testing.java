@@ -2,9 +2,11 @@ package uk.ac.bbsrc.tgac.miso.runscanner.processors;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,6 +41,11 @@ public class Testing extends RunProcessor {
     default:
       return NotificationDto.class;
     }
+  }
+
+  @Override
+  public Stream<File> getRunsFromRoot(File root) {
+    return Arrays.stream(root.listFiles(File::isDirectory));
   }
 
   @Override

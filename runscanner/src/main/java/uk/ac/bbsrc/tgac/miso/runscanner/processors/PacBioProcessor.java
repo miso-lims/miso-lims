@@ -14,6 +14,7 @@ import java.util.TimeZone;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -120,6 +121,8 @@ public class PacBioProcessor extends RunProcessor {
         dto.setCompletionDate(start.plusSeconds(duration.longValue()));
       }), processSampleInformation() };
 
+  private static final Pattern RUN_DIRECTORY = Pattern.compile("^.+_\\d+$");
+
   private static final DateTimeFormatter URL_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
   /**
@@ -214,6 +217,11 @@ public class PacBioProcessor extends RunProcessor {
   public PacBioProcessor(Builder builder, String address) {
     super(builder);
     this.address = address;
+  }
+
+  @Override
+  public Stream<File> getRunsFromRoot(File root) {
+    return Arrays.stream(root.listFiles(f -> f.isDirectory() && RUN_DIRECTORY.matcher(f.getName()).matches()));
   }
 
   @Override

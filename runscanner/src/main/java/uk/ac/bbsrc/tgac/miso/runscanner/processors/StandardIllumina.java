@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,6 +41,11 @@ public final class StandardIllumina extends RunProcessor {
 
   public StandardIllumina(Builder builder) {
     super(builder);
+  }
+
+  @Override
+  public Stream<File> getRunsFromRoot(File root) {
+    return Arrays.stream(root.listFiles(File::isDirectory));
   }
 
   @Override
