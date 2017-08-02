@@ -354,7 +354,7 @@ HotTarget.sample = (function() {
                             }
                             
                             var indexOfMatchingIdentityInProject = -1;
-                            for (var i = 0; i < data.matchingIdentities.length; i++) {
+                            for (i = 0; i < data.matchingIdentities.length; i++) {
                               if (data.matchingIdentities[i].projectId == selectedProject.id 
                                   && data.matchingIdentities[i].externalName == flat.externalName) {
                                 indexOfMatchingIdentityInProject = i;
