@@ -589,6 +589,8 @@ public class Dtos {
     return dtoSet;
   }
 
+  // ignore cognitive complexity warning from SonarQube
+  @SuppressWarnings("squid:S3776")
   public static Sample to(SampleDto from) {
     Sample to = null;
     if (from instanceof DetailedSampleDto) {
