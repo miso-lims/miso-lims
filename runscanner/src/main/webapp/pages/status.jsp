@@ -60,7 +60,7 @@
         <c:otherwise>
           <table>
             <tr><th>Path</th><th>Processor Name</th><th>Platform</th><th>Time Zone</th><th>Valid?</th></tr>
-            <c:forEach items="${configurations}" var="conf"><td>${conf.path}</td><td>${conf.processor.name}</td><td>${conf.processor.platformType}</td><td>${conf.timeZone.displayName}</td><td>${conf.valid}</td></c:forEach>
+            <c:forEach items="${configurations}" var="conf"><tr><td>${conf.path}</td><td>${conf.processor.name}</td><td>${conf.processor.platformType}</td><td>${conf.timeZone.displayName}</td><td>${conf.valid}</td></tr></c:forEach>
           </table>
         </c:otherwise>
       </c:choose>
