@@ -175,7 +175,7 @@ HotTarget.sample = (function() {
               numberOfMonths : 1
             },
             allowEmpty : true,
-            include : !Constants.isDetailedSample || (Constants.isDetailedSample && config.targetSampleClass.alias != 'Identity'),
+            include : !Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity',
             unpack : function(sam, flat, setCellMeta) {
               flat.receivedDate = sam.receivedDate;
             },
