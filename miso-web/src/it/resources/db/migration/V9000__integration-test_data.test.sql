@@ -321,7 +321,10 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 2, 'ACTIVE', 1, '2017-06-27 14:12:00'),
   (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 1, 'ACTIVE', 1, '2017-07-24 16:11:00');
 
-  INSERT INTO Sample (sampleId, name, alias, description, securityProfile_profileId, identificationBarcode, sampleType, receivedDate, project_projectId,
+INSERT INTO Study (studyId, name, securityProfile_profileId, project_projectId, alias, lastModifier, studyTypeId) VALUES
+(1, 'STU1', 1, 1, 'Study One', 1, 1);
+
+INSERT INTO Sample (sampleId, name, alias, description, securityProfile_profileId, identificationBarcode, sampleType, receivedDate, project_projectId,
 scientificName, volume, qcPassed, lastModifier, creator, created, lastModified) VALUES
 (1, 'SAM1', 'TEST_0001', 'Identity', 2, '11111', 'GENOMIC', NULL, 3, 'Homo sapiens', NULL, 1, 1, 1, '2017-07-20 09:00:00', '2017-07-20 09:00:00'),
 (2, 'SAM2', 'TEST_0001_Bn_R_nn_1-1', 'Tissue', 2, '22222', 'GENOMIC', '2017-07-20', 3, 'Homo sapiens', 30, 1, 1, 1, '2017-07-20 09:01:00', '2017-07-20 09:01:00'),
@@ -402,6 +405,8 @@ INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
   volume, concentration) VALUES
+  (1, 'LIB1', 2, 8, '11211', (SELECT libraryTypeId FROM LibraryType WHERE description = 'Paired End' AND platformType = 'ILLUMINA'), '2016-11-07', 'ILLUMINA', 'TEST_0001_Bn_R_PE_300_WG', (SELECT librarySelectionTypeId FROM LibrarySelectionType WHERE name = 'PCR'), 
+  (SELECT libraryStrategyTypeId FROM LibraryStrategyType WHERE  name = 'WGS'), 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00'),
   (100001, 'LIB100001', 'LIBT_0001_Ly_P_PE_251_WG', 'libbar100001', 'libdesc100001', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10),
   (100002, 'LIB100002', 'LIBT_0001_Ly_P_PE_252_WG', 'libbar100002', 'libdesc100002', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
@@ -412,6 +417,7 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL);
 
 INSERT INTO DetailedLibrary(libraryId, kitDescriptorId, archived, libraryDesign, libraryDesignCodeId) VALUES
+  (1, 1, 0, (SELECT libraryDesignId FROM LibraryDesign WHERE name = 'WG'), (SELECT libraryDesignCodeId FROM LibraryDesignCode WHERE code = 'WG')),
   (100001, 1, 0, NULL, 7),
   (100002, 1, 0, 1, 7),
   (100003, 1, 0, NULL, 7),
@@ -422,3 +428,39 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (100001, 9),
   (100002, 6),
   (100002, 10);
+
+INSERT INTO Pool (poolId, concentration, name, alias, identificationBarcode, creationDate, securityProfile_profileId, platformType, ready, lastModifier, creator, created, lastModified) VALUES
+(1, 8.25, 'IPO1', 'POOL_1', '12341', '2017-07-20', 2, 'ILLUMINA', 1, 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00');
+
+INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
+(1, 1);
+
+INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, securityProfile_profileId, lastModifier, creator, created, lastModified) VALUES
+(1, 1, 1, 'BOX1', 'First Box', 1, 1, 2, '2017-07-20 13:01:01', '2017-07-20 13:01:01');
+
+INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
+(1, 1, 'LIBRARY', 'A01'), (1, 1, 'DILUTION', 'B02'), (1, 1, 'POOL', 'C03'), (1, 2, 'SAMPLE', 'D04'), (1, 3, 'SAMPLE', 'E05'), (1, 4, 'SAMPLE', 'F06'), (1, 7, 'SAMPLE', 'G07'), (1, 8, 'SAMPLE', 'H08'); 
+
+INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId, identificationBarcode, platform, lastModifier, creator, created, lastModified) VALUES
+(1, 3, 'ABCDEFXX', (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina MiSeq'), 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01'),
+(2, 4, 'PACBIO1', (SELECT platformId FROM Platform WHERE instrumentModel = 'PacBio RS II'), 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02');
+
+INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES 
+(1, 1, 1), (2, 1, NULL);
+
+INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partitions_partitionId) VALUES
+(1, 1), (2, 2);
+
+INSERT INTO SequencerReference (referenceId, name, platformId, ip) VALUES
+(1, 'MiSeq_1', (SELECT platformId FROM Platform WHERE instrumentModel = 'Illumina MiSeq'), '0.0.0.0'),
+(2, 'RSII_1', (SELECT platformId FROM Platform WHERE instrumentModel = 'PacBio RS II'), '0.0.0.0');
+
+INSERT INTO Run (runId, name, securityProfile_profileId, alias, sequencerReference_sequencerReferenceId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
+(1, 'RUN1', 5, 'MiSeq_Run_1', 1, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
+(2, 'RUN2', 5, 'PacBio_Run_1', 2, '2017-08-01', NULL, 'Running', 1, '2017-08-01 10:03:02', 1, '2017-08-01 10:03:02');
+
+INSERT INTO RunIllumina (runId, pairedEnd) VALUES (1, 1);
+
+INSERT INTO RunPacBio (runId) VALUES (2);
+
+INSERT INTO Run_SequencerPartitionContainer (Run_runId, containers_containerId) VALUES (1, 1), (2, 2);
