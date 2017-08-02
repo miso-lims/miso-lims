@@ -54,7 +54,6 @@ public class PacBioProcessor extends RunProcessor {
   interface ProcessMetadata {
     public void accept(Document document, PacBioNotificationDto dto) throws XPathException;
   }
-
   /**
    * This is the response object provided by the PacBio web service when queries about the state of a plate.
    */
@@ -105,7 +104,6 @@ public class PacBioProcessor extends RunProcessor {
 
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-  private static final DateTimeFormatter URL_DATE_FORMAT = DateTimeFormatter.ofPattern("YYYYMMDD-HHmmss");
   /**
    * These are all the things that can be extracted from the PacBio metadata XML file.
    */
@@ -121,6 +119,8 @@ public class PacBioProcessor extends RunProcessor {
         }
         dto.setCompletionDate(start.plusSeconds(duration.longValue()));
       }), processSampleInformation() };
+
+  private static final DateTimeFormatter URL_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
   /**
    * Compile a list of XPath expressions
