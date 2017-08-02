@@ -286,27 +286,19 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setDescription(from.getDescription());
     dto.setUpdatedById(from.getLastModifier().getUserId());
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     dto.setSampleType(from.getSampleType());
-    if (from.getReceivedDate() != null) {
-      dto.setReceivedDate(getDateString(from.getReceivedDate()));
-    }
+    dto.setReceivedDate(from.getReceivedDate() == null ? null : getDateString(from.getReceivedDate()));
     if (from.getQcPassed() != null) {
       dto.setQcPassed(from.getQcPassed());
     }
-    if (!isStringEmptyOrNull(from.getAlias())) {
-      dto.setAlias(from.getAlias());
-    }
+    dto.setAlias(from.getAlias());
     dto.setProjectId(from.getProject().getProjectId());
     dto.setScientificName(from.getScientificName());
-    if (!isStringEmptyOrNull(from.getTaxonIdentifier())) {
-      dto.setTaxonIdentifier(from.getTaxonIdentifier());
-    }
+    dto.setTaxonIdentifier(from.getTaxonIdentifier());
     if (from.getVolume() != null) {
       dto.setVolume(from.getVolume().toString());
     }
@@ -353,16 +345,12 @@ public class Dtos {
     if (from.isSynthetic() != null) {
       dto.setSynthetic(from.isSynthetic());
     }
-    if (from.getConcentration() != null) {
-      dto.setConcentration(from.getConcentration().toString());
-    }
+    dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
     if (from.getDetailedQcStatus() != null) {
       dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
     }
-    if (!isStringEmptyOrNull(from.getDetailedQcStatusNote())) {
-      dto.setDetailedQcStatusNote(from.getDetailedQcStatusNote());
-    }
+    dto.setDetailedQcStatusNote(from.getDetailedQcStatusNote());
     return dto;
   }
 
@@ -386,9 +374,7 @@ public class Dtos {
       detailedQcStatus.setId(from.getDetailedQcStatusId());
       to.setDetailedQcStatus(detailedQcStatus);
     }
-    if (!isStringEmptyOrNull(from.getDetailedQcStatusNote())) {
       to.setDetailedQcStatusNote(from.getDetailedQcStatusNote());
-    }
     if (from.getSubprojectId() != null) {
       Subproject subproject = new SubprojectImpl();
       subproject.setId(from.getSubprojectId());
@@ -399,16 +385,10 @@ public class Dtos {
       sampleClass.setId(from.getSampleClassId());
       to.setSampleClass(sampleClass);
     }
-    if (from.getGroupId() != null) {
-      to.setGroupId(from.getGroupId());
-      to.setGroupDescription(from.getGroupDescription());
-    }
-    if (from.getSynthetic() != null) {
-      to.setSynthetic(from.getSynthetic());
-    }
-    if (from.getConcentration() != null) {
-      to.setConcentration(Double.valueOf(from.getConcentration()));
-    }
+    to.setGroupId(nullifyStringIfBlank(from.getGroupId()));
+    to.setGroupDescription(nullifyStringIfBlank(from.getGroupDescription()));
+    to.setSynthetic(from.getSynthetic());
+    to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
     if (from.getIdentityId() != null) {
       to.setIdentityId(from.getIdentityId());
     }
@@ -583,9 +563,7 @@ public class Dtos {
       dto = new SampleDto();
     }
     copySampleFields(from, dto);
-    if (!isStringEmptyOrNull(from.getAccession())) {
-      dto.setAccession(from.getAccession());
-    }
+    dto.setAccession(from.getAccession());
 
     if (from.getSampleQCs() != null && !from.getSampleQCs().isEmpty()) {
       dto.setQcs(asSampleQcDtos(from.getSampleQCs()));
@@ -610,34 +588,19 @@ public class Dtos {
     }
 
     if (from.getId() != null) to.setId(from.getId());
-    if (!isStringEmptyOrNull(from.getAccession())) {
-      to.setAccession(from.getAccession());
-    }
+    to.setAccession(nullifyStringIfBlank(from.getAccession()));
     to.setName(from.getName());
-    to.setDescription(from.getDescription());
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      to.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
-    if (!isStringEmptyOrNull(from.getLocationBarcode())) {
-      to.setLocationBarcode(from.getLocationBarcode());
-    }
+    to.setDescription(nullifyStringIfBlank(from.getDescription()));
+    to.setIdentificationBarcode(nullifyStringIfBlank(from.getIdentificationBarcode()));
+    to.setLocationBarcode(nullifyStringIfBlank(from.getLocationBarcode()));
     to.setSampleType(from.getSampleType());
-    if (from.getReceivedDate() != null) {
-      to.setReceivedDate(extractDateOrNull(from.getReceivedDate()));
-    }
+    to.setReceivedDate(extractDateOrNull(from.getReceivedDate()));
     to.setQcPassed(from.getQcPassed());
-    if (!isStringEmptyOrNull(from.getAlias())) {
-      to.setAlias(from.getAlias());
-    }
     to.setScientificName(from.getScientificName());
-    if (!isStringEmptyOrNull(from.getTaxonIdentifier())) {
-      to.setTaxonIdentifier(from.getTaxonIdentifier());
-    }
+    to.setTaxonIdentifier(from.getTaxonIdentifier());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
-    if (from.getVolume() != null) {
-      to.setVolume(Double.valueOf(from.getVolume()));
-    }
+    to.setVolume(isStringEmptyOrNull(from.getVolume()) ? null : Double.valueOf(from.getVolume()));
     if (from.getDiscarded() != null) to.setDiscarded(from.getDiscarded());
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());
@@ -802,7 +765,7 @@ public class Dtos {
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
-    to.setRegion(from.getRegion());
+    to.setRegion(nullifyStringIfBlank(from.getRegion()));
     to.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
     if (from.getTissueOriginId() != null) {
       TissueOrigin tissueOrigin = new TissueOriginImpl();
@@ -1099,9 +1062,7 @@ public class Dtos {
       dto.setVolume(from.getVolume().toString());
     }
     dto.setDnaSize(from.getDnaSize());
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     if (from.getLibraryQCs() != null && !from.getLibraryQCs().isEmpty()) {
       dto.setQcs(asLibraryQcDtos(from.getLibraryQCs()));
     }
@@ -1132,9 +1093,7 @@ public class Dtos {
     to.setName(from.getName());
     to.setDescription(from.getDescription());
     to.setIdentificationBarcode(from.getIdentificationBarcode());
-    if (from.getConcentration() != null) {
-      to.setInitialConcentration(Double.valueOf(from.getConcentration()));
-    }
+    to.setInitialConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
     to.setLowQuality(from.getLowQuality());
     if (from.getPaired() != null) {
       to.setPaired(from.getPaired());
@@ -1250,13 +1209,11 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setDilutionUserName(from.getDilutionCreator());
-    dto.setConcentration(from.getConcentration());
+    dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     if (from.getCreationDate() != null) {
       dto.setCreationDate(getDateString(from.getCreationDate()));
     }
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     if (from.getTargetedSequencing() != null) {
       dto.setTargetedSequencingId(from.getTargetedSequencing().getId());
@@ -1279,14 +1236,12 @@ public class Dtos {
     dto.setId(from.getDilutionId());
     dto.setName(from.getDilutionName());
     dto.setDilutionUserName(from.getCreatorName());
-    dto.setConcentration(from.getDilutionConcentration());
+    dto.setConcentration(from.getDilutionConcentration() == null ? null : from.getDilutionConcentration().toString());
     dto.setLastModified(getDateString(from.getLastModified()));
     if (from.getCreated() != null) {
       dto.setCreationDate(getDateTimeString(from.getCreated()));
     }
-    if (!isStringEmptyOrNull(from.getDilutionBarcode())) {
-      dto.setIdentificationBarcode(from.getDilutionBarcode());
-    }
+    dto.setIdentificationBarcode(from.getDilutionBarcode());
     dto.setIndexIds(from.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
 
     LibraryDto ldto = new LibraryDto();
@@ -1322,14 +1277,10 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getName())) {
       to.setName(from.getName());
     }
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      to.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
-    to.setConcentration(from.getConcentration());
+    to.setIdentificationBarcode(from.getIdentificationBarcode());
+    to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
     to.setLibrary(to(from.getLibrary()));
-    if (!isStringEmptyOrNull(from.getDilutionUserName())) {
-      to.setDilutionCreator(from.getDilutionUserName());
-    }
+    to.setDilutionCreator(from.getDilutionUserName());
     to.setCreationDate(extractDateOrNull(from.getCreationDate()));
     if (from.getTargetedSequencingId() != null) {
       to.setTargetedSequencing(new TargetedSequencing());
@@ -1364,12 +1315,8 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setAlias(from.getAlias());
-    if (!isStringEmptyOrNull(from.getDescription())) {
-      dto.setDescription(from.getDescription());
-    }
-    if (from.getConcentration() != null) {
-      dto.setConcentration(from.getConcentration().toString());
-    }
+    dto.setDescription(from.getDescription());
+    dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(getDateString(from.getCreationDate()));
@@ -1393,9 +1340,7 @@ public class Dtos {
     } else {
       dto.setPooledElements(Collections.emptySet());
     }
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     return dto;
@@ -1746,9 +1691,7 @@ public class Dtos {
     PoolImpl to = new PoolImpl();
     to.setId(dto.getId() == null ? PoolImpl.UNSAVED_ID : dto.getId());
     to.setAlias(dto.getAlias());
-    if (dto.getConcentration() != null) {
-      to.setConcentration(Double.valueOf(dto.getConcentration()));
-    }
+    to.setConcentration(dto.getConcentration() == null ? null : Double.valueOf(dto.getConcentration()));
     to.setCreationDate(extractDateOrNull(dto.getCreationDate()));
     to.setDescription(dto.getDescription());
     to.setIdentificationBarcode(dto.getIdentificationBarcode());

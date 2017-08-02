@@ -16,6 +16,8 @@ import org.openqa.selenium.support.PageFactory;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.Lists;
 
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
 public class HandsOnTable extends AbstractElement {
 
   private static final By columnHeadingsSelector = By.cssSelector("div.ht_master table.htCore span.colHeader");
@@ -60,11 +62,24 @@ public class HandsOnTable extends AbstractElement {
   }
 
   public void enterText(String columnHeading, int rowNum, String text) {
+    if (LimsUtils.isStringEmptyOrNull(text)) {
+      clearField(columnHeading, rowNum, text);
+    } else {
+      WebElement cell = getCell(columnHeading, rowNum);
+      new Actions(getDriver())
+          .click(cell)
+          .sendKeys(text)
+          .sendKeys(Keys.ENTER)
+          .build().perform();
+    }
+  }
+
+  public void clearField(String columnHeading, int rowNum, String text) {
     WebElement cell = getCell(columnHeading, rowNum);
     new Actions(getDriver())
         .click(cell)
-        .sendKeys(text)
-        .sendKeys(Keys.ENTER)
+        .sendKeys(Keys.DELETE)
+        .sendKeys(Keys.ESCAPE)
         .build().perform();
   }
 
