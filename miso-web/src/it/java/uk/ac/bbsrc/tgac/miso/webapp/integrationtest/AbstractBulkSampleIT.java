@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
-public class SampleBulkITUtils extends AbstractIT {
+public abstract class AbstractBulkSampleIT extends AbstractIT {
 
   protected void saveSingleAndAssertSuccess(SampleHandsOnTable table) {
     HandsOnTableSaveResult result = table.save();
