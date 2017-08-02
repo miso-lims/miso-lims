@@ -103,7 +103,7 @@ ListTarget.sequencer = {
           "include" : true,
           "iSortPriority" : 0
         }, {
-          "sTitle" : "Comissioned",
+          "sTitle" : "Commissioned",
           "mData" : "dateCommissioned",
           "include" : true,
           "iSortPriority" : 0

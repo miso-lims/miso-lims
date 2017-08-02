@@ -35,7 +35,6 @@ ListUtils = (function() {
         ? ' (' + hidden + ' on other pages)' : '');
   };
   var initTable = function(elementId, target, projectId, config, optionModifier) {
-    var searchKey = target.name + '_search';
     var staticActions = target.createStaticActions(config, projectId);
     var bulkActions = target.createBulkActions(config, projectId);
     var columns = target.createColumns(config, projectId).filter(function(x) {
