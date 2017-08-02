@@ -149,11 +149,6 @@ void add_plot(const illumina::interop::constants::metric_type metric_name,
   render(type_name, dataset, output);
 }
 
-void add_read_bin_plot(
-    const illumina::interop::model::metrics::run_metrics &run,
-    const illumina::interop::model::summary::run_summary &run_summary,
-    Json::Value &output) {}
-
 void add_chart_row(Json::Value &values, const std::string &name,
                    const std::string &value) {
   Json::Value result(Json::objectValue);
@@ -371,7 +366,6 @@ int main(int argc, const char **argv) {
   add_plot<plot_by_lane_wrapper>(illumina::interop::constants::Clusters,
                                  "illumina-cluster-density-by-lane", true,
                                  false, run, metrics_results);
-  add_read_bin_plot(run, run_summary, metrics_results);
   add_global_chart(run, run_summary, metrics_results);
   add_lane_charts(run, run_summary, metrics_results);
   result["metrics"] = metrics_results;
