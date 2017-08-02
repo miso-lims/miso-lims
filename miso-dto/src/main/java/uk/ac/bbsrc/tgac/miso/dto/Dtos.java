@@ -286,9 +286,7 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setDescription(from.getDescription());
     dto.setUpdatedById(from.getLastModifier().getUserId());
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
@@ -297,14 +295,10 @@ public class Dtos {
     if (from.getQcPassed() != null) {
       dto.setQcPassed(from.getQcPassed());
     }
-    if (!isStringEmptyOrNull(from.getAlias())) {
-      dto.setAlias(from.getAlias());
-    }
+    dto.setAlias(from.getAlias());
     dto.setProjectId(from.getProject().getProjectId());
     dto.setScientificName(from.getScientificName());
-    if (!isStringEmptyOrNull(from.getTaxonIdentifier())) {
-      dto.setTaxonIdentifier(from.getTaxonIdentifier());
-    }
+    dto.setTaxonIdentifier(from.getTaxonIdentifier());
     if (from.getVolume() != null) {
       dto.setVolume(from.getVolume().toString());
     }
@@ -356,9 +350,7 @@ public class Dtos {
     if (from.getDetailedQcStatus() != null) {
       dto.setDetailedQcStatusId(from.getDetailedQcStatus().getId());
     }
-    if (!isStringEmptyOrNull(from.getDetailedQcStatusNote())) {
-      dto.setDetailedQcStatusNote(from.getDetailedQcStatusNote());
-    }
+    dto.setDetailedQcStatusNote(from.getDetailedQcStatusNote());
     return dto;
   }
 
@@ -393,8 +385,8 @@ public class Dtos {
       sampleClass.setId(from.getSampleClassId());
       to.setSampleClass(sampleClass);
     }
-    to.setGroupId(isStringEmptyOrNull(from.getGroupId()) ? null : from.getGroupId());
-    to.setGroupDescription(isStringEmptyOrNull(from.getGroupDescription()) ? null : from.getGroupDescription());
+    to.setGroupId(nullifyStringIfBlank(from.getGroupId()));
+    to.setGroupDescription(nullifyStringIfBlank(from.getGroupDescription()));
     to.setSynthetic(from.getSynthetic());
     to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
     if (from.getIdentityId() != null) {
@@ -571,9 +563,7 @@ public class Dtos {
       dto = new SampleDto();
     }
     copySampleFields(from, dto);
-    if (!isStringEmptyOrNull(from.getAccession())) {
-      dto.setAccession(from.getAccession());
-    }
+    dto.setAccession(from.getAccession());
 
     if (from.getSampleQCs() != null && !from.getSampleQCs().isEmpty()) {
       dto.setQcs(asSampleQcDtos(from.getSampleQCs()));
@@ -607,9 +597,7 @@ public class Dtos {
     to.setReceivedDate(extractDateOrNull(from.getReceivedDate()));
     to.setQcPassed(from.getQcPassed());
     to.setScientificName(from.getScientificName());
-    if (!isStringEmptyOrNull(from.getTaxonIdentifier())) {
-      to.setTaxonIdentifier(from.getTaxonIdentifier());
-    }
+    to.setTaxonIdentifier(from.getTaxonIdentifier());
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setVolume(isStringEmptyOrNull(from.getVolume()) ? null : Double.valueOf(from.getVolume()));
@@ -1074,9 +1062,7 @@ public class Dtos {
       dto.setVolume(from.getVolume().toString());
     }
     dto.setDnaSize(from.getDnaSize());
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     if (from.getLibraryQCs() != null && !from.getLibraryQCs().isEmpty()) {
       dto.setQcs(asLibraryQcDtos(from.getLibraryQCs()));
     }
@@ -1227,9 +1213,7 @@ public class Dtos {
     if (from.getCreationDate() != null) {
       dto.setCreationDate(getDateString(from.getCreationDate()));
     }
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     if (from.getTargetedSequencing() != null) {
       dto.setTargetedSequencingId(from.getTargetedSequencing().getId());
@@ -1257,9 +1241,7 @@ public class Dtos {
     if (from.getCreated() != null) {
       dto.setCreationDate(getDateTimeString(from.getCreated()));
     }
-    if (!isStringEmptyOrNull(from.getDilutionBarcode())) {
-      dto.setIdentificationBarcode(from.getDilutionBarcode());
-    }
+    dto.setIdentificationBarcode(from.getDilutionBarcode());
     dto.setIndexIds(from.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
 
     LibraryDto ldto = new LibraryDto();
@@ -1295,14 +1277,10 @@ public class Dtos {
     if (!isStringEmptyOrNull(from.getName())) {
       to.setName(from.getName());
     }
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      to.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
+    to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
     to.setLibrary(to(from.getLibrary()));
-    if (!isStringEmptyOrNull(from.getDilutionUserName())) {
-      to.setDilutionCreator(from.getDilutionUserName());
-    }
+    to.setDilutionCreator(from.getDilutionUserName());
     to.setCreationDate(extractDateOrNull(from.getCreationDate()));
     if (from.getTargetedSequencingId() != null) {
       to.setTargetedSequencing(new TargetedSequencing());
@@ -1337,9 +1315,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setAlias(from.getAlias());
-    if (!isStringEmptyOrNull(from.getDescription())) {
-      dto.setDescription(from.getDescription());
-    }
+    dto.setDescription(from.getDescription());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
@@ -1364,9 +1340,7 @@ public class Dtos {
     } else {
       dto.setPooledElements(Collections.emptySet());
     }
-    if (!isStringEmptyOrNull(from.getIdentificationBarcode())) {
-      dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    }
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
     return dto;
