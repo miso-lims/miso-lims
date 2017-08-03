@@ -83,6 +83,9 @@ public class PacBioProcessor extends RunProcessor {
     }
 
     public HealthType translateStatus() {
+      if (status == null) {
+        return HealthType.Unknown;
+      }
       switch (status) {
       case "Ready":
         return HealthType.Started;
