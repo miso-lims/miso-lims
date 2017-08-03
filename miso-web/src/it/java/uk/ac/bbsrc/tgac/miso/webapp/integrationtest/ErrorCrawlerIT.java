@@ -1,10 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -73,13 +71,8 @@ public class ErrorCrawlerIT extends AbstractIT {
 
   @Test
   public void testForStacktracesOnPages() {
-    Map<String, String> stacktraces = new HashMap<>();
-    for (String slug : urlSlugs) {
-      stacktraces.put(slug, String.valueOf(AbstractPage.checkForErrors(getDriver(), getBaseUrl(), slug)));
-    }
-    List<String> errors = stacktraces.entrySet().stream()
-        .filter(map -> map.getValue() == "true")
-        .map(entryset -> entryset.getKey())
+    List<String> errors = urlSlugs.stream()
+        .filter(slug -> AbstractPage.checkForErrors(getDriver(), getBaseUrl(), slug))
         .collect(Collectors.toList());
     if (errors.size() > 0) throw new IllegalArgumentException("Errors on page(s):\n" + String.join("\n", errors));
   }
