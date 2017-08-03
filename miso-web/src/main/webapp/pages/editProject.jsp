@@ -43,7 +43,7 @@
 <h1>
 <c:choose><c:when test="${project.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
   Project
-  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="Project.validateProject();">
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Project.validateProject();">
     Save
   </button>
 </h1>
@@ -83,7 +83,7 @@
   </tr>
   <tr>
     <td class="h">Creation date:</td>
-    <td><fmt:formatDate value="${project.creationDate}"/></td>
+    <td><span id="creationDate"><fmt:formatDate value="${project.creationDate}"/></span></td>
   </tr>
   <tr>
     <td class="h">Alias:</td>

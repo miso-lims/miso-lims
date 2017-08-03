@@ -39,10 +39,10 @@ public class HomePageIT extends AbstractIT {
 
     ProjectPage projectPage = page.clickProjectSearchResult(1L);
     assertNotNull(projectPage);
-    String projectIdString = projectPage.getProjectId();
+    String projectIdString = projectPage.getId();
     long projectId = Long.parseLong(projectIdString);
     assertEquals(1L, projectId);
-    assertEquals("PRO1", projectPage.getProjectName());
+    assertEquals("PRO1", projectPage.getName());
   }
 
 }

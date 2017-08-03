@@ -46,6 +46,16 @@ public abstract class AbstractPage extends AbstractElement {
     element.sendKeys(Keys.ESCAPE);
   }
 
+  protected void setCheckbox(Boolean check, WebElement element) {
+    // only change if given value and element value differ
+    if (check && !element.isSelected()) {
+      element.click();
+    }
+    if (!check && element.isSelected()) {
+      element.click();
+    }
+  }
+
   protected void setDropdown(String input, WebElement element) {
     element.click();
     Select select = new Select(element);
@@ -53,19 +63,21 @@ public abstract class AbstractPage extends AbstractElement {
     element.sendKeys(Keys.ESCAPE);
   }
 
-  protected void setCheckbox(Boolean value, WebElement element) {
-    // only change if given value and element value differ
-    if (value && "false".equals(element.getAttribute("value"))) {
-      element.click();
-    }
-    if (!value && "true".equals(element.getAttribute("value"))) {
-      element.click();
-    }
-  }
-
   protected String getSelectedDropdownText(WebElement element) {
     Select dropdown = new Select(element);
     return dropdown.getFirstSelectedOption().getText();
+  }
+
+  protected void setRadioButton(String input, List<WebElement> buttons) {
+    WebElement targetButton = buttons.stream().filter(button -> button.getAttribute("value").equals(input)).findAny().orElse(null);
+    if (targetButton == null) throw new IllegalArgumentException("Could not find radio button with label " + input);
+    targetButton.click();
+  }
+
+  protected String getSelectedRadioButtonText(List<WebElement> buttons) {
+    WebElement selectedButton = buttons.stream().filter(button -> button.isSelected()).findAny().orElse(null);
+    if (selectedButton == null) throw new IllegalArgumentException("No buttons are selected for set " + buttons.get(0).getAttribute("id"));
+    return selectedButton.getAttribute("value");
   }
 
   private static final String MISO_URL = "%smiso/%s";
