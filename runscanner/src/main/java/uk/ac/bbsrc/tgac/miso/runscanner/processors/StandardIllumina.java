@@ -67,13 +67,16 @@ public final class StandardIllumina extends RunProcessor {
 
     // See if we can figure out the chemistry
 
-    try {
-      Document parameters = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(runDirectory, "runParameters.xml"));
-      dto.setChemistry(Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(parameters)).findFirst()
-          .orElse(IlluminaChemistry.UNKNOWN));
-    } catch (SAXException | ParserConfigurationException e) {
-      log.error("Failed to parse parameters", e);
-    }
+    dto.setChemistry(Stream.of("runParameters.xml", "RunParameters.xml").map(f -> new File(runDirectory, f))
+        .filter(file -> file.exists() && file.canRead()).findAny().flatMap(file -> {
+          try {
+            Document parameters = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
+            return Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(parameters)).findFirst();
+          } catch (SAXException | ParserConfigurationException | IOException e) {
+            log.error("Failed to parse parameters", e);
+            return Optional.empty();
+          }
+        }).orElse(IlluminaChemistry.UNKNOWN));
 
     // The Illumina library can't distinguish between a failed run and one that either finished or is still going. Scan the logs, if
     // available to determine if the run failed.
