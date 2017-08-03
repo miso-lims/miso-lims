@@ -377,7 +377,8 @@ int main(int argc, const char **argv) {
                                  false, run, metrics_results);
   add_global_chart(run, run_summary, metrics_results);
   add_lane_charts(run, run_summary, metrics_results);
-  result["metrics"] = metrics_results;
+  Json::FastWriter fastWriter;
+  result["metrics"] = fastWriter.write(metrics_results);
 
   /* Write everything to standard output from consumption by Java. */
   std::cout << result << std::endl;

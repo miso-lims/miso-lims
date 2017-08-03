@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -27,7 +26,7 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
   private LocalDateTime completionDate;
   private boolean pairedEndRun;
   private String software;
-  private ArrayNode metrics;
+  private String metrics;
 
   public String getRunAlias() {
     return runAlias;
@@ -109,11 +108,11 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
     this.completionDate = completionDate;
   }
 
-  public ArrayNode getMetrics() {
+  public String getMetrics() {
     return metrics;
   }
 
-  public void setMetrics(ArrayNode metrics) {
+  public void setMetrics(String metrics) {
     this.metrics = metrics;
   }
 
