@@ -342,7 +342,7 @@ int main(int argc, const char **argv) {
        run.get<illumina::interop::model::metrics::extraction_metric>()) {
     std::time_t t = extraction_metric.date_time();
     std::stringstream date_buffer;
-    date_buffer << std::put_time(std::localtime(&t), "%Y-%m-%dT00:00:00");
+    date_buffer << std::put_time(std::localtime(&t), "%Y-%m-%dT%H:%M:%S");
     result["completionDate"] = date_buffer.str();
     has_extraction = true;
   }
