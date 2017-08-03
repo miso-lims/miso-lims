@@ -33,7 +33,7 @@ public class HomePageIT extends AbstractIT {
     List<Long> badSearch = page.searchProjects("notaproject");
     assertTrue(badSearch.isEmpty());
 
-    List<Long> goodSearch = page.searchProjects("PRO1");
+    List<Long> goodSearch = page.searchProjects("Project One");
     assertEquals(1, goodSearch.size());
     assertEquals(1L, goodSearch.get(0).longValue());
 

@@ -32,11 +32,11 @@ public abstract class AbstractElement {
     }
   }
 
-  protected void waitUntil(Function<? super WebDriver, Boolean> condition) {
+  protected <T> void waitUntil(Function<? super WebDriver, T> condition) {
     waitUntil(condition, DEFAULT_WAIT);
   }
 
-  protected void waitUntil(Function<? super WebDriver, Boolean> condition, long seconds) {
+  protected <T> void waitUntil(Function<? super WebDriver, T> condition, long seconds) {
     waitWithTimeout(seconds).until(condition);
   }
 

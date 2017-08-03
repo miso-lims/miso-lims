@@ -169,7 +169,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     assertTrue(tissueOrigins.contains("Bn (Brain)"));
     assertTrue(tissueOrigins.contains("Pa (Pancreas)"));
 
-    table.enterText(Columns.TISSUE_ORIGIN, 0, "L");
+    table.enterText(Columns.TISSUE_ORIGIN, 0, "Ly");
     assertEquals("Ly (Lymphocyte)", table.getText(Columns.TISSUE_ORIGIN, 0));
 
     List<String> tissueTypes = table.getDropdownOptions(Columns.TISSUE_TYPE, 0);
@@ -1126,10 +1126,10 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, identityClassId);
     HandsOnTable table = page.getTable();
 
-    table.enterText(Columns.QC_NOTE, 0, "invisible");
-    assertTrue("note is read-only", isStringEmptyOrNull(table.getText(Columns.QC_NOTE, 0)));
+    assertFalse(table.isWritable(Columns.QC_NOTE, 0));
 
     table.enterText(Columns.QC_STATUS, 0, "Okd by Collaborator");
+    assertTrue(table.isWritable(Columns.QC_NOTE, 0));
     table.enterText(Columns.QC_NOTE, 0, "writable note");
     assertEquals("note is writable", "writable note", table.getText(Columns.QC_NOTE, 0));
   }

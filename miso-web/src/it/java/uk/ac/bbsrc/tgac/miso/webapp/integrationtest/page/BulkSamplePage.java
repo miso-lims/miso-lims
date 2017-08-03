@@ -53,6 +53,10 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String NEW_DV200 = "New DV200";
     public static final String QC_NOTE = "QC Note";
     public static final String PURPOSE = "Purpose";
+
+    private Columns() {
+      throw new IllegalStateException("Util class not intended for instantiation");
+    }
   };
 
   private static final String CREATE_URL_FORMAT = "%smiso/sample/bulk/new?quantity=%d&projectId=%s&sampleClassId=%d";
