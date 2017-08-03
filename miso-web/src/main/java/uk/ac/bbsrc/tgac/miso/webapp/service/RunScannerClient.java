@@ -114,7 +114,7 @@ public class RunScannerClient {
     }
   }
 
-  @Value("${miso.runscanner.urls}")
+  @Value("${miso.runscanner.urls:}")
   public void setUrls(String urls) {
     WHITESPACE.splitAsStream(urls).map(url -> !url.isEmpty() && !servers.containsKey(url))
         .forEach(url -> servers.put(urls, new ProgressiveRequestDto()));
