@@ -252,6 +252,7 @@ public class Scheduler {
   private void queueDirectory(final File directory, final RunProcessor processor, final TimeZone tz) {
     workToDo.add(directory);
     workPool.submit(() -> {
+      Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
       processing.add(directory);
       workToDo.remove(directory);
 
