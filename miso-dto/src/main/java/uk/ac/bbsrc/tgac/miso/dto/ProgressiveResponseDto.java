@@ -7,6 +7,7 @@ import java.util.List;
  * {@link ProgressiveRequestDto#update(ProgressiveResponseDto)}.
  */
 public class ProgressiveResponseDto {
+  private boolean moreAvailable;
   private int epoch;
   private long token;
   private List<NotificationDto> updates;
@@ -30,6 +31,14 @@ public class ProgressiveResponseDto {
    */
   public List<NotificationDto> getUpdates() {
     return updates;
+  }
+
+  public boolean isMoreAvailable() {
+    return moreAvailable;
+  }
+
+  public void setMoreAvailable(boolean moreAvailable) {
+    this.moreAvailable = moreAvailable;
   }
 
   public void setEpoch(int epoch) {

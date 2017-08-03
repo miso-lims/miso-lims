@@ -18,6 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,6 +62,36 @@ public class Scheduler {
     public boolean shouldRerun() {
       return !dto.getHealthType().isDone() && Duration.between(created, Instant.now()).toMinutes() > 10;
     }
+  }
+
+  public static class OutputSizeLimit implements Predicate<FinishedWork> {
+    private int count;
+    private int highestEpoch;
+    private final int softLimit;
+
+    public OutputSizeLimit(int softLimit) {
+      super();
+      this.softLimit = softLimit;
+    }
+
+    public int getEpoch() {
+      return highestEpoch;
+    }
+
+    public boolean hasCapacity() {
+      return count < softLimit;
+    }
+
+    @Override
+    public boolean test(FinishedWork work) {
+      if (hasCapacity()) {
+        count++;
+        highestEpoch = work.epoch;
+        return true;
+      }
+      return work.epoch == highestEpoch;
+    }
+
   }
 
   public static class SuppliedDirectoryConfig {
@@ -176,11 +207,11 @@ public class Scheduler {
   private final Set<File> workToDo = new ConcurrentSkipListSet<>();
 
   public Stream<NotificationDto> finished() {
-    return finishedWork.values().stream().map(x -> x.dto);
+    return finished(0, x -> true);
   }
 
-  public Stream<NotificationDto> finished(long epoch) {
-    return finishedWork.values().stream().filter(x -> x.epoch >= epoch).map(x -> x.dto);
+  public Stream<NotificationDto> finished(long epoch, Predicate<FinishedWork> filter) {
+    return finishedWork.values().stream().filter(x -> x.epoch >= epoch).sorted((a, b) -> a.epoch - b.epoch).filter(filter).map(x -> x.dto);
   }
 
   public Iterable<Configuration> getConfiguration() {

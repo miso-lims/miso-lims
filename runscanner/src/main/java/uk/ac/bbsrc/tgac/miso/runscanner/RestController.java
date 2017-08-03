@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProgressiveRequestDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProgressiveResponseDto;
+import uk.ac.bbsrc.tgac.miso.runscanner.Scheduler.OutputSizeLimit;
 
 /**
  * Provide information about the run scanner's current run cache via a REST interface.
@@ -77,13 +78,12 @@ public class RestController {
   public ProgressiveResponseDto progressive(@RequestBody ProgressiveRequestDto request) {
     ProgressiveResponseDto response = new ProgressiveResponseDto();
     response.setToken(token);
-    // We read the epoch before we read the runs because new runs might be added while waiting, but that means we will send the run
-    // multiple
-    // times, which is a safe failure.
-    response.setEpoch(scheduler.getEpoch());
     try (AutoCloseable timer = progressiveLatency.start()) {
-      response.setUpdates((request.getToken() == token ? scheduler.finished(request.getEpoch()) : scheduler.finished())
+      Scheduler.OutputSizeLimit limit = new OutputSizeLimit(Math.min(request.getLimit(), 500));
+      response.setUpdates(scheduler.finished(request.getToken() == token ? request.getEpoch() : 0, limit)
           .collect(Collectors.toList()));
+      response.setMoreAvailable(!limit.hasCapacity());
+      response.setEpoch(limit.getEpoch());
     } catch (Exception e) {
       log.error("Error during progressive run", e);
       response.setUpdates(Collections.emptyList());

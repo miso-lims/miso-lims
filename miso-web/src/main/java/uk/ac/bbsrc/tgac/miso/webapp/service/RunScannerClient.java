@@ -76,10 +76,13 @@ public class RunScannerClient {
     List<NotificationDto> results = new ArrayList<>();
     for (Entry<String, ProgressiveRequestDto> entry : servers.entrySet()) {
       try (AutoCloseable timer = serverReadTime.start(entry.getKey())) {
-        ProgressiveResponseDto response = template.postForObject(entry.getKey() + "/runs/progressive", entry.getValue(),
-            ProgressiveResponseDto.class);
-        entry.getValue().update(response);
-        results.addAll(response.getUpdates());
+        ProgressiveResponseDto response;
+        do {
+          response = template.postForObject(entry.getKey() + "/runs/progressive", entry.getValue(),
+              ProgressiveResponseDto.class);
+          entry.getValue().update(response);
+          results.addAll(response.getUpdates());
+        } while (response.isMoreAvailable());
       } catch (Exception e) {
         log.error("Failed to get runs from " + entry.getKey(), e);
         serverFailures.labels(entry.getKey()).inc();
