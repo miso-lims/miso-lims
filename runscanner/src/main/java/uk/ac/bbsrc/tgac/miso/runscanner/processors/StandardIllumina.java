@@ -53,7 +53,7 @@ public final class StandardIllumina extends RunProcessor {
   public NotificationDto process(File runDirectory, TimeZone tz) throws IOException {
     // Call the C++ program to do the real work and write a notification DTO to standard output. The C++ object has no direct binding to the
     // DTO, so any changes to the DTO must be manually changed in the C++ code.
-    Process process = new ProcessBuilder("runscanner-illumina", runDirectory.getAbsolutePath()).directory(runDirectory).start();
+    Process process = new ProcessBuilder("nice", "runscanner-illumina", runDirectory.getAbsolutePath()).directory(runDirectory).start();
 
     IlluminaNotificationDto dto = createObjectMapper().readValue(process.getInputStream(), IlluminaNotificationDto.class);
     dto.setSequencerFolderPath(runDirectory.getAbsolutePath());
