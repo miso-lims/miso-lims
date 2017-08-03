@@ -12,11 +12,17 @@ package uk.ac.bbsrc.tgac.miso.dto;
  * Otherwise, the epoch and token value should be initialised to zero.
  */
 public class ProgressiveRequestDto {
+  private static final int DEFAULT_LIMIT = 100;
   private int epoch;
+  private int limit = DEFAULT_LIMIT;
   private long token;
 
   public int getEpoch() {
     return epoch;
+  }
+
+  public int getLimit() {
+    return limit < 1 ? DEFAULT_LIMIT : limit;
   }
 
   public long getToken() {
@@ -25,6 +31,10 @@ public class ProgressiveRequestDto {
 
   public void setEpoch(int epoch) {
     this.epoch = epoch;
+  }
+
+  public void setLimit(int limit) {
+    this.limit = limit;
   }
 
   public void setToken(long token) {
