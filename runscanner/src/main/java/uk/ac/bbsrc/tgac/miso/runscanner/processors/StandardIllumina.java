@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
@@ -77,8 +78,9 @@ public final class StandardIllumina extends RunProcessor {
     // The Illumina library can't distinguish between a failed run and one that either finished or is still going. Scan the logs, if
     // available to determine if the run failed.
     File rtaLogDir = new File(runDirectory, "/Data/RTALogs");
-    boolean failed = rtaLogDir.exists()
-        ? Arrays.stream(rtaLogDir.listFiles(file -> file.getName().endsWith("Log.txt") || file.getName().endsWith("Log_00.txt")))
+    boolean failed = Optional
+        .ofNullable(rtaLogDir.listFiles(file -> file.getName().endsWith("Log.txt") || file.getName().endsWith("Log_00.txt")))
+        .map(files -> Arrays.stream(files)
             .anyMatch(file -> {
               try (Scanner scanner = new Scanner(file)) {
                 return scanner.findWithinHorizon(FAILED_MESSAGE, 0) != null;
@@ -86,8 +88,8 @@ public final class StandardIllumina extends RunProcessor {
                 log.error("RTA file vanished before reading", e);
                 return false;
               }
-            })
-        : false;
+            }))
+        .orElse(false);
     if (failed) {
       dto.setHealthType(HealthType.Failed);
     }
