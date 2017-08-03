@@ -254,7 +254,6 @@ public class PacBioProcessor extends RunProcessor {
 
     ObjectMapper mapper = createObjectMapper();
     ArrayNode metrics = mapper.createArrayNode();
-    dto.setMetrics(metrics);
 
     try {
       ObjectNode dashboardMetric = metrics.addObject();
@@ -269,6 +268,8 @@ public class PacBioProcessor extends RunProcessor {
     } catch (URISyntaxException e) {
       throw new IOException(e);
     }
+
+    dto.setMetrics(mapper.writeValueAsString(metrics));
 
     return dto;
   }
