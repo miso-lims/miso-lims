@@ -44,7 +44,8 @@ public abstract class AbstractPage extends AbstractElement {
 
   protected void setDropdown(String input, WebElement element) {
     element.click();
-    ((Select) element).selectByVisibleText(input);
+    Select select = new Select(element);
+    select.selectByVisibleText(input);
     element.sendKeys(Keys.ESCAPE);
   }
 

@@ -158,6 +158,9 @@ INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfter
 DELETE FROM BoxUse;
 INSERT INTO BoxUse (alias) VALUES ('DNA'), ('RNA'), ('Libraries'), ('Sequencing'), ('Storage'), ('Tissue');
 
+DELETE FROM BoxSize;
+INSERT INTO BoxSize (`rows`, `columns`, `scannable`) VALUES (8, 12, 1), (10, 10, 0);
+
 DELETE FROM `_Group`;
 INSERT INTO `_Group` (description, name) VALUES
 ('TestGroup1', 'TestGroup1'), ('TestGroup2', 'TestGroup2');

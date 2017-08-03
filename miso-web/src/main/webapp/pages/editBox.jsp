@@ -51,7 +51,7 @@
     <c:when test="${box.id !=0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Box
-  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Box.validateBox();">Save</button>
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Box.validateBox();">Save</button>
 </h1>
 
 <div class="sectionDivider"  onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
@@ -116,12 +116,12 @@
   <table class="in">
     <tr>
       <td class="h">Box ID:</td>
-      <td>
+      <td><span id="id">
         <c:choose>
           <c:when test="${box.id != 0}">${box.id}</c:when>
           <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
-      </td>
+      </span></td>
     </tr>
     <tr>
       <td>Name:</td>
@@ -159,7 +159,7 @@
              </c:otherwise>
            </c:choose></td>
         </c:when>
-        <c:otherwise><td>${box.size.getRowsByColumns()} <c:choose><c:when test="${scannerEnabled}">(can ${box.size.scannable ? '':'not '}be scanned by your lab's bulk scanner)</c:when></c:choose></td></c:otherwise>
+        <c:otherwise><td><span id="boxSize">${box.size.getRowsByColumns()}</span> <c:choose><c:when test="${scannerEnabled}">(can ${box.size.scannable ? '':'not '}be scanned by your lab's bulk scanner)</c:when></c:choose></td></c:otherwise>
       </c:choose>
     </tr>
     <tr>
