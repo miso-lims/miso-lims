@@ -87,13 +87,9 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     editable.forEach((k, v) -> table.enterText(k, 0, v));
     editable.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
 
-    Map<String, String> readOnly = new HashMap<>();
-    readOnly.put(Columns.NAME, "nope");
-    readOnly.put(Columns.SAMPLE_CLASS, "nope");
-    readOnly.put(Columns.QC_NOTE, "nope");
-
-    readOnly.forEach((k, v) -> table.enterText(k, 0, v));
-    readOnly.forEach((k, v) -> assertNotEquals(v, table.getText(k, 0)));
+    assertFalse(table.isWritable(Columns.NAME, 0));
+    assertFalse(table.isWritable(Columns.SAMPLE_CLASS, 0));
+    assertFalse(table.isWritable(Columns.QC_NOTE, 0));
 
     // ensure dependent columns update properly
     editable.put(Columns.QC_STATUS, "OKd by Collaborator");

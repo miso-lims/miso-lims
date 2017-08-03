@@ -366,7 +366,7 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
 
 INSERT INTO Identity (sampleId, externalName, donorSex) VALUES
   (1, 'TEST_external_1', 'MALE'),
-  (100001, 'LIBT_identity1', NULL);
+  (100001, 'LIBT_identity1', 'UNKNOWN');
 
 INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, externalInstituteIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
   (2, 1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2),

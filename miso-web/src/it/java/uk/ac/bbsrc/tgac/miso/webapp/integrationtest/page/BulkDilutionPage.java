@@ -17,28 +17,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 public class BulkDilutionPage extends AbstractPage {
 
   public static class Columns {
-    public static final String NAME = "Library Name";
-    public static final String ALIAS = "Library Alias";
-    public static final String SAMPLE_ALIAS = "Sample Alias";
-    public static final String ID_BARCODE = "Matrix Barcode";
-    public static final String DESCRIPTION = "Description";
-    public static final String DESIGN = "Design";
-    public static final String CODE = "Code";
-    public static final String PLATFORM = "Platform";
-    public static final String LIBRARY_TYPE = "Type";
-    public static final String SELECTION = "Selection";
-    public static final String STRATEGY = "Strategy";
-    public static final String INDEX_FAMILY = "Index Kit";
-    public static final String INDEX_1 = "Index 1";
-    public static final String INDEX_2 = "Index 2";
-    public static final String KIT_DESCRIPTOR = "Kit";
-    public static final String QC_PASSED = "QC Passed?";
-    public static final String SIZE = "Size (bp)";
-    public static final String VOLUME = "Vol. (µl)";
-    public static final String CONCENTRATION = "Conc.";
-    public static final String QUBIT = "New Qubit (ng/µl)";
-    public static final String TAPE_STATION = "New TapeStation (bp)";
-    public static final String QPCR = "New qPCR (mol/µl)";
+    // TODO: add column constants
 
     private Columns() {
       throw new IllegalStateException("Util class not intended for instantiation");
