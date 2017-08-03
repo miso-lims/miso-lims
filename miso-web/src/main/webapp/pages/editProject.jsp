@@ -83,7 +83,7 @@
   </tr>
   <tr>
     <td class="h">Creation date:</td>
-    <td><span id="creationDate"><fmt:formatDate value="${project.creationDate}"/></span></td>
+    <td><span id="creationDate"><fmt:formatDate pattern="d-MMM-yyyy" value="${project.creationDate}"/></span></td>
   </tr>
   <tr>
     <td class="h">Alias:</td>
