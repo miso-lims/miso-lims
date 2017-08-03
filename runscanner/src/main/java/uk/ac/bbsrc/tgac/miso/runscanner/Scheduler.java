@@ -112,19 +112,19 @@ public class Scheduler {
     }
   }
 
-  private static final Gauge acceptedDirectories = Gauge.build().name("miso_run_scanner_directories_accepted")
+  private static final Gauge acceptedDirectories = Gauge.build().name("miso_runscanner_directories_accepted")
       .help("The number of directories that were readable and sent for processing in the last pass.").register();
-  private static final Gauge attemptedDirectories = Gauge.build().name("miso_run_scanner_directories_attempted")
+  private static final Gauge attemptedDirectories = Gauge.build().name("miso_runscanner_directories_attempted")
       .help("The number of directories that were considered in the last pass.").register();
 
   private static final Gauge configurationEntries = Gauge.build().name("miso_runscanner_configuration_entries")
       .help("The number of entries from the last configuration.").register();
 
-  private static final Gauge configurationTimestamp = Gauge.build().name("miso_run_scanner_configuration_timestamp")
+  private static final Gauge configurationTimestamp = Gauge.build().name("miso_runscanner_configuration_timestamp")
       .help("The epoch time when the configuration was last read.").register();
   private static final Gauge configurationValid = Gauge.build().name("miso_runscanner_configuration_valid")
       .help("Whether the configuration loaded from disk is valid.").register();
-  private static final Gauge epochGauge = Gauge.build().name("miso_run_scanner_epoch")
+  private static final Gauge epochGauge = Gauge.build().name("miso_runscanner_epoch")
       .help("The current round of processing done for keeping the client in sync when progressively scanning.").register();
 
   private static final Counter errors = Counter.build().name("miso_runscanner_errors").help("The number of bad directories encountered.")
@@ -137,7 +137,7 @@ public class Scheduler {
       .name("miso_runscanner_directory_process_time").help("Time to process a run directories in seconds.")
       .labelNames("platform", "instrument").register();
 
-  private static final Counter reentered = Counter.build().name("miso_run_scanner_reentered")
+  private static final Counter reentered = Counter.build().name("miso_runscanner_reentered")
       .help("The number of times the scanner was already running while scheduled to run again.").register();
 
   private static final LatencyHistogram scanTime = new LatencyHistogram("miso_runscanner_directory_scan_time",
