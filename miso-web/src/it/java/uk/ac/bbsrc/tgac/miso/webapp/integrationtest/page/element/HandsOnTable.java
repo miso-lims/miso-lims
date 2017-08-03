@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.invisibilityOf;
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +28,7 @@ public class HandsOnTable extends AbstractElement {
 
   private static final By columnHeadingsSelector = By.cssSelector("div.ht_master table.htCore span.colHeader");
   private static final By inputRowsSelector = By.cssSelector("div.ht_master table.htCore tbody tr");
+  private static final By lockedRowsSelector = By.cssSelector("div.ht_clone_left table.htCore tbody tr");
   private static final By inputCellSelector = By.tagName("td");
   private static final By dropdownArrowSelector = By.className("htAutocompleteArrow");
   private static final By activeDropdownSelector = By.cssSelector("div.handsontableInputHolder[style*='block']");
@@ -35,7 +36,7 @@ public class HandsOnTable extends AbstractElement {
   private static final By dropdownOptionRowsSelector = By.cssSelector("div.ht_master table.htCore > tbody > tr");
   private final List<String> columnHeadings;
   private final List<WebElement> inputRows;
-
+  private final List<WebElement> lockedRows;
 
   @FindBy(id = "hotContainer")
   private WebElement hotContainer;
@@ -53,6 +54,7 @@ public class HandsOnTable extends AbstractElement {
         .map(element -> element.getText().trim())
         .collect(Collectors.toList());
     this.inputRows = hotContainer.findElements(inputRowsSelector);
+    this.lockedRows = hotContainer.findElements(lockedRowsSelector);
   }
 
   public List<String> getColumnHeadings() {
@@ -68,6 +70,14 @@ public class HandsOnTable extends AbstractElement {
     return cleanAscii(cell.getText());
   }
 
+  /**
+   * Enters text into a writable cell. Will fail is if the cell is read-only. See {@link #isWritable(String, int)}
+   * 
+   * @param columnHeading
+   * @param rowNum data row number. 0 is the first data row
+   * @param text text to enter. Only ASCII characters are accepted
+   * @throws IllegalArgumentException if text contains non-ASCII characters
+   */
   public void enterText(String columnHeading, int rowNum, String text) {
     if (LimsUtils.isStringEmptyOrNull(text)) {
       clearField(columnHeading, rowNum, text);
@@ -80,20 +90,23 @@ public class HandsOnTable extends AbstractElement {
     cancelEditing();
     if (!cell.getAttribute("class").contains("current")) {
       cell.click();
+      cell = getCell(columnHeading, rowNum);
+      if (!cell.getAttribute("class").contains("current")) {
+        throw new IllegalStateException("Cell still not selected after clicking");
+      }
     }
+
     new Actions(getDriver()).sendKeys(Keys.ENTER).build().perform();
 
-    List<WebElement> cellEditors = getDriver().findElements(activeCellEditorSelector);
-    if (cellEditors.isEmpty()) {
-      throw new IllegalStateException("Failed to get writable cell");
-    }
-
-    WebElement cellEditor = cellEditors.get(0);
+    waitUntil(presenceOfElementLocated(activeCellEditorSelector));
+    WebElement cellEditor = getDriver().findElement(activeCellEditorSelector);
     cellEditor.clear();
-    if (!LimsUtils.isStringEmptyOrNull(text)) {
-      cellEditor.sendKeys(text);
-    }
+    waitUntil(textToBe(activeCellEditorSelector, ""));
+
+    safeInput(activeCellEditorSelector, text);
+
     cellEditor.sendKeys(Keys.ENTER);
+    waitUntil(invisibilityOf(cellEditor));
   }
 
   public void clearField(String columnHeading, int rowNum, String text) {
@@ -114,7 +127,25 @@ public class HandsOnTable extends AbstractElement {
    */
   public boolean isWritable(String columnHeading, int rowNum) {
     WebElement cell = getCell(columnHeading, rowNum);
-    return !cell.getAttribute("class").contains("htDimmed");
+    cancelEditing();
+    if (!cell.getAttribute("class").contains("current")) {
+      cell.click();
+    }
+    new Actions(getDriver()).sendKeys(Keys.ENTER).build().perform();
+    WebElement cellEditor = findElementIfExists(activeCellEditorSelector);
+    if (cell.getAttribute("class").contains("htDimmed")) {
+      if (cellEditor == null) {
+        return false;
+      } else {
+        throw new IllegalStateException("Cell is dimmed, but an editor was found");
+      }
+    } else {
+      if (cellEditor == null) {
+        throw new IllegalStateException("Cell isn't dimmed, but no editor was found");
+      } else {
+        return true;
+      }
+    }
   }
 
   public List<String> getDropdownOptions(String columnHeading, int rowNum) {
@@ -199,6 +230,13 @@ public class HandsOnTable extends AbstractElement {
     int colNum = columnHeadings.indexOf(columnHeading);
     if (colNum == -1) {
       throw new IllegalArgumentException("Column " + columnHeading + " doesn't exist");
+    }
+    if (!lockedRows.isEmpty()) {
+      WebElement lockedRow = lockedRows.get(rowNum);
+      List<WebElement> lockedCells = lockedRow.findElements(inputCellSelector);
+      if (lockedCells.size() > colNum) {
+        return lockedCells.get(colNum);
+      }
     }
     WebElement row = inputRows.get(rowNum);
     List<WebElement> cells = row.findElements(inputCellSelector);

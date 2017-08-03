@@ -1154,9 +1154,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     identity.put(Columns.QC_STATUS, "Ready");
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
-    // Setting project a second time because of odd case where it is not set correctly the first time
-    // (Happened on Travis CI branch build, but not on the PR build or outside of Travis CI)
-    table.enterText(Columns.PROJECT, 0, "PRO2");
 
     saveSingleAndAssertSuccess(table);
 
