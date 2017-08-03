@@ -286,7 +286,7 @@ ListUtils = (function() {
         "iSortPriority" : priority,
         "bSortable" : priority >= 0,
         "mRender" : function(data, type, full) {
-          return "<a href=\"/miso/" + urlFragment + "/" + data + "\">" + getLabel(full) + "</a>";
+          return data ? "<a href=\"/miso/" + urlFragment + "/" + data + "\">" + getLabel(full) + "</a>" : "";
         }
       };
     },
@@ -300,7 +300,7 @@ ListUtils = (function() {
         "bSortDirection" : true,
         "bSortable" : priority >= 0,
         "mRender" : function(data, type, full) {
-          return "<a href=\"/miso/" + urlFragment + "/" + getId(full) + "\">" + data + "</a>";
+            return data ? "<a href=\"/miso/" + urlFragment + "/" + getId(full) + "\">" + data + "</a>" : "";
         }
       };
     },

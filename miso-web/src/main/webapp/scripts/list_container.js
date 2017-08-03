@@ -50,7 +50,7 @@ ListTarget.container = {
         },
         ListUtils.idHyperlinkColumn("Last Run Name", "run", "lastRunId",
             function(container) {
-              return "RUN" + container.lastRunId;
+              return (container.lastRunId ? "RUN" + container.lastRunId : null);
             }, -1),
         ListUtils.labelHyperlinkColumn("Last Run Alias", "run", function(
             container) {
