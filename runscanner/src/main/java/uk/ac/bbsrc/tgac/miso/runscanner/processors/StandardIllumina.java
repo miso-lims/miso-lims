@@ -46,7 +46,7 @@ public final class StandardIllumina extends RunProcessor {
 
   @Override
   public Stream<File> getRunsFromRoot(File root) {
-    return Arrays.stream(root.listFiles(File::isDirectory));
+    return Arrays.stream(root.listFiles(f -> f.isDirectory() && !f.getName().equals("Instrument")));
   }
 
   @Override
