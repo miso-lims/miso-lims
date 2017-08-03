@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.Fields;
 
 public class ProjectPageIT extends AbstractIT {
 
-  static DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("d-MMM-yyyy");
+  static DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
 
   @Before
   public void setup() {
