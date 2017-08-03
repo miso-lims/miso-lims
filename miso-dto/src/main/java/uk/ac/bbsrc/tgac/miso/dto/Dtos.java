@@ -17,9 +17,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -118,8 +122,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class Dtos {
 
-  public static DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis();
-  public static DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
+  public static final DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis();
+  public static final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
+  private static final Logger log = LoggerFactory.getLogger(Dtos.class);
 
   public static TissueOriginDto asDto(TissueOrigin from) {
     TissueOriginDto dto = new TissueOriginDto();
@@ -1677,6 +1682,11 @@ public class Dtos {
     to.setHealth(from.getHealthType());
     to.setStartDate(LimsUtils.toBadDate(from.getStartDate()));
     to.setCompletionDate(LimsUtils.toBadDate(from.getCompletionDate()));
+    try {
+      to.setMetrics(new ObjectMapper().writeValueAsString(from.getMetrics()));
+    } catch (JsonProcessingException e) {
+      log.error("Bad metrics", e);
+    }
   }
 
   public static TargetedSequencingDto asDto(TargetedSequencing from) {
