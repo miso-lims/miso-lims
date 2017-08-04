@@ -91,15 +91,14 @@ public class HandsOnTable extends AbstractElement {
     cancelEditing();
     if (!cell.getAttribute("class").contains("current")) {
       cell.click();
-      cell = getCell(columnHeading, rowNum);
-      if (!cell.getAttribute("class").contains("current")) {
-        throw new IllegalStateException("Cell still not selected after clicking");
-      }
+      waitUntil((driver) -> getCell(columnHeading, rowNum).getAttribute("class").contains("current"));
     }
-    new Actions(getDriver()).sendKeys(Keys.ENTER).build().perform();
-
-    waitUntil(presenceOfElementLocated(activeCellEditorSelector));
-    WebElement cellEditor = getDriver().findElement(activeCellEditorSelector);
+    WebElement cellEditor = findElementIfExists(activeCellEditorSelector);
+    if (cellEditor == null) {
+      new Actions(getDriver()).sendKeys(Keys.ENTER).build().perform();
+      waitUntil(presenceOfElementLocated(activeCellEditorSelector));
+      cellEditor = getDriver().findElement(activeCellEditorSelector);
+    }
     cellEditor.clear();
     waitUntil(textToBe(activeCellEditorSelector, ""));
     cellEditor.sendKeys(text);
