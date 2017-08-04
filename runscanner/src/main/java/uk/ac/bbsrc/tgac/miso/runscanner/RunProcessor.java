@@ -16,8 +16,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
-import uk.ac.bbsrc.tgac.miso.runscanner.processors.PacBioProcessor;
-import uk.ac.bbsrc.tgac.miso.runscanner.processors.StandardIllumina;
+import uk.ac.bbsrc.tgac.miso.runscanner.processors.DefaultPacBio;
+import uk.ac.bbsrc.tgac.miso.runscanner.processors.DefaultIllumina;
 import uk.ac.bbsrc.tgac.miso.runscanner.processors.Testing;
 
 /**
@@ -76,8 +76,8 @@ public abstract class RunProcessor {
    * Produce a stream of all known builders of run processors.
    */
   public static Stream<Builder> builders() {
-    Stream<Builder> standard = Stream.of(new Builder(PlatformType.ILLUMINA, "default", StandardIllumina::create),
-        new Builder(PlatformType.PACBIO, "default", PacBioProcessor::create));
+    Stream<Builder> standard = Stream.of(new Builder(PlatformType.ILLUMINA, "default", DefaultIllumina::create),
+        new Builder(PlatformType.PACBIO, "default", DefaultPacBio::create));
     return Stream.concat(standard,
         Arrays.stream(PlatformType.values()).map(type -> new Builder(type, "testing", (builder, config) -> new Testing(builder))));
   }
