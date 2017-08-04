@@ -187,15 +187,17 @@ void add_global_chart(
   q_30 << std::fixed << std::setprecision(2)
        << run_summary.total_summary().percent_gt_q30() << " %";
   add_chart_row(values, "% > Q30", q_30.str());
-  std::stringstream total_reads;
-  total_reads.imbue(std::locale(""));
-  total_reads << std::accumulate(
-      run_summary.begin()->begin(), run_summary.begin()->end(), 0L,
-      [](long acc,
-         const illumina::interop::model::summary::lane_summary &summary) {
-        return acc + summary.reads();
-      });
-  add_chart_row(values, "Total Reads", total_reads.str());
+  if (run_summary.begin() != run_summary.end()) {
+    std::stringstream total_reads;
+    total_reads.imbue(std::locale(""));
+    total_reads << std::accumulate(
+        run_summary.begin()->begin(), run_summary.begin()->end(), 0L,
+        [](long acc,
+           const illumina::interop::model::summary::lane_summary &summary) {
+          return acc + summary.reads();
+        });
+    add_chart_row(values, "Total Reads", total_reads.str());
+  }
   result["values"] = std::move(values);
   output.append(std::move(result));
 }
