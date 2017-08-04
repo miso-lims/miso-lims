@@ -134,7 +134,7 @@ var Box = Box || {
   lookupBoxableByBarcode: function() {
     var barcode = jQuery('#selectedBarcode').val();
     if (!jQuery('#selectedPosition').text()) { 
-      jQuery('#warningMessages').html("Please select a position from the grid, then rescan the barcode."); 
+      jQuery('#warningMessages').html("Please select a single position from the grid, then rescan the barcode."); 
       return null;
     }
     if (Utils.validation.isNullCheck(barcode)) {
@@ -301,13 +301,16 @@ Box.ui = {
         [0, "asc"]
       ]
     }).css("width", "100%");
-    jQuery("#toolbar").append('<button style=\"margin-left:5px;\" class=\"fg-button ui-state-default ui-corner-all\" id="listAllItems" onclick="Box.ui.filterTableByColumn(\'#listingBoxablesTable\', \'\', 0);">List all Box Contents</button>');
+    jQuery("#toolbar").append('<button style=\"margin-left:5px;\" class=\"fg-button ui-state-default ui-corner-all\" id="listAllItems" onclick="Box.ui.filterTableByBoxPositions();">List all Box Contents</button>');
   },
-
-  // filters the table using a given (String) filter and column
-  filterTableByColumn: function (table, filter, col) {
-    var t = jQuery(table).dataTable();
-    t.fnFilter(filter, col);
+  
+  filterTableByBoxPositions: function (positionStrings) {
+    var t = jQuery('#listingBoxablesTable').dataTable();
+    var filter = '';
+    if (positionStrings && positionStrings.length > 0) {
+      filter = '^(?:' + positionStrings.join('|') + ')$';
+    }
+    t.fnFilter(filter, 0, true);
   },
 
   editBoxIdBarcode: function (span, id) {
@@ -394,14 +397,18 @@ Box.ui = {
   addItemToBox: function() {
     var barcode = jQuery('#selectedBarcode').val();
     if (!jQuery('#selectedPosition').text()) {
-      jQuery('#warningMessages').html("Please select a position from the grid, then rescan the barcode.");
+      jQuery('#warningMessages').html("Please select a single position from the grid, then rescan the barcode.");
       return null;
     }
     if (Utils.validation.isNullCheck(barcode)) {
       alert("Please enter a barcode.");
     } else {
       var selectedBarcode = jQuery('#selectedBarcode').val().trim();
-      var selectedPosition = Box.utils.getPositionString(Box.visual.selected.row, Box.visual.selected.col);
+      if (Box.visual.selectedItems.length !== 1) {
+        alert('Select a single location to add the sample to');
+        return;
+      }
+      var selectedPosition = Box.utils.getPositionString(Box.visual.selectedItems[0].row, Box.visual.selectedItems[0].col);
       var selectedItem = Box.ui.getItemAtPosition(selectedPosition);
       // if selectedPosition is already filled, confirm before deleting that position
       if (selectedItem && selectedItem.identificationBarcode != selectedBarcode) {
@@ -441,7 +448,11 @@ Box.ui = {
   },
   
   removeOneItem: function() {
-    var selectedPosition = Box.utils.getPositionString(Box.visual.selected.row, Box.visual.selected.col);
+    if (Box.visual.selectedItems.length !== 1) {
+      alert('Select a single tube to remove');
+      return;
+    }
+    var selectedPosition = Box.utils.getPositionString(Box.visual.selectedItems[0].row, Box.visual.selectedItems[0].col);
     var selectedItem = Box.ui.getItemAtPosition(selectedPosition);
   
     if (confirm("Are you sure you wish to set location to unknown for " + selectedItem.name + "? You should re-home it as soon as possible")) {
@@ -468,7 +479,11 @@ Box.ui = {
   },
   
   discardOneItem: function() {
-    var selectedPosition = Box.utils.getPositionString(Box.visual.selected.row, Box.visual.selected.col);
+    if (Box.visual.selectedItems.length !== 1) {
+      alert('Select a single tube to discard');
+      return;
+    }
+    var selectedPosition = Box.utils.getPositionString(Box.visual.selectedItems[0].row, Box.visual.selectedItems[0].col);
     if(confirm("Are you sure you wish to discard this tube?")) {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       
