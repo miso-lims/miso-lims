@@ -31,16 +31,16 @@ import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
  *
  * This should work for all sequencer execept the Genome Analyzer and Genome Analyzer II.
  */
-public final class StandardIllumina extends RunProcessor {
+public final class DefaultIllumina extends RunProcessor {
   private static final Pattern FAILED_MESSAGE = Pattern.compile("Application\\sexited\\sbefore\\scompletion");
 
-  private static final Logger log = LoggerFactory.getLogger(StandardIllumina.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultIllumina.class);
 
-  public static StandardIllumina create(Builder builder, ObjectNode parameters) {
-    return new StandardIllumina(builder);
+  public static DefaultIllumina create(Builder builder, ObjectNode parameters) {
+    return new DefaultIllumina(builder);
   }
 
-  public StandardIllumina(Builder builder) {
+  public DefaultIllumina(Builder builder) {
     super(builder);
   }
 

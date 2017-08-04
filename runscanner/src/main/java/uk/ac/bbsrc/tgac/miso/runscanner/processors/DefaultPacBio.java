@@ -48,7 +48,7 @@ import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
  * Scan PacBio runs from a directory. The address
  *
  */
-public class PacBioProcessor extends RunProcessor {
+public class DefaultPacBio extends RunProcessor {
   /**
    * Extract data from an XML metadata file and put it in the DTO.
    */
@@ -59,7 +59,7 @@ public class PacBioProcessor extends RunProcessor {
    * This is the response object provided by the PacBio web service when queries about the state of a plate.
    */
   @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class Status {
+  public static class StatusResponse {
 
     private String customState;
     private String status;
@@ -145,9 +145,9 @@ public class PacBioProcessor extends RunProcessor {
     }
   }
 
-  public static PacBioProcessor create(Builder builder, ObjectNode parameters) {
+  public static DefaultPacBio create(Builder builder, ObjectNode parameters) {
     JsonNode address = parameters.get("address");
-    return address.isTextual() ? new PacBioProcessor(builder, address.textValue().replaceAll("/+$", "")) : null;
+    return address.isTextual() ? new DefaultPacBio(builder, address.textValue().replaceAll("/+$", "")) : null;
   }
 
   /**
@@ -217,7 +217,7 @@ public class PacBioProcessor extends RunProcessor {
 
   private final String address;
 
-  public PacBioProcessor(Builder builder, String address) {
+  public DefaultPacBio(Builder builder, String address) {
     super(builder);
     this.address = address;
   }
@@ -245,7 +245,7 @@ public class PacBioProcessor extends RunProcessor {
     RestTemplate rest = new RestTemplate();
     String url = String.format("%s/Jobs/Plate/%s/Status", address,
         URLEncoder.encode(dto.getContainerSerialNumber(), "US-ASCII").replaceAll("\\+", "%20"));
-    Status status = rest.getForObject(url, Status.class);
+    StatusResponse status = rest.getForObject(url, StatusResponse.class);
     dto.setHealthType(status.translateStatus());
     // If the metadata gave us a completion date, but the web service told us the run isn't complete, delete the completion date of lies.
     if (!dto.getHealthType().isDone()) {
