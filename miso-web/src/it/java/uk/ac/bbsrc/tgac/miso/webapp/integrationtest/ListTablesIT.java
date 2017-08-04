@@ -357,8 +357,8 @@ public class ListTablesIT extends AbstractIT {
           // compare results if they are not equal
           if (!ascRow1Val.equals(ascRow2Val) || !descRow2Val.equals(descRow2Val)) {
             assertNotEquals(
-                heading + " sort broken. asc1: " + ascRow1Val + ". asc2: " + ascRow2Val + ". desc1: " + descRow1Val + ". desc2: "
-                    + descRow2Val,
+                heading + " sort broken. asc1: '" + ascRow1Val + "'. asc2: '" + ascRow2Val + "'. desc1: '" + descRow1Val + "'. desc2: '"
+                    + descRow2Val + "'.",
                 ascRow1Val.compareTo(ascRow2Val) >= 0,
                 descRow1Val.compareTo(descRow2Val) >= 0);
           }

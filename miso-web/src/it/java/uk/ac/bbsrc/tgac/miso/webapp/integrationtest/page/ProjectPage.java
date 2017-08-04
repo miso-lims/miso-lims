@@ -114,6 +114,6 @@ public class ProjectPage extends HeaderFooterPage {
 
   public void clickSave() {
     saveButton.click();
-    waitWithTimeout().until(titleContains("Project "));
+    waitForPageRefresh();
   }
 }
