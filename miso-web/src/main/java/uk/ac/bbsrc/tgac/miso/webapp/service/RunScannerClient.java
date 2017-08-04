@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,25 +68,7 @@ public class RunScannerClient {
   private SecurityManager securityManager;
   private final ConcurrentMap<String, ProgressiveRequestDto> servers = new ConcurrentHashMap<>();
 
-  @Scheduled(fixedDelayString = "${miso.runscanner.interval:300000}")
-  public void scheduler() {
-    scanTimestamp.set(System.currentTimeMillis() / 1000);
-    RestTemplate template = new RestTemplate();
-    List<NotificationDto> results = new ArrayList<>();
-    for (Entry<String, ProgressiveRequestDto> entry : servers.entrySet()) {
-      try (AutoCloseable timer = serverReadTime.start(entry.getKey())) {
-        ProgressiveResponseDto response;
-        do {
-          response = template.postForObject(entry.getKey() + "/runs/progressive", entry.getValue(),
-              ProgressiveResponseDto.class);
-          entry.getValue().update(response);
-          results.addAll(response.getUpdates());
-        } while (response.isMoreAvailable());
-      } catch (Exception e) {
-        log.error("Failed to get runs from " + entry.getKey(), e);
-        serverFailures.labels(entry.getKey()).inc();
-      }
-    }
+  private void processResults(List<NotificationDto> results) {
     try {
       User user = securityManager.getUserByLoginName("notification");
       SecurityContextHolder.getContext().setAuthentication(new SuperuserAuthentication(user));
@@ -111,6 +92,28 @@ public class RunScannerClient {
       lock.release();
     } catch (IOException e) {
       log.error("Failed to save runs", e);
+    }
+  }
+
+  @Scheduled(fixedDelayString = "${miso.runscanner.interval:300000}")
+  public void scheduler() {
+    scanTimestamp.set(System.currentTimeMillis() / 1000);
+    RestTemplate template = new RestTemplate();
+    for (Entry<String, ProgressiveRequestDto> entry : servers.entrySet()) {
+      ProgressiveResponseDto response = null;
+      do {
+        try (AutoCloseable timer = serverReadTime.start(entry.getKey())) {
+          response = template.postForObject(entry.getKey() + "/runs/progressive", entry.getValue(),
+              ProgressiveResponseDto.class);
+          entry.getValue().update(response);
+        } catch (Exception e) {
+          log.error("Failed to get runs from " + entry.getKey(), e);
+          serverFailures.labels(entry.getKey()).inc();
+        }
+        if (response != null) {
+          processResults(response.getUpdates());
+        }
+      } while (response != null && response.isMoreAvailable());
     }
   }
 
