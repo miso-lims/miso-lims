@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -330,40 +331,65 @@ public class ListTablesIT extends AbstractIT {
       // if there are at least two rows, ensure that sort was correct
       if (!table.isTableEmpty()) {
         int numRows = table.countRows();
-        String ascRow1Val, ascRow2Val, descRow1Val, descRow2Val;
+        String ascRow1Val = "";
+        String ascRow2Val = "";
+        String descRow1Val = "";
+        String descRow2Val = "";
         if (numRows > 1) {
-          int num = 0;
-          ascRow1Val = table.getTextAtCell(heading, num);
-          num += 1;
-          ascRow2Val = table.getTextAtCell(heading, num);
-          while (ascRow1Val.equals(ascRow2Val) && numRows - num > 1) {
-            ascRow1Val = table.getTextAtCell(heading, num);
-            num += 1;
-            ascRow2Val = table.getTextAtCell(heading, num);
-          }
+          findFirstTwoNonMatchingValues(table, heading, ascRow1Val, ascRow2Val);
           // sort the other way
           page.sortByColumn(heading);
           assertTrue("sort twice on column '" + heading + "' without errors", LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
+          findFirstTwoNonMatchingValues(table, heading, descRow1Val, descRow2Val);
 
-          num = 0;
-          descRow1Val = table.getTextAtCell(heading, num);
-          num += 1;
-          descRow2Val = table.getTextAtCell(heading, num);
-          while (descRow1Val.equals(descRow2Val) && numRows - num > 1) {
-            descRow1Val = table.getTextAtCell(heading, num);
-            num += 1;
-            descRow2Val = table.getTextAtCell(heading, num);
-          }
           // compare results if they are not equal
           if (!ascRow1Val.equals(ascRow2Val) || !descRow2Val.equals(descRow2Val)) {
+            Comparator<String> columnComparator = (heading.equals(Columns.QC_PASSED) ? new QcPassedComparator() : new StandardComparator());
             assertNotEquals(
                 heading + " sort broken. asc1: '" + ascRow1Val + "'. asc2: '" + ascRow2Val + "'. desc1: '" + descRow1Val + "'. desc2: '"
-                    + descRow2Val + "'.",
-                ascRow1Val.compareTo(ascRow2Val) >= 0,
-                descRow1Val.compareTo(descRow2Val) >= 0);
+                    + descRow2Val + "'",
+                columnComparator.compare(ascRow1Val, ascRow2Val) >= 0,
+                columnComparator.compare(descRow1Val, descRow2Val) >= 0);
           }
         }
       }
     });
+  }
+
+  private void findFirstTwoNonMatchingValues(DataTable table, String heading, String row1Val, String row2Val) {
+    int num = 0;
+    row1Val = table.getTextAtCell(heading, num).toLowerCase();
+    num += 1;
+    row2Val = table.getTextAtCell(heading, num).toLowerCase();
+    while (row1Val.equals(row2Val) && table.countRows() - num > 1) {
+      row1Val = table.getTextAtCell(heading, num).toLowerCase();
+      num += 1;
+      row2Val = table.getTextAtCell(heading, num).toLowerCase();
+    }
+  }
+
+  /**
+   * Standard comparator
+   */
+  static class StandardComparator implements Comparator<String> {
+    @Override
+    public int compare(String s1, String s2) {
+      return s1.compareTo(s2);
+    }
+  }
+
+  /**
+   * Comparator for QC Passed columns, which render the boolean values as symbols.
+   */
+  static class QcPassedComparator implements Comparator<String> {
+    @Override
+    public int compare(String s1, String s2) {
+      final Map<String, Boolean> qcPassed = new HashMap<>();
+      qcPassed.put("?", null);
+      qcPassed.put("✔", true);
+      qcPassed.put("✘", false);
+
+      return qcPassed.get(s1).compareTo(qcPassed.get(s2));
+    }
   }
 }
