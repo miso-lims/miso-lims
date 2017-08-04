@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.ldap.userdetails.InetOrgPerson;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -48,8 +49,16 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 @Controller
 public class ListUsersController {
+  private static String getUsername(Object user) {
+    if (user instanceof org.springframework.security.core.userdetails.User)
+      return ((org.springframework.security.core.userdetails.User) user).getUsername();
+    if (user instanceof InetOrgPerson) return ((InetOrgPerson) user).getUsername();
+    throw new IllegalArgumentException("User principal of unsupported type: " + user.getClass().getName());
+  }
+
   @Autowired
   private SecurityManager securityManager;
+
   @Autowired
   @Qualifier("sessionRegistry")
   private SessionRegistry sessionRegistry;
@@ -69,7 +78,7 @@ public class ListUsersController {
   public ModelAndView adminListUsers(ModelMap model) throws IOException {
     Set<String> loggedIn = sessionRegistry.getAllPrincipals().stream()
         .filter(u -> !sessionRegistry.getAllSessions(u, false).isEmpty())
-        .map(u -> ((org.springframework.security.core.userdetails.User) u).getUsername())
+        .map(ListUsersController::getUsername)
         .collect(Collectors.toSet());
 
     return usersPage.list(model,
