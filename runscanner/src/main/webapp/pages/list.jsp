@@ -22,6 +22,7 @@
   --%>
 <!DOCTYPE html>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -39,6 +40,7 @@
       <c:choose>
         <c:when test="${empty runs}"><p>No directories.</p></c:when>
         <c:otherwise>
+          <p>${fn:length(runs)} directories.</p>
           <table>
             <tr><th>Name</th><th>Path</th></tr>
             <c:forEach items="${runs}" var="run"><tr><td>${run.name}</td><td>${run.path}</td></tr></c:forEach>
