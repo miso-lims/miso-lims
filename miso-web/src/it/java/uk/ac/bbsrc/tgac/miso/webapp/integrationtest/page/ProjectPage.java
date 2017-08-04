@@ -112,8 +112,9 @@ public class ProjectPage extends HeaderFooterPage {
     setDropdown(referenceGenome, referenceGenomeLabel);
   }
 
-  public void clickSave() {
+  public ProjectPage clickSave() {
     saveButton.click();
     waitForPageRefresh();
+    return new ProjectPage(getDriver());
   }
 }

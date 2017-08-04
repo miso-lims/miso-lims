@@ -30,7 +30,7 @@ public class ProjectPageIT extends AbstractIT {
 
   @Test
   public void testSaveEditNewProject() {
-    // Goal: save and edit one project. (Fill in all fields, then change all editable fields.)
+    // Goal: save one project.
     ProjectPage page = getProjectPage(null);
     assertNotNull(page);
 
@@ -53,18 +53,22 @@ public class ProjectPageIT extends AbstractIT {
     page.setProgress(unsaved.get(Fields.PROGRESS));
     page.setReferenceGenome(unsaved.get(Fields.REFERENCE_GENOME));
 
-    page.clickSave();
+    ProjectPage savedPage = page.clickSave();
 
-    assertNotEquals("Project ID is now a number", unsaved.get(Fields.ID), page.getId());
-    assertNotEquals("Project name is saved", unsaved.get(Fields.NAME), page.getName());
-    assertEquals("Project creation date saved correctly", unsaved.get(Fields.CREATION_DATE), page.getCreationDate());
-    assertEquals(unsaved.get(Fields.ALIAS), page.getAlias());
-    assertEquals(unsaved.get(Fields.SHORTNAME), page.getShortName());
-    assertEquals(unsaved.get(Fields.DESCRIPTION), page.getDescription());
-    assertEquals(unsaved.get(Fields.PROGRESS), page.getProgress());
-    assertEquals(unsaved.get(Fields.REFERENCE_GENOME), page.getReferenceGenome());
+    assertNotEquals("Project ID is now a number", unsaved.get(Fields.ID), savedPage.getId());
+    assertNotEquals("Project name is saved", unsaved.get(Fields.NAME), savedPage.getName());
+    assertEquals("Project creation date saved correctly", unsaved.get(Fields.CREATION_DATE), savedPage.getCreationDate());
+    assertEquals(unsaved.get(Fields.ALIAS), savedPage.getAlias());
+    assertEquals(unsaved.get(Fields.SHORTNAME), savedPage.getShortName());
+    assertEquals(unsaved.get(Fields.DESCRIPTION), savedPage.getDescription());
+    assertEquals(unsaved.get(Fields.PROGRESS), savedPage.getProgress());
+    assertEquals(unsaved.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());
+  }
 
-    // change fields
+  @Test
+  public void testChangeExistingProject() {
+    // Goal: change all editable fields for one project
+    ProjectPage page = getProjectPage(4L);
     Map<String, String> updated = new HashMap<>();
     updated.put(Fields.ALIAS, "Changed Project");
     updated.put(Fields.DESCRIPTION, "Changed Description");
@@ -78,13 +82,13 @@ public class ProjectPageIT extends AbstractIT {
     page.setProgress(updated.get(Fields.PROGRESS));
     page.setReferenceGenome(updated.get(Fields.REFERENCE_GENOME));
 
-    page.clickSave();
+    ProjectPage savedPage = page.clickSave();
 
-    assertEquals(updated.get(Fields.ALIAS), page.getAlias());
-    assertEquals(updated.get(Fields.SHORTNAME), page.getShortName());
-    assertEquals(updated.get(Fields.DESCRIPTION), page.getDescription());
-    assertEquals(updated.get(Fields.PROGRESS), page.getProgress());
-    assertEquals(updated.get(Fields.REFERENCE_GENOME), page.getReferenceGenome());
+    assertEquals(updated.get(Fields.ALIAS), savedPage.getAlias());
+    assertEquals(updated.get(Fields.SHORTNAME), savedPage.getShortName());
+    assertEquals(updated.get(Fields.DESCRIPTION), savedPage.getDescription());
+    assertEquals(updated.get(Fields.PROGRESS), savedPage.getProgress());
+    assertEquals(updated.get(Fields.REFERENCE_GENOME), savedPage.getReferenceGenome());
   }
 
   @Test
