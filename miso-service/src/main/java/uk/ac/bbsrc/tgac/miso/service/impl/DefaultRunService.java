@@ -657,7 +657,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
         results.put(node.get("type").textValue(), node);
       }
     }
-    return null;
+    return results;
   }
 
   private boolean updateIlluminaRunFromNotification(IlluminaRun source, final IlluminaRun target) {
