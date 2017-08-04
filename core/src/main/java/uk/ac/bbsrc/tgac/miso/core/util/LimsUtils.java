@@ -758,7 +758,7 @@ public class LimsUtils {
    * @return Milliseconds from the epoch.
    */
   public static Date toBadDate(LocalDate localDate, ZoneId timezone) {
-    return Date.from(localDate.atStartOfDay(timezone).toInstant());
+    return localDate == null ? null : Date.from(localDate.atStartOfDay(timezone).toInstant());
   }
 
   public static Date toBadDate(LocalDate localDate) {
@@ -766,7 +766,7 @@ public class LimsUtils {
   }
 
   public static Date toBadDate(LocalDateTime localDate, ZoneId timezone) {
-    return toBadDate(localDate.toLocalDate());
+    return localDate == null ? null : toBadDate(localDate.toLocalDate());
   }
 
   public static Date toBadDate(LocalDateTime localDate) {
