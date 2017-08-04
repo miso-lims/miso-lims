@@ -97,6 +97,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.AlphanumericComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
@@ -667,6 +668,7 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+      config.put("sortableLocation", true);
       writeLibraryConfiguration(mapper, config);
     }
   };
@@ -682,7 +684,9 @@ public class EditLibraryController {
         DetailedLibraryDto detailedDto = new DetailedLibraryDto();
         detailedDto.setParentSampleClassId(sample.getSampleClass().getId());
         detailedDto.setNonStandardAlias(sample.hasNonStandardAlias());
-
+        if (sample.getBox() != null) {
+          detailedDto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(sample.getBox().getAlias(), sample.getBoxPosition()));
+        }
         dto = detailedDto;
       } else {
         dto = new LibraryDto();
@@ -726,6 +730,8 @@ public class EditLibraryController {
     config.put("showDescription", showDescription);
     config.put("showVolume", showVolume);
     config.put("showLibraryAlias", showLibraryAlias);
+    config.put("sortableLocation", true);
+    config.put("propagate", true);
   }
 
   @RequestMapping(value = "/bulk/propagate", method = RequestMethod.GET)

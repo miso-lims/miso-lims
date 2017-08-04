@@ -132,6 +132,8 @@ var HotUtils = {
           columns : columns,
           data : flatObjects,
           maxRows : data.length,
+          renderAllRows : true,
+          columnSorting : true,
           cells : function(row, col, prop) {
             var cellProperties = {};
             
@@ -538,6 +540,87 @@ var HotUtils = {
       table.render();
       initialSetup = false;
     });
+    
+    if (config.sortableLocation) {
+      var makeSortButton = function(buttonText, sortFunc) {
+        var rowCount = table.countRows();
+        var locationCol = Utils.array.findFirstOrNull(function (col) { return col.data == 'boxPositionLabel'; }, columns);
+        function sortListener() {
+          if (!locationCol) return;
+          for (var i = 0; i < rowCount; i++) {
+            table.setCellMeta(i, locationCol.hotIndex, 'sortFunction', sortFunc);
+          }
+          table.sort(locationCol.hotIndex);
+        };
+        var button = document.createElement('input');
+        button.type = 'button';
+        button.value = buttonText;
+        button.addEventListener('click', sortListener);
+        return button;
+      };
+    
+      var sortByRows = makeSortButton('Sort by ' + (config.propagate ? 'Parent ' : '') + 'Location (rows)', HotUtils.sorting.rowSort);
+      document.getElementById('bulkactions').appendChild(sortByRows);
+    
+      var sortByCols = makeSortButton('Sort by ' + (config.propagate ? 'Parent ' : '') + 'Location (columns)', HotUtils.sorting.colSort);
+      document.getElementById('bulkactions').appendChild(sortByCols);
+    }
+  },
+  
+  sorting : {
+    /** Sorts by box row: A01, A02, B01, B03, H02 */
+    rowSort : function(sortOrder) {
+      return function(a, b) {
+        // a & b are each an array: [row_index, element_value]
+        var aPosn = a[1], bPosn = b[1];
+        var aRow = aPosn.slice(aPosn.length - 3, aPosn.length - 2);
+        var aCol = aPosn.slice(aPosn.length - 2);
+        var bRow = bPosn.slice(bPosn.length - 3, bPosn.length - 2);
+        var bCol = bPosn.slice(bPosn.length - 2);
+        if (!(aRow + aCol).match(/[A-Z]\d{2}/) || !(bRow + bCol).match(/[A-Z]\d{2}/)) {
+          // don't know what to do with locations not like 'A01'-'Q33'
+          return 1;
+        }
+        if (aRow === bRow) {
+          // compare columns within the row
+          aCol = parseInt(aCol);
+          bCol = parseInt(bCol);
+          // assumption: users always want to sort BoxPosition ascending
+          return (aCol > bCol ? 1 : (bCol > aCol ? -1 : 0));
+        } else {
+          // compare rows
+          // assumption: users always want to sort BoxPosition ascending
+          return (aRow > bRow ? 1 : (bRow > aRow ? -1 : 0));
+        }
+      }
+    },
+    
+    /** Sorts by box column: A01, B01, A02, H02, B03. Useful for applying indices to libraries using the Sciclone machine. */
+    colSort : function(sortOrder) {
+      return function(a, b) {
+        // a & b are each an array: [row_index, element_value]
+        var aPosn = a[1], bPosn = b[1];
+        var aRow = aPosn.slice(aPosn.length - 3, aPosn.length - 2);
+        var aCol = aPosn.slice(aPosn.length - 2);
+        var bRow = bPosn.slice(bPosn.length - 3, bPosn.length - 2);
+        var bCol = bPosn.slice(bPosn.length - 2);
+        if (!(aRow + aCol).match(/[A-Z]\d{2}/) || !(bRow + bCol).match(/[A-Z]\d{2}/)) {
+          // don't know what to do with locations not like 'A01'-'Q33'
+          return true;
+        }
+        if (aCol === bCol) {
+          // compare rows within the column
+          // assumption: users always want to sort BoxPosition ascending
+          return (aRow > bRow ? 1 : (bRow > aRow ? -1 : 0));
+        } else {
+          // compare columns
+          aCol = parseInt(aCol);
+          bCol = parseInt(bCol);
+          // assumption: users always want to sort BoxPosition ascending
+          return (aCol > bCol ? 1 : (bCol > aCol ? -1 : 0));
+        }
+      }
+    }
   },
   
   showServerErrors : function(response, serverStatus) {
@@ -746,7 +829,6 @@ var HotUtils = {
       }
     }
   }
-
 };
 
 HotTarget = {};

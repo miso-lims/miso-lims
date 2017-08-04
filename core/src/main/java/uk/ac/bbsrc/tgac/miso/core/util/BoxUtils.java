@@ -185,4 +185,19 @@ public class BoxUtils {
       return "Unknown";
     }
   }
+
+  /**
+   * Returns a string like "Box_1 A01"
+   * 
+   * @param boxAlias
+   * @param position
+   * @return
+   */
+  public static String makeBoxPositionLabel(String boxAlias, String position) {
+    if (boxAlias != null && position != null) {
+      return boxAlias + " " + position;
+    } else {
+      return "Unknown";
+    }
+  }
 }

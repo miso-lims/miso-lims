@@ -31,9 +31,9 @@ public class BulkLibraryIT extends AbstractIT {
   private static final Logger log = LoggerFactory.getLogger(BulkLibraryIT.class);
 
   private static final Set<String> commonColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.SAMPLE_ALIAS, Columns.ID_BARCODE,
-      Columns.DESCRIPTION, Columns.DESIGN, Columns.CODE, Columns.PLATFORM, Columns.LIBRARY_TYPE, Columns.SELECTION, Columns.STRATEGY,
-      Columns.INDEX_FAMILY, Columns.INDEX_1, Columns.INDEX_2, Columns.KIT_DESCRIPTOR, Columns.QC_PASSED, Columns.SIZE, Columns.VOLUME,
-      Columns.CONCENTRATION);
+      Columns.PARENT_LOCATION, Columns.DESCRIPTION, Columns.DESIGN, Columns.CODE, Columns.PLATFORM, Columns.LIBRARY_TYPE, Columns.SELECTION,
+      Columns.STRATEGY, Columns.INDEX_FAMILY, Columns.INDEX_1, Columns.INDEX_2, Columns.KIT_DESCRIPTOR, Columns.QC_PASSED, Columns.SIZE,
+      Columns.VOLUME, Columns.CONCENTRATION);
   private static final Set<String> qcColumns = Sets.newHashSet(Columns.QUBIT, Columns.TAPE_STATION, Columns.QPCR);
 
   private static final String NO_INDEX_FAMILY = "No indices";

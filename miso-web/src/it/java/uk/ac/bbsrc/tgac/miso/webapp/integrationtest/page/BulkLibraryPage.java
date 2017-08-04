@@ -21,6 +21,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String ALIAS = "Library Alias";
     public static final String SAMPLE_ALIAS = "Sample Alias";
     public static final String ID_BARCODE = "Matrix Barcode";
+    public static final String PARENT_LOCATION = "Sample Location";
     public static final String DESCRIPTION = "Description";
     public static final String DESIGN = "Design";
     public static final String CODE = "Code";

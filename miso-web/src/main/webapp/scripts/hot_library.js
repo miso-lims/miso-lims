@@ -174,6 +174,19 @@ HotTarget.library = (function() {
             pack : function(lib, flat, errorHandler) {
             }
           },
+          {
+            header : 'Sample Location',
+            data: 'boxPositionLabel',
+            type: 'text',
+            readOnly: true,
+            include: config.sortableLocation,
+            unpack : function(sam, flat, setCellMeta) {
+              flat.boxPositionLabel = sam.boxPositionLabel;
+            },
+            pack : function(sam, flat, errorHandler) {
+              sam.boxPositionLabel = flat.boxPositionLabel;
+            }
+          },
           HotUtils.makeColumnForText('Matrix Barcode',
               !Constants.automaticBarcodes, 'identificationBarcode', {
                 validator : HotUtils.validator.optionalTextNoSpecialChars
