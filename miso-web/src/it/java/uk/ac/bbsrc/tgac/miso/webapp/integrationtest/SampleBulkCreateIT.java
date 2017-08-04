@@ -1141,12 +1141,12 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     SampleHandsOnTable table = page.getTable();
 
     Map<String, String> identity = new HashMap<>();
-    identity.put(Columns.ALIAS, "PRO2_1001");
+    identity.put(Columns.ALIAS, "PROT_1001");
     identity.put(Columns.DESCRIPTION, "");
     identity.put(Columns.ID_BARCODE, "");
     identity.put(Columns.SAMPLE_TYPE, "GENOMIC");
     identity.put(Columns.SCIENTIFIC_NAME, "Homo sapiens");
-    identity.put(Columns.PROJECT, "PRO2"); // different project so as not to mess with the SampleNumberPerProject generator
+    identity.put(Columns.PROJECT, "PROT"); // different project so as not to mess with the SampleNumberPerProject generator
     identity.put(Columns.EXTERNAL_NAME, "ext2001"); // increment
     identity.put(Columns.DONOR_SEX, "Female");
     identity.put(Columns.GROUP_ID, "");
@@ -1154,9 +1154,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     identity.put(Columns.QC_STATUS, "Ready");
 
     identity.forEach((k, v) -> table.enterText(k, 0, v));
-    // Setting project a second time because of odd case where it is not set correctly the first time
-    // (Happened on Travis CI branch build, but not on the PR build or outside of Travis CI)
-    table.enterText(Columns.PROJECT, 0, "PRO2");
 
     saveSingleAndAssertSuccess(table);
 
@@ -1174,7 +1171,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     SampleHandsOnTable table = page.getTable();
 
     Map<String, String> identity = new HashMap<>();
-    identity.put(Columns.ALIAS, "PRO2_1002");
+    identity.put(Columns.ALIAS, "PROT_1002");
     identity.put(Columns.DESCRIPTION, "");
     identity.put(Columns.ID_BARCODE, "");
     identity.put(Columns.SAMPLE_TYPE, "GENOMIC");
