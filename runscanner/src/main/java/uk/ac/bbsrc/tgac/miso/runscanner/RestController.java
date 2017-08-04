@@ -78,15 +78,17 @@ public class RestController {
   public ProgressiveResponseDto progressive(@RequestBody ProgressiveRequestDto request) {
     ProgressiveResponseDto response = new ProgressiveResponseDto();
     response.setToken(token);
+    int requestedEpoch = request.getToken() == token ? request.getEpoch() : 0;
     try (AutoCloseable timer = progressiveLatency.start()) {
       Scheduler.OutputSizeLimit limit = new OutputSizeLimit(Math.min(request.getLimit(), 500));
-      response.setUpdates(scheduler.finished(request.getToken() == token ? request.getEpoch() : 0, limit)
+      response.setUpdates(scheduler.finished(requestedEpoch, limit)
           .collect(Collectors.toList()));
       response.setMoreAvailable(!limit.hasCapacity());
       response.setEpoch(limit.getEpoch());
     } catch (Exception e) {
       log.error("Error during progressive run", e);
       response.setUpdates(Collections.emptyList());
+      response.setEpoch(requestedEpoch);
     }
     return response;
   }
