@@ -32,8 +32,13 @@ public abstract class AbstractPage extends AbstractElement {
     }
   }
 
-  protected void waitForPageRefresh() {
-    waitUntil(ExpectedConditions.stalenessOf(getDriver().findElement(By.tagName("html"))));
+  /**
+   * Assesses page refresh by checking the staleness state of the HTML tag of the current page.
+   * 
+   * @param html the HTML element of the current page
+   */
+  protected void waitForPageRefresh(WebElement html) {
+    waitUntil(ExpectedConditions.stalenessOf(html));
     waitUntil(pageLoaded);
   }
 
@@ -99,6 +104,10 @@ public abstract class AbstractPage extends AbstractElement {
     } else {
       return false;
     }
+  }
+
+  protected WebElement getHtmlElement() {
+    return getDriver().findElement(By.tagName("html"));
   }
 
 }

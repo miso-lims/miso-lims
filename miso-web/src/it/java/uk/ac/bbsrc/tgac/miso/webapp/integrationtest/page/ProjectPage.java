@@ -113,8 +113,9 @@ public class ProjectPage extends HeaderFooterPage {
   }
 
   public ProjectPage clickSave() {
+    WebElement html = getHtmlElement();
     saveButton.click();
-    waitForPageRefresh();
+    waitForPageRefresh(html);
     return new ProjectPage(getDriver());
   }
 }
