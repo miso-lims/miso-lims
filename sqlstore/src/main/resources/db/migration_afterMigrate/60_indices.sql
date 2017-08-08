@@ -213,4 +213,26 @@ CALL addIndex('Lexogen i7', 'H9', 'GTAGAA', 1);
 CALL addIndex('Lexogen i7', 'H10', 'AACAAG', 1);
 CALL addIndex('Lexogen i7', 'H11', 'AGACCA', 1);
 CALL addIndex('Lexogen i7', 'H12', 'ACACGC', 1);
+
+CALL addIndex('iDES 8bp', 'Index 13', 'GAAGCGTT', 1);
+CALL addIndex('iDES 8bp', 'Index 14', 'AGTGAGGT', 1);
+CALL addIndex('iDES 8bp', 'Index 15', 'TTGGCAGT', 1);
+CALL addIndex('iDES 8bp', 'Index 16', 'GCGAATCT', 1);
+CALL addIndex('iDES 8bp', 'Index 17', 'CGGTTGTT', 1);
+CALL addIndex('iDES 8bp', 'Index 18', 'TAGCTCTG', 1);
+CALL addIndex('iDES 8bp', 'Index 19', 'CCTGTATG', 1);
+CALL addIndex('iDES 8bp', 'Index 20', 'GATCAAGG', 1);
+CALL addIndex('iDES 8bp', 'Index 21', 'GGAGTTAG', 1);
+CALL addIndex('iDES 8bp', 'Index 22', 'ATGGTTCC', 1);
+CALL addIndex('iDES 8bp', 'Index 23', 'TGGTTCGA', 1);
+CALL addIndex('iDES 8bp', 'Index 24', 'CAGTATGG', 1);
+CALL addIndex('iDES 8bp', 'Index 25', 'CGTGATTC', 1);
+CALL addIndex('iDES 8bp', 'Index 26', 'GGATATCG', 1);
+CALL addIndex('iDES 8bp', 'Index 27', 'AGATTGCC', 1);
+CALL addIndex('iDES 8bp', 'Index 28', 'CGGAACAA', 1);
+CALL addIndex('iDES 8bp', 'Index 29', 'GGTTACAC', 1);
+CALL addIndex('iDES 8bp', 'Index 30', 'AAGAGTCG', 1);
+CALL addIndex('iDES 8bp', 'Index 31', 'GCTATAGG', 1);
+CALL addIndex('iDES 8bp', 'Index 32', 'CCACTAAG', 1);
+CALL addIndex('iDES 8bp', 'Index 33', 'ACTCTCTC', 1);
 --EndNoTest
