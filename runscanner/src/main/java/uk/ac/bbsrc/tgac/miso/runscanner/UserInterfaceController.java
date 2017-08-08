@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
@@ -85,6 +86,7 @@ public class UserInterfaceController {
     model.put("configurations", scheduler.getConfiguration());
     model.put("isConfigurationGood", scheduler.isConfigurationGood());
     model.put("lastConfigurationRead", scheduler.getConfigurationLastRead());
+    model.put("lastConfigurationReadLocal", scheduler.getConfigurationLastRead().atZone(ZoneId.systemDefault()));
     Instant lastScanTime = scheduler.getScanLastStarted();
     model.put("timeSinceLastScan", lastScanTime == null ? "Not yet scanned" : Duration.between(lastScanTime, Instant.now()).toString());
     return new ModelAndView("/pages/status.jsp", model);
