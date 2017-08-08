@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,17 +57,31 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
 
 @Controller
 @RequestMapping("/run")
 @SessionAttributes("run")
 public class EditRunController {
   protected static final Logger log = LoggerFactory.getLogger(EditRunController.class);
+
+  /**
+   * Get a stream of source of metrics
+   * 
+   * Normally, metrics collected by run scanner are stored in the MISO database, but it is possible to provide
+   * 
+   * @return
+   */
+  public Stream<RunMetricsSource> getSources() {
+    return Stream.of(Run::getMetrics);
+  }
 
   @Autowired
   private SecurityManager securityManager;
@@ -169,7 +184,6 @@ public class EditRunController {
   public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
     Run run = runService.get(runId);
 
-
     return setupForm(run, run.getSequencerReference().getPlatform().getPlatformType(), model);
 
   }
@@ -190,9 +204,13 @@ public class EditRunController {
       if (run.getId() == Run.UNSAVED_ID) {
         model.put("title", "New Run");
         model.put("multiplexed", false);
+        model.put("metrics", "[]");
       } else {
         model.put("title", "Run " + run.getId());
         model.put("multiplexed", isMultiplexed(run));
+        model.put("metrics",
+            getSources().map(source -> source.fetchMetrics(run)).filter(metrics -> !LimsUtils.isStringBlankOrNull(metrics))
+                .collect(new JsonArrayCollector()));
       }
 
       if (!run.userCanRead(user)) {

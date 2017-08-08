@@ -295,7 +295,7 @@
   </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      RunGraph.renderMetrics(${run.metrics});
+      RunGraph.renderMetrics(${metrics});
     });
   </script>
   </c:if>
