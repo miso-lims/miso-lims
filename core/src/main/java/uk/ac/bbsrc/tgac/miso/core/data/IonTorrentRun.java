@@ -12,6 +12,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 public class IonTorrentRun extends Run {
   private static final long serialVersionUID = 1L;
 
+  public IonTorrentRun() {
+    super();
+  }
+
   public IonTorrentRun(User user) {
     super(user);
   }

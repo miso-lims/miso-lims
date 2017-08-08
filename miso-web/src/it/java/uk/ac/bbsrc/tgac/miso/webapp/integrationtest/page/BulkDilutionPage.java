@@ -57,8 +57,9 @@ public class BulkDilutionPage extends AbstractPage {
   }
 
   public BulkDilutionPage chainEdit() {
+    WebElement html = getHtmlElement();
     toolbar.findElement(EDIT_BUTTON_TEXT).click();
-    waitForPageRefresh();
+    waitForPageRefresh(html);
     return new BulkDilutionPage(getDriver());
   }
 
