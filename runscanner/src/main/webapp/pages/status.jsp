@@ -40,7 +40,7 @@
       <table>
         <tr><td>Uptime</td><td>${uptime}</td></tr>
         <tr><td>Is Configuration Good?</td><td>${isConfigurationGood}</td></tr>
-        <tr><td>Last Configuration Read</td><td>${lastConfigurationRead}</td></tr>
+        <tr><td>Last Configuration Read</td><td>${lastConfigurationRead} (${lastConfigurationReadLocal})</td></tr>
         <tr><td>Scanning Enabled</td><td>${isScanningEnabled}</td></tr>
         <tr><td>Currently Scanning</td><td>${isScanningNow}</td></tr>
         <tr><td>Time Since Last Scan</td><td>${timeSinceLastScan}</td></tr>
