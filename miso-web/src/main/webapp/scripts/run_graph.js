@@ -221,6 +221,20 @@ var RunGraph = (function() {
   };
   
   return {
+    // This is a list of standard metric processors for metrics produced by run
+    // scanner. Additional processors maybe added in separate files and appended
+    // to this list.
+    metricProcessors : [
+        example,
+        externalLink,
+        chart,
+        summaryTable,
+        illuminaPerCyclePlot('illumina-q30-by-cycle', '> Q30', '% Bases >Q30'),
+        lineGraph('illumina-called-intensity-by-cycle', 'Called Intensity',
+            'Average Intensity per Cycle'),
+        lineGraph('illumina-base-percent-by-cycle', 'Base %', 'Percentage'),
+        illuminaPerLanePlot('illumina-cluster-density-by-lane',
+            'Cluster Density', 'Density (K/mm²)') ],
     // Takes a list of metrics and renders them to #metricsdiv
     renderMetrics : function(metrics) {
       var container = document.getElementById('metricsdiv');
@@ -231,27 +245,12 @@ var RunGraph = (function() {
         }
         var width = Math.round(jQuery(container).width() * 0.49);
         // Start with graphs we know how to make (see the example for a
-        // template).
-        // Then filter them as appropriate for the data we have.
-        var graphs = metrics
-            ? [
-                example,
-                externalLink,
-                chart,
-                summaryTable,
-                illuminaPerCyclePlot('illumina-q30-by-cycle', '> Q30',
-                    '% Bases >Q30'),
-                lineGraph('illumina-called-intensity-by-cycle',
-                    'Called Intensity', 'Average Intensity per Cycle'),
-                lineGraph('illumina-base-percent-by-cycle', 'Base %',
-                    'Percentage'),
-                illuminaPerLanePlot('illumina-cluster-density-by-lane',
-                    'Cluster Density', 'Density (K/mm²)') ].map(
-                function(graph) {
-                  return graph(metrics, width);
-                }).reduce(function(a, b) {
-              return a.concat(b);
-            }) : [];
+        // template). Then filter them as appropriate for the data we have.
+        var graphs = RunGraph.metricProcessors.map(function(graph) {
+          return graph(metrics, width);
+        }).reduce(function(a, b) {
+          return a.concat(b);
+        });
         if (graphs.length == 0) {
           container.innerText = "No graphs available.";
           return;
