@@ -29,7 +29,7 @@ public class ProjectPageIT extends AbstractIT {
   }
 
   @Test
-  public void testSaveEditNewProject() {
+  public void testSaveNewProject() {
     // Goal: save one project.
     ProjectPage page = getProjectPage(null);
     assertNotNull(page);
@@ -66,7 +66,7 @@ public class ProjectPageIT extends AbstractIT {
   }
 
   @Test
-  public void testChangeExistingProject() {
+  public void testEditExistingProject() {
     // Goal: change all editable fields for one project
     ProjectPage page = getProjectPage(4L);
     Map<String, String> updated = new HashMap<>();
