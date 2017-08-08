@@ -26,10 +26,14 @@ before_install:
     - 'echo pr slug ${TRAVIS_PULL_REQUEST_SLUG} && echo repo slug ${TRAVIS_REPO_SLUG}'
 
 before_script:
-  - export MAVEN_OPTS='-Xms1g -Xmx2g'
-
+  - export MAVEN_OPTS='-Xms1g -Xmx2g' CXX=g++-5
+  - sudo apt-add-repository -y ppa:likemartinma/devel
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update
+  - sudo apt-get install -y pkg-config cmake libjsoncpp-dev autoconf libtool build-essential gcc-5 g++-5
 script:
-  - mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false install
+  - pushd runscanner-illumina && ./build-illumina-interop && autoreconf -i && ./configure && make && popd
+  - PATH=$PATH:$(pwd)/runscanner-illumina mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false install
   - 'if [[ ${TRAVIS_PULL_REQUEST_SLUG} == ${TRAVIS_REPO_SLUG} ]] ; then 
         mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar ;
      else 
