@@ -147,7 +147,10 @@ var RunGraph = (function() {
                   shadow : false
                 },
                 series : {
-                  animation : false
+                  animation : false,
+                  tooltip : {
+                    valueDecimals : 2
+                  }
                 }
               },
               series : metric.series
@@ -197,7 +200,10 @@ var RunGraph = (function() {
                   shadow : false
                 },
                 series : {
-                  animation : false
+                  animation : false,
+                  tooltip : {
+                    valueDecimals : 2
+                  }
                 }
               },
               series : metric.series
@@ -235,7 +241,10 @@ var RunGraph = (function() {
               medianColor : 'red'
             },
             series : {
-              animation : false
+              animation : false,
+              tooltip : {
+                valueDecimals : 2
+              }
             }
           },
           series : metric.series
