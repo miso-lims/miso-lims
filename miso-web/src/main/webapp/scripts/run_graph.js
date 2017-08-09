@@ -157,6 +157,56 @@ var RunGraph = (function() {
       });
     };
   };
+  var barGraph = function(typeName, title, yLabel) {
+    return function(metrics, width) {
+      return metrics.filter(function(metric) {
+        return metric.type == typeName;
+      }).map(function(metric) {
+        var node = document.createElement('DIV');
+        return {
+          dom : node,
+          render : function() {
+            new Highcharts.Chart({
+              chart : {
+                type : 'bar',
+                renderTo : node,
+                zoomType : 'x',
+                spacingRight : 20,
+                width : width
+              },
+              title : {
+                text : title
+              },
+              xAxis : {
+                categories : metric.categories,
+                title : {
+                  text : null
+                }
+              },
+              yAxis : {
+                title : {
+                  text : yLabel
+                }
+              },
+              plotOptions : {
+                line : {
+                  lineWidth : 1,
+                  marker : {
+                    enabled : false
+                  },
+                  shadow : false
+                },
+                series : {
+                  animation : false
+                }
+              },
+              series : metric.series
+            });
+          }
+        };
+      });
+    };
+  };
   
   var boxPlot = function(metric, title, yLabel, width) {
     var node = document.createElement('DIV');
@@ -234,7 +284,8 @@ var RunGraph = (function() {
             'Average Intensity per Cycle'),
         lineGraph('illumina-base-percent-by-cycle', 'Base %', 'Percentage'),
         illuminaPerLanePlot('illumina-cluster-density-by-lane',
-            'Cluster Density', 'Density (K/mm²)') ],
+            'Cluster Density', 'Density (K/mm²)'),
+        barGraph('illumina-yield-by-read', 'Yields', 'Yield (g)') ],
     // Takes a list of metrics and renders them to #metricsdiv
     renderMetrics : function(metrics) {
       var container = document.getElementById('metricsdiv');
