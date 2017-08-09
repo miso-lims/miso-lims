@@ -993,6 +993,8 @@ CREATE PROCEDURE deletePool(
     AND Pool_Note.pool_poolId = iPoolId;
 
   DELETE FROM PoolOrder WHERE poolId = iPoolId;
+  DELETE FROM PoolQC WHERE pool_poolId = iPoolId;
+  DELETE FROM Pool_Watcher WHERE poolId = iPoolId;
   DELETE FROM PoolChangeLog WHERE poolId = iPoolId;
   DELETE FROM Pool_Dilution WHERE pool_poolId = iPoolId;
   DELETE FROM Pool WHERE poolId = iPoolId;
