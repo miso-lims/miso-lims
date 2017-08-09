@@ -196,7 +196,7 @@
   </ul>
 </div>
 <div id="boxContentsDiagram">
-  <div id="boxContentsTable" style="float:left;"></div>
+  <div id="boxContentsTable" class="unselectable" style="float:left;"></div>
   <div style="float:left;padding:20px;">
     <table id="selectedPositionInfo">
 	    <tr>
@@ -231,7 +231,6 @@
 
 <script type="text/javascript">
   Box.visual = new Box.Visual();
-  var ctrlPressed = false; 
   jQuery(document).ready(function() {
     Box.boxJSON = ${boxJSON};
     Box.boxId = ${box.id};
@@ -245,15 +244,6 @@
     });
     jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
     Box.ui.createListingBoxablesTable(Box.boxJSON);
-  });
-
-  jQuery(document).keydown(function(event) {
-  if (event.which == "17")
-    ctrlPressed = true;
-  });
-
-  jQuery(document).keyup(function() {
-    ctrlPressed = false;
   });
 
   jQuery('#selectedBarcode').keyup(function(event) {
