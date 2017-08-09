@@ -337,18 +337,24 @@ int main(int argc, const char **argv) {
       (Json::Value::Int)length(run_summary.cycle_state().called_cycle_range());
 
   /* If there's an extraction metric with a end date, use that, reformatted as a
-   * "YYYY-mm-dd" string. There can be multiple extractions, so pick on
-   * basically at random. */
-  auto has_extraction = false;
-  for (const auto &extraction_metric :
-       run.get<illumina::interop::model::metrics::extraction_metric>()) {
-    std::time_t t = extraction_metric.date_time();
+   * "YYYY-mm-dd" string. There can be multiple extractions, so pick the last
+   * one. */
+  const auto extractions =
+      run.get<illumina::interop::model::metrics::extraction_metric>();
+  std::time_t extraction_time(std::accumulate(
+      extractions.begin(), extractions.end(), 0,
+      [](illumina::interop::model::metric_base::base_metric::ulong_t a,
+         const illumina::interop::model::metrics::extraction_metric &m) {
+        return std::max(a, m.date_time());
+      }));
+  if (extraction_time == 0) {
+    is_complete = false;
+  } else {
     std::stringstream date_buffer;
-    date_buffer << std::put_time(std::localtime(&t), "%Y-%m-%dT%H:%M:%S");
+    date_buffer << std::put_time(std::localtime(&extraction_time),
+                                 "%Y-%m-%dT%H:%M:%S");
     result["completionDate"] = date_buffer.str();
-    has_extraction = true;
   }
-  is_complete &= has_extraction;
 
   is_complete &= run_summary.cycle_state().called_cycle_range().last_cycle() ==
                  run.run_info().total_cycles();
