@@ -227,6 +227,10 @@ public class DefaultPacBio extends RunProcessor {
     return Arrays.stream(root.listFiles(f -> f.isDirectory() && RUN_DIRECTORY.matcher(f.getName()).matches()));
   }
 
+  protected StatusResponse getStatus(String url) {
+    return new RestTemplate().getForObject(url, StatusResponse.class);
+  }
+
   @Override
   public NotificationDto process(File runDirectory, TimeZone tz) throws IOException {
     // We create one DTO for a run, but there are going to be many wells with independent and duplicate metadata that will will simply
@@ -242,11 +246,9 @@ public class DefaultPacBio extends RunProcessor {
         .forEach(metadataFile -> processMetadata(metadataFile, dto));
 
     // The current job state is not available from the metadata files, so contact the PacBio instrument's web service.
-    RestTemplate rest = new RestTemplate();
     String url = String.format("%s/Jobs/Plate/%s/Status", address,
         URLEncoder.encode(dto.getContainerSerialNumber(), "US-ASCII").replaceAll("\\+", "%20"));
-    StatusResponse status = rest.getForObject(url, StatusResponse.class);
-    dto.setHealthType(status.translateStatus());
+    dto.setHealthType(getStatus(url).translateStatus());
     // If the metadata gave us a completion date, but the web service told us the run isn't complete, delete the completion date of lies.
     if (!dto.getHealthType().isDone()) {
       dto.setCompletionDate(null);
