@@ -280,6 +280,51 @@ void add_lane_charts(
   output.append(std::move(result));
 }
 
+void add_yield_bars(
+    const illumina::interop::model::metrics::run_metrics &run,
+    const illumina::interop::model::summary::run_summary &run_summary,
+    Json::Value &output) {
+  Json::Value result(Json::objectValue);
+  result["type"] = "illumina-yield-by-read";
+
+  Json::Value categories(Json::arrayValue);
+  auto index = 0;
+  for (auto read = 0; read < run_summary.size(); read++) {
+    auto is_index = run.run_info().read(read + 1).is_index();
+    std::stringstream buffer;
+    if (is_index) {
+      index++;
+      buffer << " Index " << index;
+    } else {
+      buffer << " Read " << read + 1 - index;
+    }
+    categories.append(buffer.str());
+  }
+
+  result["categories"] = std::move(categories);
+
+  Json::Value series(Json::arrayValue);
+  Json::Value yield_series(Json::objectValue);
+  Json::Value projected_yield_series(Json::objectValue);
+  yield_series["name"] = "Yield";
+  projected_yield_series["name"] = "Projected Yield";
+
+  Json::Value yield_data(Json::arrayValue);
+  Json::Value projected_yield_data(Json::arrayValue);
+  for (auto read = 0; read < run_summary.size(); read++) {
+    yield_data.append(run_summary[read].summary().yield_g());
+    projected_yield_data.append(
+        run_summary[read].summary().projected_yield_g());
+  }
+  yield_series["data"] = std::move(yield_data);
+  projected_yield_series["data"] = std::move(projected_yield_data);
+  series.append(std::move(yield_series));
+  series.append(std::move(projected_yield_series));
+  result["series"] = std::move(series);
+
+  output.append(std::move(result));
+}
+
 int main(int argc, const char **argv) {
   if (argc != 2) {
     return 1;
@@ -385,6 +430,7 @@ int main(int argc, const char **argv) {
                                  false, run, metrics_results);
   add_global_chart(run, run_summary, metrics_results);
   add_lane_charts(run, run_summary, metrics_results);
+  add_yield_bars(run, run_summary, metrics_results);
   Json::FastWriter fastWriter;
   result["metrics"] = fastWriter.write(metrics_results);
 
