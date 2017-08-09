@@ -93,6 +93,7 @@ public class BoxableView implements Serializable {
   private String boxPosition;
   private String boxLocationBarcode;
   private Long preMigrationId;
+  private Long sampleClassId;
 
   public static BoxableView fromBoxable(Boxable boxable) {
     BoxableView v = new BoxableView();
@@ -217,6 +218,14 @@ public class BoxableView implements Serializable {
 
   public void setPreMigrationId(Long preMigrationId) {
     this.preMigrationId = preMigrationId;
+  }
+
+  public Long getSampleClassId() {
+    return sampleClassId;
+  }
+
+  public void setSampleClassId(Long sampleClassId) {
+    this.sampleClassId = sampleClassId;
   }
 
 }

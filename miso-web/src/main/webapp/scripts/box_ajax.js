@@ -311,6 +311,67 @@ Box.ui = {
       filter = '^(?:' + positionStrings.join('|') + ')$';
     }
     t.fnFilter(filter, 0, true);
+    Box.ui.getBulkActions(positionStrings);
+  },
+  
+  getBulkActions: function(positionStrings) {
+    var items = Box.visual.data.filter(function(item) { return positionStrings.indexOf(item.coordinates) >= 0 });
+    if (!items || items.length < 1) {
+      items = Box.visual.data;
+    }
+    if (!items || items.length < 1) {
+      return;
+    }
+    
+    var entityTypes = Utils.array.deduplicateString(items.map(function(item) {
+      return item.entityType;
+    }));
+    
+    if (entityTypes.length > 1) {
+      return;
+    }
+    
+    var actions = [];
+    switch (entityTypes[0]) {
+    case 'SAMPLE':
+      actions = HotTarget.sample.bulkActions;
+      break;
+    case 'LIBRARY':
+      actions = HotTarget.library.bulkActions;
+      break;
+    case 'DILUTION':
+      actions = HotTarget.dilution.bulkActions;
+      break;
+    case 'POOL':
+      actions = HotTarget.pool.bulkActions;
+      break;
+    }
+    
+    Box.ui.refreshToolbar(actions, items);
+  },
+  
+  refreshToolbar: function(actions, items) {
+    var toolbar = jQuery('#listingBoxablesToolbar');
+    if (!toolbar.length) {
+      toolbar = jQuery('<div />', {
+        id: 'listingBoxablesToolbar',
+        'class': 'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix paging_full_numbers'
+      });
+      // TODO: move to better location and/or combine with other table controls
+      toolbar.insertAfter(jQuery('#listingBoxablesTable'));
+    }
+    toolbar.empty();
+    actions.forEach(function(action) {
+      var button = jQuery('<a />', {
+        'class': 'ui-button ui-state-default',
+        title: action.title || '',
+        text: action.name
+      });
+      button.click(function() {
+        action.action(items);
+      });
+      button.appendTo(toolbar);
+    });
   },
 
   editBoxIdBarcode: function (span, id) {
