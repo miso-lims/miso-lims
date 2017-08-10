@@ -85,7 +85,7 @@ var RunGraph = (function() {
       };
     });
   };
-  var summaryTable = function(metrics, width) {
+  var summaryTable = function(metrics, width, renamePartitions) {
     return metrics.filter(function(metric) {
       return metric.type == 'table';
     }).map(function(metric) {
@@ -99,6 +99,9 @@ var RunGraph = (function() {
               return {
                 "sTitle" : column.name,
                 "mData" : column.property,
+                "mRender" : function(data) {
+                  return renamePartitions(data, false);
+                }
               };
             }),
             'sDom' : '<"datatable-scroll"t><"F"ip>',
@@ -110,12 +113,13 @@ var RunGraph = (function() {
     });
   };
   var lineGraph = function(typeName, title, yLabel) {
-    return function(metrics, width) {
+    return function(metrics, width, renamePartitions) {
       return metrics.filter(function(metric) {
         return metric.type == typeName;
       }).map(function(metric) {
         metric.series.forEach(function(series) {
-          series.visible = !series.name.includes("Lane");
+          series.visible = !/{\d+}/.test(series.name);
+          series.name = renamePartitions(series.name, true);
         });
         var node = document.createElement('DIV');
         return {
@@ -161,10 +165,13 @@ var RunGraph = (function() {
     };
   };
   var barGraph = function(typeName, title, yLabel) {
-    return function(metrics, width) {
+    return function(metrics, width, renamePartitions) {
       return metrics.filter(function(metric) {
         return metric.type == typeName;
       }).map(function(metric) {
+        metric.series.forEach(function(series) {
+          series.name = renamePartitions(series.name, true);
+        });
         var node = document.createElement('DIV');
         return {
           dom : node,
@@ -254,7 +261,7 @@ var RunGraph = (function() {
   };
   
   var illuminaPerCyclePlot = function(typeName, title, yLabel) {
-    return function(metrics, width) {
+    return function(metrics, width, renamePartitions) {
       return metrics.filter(function(metric) {
         return metric.type == typeName;
       }).map(function(metric) {
@@ -262,7 +269,8 @@ var RunGraph = (function() {
           series.tooltip = {
             headerFormat : '<em>Cycle {point.key}</em><br/>'
           };
-          series.visible = !series.name.includes("Lane");
+          series.visible = !/{\d+}/.test(series.name);
+          series.name = renamePartitions(series.name, true);
         });
         return boxPlot(metric, title, yLabel, width);
       });
@@ -270,10 +278,13 @@ var RunGraph = (function() {
   };
   
   var illuminaPerLanePlot = function(typeName, title, yLabel) {
-    return function(metrics) {
+    return function(metrics, width, renamePartitions) {
       return metrics.filter(function(metric) {
         return metric.type == typeName;
       }).map(function(metric) {
+        metric.series.forEach(function(series) {
+          series.name = renamePartitions(series.name, true);
+        });
         return boxPlot(metric, title, yLabel);
       });
     };
@@ -296,7 +307,7 @@ var RunGraph = (function() {
             'Cluster Density', 'Density (K/mm²)'),
         barGraph('illumina-yield-by-read', 'Yields', 'Yield (gb)') ],
     // Takes a list of metrics and renders them to #metricsdiv
-    renderMetrics : function(metrics) {
+    renderMetrics : function(metrics, partitionNames) {
       var container = document.getElementById('metricsdiv');
       
       var renderAll = function() {
@@ -306,9 +317,22 @@ var RunGraph = (function() {
         var width = Math.round(jQuery(container).width() * 0.49);
         // Start with graphs we know how to make (see the example for a
         // template). Then filter them as appropriate for the data we have.
-        var graphs = RunGraph.metricProcessors.map(function(graph) {
-          return graph(metrics, width);
-        }).reduce(function(a, b) {
+        var graphs = RunGraph.metricProcessors.map(
+            function(graph) {
+              return graph(metrics, width, function(str, includePrefix) {
+                return ("" + str).replace(/{(\d+)}/, function(match,
+                    partitionNumber) {
+                  var index = parseInt(partitionNumber) - 1;
+                  if (partitionNames[index]) {
+                    return (includePrefix ? "Lane " + partitionNumber + ": "
+                        : "") + partitionNames[index];
+                  } else {
+                    return includePrefix ? ("Lane " + partitionNumber)
+                        : "N/A";
+                  }
+                });
+              });
+            }).reduce(function(a, b) {
           return a.concat(b);
         });
         if (graphs.length == 0) {

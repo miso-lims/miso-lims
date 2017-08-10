@@ -139,7 +139,7 @@ void add_plot(const illumina::interop::constants::metric_type metric_name,
       if (lane == 0) {
         name << "Combined";
       } else {
-        name << "Lane " << lane;
+        name << "{" << lane << "}";
       }
       dataset.push_back(std::make_pair(name.str(), std::move(data)));
     }
@@ -227,6 +227,7 @@ void add_lane_charts(
 
   Json::Value columns(Json::arrayValue);
   add_table_column(columns, "Lane", "lane");
+  add_table_column(columns, "Pool", "pool");
   add_table_column(columns, "Density %", "densityPct");
   add_table_column(columns, "Density", "density");
   add_table_column(columns, "Density PF", "densityPf");
@@ -256,6 +257,9 @@ void add_lane_charts(
   for (auto lane = 0; lane < run_summary.lane_count(); lane++) {
     Json::Value row(Json::objectValue);
     row["lane"] = lane + 1;
+    std::stringstream pool;
+    pool << "{" << lane + 1 << "}";
+    row["pool"] = pool.str();
     std::stringstream density_pct;
     density_pct << std::fixed << std::setprecision(2)
                 << (run_summary[0][lane].density_pf().mean() /

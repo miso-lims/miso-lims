@@ -295,7 +295,7 @@
   </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      RunGraph.renderMetrics(${metrics});
+      RunGraph.renderMetrics(${metrics}, ${partitionNames});
     });
   </script>
   </c:if>
