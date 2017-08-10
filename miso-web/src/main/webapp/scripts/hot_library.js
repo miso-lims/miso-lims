@@ -188,11 +188,13 @@ HotTarget.library = (function() {
             },
             customSorting : [
               {
-                name : 'Sort by Sample Location (rows)',
+                buttonText : 'Sort by Sample Location (rows)',
+                sortTarget : 'rows',
                 sortFunc : HotUtils.sorting.rowSort
               },
               {
-                name : 'Sort by Sample Location (columns)',
+                buttonText : 'Sort by Sample Location (columns)',
+                sortTarget : 'columns',
                 sortFunc : HotUtils.sorting.colSort
               }
             ] 

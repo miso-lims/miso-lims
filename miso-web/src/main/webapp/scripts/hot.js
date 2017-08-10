@@ -361,17 +361,18 @@ var HotUtils = {
       }
     });
     
-    var makeSortButton = function(buttonText, sortColIndex, sortFunc) {
+    var makeSortButton = function(sortOption, sortColIndex) {
       var rowCount = table.countRows();
       function sortListener() {
         for (var i = 0; i < rowCount; i++) {
-          table.setCellMeta(i, sortColIndex, 'sortFunction', sortFunc);
+          table.setCellMeta(i, sortColIndex, 'sortFunction', sortOption.sortFunc);
         }
         table.sort(sortColIndex);
       };
       var button = document.createElement('input');
       button.type = 'button';
-      button.value = buttonText;
+      button.id = 'sort' + sortOption.sortTarget;
+      button.value = sortOption.buttonText;
       button.addEventListener('click', sortListener);
       return button;
     };
@@ -381,7 +382,7 @@ var HotUtils = {
       return column.customSorting;
     }).forEach(function(column) {
       column.customSorting.forEach(function(sortOption) {
-        var sortBy = makeSortButton(sortOption.name, column.hotIndex, sortOption.sortFunc);
+        var sortBy = makeSortButton(sortOption, column.hotIndex);
         document.getElementById('bulkactions').appendChild(sortBy);
       });
     });
