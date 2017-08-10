@@ -294,7 +294,7 @@ var RunGraph = (function() {
         lineGraph('illumina-base-percent-by-cycle', 'Base %', 'Percentage'),
         illuminaPerLanePlot('illumina-cluster-density-by-lane',
             'Cluster Density', 'Density (K/mm²)'),
-        barGraph('illumina-yield-by-read', 'Yields', 'Yield (g)') ],
+        barGraph('illumina-yield-by-read', 'Yields', 'Yield (gb)') ],
     // Takes a list of metrics and renders them to #metricsdiv
     renderMetrics : function(metrics) {
       var container = document.getElementById('metricsdiv');
