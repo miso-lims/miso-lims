@@ -16,7 +16,7 @@ HotTarget.dilution = {
           validator : HotUtils.validator.optionalTextNoSpecialChars,
           unpackAfterSave : true,
           unpack : function(dil, flat, setCellMeta) {
-            flat.name = dil.name;
+            flat.name = dil.name || null;
           },
           pack : function(dil, flat, errorHandler) {
             dil.name = flat.name;

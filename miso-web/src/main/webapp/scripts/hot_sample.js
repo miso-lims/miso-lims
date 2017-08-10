@@ -109,7 +109,7 @@ HotTarget.sample = (function() {
             include : true,
             unpackAfterSave : true,
             unpack : function(sam, flat, setCellMeta) {
-              flat.name = sam.name;
+              flat.name = sam.name || null;
             },
             pack : function(sam, flat, errorHandler) {
             }
@@ -152,7 +152,7 @@ HotTarget.sample = (function() {
             unpackAfterSave : true,
             unpack : function(sam, flat, setCellMeta) {
               validationCache[sam.alias] = true;
-              flat.alias = sam.alias;
+              flat.alias = sam.alias || null;
               if (sam.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
               }
@@ -177,7 +177,7 @@ HotTarget.sample = (function() {
             allowEmpty : true,
             include : !Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity',
             unpack : function(sam, flat, setCellMeta) {
-              flat.receivedDate = sam.receivedDate;
+              flat.receivedDate = sam.receivedDate || null;
             },
             pack : function(sam, flat, errorHandler) {
               sam.receivedDate = flat.receivedDate;
@@ -217,12 +217,12 @@ HotTarget.sample = (function() {
             unpack : function(sam, flat, setCellMeta) {
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
               if (config.hasProject) {
-                flat.projectAlias = config.project[label];
+                flat.projectAlias = config.project[label] || null;
               } else {
                 flat.projectAlias = Utils.array.maybeGetProperty(Utils.array
                     .findFirstOrNull(function(item) {
                       return item.id == sam.projectId;
-                    }, config.projects), 'alias');
+                    }, config.projects), 'alias') || null;
               }
             },
             pack : function(sam, flat, errorHandler) {
@@ -257,7 +257,7 @@ HotTarget.sample = (function() {
               flat.parentTissueSampleClassAlias = Utils.array.maybeGetProperty(
                   Utils.array.findFirstOrNull(function(item) {
                     return item.id == sam.parentTissueSampleClassId;
-                  }, Constants.sampleClasses), 'alias');
+                  }, Constants.sampleClasses), 'alias') || null;
             },
             pack : function(sam, flat, errorHandler) {
               sam.parentTissueSampleClassId = Utils.array.maybeGetProperty(
@@ -275,7 +275,7 @@ HotTarget.sample = (function() {
             validator : HotUtils.validator.requiredTextNoSpecialChars,
             include : show['Identity'],
             unpack : function(sam, flat, setCellMeta) {
-              flat.externalName = sam.externalName;
+              flat.externalName = sam.externalName || null;
             },
             pack : function(sam, flat, errorHandler) {
               if (!getSelectedIdentity(flat)) {
@@ -403,7 +403,7 @@ HotTarget.sample = (function() {
               flat.sampleClassAlias = Utils.array.maybeGetProperty(Utils.array
                   .findFirstOrNull(function(item) {
                     return item.id == sam.sampleClassId;
-                  }, Constants.sampleClasses), 'alias');
+                  }, Constants.sampleClasses), 'alias') || null;
             },
             pack : function(sam, flat, errorHandler) {
               sam.sampleClassId = Utils.array.maybeGetProperty(Utils.array
@@ -482,7 +482,7 @@ HotTarget.sample = (function() {
               if (sam.stain) {
                 flat.stainName = Utils.array.maybeGetProperty(Utils.array
                     .findFirstOrNull(Utils.array.idPredicate(sam.stain.id),
-                        Constants.stains), 'name');
+                        Constants.stains), 'name') || null;
               } else {
                 flat.stainName = '(None)';
               }
@@ -586,7 +586,7 @@ HotTarget.sample = (function() {
                 flat.detailedQcStatusDescription = Utils.array
                     .maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
                         .idPredicate(sam.detailedQcStatusId),
-                        Constants.detailedQcStatuses), 'description');
+                        Constants.detailedQcStatuses), 'description') || null;
               }
             },
             pack : function(sam, flat, errorHandler) {

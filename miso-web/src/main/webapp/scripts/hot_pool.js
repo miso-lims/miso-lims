@@ -15,7 +15,7 @@ HotTarget.pool = {
           validator : HotUtils.validator.requiredText,
           unpackAfterSave : true,
           unpack : function(dil, flat, setCellMeta) {
-            flat.alias = dil.alias;
+            flat.alias = dil.alias || null;
           },
           pack : function(dil, flat, errorHandler) {
             dil.alias = flat.alias;
@@ -27,7 +27,7 @@ HotTarget.pool = {
           validator : HotUtils.validator.optionalTextNoSpecialChars,
           include : !Constants.automaticBarcodes,
           unpack : function(dil, flat, setCellMeta) {
-            flat.identificationBarcode = dil.identificationBarcode;
+            flat.identificationBarcode = dil.identificationBarcode || null;
           },
           pack : function(dil, flat, errorHandler) {
             dil.identificationBarcode = flat.identificationBarcode;
@@ -46,7 +46,7 @@ HotTarget.pool = {
           validator : HotUtils.validator.requiredText,
           include : true,
           unpack : function(pool, flat, setCellMeta) {
-            flat.creationDate = pool.creationDate;
+            flat.creationDate = pool.creationDate || null;
           },
           pack : function(pool, flat, errorHandler) {
             pool.creationDate = flat.creationDate;

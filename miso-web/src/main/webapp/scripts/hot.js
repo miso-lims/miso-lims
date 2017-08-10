@@ -710,7 +710,7 @@ var HotUtils = {
       'type' : 'text',
       'include' : include,
       'unpack' : function(obj, flat, setCellMeta) {
-        flat[property] = obj[property];
+        flat[property] = obj[property] || null;
       },
       'validator' : required ? HotUtils.validator.requiredNumber
           : HotUtils.validator.optionalNumber,
@@ -743,7 +743,7 @@ var HotUtils = {
       'include' : include,
       'validator' : validator,
       'unpack' : function(obj, flat, setCellMeta) {
-        flat[property] = obj[property];
+        flat[property] = obj[property] || null;
       },
       'pack' : function(obj, flat, errorHandler) {
         if (!Utils.validation.isEmpty(flat[property])) {
@@ -761,7 +761,7 @@ var HotUtils = {
     baseobj.type = 'text';
     baseobj.include = include;
     baseobj.unpack = function(obj, flat, setCellMeta) {
-      flat[property] = obj[property];
+      flat[property] = obj[property] || null;
     };
     baseobj.pack = function(obj, flat, errorHandler) {
       if (!Utils.validation.isEmpty(flat[property])) {
