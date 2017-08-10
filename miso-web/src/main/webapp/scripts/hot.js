@@ -361,6 +361,31 @@ var HotUtils = {
       }
     });
     
+    var makeSortButton = function(buttonText, sortColIndex, sortFunc) {
+      var rowCount = table.countRows();
+      function sortListener() {
+        for (var i = 0; i < rowCount; i++) {
+          table.setCellMeta(i, sortColIndex, 'sortFunction', sortFunc);
+        }
+        table.sort(sortColIndex);
+      };
+      var button = document.createElement('input');
+      button.type = 'button';
+      button.value = buttonText;
+      button.addEventListener('click', sortListener);
+      return button;
+    };
+    
+    // Columns that have custom sorters need to make the sorting accessible
+    columns.filter(function(column) {
+      return column.customSorting;
+    }).forEach(function(column) {
+      column.customSorting.forEach(function(sortOption) {
+        var sortBy = makeSortButton(sortOption.name, column.hotIndex, sortOption.sortFunc);
+        document.getElementById('bulkactions').appendChild(sortBy);
+      });
+    });
+    
     var save = document.getElementById('save');
     save
         .addEventListener(
@@ -540,31 +565,6 @@ var HotUtils = {
       table.render();
       initialSetup = false;
     });
-    
-    if (config.sortableLocation) {
-      var makeSortButton = function(buttonText, sortFunc) {
-        var rowCount = table.countRows();
-        var locationCol = Utils.array.findFirstOrNull(function (col) { return col.data == 'boxPositionLabel'; }, columns);
-        function sortListener() {
-          if (!locationCol) return;
-          for (var i = 0; i < rowCount; i++) {
-            table.setCellMeta(i, locationCol.hotIndex, 'sortFunction', sortFunc);
-          }
-          table.sort(locationCol.hotIndex);
-        };
-        var button = document.createElement('input');
-        button.type = 'button';
-        button.value = buttonText;
-        button.addEventListener('click', sortListener);
-        return button;
-      };
-    
-      var sortByRows = makeSortButton('Sort by ' + (config.propagate ? 'Parent ' : '') + 'Location (rows)', HotUtils.sorting.rowSort);
-      document.getElementById('bulkactions').appendChild(sortByRows);
-    
-      var sortByCols = makeSortButton('Sort by ' + (config.propagate ? 'Parent ' : '') + 'Location (columns)', HotUtils.sorting.colSort);
-      document.getElementById('bulkactions').appendChild(sortByCols);
-    }
   },
   
   sorting : {
@@ -572,26 +572,7 @@ var HotUtils = {
     rowSort : function(sortOrder) {
       return function(a, b) {
         // a & b are each an array: [row_index, element_value]
-        var aPosn = a[1], bPosn = b[1];
-        var aRow = aPosn.slice(aPosn.length - 3, aPosn.length - 2);
-        var aCol = aPosn.slice(aPosn.length - 2);
-        var bRow = bPosn.slice(bPosn.length - 3, bPosn.length - 2);
-        var bCol = bPosn.slice(bPosn.length - 2);
-        if (!(aRow + aCol).match(/[A-Z]\d{2}/) || !(bRow + bCol).match(/[A-Z]\d{2}/)) {
-          // don't know what to do with locations not like 'A01'-'Q33'
-          return 1;
-        }
-        if (aRow === bRow) {
-          // compare columns within the row
-          aCol = parseInt(aCol);
-          bCol = parseInt(bCol);
-          // assumption: users always want to sort BoxPosition ascending
-          return (aCol > bCol ? 1 : (bCol > aCol ? -1 : 0));
-        } else {
-          // compare rows
-          // assumption: users always want to sort BoxPosition ascending
-          return (aRow > bRow ? 1 : (bRow > aRow ? -1 : 0));
-        }
+        return Utils.sorting.sortBoxPositions(a[1], b[1], true);
       }
     },
     
@@ -599,28 +580,9 @@ var HotUtils = {
     colSort : function(sortOrder) {
       return function(a, b) {
         // a & b are each an array: [row_index, element_value]
-        var aPosn = a[1], bPosn = b[1];
-        var aRow = aPosn.slice(aPosn.length - 3, aPosn.length - 2);
-        var aCol = aPosn.slice(aPosn.length - 2);
-        var bRow = bPosn.slice(bPosn.length - 3, bPosn.length - 2);
-        var bCol = bPosn.slice(bPosn.length - 2);
-        if (!(aRow + aCol).match(/[A-Z]\d{2}/) || !(bRow + bCol).match(/[A-Z]\d{2}/)) {
-          // don't know what to do with locations not like 'A01'-'Q33'
-          return true;
-        }
-        if (aCol === bCol) {
-          // compare rows within the column
-          // assumption: users always want to sort BoxPosition ascending
-          return (aRow > bRow ? 1 : (bRow > aRow ? -1 : 0));
-        } else {
-          // compare columns
-          aCol = parseInt(aCol);
-          bCol = parseInt(bCol);
-          // assumption: users always want to sort BoxPosition ascending
-          return (aCol > bCol ? 1 : (bCol > aCol ? -1 : 0));
-        }
+        return Utils.sorting.sortBoxPositions(a[1], b[1], false);
       }
-    }
+    }      
   },
   
   showServerErrors : function(response, serverStatus) {
@@ -670,7 +632,7 @@ var HotUtils = {
   
   makeColumnForConstantsList : function(headerName, include, flatProperty,
       modelProperty, id, name, items, required, baseobj, sortFunc) {
-    var labels = items.sort(sortFunc || Utils.array.standardSort(name)).map(
+    var labels = items.sort(sortFunc || Utils.sorting.standardSort(name)).map(
         function(item) {
           return item[name];
         });

@@ -209,7 +209,7 @@ HotTarget.sample = (function() {
               var comparator = Constants.isDetailedSample ? 'shortName' : 'id';
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
               var projectLabels = (config.projects ? config.projects.sort(
-                  Utils.array.standardSort(comparator)).map(function(item) {
+                  Utils.sorting.standardSort(comparator)).map(function(item) {
                 return item[label];
               }) : []); /* use empty array if projects are not provided (should only happen during propagate or edit) */
               return projectLabels;
@@ -681,7 +681,7 @@ HotTarget.sample = (function() {
             
             // In the case of plain samples, this will be empty, which is fine.
             var targets = getChildSampleClasses(classes).sort(
-                Utils.array.sampleClassComparator).map(
+                Utils.sorting.sampleClassComparator).map(
                 function(sampleClass) {
                   
                   return {

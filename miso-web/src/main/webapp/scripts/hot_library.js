@@ -176,16 +176,26 @@ HotTarget.library = (function() {
           },
           {
             header : 'Sample Location',
-            data: 'boxPositionLabel',
+            data: 'sampleBoxPositionLabel',
             type: 'text',
             readOnly: true,
             include: config.sortableLocation,
             unpack : function(sam, flat, setCellMeta) {
-              flat.boxPositionLabel = sam.boxPositionLabel;
+              flat.sampleBoxPositionLabel = sam.sampleBoxPositionLabel;
             },
             pack : function(sam, flat, errorHandler) {
-              sam.boxPositionLabel = flat.boxPositionLabel;
-            }
+              sam.sampleBoxPositionLabel = flat.sampleBoxPositionLabel;
+            },
+            customSorting : [
+              {
+                name : 'Sort by Sample Location (rows)',
+                sortFunc : HotUtils.sorting.rowSort
+              },
+              {
+                name : 'Sort by Sample Location (columns)',
+                sortFunc : HotUtils.sorting.colSort
+              }
+            ] 
           },
           HotUtils.makeColumnForText('Matrix Barcode',
               !Constants.automaticBarcodes, 'identificationBarcode', {
