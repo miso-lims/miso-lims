@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -47,6 +48,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -205,12 +207,22 @@ public class EditRunController {
         model.put("title", "New Run");
         model.put("multiplexed", false);
         model.put("metrics", "[]");
+        model.put("partitionNames", "[]");
       } else {
         model.put("title", "Run " + run.getId());
         model.put("multiplexed", isMultiplexed(run));
         model.put("metrics",
             getSources().map(source -> source.fetchMetrics(run)).filter(metrics -> !LimsUtils.isStringBlankOrNull(metrics))
                 .collect(new JsonArrayCollector()));
+        if (run.getSequencerPartitionContainers().size() == 1) {
+          ObjectMapper mapper = new ObjectMapper();
+          model.put("partitionNames", mapper.writeValueAsString(
+              run.getSequencerPartitionContainers().get(0).getPartitions().stream()
+                  .sorted((a, b) -> a.getPartitionNumber() - b.getPartitionNumber())
+                  .map(partition -> partition.getPool() == null ? "N/A" : partition.getPool().getAlias()).collect(Collectors.toList())));
+        } else {
+          model.put("partitionNames", "[]");
+        }
       }
 
       if (!run.userCanRead(user)) {
