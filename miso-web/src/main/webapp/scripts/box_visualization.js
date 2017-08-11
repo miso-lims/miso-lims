@@ -56,11 +56,18 @@ var BoxPosition = function(opts) {
   };
 
   self.click = function(event) {
-    if (event.ctrlKey) {
+    if (isMultiSelectClick(event)) {
       self.controlClick();
     } else {
       self.normalClick();
     }
+  };
+  
+  isMultiSelectClick = function(event) {
+    function isMac() {
+      return navigator.platform.indexOf('Mac') != -1;
+    }
+    return (isMac() && event.metaKey || !isMac && e.ctrlKey);
   };
 
   self.normalClick = function() {
@@ -179,7 +186,7 @@ var BoxVisual = function() {
   };
   
   var toggleGroupSelection = function(event, items) {
-    if (!event.ctrlKey) {
+    if (!isMultiSelectClick(event)) {
       self.clearSelection();
     }
     var allSelected = true;
@@ -189,7 +196,7 @@ var BoxVisual = function() {
         allSelected = false;
       }
     });
-    if (event.ctrlKey && allSelected) {
+    if (isMultiSelectClick(event) && allSelected) {
       for (var i = 0; i < items.length; i++) {
         self.unselect(items[i], true);
       }

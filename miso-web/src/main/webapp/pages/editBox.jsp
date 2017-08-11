@@ -226,6 +226,8 @@
 	    </tr>
     </table>
     <p class="warning" id="warningMessages"></p>
+    <p>Hold down Control (Windows, Linux) or Command (Mac) to select multiple positions.<br/>
+       Click row or column header to select entire row or column.</p>
   </div>
 </div>
 
