@@ -197,7 +197,8 @@ HotTarget.library = (function() {
                 sortTarget : 'columns',
                 sortFunc : HotUtils.sorting.colSort
               }
-            ] 
+            ],
+            sortIndicator : true
           },
           HotUtils.makeColumnForText('Matrix Barcode',
               !Constants.automaticBarcodes, 'identificationBarcode', {
