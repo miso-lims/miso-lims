@@ -33,7 +33,8 @@ var RunGraph = (function() {
       var node = document.createElement('P');
       return {
         dom : node,
-        span : false, // Span the whole row?
+        span : false, // Indicator of whether the graph spans the entire width
+                      // of the row.
         render : function() {
           // Callback to render the graph after the DOM node is inserted.
           node.innerText = 'Look at me. I am gorgeous.';
