@@ -33,6 +33,7 @@ var RunGraph = (function() {
       var node = document.createElement('P');
       return {
         dom : node,
+        span : false, // Span the whole row?
         render : function() {
           // Callback to render the graph after the DOM node is inserted.
           node.innerText = 'Look at me. I am gorgeous.';
@@ -51,6 +52,7 @@ var RunGraph = (function() {
       link.target = "_blank";
       return {
         dom : link,
+        span : false,
         render : function() {
         }
       };
@@ -64,6 +66,7 @@ var RunGraph = (function() {
       var node = document.createElement('TABLE');
       return {
         dom : node,
+        span : false,
         render : function() {
           jQuery(node).dataTable({
             'bJQueryUI' : true,
@@ -88,29 +91,32 @@ var RunGraph = (function() {
   var summaryTable = function(metrics, width, renamePartitions) {
     return metrics.filter(function(metric) {
       return metric.type == 'table';
-    }).map(function(metric) {
-      var node = document.createElement('TABLE');
-      return {
-        dom : node,
-        render : function() {
-          var dt = jQuery(node).dataTable({
-            'bJQueryUI' : true,
-            'aoColumns' : metric.columns.map(function(column) {
-              return {
-                "sTitle" : column.name,
-                "mData" : column.property,
-                "mRender" : function(data) {
-                  return renamePartitions(data, false);
-                }
-              };
-            }),
-            'sDom' : '<"datatable-scroll"t><"F"ip>',
-            'aaData' : metric.rows
-          });
-          dt.parents("div.dataTables_wrapper").css("width", width + "px");
-        }
-      };
-    });
+    }).map(
+        function(metric) {
+          var node = document.createElement('TABLE');
+          return {
+            dom : node,
+            span : true,
+            render : function() {
+              var dt = jQuery(node).dataTable({
+                'bJQueryUI' : true,
+                'aoColumns' : metric.columns.map(function(column) {
+                  return {
+                    "sTitle" : column.name,
+                    "mData" : column.property,
+                    "mRender" : function(data) {
+                      return renamePartitions(data, false);
+                    }
+                  };
+                }),
+                'sDom' : '<"datatable-scroll"t><"F"ip>',
+                'aaData' : metric.rows
+              });
+              dt.parents("div.dataTables_wrapper").css("width",
+                  (width * 2) + "px");
+            }
+          };
+        });
   };
   var lineGraph = function(typeName, title, yLabel) {
     return function(metrics, width, renamePartitions) {
@@ -124,6 +130,7 @@ var RunGraph = (function() {
         var node = document.createElement('DIV');
         return {
           dom : node,
+          span : false,
           render : function() {
             new Highcharts.Chart({
               chart : {
@@ -175,6 +182,7 @@ var RunGraph = (function() {
         var node = document.createElement('DIV');
         return {
           dom : node,
+          span : false,
           render : function() {
             new Highcharts.Chart({
               chart : {
@@ -225,6 +233,7 @@ var RunGraph = (function() {
     var node = document.createElement('DIV');
     return {
       dom : node,
+      span : false,
       render : function() {
         new Highcharts.Chart({
           chart : {
@@ -327,8 +336,7 @@ var RunGraph = (function() {
                     return (includePrefix ? "Lane " + partitionNumber + ": "
                         : "") + partitionNames[index];
                   } else {
-                    return includePrefix ? ("Lane " + partitionNumber)
-                        : "N/A";
+                    return includePrefix ? ("Lane " + partitionNumber) : "N/A";
                   }
                 });
               });
@@ -347,7 +355,12 @@ var RunGraph = (function() {
           var cell = document.createElement('TD');
           cell.style.cssText = css;
           cell.appendChild(graph.dom);
-          if (row == null) {
+          if (graph.span) {
+            cell.colSpan = 2;
+            var spanRow = document.createElement('TR');
+            spanRow.appendChild(cell);
+            table.appendChild(spanRow);
+          } else if (row == null) {
             row = document.createElement('TR');
             row.appendChild(cell);
             table.appendChild(row);
