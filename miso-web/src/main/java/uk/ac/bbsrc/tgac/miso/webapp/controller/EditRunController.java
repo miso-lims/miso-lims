@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -212,7 +213,8 @@ public class EditRunController {
         model.put("title", "Run " + run.getId());
         model.put("multiplexed", isMultiplexed(run));
         model.put("metrics",
-            getSources().map(source -> source.fetchMetrics(run)).filter(metrics -> !LimsUtils.isStringBlankOrNull(metrics))
+            getSources().filter(Objects::nonNull).map(source -> source.fetchMetrics(run))
+                .filter(metrics -> !LimsUtils.isStringBlankOrNull(metrics))
                 .collect(new JsonArrayCollector()));
         if (run.getSequencerPartitionContainers().size() == 1) {
           ObjectMapper mapper = new ObjectMapper();
