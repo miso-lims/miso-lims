@@ -21,6 +21,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String ALIAS = "Library Alias";
     public static final String SAMPLE_ALIAS = "Sample Alias";
     public static final String ID_BARCODE = "Matrix Barcode";
+    public static final String SAMPLE_LOCATION = "Sample Location";
     public static final String DESCRIPTION = "Description";
     public static final String DESIGN = "Design";
     public static final String CODE = "Code";
@@ -47,6 +48,8 @@ public class BulkLibraryPage extends HeaderFooterPage {
 
   private static final By EDIT_BUTTON_TEXT = By.linkText("Edit");
   private static final By PROPAGATE_BUTTON_TEXT = By.linkText("Make dilutions");
+  private static final By SORT_BY_SAMPLE_LOCATION_ROWS = By.id("sortrows");
+  private static final By SORT_BY_SAMPLE_LOCATION_COLS = By.id("sortcolumns");
 
   @FindBy(id = "bulkactions")
   private WebElement toolbar;
@@ -88,6 +91,14 @@ public class BulkLibraryPage extends HeaderFooterPage {
   public BulkDilutionPage chainPropagateDilutions() {
     toolbar.findElement(PROPAGATE_BUTTON_TEXT).click();
     return new BulkDilutionPage(getDriver());
+  }
+
+  public void sortBySampleLocationRows() {
+    toolbar.findElement(SORT_BY_SAMPLE_LOCATION_ROWS).click();
+  }
+
+  public void sortBySampleLocationColumns() {
+    toolbar.findElement(SORT_BY_SAMPLE_LOCATION_COLS).click();
   }
 
 }

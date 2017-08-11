@@ -915,6 +915,9 @@ public class Dtos {
     dto.setPreMigrationId(from.getPreMigrationId());
     dto.setArchived(from.getArchived());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
+    if (from.getSample().getBox() != null) {
+      dto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
+    }
     return dto;
   }
 

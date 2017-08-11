@@ -324,7 +324,8 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (2, 'PRO2', 'Project Two', 'PRO2', '2017-07-20', 'integration test project for custom identities', 2, 'ACTIVE', 1, '2017-07-20 16:55:00'),
   (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 2, 'ACTIVE', 1, '2017-06-27 14:12:00'),
   (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 2, 'PROPOSED', 2, '2017-08-04 15:12:00'),
-  (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 1, 'ACTIVE', 1, '2017-07-24 16:11:00');
+  (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 1, 'ACTIVE', 1, '2017-07-24 16:11:00'),
+  (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 1, 'ACTIVE', 1, '2017-08-09 11:51:00');
 
 INSERT INTO Study (studyId, name, securityProfile_profileId, project_projectId, alias, lastModifier, studyTypeId) VALUES
 (1, 'STU1', 1, 1, 'Study One', 1, 1);
@@ -351,7 +352,13 @@ INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_pro
   (100001, 100001, 'SAM100001', 'LIBT_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (100002, 100001, 'SAM100002', 'LIBT_0001_Ly_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (100003, 100001, 'SAM100003', 'LIBT_0001_Ly_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
-  (100004, 100001, 'SAM100004', 'LIBT_0001_Ly_P_1-1_D1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00');
+  (100004, 100001, 'SAM100004', 'LIBT_0001_Ly_P_1-1_D1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (201, 200, 'SAM201', 'SORT_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (202, 200, 'SAM202', 'SORT_0001_nn_n_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (203, 200, 'SAM203', 'SORT_0001_nn_n_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (204, 200, 'SAM204', 'SORT_0001_nn_n_1-1_D_1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (205, 200, 'SAM205', 'SORT_0001_nn_n_1-1_D_2', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
+  (206, 200, 'SAM206', 'SORT_0001_nn_n_1-1_D_3', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00');
 
 INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, concentration) VALUES
 (1, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL),
@@ -373,15 +380,23 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
   (100001, 1, NULL, 1, 0),  -- Identity
   (100002, 23, NULL, 1, 0), -- Tissue
   (100003, 11, NULL, 1, 0), -- gDNA (stock)
-  (100004, 15, NULL, 1, 0); -- gDNA (aliquot)
+  (100004, 15, NULL, 1, 0), -- gDNA (aliquot)
+  (201, 1, NULL, 1, 0),
+  (202, 23, NULL, 1, 0),
+  (203, 11, NULL, 1, 0),
+  (204, 15, NULL, 1, 0),
+  (205, 15, NULL, 1, 0),
+  (206, 15, NULL, 1, 0);
 
 INSERT INTO Identity (sampleId, externalName, donorSex) VALUES
   (1, 'TEST_external_1', 'MALE'),
-  (100001, 'LIBT_identity1', 'UNKNOWN');
+  (100001, 'LIBT_identity1', 'UNKNOWN'),
+  (201, 'SORT_identity_1', 'UNKNOWN');
 
 INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, externalInstituteIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
   (2, 1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2),
-  (100002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL);
+  (100002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  (202, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL);
 
 INSERT INTO SampleTissueProcessing(sampleId) VALUES
 (3),(4),(5);
@@ -396,7 +411,8 @@ INSERT INTO `SampleStock` (sampleId, strStatus, dnaseTreated) VALUES
 (6, 'SUBMITTED', 0),
 (7, 'NOT_SUBMITTED', 0),
 (10, 'PASS', 0),
-(100003, 'NOT_SUBMITTED', 0);
+(100003, 'NOT_SUBMITTED', 0),
+(203, 'NOT_SUBMITTED', 0);
 
 INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 (8, 9),
@@ -405,7 +421,10 @@ INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 (12, 6),
 (13, 7),
 (14, 3),
-(100004, NULL);
+(100004, NULL),
+(204, NULL),
+(205, NULL),
+(206, NULL);
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
@@ -419,14 +438,23 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
   (100003, 'LIB100003', 'LIBT_0001_Ly_P_PE_253_WG', NULL,           NULL,            1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL),
   (100004, 'LIB100004', 'LIBT_0001_Ly_P_PE_254_WG', NULL,           'libdesc100004', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
-    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL);
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL),
+  (204, 'LIB204', 'SORT_0001_nn_n_PE_204_WG', NULL, 'description', 1, 204, 'ILLUMINA', 1, 3, 1, '2017-08-09',
+    1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL),
+  (205, 'LIB205', 'SORT_0001_nn_n_PE_205_WG', NULL, 'description', 1, 205, 'ILLUMINA', 1, 3, 1, '2017-08-09',
+    1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL),
+  (206, 'LIB206', 'SORT_0001_nn_n_PE_206_WG', NULL, 'description', 1, 206, 'ILLUMINA', 1, 3, 1, '2017-08-09',
+    1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL);
 
 INSERT INTO DetailedLibrary(libraryId, kitDescriptorId, archived, libraryDesign, libraryDesignCodeId) VALUES
   (1, 1, 0, 1, 7),
   (100001, 1, 0, NULL, 7),
   (100002, 1, 0, 1, 7),
   (100003, 1, 0, NULL, 7),
-  (100004, 1, 0, NULL, 7);
+  (100004, 1, 0, NULL, 7),
+  (204, 1, 0, NULL, 7),
+  (205, 1, 0, NULL, 7),
+  (206, 1, 0, NULL, 7);
 
 INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (100001, 5),
@@ -447,7 +475,8 @@ INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, securityProfile_profil
 (1, 1, 1, 'BOX1', 'First Box', 1, 1, 2, '2017-07-20 13:01:01', '2017-07-20 13:01:01');
 
 INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
-(1, 1, 'LIBRARY', 'A01'), (1, 1, 'DILUTION', 'B02'), (1, 1, 'POOL', 'C03'), (1, 2, 'SAMPLE', 'D04'), (1, 3, 'SAMPLE', 'E05'), (1, 4, 'SAMPLE', 'F06'), (1, 7, 'SAMPLE', 'G07'), (1, 8, 'SAMPLE', 'H08'); 
+(1, 1, 'LIBRARY', 'A01'), (1, 1, 'DILUTION', 'B02'), (1, 1, 'POOL', 'C03'), (1, 2, 'SAMPLE', 'D04'), (1, 3, 'SAMPLE', 'E05'), (1, 4, 'SAMPLE', 'F06'), (1, 7, 'SAMPLE', 'G07'), (1, 8, 'SAMPLE', 'H08'),
+(1, 204, 'SAMPLE', 'C06'), (1, 205, 'SAMPLE', 'A07'), (1, 206, 'SAMPLE', 'B05'); 
 
 INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId, identificationBarcode, platform, lastModifier, creator, created, lastModified) VALUES
 (1, 3, 'ABCDEFXX', 2, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01'),

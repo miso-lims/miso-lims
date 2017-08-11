@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,9 +32,9 @@ public class BulkLibraryIT extends AbstractIT {
   private static final Logger log = LoggerFactory.getLogger(BulkLibraryIT.class);
 
   private static final Set<String> commonColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.SAMPLE_ALIAS, Columns.ID_BARCODE,
-      Columns.DESCRIPTION, Columns.DESIGN, Columns.CODE, Columns.PLATFORM, Columns.LIBRARY_TYPE, Columns.SELECTION, Columns.STRATEGY,
-      Columns.INDEX_FAMILY, Columns.INDEX_1, Columns.INDEX_2, Columns.KIT_DESCRIPTOR, Columns.QC_PASSED, Columns.SIZE, Columns.VOLUME,
-      Columns.CONCENTRATION);
+      Columns.SAMPLE_LOCATION, Columns.DESCRIPTION, Columns.DESIGN, Columns.CODE, Columns.PLATFORM, Columns.LIBRARY_TYPE, Columns.SELECTION,
+      Columns.STRATEGY, Columns.INDEX_FAMILY, Columns.INDEX_1, Columns.INDEX_2, Columns.KIT_DESCRIPTOR, Columns.QC_PASSED, Columns.SIZE,
+      Columns.VOLUME, Columns.CONCENTRATION);
   private static final Set<String> qcColumns = Sets.newHashSet(Columns.QUBIT, Columns.TAPE_STATION, Columns.QPCR);
 
   private static final String NO_INDEX_FAMILY = "No indices";
@@ -557,6 +558,41 @@ public class BulkLibraryIT extends AbstractIT {
     Optional<LibraryQC> qPcrMaybe = updated.getLibraryQCs().stream().filter(qc -> "qPCR".equals(qc.getQcType().getName())).findFirst();
     assertTrue(qPcrMaybe.isPresent());
     assertEquals(Double.valueOf(attrs.get(Columns.QPCR)), qPcrMaybe.get().getResults());
+  }
+
+  @Test
+  public void testSortByBoxPosition() {
+    BulkLibraryPage page = BulkLibraryPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(204L, 205L, 206L));
+    HandsOnTable table = page.getTable();
+    
+    final class Libs {
+      final static String C06 = "C06";
+      final static String A07 = "A07";
+      final static String B05 = "B05";
+    }
+
+    Map<Integer, String> initial = new HashMap<>();
+    initial.put(0, Libs.C06);
+    initial.put(1, Libs.A07);
+    initial.put(2, Libs.B05);
+
+    initial.forEach((k, v) -> assertTrue("initial value " + v + " in row " + k, table.getText(Columns.SAMPLE_LOCATION, k).endsWith(v)));
+    
+    Map<Integer, String> sortCols = new HashMap<>();
+    sortCols.put(0, Libs.B05);
+    sortCols.put(1, Libs.C06);
+    sortCols.put(2, Libs.A07);
+    
+    page.sortBySampleLocationColumns();
+    sortCols.forEach((k, v) -> assertTrue("sortCols value " + v + " in row " + k, table.getText(Columns.SAMPLE_LOCATION, k).endsWith(v)));
+    
+    Map<Integer, String> sortRows = new HashMap<>();
+    sortRows.put(0, Libs.A07);
+    sortRows.put(1, Libs.B05);
+    sortRows.put(2, Libs.C06);
+    
+    page.sortBySampleLocationRows();
+    sortRows.forEach((k, v) -> assertTrue(table.getText(Columns.SAMPLE_LOCATION, k).endsWith(v)));
   }
 
   private void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {
