@@ -41,6 +41,20 @@ var RunGraph = (function() {
       
     });
   };
+  var errorMessage = function(metrics, width) {
+    return metrics.filter(function(metric) {
+      return metric.type == 'message';
+    }).map(function(metric) {
+      var node = document.createElement('P');
+      node.setAttribute('class', 'parsley-error');
+      node.innerText = metric.message;
+      return {
+        dom : node,
+        render : function() {
+        }
+      };
+    });
+  };
   var externalLink = function(metrics, width) {
     return metrics.filter(function(metric) {
       return metric.type == 'link';
@@ -297,6 +311,7 @@ var RunGraph = (function() {
     metricProcessors : [
         example,
         externalLink,
+        errorMessage,
         chart,
         summaryTable,
         illuminaPerCyclePlot('illumina-q30-by-cycle', '> Q30', '% Bases >Q30'),
