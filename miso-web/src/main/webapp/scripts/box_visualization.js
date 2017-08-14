@@ -66,7 +66,7 @@ var BoxPosition = function(opts) {
   var isMultiSelectClick = function(event) {
     // multi-select is accessible by pressing the Command key (metaKey) on Mac,
     // or the Control key (ctrlKey) on Windows or Linux
-    return navigator.platform.indexOf('Mac') != -1 ? event.metaKey : e.ctrlKey;
+    return navigator.platform.indexOf('Mac') != -1 ? event.metaKey : event.ctrlKey;
   };
 
   self.normalClick = function() {
