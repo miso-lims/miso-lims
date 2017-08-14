@@ -53,22 +53,22 @@ public class BulkDilutionIT extends AbstractIT {
   public void testPropagateSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(),
-        Sets.newHashSet(100001L, 100002L, 100003L, 100004L));
+        Sets.newHashSet(100002L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(columns.size(), headings.size());
     for (String col : columns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
-    assertEquals(4, table.getRowCount());
+    assertEquals(1, table.getRowCount());
 
-    assertEquals("LIBT_0001_Ly_P_PE_251_WG", table.getText(Columns.LIBRARY_ALIAS, 0));
+    assertEquals("LIBT_0001_Ly_P_PE_252_WG", table.getText(Columns.LIBRARY_ALIAS, 0));
   }
 
   @Test
   public void testCreateDropdowns() throws Exception {
     BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(),
-        Sets.newHashSet(100001L, 100002L, 100003L, 100004L));
+        Sets.newHashSet(100001L));
     HandsOnTable table = page.getTable();
     
     List<String> targetedSequencings = table.getDropdownOptions(Columns.TARGETED_SEQUENCING, 0);
