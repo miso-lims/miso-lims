@@ -20,7 +20,7 @@ public class IlluminaProcessorTest extends AbstractProcessorTest {
 
   @Override
   protected NotificationDto process(File directory) throws IOException {
-    return instance.process(directory, TimeZone.getDefault());
+    return instance.process(directory, TimeZone.getTimeZone("America/Toronto"));
   }
 
   @Test
