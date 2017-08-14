@@ -256,6 +256,15 @@ DELETE FROM KitDescriptor;
 INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, lastModifier) VALUES
   (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1),
   (2, 'Test Kit 2', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1);
+  
+DELETE FROM TargetedSequencing;
+INSERT INTO TargetedSequencing (targetedSequencingId, alias, description, archived, createdBy, updatedBy, creationDate, lastUpdated) VALUES
+  (1, 'Test TarSeq 1', 'first test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00'),
+  (2, 'Test TarSeq 2', 'second test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00'),
+  (3, 'Test TarSeq 3', 'third test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00');
+  
+INSERT INTO TargetedSequencing_KitDescriptor (targetedSequencingId, kitDescriptorId) VALUES
+  (1, 1), (2, 1), (3, 2);
 
 DELETE FROM BoxUse;
 INSERT INTO BoxUse (alias) VALUES ('DNA'), ('RNA'), ('Libraries'), ('Sequencing'), ('Storage'), ('Tissue');
@@ -463,7 +472,11 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (100002, 10);
   
 INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated) VALUES
-(1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 'admin', 2, 1, '2017-07-20 09:01:00');
+(1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 'admin', 2, 1, '2017-07-20 09:01:00'),
+(100001, 'LDI100001', 3.97, 100001, '3010001', '2017-07-20', 'admin', 1, 1, '2017-07-20 10:00:00'),
+(100002, 'LDI100002', 4.97, 100002, '3010002', '2017-07-20', 'admin', 1, 1, '2017-07-20 10:00:00'),
+(100003, 'LDI100003', 5.97, 100003, '3010003', '2017-07-20', 'admin', 1, 1, '2017-07-20 10:00:00'),
+(100004, 'LDI100004', 6.97, 100004, '3010004', '2017-07-20', 'admin', 1, 1, '2017-07-20 10:00:00');
 
 INSERT INTO Pool (poolId, concentration, name, alias, identificationBarcode, creationDate, securityProfile_profileId, platformType, ready, lastModifier, creator, created, lastModified) VALUES
 (1, 8.25, 'IPO1', 'POOL_1', '12341', '2017-07-20', 2, 'ILLUMINA', 1, 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00');
