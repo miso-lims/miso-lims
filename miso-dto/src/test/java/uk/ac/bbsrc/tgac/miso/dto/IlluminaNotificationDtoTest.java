@@ -3,11 +3,11 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.junit.Test;
 
@@ -26,7 +26,7 @@ public class IlluminaNotificationDtoTest {
   public void testPartiallyPopulatedIlluminaNotificationRoundTrip() throws Exception {
     IlluminaNotificationDto notificationDto = new IlluminaNotificationDto();
     notificationDto.setSequencerName("Coffee");
-    notificationDto.setCompletionDate(LocalDate.of(2017, 2, 23));
+    notificationDto.setCompletionDate(LocalDateTime.of(2017, 2, 23, 0, 0));
     notificationDto.setHealthType(HealthType.Started);
 
     ObjectMapper mapper = new ObjectMapper();
@@ -56,22 +56,22 @@ public class IlluminaNotificationDtoTest {
   public void testConvertToUtilDate() throws ParseException {
     NotificationDto dto = fullyPopulatedIlluminaNotificationDto("RUN_B");
 
-    Run run = Dtos.to(dto);
+    Run run = Dtos.to(dto, null);
 
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-    assertThat(dto.getStartDate().toString(), is(format.format(run.getStartDate())));
+    assertThat(dto.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE), is(format.format(run.getStartDate())));
   }
 
   static IlluminaNotificationDto fullyPopulatedIlluminaNotificationDto(String sequencerName) {
     IlluminaNotificationDto notificationDto = new IlluminaNotificationDto();
-    notificationDto.setRunName("TEST_RUN_NAME");
-    notificationDto.setSequencerFolderPath(Paths.get("/sequencers/TEST_RUN_FOLDER"));
-    notificationDto.setContainerId("CONTAINER_ID");
+    notificationDto.setRunAlias("TEST_RUN_NAME");
+    notificationDto.setSequencerFolderPath("/sequencers/TEST_RUN_FOLDER");
+    notificationDto.setContainerSerialNumber("CONTAINER_ID");
     notificationDto.setSequencerName(sequencerName);
     notificationDto.setLaneCount(8);
     notificationDto.setHealthType(HealthType.Started);
-    notificationDto.setStartDate(LocalDate.of(2017, 2, 23));
-    notificationDto.setCompletionDate(LocalDate.of(2017, 2, 27));
+    notificationDto.setStartDate(LocalDateTime.of(2017, 2, 23, 0, 0));
+    notificationDto.setCompletionDate(LocalDateTime.of(2017, 2, 27, 0, 0));
     notificationDto.setPairedEndRun(true);
     notificationDto.setSoftware("Fido Opus SEAdog Standard Interface Layer");
     notificationDto.setNumCycles(20);

@@ -34,6 +34,7 @@
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
@@ -50,7 +51,7 @@
     <c:when test="${box.id !=0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Box
-  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Box.validateBox();">Save</button>
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Box.validateBox();">Save</button>
 </h1>
 
 <div class="sectionDivider"  onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
@@ -115,12 +116,12 @@
   <table class="in">
     <tr>
       <td class="h">Box ID:</td>
-      <td>
+      <td><span id="id">
         <c:choose>
           <c:when test="${box.id != 0}">${box.id}</c:when>
           <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
-      </td>
+      </span></td>
     </tr>
     <tr>
       <td>Name:</td>
@@ -158,7 +159,7 @@
              </c:otherwise>
            </c:choose></td>
         </c:when>
-        <c:otherwise><td>${box.size.getRowsByColumns()} <c:choose><c:when test="${scannerEnabled}">(can ${box.size.scannable ? '':'not '}be scanned by your lab's bulk scanner)</c:when></c:choose></td></c:otherwise>
+        <c:otherwise><td><span id="boxSize">${box.size.getRowsByColumns()}</span> <c:choose><c:when test="${scannerEnabled}">(can ${box.size.scannable ? '':'not '}be scanned by your lab's bulk scanner)</c:when></c:choose></td></c:otherwise>
       </c:choose>
     </tr>
     <tr>
@@ -195,7 +196,7 @@
   </ul>
 </div>
 <div id="boxContentsDiagram">
-  <div id="boxContentsTable" style="float:left;"></div>
+  <div id="boxContentsTable" class="unselectable" style="float:left;"></div>
   <div style="float:left;padding:20px;">
     <table id="selectedPositionInfo">
 	    <tr>
@@ -225,12 +226,13 @@
 	    </tr>
     </table>
     <p class="warning" id="warningMessages"></p>
+    <p>Hold down Control (Windows, Linux) or Command (Mac) to select multiple positions.<br/>
+       Click row or column header to select entire row or column.</p>
   </div>
 </div>
 
 <script type="text/javascript">
   Box.visual = new Box.Visual();
-  var ctrlPressed = false; 
   jQuery(document).ready(function() {
     Box.boxJSON = ${boxJSON};
     Box.boxId = ${box.id};
@@ -244,15 +246,6 @@
     });
     jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
     Box.ui.createListingBoxablesTable(Box.boxJSON);
-  });
-
-  jQuery(document).keydown(function(event) {
-  if (event.which == "17")
-    ctrlPressed = true;
-  });
-
-  jQuery(document).keyup(function() {
-    ctrlPressed = false;
   });
 
   jQuery('#selectedBarcode').keyup(function(event) {
@@ -271,30 +264,7 @@
 <div id="boxContentsList" style="clear:both;">
   <table id="listingBoxablesTable" class="display"></table>
 </div>
-  <c:if test="${not empty box.changeLog}">
-    <br/>
-    <h1>Changes</h1>
-    <div style="clear:both">
-      <table class="list" id="changelog_table">
-        <thead>
-        <tr>
-          <th>Editor</th>
-          <th>Summary</th>
-          <th>Time</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${box.changeLog}" var="change">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${change.user.fullName} (${change.user.loginName})</td>
-            <td><b>${change.summary}</b></td>
-            <td>${change.time}</td>
-          </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-    </div>
-  </c:if>
+    <miso:changelog item="${box}"/>
 </c:if>
 
 <div id='dialogDialog' title='Scan' hidden='true'>
@@ -322,6 +292,7 @@
     });
   });
 </script>
+<div id="dialog"></div>
 
 <%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>

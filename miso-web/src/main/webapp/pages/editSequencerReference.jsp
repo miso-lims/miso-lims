@@ -36,7 +36,7 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form id="sequencer_reference_form" data-parsley-validate="" action="/miso/stats/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
+    <form:form id="sequencer_reference_form" data-parsley-validate="" action="/miso/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="sequencerReference"/>
       <h1>
         <sec:authorize access="hasRole('ROLE_ADMIN')">

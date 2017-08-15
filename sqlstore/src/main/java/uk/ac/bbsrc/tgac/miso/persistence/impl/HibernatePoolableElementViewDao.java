@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
@@ -70,6 +71,18 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
   }
 
   @Override
+  public List<PoolableElementView> list(List<Long> dilutionIds) throws IOException {
+    if (dilutionIds.size() == 0) {
+      return Collections.emptyList();
+    }
+    Criteria criteria = currentSession().createCriteria(PoolableElementView.class);
+    criteria.add(Restrictions.in("id", dilutionIds));
+    @SuppressWarnings("unchecked")
+    List<PoolableElementView> results = criteria.list();
+    return results;
+  }
+
+  @Override
   public Iterable<String> listAliases() {
     return Collections.emptyList();
   }
@@ -85,6 +98,10 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "libraryId";
     case "library.alias":
       return "libraryAlias";
+    case "library.parentSampleId":
+      return "sampleId";
+    case "library.parentSampleAlias":
+      return "sampleAlias";
     case "dilutionUserName":
       return "creatorName";
     case "creationDate":

@@ -1,54 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+
 public class IlluminaNotificationDto extends NotificationDto {
 
+  private int callCycle;
+  private IlluminaChemistry chemistry;
+  private int imgCycle;
   private int numCycles;
-  private int ImgCycle;
-  private int ScoreCycle;
-  private int CallCycle;
+  private int readLength;
+  private int scoreCycle;
 
-  public int getNumCycles() {
-    return numCycles;
-  }
-
-  public void setNumCycles(int numCycles) {
-    this.numCycles = numCycles;
-  }
-
-  public int getImgCycle() {
-    return ImgCycle;
-  }
-
-  public void setImgCycle(int imgCycle) {
-    ImgCycle = imgCycle;
-  }
-
-  public int getScoreCycle() {
-    return ScoreCycle;
-  }
-
-  public void setScoreCycle(int scoreCycle) {
-    ScoreCycle = scoreCycle;
-  }
-
-  public int getCallCycle() {
-    return CallCycle;
-  }
-
-  public void setCallCycle(int callCycle) {
-    CallCycle = callCycle;
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + CallCycle;
-    result = prime * result + ImgCycle;
-    result = prime * result + ScoreCycle;
-    result = prime * result + numCycles;
-    return result;
-  }
 
   @Override
   public boolean equals(Object obj) {
@@ -56,20 +20,96 @@ public class IlluminaNotificationDto extends NotificationDto {
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
     IlluminaNotificationDto other = (IlluminaNotificationDto) obj;
-    if (CallCycle != other.CallCycle) return false;
-    if (ImgCycle != other.ImgCycle) return false;
-    if (ScoreCycle != other.ScoreCycle) return false;
+    if (callCycle != other.callCycle) return false;
+    if (chemistry != other.chemistry) return false;
+    if (imgCycle != other.imgCycle) return false;
     if (numCycles != other.numCycles) return false;
+    if (readLength != other.readLength) return false;
+    if (scoreCycle != other.scoreCycle) return false;
     return true;
+  }
+
+  public int getCallCycle() {
+    return callCycle;
+  }
+
+  public IlluminaChemistry getChemistry() {
+    return chemistry;
+  }
+
+  public int getImgCycle() {
+    return imgCycle;
+  }
+
+  public int getNumCycles() {
+    return numCycles;
+  }
+
+
+  @Override
+  public PlatformType getPlatformType() {
+    return PlatformType.ILLUMINA;
+  }
+
+  public int getReadLength() {
+    return readLength;
+  }
+
+  public int getScoreCycle() {
+    return scoreCycle;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + callCycle;
+    result = prime * result + ((chemistry == null) ? 0 : chemistry.hashCode());
+    result = prime * result + imgCycle;
+    result = prime * result + numCycles;
+    result = prime * result + readLength;
+    result = prime * result + scoreCycle;
+    return result;
+  }
+
+  public void setCallCycle(int callCycle) {
+    this.callCycle = callCycle;
+  }
+
+  public void setChemistry(IlluminaChemistry chemistry) {
+    this.chemistry = chemistry;
+  }
+
+  public void setImgCycle(int imgCycle) {
+    this.imgCycle = imgCycle;
+  }
+
+  public void setNumCycles(int numCycles) {
+    this.numCycles = numCycles;
+  }
+
+  public void setReadLength(int readLength) {
+    this.readLength = readLength;
+  }
+
+  public void setScoreCycle(int scoreCycle) {
+    this.scoreCycle = scoreCycle;
+  }
+
+  @Override
+  public boolean test(SequencingParameters params) {
+    return params.getPlatform().getPlatformType() == PlatformType.ILLUMINA &&
+        Math.abs(params.getReadLength() - readLength) < 2 && params.isPaired() == isPairedEndRun() && params.getChemistry() == chemistry;
   }
 
   @Override
   public String toString() {
-    return "IlluminaNotificationDto [numCycles=" + numCycles + ", ImgCycle=" + ImgCycle + ", ScoreCycle=" + ScoreCycle + ", CallCycle="
-        + CallCycle + ", getRunName()=" + getRunName() + ", getSequencerName()=" + getSequencerName() + ", getCompletionDate()="
-        + getCompletionDate() + ", getStartDate()=" + getStartDate() + ", getContainerId()=" + getContainerId() + ", getLaneCount()="
+    return "IlluminaNotificationDto [callCycle=" + callCycle + ", imgCycle=" + imgCycle + ", numCycles=" + numCycles + ", scoreCycle="
+        + scoreCycle + ", chemistry=" + chemistry + ", readLength=" + readLength + ", getRunAlias()=" + getRunAlias()
+        + ", getSequencerName()=" + getSequencerName() + ", getContainerSerialNumber()=" + getContainerSerialNumber() + ", getLaneCount()="
         + getLaneCount() + ", getHealthType()=" + getHealthType() + ", getSequencerFolderPath()=" + getSequencerFolderPath()
-        + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()=" + getSoftware() + "]";
+        + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()=" + getSoftware() + ", getStartDate()=" + getStartDate()
+        + ", getCompletionDate()=" + getCompletionDate() + "]";
   }
 
 }

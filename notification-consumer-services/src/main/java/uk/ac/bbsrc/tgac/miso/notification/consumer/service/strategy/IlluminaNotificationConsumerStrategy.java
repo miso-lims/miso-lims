@@ -58,10 +58,10 @@ public class IlluminaNotificationConsumerStrategy implements NotificationConsume
 
   @Override
   public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
-    IlluminaNotificationMessageConsumerMechanism inmcm = new IlluminaNotificationMessageConsumerMechanism();
+    IlluminaNotificationMessageConsumerMechanism mechanism = new IlluminaNotificationMessageConsumerMechanism();
     ApplicationContext ctxt = ApplicationContextProvider.getApplicationContext();
-    ctxt.getAutowireCapableBeanFactory().autowireBean(inmcm);
-    inmcm.consume(m);
+    ctxt.getAutowireCapableBeanFactory().autowireBean(mechanism);
+    mechanism.consume(m);
   }
 
   @Override

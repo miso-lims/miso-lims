@@ -276,6 +276,7 @@ FOR EACH ROW
         CASE WHEN (NEW.filePath IS NULL) <> (OLD.filePath IS NULL) OR NEW.filePath <> OLD.filePath THEN CONCAT('file path: ', COALESCE(OLD.filePath, 'n/a'), ' → ', COALESCE(NEW.filePath, 'n/a')) END,
         CASE WHEN NEW.health <> OLD.health THEN CONCAT('health: ', COALESCE(OLD.health, 'n/a'), ' → ', COALESCE(NEW.health, 'n/a')) END,
         CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN CONCAT('startDate: ', COALESCE(OLD.startDate, 'n/a'), ' → ', COALESCE(NEW.startDate, 'n/a')) END,
+        CASE WHEN (NEW.sequencingParameters_parametersId IS NULL) <> (OLD.sequencingParameters_parametersId IS NULL) OR NEW.sequencingParameters_parametersId <> OLD.sequencingParameters_parametersId THEN CONCAT('parameters: ', COALESCE((SELECT name FROM SequencingParameters WHERE parametersId = OLD.sequencingParameters_parametersId), 'n/a'), ' → ', COALESCE((SELECT name FROM SequencingParameters WHERE parametersId = NEW.sequencingParameters_parametersId), 'n/a')) END,
         CASE WHEN (NEW.sequencerReference_sequencerReferenceId IS NULL) <> (OLD.sequencerReference_sequencerReferenceId IS NULL) OR NEW.sequencerReference_sequencerReferenceId <> OLD.sequencerReference_sequencerReferenceId THEN CONCAT('sequencer: ', COALESCE((SELECT name FROM SequencerReference WHERE referenceId = OLD.sequencerReference_sequencerReferenceId), 'n/a'), ' → ', COALESCE((SELECT name FROM SequencerReference WHERE referenceId = NEW.sequencerReference_sequencerReferenceId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
@@ -289,6 +290,7 @@ FOR EACH ROW
         CASE WHEN (NEW.health IS NULL) <> (OLD.health IS NULL) OR NEW.health <> OLD.health THEN 'health' END,
         CASE WHEN (NEW.metrics IS NULL) <> (OLD.metrics IS NULL) OR NEW.metrics <> OLD.metrics THEN 'metrics' END,
         CASE WHEN (NEW.startDate IS NULL) <> (OLD.startDate IS NULL) OR NEW.startDate <> OLD.startDate THEN 'startDate' END,
+        CASE WHEN (NEW.sequencingParameters_parametersId IS NULL) <> (OLD.sequencingParameters_parametersId IS NULL) OR NEW.sequencingParameters_parametersId <> OLD.sequencingParameters_parametersId THEN 'parameters' END,
         CASE WHEN (NEW.sequencerReference_sequencerReferenceId IS NULL) <> (OLD.sequencerReference_sequencerReferenceId IS NULL) OR NEW.sequencerReference_sequencerReferenceId <> OLD.sequencerReference_sequencerReferenceId THEN 'sequencerReference_sequencerReferenceId' END), ''),
       NEW.lastModifier,
       log_message);
@@ -326,23 +328,6 @@ FOR EACH ROW
       NEW.runId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedend' END), ''),
-      (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
-      log_message);
-  END IF;
-  END//
-
-DROP TRIGGER IF EXISTS RunChangePacBio//
-CREATE TRIGGER RunChangePacBio BEFORE UPDATE ON RunPacBio
-FOR EACH ROW
-  BEGIN
-  DECLARE log_message varchar(500) CHARACTER SET utf8;
-  SET log_message = CONCAT_WS(', ',
-        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN CONCAT('movie duration: ', COALESCE(OLD.movieDuration, 'n/a'), ' → ', COALESCE(NEW.movieDuration, 'n/a')) END);
-  IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message) VALUES (
-      NEW.runId,
-      COALESCE(CONCAT_WS(',',
-        CASE WHEN (NEW.movieDuration IS NULL) <> (OLD.movieDuration IS NULL) OR NEW.movieDuration <> OLD.movieDuration THEN 'movieDuration' END), ''),
       (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
       log_message);
   END IF;
@@ -979,6 +964,91 @@ CREATE PROCEDURE deleteDilution(
   COMMIT;
 END//
 
+DROP PROCEDURE IF EXISTS deletePool//
+CREATE PROCEDURE deletePool(
+  iPoolId BIGINT(20),
+  iPoolAlias VARCHAR(255)
+) BEGIN
+  DECLARE errorMessage VARCHAR(300);
+  -- rollback if any errors are thrown
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    RESIGNAL;
+  END;
+  
+  START TRANSACTION;
+  
+  -- check that the pool exists
+  IF NOT EXISTS (SELECT 1 FROM Pool WHERE poolId = iPoolId AND alias = iPoolAlias)
+  THEN
+    SET errorMessage = CONCAT('Cannot find pool with ID ', iPoolId, ' and alias "', iPoolAlias, '"');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+  
+  DELETE Note, Pool_Note
+    FROM Pool_Note
+    JOIN Note
+    WHERE Note.noteId = Pool_Note.notes_noteId
+    AND Pool_Note.pool_poolId = iPoolId;
+
+  DELETE FROM PoolOrder WHERE poolId = iPoolId;
+  DELETE FROM PoolQC WHERE pool_poolId = iPoolId;
+  DELETE FROM Pool_Watcher WHERE poolId = iPoolId;
+  DELETE FROM PoolChangeLog WHERE poolId = iPoolId;
+  DELETE FROM Pool_Dilution WHERE pool_poolId = iPoolId;
+  DELETE FROM Pool WHERE poolId = iPoolId;
+  
+  SELECT ROW_COUNT() AS number_deleted;
+  
+  COMMIT;
+END//
+
+DROP PROCEDURE IF EXISTS deleteRun//
+CREATE PROCEDURE deleteRun(
+  iRunId BIGINT(20),
+  iRunAlias VARCHAR(255)
+) BEGIN
+  DECLARE errorMessage VARCHAR(300);
+  -- rollback if any errors are thrown
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    RESIGNAL;
+  END;
+  
+  START TRANSACTION;
+  
+  -- check that the run exists
+  IF NOT EXISTS (SELECT 1 FROM Run WHERE runId = iRunId AND alias = iRunAlias)
+  THEN
+    SET errorMessage = CONCAT('Cannot find run with ID ', iRunId, ' and alias "', iRunAlias, '"');
+    SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
+  END IF;
+  
+  SET @runId = iRunId;
+  
+  -- delete any and all associated items
+  DELETE Note, Run_Note FROM Run_Note
+  JOIN Note 
+  WHERE Note.noteId = Run_Note.notes_noteId AND Run_Note.run_runId = @runId;
+  
+  DELETE FROM RunChangeLog WHERE runId = @runId;
+  DELETE FROM Run_SequencerPartitionContainer WHERE Run_runId = @runId;
+  
+  -- delete from platform-specific tables
+  DELETE FROM RunIllumina WHERE runId = @runId;
+  DELETE FROM RunIonTorrent WHERE runId = @runId;
+  DELETE FROM RunLS454 WHERE runId = @runId;
+  DELETE FROM RunPacBio WHERE runId = @runId;
+  DELETE FROM RunSolid WHERE runId = @runId;
+  
+  DELETE FROM Run WHERE runId = @runId;
+  SELECT ROW_COUNT() AS number_deleted;
+  
+  COMMIT;
+END//
+
 DELIMITER ;
 -- EndNoTest
 
@@ -1096,18 +1166,19 @@ CREATE OR REPLACE VIEW BoxableView AS
 SELECT a.*, bp.boxId, bp.position AS boxPosition, b.name AS boxName, b.alias AS boxAlias, b.locationBarcode AS boxLocationBarcode
 FROM (
     SELECT s.sampleId AS targetId, 'SAMPLE' AS targetType, s.name, s.alias, s.identificationBarcode, s.locationBarcode, s.volume,
-        s.discarded, ds.preMigrationId
+        s.discarded, ds.preMigrationId, ds.sampleClassId
         FROM Sample s
         LEFT JOIN DetailedSample ds ON ds.sampleId = s.sampleId
     UNION ALL
-    SELECT l.libraryId, 'LIBRARY', l.name, l.alias, l.identificationBarcode, l.locationBarcode, l.volume, l.discarded, dl.preMigrationId
+    SELECT l.libraryId, 'LIBRARY', l.name, l.alias, l.identificationBarcode, l.locationBarcode, l.volume, l.discarded, dl.preMigrationId,
+        NULL
         FROM Library l
         LEFT JOIN DetailedLibrary dl ON dl.libraryId = l.libraryId
     UNION ALL
-    SELECT dilutionId, 'DILUTION', name, name, identificationBarcode, NULL, volume, discarded, preMigrationId
+    SELECT dilutionId, 'DILUTION', name, name, identificationBarcode, NULL, volume, discarded, preMigrationId, NULL
         FROM LibraryDilution
     UNION ALL
-    SELECT poolId, 'POOL', name, alias, identificationBarcode, NULL, volume, discarded, NULL
+    SELECT poolId, 'POOL', name, alias, identificationBarcode, NULL, volume, discarded, NULL, NULL
         FROM Pool
 ) a
 LEFT JOIN BoxPosition bp ON bp.targetId = a.targetId AND bp.targetType = a.targetType

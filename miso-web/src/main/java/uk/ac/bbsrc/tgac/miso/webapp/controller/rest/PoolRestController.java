@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,6 +52,7 @@ import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -60,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 
 /**
  * A controller to handle all REST requests for Pools
@@ -70,6 +74,26 @@ import uk.ac.bbsrc.tgac.miso.service.PoolService;
 @RequestMapping("/rest/pool")
 @SessionAttributes("pool")
 public class PoolRestController extends RestController {
+  public static class PoolChangeRequest {
+    private List<Long> add;
+    private List<Long> remove;
+
+    public List<Long> getAdd() {
+      return add;
+    }
+
+    public List<Long> getRemove() {
+      return remove;
+    }
+
+    public void setAdd(List<Long> add) {
+      this.add = add;
+    }
+
+    public void setRemove(List<Long> remove) {
+      this.remove = remove;
+    }
+  }
   private final JQueryDataTableBackend<Pool, PoolDto> jQueryBackend = new JQueryDataTableBackend<Pool, PoolDto>() {
 
     @Override
@@ -92,6 +116,8 @@ public class PoolRestController extends RestController {
   private PlatformService platformService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private PoolableElementViewService poolableElementViewService;
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
@@ -125,6 +151,17 @@ public class PoolRestController extends RestController {
     Pool p = Dtos.to(pool);
     p.setId(poolId);
     poolService.save(p);
+    return Dtos.asDto(poolService.get(poolId), true);
+  }
+
+  @RequestMapping(value = "/{poolId}/contents", method = RequestMethod.PUT, produces = "application/json")
+  public @ResponseBody PoolDto changePoolContents(@PathVariable Long poolId, @RequestBody PoolChangeRequest request) throws IOException {
+    Pool pool = poolService.get(poolId);
+    Stream<PoolableElementView> originalMinusRemoved = pool.getPoolableElementViews().stream()
+        .filter(element -> !request.remove.contains(element.getDilutionId()));
+    Stream<PoolableElementView> added = poolableElementViewService.list(request.add).stream();
+    pool.setPoolableElementViews(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
+    poolService.save(pool);
     return Dtos.asDto(poolService.get(poolId), true);
   }
 

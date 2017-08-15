@@ -28,11 +28,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -47,6 +49,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -57,19 +60,31 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
-import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
 
 @Controller
 @RequestMapping("/run")
 @SessionAttributes("run")
 public class EditRunController {
   protected static final Logger log = LoggerFactory.getLogger(EditRunController.class);
+
+  /**
+   * Get a stream of source of metrics
+   * 
+   * Normally, metrics collected by run scanner are stored in the MISO database, but it is possible to provide
+   * 
+   * @return
+   */
+  public Stream<RunMetricsSource> getSources() {
+    return Stream.of(Run::getMetrics);
+  }
 
   @Autowired
   private SecurityManager securityManager;
@@ -80,7 +95,6 @@ public class EditRunController {
   @Autowired
   private PlatformService platformService;
 
-  private RunStatsManager runStatsManager;
   @Autowired
   private SequencerReferenceService sequencerReferenceService;
   @Autowired
@@ -92,10 +106,6 @@ public class EditRunController {
 
   public void setRunService(RunService runService) {
     this.runService = runService;
-  }
-
-  public void setRunStatsManager(RunStatsManager runStatsManager) {
-    this.runStatsManager = runStatsManager;
   }
 
   @ModelAttribute("maxLengths")
@@ -129,29 +139,6 @@ public class EditRunController {
       }
     }
     return false;
-  }
-
-  @Value("${miso.notification.interop.enabled}")
-  private Boolean metrixEnabled;
-
-  @ModelAttribute("metrixEnabled")
-  public Boolean isMetrixEnabled() {
-    return metrixEnabled;
-  }
-
-  @Value("${miso.pacbio.dashboard.connected}")
-  private Boolean isPacBioDashboardConnected;
-
-  @Value("${miso.pacbio.dashboard.url}")
-  private String pacBioDashboardUrl;
-
-  @ModelAttribute("pacBioDashboardUrl")
-  public String getPacBioDashboardUrl() {
-    if (isPacBioDashboardConnected) {
-      return pacBioDashboardUrl + (pacBioDashboardUrl.endsWith("/") ? "" : "/") + "Metrics/RSRunReport";
-    } else {
-      return null;
-    }
   }
 
   public Boolean hasOperationsQcPassed(Run run) throws IOException {
@@ -200,7 +187,6 @@ public class EditRunController {
   public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
     Run run = runService.get(runId);
 
-
     return setupForm(run, run.getSequencerReference().getPlatform().getPlatformType(), model);
 
   }
@@ -221,17 +207,23 @@ public class EditRunController {
       if (run.getId() == Run.UNSAVED_ID) {
         model.put("title", "New Run");
         model.put("multiplexed", false);
+        model.put("metrics", "[]");
+        model.put("partitionNames", "[]");
       } else {
         model.put("title", "Run " + run.getId());
         model.put("multiplexed", isMultiplexed(run));
-        try {
-          if (runStatsManager != null) {
-            model.put("statsAvailable", runStatsManager.hasStatsForRun(run));
-          }
-          model.put("operationsQcPassed", hasOperationsQcPassed(run));
-          model.put("informaticsQcPassed", hasInformaticsQcPassed(run));
-        } catch (RunStatsException e) {
-          log.error("setup run form", e);
+        model.put("metrics",
+            getSources().filter(Objects::nonNull).map(source -> source.fetchMetrics(run))
+                .filter(metrics -> !LimsUtils.isStringBlankOrNull(metrics))
+                .collect(new JsonArrayCollector()));
+        if (run.getSequencerPartitionContainers().size() == 1) {
+          ObjectMapper mapper = new ObjectMapper();
+          model.put("partitionNames", mapper.writeValueAsString(
+              run.getSequencerPartitionContainers().get(0).getPartitions().stream()
+                  .sorted((a, b) -> a.getPartitionNumber() - b.getPartitionNumber())
+                  .map(partition -> partition.getPool() == null ? "N/A" : partition.getPool().getAlias()).collect(Collectors.toList())));
+        } else {
+          model.put("partitionNames", "[]");
         }
       }
 

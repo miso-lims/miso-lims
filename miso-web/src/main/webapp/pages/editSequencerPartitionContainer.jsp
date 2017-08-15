@@ -29,6 +29,8 @@
  --%>
 <%@ include file="../header.jsp" %>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -317,85 +319,8 @@
   });
 </script>
 
-<c:if test="${not empty containerRuns}">
-  <div>
-    <h1>${fn:length(containerRuns)} Runs</h1>
-    <div class="clear">
-      <table class="list" id="run_table">
-        <thead>
-        <tr>
-          <th>Run Name</th>
-          <th>Run Alias</th>
-          <th>Status</th>
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-          </sec:authorize>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${containerRuns}" var="run" varStatus="runCount">
-          <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td><b><a href='<c:url value="/miso/run/${run.id}"/>'>${run.name}</a></b></td>
-            <td><a href='<c:url value="/miso/run/${run.id}"/>'>${run.alias}</a></td>
-            <td>${run.health}</td>
-            <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"></span>
-            </td>
-            </sec:authorize>
-          </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery('#run_table').dataTable({
-        "aaSorting": [
-          [0, 'asc'],
-          [1, 'asc']
-        ],
-        "aoColumns": [
-          null,
-          null,
-          null
-          <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-        ],
-        "iDisplayLength": 50,
-        "bJQueryUI": true,
-        "bRetrieve": true
-      });
-    });
-  </script>
-</c:if>
-
-<c:if test="${not empty container.changeLog}">
-  <div>
-	  <h1>Changes</h1>
-	  <div class="clear">
-	    <table class="list" id="changelog_table">
-	      <thead>
-	      <tr>
-            <th>Editor</th>
-	        <th>Summary</th>
-	        <th>Time</th>
-	      </tr>
-	      </thead>
-	      <tbody>
-	      <c:forEach items="${container.changeLog}" var="change">
-	        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-              <td>${change.user.fullName} (${change.user.loginName})</td>
-	          <td><b>${change.summary}</b></td>
-	          <td>${change.time}</td>
-	        </tr>
-	      </c:forEach>
-	      </tbody>
-	    </table>
-	  </div>
-  </div>
-</c:if>
-
+  <miso:list-section name="Runs" target="run" items="${containerRuns}"/>
+  <miso:changelog item="${container}"/>
 </div>
 </div>
 

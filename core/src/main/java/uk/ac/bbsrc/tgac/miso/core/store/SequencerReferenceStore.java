@@ -24,11 +24,10 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * Defines a DAO interface for storing SequencerReferences
@@ -36,7 +35,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface SequencerReferenceStore extends Store<SequencerReference>, Remover<SequencerReference> {
+public interface SequencerReferenceStore
+    extends Store<SequencerReference>, Remover<SequencerReference>, PaginatedDataSource<SequencerReference> {
 
   /**
    * Get a SequencerReference by a given name
@@ -60,17 +60,6 @@ public interface SequencerReferenceStore extends Store<SequencerReference>, Remo
    */
   SequencerReference getByUpgradedReference(long upgradedReferenceId) throws IOException;
 
-  /**
-   * Get all SequencerReferences of a given PlatformType, e.g. PlatformType.ILLUMINA
-   * 
-   * @param platformType
-   *          of type PlatformType
-   * @return Collection<SequencerReference>
-   * @throws IOException
-   *           when
-   */
-  Collection<SequencerReference> listByPlatformType(PlatformType platformType) throws IOException;
-  
   /**
    * @return a map containing all column names and max lengths from the Sequencer Reference table
    * @throws IOException

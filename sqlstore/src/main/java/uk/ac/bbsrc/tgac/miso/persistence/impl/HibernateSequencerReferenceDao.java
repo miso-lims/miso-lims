@@ -23,8 +23,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -43,11 +46,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
+import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSequencerReferenceDao implements SequencerReferenceStore {
+public class HibernateSequencerReferenceDao implements SequencerReferenceStore, HibernatePaginatedDataSource<SequencerReference> {
 
   private static final String SEQUENCER_REFERENCE_TABLE_NAME = "SequencerReference";
 
@@ -66,7 +70,8 @@ public class HibernateSequencerReferenceDao implements SequencerReferenceStore {
     this.jdbcTemplate = jdbcTemplate;
   }
 
-  private Session currentSession() {
+  @Override
+  public Session currentSession() {
     return getSessionFactory().getCurrentSession();
   }
 
@@ -115,14 +120,6 @@ public class HibernateSequencerReferenceDao implements SequencerReferenceStore {
     return (SequencerReference) criteria.uniqueResult();
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public Collection<SequencerReference> listByPlatformType(PlatformType platformType) throws IOException {
-    Criteria criteria = currentSession().createCriteria(SequencerReferenceImpl.class);
-    criteria.createAlias("platform", "platform");
-    criteria.add(Restrictions.eq("platform.platformType", platformType));
-    return criteria.list();
-  }
 
   @Override
   public SequencerReference getByUpgradedReference(long id) {
@@ -147,6 +144,60 @@ public class HibernateSequencerReferenceDao implements SequencerReferenceStore {
   @Override
   public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(jdbcTemplate, SEQUENCER_REFERENCE_TABLE_NAME);
+  }
+
+  @Override
+  public String getFriendlyName() {
+    return "Sequencer";
+  }
+
+  @Override
+  public String getProjectColumn() {
+    return null;
+  }
+
+  @Override
+  public Class<? extends SequencerReference> getRealClass() {
+    return SequencerReferenceImpl.class;
+  }
+
+  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "platform.instrumentModel" };
+
+  @Override
+  public String[] getSearchProperties() {
+    return SEARCH_PROPERTIES;
+  }
+
+  private static final List<String> STANDARD_ALIASES = Arrays.asList("platform");
+
+  @Override
+  public Iterable<String> listAliases() {
+    return STANDARD_ALIASES;
+  }
+
+  @Override
+  public String propertyForDate(Criteria criteria, DateType type) {
+    return type == DateType.CREATE ? "dateComissioned":null;
+  }
+
+  @Override
+  public String propertyForSortColumn(String original) {
+    return original;
+  }
+
+  @Override
+  public String propertyForUserName(Criteria criteria, boolean creator) {
+    return null;
+  }
+
+  @Override
+  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("platform.platformType", platformType));
+  }
+
+  @Override
+  public void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
+    criteria.add(isArchived ? Restrictions.isNotNull("dateDecommissioned") : Restrictions.isNull("dateDecommissioned"));
   }
 
 }

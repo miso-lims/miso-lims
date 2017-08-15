@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import net.sf.json.JSONObject;
+
 import uk.ac.bbsrc.tgac.miso.notification.exception.InvalidRequestParameterException;
 import uk.ac.bbsrc.tgac.miso.notification.manager.NotificationRequestManager;
 
@@ -75,8 +76,6 @@ public class NotificationRequestService {
         return queryRunInfo(j);
       } else if (j.getString("query").toLowerCase().contains("parameters")) {
         return queryRunParameters(j);
-      } else if (j.getString("query").toLowerCase().contains("interop")) {
-        return queryInterOpMetrics(j);
       } else {
         return testService(j);
       }
@@ -117,15 +116,6 @@ public class NotificationRequestService {
     } catch (Exception ise) {
       log.error("cannot retrieve run parameters", ise);
       return "{\"error\":\"Cannot retrieve run parameters: " + ise.getMessage() + "\"}";
-    }
-  }
-
-  private String queryInterOpMetrics(JSONObject request) {
-    try {
-      return notificationRequestManager.queryInterOpMetrics(request);
-    } catch (Exception ise) {
-      log.error("cannot retrieve run interop metrics", ise);
-      return "{\"error\":\"Cannot retrieve InterOp metrics: " + ise.getMessage() + "\"}";
     }
   }
 

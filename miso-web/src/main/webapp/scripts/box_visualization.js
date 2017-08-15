@@ -20,140 +20,103 @@
  *
  */
 
-var BoxItem = function(opts) {
+
+
+/*
+ * A BoxPosition represents a single position (cell) in the Box visualization (table).
+ * It is responsible for handling the functionality of a cell. This includes changing the title and image
+ * associated with the position.
+ */
+var BoxPosition = function(opts) {
   var self = {};
+  
+  isMultiSelectClick = function(event) {
+    // multi-select is accessible by pressing the Command key (metaKey) on Mac,
+    // or the Control key (ctrlKey) on Windows or Linux
+    return navigator.platform.indexOf('Mac') != -1 ? event.metaKey : event.ctrlKey;
+  };
+  
   self.title = opts.title || '';
-  self.selInfo = opts.selected;
-  self.row = opts.row || null;
-  self.col = opts.col || null;
+  self.parentVisual = opts.parentVisual;
+  self.row = opts.row;
+  self.col = opts.col;
+  self.cell = opts.cell;
   self.selectedImg = opts.selectedImg || null;
   self.unselectedImg = opts.unselectedImg || null;
   self.element = opts.element || jQuery('<img>');
 
+  self.setTitle = function() {
+    self.cell.prop('title', Box.utils.getPositionString(self.row, self.col) + ': ' + self.title);
+  };
+  
   self.setImage = opts.setImage || function(imgurl) {
     self.element.prop('src', imgurl);
   };
 
   self.select = opts.select || function() {
     self.setImage(self.selectedImg);
-    self.selected = true;
   };
 
   self.unselect = opts.unselect || function() {
     self.setImage(self.unselectedImg);
-    self.selected = false;
+  };
+
+  self.click = function(event) {
+    if (isMultiSelectClick(event)) {
+      self.controlClick();
+    } else {
+      self.normalClick();
+    }
   };
 
   self.normalClick = function() {
-    if (self.selInfo.item !== null) {
-      self.selInfo.item.unselect();
-    }
-    self.selInfo.item = self;
-    self.select();
-  };
-
-  self.clearSelectedItems = function() {
-    for (var i = 0; i < self.selInfo.items.length; i++) {
-      var item = self.selInfo.items[i];
-      item.unselect();
-    }
-    self.selInfo.items = [];
+    self.parentVisual.clearSelection();
+    self.parentVisual.select(self);
   };
 
   self.controlClick = function() {
-    // Clear a selected item before ctrl-clicking begins
-    if (self.selInfo.item !== null) {
-      self.selInfo.item.unselect();
-      self.selInfo.item = null;
-    }
-
-    if (jQuery.inArray(self, self.selInfo.items) === -1) {
-      self.selInfo.items.push(self);
-      self.select();
-      //jQuery('#multiAdd').attr('style', '');
-      //jQuery('#multiAdd').focus();
-      //jQuery('#multiAdd').val(jQuery('#multiAdd').val()+self.title+'\t');
-    }
-  };
-
-  self.click = function(event) {
-    self.selInfo.row = event.data.row;
-    self.selInfo.col = event.data.col;
-
-    if (event.ctrlKey) {
-      self.controlClick();
+    if (jQuery.inArray(self, self.parentVisual.selectedItems) === -1) {
+      self.parentVisual.select(self);
     } else {
-      self.clearSelectedItems();
-      self.normalClick();
+      self.parentVisual.unselect(self);
     }
-    opts.onClick();
   };
 
-  self.click = opts.click || self.click;
-  self.element.click({'row': self.row, 'col': self.col}, self.click);
-  self.selected ? self.select() : self.unselect();
-  return self;
-};
-
-
-/*
- * A BoxPosition represents a single position (cell) in the Box visualization (table).
- * It is responsible for handling the functionality of a cell. This includes changing the title, click event and image
- * associated with the position.
- *
- * See below for examples of usage of BoxPosition.
- */
-var BoxPosition = function(opts) {
-  var self = {};
-
-  self.item = opts.boxItem || null;
-
-  self.clear = function() {
-    jQuery(self.cell).empty();
-  };
-
-  self.click = function(event) {
-    self.item.click(event);
-  };
-
-  self.addItem = function(boxItem) {
-    self.item = boxItem;
-    self.cell.append(boxItem.element);
-  };
-
-  self.select = function() {
-    self.item.select();
-  };
-
-  self.unselect = function() {
-    self.item.unselect();
-  };
-
-  self.setTitle = function() {
-    self.cell.prop('title', Box.utils.getPositionString(self.row, self.col) + ': ' + self.item.title);
-  };
-
-  self.cell = opts.cell;
-  if (typeof self.item !== 'undefined') {
-    self.addItem(self.item);
-  }
-  self.row = opts.row || null;
-  self.col = opts.col || null;
   self.setTitle();
+  self.unselect();
+  self.element.click({'row': self.row, 'col': self.col}, self.click);
+  self.cell.append(self.element);
+  
   return self;
 };
 
 
 var BoxVisual = function() {
   var self = {};
+  
+  self.selectedItems = [];
 
-  self.selected = {
-    item: null,
-    items: [],
-    row: null,
-    col: null
+  self.clearSelection = function() {
+    self.selectedItems.forEach(function(item) { item.unselect() });
+    self.selectedItems = [];
   };
-
+  
+  self.select = function(item, skipCallback) {
+    item.select();
+    self.selectedItems.push(item);
+    if (!skipCallback) {
+      self.onSelectionChanged(self.selectedItems);
+    }
+  };
+  
+  self.unselect = function(item, skipCallback) {
+    item.unselect();
+    self.selectedItems = self.selectedItems.filter(function(selectedItem) {return selectedItem !== item});
+    if (!skipCallback) {
+      self.onSelectionChanged(self.selectedItems);
+    }
+  };
+  
   self.clear = function() {
     jQuery(self.div).empty();
   };
@@ -182,10 +145,19 @@ var BoxVisual = function() {
     tCell.css('height', '30px');
     tRow.append(tCell);
 
+    var makeColSelectEventData = function(col) {
+      return {'col': col};
+    };
+
+    var makeRowSelectEventData = function(row) {
+      return {'row': row};
+    };
+    
     for (var col = 1; col <= self.size.cols; col++) {
       tCell = jQuery('<td>').text(col).css('font-weight', 'bold');
       tCell.css('width', '30px');
       tCell.css('text-align', 'center');
+      tCell.click(makeColSelectEventData(col), self.selectCol);
       tRow.append(tCell);
     }
     tBody.append(tRow);
@@ -197,6 +169,7 @@ var BoxVisual = function() {
       tCell.css('height','30px');
       tCell.css('text-align','center');
       tCell.text(Box.utils.getRowLetter(row)).css('font-weight','bold');
+      tCell.click(makeRowSelectEventData(row), self.selectRow);
       tRow.append(tCell);
 
       for (col = 1; col <= self.size.cols; col++) {
@@ -210,26 +183,55 @@ var BoxVisual = function() {
     jQuery(self.table).append(tBody);
     jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
   };
+  
+  var toggleGroupSelection = function(event, items) {
+    if (!isMultiSelectClick(event)) {
+      self.clearSelection();
+    }
+    var allSelected = true;
+    items.forEach(function(item) {
+      if (jQuery.inArray(item, self.selectedItems) === -1) {
+        self.select(item, true);
+        allSelected = false;
+      }
+    });
+    if (isMultiSelectClick(event) && allSelected) {
+      for (var i = 0; i < items.length; i++) {
+        self.unselect(items[i], true);
+      }
+    }
+    self.onSelectionChanged(self.selectedItems);
+  };
+  
+  self.selectRow = function(event) {
+    var row = event.data.row;
+    var items = [];
+    for (var col = 1; col <= self.size.cols; col++) {
+      items.push(self.position[row][col]);
+    }
+    toggleGroupSelection(event, items);
+  };
+  
+  self.selectCol = function(event) {
+    var col = event.data.col;
+    var items = [];
+    for (var row = 1; row <= self.size.rows; row++) {
+      items.push(self.position[row][col]);
+    }
+    toggleGroupSelection(event, items);
+  };
 
   self.getBoxPosition = function(row, col, tCell) {
-    // Override this method
-    return new BoxPosition({
-      row: row,
-      col: col,
-      cell: tCell,
-      boxItem: self.getBoxItem(row, col)
-    });
+    var opts = self.getBoxPositionOpts(row, col);
+    opts.row = row;
+    opts.col = col;
+    opts.cell = tCell;
+    opts.parentVisual = self;
+    return new BoxPosition(opts);
   };
-
-  self.click = function(row, col) {
-    var event = {
-      data: {
-        'row': row,
-        'col': col
-      }
-    };
-    self.position[row][col].click(event);
-  };
+  
+  self.onSelectionChanged = function(items) {};
+  
   return self;
 };
 
@@ -264,52 +266,33 @@ Box.DialogVisual = function(scan) {
     jQuery('#dialogDialog').dialog('open');
   };
 
-  self.getBoxItem = function(row, col) {
+  self.getBoxPositionOpts = function(row, col) {
     var pos = Box.utils.getPositionString(row, col);
     var boxables;
 
     if (jQuery.inArray(pos, self.scan.readErrorPositions) !== -1) {
-      return new BoxItem({
-        row: row,
-        col: col,
-        selected: self.selected,
+      return {
         title: 'Read Error',
         selectedImg: '/styles/images/tube_error.png',
         unselectedImg: '/styles/images/tube_error.png'
-      });
+      };
     }
     boxables = self.data.filter(function(item) { return item.coordinates == pos; });
     if (boxables.length > 0) {
-      return new BoxItem({
-        row: row,
-        col: col,
-        selected: self.selected,
+      return {
         title: boxables[0].alias,
         selectedImg: '/styles/images/tube_full_selected.png',
-        unselectedImg: '/styles/images/tube_full.png',
-        onClick: function() {}
-      });
+        unselectedImg: '/styles/images/tube_full.png'
+      };
     } else {
-      return new BoxItem({
-        row: row,
-        col: col,
-        selected: self.selected,
+      return {
         title: 'Empty',
         selectedImg: '/styles/images/tube_empty_selected.png',
-        unselectedImg: '/styles/images/tube_empty.png',
-        onClick: function() {}
-      });
+        unselectedImg: '/styles/images/tube_empty.png'
+      };
     }
   };
-
-  self.getBoxPosition = function(row, col, tCell) {
-    return new BoxPosition({
-      row: row,
-      col: col,
-      cell: tCell,
-      boxItem: self.getBoxItem(row, col)
-    });
-  };
+  
   return self;
 };
 
@@ -317,60 +300,62 @@ Box.Visual = function() {
   var self = new BoxVisual();
 
   //@Override
-  self.getBoxItem = function(row, col) {
+  self.getBoxPositionOpts = function(row, col) {
     var pos = Box.utils.getPositionString(row, col);
     var boxables;
     boxables = self.data.filter(function(item) { return item.coordinates == pos; });
     if (boxables.length > 0) {
-      return new BoxItem({
-        row: row,
-        col: col,
-        selected: self.selected,
+      return {
         title: boxables[0].alias,
         selectedImg: '/styles/images/tube_full_selected.png',
-        unselectedImg: '/styles/images/tube_full.png',
-        onClick: function() {
-          jQuery('#selectedPosition').text(pos);
-          jQuery('#selectedName').text(boxables[0].name);
-          jQuery('#selectedAlias').html(Box.utils.hyperlinkifyBoxable(boxables[0].name, boxables[0].id, boxables[0].alias));
-          jQuery('#selectedName').html(Box.utils.hyperlinkifyBoxable(boxables[0].name, boxables[0].id, boxables[0].name));
-          jQuery('#selectedBarcode').val(boxables[0].identificationBarcode);
-          jQuery('#selectedBarcode').select().focus();
-          Box.ui.filterTableByColumn('#listingBoxablesTable', Box.utils.getPositionString(row, col), 0);
-          jQuery('#removeSelected, #emptySelected').prop('disabled', false).removeClass('disabled');
-          jQuery('#currentLocation, #currentLocationText, #warningMessages').html('');
-        }
-      });
+        unselectedImg: '/styles/images/tube_full.png'
+      };
     } else {
-      return new BoxItem({
-        row: row,
-        col: col,
-        selected: self.selected,
+      return {
         title: 'Empty',
         selectedImg: '/styles/images/tube_empty_selected.png',
-        unselectedImg: '/styles/images/tube_empty.png',
-        onClick: function() {
-          jQuery('#selectedPosition').text(Box.utils.getPositionString(row, col));
-          jQuery('#selectedName').empty();
-          jQuery('#selectedAlias').empty();
-          jQuery('#selectedBarcode').val('');
-          jQuery('#selectedBarcode').focus();
-          jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
-          jQuery('#currentLocation, #currentLocationText, #warningMessages').html('');
-        }
-      });
+        unselectedImg: '/styles/images/tube_empty.png'
+      };
     }
   };
-
-  //@Override
-  self.getBoxPosition = function(row, col, tCell) {
-    return new BoxPosition({
-      row: row,
-      col: col,
-      cell: tCell,
-      boxItem: self.getBoxItem(row, col)
+  
+  self.onSelectionChanged = function(items) {
+    var positions = items.map(function(item) {
+      return Box.utils.getPositionString(item.row, item.col);
     });
+    Box.ui.filterTableByBoxPositions(positions);
+    
+    var boxables = null;
+    if (positions.length === 1) {
+      boxables = self.data.filter(function(item) { return item.coordinates === positions[0] });
+    }
+    
+    if (boxables && boxables.length > 0) {
+      // filled position selected
+      jQuery('#selectedPosition').text(positions[0]);
+      jQuery('#selectedName').text(boxables[0].name);
+      jQuery('#selectedAlias').html(Box.utils.hyperlinkifyBoxable(boxables[0].name, boxables[0].id, boxables[0].alias));
+      jQuery('#selectedName').html(Box.utils.hyperlinkifyBoxable(boxables[0].name, boxables[0].id, boxables[0].name));
+      jQuery('#selectedBarcode').val(boxables[0].identificationBarcode);
+      jQuery('#selectedBarcode').select().focus();
+      jQuery('#removeSelected, #emptySelected').prop('disabled', false).removeClass('disabled');
+      jQuery('#currentLocation, #currentLocationText, #warningMessages').html('');
+    } else {
+      // empty position, no positions, or multiple positions selected
+      if (positions.length === 1) {
+        jQuery('#selectedPosition').text(positions[0]);
+      } else {
+        jQuery('#selectedPosition').empty();
+      }
+      jQuery('#selectedName').empty();
+      jQuery('#selectedAlias').empty();
+      jQuery('#selectedBarcode').val('');
+      jQuery('#selectedBarcode').focus();
+      jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
+      jQuery('#currentLocation, #currentLocationText, #warningMessages').html('');
+    }
   };
+  
   return self;
 };
 
@@ -438,25 +423,12 @@ Box.ScanDialog = function() {
     Box.scan.scanBox();
   };
 
-  self.getBoxItem = function(row, col) {
-    return new BoxItem({
-      row: row,
-      col: col,
-      selected: self.selected,
+  self.getBoxPositionOpts = function(row, col) {
+    return {
       title: 'Empty',
       selectedImg: '/styles/images/tube_empty_selected.png',
-      unselectedImg: '/styles/images/tube_empty.png',
-      onClick: function() {}
-    });
-  };
-
-  self.getBoxPosition = function(row, col, tCell) {
-    return new BoxPosition({
-      row: row,
-      col: col,
-      cell: tCell,
-      boxItem: self.getBoxItem(row, col)
-    });
+      unselectedImg: '/styles/images/tube_empty.png'
+    };
   };
 
   self.error = function(message) {
@@ -546,7 +518,7 @@ Box.ScanDiff = function() {
     jQuery('#dialogDialog').dialog('open');
   };
 
-  self.getBoxItem = function(row, col) {
+  self.getBoxPositionOpts = function(row, col) {
     var pos = Box.utils.getPositionString(row, col);
     var sel, unsel, title;
 
@@ -570,24 +542,11 @@ Box.ScanDiff = function() {
       sel = '/styles/images/tube_empty_selected.png';
       unsel = '/styles/images/tube_empty.png';
     }
-    return new BoxItem({
-      row: row,
-      col: col,
-      selected: self.selected,
+    return {
       title: title,
       selectedImg: sel,
-      unselectedImg: unsel,
-      onClick: function() {}
-    });
-  };
-
-  self.getBoxPosition = function(row, col, tCell) {
-    return new BoxPosition({
-      row: row,
-      col: col,
-      cell: tCell,
-      boxItem: self.getBoxItem(row, col)
-    });
+      unselectedImg: unsel
+    };
   };
 
   return self;

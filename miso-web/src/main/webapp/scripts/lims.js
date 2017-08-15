@@ -61,7 +61,8 @@ var Utils = Utils || {
   },
 
   setSortFromPriority: function (table) {
-    table.aaSorting = [ [ table.aoColumns.reduce(function(acc, curr, index) { return acc.iSortPriority > curr.iSortPriority ? acc : { iSortPriority : curr.iSortPriority, iPos : index }; }, { iSortPriority : -1, iPos : 0 }).iPos  , "desc" ] ];
+    var info = table.aoColumns.reduce(function(acc, curr, index) { return acc.iSortPriority > curr.iSortPriority ? acc : { iSortPriority : curr.iSortPriority, bSortDirection : !!curr.bSortDirection, iPos : index }; }, { iSortPriority : -1, bSortDirection : false, iPos : 0 })
+    table.aaSorting = [ [ info.iPos, info.bSortDirection ? "asc" : "desc" ] ];
     return table;
   },
 
@@ -157,7 +158,7 @@ var Utils = Utils || {
       fields.forEach(function(field) {
           var p = document.createElement('P');
           var input;
-          p.appendChild(document.createTextNode(field.label + ": "));
+          p.appendChild(document.createTextNode(field.label + (field.required ? "*" : "") + ": "));
           switch (field.type) {
             case 'select':
                 if (field.values.length == 0) {
@@ -191,6 +192,17 @@ var Utils = Utils || {
                     output[field.property] = parseInt(input.value);
                 };
                 break;
+            case 'date':
+                input = document.createElement('INPUT');
+                input.setAttribute('type', 'text');
+                input.onchange = function() {
+                    output[field.property] = input.value;
+                };
+                jQuery(input).datepicker({
+                    dateFormat: 'yyyy-mm-dd',
+                    showButtonPanel: true,
+                });
+                break;
             default:
                 throw "Unknown field type: " + field.type;
           }
@@ -199,13 +211,21 @@ var Utils = Utils || {
       });
 
       var buttons = {};
-      buttons[okButton] = function () { dialog.dialog("close"); callback(output); };
+      buttons[okButton] = function () {
+        var badFields = fields.filter(function(field) { return field.required && !output[field.property]; }).map(function(field) { return field.label; });
+        if (badFields.length) {
+          alert("You must fill out the following fields: " + badFields.join(", "));
+          return;
+        }
+        dialog.dialog("close");
+        callback(output);
+      };
       buttons["Cancel"] = function () { dialog.dialog("close"); };
       var dialog = jQuery('#dialog').dialog({
           autoOpen: true,
-          height: 400,
-          width: 350,
-          title:title,
+          height: fields.length * 40 + 200,
+          width: 500,
+          title: title,
           modal: true,
           buttons: buttons
       });
@@ -271,7 +291,20 @@ var Utils = Utils || {
                 alert('Sadness: ' + textStatus);
             }
         });
-    }
+    },
+    
+      
+  /**
+   * Helper method for extracting the components of a BoxPosition into integers
+   * e.g. "BOX3 A01" gets converted to [65, 1]
+   */
+  getBoxPositionAsIntArray: function(boxPosnString) {
+    var posnRegex = /.* ([A-Z])(\d{2})$/;
+    var posn = posnRegex.exec(boxPosnString);
+    var rowVal = posn[1].charCodeAt(0);
+    var colVal = parseInt(posn[2]);
+    return { row: rowVal, col: colVal };
+  }
 };
 
 Utils.timer = {
@@ -579,8 +612,10 @@ Utils.array = {
   },
   deduplicateById: function(input) {
     return input.sort(function(a, b) { return a.id - b.id; }).filter(function(obj, index, arr) { return index == 0 || obj.id != arr[index - 1].id; });
-  },
-  
+  }
+};
+
+Utils.sorting = {
   /**
    * Sorts based on a given property.
    */
@@ -589,7 +624,38 @@ Utils.array = {
       return a[property].localeCompare(b[property]);
     };
   },
+
+  /** 
+   * Sorts by comparing the first two arguments, then the second two if the first two are identical.
+   * All arguments must be integers.
+   */
+  twoByTwoComparator: function(a, b, y, z) {
+    return (a - b) || (y - z);
+  },
+  
+  /**
+   * Takes two strings, extracts the BoxPosition string from each, and compares the BoxPosition using a given comparator.
+   */
+   sortBoxPositions: function(a, b, sortOnRows) {
+     var aValues = Utils.getBoxPositionAsIntArray(a);
+     var aRow = aValues.row, aCol = aValues.col;
+     var bValues = Utils.getBoxPositionAsIntArray(b);
+     var bRow = bValues.row, bCol = bValues.col;
+     if (!aRow || !bRow || !aCol || !bCol) {
+       // don't know what to do with locations not like 'A01'-'Q33'
+       return a.localeCompare(b);
+     }
+     // assumption: users always want to sort BoxPosition ascending
+     if (sortOnRows) {
+       // compare by rows first, then by columns if rows are the same
+       return Utils.sorting.twoByTwoComparator(aRow, bRow, aCol, bCol);
+     } else {
+       // compare by columns first, then by rows if columns are the same
+       return Utils.sorting.twoByTwoComparator(aCol, bCol, aRow, bRow);
+     }
+   },
+
   sampleClassComparator: function(a, b) {
     return (Constants.sampleCategories.indexOf(a.sampleCategory) - Constants.sampleCategories.indexOf(b.sampleCategory)) || a.alias.localeCompare(b.alias);
-  },
+  }
 };

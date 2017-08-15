@@ -35,8 +35,6 @@ ListUtils = (function() {
         ? ' (' + hidden + ' on other pages)' : '');
   };
   var initTable = function(elementId, target, projectId, config, optionModifier) {
-    var searchKey = target.name + '_search';
-    var lastSearch = window.localStorage.getItem(searchKey);
     var staticActions = target.createStaticActions(config, projectId);
     var bulkActions = target.createBulkActions(config, projectId);
     var columns = target.createColumns(config, projectId).filter(function(x) {
@@ -104,32 +102,31 @@ ListUtils = (function() {
     }
     var errorMessage = document.createElement('DIV');
     var jqTable = jQuery('#' + elementId).html('');
-    var options = Utils
-        .setSortFromPriority({
-          'aoColumns' : columns,
-          'bJQueryUI' : true,
-          'bAutoWidth' : false,
-          'iDisplayLength' : 25,
-          'iDisplayStart' : 0,
-          'sDom' : '<"H"lf>r<"datatable-scroll"t><"F"ip>',
-          'sPaginationType' : 'full_numbers',
-          'bProcessing' : true,
-          'oSearch' : {
-            'sSearch' : lastSearch || ""
-          },
-          'fnDrawCallback' : function(oSettings) {
-            jqTable.removeClass('disabled');
-            jQuery('#' + elementId + '_paginate').find('.fg-button')
-                .removeClass('fg-button');
-            var filterbox = jQuery('#' + elementId + '_filter :input');
-            filterbox.val(window.localStorage.getItem(searchKey));
-            filterbox.on('change keyup paste', function() {
-              window.localStorage.setItem(searchKey, filterbox.val());
-            });
-          }
-        });
+    var options = Utils.setSortFromPriority({
+      'aoColumns' : columns,
+      'bJQueryUI' : true,
+      'bAutoWidth' : false,
+      'iDisplayLength' : 25,
+      'iDisplayStart' : 0,
+      'sDom' : '<"H"lf>r<"datatable-scroll"t><"F"ip>',
+      'sPaginationType' : 'full_numbers',
+      'bStateSave' : true,
+      'bProcessing' : true,
+      'fnDrawCallback' : function(oSettings) {
+        jqTable.removeClass('disabled');
+        jQuery('#' + elementId + '_paginate').find('.fg-button').removeClass(
+            'fg-button');
+      }
+    });
     optionModifier(options, jqTable, errorMessage, columns);
-    jqTable.dataTable(options).fnSetFilteringDelay(600);
+    jqTable.dataTable(options);
+    var filterbox = jQuery('#' + elementId + '_filter :input');
+    filterbox.unbind();
+    filterbox.bind('keyup', function(e) {
+      if (e.keyCode == 13) {
+        jqTable.fnFilter(this.value);
+      }
+    });
     var tableNode = document.getElementById(elementId + '_wrapper');
     errorMessage.setAttribute('class', 'parsley-error');
     tableNode.parentNode.insertBefore(errorMessage, tableNode);
@@ -159,7 +156,7 @@ ListUtils = (function() {
         var button;
         if (buttonDescription) {
           button = document.createElement('A');
-          button.append(document.createTextNode(buttonDescription.name));
+          button.appendChild(document.createTextNode(buttonDescription.name));
           button.href = '#';
           button.setAttribute('class', 'ui-button ui-state-default');
           button.setAttribute('title', buttonDescription.title || '');
@@ -171,10 +168,10 @@ ListUtils = (function() {
           button = document.createElement('SPAN');
           button.setAttribute('class', 'ui-state-default');
         }
-        toolbar.append(button);
+        toolbar.appendChild(button);
       });
       if (bulkActions.length > 0) {
-        toolbar.append(ListState[elementId].element);
+        toolbar.appendChild(ListState[elementId].element);
       }
     }
   }
@@ -186,6 +183,8 @@ ListUtils = (function() {
         options.sAjaxSource = target.createUrl(config, projectId);
         options.fnServerData = function(sSource, aoData, fnCallback) {
           jqTable.addClass('disabled');
+          var filterbox = jQuery('#' + elementId + '_filter :input');
+          filterbox.prop('disabled', true);
           jQuery.ajax({
             'dataType' : 'json',
             'type' : 'GET',
@@ -205,6 +204,7 @@ ListUtils = (function() {
               });
               updateSelectedLabel(ListState[elementId]);
               fnCallback(data, textStatus, xhr);
+              filterbox.prop('disabled', false);
             },
             'error' : function(xhr, statusText, errorThrown) {
               errorMessage.innerText = errorThrown;
@@ -216,6 +216,7 @@ ListUtils = (function() {
                 sEcho : aoData.sEcho,
                 aaData : []
               });
+              filterbox.prop('disabled', false);
             }
           });
         };
@@ -285,7 +286,7 @@ ListUtils = (function() {
         "iSortPriority" : priority,
         "bSortable" : priority >= 0,
         "mRender" : function(data, type, full) {
-          return "<a href=\"/miso/" + urlFragment + "/" + data + "\">" + getLabel(full) + "</a>";
+          return data ? "<a href=\"/miso/" + urlFragment + "/" + data + "\">" + getLabel(full) + "</a>" : "";
         }
       };
     },
@@ -296,9 +297,10 @@ ListUtils = (function() {
         "mData" : label,
         "include" : true,
         "iSortPriority" : priority,
+        "bSortDirection" : true,
         "bSortable" : priority >= 0,
         "mRender" : function(data, type, full) {
-          return "<a href=\"/miso/" + urlFragment + "/" + getId(full) + "\">" + data + "</a>";
+            return data ? "<a href=\"/miso/" + urlFragment + "/" + getId(full) + "\">" + data + "</a>" : "";
         }
       };
     },

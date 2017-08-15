@@ -129,7 +129,7 @@ ListTarget.completion = {
           "iSortPriority" : 0,
           "include" : true
         }, {
-          "sTitle" : "Last Updated",
+          "sTitle" : "Last Modified",
           "mData" : "lastUpdated",
           "iSortPriority" : 2,
           "iSortPriority" : 0,

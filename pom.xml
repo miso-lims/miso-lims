@@ -63,7 +63,7 @@
         <role>Administrator</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>tdebat</id>
@@ -75,7 +75,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>amasella</id>
@@ -87,7 +87,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>dcooke</id>
@@ -99,7 +99,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>harmstrong</id>
@@ -111,7 +111,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
   <modules>
@@ -125,10 +125,8 @@
     <module>miso-dto</module>
     <module>notification-server</module>
     <module>runscanner</module>
-    <module>runstats-client</module>
     <module>notification-consumer-services</module>
     <module>miso-external-web</module>
-    <module>runstats-server</module>
     <module>demo-notification-client</module>
   </modules>
   <!-- SVN connection -->
@@ -136,7 +134,7 @@
     <connection>scm:git:https://www.github.com/oicr-gsi/miso-lims</connection>
     <developerConnection>scm:git:git@github.com:oicr-gsi/miso-lims</developerConnection>
     <url>http://www.github.com/oicr-gsi/miso-lims</url>
-    <tag>v0.2.82</tag>
+    <tag>v0.2.83</tag>
   </scm>
   <!-- Bug Tracker -->
   <issueManagement>
@@ -158,6 +156,7 @@
     <downloadUrl>http://repos.tgac.ac.uk/maven/repo</downloadUrl>
   </distributionManagement>
   <properties>
+    <skipUTs>${skipTests}</skipUTs>
     <spring-version>4.3.6.RELEASE</spring-version>
     <spring-security-version>4.2.1.RELEASE</spring-security-version>
     <spring-integration-version>4.3.6.RELEASE</spring-integration-version>
@@ -203,7 +202,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>r08</version>
+        <version>22.0</version>
       </dependency>
       <dependency>
         <groupId>com.googlecode.json-simple</groupId>
@@ -474,6 +473,11 @@
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
+        <groupId>io.github.bonigarcia</groupId>
+        <artifactId>webdrivermanager</artifactId>
+        <version>1.7.0</version>
+      </dependency>
+      <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
         <version>3.2.1</version>
@@ -530,6 +534,11 @@
         <groupId>org.odftoolkit</groupId>
         <artifactId>odfdom-java</artifactId>
         <version>0.8.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-java</artifactId>
+        <version>3.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -704,11 +713,6 @@
       </dependency>
       <dependency>
         <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-        <artifactId>runstats-client</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
         <artifactId>spring</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -750,7 +754,7 @@
       <dependency>
         <groupId>xml-apis</groupId>
         <artifactId>xml-apis</artifactId>
-        <version>1.3.04</version>
+        <version>1.4.01</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -945,6 +949,11 @@
           <version>1.7.4</version>
         </plugin>
         <plugin>
+          <groupId>net.xeric.maven</groupId>
+          <artifactId>h2-maven-plugin</artifactId>
+          <version>1.5</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>2.5.5</version>
@@ -967,6 +976,11 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.20</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>2.4</version>
         </plugin>
@@ -984,6 +998,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
           <version>2.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.cargo</groupId>
+          <artifactId>cargo-maven2-plugin</artifactId>
+          <version>1.6.3</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.gmaven</groupId>
@@ -1030,6 +1049,7 @@
             <include>**/*Test.java</include>
             <include>**/*Tests.java</include>
           </includes>
+          <skipTests>${skipUTs}</skipTests>
         </configuration>
       </plugin>
       <plugin>
@@ -1104,7 +1124,6 @@
       </activation>
       <modules>
         <module>sqlstore</module>
-        <module>runstats-client</module>
         <module>notification-consumer-services</module>
         <module>notification-server</module>
         <module>demo-notification-client</module>

@@ -163,6 +163,10 @@ var Sample = Sample || {
       jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
       jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
       
+      // Tissue Class validation
+      jQuery('#tissueClass').attr('class', 'form-control');
+      jQuery('#tissueClass').attr('data-parsley-required', 'true');
+      
       // TissueOrigin validation
       jQuery('#tissueOrigin').attr('class', 'form-control');
       jQuery('#tissueOrigin').attr('data-parsley-required', 'true');
@@ -646,10 +650,10 @@ Sample.ui = {
       } else {
         jQuery('#lcmTubeTable').hide();
       }
-      if (sampleClass.alias == 'CV Slide') {
-        jQuery('#cvSlideTable').show();
+      if (sampleClass.alias == 'Slide') {
+        jQuery('#slideTable').show();
       } else {
-        jQuery('#cvSlideTable').hide();
+        jQuery('#slideTable').hide();
       }
       break;
     case 'Stock':
@@ -687,7 +691,7 @@ Sample.ui = {
     });
     jQuery('#detailedSampleAliquot').hide();
     jQuery('#detailedSampleStock').hide();
-    jQuery('#cvSlideTable').hide();
+    jQuery('#slideTable').hide();
     jQuery('#lcmTubeTable').hide();
     jQuery('#tissueClassRow').hide();
     jQuery('#stockClassRow').hide();
@@ -720,7 +724,7 @@ Sample.ui = {
     jQuery('#stockClassRow').hide();
     jQuery('#detailedSampleStock').show();
     jQuery('#detailedSampleAliquot').hide();
-    jQuery('#cvSlideTable').hide();
+    jQuery('#slideTable').hide();
     jQuery('#lcmTubeTable').hide();
   },
   

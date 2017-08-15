@@ -127,7 +127,7 @@ public class RunControllerHelperService {
         if (newPt != null) {
           log.info("STORED: " + newRuntype + " :: " + storedPlatformType);
           if (!newRuntype.equals(storedPlatformType)) {
-            run = new Run(user);
+            run = newPt.createRun(user);
             run.setId(storedRun.getId());
           } else {
             run = storedRun;
@@ -186,7 +186,7 @@ public class RunControllerHelperService {
       Map<String, Object> responseMap = new HashMap<>();
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-      Run run = new Run(user);
+      Run run = sr.getPlatform().getPlatformType().createRun(user);
 
       run.setSequencerReference(sr);
 

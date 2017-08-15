@@ -29,6 +29,9 @@
 
 --%>
 <%@ include file="../header.jsp" %>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent" class="${not empty run.health ? 'run.health.key' : ''}">
 
@@ -180,23 +183,6 @@
       </c:choose>
     </td>
   </tr>
-  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.PacBioRun')}">
-    <c:if test="${pacBioDashboardUrl != null && run.id != 0}">
-      <tr>
-        <td>PacBio Dashboard:</td>
-        <td><span id="pbDashLink"></span></td>
-        <script type="text/javascript">
-          jQuery(document).ready(function() {
-            Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.startDate}', '${run.sequencerReference.name}');
-          });
-        </script>
-      </tr>
-    </c:if>
-    <tr>
-      <td>Movie Duration (minutes):</td>
-      <td><form:input path="movieDuration" class="validateable"/></td>
-    </tr>
-  </c:if>
   <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
     <tr>
       <td>Number of Cycles:</td>
@@ -294,35 +280,22 @@
 	jQuery(document).ready(function () {
 	  // Attaches a Parsley form validator.
 	  Validate.attachParsley('#run-form');
-	  Run.makePacBioUrl('${pacBioDashboardUrl}', '${run.alias}', '${run.startDate}', '${run.sequencerReference.name}');
 	});
 </script>
 
 <%@ include file="permissions.jsp" %>
 <c:if test="${run.id != 0}">
-  <c:if test="${statsAvailable}">
-    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#stats_arrowclick'), 'stats');">Statistics
-      <div id="stats_arrowclick" class="toggleLeft"></div>
-    </div>
-    <div id="stats">
-      <h1>Statistics</h1>
-
-      <div id="summarydiv"></div>
-    </div>
-  </c:if>
-
-  <c:if test="${run.health.key ne 'Stopped' and metrixEnabled and miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
+  <c:if test="${run.id != 0}">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>
   <div id="metrix">
-    <h1>InterOp Metrics</h1>
-
-    <div id="metrixdiv"></div>
+    <h1>Metrics</h1>
+    <div id="metricsdiv"></div>
   </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      Stats.getInterOpMetrics('${run.alias}', 'Illumina');
+      RunGraph.renderMetrics(${metrics}, ${partitionNames});
     });
   </script>
   </c:if>
@@ -504,9 +477,6 @@
         <tr>
             <th>${platformType.partitionName} No.</th>
             <th>Pool</th>
-            <c:if test="${statsAvailable}">
-              <th>Stats</th>
-            </c:if>
           </tr>
         <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
           <tr>
@@ -560,12 +530,6 @@
                 </c:otherwise>
               </c:choose>
             </td>
-            <c:if test="${statsAvailable}">
-              <td><img id="charttrigger" src="<c:url value='/styles/images/chart-bar-icon.png'/>"
-                       border="0"
-                       onclick="Stats.getPartitionStats(${run.id}, ${partition.partitionNumber}); checkstats(${run.id}, ${partition.partitionNumber}); ">
-              </td>
-            </c:if>
           </tr>
         </c:forEach>
       </table>
@@ -597,23 +561,6 @@
 </div>
 
 <script type="text/javascript">
-  jQuery("#charttrigger").colorbox({
-    width: "90%",
-    html: "<div style='display:none'> " +
-          "<div id=\"graphpanel\"> " +
-          "<div id=\"statresultgraph\">" +
-          "<center><h2>Sample <span id=chartSample></span> Partition <span id=chartPartition></span> Statistics</h2></center> " +
-          "<div id=\"statstable\"></div> " +
-          "<div style=\"width: 45%; left: 10px; position: absolute;\"><h2>Quality Profile</h2>  " +
-          "<div id=\"statschartqualityprofile\" style=\"width: 100%; height:650px; position: absolute; overflow-x: scroll; overflow-y: hidden; \"></div>" +
-          "</div> " +
-          "<div style=\"width: 45%; right: 10px; position: absolute;\"><h2>Per Base Content</h2>    " +
-          "<div id=\"statschartperbasecontent\" style=\"width: 100%; right: 10px; position: absolute;\"></div>" +
-          "</div>" +
-          "<div id=\"statschartmessage\"></div> " +
-          "</div>" +
-          "</div>" +
-          "</div>"});
 
   jQuery(document).ready(function () {
     jQuery('#alias').simplyCountable({
@@ -631,96 +578,13 @@
     });
 
     Run.pool.poolSearch("", '${platformType.key}');
-    <c:if test="${run.id != 0 and metrixEnabled}">
-      Stats.checkRunProgress('${run.alias}', '${platformType.key}');
-    </c:if>
-
-
-    <c:if test="${statsAvailable}">
-      Stats.getRunStats(${run.id});
-    </c:if>
   });
 
-  function checkstats(runId, lane) {
-    jQuery('#statschartmessage').html("");
-    jQuery('#statschartqualityprofile').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
-
-    Fluxion.doAjax(
-      'statsControllerHelperService',
-      'getSummaryRunstatsDiagram',
-      {'runId': runId, 'lane': lane, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery('#statschartqualityprofile').html("");
-        readStats(json);
-      }
-      }
-    );
-
-    jQuery('#statschartmessage').html("");
-    jQuery('#statschartperbasecontent').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
-
-    Fluxion.doAjax(
-      'statsControllerHelperService',
-      'getPerPositionBaseContentDiagram',
-      {'runId': runId, 'lane': lane, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        readStatsperbasecontent(json);
-      }
-      }
-    );
-  }
-
-  function readStats(json) {
-    readStatsdb(json);
-  }
-
-  function checkstatsperbasecontent(runId, lane) {
-    jQuery('#statschartmessage').html("");
-    jQuery('#chartheader').html("Per Base Percentage");
-    jQuery('#statschart').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
-
-    Fluxion.doAjax(
-      'statsControllerHelperService',
-      'getPerPositionBaseContentDiagram',
-      {'runId': runId, 'lane': lane, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        readStatsperbasecontent(json);
-      }
-      }
-    );
-  }
-
-  function readStatsperbasecontent(json) {
-    readStatsdbperbasecontent(json);
-  }
 </script>
 
 <br/>
 </form:form>
-<c:if test="${not empty run.changeLog}">
-  <br/>
-  <h1>Changes</h1>
-  <div style="clear:both">
-    <table class="list" id="changelog_table">
-      <thead>
-      <tr>
-        <th>Editor</th>
-        <th>Summary</th>
-        <th>Time</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${run.changeLog}" var="change">
-        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${change.user.fullName} (${change.user.loginName})</td>
-          <td><b>${change.summary}</b></td>
-          <td>${change.time}</td>
-        </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-  </div>
-</c:if>
+<miso:changelog item="${run}"/>
 </div>
 </div>
 

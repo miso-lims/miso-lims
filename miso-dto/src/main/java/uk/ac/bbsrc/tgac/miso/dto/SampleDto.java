@@ -49,13 +49,13 @@ public class SampleDto implements WritableUrls {
   private String taxonIdentifier;
   private Long rootSampleClassId;
   private String rootSampleClassUrl;
-  private Double volume;
+  private String volume;
   private Boolean discarded;
   private Long updatedById;
   private String updatedByUrl;
   private String lastModified;
-  private Double qcDv200;
-  private Double qcRin;
+  private String qcDv200;
+  private String qcRin;
   private List<SampleQcDto> qcs;
 
   public Long getId() {
@@ -197,11 +197,11 @@ public class SampleDto implements WritableUrls {
     this.rootSampleClassUrl = rootSampleClassUrl;
   }
 
-  public Double getVolume() {
+  public String getVolume() {
     return volume;
   }
 
-  public void setVolume(Double volume) {
+  public void setVolume(String volume) {
     this.volume = volume;
   }
 
@@ -245,19 +245,19 @@ public class SampleDto implements WritableUrls {
     this.boxId = boxId;
   }
 
-  public Double getQcDv200() {
+  public String getQcDv200() {
     return qcDv200;
   }
 
-  public void setQcDv200(Double qcDv200) {
+  public void setQcDv200(String qcDv200) {
     this.qcDv200 = qcDv200;
   }
 
-  public Double getQcRin() {
+  public String getQcRin() {
     return qcRin;
   }
 
-  public void setQcRin(Double qcRin) {
+  public void setQcRin(String qcRin) {
     this.qcRin = qcRin;
   }
 

@@ -1,3 +1,7 @@
+-- fixes LibraryDesign changes that were marked "NoTest" in V0130
+ALTER TABLE LibraryDesign DROP CONSTRAINT `uk_libraryDesign_name`;
+ALTER TABLE LibraryDesign ADD CONSTRAINT `uk_libraryDesign_name_sampleClass` UNIQUE (`name`, `sampleClassId`);
+
 DELETE FROM Indices;
 DELETE FROM IndexFamily;
 INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES

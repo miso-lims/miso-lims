@@ -46,8 +46,8 @@ import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
-import org.springframework.util.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -61,11 +61,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 /**
@@ -81,6 +83,15 @@ public class LS454NotificationMessageConsumerMechanism
     implements NotificationMessageConsumerMechanism<Message<Map<String, List<String>>>, Set<Run>> {
   protected static final Logger log = LoggerFactory.getLogger(LS454NotificationMessageConsumerMechanism.class);
 
+  @Autowired
+  private RunService runService;
+
+  @Autowired
+  private SequencerReferenceService sequencerService;
+
+  @Autowired
+  private ContainerService containerService;
+
   public boolean attemptRunPopulation = true;
 
   public void setAttemptRunPopulation(boolean attemptRunPopulation) {
@@ -92,14 +103,12 @@ public class LS454NotificationMessageConsumerMechanism
 
   @Override
   public Set<Run> consume(Message<Map<String, List<String>>> message) throws InterrogationException {
-    RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
-    Assert.notNull(requestManager, "Cannot consume MISO notification messages without a RequestManager.");
     Map<String, List<String>> statuses = message.getPayload();
     Set<Run> output = new HashSet<>();
     for (String key : statuses.keySet()) {
       HealthType ht = HealthType.valueOf(key);
       JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
-      Map<String, Run> map = processRunJSON(ht, runs, requestManager);
+      Map<String, Run> map = processRunJSON(ht, runs);
       for (Run r : map.values()) {
         output.add(r);
       }
@@ -107,7 +116,7 @@ public class LS454NotificationMessageConsumerMechanism
     return output;
   }
 
-  private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
+  private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs) {
     Map<String, Run> updatedRuns = new HashMap<>();
     List<Run> runsToSave = new ArrayList<>();
 
@@ -139,7 +148,7 @@ public class LS454NotificationMessageConsumerMechanism
           Matcher m = p.matcher(runName);
           if (m.matches()) {
             try {
-              r = (LS454Run) requestManager.getRunByAlias(runName);
+              r = (LS454Run) runService.getRunByAlias(runName);
 
             } catch (IOException ioe) {
               log.warn(
@@ -165,10 +174,10 @@ public class LS454NotificationMessageConsumerMechanism
 
                 SequencerReference sr = null;
                 if (run.has("sequencerName")) {
-                  sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
+                  sr = sequencerService.getByName(run.getString("sequencerName"));
                 }
                 if (sr == null) {
-                  sr = requestManager.getSequencerReferenceByName(m.group(2));
+                  sr = sequencerService.getByName(m.group(2));
                 }
 
 
@@ -204,10 +213,10 @@ public class LS454NotificationMessageConsumerMechanism
                 if (r.getSequencerReference() == null) {
                   SequencerReference sr = null;
                   if (run.has("sequencerName")) {
-                    sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
+                    sr = sequencerService.getByName(run.getString("sequencerName"));
                   }
                   if (sr == null) {
-                    sr = requestManager.getSequencerReferenceByName(m.group(2));
+                    sr = sequencerService.getByName(m.group(2));
                   }
 
                   if (sr != null) {
@@ -279,7 +288,7 @@ public class LS454NotificationMessageConsumerMechanism
                       }
                       if (isStringEmptyOrNull(f.getIdentificationBarcode())) {
                         f.setIdentificationBarcode(ptpId);
-                        long flowId = requestManager.saveSequencerPartitionContainer(f).getId();
+                        long flowId = containerService.save(f).getId();
                         f.setId(flowId);
                       }
                     }
@@ -319,7 +328,7 @@ public class LS454NotificationMessageConsumerMechanism
 
     try {
       if (runsToSave.size() > 0) {
-        requestManager.saveRuns(runsToSave);
+        runService.saveRuns(runsToSave);
         log.info("Batch saved " + runsToSave.size() + " runs");
       }
     } catch (IOException e) {

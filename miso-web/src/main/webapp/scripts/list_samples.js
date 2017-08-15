@@ -82,7 +82,7 @@ ListTarget.sample = {
                 label : 'Sample Class',
                 values : Constants.sampleClasses.filter(function(sampleClass) {
                   return sampleClass.canCreateNew;
-                }).sort(Utils.array.sampleClassComparator),
+                }).sort(Utils.sorting.sampleClassComparator),
                 getLabel : Utils.array.getAlias
               });
             }
@@ -205,7 +205,7 @@ ListTarget.sample = {
           "include" : true,
           "iSortPriority" : 0
         }, {
-          "sTitle" : "Last Updated",
+          "sTitle" : "Last Modified",
           "mData" : "lastModified",
           "include" : Constants.isDetailedSample,
           "iSortPriority" : 2

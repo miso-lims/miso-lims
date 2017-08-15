@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleValidRelationshipDao;
@@ -94,45 +92,29 @@ public class DefaultSampleClassService implements SampleClassService {
   }
 
   @Override
-  public SampleClass inferStockFromAliquot(SampleClass sampleClass) {
-    SampleClass aliquotClass = sampleClassDao.getSampleClass(sampleClass.getId());
-    if (aliquotClass == null || !aliquotClass.getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
-      throw new IllegalArgumentException("Sample class " + sampleClass.getId() + " is not a valid aliquot class.");
+  public SampleClass inferParentFromChild(long childClassId, String childCategory, String parentCategory) {
+    SampleClass childClass = sampleClassDao.getSampleClass(childClassId);
+    if (childClass == null) {
+      throw new IllegalArgumentException("Invalid sample class " + childClassId);
     }
-    SampleClass stockClass = null;
-    for (SampleValidRelationship relationship : sampleValidRelationshipDao.getSampleValidRelationship()) {
-      if (!relationship.getArchived() && relationship.getChild().getId() == aliquotClass.getId()
-          && relationship.getParent().getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
-        if (stockClass == null) {
-          stockClass = relationship.getParent();
-        } else {
-          throw new IllegalStateException("Aliquot class " + sampleClass.getId() + " has multiple stock class parents.");
-        }
-      }
+    if (!childClass.getSampleCategory().equals(childCategory)) {
+      throw new IllegalArgumentException(
+          String.format("Sample class %s is not a valid %s class.", childClassId, childCategory));
     }
-    if (stockClass == null) throw new IllegalStateException("Aliquot class " + sampleClass.getId() + " has no stock class.");
-    return stockClass;
-  }
-
-  @Override
-  public SampleClass inferTissueFromStock(SampleClass sampleClass) {
-    SampleClass stockClass = sampleClassDao.getSampleClass(sampleClass.getId());
-    if (stockClass == null || !stockClass.getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
-      throw new IllegalArgumentException("Sample class " + sampleClass.getId() + " is not a valid stock class.");
+    List<SampleClass> parentClasses = sampleValidRelationshipDao.getSampleValidRelationship().stream()
+        .filter(relationship -> !relationship.getArchived() && relationship.getChild().getId() == childClass.getId()
+            && relationship.getParent().getSampleCategory().equals(parentCategory))
+        .map(SampleValidRelationship::getParent).collect(Collectors.toList());
+    switch (parentClasses.size()) {
+    case 0:
+      throw new IllegalStateException(
+          String.format("%s class %s (%d) has no %s parents", childCategory, childClass.getAlias(), childClassId, parentCategory));
+    case 1:
+      return parentClasses.get(0);
+    default:
+      throw new IllegalStateException(
+          String.format("%s class %s (%d) has multiple %s parents.", childCategory, childClass.getAlias(), childClassId, parentCategory));
     }
-    SampleClass tissueClass = null;
-    for (SampleValidRelationship relationship : sampleValidRelationshipDao.getSampleValidRelationship()) {
-      if (!relationship.getArchived() && relationship.getChild().getId() == stockClass.getId()
-          && relationship.getParent().getSampleCategory().equals(SampleTissue.CATEGORY_NAME)) {
-        if (tissueClass == null) {
-          tissueClass = relationship.getParent();
-        } else {
-          throw new IllegalStateException("Stock class " + sampleClass.getId() + " has multiple tissue class parents.");
-        }
-      }
-    }
-    if (tissueClass == null) throw new IllegalStateException("Stock class" + sampleClass.getId() + " has no stock class.");
-    return tissueClass;
   }
 
 }

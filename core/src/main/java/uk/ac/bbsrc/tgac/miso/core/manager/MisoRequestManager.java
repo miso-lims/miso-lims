@@ -23,7 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,8 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
@@ -48,25 +48,13 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.google.common.collect.Lists;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -83,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 /**
  * Implementation of a RequestManager to facilitate persistence operations on MISO model objects
@@ -90,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Transactional(rollbackFor = Exception.class)
 public class MisoRequestManager implements RequestManager {
   protected static final Logger log = LoggerFactory.getLogger(MisoRequestManager.class);
 
@@ -207,16 +197,6 @@ public class MisoRequestManager implements RequestManager {
       return projectStore.listOverviewsByProjectId(projectId);
     } else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public Collection<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode)
-      throws IOException {
-    if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.listSequencerPartitionContainersByBarcode(barcode);
-    } else {
-      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -393,146 +373,6 @@ public class MisoRequestManager implements RequestManager {
     projectStore.saveOverview(managed);
   }
 
-  @Override
-  public long saveRun(Run run) throws IOException {
-    if (runStore != null) {
-      run.setLastModifier(getCurrentUser());
-      if (run.getId() == Run.UNSAVED_ID) {
-
-        run.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(run.getSecurityProfile())));
-        run.setLastModifier(getCurrentUser());
-
-        run.setName(generateTemporaryName());
-
-        if (!run.getSequencerPartitionContainers().isEmpty()) {
-          List<SequencerPartitionContainer> containersToSave = new ArrayList<>();
-          for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
-            SequencerPartitionContainer managedContainer = getSequencerPartitionContainerById(container.getId());
-            if (managedContainer == null) {
-              containersToSave.add(container);
-            } else {
-              updateContainer(container, managedContainer);
-              containersToSave.add(managedContainer);
-            }
-          }
-          run.setSequencerPartitionContainers(containersToSave);
-        }
-        setChangeDetails(run);
-        run.setId(runStore.save(run));
-        try {
-          String name = namingScheme.generateNameFor(run);
-          run.setName(name);
-
-          validateNameOrThrow(run, namingScheme);
-          return runStore.save(run);
-        } catch (MisoNamingException e) {
-          throw new IOException("Cannot save Run - issue with generating name");
-        }
-      } else {
-        Run managed = runStore.get(run.getId());
-        log.info("update run: " + managed);
-        managed.setLastModifier(getCurrentUser());
-        managed.setAlias(run.getAlias());
-        managed.setDescription(run.getDescription());
-        managed.setFilePath(run.getFilePath());
-        managed.setHealth(run.getHealth());
-        managed.setStartDate(run.getStartDate());
-        managed.setCompletionDate(run.getCompletionDate());
-        for (RunQC runQc : run.getRunQCs()) {
-          if (!managed.getRunQCs().contains(runQc)) {
-            managed.addQc(runQc);
-          }
-        }
-        Set<String> originalContainers = Barcodable.extractLabels(managed.getSequencerPartitionContainers());
-        List<SequencerPartitionContainer> saveContainers = new ArrayList<>();
-        for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
-          SequencerPartitionContainer managedContainer = getSequencerPartitionContainerById(container.getId());
-          updateContainer(container, managedContainer);
-          saveContainers.add(managedContainer);
-        }
-        Set<String> updatedContainers = Barcodable.extractLabels(saveContainers);
-        managed.setSequencerPartitionContainers(saveContainers);
-        managed.setNotes(run.getNotes());
-        managed.setSequencingParameters(run.getSequencingParameters());
-        if (managed instanceof IlluminaRun) {
-          IlluminaRun managedIllumina = (IlluminaRun) managed;
-          IlluminaRun runIllumina = (IlluminaRun) run;
-          managedIllumina.setCallCycle(runIllumina.getCallCycle());
-          managedIllumina.setImgCycle(runIllumina.getImgCycle());
-          managedIllumina.setNumCycles(runIllumina.getNumCycles());
-          managedIllumina.setScoreCycle(runIllumina.getScoreCycle());
-          managedIllumina.setPairedEnd(runIllumina.getPairedEnd());
-        } else if (isPacBioRun(managed)) {
-          PacBioRun managedPacBio = (PacBioRun) managed;
-          PacBioRun runPacBio = (PacBioRun) run;
-          managedPacBio.setMovieDuration(runPacBio.getMovieDuration());
-        } else if (isLS454Run(managed)) {
-          LS454Run managedLS454 = (LS454Run) managed;
-          LS454Run runLS454 = (LS454Run) run;
-          managedLS454.setCycles(runLS454.getCycles());
-          managedLS454.setPairedEnd(runLS454.getPairedEnd());
-        } else if (isSolidRun(managed)) {
-          SolidRun managedSolid = (SolidRun) managed;
-          SolidRun runSolid = (SolidRun) run;
-          managedSolid.setPairedEnd(runSolid.getPairedEnd());
-        }
-
-        Set<String> added = new TreeSet<>(updatedContainers);
-        added.removeAll(originalContainers);
-        Set<String> removed = new TreeSet<>(originalContainers);
-        removed.removeAll(updatedContainers);
-        if (!added.isEmpty() || !removed.isEmpty()) {
-          StringBuilder message = new StringBuilder();
-          message.append("Containers");
-          LimsUtils.appendSet(message, added, "added");
-          LimsUtils.appendSet(message, removed, "removed");
-
-          RunChangeLog changeLog = new RunChangeLog();
-          changeLog.setRun(managed);
-          changeLog.setColumnsChanged("containers");
-          changeLog.setSummary(message.toString());
-          changeLog.setTime(new Date());
-          changeLog.setUser(managed.getLastModifier());
-          changeLogStore.create(changeLog);
-        }
-        setChangeDetails(managed);
-        runStore.save(managed);
-        return run.getId();
-      }
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  private void setChangeDetails(Run run) throws IOException {
-    User user = getCurrentUser();
-    Date now = new Date();
-    run.setLastModifier(user);
-
-    if (run.getId() == Run.UNSAVED_ID) {
-      run.setCreator(user);
-      if (run.getCreationTime() == null) {
-        run.setCreationTime(now);
-        run.setLastModified(now);
-      } else if (run.getLastModified() == null) {
-        run.setLastModified(now);
-      }
-    } else {
-      run.setLastModified(now);
-    }
-  }
-
-  @Override
-  public void saveRuns(Collection<Run> runs) throws IOException {
-    if (runStore != null) {
-      for (Run run : runs) {
-        saveRun(run);
-      }
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
   public User getCurrentUser() throws IOException {
     Authentication auth = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
     if (auth == null) {
@@ -545,61 +385,6 @@ public class MisoRequestManager implements RequestManager {
       user.setActive(true);
     }
     return user;
-  }
-
-  @Override
-  public SequencerPartitionContainer saveSequencerPartitionContainer(SequencerPartitionContainer container) throws IOException {
-    if (sequencerPartitionContainerStore != null) {
-      if (container.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
-        container.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(container.getSecurityProfile())));
-        container.setPlatform(platformStore.get(container.getPlatform().getId()));
-        container.setLastModifier(securityStore.getUserById(getCurrentUser().getUserId()));
-        Date now = new Date();
-        if (container.getCreationTime() == null) {
-          container.setCreationTime(now);
-          container.setCreator(securityStore.getUserById(getCurrentUser().getUserId()));
-          container.setLastModified(now);
-        } else if (container.getLastModified() == null) {
-          container.setLastModified(now);
-        }
-        return sequencerPartitionContainerStore.save(container);
-      } else {
-        SequencerPartitionContainer managed = getSequencerPartitionContainerById(container.getId());
-        updateContainer(container, managed);
-        managed.setLastModifier(securityStore.getUserById(getCurrentUser().getUserId()));
-        managed.setLastModified(new Date());
-        return sequencerPartitionContainerStore.save(managed);
-      }
-    } else {
-      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  private void updateContainer(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException {
-    managed.setIdentificationBarcode(source.getIdentificationBarcode());
-    managed.setLocationBarcode(source.getLocationBarcode());
-    managed.setValidationBarcode(source.getValidationBarcode());
-
-    for (Partition sourcePartition : source.getPartitions()) {
-      for (Partition managedPartition : managed.getPartitions()) {
-        if (sourcePartition == null || managedPartition == null) {
-          throw new IOException("Partition from " + (sourcePartition == null ? "client" : "database") + " is null.");
-        }
-        if (sourcePartition.getId() == managedPartition.getId()) {
-          Pool sourcePool = sourcePartition.getPool();
-          Pool managedPool = managedPartition.getPool();
-          if (sourcePool == null && managedPool == null) continue;
-          if (sourcePool == null && managedPool != null) {
-            managedPartition.setPool(null);
-          } else if (sourcePool != null && managedPool == null) {
-            managedPartition.setPool(poolStore.get(sourcePool.getId()));
-          } else if (sourcePool.getId() != managedPool.getId()) {
-            managedPartition.setPool(poolStore.get(sourcePool.getId()));
-          }
-          break;
-        }
-      }
-    }
   }
 
   @Override
@@ -640,38 +425,11 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Run getRunByAlias(String alias) throws IOException {
-    if (runStore != null) {
-      return runStore.getByAlias(alias);
-    } else {
-      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public SequencerPartitionContainer getSequencerPartitionContainerById(long containerId) throws IOException {
-    if (sequencerPartitionContainerStore != null) {
-      return sequencerPartitionContainerStore.get(containerId);
-    } else {
-      throw new IOException("No sequencerPartitionContainerStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Submission getSubmissionById(long submissionId) throws IOException {
     if (submissionStore != null) {
       return submissionStore.get(submissionId);
     } else {
       throw new IOException("No submissionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
-  public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException {
-    if (sequencerReferenceStore != null) {
-      return sequencerReferenceStore.getByName(referenceName);
-    } else {
-      throw new IOException("No sequencerReferenceStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -685,16 +443,8 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public Collection<PlatformType> listActivePlatformTypes() throws IOException {
-    Collection<PlatformType> activePlatformTypes = Lists.newArrayList();
-    for (PlatformType platformType : PlatformType.values()) {
-      for (SequencerReference sequencer : sequencerReferenceStore.listByPlatformType(platformType)) {
-        if (sequencer.isActive()) {
-          activePlatformTypes.add(platformType);
-          break;
-        }
-      }
-    }
-    return activePlatformTypes;
+    return sequencerReferenceStore.list(0, 0, true, "id", PaginationFilter.archived(false)).stream()
+        .map(sr -> sr.getPlatform().getPlatformType()).collect(Collectors.toSet());
   }
 
   @Override

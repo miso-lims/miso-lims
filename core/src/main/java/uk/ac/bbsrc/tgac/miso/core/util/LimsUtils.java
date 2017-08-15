@@ -48,6 +48,7 @@ import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
@@ -84,8 +85,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -649,16 +650,6 @@ public class LimsUtils {
     return null;
   }
 
-  public static boolean hasStockParent(Long id, Iterable<SampleValidRelationship> relationships) {
-    for (SampleValidRelationship relationship : relationships) {
-      if (!relationship.getArchived() && relationship.getChild().getId() == id
-          && relationship.getParent().getSampleCategory().equals(SampleStock.CATEGORY_NAME)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
     ValidationResult val = namingScheme.validateName(object.getName());
     if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
@@ -767,11 +758,18 @@ public class LimsUtils {
    * @return Milliseconds from the epoch.
    */
   public static Date toBadDate(LocalDate localDate, ZoneId timezone) {
-    return Date.from(localDate.atStartOfDay(timezone).toInstant());
+    return localDate == null ? null : Date.from(localDate.atStartOfDay(timezone).toInstant());
   }
-  
+
   public static Date toBadDate(LocalDate localDate) {
     return toBadDate(localDate, ZoneId.systemDefault());
   }
 
+  public static Date toBadDate(LocalDateTime localDate, ZoneId timezone) {
+    return localDate == null ? null : toBadDate(localDate.toLocalDate());
+  }
+
+  public static Date toBadDate(LocalDateTime localDate) {
+    return toBadDate(localDate, ZoneId.systemDefault());
+  }
 }

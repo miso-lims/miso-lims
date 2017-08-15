@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+
 public class BoxableDto {
   private String alias;
 
@@ -10,6 +12,10 @@ public class BoxableDto {
   private String coordinates;
 
   private Boolean discarded;
+
+  private EntityType entityType;
+
+  private Long sampleClassId;
 
   /**
    * This is the object's ID (e.g., sampleId, libraryId) used to located it when used in conjunction with the name to determine the type or
@@ -94,4 +100,21 @@ public class BoxableDto {
   public void setVolume(Double volume) {
     this.volume = volume;
   }
+
+  public EntityType getEntityType() {
+    return entityType;
+  }
+
+  public void setEntityType(EntityType entityType) {
+    this.entityType = entityType;
+  }
+
+  public Long getSampleClassId() {
+    return sampleClassId;
+  }
+
+  public void setSampleClassId(Long sampleClassId) {
+    this.sampleClassId = sampleClassId;
+  }
+
 }

@@ -45,6 +45,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
@@ -158,6 +159,11 @@ public class IlluminaRun extends Run {
   @Override
   public void setPairedEnd(boolean pairedEnd) {
     this.pairedEnd = pairedEnd;
+  }
+
+  @Override
+  public PlatformType getPlatformType() {
+    return PlatformType.ILLUMINA;
   }
 
 }

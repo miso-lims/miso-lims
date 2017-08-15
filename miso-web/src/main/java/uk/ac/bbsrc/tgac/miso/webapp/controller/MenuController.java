@@ -55,8 +55,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -282,7 +283,7 @@ public class MenuController implements ServletContextAware {
     node.put("libraryDilutionConcentrationUnits", LibraryDilution.UNITS);
     node.put("poolConcentrationUnits", PoolImpl.CONCENTRATION_UNITS);
 
-    final Iterable<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
+    final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 
     createArray(mapper, baseUri, node, "libraryDesigns", libraryDesignService.list(), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryTypes", libraryService.listLibraryTypes(), Dtos::asDto);
@@ -293,7 +294,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleClasses", sampleClassService.getAll(), model -> {
       SampleClassDto dto = Dtos.asDto(model);
-      dto.setCanCreateNew(model.canCreateNew(relationships));
+      dto.setCanCreateNew(model.hasPathToIdentity(relationships));
       return dto;
     });
     createArray(mapper, baseUri, node, "sampleValidRelationships", relationships, Dtos::asDto);
@@ -313,7 +314,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "boxSizes", boxService.listSizes(), Function.identity());
     createArray(mapper, baseUri, node, "boxUses", boxService.listUses(), Function.identity());
     createArray(mapper, baseUri, node, "studyTypes", studyService.listTypes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "sampleCategories", EditSampleController.CATEGORIES, Function.identity());
+    createArray(mapper, baseUri, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);

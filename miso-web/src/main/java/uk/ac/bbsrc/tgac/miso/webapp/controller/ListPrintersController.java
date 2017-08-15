@@ -59,7 +59,7 @@ public class ListPrintersController {
 
   @ModelAttribute("title")
   public String title() {
-    return "printers";
+    return "Printers";
   }
 
   @RequestMapping(value = "/printers", method = RequestMethod.GET)

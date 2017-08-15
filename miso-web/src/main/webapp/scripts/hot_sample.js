@@ -29,6 +29,15 @@ HotTarget.sample = (function() {
         });
   };
   
+  var getSelectedIdentity = function(flatObj) {
+	if (!flatObj.potentialIdentities) {
+      return null;
+	}
+    return Utils.array.findFirstOrNull(function(item) {
+      return item.label == flatObj.identityAlias;
+    }, flatObj.potentialIdentities);
+  }
+  
   return {
     
     createUrl : '/miso/rest/tree/sample/',
@@ -100,7 +109,7 @@ HotTarget.sample = (function() {
             include : true,
             unpackAfterSave : true,
             unpack : function(sam, flat, setCellMeta) {
-              flat.name = sam.name;
+              flat.name = sam.name || null;
             },
             pack : function(sam, flat, errorHandler) {
             }
@@ -143,7 +152,7 @@ HotTarget.sample = (function() {
             unpackAfterSave : true,
             unpack : function(sam, flat, setCellMeta) {
               validationCache[sam.alias] = true;
-              flat.alias = sam.alias;
+              flat.alias = sam.alias || null;
               if (sam.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
               }
@@ -166,9 +175,9 @@ HotTarget.sample = (function() {
               numberOfMonths : 1
             },
             allowEmpty : true,
-            include : true,
+            include : !Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity',
             unpack : function(sam, flat, setCellMeta) {
-              flat.receivedDate = sam.receivedDate;
+              flat.receivedDate = sam.receivedDate || null;
             },
             pack : function(sam, flat, errorHandler) {
               sam.receivedDate = flat.receivedDate;
@@ -186,44 +195,50 @@ HotTarget.sample = (function() {
           {
             header : 'Project',
             data : 'projectAlias',
-            type : 'dropdown',
+            type : (config.hasProject ? 'text' : 'dropdown'),
             source : (function() {
               if ((!config.projects || config.projects.length == 0) && config.create && !config.propagate && !config.hasProject) {
-                // projects list failed to generate when it should have, and we
-                // can't proceed. Notify the user.
+                /* projects list failed to generate when it should have, and we can't proceed. Notify the user. */
                 var serverErrorMessages = document
                     .getElementById('serverErrors');
                 serverErrorMessages.innerHTML = '<p>Failed to generate list of projects. Please notify your MISO administrators.</p>';
                 document.getElementById('errors').classList.remove('hidden');
-                /*
-                 * throw an error to keep the table from generating
-                 */
+                /* throw an error to keep the table from generating */
                 throw 'Server error generating list of projects';
               }
               var comparator = Constants.isDetailedSample ? 'shortName' : 'id';
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
               var projectLabels = (config.projects ? config.projects.sort(
-                  Utils.array.standardSort(comparator)).map(function(item) {
+                  Utils.sorting.standardSort(comparator)).map(function(item) {
                 return item[label];
-              }) : []); // use empty array if projects are not provided (should
-              // only happen during propagate or edit)
+              }) : []); /* use empty array if projects are not provided (should only happen during propagate or edit) */
               return projectLabels;
             })(),
             unpack : function(sam, flat, setCellMeta) {
-              flat.projectAlias = Utils.array.maybeGetProperty(Utils.array
-                  .findFirstOrNull(function(item) {
-                    return item.id == sam.projectId;
-                  }, config.projects), 'alias');
+              var label = Constants.isDetailedSample ? 'shortName' : 'name';
+              if (config.hasProject) {
+                flat.projectAlias = config.project[label] || null;
+              } else {
+                flat.projectAlias = Utils.array.maybeGetProperty(Utils.array
+                    .findFirstOrNull(function(item) {
+                      return item.id == sam.projectId;
+                    }, config.projects), 'alias') || null;
+              }
             },
             pack : function(sam, flat, errorHandler) {
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
-              sam.projectId = Utils.array.maybeGetProperty(Utils.array
-                  .findFirstOrNull(function(item) {
-                    return item[label] == flat.projectAlias;
-                  }, config.projects), 'id');
+              if (config.hasProject) {
+                sam.projectId = config.project.id;
+              } else {
+                sam.projectId = Utils.array.maybeGetProperty(Utils.array
+                    .findFirstOrNull(function(item) {
+                      return item[label] == flat.projectAlias;
+                    }, config.projects), 'id');
+              }
             },
+            readOnly : config.hasProject,
             validator : HotUtils.validator.requiredAutocomplete,
-            include : config.create && !config.hasProject
+            include : config.create
           },
           
           // Detailed Sample
@@ -242,7 +257,7 @@ HotTarget.sample = (function() {
               flat.parentTissueSampleClassAlias = Utils.array.maybeGetProperty(
                   Utils.array.findFirstOrNull(function(item) {
                     return item.id == sam.parentTissueSampleClassId;
-                  }, Constants.sampleClasses), 'alias');
+                  }, Constants.sampleClasses), 'alias') || null;
             },
             pack : function(sam, flat, errorHandler) {
               sam.parentTissueSampleClassId = Utils.array.maybeGetProperty(
@@ -260,10 +275,12 @@ HotTarget.sample = (function() {
             validator : HotUtils.validator.requiredTextNoSpecialChars,
             include : show['Identity'],
             unpack : function(sam, flat, setCellMeta) {
-              flat.externalName = sam.externalName;
+              flat.externalName = sam.externalName || null;
             },
             pack : function(sam, flat, errorHandler) {
-              sam.externalName = flat.externalName;
+              if (!getSelectedIdentity(flat)) {
+                sam.externalName = flat.externalName;
+              } // else externalName will come from an existing Identity via the Identity Alias column
             }
           },
           {
@@ -278,6 +295,17 @@ HotTarget.sample = (function() {
             depends : 'externalName',
             update : function(sam, flat, value, setReadOnly, setOptions,
                 setData) {
+              var label = Constants.isDetailedSample ? 'shortName' : 'name';
+              var selectedProject = config.project || Utils.array
+                    .findFirstOrNull(
+                        function(project) {
+                          return project[label] == flat.projectAlias;
+                        }, config.projects);
+              if (selectedProject == null) {
+              	// the user needs to select a project
+              	setData("Delete external name, select a project, then re-enter external name.");
+              	return;
+              } 
               if (!Utils.validation.isEmpty(flat.externalName)) {
                 setData('(...searching...)');
                 getIdentities(HotUtils.counter);
@@ -300,13 +328,13 @@ HotTarget.sample = (function() {
                           // make sure the counter lines up with the one from
                           // the original request
                           if (data.requestCounter == requestCounter) {
-                            var label = Constants.isDetailedSample
-                                ? 'shortName' : 'name';
-                            var selectedProject = config.project || Utils.array
-                                    .findFirstOrNull(
-                                        function(project) {
-                                          return project[label] == flat.projectAlias;
-                                        }, config.projects);
+                            var potentialIdentities = [];
+                            
+                            
+                            if (selectedProject == null) {
+                              // let the user know they need to select a project
+                              setData("Select a project");
+                            }
                             // sort with identities from selected project on top
                             var identitiesSources = [];
                             if (data.matchingIdentities.length > 0) {
@@ -317,24 +345,31 @@ HotTarget.sample = (function() {
                                     ? 0 : b.projectId;
                                 return aSortId - bSortId;
                               })
-                              identitiesSources = data.matchingIdentities
-                                  .map(function(sam) {
-                                    return sam.alias + " -- " + sam.externalName;
-                                  });
+                              potentialIdentities = data.matchingIdentities;
+                              for (var i = 0; i < potentialIdentities.length; i++) {
+                                var identityLabel = potentialIdentities[i].alias + " -- " + potentialIdentities[i].externalName;
+                                potentialIdentities[i].label = identityLabel;
+                                identitiesSources.push(identityLabel);
+                              }
                             }
                             
-                            function hasExternalNameInProject(identity) {
-                              return identity.projectId == selectedProject.id && identity.externalName == flat.externalName;
+                            var indexOfMatchingIdentityInProject = -1;
+                            for (i = 0; i < data.matchingIdentities.length; i++) {
+                              if (data.matchingIdentities[i].projectId == selectedProject.id 
+                                  && data.matchingIdentities[i].externalName == flat.externalName) {
+                                indexOfMatchingIdentityInProject = i;
+                                break;
+                              }
                             }
-                            var indexOfMatchingIdentityInProject = data.matchingIdentities.findIndex(hasExternalNameInProject);
-                            if (indexOfMatchingIdentityInProject < 0) {
+                            if (indexOfMatchingIdentityInProject >= 0) {
+                              setData(identitiesSources[indexOfMatchingIdentityInProject]);
+                            } else {
                               identitiesSources
                                   .unshift("First Receipt (" + selectedProject[label] + ")");
                               setData(identitiesSources[0]);
-                            } else {
-                              setData(identitiesSources[indexOfMatchingIdentityInProject]);
                             }
                             requestCounter++;
+                            flat.potentialIdentities = potentialIdentities;
                             setOptions({
                               'source' : identitiesSources
                             });
@@ -348,7 +383,11 @@ HotTarget.sample = (function() {
               // Do nothing; this never comes from the server
             },
             pack : function(sam, flat, errorHandler) {
-              sam.parentAlias = flat.identityAlias;
+              var selectedIdentity = getSelectedIdentity(flat);
+              if (selectedIdentity) {
+                sam.parentAlias = selectedIdentity.alias;
+                sam.externalName = selectedIdentity.externalName;
+              } // else externalName is for a new Identity and will come from the External Name column
             }
           },
           HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;', show['Identity'], true,
@@ -364,7 +403,7 @@ HotTarget.sample = (function() {
               flat.sampleClassAlias = Utils.array.maybeGetProperty(Utils.array
                   .findFirstOrNull(function(item) {
                     return item.id == sam.sampleClassId;
-                  }, Constants.sampleClasses), 'alias');
+                  }, Constants.sampleClasses), 'alias') || null;
             },
             pack : function(sam, flat, errorHandler) {
               sam.sampleClassId = Utils.array.maybeGetProperty(Utils.array
@@ -418,7 +457,7 @@ HotTarget.sample = (function() {
               .makeColumnForInt(
                   'Discards',
                   (show['Tissue Processing'] && config.targetSampleClass.alias == 'Slide'),
-                  'discards', null),
+                  'discards', HotUtils.validator.requiredNumber),
           HotUtils
               .makeColumnForInt(
                   'Thickness',
@@ -443,7 +482,7 @@ HotTarget.sample = (function() {
               if (sam.stain) {
                 flat.stainName = Utils.array.maybeGetProperty(Utils.array
                     .findFirstOrNull(Utils.array.idPredicate(sam.stain.id),
-                        Constants.stains), 'name');
+                        Constants.stains), 'name') || null;
               } else {
                 flat.stainName = '(None)';
               }
@@ -479,7 +518,7 @@ HotTarget.sample = (function() {
             pack : function(sam, flat, errorHandler) {
               sam.dnaseTreated = flat.dnaseTreated === 'True';
             },
-            include : show['Stock'] && config.targetSampleClass.dnaseTreatable
+            include : Constants.isDetailedSample && config.dnaseTreatable
           },
           HotUtils.makeColumnForFloat('Vol. (&#181;l)',
               (show['Stock'] || show['Aliquot']), 'volume'),
@@ -547,7 +586,7 @@ HotTarget.sample = (function() {
                 flat.detailedQcStatusDescription = Utils.array
                     .maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
                         .idPredicate(sam.detailedQcStatusId),
-                        Constants.detailedQcStatuses), 'description');
+                        Constants.detailedQcStatuses), 'description') || null;
               }
             },
             pack : function(sam, flat, errorHandler) {
@@ -642,7 +681,7 @@ HotTarget.sample = (function() {
             
             // In the case of plain samples, this will be empty, which is fine.
             var targets = getChildSampleClasses(classes).sort(
-                Utils.array.sampleClassComparator).map(
+                Utils.sorting.sampleClassComparator).map(
                 function(sampleClass) {
                   
                   return {

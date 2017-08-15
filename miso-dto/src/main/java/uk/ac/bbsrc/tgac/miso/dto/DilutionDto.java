@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.net.URI;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -10,12 +11,14 @@ public class DilutionDto implements WritableUrls {
   private String name;
   private String identificationBarcode;
   private String locationLabel;
-  private Double concentration;
+  private String concentration;
   private String creationDate;
   private String dilutionCreatorName;
   private Long targetedSequencingId;
   private LibraryDto library;
   private String libraryUrl;
+  private String lastModified;
+  private List<Long> indexIds;
 
   public Long getId() {
     return id;
@@ -51,11 +54,11 @@ public class DilutionDto implements WritableUrls {
     this.locationLabel = locationLabel;
   }
 
-  public Double getConcentration() {
+  public String getConcentration() {
     return concentration;
   }
 
-  public void setConcentration(Double concentration) {
+  public void setConcentration(String concentration) {
     this.concentration = concentration;
   }
 
@@ -104,6 +107,22 @@ public class DilutionDto implements WritableUrls {
     if (library != null) {
       library.writeUrls(baseUri);
     }
+  }
+
+  public String getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(String lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  public List<Long> getIndexIds() {
+    return indexIds;
+  }
+
+  public void setIndexIds(List<Long> indexIds) {
+    this.indexIds = indexIds;
   }
 
 }

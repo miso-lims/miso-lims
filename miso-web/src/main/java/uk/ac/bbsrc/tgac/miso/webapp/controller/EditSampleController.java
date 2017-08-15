@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
@@ -77,16 +77,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
@@ -117,11 +116,14 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
@@ -265,17 +267,10 @@ public class EditSampleController {
     return namingScheme != null && namingScheme.hasSampleAliasGenerator();
   }
 
-  @Value("${miso.notification.interop.enabled}")
-  private Boolean metrixEnabled;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
-
-  @ModelAttribute("metrixEnabled")
-  public Boolean isMetrixEnabled() {
-    return metrixEnabled;
-  }
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
@@ -376,30 +371,6 @@ public class EditSampleController {
     }
   }
 
-  private Set<Pool> getPoolsBySample(Sample s) throws IOException {
-    if (!s.getLibraries().isEmpty()) {
-      Set<Pool> pools = new TreeSet<>();
-      for (Library l : s.getLibraries()) {
-        List<Pool> prs = new ArrayList<>(poolService.listByLibraryId(l.getId()));
-        pools.addAll(prs);
-      }
-      return pools;
-    }
-    return Collections.emptySet();
-  }
-
-  private Set<Run> getRunsBySamplePools(Set<Pool> pools) throws IOException {
-    if (!pools.isEmpty()) {
-      Set<Run> runs = new TreeSet<>();
-      for (Pool pool : pools) {
-        Collection<Run> prs = runService.listByPoolId(pool.getId());
-        runs.addAll(prs);
-      }
-      return runs;
-    }
-    return Collections.emptySet();
-  }
-
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return sampleService.getSampleColumnSizes();
@@ -478,11 +449,8 @@ public class EditSampleController {
   @Autowired
   private SampleClassService sampleClassService;
 
-  public static final List<String> CATEGORIES = Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
-      SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
-
   private static final Comparator<SampleClass> SAMPLECLASS_CATEGORY_ALIAS = (SampleClass o1, SampleClass o2) -> {
-    int categoryOrder = CATEGORIES.indexOf(o1.getSampleCategory()) - CATEGORIES.indexOf(o2.getSampleCategory());
+    int categoryOrder = SampleClass.CATEGORIES.indexOf(o1.getSampleCategory()) - SampleClass.CATEGORIES.indexOf(o2.getSampleCategory());
     if (categoryOrder != 0) return categoryOrder;
     return o1.getAlias().compareTo(o2.getAlias());
   };
@@ -496,7 +464,7 @@ public class EditSampleController {
       if (SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory())) {
         tissueClasses.add(sc);
       }
-      if (sc.canCreateNew(relationships)) {
+      if (sc.hasPathToIdentity(relationships)) {
         sampleClasses.add(sc);
       }
     }
@@ -811,14 +779,15 @@ public class EditSampleController {
         }
         model.put("projectsDtos", "[]");
 
-        Set<Pool> pools = getPoolsBySample(sample);
-        Map<Long, Sample> poolSampleMap = new HashMap<>();
-        for (Pool pool : pools) {
-          poolSampleMap.put(pool.getId(), sample);
-        }
-        model.put("poolSampleMap", poolSampleMap);
-        model.put("samplePools", pools);
-        model.put("sampleRuns", getRunsBySamplePools(pools));
+        model.put("sampleLibraries", sample.getLibraries().stream().map(Dtos::asDto).collect(Collectors.toList()));
+        Set<Pool> pools = sample.getLibraries().stream()
+            .flatMap(WhineyFunction.flatLog(log, library -> poolService.listByLibraryId(library.getId())))
+            .distinct().collect(Collectors.toSet());
+        List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatLog(log, pool -> runService.listByPoolId(pool.getId())))
+            .map(Dtos::asDto)
+            .collect(Collectors.toList());
+        model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
+        model.put("sampleRuns", runDtos);
         List<SampleDto> relations = new ArrayList<>();
         if (LimsUtils.isDetailedSample(sample)) {
           DetailedSample detailed = (DetailedSample) sample;
@@ -827,7 +796,7 @@ public class EditSampleController {
           }
           addChildren(relations, detailed.getChildren());
         }
-        model.put("sampleRelations", mapper.writeValueAsString(relations));
+        model.put("sampleRelations", relations);
       }
 
       if (sample != null && !sample.userCanWrite(user)) {
@@ -919,7 +888,11 @@ public class EditSampleController {
         detailedTemplate = new SampleTissueDto();
         break;
       case SampleTissueProcessing.CATEGORY_NAME:
-        detailedTemplate = new SampleTissueProcessingDto();
+        if (SampleSlide.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+          detailedTemplate = new SampleSlideDto();
+        } else {
+          detailedTemplate = new SampleTissueProcessingDto();
+        }
         break;
       case SampleStock.CATEGORY_NAME:
         detailedTemplate = new SampleStockDto();
@@ -958,7 +931,8 @@ public class EditSampleController {
         builder.setTissueClass(sampleClassService.get(builder.getTissueClass().getId()));
       }
       if (builder.getParent() == null && builder.getSampleClass().getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
-        builder.setStockClass(sampleClassService.inferStockFromAliquot(builder.getSampleClass()));
+        builder.setStockClass(sampleClassService.inferParentFromChild(builder.getSampleClass().getId(), SampleAliquot.CATEGORY_NAME,
+            SampleStock.CATEGORY_NAME));
       }
       sample = builder.build();
     }
@@ -990,7 +964,7 @@ public class EditSampleController {
     }
 
     @Override
-    protected Iterable<Sample> load(List<Long> modelIds) throws IOException {
+    protected Stream<Sample> load(List<Long> modelIds) throws IOException {
       List<Sample> results = (List<Sample>) sampleService.listByIdList(modelIds);
       for (Sample sample : results) {
         if (isDetailedSampleEnabled()) {
@@ -1001,13 +975,14 @@ public class EditSampleController {
           }
         }
       }
-      return results;
+      return results.stream().sorted(new AliasComparator<>());
     }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.putPOJO("targetSampleClass", Dtos.asDto(sampleClass));
       config.putPOJO("sourceSampleClass", Dtos.asDto(sampleClass));
+      config.put("dnaseTreatable", sampleClass.getDNAseTreatable());
       config.put("propagate", false);
       config.put("edit", true);
     }
@@ -1073,13 +1048,14 @@ public class EditSampleController {
 
     @Override
     protected Stream<Sample> loadParents(List<Long> parentIds) throws IOException {
-      return sampleService.listByIdList(parentIds).stream();
+      return sampleService.listByIdList(parentIds).stream().sorted(new AliasComparator<>());
     }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       config.put("propagate", true);
       config.put("edit", false);
+      config.put("dnaseTreatable", targetSampleClass.getDNAseTreatable());
       config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
       config.putPOJO("sourceSampleClass", Dtos.asDto(sourceSampleClass));
     }
@@ -1101,6 +1077,7 @@ public class EditSampleController {
       if (targetSampleClass != null) config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
       config.put("create", true);
       config.put("hasProject", project != null);
+      config.put("dnaseTreatable", targetSampleClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
       if (project == null) {
         requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
       } else {

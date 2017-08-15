@@ -61,7 +61,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -80,7 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @Entity
 @Table(name = "Run")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Run
+public abstract class Run
     implements SecurableByProfile, Comparable<Run>, Watchable, Deletable, Nameable, ChangeLoggable, Aliasable,
     Serializable {
   private static final long serialVersionUID = 1L;
@@ -154,7 +153,7 @@ public class Run
   @JoinColumn(name = "sequencerReference_sequencerReferenceId", nullable = false)
   private SequencerReference sequencerReference;
 
-  @ManyToOne(targetEntity = SequencingParametersImpl.class)
+  @ManyToOne
   @JoinColumn(name = "sequencingParameters_parametersId")
   private SequencingParameters sequencingParameters;
   @Temporal(TemporalType.DATE)
@@ -497,5 +496,7 @@ public class Run
   public void setPairedEnd(boolean pairedEnd) {
     throw new UnsupportedOperationException("Cannot set paired end on runs from this platform.");
   }
+  
+  public abstract PlatformType getPlatformType();
 
 }

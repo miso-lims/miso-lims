@@ -34,6 +34,14 @@ var HotUtils = {
     },
     
     /**
+     * Custom validator for optional numeric fields
+     */
+    optionalNumber : function(value, callback) {
+      return callback(Utils.validation.isEmpty(value) || Handsontable.helper
+    	  .isNumeric(value));
+    },
+    
+    /**
      * Custom validator for text fields that fails on extra-special characters
      */
     noSpecialChars : function(value, callback) {
@@ -124,6 +132,8 @@ var HotUtils = {
           columns : columns,
           data : flatObjects,
           maxRows : data.length,
+          renderAllRows : true,
+          columnSorting : true,
           cells : function(row, col, prop) {
             var cellProperties = {};
             
@@ -351,6 +361,32 @@ var HotUtils = {
       }
     });
     
+    var makeSortButton = function(sortOption, sortColIndex) {
+      var rowCount = table.countRows();
+      function sortListener() {
+        for (var i = 0; i < rowCount; i++) {
+          table.setCellMeta(i, sortColIndex, 'sortFunction', sortOption.sortFunc);
+        }
+        table.sort(sortColIndex);
+      };
+      var button = document.createElement('input');
+      button.type = 'button';
+      button.id = 'sort' + sortOption.sortTarget;
+      button.value = sortOption.buttonText;
+      button.addEventListener('click', sortListener);
+      return button;
+    };
+    
+    // Columns that have custom sorters need to make the sorting accessible
+    columns.filter(function(column) {
+      return column.customSorting;
+    }).forEach(function(column) {
+      column.customSorting.forEach(function(sortOption) {
+        var sortBy = makeSortButton(sortOption, column.hotIndex);
+        document.getElementById('bulkactions').appendChild(sortBy);
+      });
+    });
+    
     var save = document.getElementById('save');
     save
         .addEventListener(
@@ -477,7 +513,7 @@ var HotUtils = {
                                 button
                                     .setAttribute('class', 'ui-state-default');
                               }
-                              bulkActionsDiv.append(button);
+                              bulkActionsDiv.appendChild(button);
                             });
                           }
                           saveSuccessesClasses.remove('hidden');
@@ -532,6 +568,24 @@ var HotUtils = {
     });
   },
   
+  sorting : {
+    /** Sorts by box row: A01, A02, B01, B03, H02 */
+    rowSort : function(sortOrder) {
+      return function(a, b) {
+        // a & b are each an array: [row_index, element_value]
+        return Utils.sorting.sortBoxPositions(a[1], b[1], true);
+      }
+    },
+    
+    /** Sorts by box column: A01, B01, A02, H02, B03. Useful for applying indices to libraries using the Sciclone machine. */
+    colSort : function(sortOrder) {
+      return function(a, b) {
+        // a & b are each an array: [row_index, element_value]
+        return Utils.sorting.sortBoxPositions(a[1], b[1], false);
+      }
+    }      
+  },
+  
   showServerErrors : function(response, serverStatus) {
     var responseText = JSON.parse(response.responseText);
     var alreadyShown = HotUtils.serverErrors
@@ -579,7 +633,7 @@ var HotUtils = {
   
   makeColumnForConstantsList : function(headerName, include, flatProperty,
       modelProperty, id, name, items, required, baseobj, sortFunc) {
-    var labels = items.sort(sortFunc || Utils.array.standardSort(name)).map(
+    var labels = items.sort(sortFunc || Utils.sorting.standardSort(name)).map(
         function(item) {
           return item[name];
         });
@@ -654,13 +708,13 @@ var HotUtils = {
     return {
       'header' : headerName,
       'data' : property,
-      'type' : 'numeric',
+      'type' : 'text',
       'include' : include,
       'unpack' : function(obj, flat, setCellMeta) {
-        flat[property] = obj[property];
+        flat[property] = obj[property] || null;
       },
       'validator' : required ? HotUtils.validator.requiredNumber
-          : Handsontable.NumericValidator,
+          : HotUtils.validator.optionalNumber,
       'pack' : function(obj, flat, errorHandler) {
         var output;
         if (Utils.validation.isEmpty(flat[property])) {
@@ -690,7 +744,7 @@ var HotUtils = {
       'include' : include,
       'validator' : validator,
       'unpack' : function(obj, flat, setCellMeta) {
-        flat[property] = obj[property];
+        flat[property] = obj[property] || null;
       },
       'pack' : function(obj, flat, errorHandler) {
         if (!Utils.validation.isEmpty(flat[property])) {
@@ -708,13 +762,13 @@ var HotUtils = {
     baseobj.type = 'text';
     baseobj.include = include;
     baseobj.unpack = function(obj, flat, setCellMeta) {
-      flat[property] = obj[property];
+      flat[property] = obj[property] || null;
     };
     baseobj.pack = function(obj, flat, errorHandler) {
       if (!Utils.validation.isEmpty(flat[property])) {
         obj[property] = flat[property];
       } else {
-        obj[property] = undefined;
+        obj[property] = null;
       }
     };
     return baseobj;
@@ -738,7 +792,6 @@ var HotUtils = {
       }
     }
   }
-
 };
 
 HotTarget = {};

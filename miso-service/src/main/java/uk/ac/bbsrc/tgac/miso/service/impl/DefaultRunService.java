@@ -4,14 +4,25 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
@@ -29,9 +44,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -41,8 +61,10 @@ import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
@@ -52,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultRunService implements RunService, AuthorizedPaginatedDataSource<Run> {
+  private static final Logger log = LoggerFactory.getLogger(DefaultRunService.class);
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -73,6 +96,8 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
+  @Autowired
+  private PoolService poolService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -292,7 +317,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     try {
       Long id = runDao.save(run);
       Run saved = runDao.get(id);
-      
+
       // post-save field generation
       boolean needsUpdate = false;
       if (hasTemporaryName(run)) {
@@ -394,7 +419,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private void applyPacBioChanges(PacBioRun target, PacBioRun source) throws IOException {
-    target.setMovieDuration(source.getMovieDuration());
   }
 
   private void applyLS454Changes(LS454Run target, LS454Run source) throws IOException {
@@ -501,6 +525,237 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
   public void setRunDao(RunStore runDao) {
     this.runDao = runDao;
+  }
+
+  @Override
+  public boolean processNotification(Run source, int laneCount, String containerSerialNumber, String sequencerName,
+      Predicate<SequencingParameters> filterParameters, IntFunction<Optional<String>> getLaneContents)
+      throws IOException, MisoNamingException {
+    final Date now = new Date();
+    User user = securityManager.getUserByLoginName("notification");
+    final Run target;
+
+    Run runFromDb = runDao.getByAlias(source.getAlias());
+    boolean isNew;
+
+    if (runFromDb == null) {
+      target = source.getPlatformType().createRun(user);
+      target.setCreationTime(now);
+      target.setCreator(user);
+      target.setName(generateTemporaryName());
+      target.setAlias(source.getAlias());
+      isNew = true;
+    } else {
+      target = runFromDb;
+      if (source.getPlatformType() != target.getPlatformType()) {
+        throw new IllegalStateException(
+            "Run scanner detected a run from " + source.getPlatformType().name() + " and there is a save run from "
+                + target.getPlatformType().name());
+      }
+      isNew = false;
+    }
+
+    target.setLastModifier(user);
+    boolean isMutated = false;
+    isMutated |= updateField(source.getCompletionDate(), target.getCompletionDate(), target::setCompletionDate);
+    isMutated |= updateMetricsFromNotification(source, target);
+    isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
+    isMutated |= updateField(source.getStartDate(), target.getCompletionDate(), target::setCompletionDate);
+
+    final SequencerReference sequencer = sequencerReferenceService.getByName(sequencerName);
+    if (sequencer == null) {
+      throw new IllegalArgumentException("No such sequencer: " + sequencerName);
+    }
+    target.setSequencerReference(sequencer);
+
+    isMutated |= updateContainerFromNotification(target, user, laneCount, containerSerialNumber, sequencer, getLaneContents);
+    isMutated |= updateHealthFromNotification(source, target, user);
+
+    switch (source.getPlatformType()) {
+    case ILLUMINA:
+      isMutated |= updateIlluminaRunFromNotification((IlluminaRun) source, (IlluminaRun) target);
+      break;
+    case IONTORRENT:
+      // Nothing to do
+      break;
+    case LS454:
+      isMutated |= updateField(((LS454Run) source).getCycles(), ((LS454Run) target).getCycles(),
+          v -> ((LS454Run) target).setCycles(v));
+      isMutated |= updateField(source.getPairedEnd(), target.getPairedEnd(), target::setPairedEnd);
+      break;
+    case OXFORDNANOPORE:
+      throw new NotImplementedException();
+    case PACBIO:
+      // Nothing to do
+      break;
+    case SOLID:
+      // Nothing to do
+      break;
+    default:
+      throw new NotImplementedException();
+    }
+
+    isMutated |= updateSequencingParameters(target, user, filterParameters, sequencer);
+
+    setChangeDetails(target);
+    if (isNew) {
+      target.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(target.getSecurityProfile())));
+      target.setName(generateTemporaryName());
+
+      save(target);
+    } else if (isMutated) {
+      save(target);
+    }
+    return isNew;
+  }
+
+  private boolean updateMetricsFromNotification(Run source, Run target) {
+    if (source.getMetrics() != null && source.getMetrics().equals(target.getMetrics())) return false;
+    if (source.getMetrics() == null) {
+      return false;
+    }
+    if (source.getMetrics() != null && target.getMetrics() == null) {
+      target.setMetrics(source.getMetrics());
+      return true;
+    }
+
+    ObjectMapper mapper = new ObjectMapper();
+    ArrayNode sourceMetrics;
+    try {
+      sourceMetrics = mapper.readValue(source.getMetrics(), ArrayNode.class);
+    } catch (IOException e) {
+      log.error("Impossible junk metrics were passed in for run " + target.getId(), e);
+      return false;
+    }
+    ArrayNode targetMetrics;
+    try {
+      targetMetrics = mapper.readValue(target.getMetrics(), ArrayNode.class);
+    } catch (IOException e) {
+      log.error("The database is full of garbage metrics for run " + target.getId(), e);
+      return false;
+    }
+    Map<String, JsonNode> sourceMetricsMap = parseMetrics(sourceMetrics);
+    Map<String, JsonNode> targetMetricsMap = parseMetrics(targetMetrics);
+    if (sourceMetricsMap.equals(targetMetricsMap))
+      return false;
+    targetMetricsMap.putAll(sourceMetricsMap);
+    ArrayNode combinedMetrics = mapper.createArrayNode();
+    combinedMetrics.addAll(targetMetricsMap.values());
+    try {
+      target.setMetrics(mapper.writeValueAsString(combinedMetrics));
+    } catch (JsonProcessingException e) {
+      log.error("Failed to save data just unserialised.", e);
+      return false;
+    }
+    return true;
+  }
+
+  private Map<String, JsonNode> parseMetrics(ArrayNode metrics) {
+    Map<String, JsonNode> results = new TreeMap<>();
+    for (JsonNode node : metrics) {
+      if (node.isObject()) {
+        results.put(node.get("type").textValue(), node);
+      }
+    }
+    return results;
+  }
+
+  private boolean updateIlluminaRunFromNotification(IlluminaRun source, final IlluminaRun target) {
+    boolean isMutated = false;
+    isMutated |= updateField(source.getCallCycle(), target.getCallCycle(), target::setCallCycle);
+    isMutated |= updateField(source.getImgCycle(), target.getImgCycle(), target::setImgCycle);
+    isMutated |= updateField(source.getNumCycles(), target.getNumCycles(), target::setNumCycles);
+    isMutated |= updateField(source.getScoreCycle(), target.getScoreCycle(), target::setScoreCycle);
+    isMutated |= updateField(source.getPairedEnd(), target.getPairedEnd(), target::setPairedEnd);
+    return isMutated;
+  }
+
+  private boolean updateSequencingParameters(final Run target, User user, Predicate<SequencingParameters> filterParameters,
+      final SequencerReference sequencer) throws IOException {
+    // If the sequencing parameters haven't been updated by a human, see if we can find exactly one that matches.
+    if (!target.didSomeoneElseChangeColumn("parameters", user)) {
+      List<SequencingParameters> possibleParameters = sequencingParametersService.getForPlatform(sequencer.getPlatform().getId()).stream()
+          .filter(parameters -> !parameters.getName().startsWith("Custom")).filter(filterParameters).collect(Collectors.toList());
+      if (possibleParameters.size() == 1) {
+        if (target.getSequencingParameters() == null
+            || possibleParameters.get(0).getId() != target.getSequencingParameters().getId()) {
+          target.setSequencingParameters(possibleParameters.get(0));
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private boolean updateContainerFromNotification(final Run target, User user, int laneCount, String containerSerialNumber,
+      final SequencerReference sequencer, final IntFunction<Optional<String>> getLaneContents) throws IOException {
+    final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
+    switch (containers.size()) {
+    case 0:
+      SequencerPartitionContainer newContainer = new SequencerPartitionContainerImpl(user);
+      newContainer.setPlatform(sequencer.getPlatform());
+      newContainer.setCreator(user);
+      newContainer.setIdentificationBarcode(containerSerialNumber);
+      newContainer.setPartitionLimit(laneCount);
+      newContainer
+          .setPartitions(
+              IntStream.range(0, laneCount).mapToObj((i) -> new PartitionImpl(newContainer, i)).collect(Collectors.toList()));
+      updatePartitionContents(getLaneContents, newContainer);
+      target.setSequencerPartitionContainers(Collections.singletonList(containerService.create(newContainer)));
+      return true;
+    case 1:
+      SequencerPartitionContainer container = containers.iterator().next();
+      if (container.getPartitions().size() != laneCount) {
+        throw new IllegalArgumentException(String.format("The container %s has %d partitions, but %d were detected by the scanner.",
+            containerSerialNumber, container.getPartitions().size(), laneCount));
+      }
+      if (target.getSequencerPartitionContainers().stream().noneMatch(c -> c.getId() == container.getId())) {
+        target.getSequencerPartitionContainers().add(container);
+        updatePartitionContents(getLaneContents, container);
+        return true;
+      }
+      break;
+    default:
+      throw new IllegalArgumentException("Multiple containers with same identifier: " + containerSerialNumber);
+    }
+    return false;
+  }
+
+  private void updatePartitionContents(final IntFunction<Optional<String>> getLaneContents, SequencerPartitionContainer newContainer) {
+    newContainer.getPartitions().stream().filter(partition -> partition.getPool() == null)
+        .forEach(partition -> getLaneContents.apply(partition.getPartitionNumber())
+            .map(WhineyFunction.log(log, poolService::getByBarcode)).ifPresent(partition::setPool));
+  }
+
+  private boolean updateHealthFromNotification(Run source, final Run target, User user) {
+    if (source.getHealth() == null) {
+      // If the server has sent us nothing, ignore it.
+      return false;
+    } else if (source.getHealth() == HealthType.Unknown) {
+      // If it is sending us (effectively) an error, don't update the health if we have something already.
+      if (target.getHealth() == null) {
+        target.setHealth(source.getHealth());
+        return true;
+      }
+    } else {
+      if (!target.didSomeoneElseChangeColumn("health", user) && target.getHealth() != source.getHealth()) {
+        // A human user has never change the health of this run, so we will.
+        target.setHealth(source.getHealth());
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private <T> boolean updateField(T dtoValue, T modelValue, Consumer<T> writer) {
+    if (dtoValue == null) {
+      return false;
+    }
+    if (dtoValue.equals(modelValue)) {
+      return false;
+    }
+    writer.accept(dtoValue);
+    return true;
   }
 
 }
