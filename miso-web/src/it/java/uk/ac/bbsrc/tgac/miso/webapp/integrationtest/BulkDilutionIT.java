@@ -92,7 +92,7 @@ public class BulkDilutionIT extends AbstractIT {
   
   @Test
   public void testPropagate() throws Exception {
-    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100001L));
+    BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100004L));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
