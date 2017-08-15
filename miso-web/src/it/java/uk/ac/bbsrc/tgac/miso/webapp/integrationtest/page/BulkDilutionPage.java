@@ -14,10 +14,15 @@ import com.google.common.base.Joiner;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
-public class BulkDilutionPage extends AbstractPage {
+public class BulkDilutionPage extends HeaderFooterPage {
 
   public static class Columns {
-    // TODO: add column constants
+    public static final String NAME = "Dilution Name";
+    public static final String ID_BARCODE = "Matrix Barcode";
+    public static final String LIBRARY_ALIAS = "Library Alias";
+    public static final String CONCENTRATION = "Conc. (nM)";
+    public static final String CREATION_DATE = "Creation Date";
+    public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
 
     private Columns() {
       throw new IllegalStateException("Util class not intended for instantiation");
@@ -25,6 +30,8 @@ public class BulkDilutionPage extends AbstractPage {
   };
 
   private static final By EDIT_BUTTON_TEXT = By.linkText("Edit");
+  private static final By POOL_TOGETHER_BUTTON_TEXT = By.linkText("Pool together");
+  private static final By POOL_SEPARATELY_BUTTON_TEXT = By.linkText("Pool separately");
 
   @FindBy(id = "bulkactions")
   private WebElement toolbar;
@@ -61,6 +68,20 @@ public class BulkDilutionPage extends AbstractPage {
     toolbar.findElement(EDIT_BUTTON_TEXT).click();
     waitForPageRefresh(html);
     return new BulkDilutionPage(getDriver());
+  }
+
+  public BulkPoolPage chainPoolTogether() {
+    WebElement html = getHtmlElement();
+    toolbar.findElement(POOL_TOGETHER_BUTTON_TEXT).click();
+    waitForPageRefresh(html);
+    return new BulkPoolPage(getDriver());
+  }
+
+  public BulkPoolPage chainPoolSeparately() {
+    WebElement html = getHtmlElement();
+    toolbar.findElement(POOL_SEPARATELY_BUTTON_TEXT).click();
+    waitForPageRefresh(html);
+    return new BulkPoolPage(getDriver());
   }
 
 }
