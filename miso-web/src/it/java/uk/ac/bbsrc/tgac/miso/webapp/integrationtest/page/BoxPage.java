@@ -38,15 +38,27 @@ public class BoxPage extends HeaderFooterPage {
   @FindBy(id = "save")
   private WebElement saveButton;
 
+  private final BoxVisualization visualization;
+
   public BoxPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Box"));
+    if (driver.getTitle().startsWith("New Box")) {
+      visualization = null;
+    } else {
+      visualization = new BoxVisualization(driver);
+    }
   }
 
   public static BoxPage get(WebDriver driver, String baseUrl, Long boxId) {
     driver.get(baseUrl + "miso/box/" + (boxId == null ? "new" : boxId));
+
     return new BoxPage(driver);
+  }
+
+  public BoxVisualization getVisualization() {
+    return visualization;
   }
 
   public String getId() {
@@ -97,8 +109,10 @@ public class BoxPage extends HeaderFooterPage {
     setText(location, locationLabel);
   }
 
-  public void clickSave() {
+  public BoxPage clickSave() {
     saveButton.click();
     waitWithTimeout().until(titleContains("Box "));
+    return new BoxPage(getDriver());
   }
+
 }

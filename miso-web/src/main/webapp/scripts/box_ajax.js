@@ -23,7 +23,7 @@ var Box = Box || {
           var prefix = document.getElementById('prefix').value;
           var suffix = jQuery('input[name="suffix"]:checked').val() || 'standard';
           if (!prefix || !(new RegExp(Utils.validation.sanitizeRegex).test(prefix))) {
-            alert('Not a valid prefix.');
+            Utils.showOkDialog('Invalid prefix', [(prefix ? prefix + ' is n' : 'N') + 'ot a valid prefix.']);
             return;
           }
           dialog.dialog('close');
@@ -50,7 +50,7 @@ var Box = Box || {
             {
               'doOnSuccess':  Utils.page.pageReload,
               'doOnError': function(json) {
-                alert("Error saving box contents: " + json.error);
+                Utils.showOkDialog('Error saving box contents', [json.error]);
                 dialog.dialog('close');
               }
             }
@@ -110,25 +110,29 @@ var Box = Box || {
       },
       {
         'doOnSuccess': function() { Box.update(); },
-        'doOnError': function(json) { alert("Error saving box contents: "+json.error); }
+        'doOnError': function(json) { Utils.showOkDialog('Error saving box contents', [json.error]); }
       }
     );
   },
 
   deleteBox: function () {
-    if (confirm("Are you sure you really want to delete BOX" + Box.boxId + "? This operation is permanent!")) {
-      Fluxion.doAjax(
-        'boxControllerHelperService',
-        'deleteBox',
-        {
-          'boxId': Box.boxId,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': function () { window.location.href = '/miso/boxes'; }
-        }
-      );
-    }
+      function deleteIt() {
+          Fluxion.doAjax(
+	        'boxControllerHelperService',
+	        'deleteBox',
+	        {
+	          'boxId': Box.boxId,
+	          'url': ajaxurl
+	        },
+	        {
+	          'doOnSuccess': function () { window.location.href = '/miso/boxes'; }
+	        }
+	      )
+      }
+	  Utils.showConfirmDialog('Delete Box', 'Delete', 
+	      ["Are you sure you really want to delete BOX" + Box.boxId + "? This operation is permanent!"],
+	      deleteIt
+	  );
   },
   
   lookupBoxableByBarcode: function() {
@@ -138,7 +142,7 @@ var Box = Box || {
       return null;
     }
     if (Utils.validation.isNullCheck(barcode)) {
-      alert("Please enter a barcode.");
+      Utils.showOkDialog('Empty barcode', ['Please enter a barcode']);
     } else {
       jQuery('#lookupBarcode').prop('disabled', true).addClass('disabled');
       jQuery('#warningMessages').html('<img src="/styles/images/ajax-loader.gif" alt="Loading" />');
@@ -173,7 +177,7 @@ var Box = Box || {
           },
           'doOnError': function (json) {
             jQuery('#warningMessages').html('');
-            alert(json.error);
+            Utils.showOkDialog('Error looking up item', [json.error]);
             jQuery('#selectedBarcode').val('').focus();
             jQuery('#lookupBarcode').prop('disabled', false).removeClass('disabled');
           }
@@ -498,65 +502,77 @@ Box.ui = {
       return null;
     }
     if (Utils.validation.isNullCheck(barcode)) {
-      alert("Please enter a barcode.");
+      Utils.showOkDialog('Enter a barcode', ['Please enter a barcode.']);
+      return;
     } else {
       var selectedBarcode = jQuery('#selectedBarcode').val().trim();
       if (Box.visual.selectedItems.length !== 1) {
-        alert('Select a single location to add the sample to');
+        Utils.showOkDialog('Too many positions selected', ['Select a single position for the tube to go.']);
         return;
       }
       var selectedPosition = Box.utils.getPositionString(Box.visual.selectedItems[0].row, Box.visual.selectedItems[0].col);
       var selectedItem = Box.ui.getItemAtPosition(selectedPosition);
+      
+      var addTheItem = function() {
+	    jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
+	    jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
+  
+	    Fluxion.doAjax(
+         'boxControllerHelperService',
+	     'updateOneItem',
+	     {
+	       'boxId': Box.boxId,
+	       'barcode': selectedBarcode,
+	       'position': selectedPosition,
+	       'url': ajaxurl
+	     },
+	     {
+	       'doOnSuccess': function(json) {
+	         Box.boxJSON = JSON.parse(json.boxJSON);
+	         Box.update();
+	         Box.ui.getBulkActions();
+	         console.log(json);
+	         jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
+	         jQuery('#ajaxLoader').remove();
+	       },
+	       'doOnError': function (json) {
+	         Utils.showOkDialog('Error adding item', [json.error]);
+	         jQuery('#selectedBarcode').val(selectedItem.identificationBarcode);
+	         jQuery('#ajaxLoader').remove();
+	       }
+	     }
+	   );
+      }
+      
       // if selectedPosition is already filled, confirm before deleting that position
       if (selectedItem && selectedItem.identificationBarcode != selectedBarcode) {
-        var sampleInfo = selectedItem.name +"::"+ selectedItem.alias;
-        if(confirm(sampleInfo + " is already located at position " + selectedPosition + ". Are you sure you wish to remove it from the box?")) {
-          Box.boxJSON.items = Box.boxJSON.items.filter(function(item) { return item.coordinates != selectedPosition; });
-        } else {
-          return null;
+        var sampleInfo = selectedItem.name + ' (' + selectedItem.alias + ')';
+        var existingInfo = jQuery('#selectedName a:first').html() + ' (' + jQuery('#selectedAlias a:first').html() + ')';
+        
+        var replaceIt = function() {
+            Box.boxJSON.items = Box.boxJSON.items.filter(function(item) { return item.coordinates != selectedPosition; });
+            addTheItem();
         }
+        Utils.showConfirmDialog('Replace Item', 'Replace', 
+          [sampleInfo + " is already located at position " + selectedPosition + ". Are you sure you wish to remove it from the box and replace it with " + existingInfo + "?",
+           "If so, you should re-home " + selectedItem.name + " as soon as possible."],
+          replaceIt
+        );
+      } else {
+        addTheItem();
       }
-  
-      jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
-      jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
-      
-      Fluxion.doAjax(
-        'boxControllerHelperService',
-        'updateOneItem',
-        {
-          'boxId': Box.boxId,
-          'barcode': selectedBarcode,
-          'position': selectedPosition,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': function(json) {
-            Box.boxJSON = JSON.parse(json.boxJSON);
-            Box.update();
-            Box.ui.getBulkActions();
-            console.log(json);
-            jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
-            jQuery('#ajaxLoader').remove();
-        },
-          'doOnError': function (json) {
-            alert(json.error);
-            jQuery('#selectedBarcode').val(selectedItem.identificationBarcode);
-            jQuery('#ajaxLoader').remove();
-          }
-        }
-      );
     }
   },
   
   removeOneItem: function() {
     if (Box.visual.selectedItems.length !== 1) {
-      alert('Select a single tube to remove');
+    Utils.showOkDialog('Too many tubes selected', ['Select a single tube to remove.']);
       return;
     }
     var selectedPosition = Box.utils.getPositionString(Box.visual.selectedItems[0].row, Box.visual.selectedItems[0].col);
     var selectedItem = Box.ui.getItemAtPosition(selectedPosition);
   
-    if (confirm("Are you sure you wish to set location to unknown for " + selectedItem.name + "? You should re-home it as soon as possible")) {
+    var removeIt = function() {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
       jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
       
@@ -571,45 +587,59 @@ Box.ui = {
         {
           'doOnSuccess': Utils.page.pageReload,
           'doOnError': function (json) {
-            alert(json.error);
+            Utils.showOkDialog('Error removing item', [json.error]);
             jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
             jQuery('#selectedBarcode').val(selectedItem.identificationBarcode);
           }
         }
-      );  
-    } 
+      );
+    }
+    
+    Utils.showConfirmDialog('Remove Item', 'Remove', 
+      ["Are you sure you wish to set location to unknown for " + selectedItem.name + "? You should re-home it as soon as possible."],
+      removeIt
+    );
   },
   
   discardOneItem: function() {
     if (Box.visual.selectedItems.length !== 1) {
-      alert('Select a single tube to discard');
+      Utils.showOkDialog('Too many tubes selected', ['Select a single tube to discard']);
       return;
     }
+    
     var selectedPosition = Box.utils.getPositionString(Box.visual.selectedItems[0].row, Box.visual.selectedItems[0].col);
-    if(confirm("Are you sure you wish to discard this tube?")) {
-      jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
+    
+    var discardIt = function() {
+        jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
+        jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
       
-      Fluxion.doAjax(
-        'boxControllerHelperService',
-        'discardSingleTube',
-        {
-          'boxId': Box.boxId,
-          'position': selectedPosition,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': Utils.page.pageReload,
-          'doOnError': function (json) { 
-            alert(json.error); 
-            jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
+        Fluxion.doAjax(
+          'boxControllerHelperService',
+          'discardSingleTube',
+          {
+            'boxId': Box.boxId,
+            'position': selectedPosition,
+            'url': ajaxurl
+          },
+          {
+            'doOnSuccess': Utils.page.pageReload,
+            'doOnError': function (json) {
+              Utils.showOkDialog('Error discarding tube', [json.error]);
+              jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
+            }
           }
-        }
-      );
-    } 
+        );
+    }
+    
+    Utils.showConfirmDialog('Discard Item', 'Discard', 
+      ["Are you sure you wish to discard this tube?"],
+      discardIt
+    );
   },
 
   discardEntireBox: function (boxId) {
-    if(confirm("Are you sure you wish to discard all tubes in this box?")) {      
+  
+    var discardBox = function () {
       Fluxion.doAjax(
         'boxControllerHelperService',
         'discardEntireBox',
@@ -619,12 +649,16 @@ Box.ui = {
         },
         {
           'doOnSuccess': Utils.page.pageReload,
-          'doOnError': function (json) { 
-            alert(json.error); 
+          'doOnError': function (json) {
+            Utils.showOkDialog('Error discarding box', [json.error]);
           }
         }
       );
-    }
+    };
+    Utils.showConfirmDialog('Discard Entire Box', 'Discard',
+      ["Are you sure you wish to discard all tubes in this box?"],
+      discardBox
+    );
   }
 };
 
@@ -666,7 +700,7 @@ Box.barcode = {
                   },
                   {
                     'doOnSuccess': function (json) {
-                      alert(json.response);
+                      Utils.showOkDialog('Print Services', [json.response]);
                     }
                   }
                 );
@@ -679,7 +713,7 @@ Box.barcode = {
           });
         },
         'doOnError': function (json) {
-          alert(json.error);
+          Utils.showOkDialog('Error getting print services', [json.error]);
         }
       }
     );

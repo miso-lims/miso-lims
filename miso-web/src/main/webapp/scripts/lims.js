@@ -148,6 +148,74 @@ var Utils = Utils || {
       }
     }
   },
+  
+  showOkDialog: function(title, fields) {
+    var dialogArea = document.getElementById('dialog');
+    while (dialogArea.hasChildNodes()) {
+      dialogArea.removeChild(dialogArea.lastChild);
+    }
+  
+    var output = {};
+    fields.forEach(function(field) {
+      var p = document.createElement('P');
+      p.textContent = field;
+      dialogArea.appendChild(p);
+    });
+    
+    var dialog = jQuery('#dialog').dialog({
+      autoOpen: true,
+      width: 500,
+      title: title,
+      modal: true,
+      buttons: {
+        'OK': {
+          id: 'ok',
+          text: 'OK',
+          click: function () {
+            dialog.dialog("close");
+          }
+        }
+      }
+    });
+  },
+  
+  showConfirmDialog: function(title, okButton, fields, callback) {
+      var dialogArea = document.getElementById('dialog');
+      while (dialogArea.hasChildNodes()) {
+          dialogArea.removeChild(dialogArea.lastChild);
+      }
+      
+      var output = {};
+      fields.forEach(function(field) {
+          var p = document.createElement('P');
+          p.textContent = field;
+          dialogArea.appendChild(p);
+      });
+      
+      var buttons = {};
+      buttons[okButton] = {
+        id: 'ok',
+        text: okButton,
+        click: function () {
+          dialog.dialog("close");
+          callback();
+        }
+      };
+      buttons["Cancel"] = {
+        id: 'cancel',
+        text: 'Cancel',
+        click: function () {
+          dialog.dialog("close");
+        }
+      };
+      var dialog = jQuery('#dialog').dialog({
+          autoOpen: true,
+          width: 500,
+          title: title,
+          modal: true,
+          buttons: buttons
+      });
+  },
   showDialog: function(title, okButton, fields, callback) {
       var dialogArea = document.getElementById('dialog');
       while (dialogArea.hasChildNodes()) {
