@@ -72,8 +72,8 @@ public class BulkDilutionIT extends AbstractIT {
     HandsOnTable table = page.getTable();
     
     List<String> targetedSequencings = table.getDropdownOptions(Columns.TARGETED_SEQUENCING, 0);
-    assertTrue(targetedSequencings.contains("Test TarSeq 1"));
-    assertTrue(targetedSequencings.contains("Test TarSeq 2"));
+    assertTrue(targetedSequencings.contains("Test TarSeq One"));
+    assertTrue(targetedSequencings.contains("Test TarSeq Two"));
     assertTrue(targetedSequencings.contains("(None)"));
     assertEquals("targeted sequencing size", 3, targetedSequencings.size()); // two plus "(None)"
   }
@@ -101,7 +101,7 @@ public class BulkDilutionIT extends AbstractIT {
     attrs.put(Columns.ID_BARCODE, "102938");
     attrs.put(Columns.CONCENTRATION, "3.45");
     attrs.put(Columns.CREATION_DATE, "2017-08-14");
-    attrs.put(Columns.TARGETED_SEQUENCING, "Test TarSeq 2");
+    attrs.put(Columns.TARGETED_SEQUENCING, "Test TarSeq Two");
 
     fillRow(table, 0, attrs);
 
@@ -125,7 +125,7 @@ public class BulkDilutionIT extends AbstractIT {
     attrs.put(Columns.ID_BARCODE, "11223344");
     attrs.put(Columns.CONCENTRATION, "4.56");
     attrs.put(Columns.CREATION_DATE, "2017-08-14");
-    attrs.put(Columns.TARGETED_SEQUENCING, "Test TarSeq 1");
+    attrs.put(Columns.TARGETED_SEQUENCING, "Test TarSeq One");
 
     fillRow(table, 0, attrs);
 
