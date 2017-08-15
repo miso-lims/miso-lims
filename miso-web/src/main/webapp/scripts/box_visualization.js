@@ -30,6 +30,12 @@
 var BoxPosition = function(opts) {
   var self = {};
   
+  isMultiSelectClick = function(event) {
+    // multi-select is accessible by pressing the Command key (metaKey) on Mac,
+    // or the Control key (ctrlKey) on Windows or Linux
+    return navigator.platform.indexOf('Mac') != -1 ? event.metaKey : event.ctrlKey;
+  };
+  
   self.title = opts.title || '';
   self.parentVisual = opts.parentVisual;
   self.row = opts.row;
@@ -61,12 +67,6 @@ var BoxPosition = function(opts) {
     } else {
       self.normalClick();
     }
-  };
-  
-  var isMultiSelectClick = function(event) {
-    // multi-select is accessible by pressing the Command key (metaKey) on Mac,
-    // or the Control key (ctrlKey) on Windows or Linux
-    return navigator.platform.indexOf('Mac') != -1 ? event.metaKey : event.ctrlKey;
   };
 
   self.normalClick = function() {
