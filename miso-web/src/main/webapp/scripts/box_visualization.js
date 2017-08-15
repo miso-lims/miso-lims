@@ -30,6 +30,12 @@
 var BoxPosition = function(opts) {
   var self = {};
   
+  isMultiSelectClick = function(event) {
+    // multi-select is accessible by pressing the Command key (metaKey) on Mac,
+    // or the Control key (ctrlKey) on Windows or Linux
+    return navigator.platform.indexOf('Mac') != -1 ? event.metaKey : event.ctrlKey;
+  };
+  
   self.title = opts.title || '';
   self.parentVisual = opts.parentVisual;
   self.row = opts.row;
@@ -56,7 +62,7 @@ var BoxPosition = function(opts) {
   };
 
   self.click = function(event) {
-    if (event.ctrlKey) {
+    if (isMultiSelectClick(event)) {
       self.controlClick();
     } else {
       self.normalClick();
@@ -179,7 +185,7 @@ var BoxVisual = function() {
   };
   
   var toggleGroupSelection = function(event, items) {
-    if (!event.ctrlKey) {
+    if (!isMultiSelectClick(event)) {
       self.clearSelection();
     }
     var allSelected = true;
@@ -189,7 +195,7 @@ var BoxVisual = function() {
         allSelected = false;
       }
     });
-    if (event.ctrlKey && allSelected) {
+    if (isMultiSelectClick(event) && allSelected) {
       for (var i = 0; i < items.length; i++) {
         self.unselect(items[i], true);
       }
