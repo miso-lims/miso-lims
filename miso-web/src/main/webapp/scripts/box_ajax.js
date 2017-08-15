@@ -335,9 +335,15 @@ Box.ui = {
       items = Box.visual.data;
     }
     if (items.length < 1) {
-      // empty box
-      addToolbarMemo("Add items to box to see bulk actions.");
-      return;
+      if (Box.visual.data.length) {
+        // there are items in the box but an empty position is selected
+        addToolbarMemo("Select one or more itmes to see bulk actions.");
+        return;
+      } else {
+        // empty box
+        addToolbarMemo("Add items to box to see bulk actions.");
+        return;
+      }
     }
     
     
@@ -346,8 +352,15 @@ Box.ui = {
     }));
     
     if (entityTypes.length > 1) {
-      addToolbarMemo("Box contains multiple types of tubes. Select tubes of same type to see bulk actions.");
-      return;
+      if (positionStrings) {
+        // heterogenous items are selected
+        addToolbarMemo("Selection contains multiple types of tubes. Select tubes of the same type to see bulk actions.");
+        return;
+      } else {
+        // no items are selected, but box contains heterogenous items
+        addToolbarMemo("Box contains multiple types of tubes. Select tubes of same type to see bulk actions.");
+        return;
+      }
     }
     
     var actions = [];
