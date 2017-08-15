@@ -1195,6 +1195,8 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setName(from.getName());
     dto.setVolume(from.getVolume());
+    dto.setEntityType(from.getId().getTargetType());
+    dto.setSampleClassId(from.getSampleClassId());
     return dto;
   }
 

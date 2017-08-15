@@ -292,6 +292,7 @@
     });
   });
 </script>
+<div id="dialog"></div>
 
 <%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>

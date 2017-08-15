@@ -296,12 +296,14 @@ Box.ui = {
       "aLengthMenu": [[Box.boxJSON.cols*Box.boxJSON.rows, 50, 25, 10],
                       [Box.boxJSON.cols*Box.boxJSON.rows, 50, 25, 10]],
       "iDisplayLength": Box.boxJSON.cols*Box.boxJSON.rows,
-      "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+      "sPaginationType" : "full_numbers",
+      "sDom": '<"#toolbar.fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"lf>r<t><"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
       "aaSorting": [
         [0, "asc"]
       ]
     }).css("width", "100%");
     jQuery("#toolbar").append('<button style=\"margin-left:5px;\" class=\"fg-button ui-state-default ui-corner-all\" id="listAllItems" onclick="Box.ui.filterTableByBoxPositions();">List all Box Contents</button>');
+    Box.ui.getBulkActions();
   },
   
   filterTableByBoxPositions: function (positionStrings) {
@@ -311,6 +313,101 @@ Box.ui = {
       filter = '^(?:' + positionStrings.join('|') + ')$';
     }
     t.fnFilter(filter, 0, true);
+    Box.ui.getBulkActions(positionStrings);
+  },
+  
+  getBulkActions: function(positionStrings) {
+    function addToolbarMemo(memo) {
+      // empty all previous bulk actions and/or info
+      Box.ui.createToolbarIfNecessary();
+      var toolbar = jQuery('#listingBoxablesToolbar');
+      toolbar.empty();
+      jQuery('<span/>', {
+          'text': memo
+      }).appendTo(toolbar);
+    }
+    
+    var items;
+    if (positionStrings) {
+      items = Box.visual.data.filter(function(item) { return positionStrings.indexOf(item.coordinates) >= 0 });
+    } else {
+      // if no items are selected, determine bulk actions based on the entity types of all box contents
+      items = Box.visual.data;
+    }
+    if (items.length < 1) {
+      if (Box.visual.data.length) {
+        // there are items in the box but an empty position is selected
+        addToolbarMemo("Select one or more itmes to see bulk actions.");
+        return;
+      } else {
+        // empty box
+        addToolbarMemo("Add items to box to see bulk actions.");
+        return;
+      }
+    }
+    
+    
+    var entityTypes = Utils.array.deduplicateString(items.map(function(item) {
+      return item.entityType;
+    }));
+    
+    if (entityTypes.length > 1) {
+      if (positionStrings) {
+        // heterogenous items are selected
+        addToolbarMemo("Selection contains multiple types of tubes. Select tubes of the same type to see bulk actions.");
+        return;
+      } else {
+        // no items are selected, but box contains heterogenous items
+        addToolbarMemo("Box contains multiple types of tubes. Select tubes of same type to see bulk actions.");
+        return;
+      }
+    }
+    
+    var actions = [];
+    switch (entityTypes[0]) {
+    case 'SAMPLE':
+      actions = HotTarget.sample.bulkActions;
+      break;
+    case 'LIBRARY':
+      actions = HotTarget.library.bulkActions;
+      break;
+    case 'DILUTION':
+      actions = HotTarget.dilution.bulkActions;
+      break;
+    case 'POOL':
+      actions = HotTarget.pool.bulkActions;
+      break;
+    }
+    
+    Box.ui.refreshToolbar(actions, items);
+  },
+  
+  createToolbarIfNecessary: function() {
+    var toolbar = jQuery('#listingBoxablesToolbar');
+    if (!toolbar.length) {
+      toolbar = jQuery('<div />', {
+        id: 'listingBoxablesToolbar',
+        'class': 'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix paging_full_numbers'
+      });
+      toolbar.insertBefore(jQuery('#toolbar'));
+    }
+  },
+  
+  refreshToolbar: function(actions, items) {
+    Box.ui.createToolbarIfNecessary();
+    var toolbar = jQuery('#listingBoxablesToolbar');
+    toolbar.empty();
+    actions.forEach(function(action) {
+      var button = jQuery('<a />', {
+        'class': 'ui-button ui-state-default',
+        title: action.title || '',
+        text: action.name
+      });
+      button.click(function() {
+        action.action(items);
+      });
+      button.appendTo(toolbar);
+    });
   },
 
   editBoxIdBarcode: function (span, id) {
@@ -421,6 +518,7 @@ Box.ui = {
       }
   
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
+      jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
       
       Fluxion.doAjax(
         'boxControllerHelperService',
@@ -435,15 +533,18 @@ Box.ui = {
           'doOnSuccess': function(json) {
             Box.boxJSON = JSON.parse(json.boxJSON);
             Box.update();
+            Box.ui.getBulkActions();
             console.log(json);
             jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
+            jQuery('#ajaxLoader').remove();
         },
           'doOnError': function (json) {
             alert(json.error);
             jQuery('#selectedBarcode').val(selectedItem.identificationBarcode);
+            jQuery('#ajaxLoader').remove();
           }
         }
-      );  
+      );
     }
   },
   
@@ -457,6 +558,7 @@ Box.ui = {
   
     if (confirm("Are you sure you wish to set location to unknown for " + selectedItem.name + "? You should re-home it as soon as possible")) {
       jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
+      jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
       
       Fluxion.doAjax(
         'boxControllerHelperService',
