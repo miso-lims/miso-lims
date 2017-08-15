@@ -72,8 +72,10 @@ public class BulkDilutionIT extends AbstractIT {
     HandsOnTable table = page.getTable();
     
     List<String> targetedSequencings = table.getDropdownOptions(Columns.TARGETED_SEQUENCING, 0);
-    assertEquals("targeted sequencing size", 3, targetedSequencings.size()); // two plus "(None)"
     assertTrue(targetedSequencings.contains("Test TarSeq 1"));
+    assertTrue(targetedSequencings.contains("Test TarSeq 2"));
+    assertTrue(targetedSequencings.contains("(None)"));
+    assertEquals("targeted sequencing size", 3, targetedSequencings.size()); // two plus "(None)"
   }
 
   @Test
