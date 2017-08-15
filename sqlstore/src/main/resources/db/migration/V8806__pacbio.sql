@@ -1,2 +1,0 @@
-ALTER TABLE RunPacBio DROP COLUMN movieDuration;
-ALTER TABLE RunPacBio DROP COLUMN wellName;
