@@ -10,13 +10,15 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -70,15 +72,9 @@ public final class DefaultIllumina extends RunProcessor {
     // See if we can figure out the chemistry
 
     dto.setChemistry(Stream.of("runParameters.xml", "RunParameters.xml").map(f -> new File(runDirectory, f))
-        .filter(file -> file.exists() && file.canRead()).findAny().flatMap(file -> {
-          try {
-            Document parameters = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
-            return Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(parameters)).findFirst();
-          } catch (SAXException | ParserConfigurationException | IOException e) {
-            log.error("Failed to parse parameters", e);
-            return Optional.empty();
-          }
-        }).orElse(IlluminaChemistry.UNKNOWN));
+        .filter(file -> file.exists() && file.canRead()).findAny().flatMap(RunProcessor::parseXml)
+        .flatMap(parameters -> Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(parameters)).findFirst())
+        .orElse(IlluminaChemistry.UNKNOWN));
 
     // The Illumina library can't distinguish between a failed run and one that either finished or is still going. Scan the logs, if
     // available to determine if the run failed.
