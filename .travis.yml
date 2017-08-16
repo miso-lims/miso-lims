@@ -33,7 +33,7 @@ before_script:
   - sudo apt-get install -y pkg-config cmake libjsoncpp-dev autoconf libtool build-essential gcc-5 g++-5
 script:
   - pushd runscanner-illumina && ./build-illumina-interop && autoreconf -i && ./configure && make && popd
-  - PATH=$PATH:$(pwd)/runscanner-illumina mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false install
+  - PATH=$PATH:$(pwd)/runscanner-illumina mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false -DskipIllumina=false install
   - 'if [[ ${TRAVIS_PULL_REQUEST_SLUG} == ${TRAVIS_REPO_SLUG} ]] ; then 
         mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar ;
      else 

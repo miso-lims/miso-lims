@@ -25,7 +25,9 @@ public class IlluminaProcessorTest extends AbstractProcessorTest {
 
   @Test
   public void testGoldens() throws IOException {
-    checkDirectory("/illumina");
+    if (!System.getProperty("skipIllumina", "true").equals("true")) {
+      checkDirectory("/illumina");
+    }
   }
 
 }

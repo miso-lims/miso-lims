@@ -34,6 +34,9 @@
   <artifactId>runscanner</artifactId>
   <packaging>war</packaging>
   <name>MISO Run Scanner</name>
+  <properties>
+    <skipIllumina>true</skipIllumina>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.parent.groupId}</groupId>
@@ -151,6 +154,16 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <propertyName>skipIllumina</propertyName>
+            <buildDirectory>${skipIllumina}</buildDirectory>
+          </systemPropertyVariables>
+        </configuration>
       </plugin>
     </plugins>
   </build>
