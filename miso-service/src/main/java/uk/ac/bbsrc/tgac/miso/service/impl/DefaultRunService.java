@@ -699,7 +699,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       newContainer.setPartitionLimit(laneCount);
       newContainer
           .setPartitions(
-              IntStream.range(0, laneCount).mapToObj((i) -> new PartitionImpl(newContainer, i)).collect(Collectors.toList()));
+              IntStream.range(0, laneCount).mapToObj((i) -> new PartitionImpl(newContainer, i + 1)).collect(Collectors.toList()));
       updatePartitionContents(getLaneContents, newContainer);
       target.setSequencerPartitionContainers(Collections.singletonList(containerService.create(newContainer)));
       return true;
