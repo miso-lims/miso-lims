@@ -32,7 +32,7 @@ public class UserInterfaceController {
   private static final Map<String, Function<Scheduler, Iterable<File>>> COLLECTIONS = ImmutableSortedMap
       .<String, Function<Scheduler, Iterable<File>>> naturalOrder().put("Finished", Scheduler::getFinishedDirectories)
       .put("Scheduled", Scheduler::getScheduledWork).put("Processing", Scheduler::getCurrentWork).put("Instruments", Scheduler::getRoots)
-      .put("Failed", Scheduler::getFailedDirectories).build();
+      .put("Failed", Scheduler::getFailedDirectories).put("Unreadable", Scheduler::getUnreadableDirectories).build();
 
   @Autowired
   private Scheduler scheduler;
