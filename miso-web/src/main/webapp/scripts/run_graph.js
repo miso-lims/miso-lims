@@ -34,7 +34,7 @@ var RunGraph = (function() {
       return {
         dom : node,
         span : false, // Indicator of whether the graph spans the entire width
-                      // of the row.
+        // of the row.
         render : function() {
           // Callback to render the graph after the DOM node is inserted.
           node.innerText = 'Look at me. I am gorgeous.';
@@ -339,7 +339,9 @@ var RunGraph = (function() {
         while (container.hasChildNodes()) {
           container.removeChild(container.lastChild);
         }
-        var width = Math.round(jQuery(container).width() * 0.49);
+        var realWidth = jQuery(container).width();
+        var forceSpan = realWidth < 550;
+        var width = forceSpan ? realWidth : Math.round(realWidth * 0.49);
         // Start with graphs we know how to make (see the example for a
         // template). Then filter them as appropriate for the data we have.
         var graphs = RunGraph.metricProcessors.map(
@@ -371,7 +373,7 @@ var RunGraph = (function() {
           var cell = document.createElement('TD');
           cell.style.cssText = css;
           cell.appendChild(graph.dom);
-          if (graph.span) {
+          if (graph.span || forceSpan) {
             cell.colSpan = 2;
             var spanRow = document.createElement('TR');
             spanRow.appendChild(cell);
