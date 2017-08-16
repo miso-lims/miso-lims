@@ -44,7 +44,7 @@
           <c:when test="${study.id != 0}">Edit</c:when>
           <c:otherwise>Create</c:otherwise>
         </c:choose> Study
-        <button type="submit" class="fg-button ui-state-default ui-corner-all" onclick="return Study.validateStudy();">Save</button>
+        <button id="save" type="submit" class="fg-button ui-state-default ui-corner-all" onclick="return Study.validateStudy();">Save</button>
       </h1>
       <div class="breadcrumbs">
         <ul>
@@ -79,36 +79,36 @@
       <table class="in">
       <tr>
         <td class="h">Study ID:</td>
-        <td>
+        <td><span id="studyId">
           <c:choose>
             <c:when test="${study.id != 0}">${study.id}</c:when>
             <c:otherwise><i>Unsaved</i></c:otherwise>
           </c:choose>
-        </td>
+        </span></td>
       </tr>
       <tr>
-        <td class="h">Project ID:</td>
+        <td class="h">Project Name:</td>
         <td>
           <input type="hidden" value="${study.project.id}" name="project" id="project"/>
-          <a href='<c:url value="/miso/project/${study.project.id}"/>'>${study.project.name}</a>
+          <a href='<c:url value="/miso/project/${study.project.id}"/>'><span id="projectName">${study.project.name}</span></a>
         </td>
       </tr>
       <tr>
         <td>Name:</td>
-        <td>
+        <td><span id="name">
           <c:choose>
             <c:when test="${study.id != 0}">${study.name}</c:when>
             <c:otherwise><i>Unsaved</i></c:otherwise>
           </c:choose>
-        </td>
+        </span></td>
       </tr>
       <tr>
         <td class="h">Alias:</td>
-        <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
+        <td><form:input id="alias" path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
       </tr>
       <tr>
         <td>Description:</td>
-        <td><form:input path="description" class="validateable"/><span id="descriptioncounter" class="counter"></span>
+        <td><form:input id="description" path="description" class="validateable"/><span id="descriptioncounter" class="counter"></span>
         </td>
       </tr>
       <c:if test="${not empty study.accession}">
