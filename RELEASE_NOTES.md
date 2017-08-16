@@ -1,3 +1,10 @@
+# 0.2.84
+
+Changes:
+
+ * Fix off-by-one error when creating new flow cells from run scanner
+ * Switch to single column when run page is narrow
+
 # 0.2.83
 
 Changes:
@@ -10,6 +17,10 @@ Changes:
  * Fix stacktrace on bulk create Slide
  * Require enter to search
  * Fix problems with inferring tissue for tissue processing
+
+Bad:
+
+ * Run Scanner created incorrect partition numbers
 
 # 0.2.81
 
