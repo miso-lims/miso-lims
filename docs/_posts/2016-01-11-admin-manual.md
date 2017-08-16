@@ -114,7 +114,7 @@ and populate it with the following information:
       url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8"
       username="tgaclims"
       password="tgaclims"/>
-      <Parameter name="miso.propertiesFile" value="file:${CATALINA_HOME}/conf/Catalina/localhost/miso.properties" override="false"/>
+      <Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/>
       <Parameter name="miso.name" value="Test"/>
     </Context>
 

@@ -333,11 +333,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
   }
 
   @Test
-  public void testCreateSlideDepencencyCells() throws Exception {
-    // none unique to this class at this time
-  }
-
-  @Test
   public void testCreateOneSlideNoProject() throws Exception {
     // Goal: ensure one slide can be saved
     BulkSamplePage page = getCreatePage(1, null, slideClassId);
@@ -443,16 +438,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
-  }
-
-  @Test
-  public void testCreateCurlsDropdowns() throws Exception {
-    // none unique to this class at this time
-  }
-
-  @Test
-  public void testCreateCurlsDependencyCells() throws Exception {
-    // none unique to this class at this time
   }
 
   @Test
@@ -572,11 +557,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
   }
 
   @Test
-  public void testCreateGdnaStockDependencyCells() {
-    // none unique to this class at this time
-  }
-
-  @Test
   public void testCreateOneGdnaStockNoProject() throws Exception {
     // Goal: ensure one gDNA (stock) can be saved
     BulkSamplePage page = getCreatePage(1, null, gStockClassId);
@@ -692,11 +672,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     assertEquals(2, dnaseTreated.size());
     assertTrue(dnaseTreated.contains("True"));
     assertTrue(dnaseTreated.contains("False"));
-  }
-
-  @Test
-  public void testCreateRnaStockDependencyCells() throws Exception {
-    // none unique to this class at this time
   }
 
   @Test
@@ -846,11 +821,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
   }
 
   @Test
-  public void testCreateGdnaAliquotDependencyCells() throws Exception {
-    // none unique to this class at this time
-  }
-
-  @Test
   public void testCreateOneGdnaAliquotNoProject() throws Exception {
     // Goal: ensure one gDNA (aliquot) can be saved
     BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
@@ -958,16 +928,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
-  }
-
-  @Test
-  public void testCreateRnaAliquotDropdowns() throws Exception {
-    // none unique to this class at this time
-  }
-
-  @Test
-  public void testCreateRnaAliquotDependencyCells() throws Exception {
-    // none unique to this class at this time
   }
 
   @Test

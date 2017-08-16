@@ -309,7 +309,7 @@ public class BulkLibraryIT extends AbstractIT {
     changes.put(Columns.LIBRARY_TYPE, "Single End");
     changes.put(Columns.INDEX_FAMILY, "Single Index 6bp");
     changes.put(Columns.INDEX_1, "Index 01 (AAAAAA)");
-    changes.put(Columns.KIT_DESCRIPTOR, "Test Kit 2");
+    changes.put(Columns.KIT_DESCRIPTOR, "Test Kit Two");
     changes.put(Columns.QC_PASSED, "True");
     changes.put(Columns.SIZE, "241");
     changes.put(Columns.VOLUME, "1.88");
