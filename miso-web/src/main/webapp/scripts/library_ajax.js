@@ -684,7 +684,7 @@ Library.ui = {
     var family = Library.ui.getCurrentIndexFamily();
     var max = Library.ui.maxIndexPositionInFamily(family);
     if (Library.lastIndexPosition < max) {
-      Library.ui.createIndexSelect(max, null);
+      Library.ui.createIndexSelect(max, 0);
     } else if (Library.lastIndexPosition == 0) {
       var container = jQuery('#indicesDiv');
       if (container.children().length == 0) {
@@ -717,6 +717,7 @@ Library.ui = {
     var container = document.getElementById('indicesDiv');
     for (var position = Library.lastIndexPosition + 1; position <= newPosition; position++) {
       var widget = document.createElement("select");
+      widget.id = "index" + position;
       widget.name = "indices[" + (position - 1) + "]";
       if (position > 1) {
         var nullOption = document.createElement("option");
