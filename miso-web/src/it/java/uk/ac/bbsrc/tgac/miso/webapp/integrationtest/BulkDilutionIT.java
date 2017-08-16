@@ -79,11 +79,6 @@ public class BulkDilutionIT extends AbstractIT {
   }
 
   @Test
-  public void testCreateDependencyCells() throws Exception {
-    // none at this time
-  }
-
-  @Test
   public void testReadOnlyCells() {
     BulkDilutionPage page = BulkDilutionPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(304L));
     HandsOnTable table = page.getTable();

@@ -501,10 +501,6 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   
 INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated) VALUES
 (1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 'admin', 2, 1, '2017-07-20 09:01:00'),
-(100001, 'LDI100001', 3.97, 100001, '3010001', '2017-07-20', 'admin', 1, 1, '2017-07-20 10:00:00'),
-(100002, 'LDI100002', 4.97, 100002, '3010002', '2017-07-20', 'admin', 1, 1, '2017-07-20 10:00:00'),
-(100003, 'LDI100003', 5.97, 100003, '3010003', '2017-07-20', 'admin', 1, 1, '2017-07-20 10:00:00'),
-(100004, 'LDI100004', 6.97, 100004, '3010004', '2017-07-20', 'admin', 1, 1, '2017-07-20 10:00:00'),
 (304, 'LDI304', 7.97, 304, '300304', '2017-08-14', 'admin', 1, 1, '2017-08-14 12:25:00'),
 (305, 'LDI305', 7.97, 305, '300305', '2017-08-14', 'admin', 1, 1, '2017-08-14 12:25:00');
 
