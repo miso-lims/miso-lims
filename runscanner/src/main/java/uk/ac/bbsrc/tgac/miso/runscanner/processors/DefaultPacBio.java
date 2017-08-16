@@ -10,26 +10,22 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.jfree.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -55,6 +51,7 @@ public class DefaultPacBio extends RunProcessor {
   interface ProcessMetadata {
     public void accept(Document document, PacBioNotificationDto dto) throws XPathException;
   }
+
   /**
    * This is the response object provided by the PacBio web service when queries about the state of a plate.
    */
@@ -108,6 +105,8 @@ public class DefaultPacBio extends RunProcessor {
 
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
+  private static final Logger log = LoggerFactory.getLogger(DefaultPacBio.class);
+
   /**
    * These are all the things that can be extracted from the PacBio metadata XML file.
    */
@@ -127,23 +126,6 @@ public class DefaultPacBio extends RunProcessor {
   private static final Pattern RUN_DIRECTORY = Pattern.compile("^.+_\\d+$");
 
   private static final DateTimeFormatter URL_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
-
-  /**
-   * Compile a list of XPath expressions
-   */
-  private static XPathExpression[] compile(String... expression) {
-    XPathFactory xpathFactory = XPathFactory.newInstance();
-    XPath xpath = xpathFactory.newXPath();
-    XPathExpression[] expr = new XPathExpression[expression.length];
-    try {
-      for (int i = 0; i < expression.length; i++) {
-        expr[i] = xpath.compile(expression[i]);
-      }
-      return expr;
-    } catch (XPathExpressionException e) {
-      throw new IllegalArgumentException("Failed to compile XPath expression: " + expression, e);
-    }
-  }
 
   public static DefaultPacBio create(Builder builder, ObjectNode parameters) {
     JsonNode address = parameters.get("address");
@@ -168,7 +150,7 @@ public class DefaultPacBio extends RunProcessor {
    * @return
    */
   private static ProcessMetadata processNumber(String expression, BiConsumer<PacBioNotificationDto, Double> setter) {
-    XPathExpression expr = compile(expression)[0];
+    XPathExpression expr = RunProcessor.compileXPath(expression)[0];
     return (document, dto) -> {
       Double result = (Double) expr.evaluate(document, XPathConstants.NUMBER);
       if (result != null) {
@@ -183,7 +165,7 @@ public class DefaultPacBio extends RunProcessor {
    * @return
    */
   private static ProcessMetadata processSampleInformation() {
-    XPathExpression[] expr = compile("//Sample/WellName", "//Sample/Name");
+    XPathExpression[] expr = RunProcessor.compileXPath("//Sample/WellName", "//Sample/Name");
     return (document, dto) -> {
       String well = (String) expr[0].evaluate(document, XPathConstants.STRING);
       String name = (String) expr[1].evaluate(document, XPathConstants.STRING);
@@ -206,7 +188,7 @@ public class DefaultPacBio extends RunProcessor {
    * @return
    */
   private static ProcessMetadata processString(String expression, BiConsumer<PacBioNotificationDto, String> setter) {
-    XPathExpression expr = compile(expression)[0];
+    XPathExpression expr = RunProcessor.compileXPath(expression)[0];
     return (document, dto) -> {
       String result = (String) expr.evaluate(document, XPathConstants.STRING);
       if (result != null) {
@@ -243,7 +225,8 @@ public class DefaultPacBio extends RunProcessor {
     // Read all the metadata files and write their results into the DTO.
     Arrays.stream(runDirectory.listFiles(cellDirectory -> cellDirectory.isDirectory() && CELL_DIRECTORY.test(cellDirectory.getName())))
         .flatMap(cellDirectory -> Arrays.stream(cellDirectory.listFiles(file -> file.getName().endsWith(".metadata.xml"))))
-        .forEach(metadataFile -> processMetadata(metadataFile, dto));
+        .map(RunProcessor::parseXml).filter(Optional::isPresent)
+        .forEach(metadata -> processMetadata(metadata.get(), dto));
 
     // The current job state is not available from the metadata files, so contact the PacBio instrument's web service.
     String url = String.format("%s/Jobs/Plate/%s/Status", address,
@@ -282,16 +265,15 @@ public class DefaultPacBio extends RunProcessor {
    * @param metadataFile the path to the XML file
    * @param dto the DTO to update
    */
-  private void processMetadata(File metadataFile, PacBioNotificationDto dto) {
-    try {
-      Document metadata = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(metadataFile);
-      for (ProcessMetadata processor : METADATA_PROCESSORS) {
+  private void processMetadata(Document metadata, PacBioNotificationDto dto) {
+    for (ProcessMetadata processor : METADATA_PROCESSORS) {
+      try {
         processor.accept(metadata, dto);
+      } catch (XPathException e) {
+        log.error("Failed to extract metadata", e);
       }
-      dto.setLaneCount(dto.getLaneCount() + 1);
-    } catch (SAXException | IOException | ParserConfigurationException | XPathException e) {
-      Log.error("Failed to parse metadata", e);
     }
+    dto.setLaneCount(dto.getLaneCount() + 1);
   }
 
 }
