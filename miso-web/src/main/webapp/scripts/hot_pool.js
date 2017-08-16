@@ -9,16 +9,29 @@ HotTarget.pool = {
   createColumns : function(config, create, data) {
     return [
         {
+          header : 'Pool Name',
+          data : 'name',
+          readOnly : true,
+          include : true,
+          unpackAfterSave : true,
+          unpack : function(pool, flat, setCellMeta) {
+            flat.name = pool.name;
+          },
+          pack : function(pool, flat, errorHandler) {
+            pool.name = flat.name;
+          }
+        },
+        {
           header : 'Pool Alias',
           data : 'alias',
           include : true,
           validator : HotUtils.validator.requiredText,
           unpackAfterSave : true,
-          unpack : function(dil, flat, setCellMeta) {
-            flat.alias = dil.alias || null;
+          unpack : function(pool, flat, setCellMeta) {
+            flat.alias = pool.alias || null;
           },
-          pack : function(dil, flat, errorHandler) {
-            dil.alias = flat.alias;
+          pack : function(pool, flat, errorHandler) {
+            pool.alias = flat.alias;
           }
         },
         {
@@ -26,11 +39,11 @@ HotTarget.pool = {
           data : 'identificationBarcode',
           validator : HotUtils.validator.optionalTextNoSpecialChars,
           include : !Constants.automaticBarcodes,
-          unpack : function(dil, flat, setCellMeta) {
-            flat.identificationBarcode = dil.identificationBarcode || null;
+          unpack : function(pool, flat, setCellMeta) {
+            flat.identificationBarcode = pool.identificationBarcode || null;
           },
-          pack : function(dil, flat, errorHandler) {
-            dil.identificationBarcode = flat.identificationBarcode;
+          pack : function(pool, flat, errorHandler) {
+            pool.identificationBarcode = flat.identificationBarcode;
           }
         },
         {
