@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.assertColumnValues;
 
 import java.util.HashMap;
 import java.util.List;
@@ -597,17 +598,6 @@ public class BulkLibraryIT extends AbstractIT {
 
   private void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {
     attributes.forEach((key, val) -> table.enterText(key, rowNum, val));
-  }
-
-  private void assertColumnValues(HandsOnTable table, int rowNum, Map<String, String> attributes, String hintMessage) {
-    String formatString = hintMessage + " row %d column '%s' value";
-    attributes.forEach((key, val) -> {
-      if (isStringEmptyOrNull(val)) {
-        assertTrue(String.format(formatString, rowNum, key) + " expected empty", isStringEmptyOrNull(table.getText(key, rowNum)));
-      } else {
-        assertEquals(String.format(formatString, rowNum, key), val, table.getText(key, rowNum));
-      }
-    });
   }
 
   private long getSavedId(HandsOnTable table, int rowNum) {

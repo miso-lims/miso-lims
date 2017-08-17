@@ -334,6 +334,7 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 2, 'ACTIVE', 1, '2017-06-27 14:12:00'),
   (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 2, 'PROPOSED', 2, '2017-08-04 15:12:00'),
   (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 1, 'ACTIVE', 1, '2017-07-24 16:11:00'),
+  (200001, 'PRO200001', 'BulkPoolIT', 'IPOT', '2017-08-15', 'bulk Pool test project', 1, 'ACTIVE', 1, '2017-08-15 12:22:00'),
   (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 1, 'ACTIVE', 1, '2017-08-09 11:51:00'),
   (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 1, 'ACTIVE', 1, '2017-08-14 11:54:00'),
   (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 1, 'ACTIVE', 1, '2017-08-16 14:50:00');
@@ -365,6 +366,10 @@ INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_pro
   (100002, 100001, 'SAM100002', 'LIBT_0001_Ly_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (100003, 100001, 'SAM100003', 'LIBT_0001_Ly_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (100004, 100001, 'SAM100004', 'LIBT_0001_Ly_P_1-1_D1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (200001, 200001, 'SAM200001', 'IPOT_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (200002, 200001, 'SAM200002', 'IPOT_0001_Pa_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (200003, 200001, 'SAM200003', 'IPOT_0001_Pa_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (200004, 200001, 'SAM200004', 'IPOT_0001_Pa_P_1-1_D_1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (201, 200, 'SAM201', 'SORT_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
   (202, 200, 'SAM202', 'SORT_0001_nn_n_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
   (203, 200, 'SAM203', 'SORT_0001_nn_n_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-09 11:51:00', 1, '2017-08-09 11:51:00'),
@@ -398,6 +403,10 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
   (100002, 23, NULL, 1, 0), -- Tissue
   (100003, 11, NULL, 1, 0), -- gDNA (stock)
   (100004, 15, NULL, 1, 0), -- gDNA (aliquot)
+  (200001, 1, NULL, 1, 0),  -- Identity
+  (200002, 23, NULL, 1, 0), -- Tissue
+  (200003, 11, NULL, 1, 0), -- gDNA (stock)
+  (200004, 15, NULL, 1, 0), -- gDNA (aliquot)
   (201, 1, NULL, 1, 0),
   (202, 23, NULL, 1, 0),
   (203, 11, NULL, 1, 0),
@@ -413,12 +422,14 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
 INSERT INTO Identity (sampleId, externalName, donorSex) VALUES
   (1, 'TEST_external_1', 'MALE'),
   (100001, 'LIBT_identity1', 'UNKNOWN'),
+  (200001, 'IPOT_identity1', 'UNKNOWN'),
   (201, 'SORT_identity_1', 'UNKNOWN'),
   (301, 'DILT_identity_1', 'FEMALE');
 
 INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, externalInstituteIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
   (2, 1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2),
   (100002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  (200002, 3, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (202, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (302, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL);
 
@@ -436,6 +447,7 @@ INSERT INTO `SampleStock` (sampleId, strStatus, dnaseTreated) VALUES
 (7, 'NOT_SUBMITTED', 0),
 (10, 'PASS', 0),
 (100003, 'NOT_SUBMITTED', 0),
+(200003, 'NOT_SUBMITTED', 0),
 (203, 'NOT_SUBMITTED', 0),
 (303, 'NOT_SUBMITTED', 0);
 
@@ -447,6 +459,7 @@ INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 (13, 7),
 (14, 3),
 (100004, NULL),
+(200004, NULL),
 (204, NULL),
 (205, NULL),
 (206, NULL),
@@ -466,6 +479,10 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL),
   (100004, 'LIB100004', 'LIBT_0001_Ly_P_PE_254_WG', NULL,           'libdesc100004', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL),
+  (200001, 'LIB200001', 'IPOT_0001_Pa_P_PE_251_WG', 'libbar200001', 'libdesc200001', 1, 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10),
+  (200002, 'LIB200002', 'IPOT_0001_Pa_P_PE_252_WG', 'libbar200002', 'libdesc200002', 1, 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3),
   (204, 'LIB204', 'SORT_0001_nn_n_PE_204_WG', NULL, 'description', 1, 204, 'ILLUMINA', 1, 3, 1, '2017-08-09',
     1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL),
   (205, 'LIB205', 'SORT_0001_nn_n_PE_205_WG', NULL, 'description', 1, 205, 'ILLUMINA', 1, 3, 1, '2017-08-09',
@@ -485,6 +502,8 @@ INSERT INTO DetailedLibrary(libraryId, kitDescriptorId, archived, libraryDesign,
   (100002, 1, 0, 1, 7),
   (100003, 1, 0, NULL, 7),
   (100004, 1, 0, NULL, 7),
+  (200001, 1, 0, NULL, 7),
+  (200002, 1, 0, 1, 7),
   (204, 1, 0, NULL, 7),
   (205, 1, 0, NULL, 7),
   (206, 1, 0, NULL, 7),
@@ -504,13 +523,26 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
 INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated) VALUES
 (1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 'admin', 2, 1, '2017-07-20 09:01:00'),
 (304, 'LDI304', 7.97, 304, '300304', '2017-08-14', 'admin', 1, 1, '2017-08-14 12:25:00'),
-(305, 'LDI305', 7.97, 305, '300305', '2017-08-14', 'admin', 1, 1, '2017-08-14 12:25:00');
+(305, 'LDI305', 7.97, 305, '300305', '2017-08-14', 'admin', 1, 1, '2017-08-14 12:25:00'),
+(200001, 'LDI200001', 4, 200001, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
+(200002, 'LDI200002', 3, 200002, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00');
 
-INSERT INTO Pool (poolId, concentration, name, alias, identificationBarcode, creationDate, securityProfile_profileId, platformType, ready, lastModifier, creator, created, lastModified) VALUES
-(1, 8.25, 'IPO1', 'POOL_1', '12341', '2017-07-20', 2, 'ILLUMINA', 1, 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00');
+INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, creationDate, securityProfile_profileId, platformType, ready, lastModifier, creator, created, lastModified, qcPassed) VALUES
+(1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', '2017-07-20', 2, 'ILLUMINA', 1, 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
+(200001, 6.5, 12, 'IPO200001', 'IPOT_POOL_1', 'ipobar200001', '2017-08-15', 2, 'ILLUMINA', 0, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(200002, 6.5, NULL, 'IPO200002', 'IPOT_POOL_2', NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', NULL),
+(200003, 6.5, 7.92, 'IPO200003', 'IPOT_POOL_3', 'ipobar200003', '2017-08-15', 2, 'ILLUMINA', 1, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
+(200004, 6.5, 7.92, 'IPO200004', 'IPOT_POOL_4', 'ipobar200004', '2017-08-15', 2, 'ILLUMINA', 1, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
-(1, 1);
+(1, 1),
+(200001, 200001),
+(200001, 200002),
+(200002, 200001),
+(200002, 200002),
+(200003, 200001),
+(200003, 200002),
+(200004, 200001);
 
 INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, securityProfile_profileId, lastModifier, creator, created, lastModified) VALUES
 (1, 1, 1, 'BOX1', 'First Box', 1, 1, 2, '2017-07-20 13:01:01', '2017-07-20 13:01:01');
