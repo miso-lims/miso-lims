@@ -10,11 +10,9 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +36,25 @@ public final class DefaultIllumina extends RunProcessor {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultIllumina.class);
 
+  private static final XPathExpression RUN_COMPLETION_STATUS_EXPRESSION = compileXPath("//CompletionStatus")[0];
+
   public static DefaultIllumina create(Builder builder, ObjectNode parameters) {
     return new DefaultIllumina(builder);
+  }
+
+  private static Optional<HealthType> getHealth(Document document) {
+    try {
+      String status = (String) RUN_COMPLETION_STATUS_EXPRESSION.evaluate(document, XPathConstants.STRING);
+      switch (status) {
+      case "CompletedAsPlanned":
+        return Optional.of(HealthType.Completed);
+      default:
+        log.debug("New Illumina completion status found: " + status);
+      }
+    } catch (XPathExpressionException e) {
+      log.error("Failed to evaluate completion status", e);
+    }
+    return Optional.empty();
   }
 
   public DefaultIllumina(Builder builder) {
@@ -94,6 +109,10 @@ public final class DefaultIllumina extends RunProcessor {
     if (failed) {
       dto.setHealthType(HealthType.Failed);
     }
+
+    Optional.of(new File(runDirectory, "RunCompletionStatus.xml")).filter(File::canRead).flatMap(RunProcessor::parseXml)
+        .flatMap(DefaultIllumina::getHealth).ifPresent(dto::setHealthType);
+
     return dto;
   }
 }
