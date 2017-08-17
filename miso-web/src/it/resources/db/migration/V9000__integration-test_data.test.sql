@@ -335,10 +335,12 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 2, 'PROPOSED', 2, '2017-08-04 15:12:00'),
   (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 1, 'ACTIVE', 1, '2017-07-24 16:11:00'),
   (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 1, 'ACTIVE', 1, '2017-08-09 11:51:00'),
-  (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 1, 'ACTIVE', 1, '2017-08-14 11:54:00');
+  (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 1, 'ACTIVE', 1, '2017-08-14 11:54:00'),
+  (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 1, 'ACTIVE', 1, '2017-08-16 14:50:00');
 
 INSERT INTO Study (studyId, name, securityProfile_profileId, project_projectId, alias, lastModifier, studyTypeId) VALUES
-(1, 'STU1', 1, 1, 'Study One', 1, 1);
+(1, 'STU1', 1, 1, 'Study One', 1, 1),
+(400, 'STU400', 1, 400, 'UI Test Study', 1, 1);
 
 INSERT INTO Sample (sampleId, name, alias, description, securityProfile_profileId, identificationBarcode, sampleType, receivedDate, project_projectId,
 scientificName, volume, qcPassed, lastModifier, creator, created, lastModified) VALUES
