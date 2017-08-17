@@ -18,7 +18,6 @@ HotTarget.pool = {
             flat.name = pool.name;
           },
           pack : function(pool, flat, errorHandler) {
-            pool.name = flat.name;
           }
         },
         {
