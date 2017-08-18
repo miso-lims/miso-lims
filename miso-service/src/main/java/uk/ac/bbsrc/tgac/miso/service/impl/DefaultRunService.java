@@ -557,7 +557,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
     target.setLastModifier(user);
     boolean isMutated = false;
-    isMutated |= updateField(source.getCompletionDate(), target.getCompletionDate(), target::setCompletionDate);
     isMutated |= updateMetricsFromNotification(source, target);
     isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
     isMutated |= updateField(source.getStartDate(), target.getCompletionDate(), target::setCompletionDate);
@@ -735,12 +734,14 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       // If it is sending us (effectively) an error, don't update the health if we have something already.
       if (target.getHealth() == null) {
         target.setHealth(source.getHealth());
+        target.setCompletionDate(source.getHealth().isDone() ? source.getCompletionDate() : null);
         return true;
       }
     } else {
       if (!target.didSomeoneElseChangeColumn("health", user) && target.getHealth() != source.getHealth()) {
         // A human user has never change the health of this run, so we will.
         target.setHealth(source.getHealth());
+        target.setCompletionDate(source.getHealth().isDone() ? source.getCompletionDate() : null);
         return true;
       }
     }
