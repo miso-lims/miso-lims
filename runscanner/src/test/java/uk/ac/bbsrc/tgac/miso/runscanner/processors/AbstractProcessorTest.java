@@ -27,7 +27,7 @@ public abstract class AbstractProcessorTest {
       NotificationDto reference = mapper.readValue(new File(directory, "reference.json"), clazz);
       result.setSequencerFolderPath(null); // We delete this because it is going to be different in each environment.
       result.setMetrics(null); // We delete these because changes in metrics are non-critical.
-      assertEquals(result, reference);
+      assertEquals(reference, result);
     }
   }
 

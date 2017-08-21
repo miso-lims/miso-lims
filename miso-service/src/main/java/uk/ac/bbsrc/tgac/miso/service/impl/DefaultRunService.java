@@ -722,7 +722,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
   private void updatePartitionContents(final IntFunction<Optional<String>> getLaneContents, SequencerPartitionContainer newContainer) {
     newContainer.getPartitions().stream().filter(partition -> partition.getPool() == null)
-        .forEach(partition -> getLaneContents.apply(partition.getPartitionNumber())
+        .forEach(partition -> getLaneContents.apply(partition.getPartitionNumber()).filter(s -> !LimsUtils.isStringBlankOrNull(s))
             .map(WhineyFunction.log(log, poolService::getByBarcode)).ifPresent(partition::setPool));
   }
 
