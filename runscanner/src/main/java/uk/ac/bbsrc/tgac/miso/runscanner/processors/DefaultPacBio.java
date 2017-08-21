@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -105,6 +106,8 @@ public class DefaultPacBio extends RunProcessor {
 
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
+  private static final Pattern LINES = Pattern.compile("\\r?\\n");
+
   private static final Logger log = LoggerFactory.getLogger(DefaultPacBio.class);
 
   /**
@@ -126,6 +129,8 @@ public class DefaultPacBio extends RunProcessor {
   private static final Pattern RUN_DIRECTORY = Pattern.compile("^.+_\\d+$");
 
   private static final DateTimeFormatter URL_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+
+  private static final Pattern WELL_LINE = Pattern.compile("^([A-Z]\\d+),.*$");
 
   public static DefaultPacBio create(Builder builder, ObjectNode parameters) {
     JsonNode address = parameters.get("address");
@@ -174,7 +179,13 @@ public class DefaultPacBio extends RunProcessor {
       }
       Map<String, String> poolInfo = dto.getPoolNames();
       if (poolInfo == null) {
-        dto.setPoolNames(poolInfo = new HashMap<>());
+        poolInfo = new HashMap<>();
+        dto.setPoolNames(poolInfo);
+      } else if (poolInfo.containsKey(well)) {
+        // If there are multiple things assigned to this well in the sample sheet, then MISO will not be able to figure out a single pool to
+        // assign to this well. In this case, we set the pool to be the empty string so that nothing will be automatically assigned.
+        log.error(String.format("Multiple pools in well %s on run %s; abandoing automatic pool assignment", well, dto.getRunAlias()));
+        name = "";
       }
       poolInfo.put(well, name);
     };
@@ -209,6 +220,10 @@ public class DefaultPacBio extends RunProcessor {
     return Arrays.stream(root.listFiles(f -> f.isDirectory() && RUN_DIRECTORY.matcher(f.getName()).matches()));
   }
 
+  protected String getSampleSheet(String url) {
+    return new RestTemplate().getForObject(url, String.class);
+  }
+
   protected StatusResponse getStatus(String url) {
     return new RestTemplate().getForObject(url, StatusResponse.class);
   }
@@ -229,13 +244,16 @@ public class DefaultPacBio extends RunProcessor {
         .forEach(metadata -> processMetadata(metadata.get(), dto));
 
     // The current job state is not available from the metadata files, so contact the PacBio instrument's web service.
-    String url = String.format("%s/Jobs/Plate/%s/Status", address,
-        URLEncoder.encode(dto.getContainerSerialNumber(), "US-ASCII").replaceAll("\\+", "%20"));
-    dto.setHealthType(getStatus(url).translateStatus());
+    String plateUrl = URLEncoder.encode(dto.getContainerSerialNumber(), "US-ASCII").replaceAll("\\+", "%20");
+    dto.setHealthType(getStatus(String.format("%s/Jobs/Plate/%s/Status", address, plateUrl)).translateStatus());
     // If the metadata gave us a completion date, but the web service told us the run isn't complete, delete the completion date of lies.
     if (!dto.getHealthType().isDone()) {
       dto.setCompletionDate(null);
     }
+
+    String sampleSheet = getSampleSheet(String.format("%s/SampleSheet/%s", address, plateUrl));
+    dto.setLaneCount(
+        (int) LINES.splitAsStream(sampleSheet).map(WELL_LINE::matcher).filter(Matcher::matches).map(m -> m.group(1)).distinct().count());
 
     ObjectMapper mapper = createObjectMapper();
     ArrayNode metrics = mapper.createArrayNode();
@@ -273,7 +291,6 @@ public class DefaultPacBio extends RunProcessor {
         log.error("Failed to extract metadata", e);
       }
     }
-    dto.setLaneCount(dto.getLaneCount() + 1);
   }
 
 }

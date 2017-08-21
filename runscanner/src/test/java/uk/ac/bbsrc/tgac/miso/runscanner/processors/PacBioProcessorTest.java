@@ -17,16 +17,23 @@ import uk.ac.bbsrc.tgac.miso.runscanner.processors.DefaultPacBio.StatusResponse;
 
 public class PacBioProcessorTest extends AbstractProcessorTest {
   private static class TestPacBio extends DefaultPacBio {
-    private final Map<String, StatusResponse> responses;
+    private final Map<String, StatusResponse> statusResponses;
+    private final Map<String, String> sampleSheetResponses;
 
-    private TestPacBio(Map<String, StatusResponse> responses) {
+    private TestPacBio(Map<String, StatusResponse> statusResponses, Map<String, String> sampleSheetResponses) {
       super(new Builder(PlatformType.PACBIO, "unittest", null), URL_PREFIX);
-      this.responses = responses;
+      this.statusResponses = statusResponses;
+      this.sampleSheetResponses = sampleSheetResponses;
     }
 
     @Override
     protected StatusResponse getStatus(String url) {
-      return responses.get(url.substring(URL_PREFIX.length()));
+      return statusResponses.get(url.substring(URL_PREFIX.length()));
+    }
+
+    @Override
+    protected String getSampleSheet(String url) {
+      return sampleSheetResponses.get(url.substring(URL_PREFIX.length()));
     }
   }
 
@@ -39,9 +46,11 @@ public class PacBioProcessorTest extends AbstractProcessorTest {
   @Override
   protected NotificationDto process(File directory) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    Map<String, StatusResponse> responses = mapper.readValue(new File(directory, "webrequests.json"),
+    Map<String, StatusResponse> statusResponses = mapper.readValue(new File(directory, "webrequests-status.json"),
         mapper.getTypeFactory().constructMapLikeType(HashMap.class, String.class, StatusResponse.class));
-    return new TestPacBio(responses).process(directory, TimeZone.getDefault());
+    Map<String, String> sampleSheetResponses = mapper.readValue(new File(directory, "webrequests-samplesheet.json"),
+        mapper.getTypeFactory().constructMapLikeType(HashMap.class, String.class, String.class));
+    return new TestPacBio(statusResponses, sampleSheetResponses).process(directory, TimeZone.getDefault());
   }
 
   @Test
