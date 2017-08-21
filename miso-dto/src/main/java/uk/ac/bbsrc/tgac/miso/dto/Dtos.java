@@ -1674,6 +1674,10 @@ public class Dtos {
 
   private static void setIlluminaRunValues(IlluminaNotificationDto from, IlluminaRun to) {
     to.setPairedEnd(from.isPairedEndRun());
+    to.setNumCycles(from.getNumCycles());
+    to.setImgCycle(from.getImgCycle());
+    to.setCallCycle(from.getCallCycle());
+    to.setScoreCycle(from.getScoreCycle());
   }
 
   private static void setCommonRunValues(NotificationDto from, Run to) {
