@@ -559,7 +559,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     boolean isMutated = false;
     isMutated |= updateMetricsFromNotification(source, target);
     isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
-    isMutated |= updateField(source.getStartDate(), target.getCompletionDate(), target::setCompletionDate);
+    isMutated |= updateField(source.getStartDate(), target.getStartDate(), target::setStartDate);
 
     final SequencerReference sequencer = sequencerReferenceService.getByName(sequencerName);
     if (sequencer == null) {
