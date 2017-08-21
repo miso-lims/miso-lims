@@ -204,6 +204,9 @@ void add_global_chart(
 
 std::string format(const illumina::interop::model::summary::metric_stat &stat,
                    const float scale = 1) {
+  if (std::isnan(stat.mean())) {
+    return "N/A";
+  }
   std::stringstream output;
   output << std::setprecision(2) << stat.mean() / scale << " ± "
          << stat.stddev() / scale;
