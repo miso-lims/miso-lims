@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -72,6 +73,7 @@ public final class Main {
     }
 
     try {
+      mapper.enable(SerializationFeature.INDENT_OUTPUT);
       mapper.writeValue(System.out, results);
     } catch (IOException e) {
       e.printStackTrace();
