@@ -10,7 +10,7 @@ import org.openqa.selenium.support.PageFactory;
 
 public class LibraryPage extends FormPage<LibraryPage.Field> {
 
-  public static enum Field {
+  public static enum Field implements FormPage.FieldElement {
     ID(By.id("libraryId"), FieldType.LABEL),
     NAME(By.id("name"), FieldType.LABEL),
     ALIAS(By.id("alias"), FieldType.TEXT),
@@ -44,20 +44,14 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
       this.type = type;
     }
 
-    protected boolean isEditable(WebDriver driver) {
-      return type.isEditable(driver, selector);
+    @Override
+    public By getSelector() {
+      return selector;
     }
 
-    protected String get(WebDriver driver) {
-      return type.getValue(driver, selector);
-    }
-
-    protected void set(WebDriver driver, String value) {
-      if (isEditable(driver)) {
-        type.setValue(driver, selector, value);
-      } else {
-        throw new IllegalStateException(this.toString() + " is read-only");
-      }
+    @Override
+    public FieldType getType() {
+      return type;
     }
   }
 
@@ -73,21 +67,6 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
   public static LibraryPage get(WebDriver driver, String baseUrl, long libraryId) {
     driver.get(baseUrl + "miso/library/" + libraryId);
     return new LibraryPage(driver);
-  }
-
-  @Override
-  public String getField(Field field) {
-    return field.get(getDriver());
-  }
-
-  @Override
-  public void setField(Field field, String value) {
-    field.set(getDriver(), value);
-  }
-
-  @Override
-  public boolean isEditable(Field field) {
-    return field.isEditable(getDriver());
   }
 
   public LibraryPage save() {

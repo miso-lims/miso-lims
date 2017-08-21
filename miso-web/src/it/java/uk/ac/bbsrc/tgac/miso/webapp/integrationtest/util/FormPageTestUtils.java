@@ -6,6 +6,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.FormPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.FormPage.FieldElement;
 
 public class FormPageTestUtils {
 
@@ -13,7 +14,7 @@ public class FormPageTestUtils {
     throw new IllegalStateException("Util class not intended for instantiation");
   }
 
-  public static <T> void assertFieldValues(String hintMessage, Map<T, String> fields, FormPage<T> page) {
+  public static <T extends FieldElement> void assertFieldValues(String hintMessage, Map<T, String> fields, FormPage<T> page) {
     String formatString = hintMessage + " field '%s' value";
     fields.forEach((key, val) -> {
       String fieldValue = page.getField(key);
