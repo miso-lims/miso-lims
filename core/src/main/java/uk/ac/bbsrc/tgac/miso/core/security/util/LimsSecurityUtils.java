@@ -81,7 +81,7 @@ public class LimsSecurityUtils {
     // user and this user will inherit the already-persisted userID.
     final UserImpl user = new UserImpl();
 
-    final List<String> roles = new ArrayList<String>();
+    final List<String> roles = new ArrayList<>();
     for (final GrantedAuthority ga : details.getAuthorities()) {
       roles.add(removePrefix(ga.toString(), LimsSecurityUtils.rolePrefix));
     }
@@ -145,7 +145,8 @@ public class LimsSecurityUtils {
 
   public static org.springframework.security.core.userdetails.User toUserDetails(User user) {
     final Collection<GrantedAuthority> auths = user.getPermissionsAsAuthorities();
-    return new org.springframework.security.core.userdetails.User(user.getLoginName(), user.getPassword(), user.isActive(), user.isActive(),
+    return new org.springframework.security.core.userdetails.User(user.getLoginName(),
+        user.getPassword() == null ? "junkToShutUpSpring" : user.getPassword(), user.isActive(), user.isActive(),
         user.isActive(), user.isActive(), auths);
   }
 
@@ -164,7 +165,7 @@ public class LimsSecurityUtils {
    *           when
    */
   public static Set<User> getPotentialOwners(User user, SecurableByProfile object, Collection<User> allUsers) throws IOException {
-    final SortedSet<User> owners = new TreeSet<User>(new FullNameComparator());
+    final SortedSet<User> owners = new TreeSet<>(new FullNameComparator());
     if (user.isAdmin()) {
       for (final User u : allUsers) {
         owners.add(u);
@@ -196,7 +197,7 @@ public class LimsSecurityUtils {
    * @return Set<User> the collection of Users that can own the given SecurableByProfile object
    */
   public static Set<User> getAccessibleUsers(User user, SecurableByProfile object, Collection<User> allUsers) {
-    final SortedSet<User> su = new TreeSet<User>(new FullNameComparator());
+    final SortedSet<User> su = new TreeSet<>(new FullNameComparator());
 
     if (user.isAdmin()) {
       for (final User u : allUsers) {
@@ -229,9 +230,9 @@ public class LimsSecurityUtils {
    * @return Set<User>
    */
   public static Set<User> getSelectedReadUsers(User user, SecurableByProfile object) {
-    final SortedSet<User> su = new TreeSet<User>(new FullNameComparator());
+    final SortedSet<User> su = new TreeSet<>(new FullNameComparator());
     if (user.isAdmin()) {
-      return new HashSet<User>(object.getSecurityProfile().getReadUsers());
+      return new HashSet<>(object.getSecurityProfile().getReadUsers());
     } else if (object.getSecurityProfile().getOwner() != null && object.getSecurityProfile().getOwner().equals(user)) {
       for (final User u : object.getSecurityProfile().getReadUsers()) {
         if (!u.isAdmin()) {
@@ -261,7 +262,7 @@ public class LimsSecurityUtils {
    * @return Set<User>
    */
   public static Set<User> getAvailableReadUsers(User user, SecurableByProfile object, Collection<User> allUsers) {
-    final SortedSet<User> su = new TreeSet<User>(new FullNameComparator());
+    final SortedSet<User> su = new TreeSet<>(new FullNameComparator());
     if (user.isAdmin()) {
       for (final User u : allUsers) {
         if (!object.getSecurityProfile().getReadUsers().contains(u)) {
@@ -297,9 +298,9 @@ public class LimsSecurityUtils {
    * @return Set<User>
    */
   public static Set<User> getSelectedWriteUsers(User user, SecurableByProfile object) {
-    final SortedSet<User> su = new TreeSet<User>(new FullNameComparator());
+    final SortedSet<User> su = new TreeSet<>(new FullNameComparator());
     if (user.isAdmin()) {
-      return new TreeSet<User>(object.getSecurityProfile().getWriteUsers());
+      return new TreeSet<>(object.getSecurityProfile().getWriteUsers());
     } else if (object.getSecurityProfile().getOwner() != null && object.getSecurityProfile().getOwner().equals(user)) {
       for (final User u : object.getSecurityProfile().getWriteUsers()) {
         if (!u.isAdmin()) {
@@ -329,7 +330,7 @@ public class LimsSecurityUtils {
    * @return Set<User>
    */
   public static Set<User> getAvailableWriteUsers(User user, SecurableByProfile object, Collection<User> allUsers) {
-    final SortedSet<User> su = new TreeSet<User>(new FullNameComparator());
+    final SortedSet<User> su = new TreeSet<>(new FullNameComparator());
     if (user.isAdmin()) {
       for (final User u : allUsers) {
         if (!object.getSecurityProfile().getWriteUsers().contains(u)) {
@@ -363,7 +364,7 @@ public class LimsSecurityUtils {
    * @return Set<Group>
    */
   public static Set<Group> getAccessibleGroups(User user, SecurableByProfile object, Collection<Group> allGroups) {
-    final SortedSet<Group> su = new TreeSet<Group>();
+    final SortedSet<Group> su = new TreeSet<>();
     if (user.isAdmin() || (object.getSecurityProfile().getOwner() != null && object.getSecurityProfile().getOwner().equals(user))) {
       for (final Group g : allGroups) {
         if (!g.getName().endsWith("Watchers")) {
@@ -388,9 +389,9 @@ public class LimsSecurityUtils {
    * @return Set<User>
    */
   public static Set<Group> getSelectedReadGroups(User user, SecurableByProfile object) {
-    final SortedSet<Group> su = new TreeSet<Group>();
+    final SortedSet<Group> su = new TreeSet<>();
     if (user.isAdmin() || (object.getSecurityProfile().getOwner() != null && object.getSecurityProfile().getOwner().equals(user))) {
-      return new TreeSet<Group>(object.getSecurityProfile().getReadGroups());
+      return new TreeSet<>(object.getSecurityProfile().getReadGroups());
     }
     return Collections.emptySet();
   }
@@ -411,7 +412,7 @@ public class LimsSecurityUtils {
    * @return Set<Group>
    */
   public static Set<Group> getAvailableReadGroups(User user, SecurableByProfile object, Collection<Group> allGroups) {
-    final SortedSet<Group> su = new TreeSet<Group>();
+    final SortedSet<Group> su = new TreeSet<>();
     if (user.isAdmin() || (object.getSecurityProfile().getOwner() != null && object.getSecurityProfile().getOwner().equals(user))) {
       for (final Group g : allGroups) {
         if (!object.getSecurityProfile().getReadGroups().contains(g)) {
@@ -436,9 +437,9 @@ public class LimsSecurityUtils {
    * @return Set<User>
    */
   public static Set<Group> getSelectedWriteGroups(User user, SecurableByProfile object) {
-    final SortedSet<Group> su = new TreeSet<Group>();
+    final SortedSet<Group> su = new TreeSet<>();
     if (user.isAdmin() || (object.getSecurityProfile().getOwner() != null && object.getSecurityProfile().getOwner().equals(user))) {
-      return new TreeSet<Group>(object.getSecurityProfile().getWriteGroups());
+      return new TreeSet<>(object.getSecurityProfile().getWriteGroups());
     }
     return Collections.emptySet();
   }
@@ -459,7 +460,7 @@ public class LimsSecurityUtils {
    * @return Set<Group>
    */
   public static Set<Group> getAvailableWriteGroups(User user, SecurableByProfile object, Collection<Group> allGroups) {
-    final SortedSet<Group> su = new TreeSet<Group>();
+    final SortedSet<Group> su = new TreeSet<>();
     if (user.isAdmin() || (object.getSecurityProfile().getOwner() != null && object.getSecurityProfile().getOwner().equals(user))) {
       for (final Group g : allGroups) {
         if (!object.getSecurityProfile().getWriteGroups().contains(g)) {
