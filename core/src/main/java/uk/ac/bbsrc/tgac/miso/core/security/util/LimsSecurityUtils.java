@@ -37,10 +37,8 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.ldap.userdetails.InetOrgPerson;
-import org.springframework.security.ldap.userdetails.LdapUserDetails;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
@@ -106,41 +104,6 @@ public class LimsSecurityUtils {
       result = s.substring(prefix.length());
     }
     return result;
-  }
-
-  /**
-   * Converts a MISO User into a LDAP {@link org.springframework.security.ldap.userdetails.LdapUserDetails} object
-   * 
-   * @param user
-   *          of type User
-   * @return LdapUserDetails
-   */
-  public static LdapUserDetails toLdapUser(User user) {
-    final InetOrgPerson.Essence p = new org.springframework.security.ldap.userdetails.InetOrgPerson.Essence();
-    p.setEnabled(user.isActive());
-    p.setAccountNonExpired(user.isActive());
-    p.setAccountNonLocked(user.isActive());
-
-    final Collection<GrantedAuthority> auths = user.getPermissionsAsAuthorities();
-    p.setAuthorities(auths);
-
-    p.setDisplayName(user.getFullName());
-    p.setMail(user.getEmail());
-
-    p.setUsername(user.getLoginName());
-    p.setPassword(user.getPassword());
-    p.setUid(user.getLoginName());
-
-    // must set these as part of the Person creation assertions
-    p.setSn(user.getFullName().split(" ")[1]);
-    p.setCn(new String[] { user.getFullName() });
-
-    final DistinguishedName newDn = new DistinguishedName();
-    newDn.add("ou", "Users");
-    newDn.add("cn", user.getFullName());
-    p.setDn(newDn);
-
-    return p.createUserDetails();
   }
 
   public static org.springframework.security.core.userdetails.User toUserDetails(User user) {
