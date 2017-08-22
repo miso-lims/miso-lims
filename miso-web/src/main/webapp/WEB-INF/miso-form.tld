@@ -238,6 +238,12 @@
 			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
+		<attribute>
+			<description>The configuration JSON object to be passed to the front end.</description>
+			<name>config</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 		<dynamic-attributes>false</dynamic-attributes>
 	</tag>
 

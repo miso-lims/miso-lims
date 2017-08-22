@@ -26,6 +26,7 @@ public interface AbstractListPage {
     public static final String DESCRIPTION = "Description";
     public static final String DATE_CREATED = "Date Created";
     public static final String DIL_CONCENTRATION = "Concentration";
+    public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
     public static final String POOL_CONCENTRATION = "Conc. (nM)";
     public static final String LONGEST_INDEX = "Longest Index";
     public static final String SEQUENCING_PARAMETERS = "Sequencing Parameters";

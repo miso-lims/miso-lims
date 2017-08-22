@@ -190,61 +190,6 @@ Pool.qc = {
   }
 };
 
-Pool.wizard = {
-  insertPoolQCRow : function() {
-    if (!jQuery('#poolQcTable').attr("qcInProgress")) {
-      jQuery('#poolQcTable').attr("qcInProgress", "true");
-
-      jQuery('#poolQcTable')[0].insertRow(1);
-      var column3 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text'/>";
-      var column4 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
-      column4.innerHTML = "<select id='poolQcType' name='poolQcType' onchange='Pool.qc.changePoolQcUnits(this);'/>";
-      var column5 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
-      column5.innerHTML = "<input id='poolQcResults' name='poolQcResults' type='text'/><span id='units'/>";
-      var column6 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
-      column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.wizard.addPoolQC(this);'/>Add</a>";
-
-      jQuery("#poolQcDate").val(jQuery.datepicker.formatDate('dd/mm/yy', new Date()));
-      Utils.ui.addMaxDatePicker("poolQcDate", 0);
-
-      Fluxion.doAjax(
-        'poolControllerHelperService',
-        'getPoolQcTypes',
-        {
-          'url':ajaxurl
-        },
-        {
-          'doOnSuccess':function(json) {
-            jQuery('#poolQcType').html(json.types);
-            jQuery('#units').html(jQuery('#poolQcType option:first').attr("units"));
-          }
-        }
-      );
-    } else {
-      alert("Cannot add another QC when one is already in progress.");
-    }
-  },
-
-  addPoolQC : function(add) {
-    var row = jQuery(add).parent().parent();
-    jQuery(add).html("Remove");
-    jQuery(add).removeAttr("onclick");
-    jQuery(add).click(function() {
-      if (confirm("Remove this QC?")) {
-        row.remove();
-      }
-    });
-    jQuery('#poolQcTable').removeAttr("qcInProgress");
-
-    row.find(":input").each(function() {
-      var td = jQuery(this).parent();
-      jQuery(td).attr("name", jQuery(this).attr("name"));
-      jQuery(this).parent().html(jQuery(this).val());
-    });
-  }
-};
-
 Pool.ui = {
   selectElementsByBarcodes : function(codes) {
     if (codes === "") {

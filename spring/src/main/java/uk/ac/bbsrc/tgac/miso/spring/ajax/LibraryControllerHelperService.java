@@ -33,14 +33,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
@@ -53,48 +48,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.IndexStore;
-import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
-import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
@@ -180,23 +158,15 @@ public class LibraryControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
-  @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
   private PrinterService printerService;
-  @Autowired
-  private IndexStore indexStore;
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
   private LibraryService libraryService;
   @Autowired
   private LibraryDilutionService dilutionService;
-  @Autowired
-  private KitService kitService;
-  @Autowired
-  private TargetedSequencingService targetedSequencingService;
   @Autowired
   private BoxService boxService;
 
@@ -359,164 +329,6 @@ public class LibraryControllerHelperService {
     return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
   }
 
-  public JSONObject getLibraryDilutionBarcode(HttpSession session, JSONObject json) {
-    Long dilutionId = json.getLong("dilutionId");
-    File temploc = getBarcodeFileLocation(session);
-    try {
-      LibraryDilution dil = dilutionService.get(dilutionId);
-      BarcodeFactory barcodeFactory = new BarcodeFactory();
-      barcodeFactory.setPointPixels(1.5f);
-      barcodeFactory.setBitmapResolution(600);
-      RenderedImage bi = barcodeFactory.generateSquareDataMatrix(dil, 400);
-      if (bi != null) {
-        File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
-        if (ImageIO.write(bi, "png", tempimage)) {
-          return JSONUtils.JSONObjectResponse("img", tempimage.getName());
-        }
-        return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      } else {
-        return JSONUtils.SimpleJSONError("Dilution has no parseable barcode");
-      }
-    } catch (IOException e) {
-      log.error("library dilution barcode", e);
-      return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to generate temp file for barcode");
-    }
-  }
-
-  public JSONObject bulkSaveLibraries(HttpSession session, JSONObject json) {
-    if (json.has("libraries")) {
-      try {
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Project p = requestManager.getProjectById(json.getLong("projectId"));
-        JSONArray a = JSONArray.fromObject(json.get("libraries"));
-        Set<Library> saveSet = new HashSet<>();
-
-        for (JSONObject j : (Iterable<JSONObject>) a) {
-          try {
-            SecurityProfile sp = null;
-            Sample sample = null;
-            String sampleAlias = j.getString("parentSample");
-
-            for (Sample s : p.getSamples()) {
-              if (s.getAlias().equals(sampleAlias)) {
-                sp = s.getSecurityProfile();
-                sample = s;
-                break;
-              }
-            }
-
-            if (sample != null) {
-              String descr = j.getString("description");
-              String platform = j.getString("platform");
-              String type = j.getString("libraryType");
-              String selectionType = j.getString("selectionType");
-              String strategyType = j.getString("strategyType");
-              String locationBarcode = j.getString("locationBarcode");
-
-              Library library = new LibraryImpl();
-              library.setSample(sample);
-
-              String libAlias = namingScheme.generateLibraryAlias(library);
-
-              library.setAlias(libAlias);
-              library.setSecurityProfile(sp);
-              library.setDescription(descr);
-              library.setCreationDate(new Date());
-              library.setPlatformType(platform);
-              library.setLocationBarcode(locationBarcode);
-              library.setQcPassed(false);
-              library
-                  .setLibraryType(
-                      libraryService.getLibraryTypeByDescriptionAndPlatform(type, library.getPlatformType()));
-              library.setLibrarySelectionType(libraryService.getLibrarySelectionTypeByName(selectionType));
-              library.setLibraryStrategyType(libraryService.getLibraryStrategyTypeByName(strategyType));
-              library.setLastModifier(user);
-
-              boolean paired = false;
-              if (!isStringEmptyOrNull(j.getString("paired"))) {
-                paired = j.getBoolean("paired");
-              }
-              library.setPaired(paired);
-
-              if (j.has("indices") && !isStringEmptyOrNull(j.getString("indices")) && !j.getString("indices").contains("Select")) {
-                String[] codes = j.getString("indices").split(Pattern.quote("|"));
-                List<Index> indices = new ArrayList<>();
-                for (String code : codes) {
-                  try {
-                    long cl = Long.parseLong(code);
-                    Index index = indexStore.getIndexById(cl);
-                    indices.add(index);
-                  } catch (NumberFormatException e) {
-                    log.error("cannot save library", e);
-                    return JSONUtils.SimpleJSONError("Cannot save Library. It looks like there are indices for the library of "
-                        + sample.getAlias() + ", but they cannot be processed");
-                  }
-                }
-                library.setIndices(indices);
-              }
-
-              saveSet.add(library);
-            } else {
-              throw new IOException("Could not find a selected Sample to generate Libraries.");
-            }
-          } catch (IOException e) {
-            log.error("cannot save library", e);
-            return JSONUtils.SimpleJSONError("Cannot save Library generated from " + j.getString("parentSample") + ": " + e.getMessage());
-          } catch (JSONException e) {
-            log.error("cannot save library", e);
-            return JSONUtils
-                .SimpleJSONError("Cannot save Library. Something cannot be retrieved from the bulk input table: " + e.getMessage());
-          }
-        }
-
-        try {
-          List<Library> sortedList = new ArrayList<>(saveSet);
-          Collections.sort(sortedList, new AliasComparator<>());
-          for (Library library : sortedList) {
-            libraryService.create(library);
-          }
-        } catch (Exception e) {
-          log.error("Error saving bulk libraries", e);
-          return JSONUtils.SimpleJSONError("Error saving libraries, please contact your administrator.");
-        }
-
-        return JSONUtils.SimpleJSONResponse("All libraries saved successfully");
-      } catch (Exception e) {
-        log.error("cannot retrieve parent project", e);
-        return JSONUtils.SimpleJSONError("Cannot retrieve parent project with ID " + json.getLong("projectId"));
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No libraries specified");
-    }
-  }
-
-  public JSONObject getIndicesForFamily(HttpSession session, JSONObject json) {
-    if (json.has("indexFamily")) {
-      IndexFamily ifam = indexStore.getIndexFamilyByName(json.getString("indexFamily"));
-      if (ifam != null) {
-        Map<String, Object> map = new HashMap<>();
-        StringBuilder indexsb = new StringBuilder();
-        for (int i = 1; i <= ifam.getMaximumNumber(); i++) {
-          // select
-          indexsb.append("Index " + i + ": " + "<select id='indices[\"" + i + "\"]' name='indices[\"" + i + "\"]'>");
-          indexsb.append("<option value=''>No Index</option>");
-          for (Index tb : ifam.getIndicesForPosition(i)) {
-            // option
-            indexsb.append("<option value='" + tb.getId() + "'>" + tb.getName() + "</option>");
-          }
-          indexsb.append("</select><br/>");
-          indexsb.append("<input type='hidden' value='on' name='indices[\"" + i + "\"]'/>");
-        }
-        map.put("indices", indexsb.toString());
-        return JSONUtils.JSONObjectResponse(map);
-      } else {
-        return JSONUtils.SimpleJSONError("No such Index Family: " + json.getString("indexFamily"));
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No valid Index Family selected");
-    }
-  }
-
   public JSONObject getLibraryQcTypes(HttpSession session, JSONObject json) {
     try {
       StringBuilder sb = new StringBuilder();
@@ -531,69 +343,6 @@ public class LibraryControllerHelperService {
       log.error("cannot list all library QC types", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list all Library QC Types");
-  }
-
-  public JSONObject getTargetedSequencingTypes(HttpSession session, JSONObject json) {
-    Long libraryPrepKitId = null;
-    if (json.has("libraryPrepKitId")) {
-      libraryPrepKitId = json.getLong("libraryPrepKitId");
-    }
-
-    Map<String, Object> targetedSequencingTypes = Maps.newHashMap();
-    try {
-      if (libraryPrepKitId != null) {
-        targetedSequencingTypes.put("targetedSequencings", getTargetedSequencingTypes(libraryPrepKitId));
-      } else {
-        targetedSequencingTypes.put("targetedSequencings", getTargetedSequencingTypes());
-      }
-      return JSONUtils.JSONObjectResponse(targetedSequencingTypes);
-    } catch (IOException e) {
-      log.error("Cannot list all Targeted Sequencing entries ", e);
-    }
-    return JSONUtils.SimpleJSONError("Cannot list all Targeted Sequencing entries");
-  }
-
-  public JSONArray getTargetedSequencingTypes() throws IOException {
-    Collection<TargetedSequencing> targetedSequencings = getNonArchivedTargetedSequencing(
-        targetedSequencingService.list());
-    JSONArray fullTargetedSequencingCollection = new JSONArray();
-
-    for (TargetedSequencing targetedSequencing : targetedSequencings) {
-      for (KitDescriptor kitDescriptor : targetedSequencing.getKitDescriptors()) {
-        Map<String, Object> targetedSequencingMap = Maps.newHashMap();
-        targetedSequencingMap.put("targetedSequencingId", targetedSequencing.getId());
-        targetedSequencingMap.put("alias", targetedSequencing.getAlias());
-        targetedSequencingMap.put("kitDescriptorId", kitDescriptor.getId());
-        fullTargetedSequencingCollection.add(targetedSequencingMap);
-      }
-    }
-
-    return fullTargetedSequencingCollection;
-  }
-
-  public JSONArray getTargetedSequencingTypes(Long libraryPrepKitId) throws IOException {
-    JSONArray targetedSequencingByKit = new JSONArray();
-    KitDescriptor kd = kitService.getKitDescriptorById(libraryPrepKitId);
-    for (TargetedSequencing targetedSequencing : getNonArchivedTargetedSequencing(
-        kd.getTargetedSequencing())) {
-      Map<String, Object> targetedSequencingMap = Maps.newHashMap();
-      targetedSequencingMap.put("targetedSequencingId", targetedSequencing.getId());
-      targetedSequencingMap.put("alias", targetedSequencing.getAlias());
-      targetedSequencingMap.put("kitDescriptorId", libraryPrepKitId);
-      targetedSequencingByKit.add(targetedSequencingMap);
-    }
-
-    return targetedSequencingByKit;
-  }
-
-  private Collection<TargetedSequencing> getNonArchivedTargetedSequencing(Collection<TargetedSequencing> targetedSequencings) {
-    List<TargetedSequencing> result = Lists.newArrayList();
-    for (TargetedSequencing targetedSequencing : targetedSequencings) {
-      if (!targetedSequencing.isArchived()) {
-        result.add(targetedSequencing);
-      }
-    }
-    return result;
   }
 
   public JSONObject addLibraryQC(HttpSession session, JSONObject json) {
@@ -678,173 +427,6 @@ public class LibraryControllerHelperService {
     }
   }
 
-  public JSONObject addLibraryDilution(HttpSession session, JSONObject json) {
-    try {
-      for (Object k : json.keySet()) {
-        String key = (String) k;
-        if (isStringEmptyOrNull(json.getString(key)) && !key.equals("idBarcode")) {
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
-        }
-      }
-      if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
-        boolean autoGenerateIdBarcodes = json.getBoolean("autoGenerateIdBarcodes");
-        boolean detailedSample = json.getBoolean("detailedSample");
-        Long libraryId = Long.parseLong(json.getString("libraryId"));
-        Library library = libraryService.get(libraryId);
-        LibraryDilution newDilution = new LibraryDilution();
-        newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
-        newDilution.setLastUpdated(newDilution.getCreationDate());
-        newDilution.setConcentration(Double.parseDouble(json.getString("results")));
-        if (json.has("targetedSequencing")) {
-          Long libraryDilutionTargetedSequencingId = Long.parseLong(json.getString("targetedSequencing"));
-          if (libraryDilutionTargetedSequencingId > 0) {
-            TargetedSequencing targetedSequencing = targetedSequencingService.get(libraryDilutionTargetedSequencingId);
-            newDilution.setTargetedSequencing(targetedSequencing);
-          }
-        }
-        if (json.has("idBarcode")) {
-          newDilution.setIdentificationBarcode(json.getString("idBarcode"));
-        }
-        library.addDilution(newDilution);
-        dilutionService.create(newDilution);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<tr>");
-        sb.append("<th>LD Name</th><th>Done By</th><th>Date</th><th>Results</th>");
-        if (json.has("targetedSequencing")) {
-          sb.append("<th>Targeted Sequencing</th>");
-        }
-        sb.append("<th>ID barcode</th>");
-        sb.append("</tr>");
-
-        File temploc = getBarcodeFileLocation(session);
-        for (LibraryDilution dil : library.getLibraryDilutions()) {
-          SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-          sb.append("<tr>");
-          sb.append("<td>" + dil.getName() + "</td>");
-          sb.append("<td>" + dil.getDilutionCreator() + "</td>");
-          sb.append("<td>" + date.format(dil.getCreationDate()) + "</td>");
-          sb.append("<td>" + LimsUtils.round(dil.getConcentration(), 2) + " " + dil.getUnits() + "</td>");
-          if (json.has("targetedSequencing")) {
-            sb.append("<td>");
-            if (dil.getTargetedSequencing() == null) {
-              sb.append("NONE");
-            } else {
-              sb.append(dil.getTargetedSequencing().getAlias());
-            }
-            sb.append("</td>");
-          }
-          sb.append("<td>");
-
-          try {
-            BarcodeFactory barcodeFactory = new BarcodeFactory();
-
-            barcodeFactory.setPointPixels(1.5f);
-            barcodeFactory.setBitmapResolution(600);
-            RenderedImage bi = barcodeFactory.generateSquareDataMatrix(dil, 400);
-            if (bi != null) {
-              File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
-              if (ImageIO.write(bi, "png", tempimage)) {
-                sb.append("<img style='border:0;' src='/temp/" + tempimage.getName() + "'/>");
-              }
-            }
-          } catch (IOException e) {
-            log.error("Error generating library dilution barcode", e);
-          }
-          sb.append("</td>");
-          sb.append("<td id='edit").append(dil.getId()).append("' align='center'>");
-          sb.append("<a href='javascript:void(0);' onclick='Library.dilution.changeLibraryDilutionRow(");
-          sb.append(dil.getId()).append(", ").append(autoGenerateIdBarcodes).append(", ");
-          sb.append(detailedSample).append(")'>");
-          sb.append("<span class='ui-icon ui-icon-pencil'></span></a></td>");
-
-          sb.append(
-              "<td><a href='/miso/poolwizard/new/" + library.getSample().getProject().getProjectId() + "'>Construct New Pool</a></td>");
-
-          sb.append("</tr>");
-        }
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Library Dilution to this Library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Library Dilution to this Library: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONError("Cannot add LibraryDilution");
-  }
-
-  public JSONObject changeLibraryDilutionRow(HttpSession session, JSONObject json) {
-    try {
-      JSONObject response = new JSONObject();
-      Long dilutionId = Long.parseLong(json.getString("dilutionId"));
-      LibraryDilution dilution = dilutionService.get(dilutionId);
-      response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "'/>");
-      if (!json.getBoolean("autoGenerateIdBarcodes")) {
-        response.put("idBarcode",
-            "<input type='text' id='idBarcodeValue" + dilutionId + "' value='"
-                + (isStringEmptyOrNull(dilution.getIdentificationBarcode()) ? "" : dilution.getIdentificationBarcode()) + "'/>");
-      }
-      if (LimsUtils.isDetailedLibrary(dilution.getLibrary()) && ((DetailedLibrary) dilution.getLibrary()).getKitDescriptor() != null
-          && ((DetailedLibrary) dilution.getLibrary()).getKitDescriptor().getId() != null && json.getBoolean("detailedSample")) {
-        response.put("targetedSequencings",
-            getTargetedSequencingTypes(((DetailedLibrary) dilution.getLibrary()).getKitDescriptor().getId()));
-      }
-      response.put("edit",
-          "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\", "
-              + json.getBoolean("autoGenerateIdBarcodes") + ", " + json.getBoolean("detailedSample") + ");'>Save</a>");
-      return response;
-    } catch (Exception e) {
-      log.error("Failed to display Library Dilution of this Library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to display Library Dilution of this sample: " + e.getMessage());
-    }
-  }
-
-  public JSONObject editLibraryDilution(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("dilutionId") && !isStringEmptyOrNull(json.getString("dilutionId"))) {
-        Long dilutionId = Long.parseLong(json.getString("dilutionId"));
-        LibraryDilution dilution = dilutionService.get(dilutionId);
-        dilution.setConcentration(Double.parseDouble(json.getString("result")));
-        if (json.has("targetedSequencing")) {
-          if (isStringEmptyOrNull(json.getString("targetedSequencing"))) {
-            dilution.setTargetedSequencing(null);
-          } else {
-            dilution.setTargetedSequencing(targetedSequencingService.get(json.getLong("targetedSequencing")));
-          }
-        }
-        if (json.has("idBarcode")) {
-          String idBarcode = json.getString("idBarcode");
-
-          if (isStringEmptyOrNull(idBarcode)) {
-            // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
-            idBarcode = null;
-          } else {
-            List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays
-                .asList(idBarcode)));
-            if (!previouslyBarcodedItems.isEmpty() && (
-                previouslyBarcodedItems.size() != 1
-                    || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.DILUTION
-                    || previouslyBarcodedItems.get(0).getId().getTargetId() != dilutionId)) {
-              BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
-              String error = String.format(
-                  "Could not change dilution identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
-                  idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
-              log.debug(error);
-              return JSONUtils.SimpleJSONError(error);
-            }
-          }
-          dilution.setIdentificationBarcode(idBarcode);
-        }
-
-        dilutionService.update(dilution);
-        return JSONUtils.SimpleJSONResponse("OK");
-      }
-    } catch (Exception e) {
-      log.error("Failed to edit Library Dilution of this Library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to edit Library Dilution of this Library: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONError("Cannot add LibraryDilution");
-  }
-
   public JSONObject changeLibraryQCRow(HttpSession session, JSONObject json) {
     try {
       JSONObject response = new JSONObject();
@@ -894,27 +476,8 @@ public class LibraryControllerHelperService {
     }
   }
 
-  public JSONObject deleteLibraryDilution(HttpSession session, JSONObject json) {
-    if (json.has("libraryDilutionId")) {
-      Long libraryDilutionId = json.getLong("libraryDilutionId");
-      try {
-        dilutionService.delete(dilutionService.get(libraryDilutionId));
-        return JSONUtils.SimpleJSONResponse("LibraryDilution deleted");
-      } catch (IOException e) {
-        log.error("delete library dilution", e);
-        return JSONUtils.SimpleJSONError("Cannot delete library dilution: " + e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No library dilution specified to delete.");
-    }
-  }
-
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
   }
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
@@ -927,10 +490,6 @@ public class LibraryControllerHelperService {
 
   public void setLibraryNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setIndexStore(IndexStore indexStore) {
-    this.indexStore = indexStore;
   }
 
   public void setLibraryService(LibraryService libraryService) {

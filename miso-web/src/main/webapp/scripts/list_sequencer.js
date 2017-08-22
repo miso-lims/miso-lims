@@ -91,7 +91,7 @@ ListTarget.sequencer = {
   createColumns : function(config, projectId) {
     return [
         ListUtils.labelHyperlinkColumn("Name", "sequencer", Utils.array.getId,
-            "name", 1), {
+            "name", 1, true), {
           "sTitle" : "Platform",
           "mData" : "platform.platformType",
           "include" : true,

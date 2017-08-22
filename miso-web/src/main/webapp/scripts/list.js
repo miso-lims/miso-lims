@@ -278,11 +278,11 @@ ListUtils = (function() {
       updateSelectedLabel(state);
     },
     idHyperlinkColumn : function(headerName, urlFragment, id, getLabel,
-        priority) {
+        priority, include) {
       return {
         "sTitle" : headerName,
         "mData" : id,
-        "include" : true,
+        "include" : include,
         "iSortPriority" : priority,
         "bSortable" : priority >= 0,
         "mRender" : function(data, type, full) {
@@ -291,11 +291,11 @@ ListUtils = (function() {
       };
     },
     labelHyperlinkColumn : function(headerName, urlFragment, getId, label,
-        priority) {
+        priority, include) {
       return {
         "sTitle" : headerName,
         "mData" : label,
-        "include" : true,
+        "include" : include,
         "iSortPriority" : priority,
         "bSortDirection" : true,
         "bSortable" : priority >= 0,

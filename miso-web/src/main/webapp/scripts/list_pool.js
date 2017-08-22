@@ -44,9 +44,9 @@ ListTarget.pool = {
   createColumns : function(config, projectId) {
     return [
         ListUtils.idHyperlinkColumn("Name", "pool", "id", Utils.array.getName,
-            1),
+            1, true),
         ListUtils.labelHyperlinkColumn("Alias", "pool", Utils.array.getId,
-            "alias", 0),
+            "alias", 0, true),
         {
           "sTitle" : "Description",
           "mData" : "description",

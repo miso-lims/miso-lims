@@ -568,124 +568,12 @@
   });
 </script>
 
-<h1>
-  <span id="ldsTotalCount">
-  </span>
-</h1>
-<ul class="sddm">
-  <li>
-    <a onmouseover="mopen('ldmenu')" onmouseout="mclosetime()">Options
-      <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-    </a>
-
-    <div id="ldmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-      <a href='javascript:void(0);' class="add" onclick="Library.dilution.insertLibraryDilutionRow(${library.id}, <c:out value="${library.kitDescriptor.id}" default="0"/>, ${autoGenerateIdBarcodes}); return false;">
-        Add Library Dilution
-      </a>
-      <c:if test="${not empty library.libraryDilutions}">
-      <a href='<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>'>Create Pools</a>
-      </c:if>
-    </div>
-  </li>
-</ul>
-<div style="clear:both">
-  <div id="addLibraryDilution"></div>
-  <form id='addDilutionForm'>
-    <table class="list" id="libraryDilutionTable">
-      <thead>
-      <tr>
-        <th>LD Name</th>
-        <th>Done By</th>
-        <th>Date</th>
-        <th>Concentration (${libraryDilutionUnits})</th>
-        <c:if test="${detailedSample}">
-          <th>Targeted Sequencing</th>
-        </c:if>
-        <th>ID Barcode</th>
-        <th align="center">Edit</th>
-        <th align="center">Pool</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:if test="${not empty library.libraryDilutions}">
-        <c:forEach items="${library.libraryDilutions}" var="dil">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${dil.name}</td>
-            <td>${dil.dilutionCreator}</td>
-            <td><fmt:formatDate value="${dil.creationDate}"/></td>
-            <fmt:formatNumber var="concentrationRounded"
-                          value="${dil.concentration}"
-                          maxFractionDigits="2" />
-            <td id="results${dil.id}">${concentrationRounded}</td>
-            <c:if test="${detailedSample}">
-              <td id="tarSeq${dil.id}">
-                <c:if test="${empty dil.targetedSequencing}">
-                  NONE
-                </c:if>
-                <c:if test="${not empty dil.targetedSequencing}">
-                  ${dil.targetedSequencing.alias}
-                </c:if>
-              </td>
-            </c:if>
-            <td class="fit" id="idBarcode${dil.id}">
-              <c:if test="${not empty dil.identificationBarcode}">
-                <div class="barcodes">
-                  <div class="barcodeArea ui-corner-all">
-                    <ul class="barcode-ddm">
-                      <li>
-                        <a onmouseover="mopen('dil${dil.id}IdBarcodeMenu')" onmouseout="mclosetime()">
-                          <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-                          <span id="dil${dil.id}IdBarcode" style="float:right"></span>
-                        </a>
-
-                        <div id="dil${dil.id}IdBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-                          <a href="javascript:void(0);" onclick="Library.barcode.printDilutionBarcode(${dil.id}, '${library.platformType}');">Print</a>
-                        </div>
-                      </li>
-                    </ul>
-
-                    <script type="text/javascript">
-                      jQuery(document).ready(function () {
-                        Fluxion.doAjax(
-                          'libraryControllerHelperService',
-                          'getLibraryDilutionBarcode',
-                          {'dilutionId':${dil.id},
-                            'url': ajaxurl
-                          },
-                          {'doOnSuccess': function (json) {
-                            jQuery('#dil${dil.id}IdBarcode').html(
-                              "<img style='border:0;' src='<c:url value='/temp/'/>" + json.img + "'/><br/>"
-                            );
-                          }
-                          });
-                      });
-                    </script>
-                  </div>
-                </div>
-
-              </c:if>
-            </td>
-            <td id="edit${dil.id}" align="center">
-              <a href="javascript:void(0);" onclick="Library.dilution.changeLibraryDilutionRow('${dil.id}',${autoGenerateIdBarcodes}, ${detailedSample})">
-                <span class="ui-icon ui-icon-pencil"></span>
-              </a>
-            </td>
-            <td>
-              <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
-            </td>
-          </tr>
-        </c:forEach>
-      </c:if>
-      </tbody>
-    </table>
-    <input type='hidden' id='dilLibraryId' name='id' value='${library.id}'/>
-  </form>
-</div>
-
+  <miso:list-section name="Dilutions" target="dilution" items="${libraryDilutions}" config="${libraryDilutionsConfig}"/>
   <miso:list-section name="Pools" target="pool" items="${libraryPools}"/>
   <miso:list-section name="Runs" target="run" items="${libraryRuns}"/>
   <miso:changelog item="${library}"/>
 </c:if>
+<div id="dialog"></div>
 </div>
 </div>
 

@@ -31,7 +31,8 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SAMPLE_NAME,
       Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDICES, Columns.LOCATION, Columns.LAST_MODIFIED);
   private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
-      Columns.LIBRARY_ALIAS, Columns.CREATOR, Columns.CREATION_DATE, Columns.PLATFORM, Columns.DIL_CONCENTRATION);
+      Columns.LIBRARY_ALIAS, Columns.CREATOR, Columns.CREATION_DATE, Columns.PLATFORM, Columns.DIL_CONCENTRATION,
+      Columns.TARGETED_SEQUENCING);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.POOL_CONCENTRATION, Columns.LOCATION,
       Columns.LAST_MODIFIED);
@@ -107,6 +108,7 @@ public class ListTablesIT extends AbstractIT {
   private ListTabbedPage getTabbedList(String listTarget) {
     return ListTabbedPage.getTabbedListPage(getDriver(), getBaseUrl(), listTarget);
   }
+
   @Test
   public void testListSamplesPageSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
@@ -167,7 +169,7 @@ public class ListTablesIT extends AbstractIT {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     headings.removeAll(ordersColumns);
-    
+
     // confirm that order completion columns are part of the expected set and are not duplicated
     Set<String> foundCompletionHeaders = new HashSet<>();
     for (String remaining : headings) {
@@ -213,9 +215,9 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-   public void testListSequencersSetup() throws Exception {
+  public void testListSequencersSetup() throws Exception {
     testPageSetup(ListTarget.SEQUENCERS, sequencersColumns);
-   }
+  }
 
   @Test
   public void testListSequencersColumnSort() throws Exception {

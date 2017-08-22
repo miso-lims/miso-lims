@@ -107,7 +107,8 @@ HotTarget.dilution = {
               .param({
                 ids : items.map(Utils.array.getId).join(',')
               });
-        }
+        },
+        allowOnLibraryPage : true
       },
       {
         name : 'Pool together',
@@ -117,7 +118,8 @@ HotTarget.dilution = {
               .param({
                 ids : items.map(Utils.array.getId).join(',')
               });
-        }
+        },
+        allowOnLibraryPage : false
       },
       {
         name : 'Pool separately',
@@ -127,7 +129,8 @@ HotTarget.dilution = {
               .param({
                 ids : items.map(Utils.array.getId).join(',')
               });
-        }
+        },
+        allowOnLibraryPage : true
       }, ],
 
 };

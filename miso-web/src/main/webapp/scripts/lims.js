@@ -192,6 +192,15 @@ var Utils = Utils || {
                     output[field.property] = parseInt(input.value);
                 };
                 break;
+            case 'float':
+                input = document.createElement('INPUT');
+                input.setAttribute('type', 'text');
+                input.value = field.value || 0;
+                output[field.property] = field.value || 0;
+                input.onchange = function() {
+                    output[field.property] = parseFloat(input.value);
+                };
+                break;
             case 'date':
                 input = document.createElement('INPUT');
                 input.setAttribute('type', 'text');
@@ -199,7 +208,7 @@ var Utils = Utils || {
                     output[field.property] = input.value;
                 };
                 jQuery(input).datepicker({
-                    dateFormat: 'yyyy-mm-dd',
+                    dateFormat: 'yy-mm-dd',
                     showButtonPanel: true,
                 });
                 break;

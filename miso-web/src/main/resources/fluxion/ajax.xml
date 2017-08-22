@@ -97,9 +97,6 @@
   <bean id="experimentWizardControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentWizardControllerHelperService">
   </bean>
 
-  <bean id="poolWizardControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolWizardControllerHelperService">
-  </bean>
-
   <bean id="taskControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.TaskControllerHelperService">
   </bean>
 
