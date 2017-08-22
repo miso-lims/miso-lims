@@ -82,7 +82,7 @@ public class RunScannerClient {
       for (NotificationDto dto : results) {
         try (AutoCloseable timer = saveTime.start()) {
           (runService.processNotification(Dtos.to(dto, user), dto.getLaneCount(), dto.getContainerSerialNumber(), dto.getSequencerName(),
-              dto, dto::getLaneContents) ? saveNew : saveUpdate).inc();
+              dto, dto) ? saveNew : saveUpdate).inc();
           saveCount.inc();
         } catch (Exception e) {
           log.error("Failed to save run: " + dto.getRunAlias(), e);
