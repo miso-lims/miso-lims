@@ -49,6 +49,10 @@ public abstract class AbstractElement {
   }
 
   protected WebElement findElementIfExists(By selector) {
+    return findElementIfExists(getDriver(), selector);
+  }
+
+  protected static WebElement findElementIfExists(WebDriver driver, By selector) {
     List<WebElement> elements = driver.findElements(selector);
     switch (elements.size()) {
     case 0:

@@ -45,7 +45,7 @@
     <c:when test="${library.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Library
-  <button type="button" class="fg-button ui-state-default ui-corner-all"
+  <button id="save" type="button" class="fg-button ui-state-default ui-corner-all"
       onclick="return Library.validateLibrary(${detailedSample && (library.hasNonStandardAlias() || library.sample.hasNonStandardAlias())});">
     Save
   </button>
@@ -147,7 +147,7 @@
 <table class="in">
 <tr>
   <td class="h">Library ID:</td>
-  <td>
+  <td id="libraryId">
     <c:choose>
       <c:when test="${library.id != 0}">${library.id}</c:when>
       <c:otherwise><i>Unsaved</i></c:otherwise>
@@ -156,7 +156,7 @@
 </tr>
 <tr>
   <td class="h">Name:</td>
-  <td>
+  <td id="name">
     <c:choose>
       <c:when test="${library.id != 0}">${library.name}</c:when>
       <c:otherwise><i>Unsaved</i></c:otherwise>
@@ -220,7 +220,7 @@
 </tr>
 <tr>
   <td class="h">Creation date:</td>
-  <td><fmt:formatDate value="${library.creationDate}"/></td>
+  <td id="creationDate"><fmt:formatDate pattern="yyyy-MM-dd" type="date" value="${library.creationDate}"/></td>
 </tr>
 <c:if test="${not empty library.accession}">
   <tr>
@@ -368,7 +368,7 @@
 </tr>
 <tr>
   <td class="h">Box Location:</td>
-  <td>
+  <td id="boxLocation">
     <c:if test="${!empty library.box.locationBarcode}">${library.box.locationBarcode},</c:if>
     <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.box.id}"/>'>${library.box.alias}, ${library.boxPosition}</a></c:if>
   </td>

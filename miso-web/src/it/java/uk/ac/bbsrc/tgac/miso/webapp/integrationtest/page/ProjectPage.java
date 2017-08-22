@@ -97,7 +97,7 @@ public class ProjectPage extends HeaderFooterPage {
   }
 
   public String getProgress() {
-    return getSelectedRadioButtonText(progressLabel);
+    return getSelectedRadioButtonValue(progressLabel);
   }
 
   public void setProgress(String progress) {

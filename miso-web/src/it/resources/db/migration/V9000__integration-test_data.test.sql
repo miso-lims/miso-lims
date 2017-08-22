@@ -334,6 +334,7 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (3, 'PRO3', 'Test Data', 'TEST', '2017-06-27', 'integration test project three', 2, 'ACTIVE', 1, '2017-06-27 14:12:00'),
   (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 2, 'PROPOSED', 2, '2017-08-04 15:12:00'),
   (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 1, 'ACTIVE', 1, '2017-07-24 16:11:00'),
+  (110001, 'PRO110001', 'SingleLibraryIT', '1LIB', '2017-08-16', 'single library test project', 1, 'ACTIVE', 1, '2017-08-16 16:11:00'),
   (200001, 'PRO200001', 'BulkPoolIT', 'IPOT', '2017-08-15', 'bulk Pool test project', 1, 'ACTIVE', 1, '2017-08-15 12:22:00'),
   (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 1, 'ACTIVE', 1, '2017-08-09 11:51:00'),
   (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 1, 'ACTIVE', 1, '2017-08-14 11:54:00'),
@@ -366,6 +367,10 @@ INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_pro
   (100002, 100001, 'SAM100002', 'LIBT_0001_Ly_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (100003, 100001, 'SAM100003', 'LIBT_0001_Ly_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (100004, 100001, 'SAM100004', 'LIBT_0001_Ly_P_1-1_D1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (110001, 110001, 'SAM110001', '1LIB_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (110002, 110001, 'SAM110002', '1LIB_0001_Ly_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (110003, 110001, 'SAM110003', '1LIB_0001_Ly_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (110004, 110001, 'SAM110004', '1LIB_0001_Ly_P_1-1_D1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (200001, 200001, 'SAM200001', 'IPOT_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (200002, 200001, 'SAM200002', 'IPOT_0001_Pa_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (200003, 200001, 'SAM200003', 'IPOT_0001_Pa_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
@@ -403,6 +408,10 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
   (100002, 23, NULL, 1, 0), -- Tissue
   (100003, 11, NULL, 1, 0), -- gDNA (stock)
   (100004, 15, NULL, 1, 0), -- gDNA (aliquot)
+  (110001, 1, NULL, 1, 0),  -- Identity
+  (110002, 23, NULL, 1, 0), -- Tissue
+  (110003, 11, NULL, 1, 0), -- gDNA (stock)
+  (110004, 15, NULL, 1, 0), -- gDNA (aliquot)
   (200001, 1, NULL, 1, 0),  -- Identity
   (200002, 23, NULL, 1, 0), -- Tissue
   (200003, 11, NULL, 1, 0), -- gDNA (stock)
@@ -422,6 +431,7 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
 INSERT INTO Identity (sampleId, externalName, donorSex) VALUES
   (1, 'TEST_external_1', 'MALE'),
   (100001, 'LIBT_identity1', 'UNKNOWN'),
+  (110001, '1LIB_identity1', 'UNKNOWN'),
   (200001, 'IPOT_identity1', 'UNKNOWN'),
   (201, 'SORT_identity_1', 'UNKNOWN'),
   (301, 'DILT_identity_1', 'FEMALE');
@@ -429,6 +439,7 @@ INSERT INTO Identity (sampleId, externalName, donorSex) VALUES
 INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, externalInstituteIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
   (2, 1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2),
   (100002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  (110002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (200002, 3, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (202, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (302, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL);
@@ -447,6 +458,7 @@ INSERT INTO `SampleStock` (sampleId, strStatus, dnaseTreated) VALUES
 (7, 'NOT_SUBMITTED', 0),
 (10, 'PASS', 0),
 (100003, 'NOT_SUBMITTED', 0),
+(110003, 'NOT_SUBMITTED', 0),
 (200003, 'NOT_SUBMITTED', 0),
 (203, 'NOT_SUBMITTED', 0),
 (303, 'NOT_SUBMITTED', 0);
@@ -459,6 +471,7 @@ INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 (13, 7),
 (14, 3),
 (100004, NULL),
+(110004, NULL),
 (200004, NULL),
 (204, NULL),
 (205, NULL),
@@ -468,33 +481,43 @@ INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
-  volume, concentration) VALUES
+  volume, concentration, locationBarcode) VALUES
   (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 2, 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
-    1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300, 5.0, 2.75),
+    1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 300, 5.0, 2.75, NULL),
   (100001, 'LIB100001', 'LIBT_0001_Ly_P_PE_251_WG', 'libbar100001', 'libdesc100001', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
-    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10),
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL),
   (100002, 'LIB100002', 'LIBT_0001_Ly_P_PE_252_WG', 'libbar100002', 'libdesc100002', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
-    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3),
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3, NULL),
   (100003, 'LIB100003', 'LIBT_0001_Ly_P_PE_253_WG', NULL,           NULL,            1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
-    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL),
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL),
   (100004, 'LIB100004', 'LIBT_0001_Ly_P_PE_254_WG', NULL,           'libdesc100004', 1, 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
-    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL),
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL),
+  (110001, 'LIB110001', '1LIB_0001_Ly_P_PE_251_WG', 'libbar110001', 'libdesc110001', 1, 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL),
+  (110002, 'LIB110002', '1LIB_0001_Ly_P_PE_252_WG', 'libbar110002', 'libdesc110002', 1, 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3, 'lib_location_110002'),
+  (110003, 'LIB110003', '1LIB_0001_Ly_P_PE_253_WG', NULL,           NULL,            1, 110004, 'ILLUMINA', 1, NULL, NULL, '2017-07-24',
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL),
+  (110004, 'LIB110004', '1LIB_0001_Ly_P_PE_254_WG', NULL,           'libdesc110004', 1, 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, 5, NULL, NULL),
+  (110005, 'LIB110005', '1LIB_0001_Ly_P_PE_255_WG', NULL,           'libdesc110005', 1, 110004, 'ILLUMINA', 1, NULL, NULL, '2017-07-24',
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, 5, NULL, NULL),
   (200001, 'LIB200001', 'IPOT_0001_Pa_P_PE_251_WG', 'libbar200001', 'libdesc200001', 1, 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
-    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10),
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL),
   (200002, 'LIB200002', 'IPOT_0001_Pa_P_PE_252_WG', 'libbar200002', 'libdesc200002', 1, 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
-    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3),
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3, NULL),
   (204, 'LIB204', 'SORT_0001_nn_n_PE_204_WG', NULL, 'description', 1, 204, 'ILLUMINA', 1, 3, 1, '2017-08-09',
-    1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL),
+    1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL),
   (205, 'LIB205', 'SORT_0001_nn_n_PE_205_WG', NULL, 'description', 1, 205, 'ILLUMINA', 1, 3, 1, '2017-08-09',
-    1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL),
+    1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL),
   (206, 'LIB206', 'SORT_0001_nn_n_PE_206_WG', NULL, 'description', 1, 206, 'ILLUMINA', 1, 3, 1, '2017-08-09',
-    1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL),
+    1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL),
   (304, 'LIB304', 'DILT_0001_nn_n_PE_304_WG', NULL, 'description', 1, 304, 'ILLUMINA', 1, 3, 1, '2017-08-14',
-    1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, NULL),
+    1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, NULL, NULL),
   (305, 'LIB305', 'DILT_0001_nn_n_PE_305_WG', NULL, 'description', 1, 305, 'ILLUMINA', 1, 3, 1, '2017-08-14',
-    1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, NULL),
+    1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, NULL, NULL),
   (306, 'LIB306', 'DILT_0001_nn_n_PE_306_WG', NULL, 'description', 1, 304, 'ILLUMINA', 1, 3, 1, '2017-08-14',
-    1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, NULL);
+    1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO DetailedLibrary(libraryId, kitDescriptorId, archived, libraryDesign, libraryDesignCodeId) VALUES
   (1, 1, 0, 1, 7),
@@ -502,6 +525,11 @@ INSERT INTO DetailedLibrary(libraryId, kitDescriptorId, archived, libraryDesign,
   (100002, 1, 0, 1, 7),
   (100003, 1, 0, NULL, 7),
   (100004, 1, 0, NULL, 7),
+  (110001, 1, 0, NULL, 7),
+  (110002, 1, 0, 1, 7),
+  (110003, 1, 0, NULL, 7),
+  (110004, 1, 0, NULL, 7),
+  (110005, 1, 0, NULL, 3),
   (200001, 1, 0, NULL, 7),
   (200002, 1, 0, 1, 7),
   (204, 1, 0, NULL, 7),
@@ -516,6 +544,12 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (100001, 9),
   (100002, 6),
   (100002, 10),
+  (110001, 5),
+  (110001, 9),
+  (110002, 5),
+  (110002, 9),
+  (110005, 5),
+  (110005, 9),
   (304, 5),
   (305, 6),
   (306, 9);
