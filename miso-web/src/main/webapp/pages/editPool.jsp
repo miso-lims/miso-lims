@@ -42,7 +42,7 @@
 <sessionConversation:insertSessionConversationId attributeName="pool"/>
 <h1><c:choose><c:when
     test="${pool.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose> Pool
-  <button type="button" onclick="return Pool.validatePool();" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button id="save" type="button" onclick="return Pool.validatePool();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
@@ -65,7 +65,7 @@
     <c:if test="${pool.id != 0}">
       <ul class="barcode-ddm">
         <li>
-          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
+          <a id="idBarcodeMenuHandle" onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
             <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
             <span id="idBarcode" style="float:right"></span>
           </a>
@@ -83,7 +83,7 @@
         </li>
       </ul>
     </c:if>
-    <div id="changePoolIdBarcodeDialog" title="Assign New Barcode"></div>
+    <div id="changeIdBarcodeDialog" title="Assign New Barcode"></div>
     <c:if test="${not empty pool.identificationBarcode}">
       <script type="text/javascript">
         jQuery(document).ready(function () {
@@ -105,7 +105,7 @@
 <table class="in">
   <tr>
     <td class="h">Pool ID:</td>
-    <td>
+    <td id="poolId">
       <c:choose>
         <c:when test="${pool.id != 0}">${pool.id}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
@@ -121,7 +121,7 @@
   </tr>
   <tr>
     <td class="h">Name:</td>
-    <td>
+    <td id="name">
       <c:choose>
         <c:when test="${pool.id != 0}">${pool.name}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
@@ -141,7 +141,7 @@
     <td>
       <c:choose>
         <c:when test="${pool.id != 0}">
-          ${pool.platformType.key}
+          <span id="platformType">${pool.platformType.key}</span>
         </c:when>
         <c:otherwise>
           <form:select id="platformType" path="platformType" items="${platformTypes}"/>
@@ -157,9 +157,16 @@
     <td class="h">Creation Date:*</td>
     <td><c:choose>
       <c:when test="${pool.id != 0}">
-        <fmt:formatDate pattern="yyyy-MM-dd" type="both" value="${pool.creationDate}"/>
+        <span id="creationDate">
+          <fmt:formatDate pattern="yyyy-MM-dd" type="both" value="${pool.creationDate}"/>
+        </span>
       </c:when>
-      <c:otherwise><form:input path="creationDate"/></c:otherwise>
+      <c:otherwise>
+        <form:input id="creationDate" path="creationDate"/>
+        <script type="text/javascript">
+          Utils.ui.addMaxDatePicker("creationDate", 0);
+        </script>
+      </c:otherwise>
     </c:choose>
     </td>
   </tr>
@@ -193,7 +200,7 @@
   </tr>
   <tr>
     <td class="h">Location:</td>
-    <td>
+    <td id="location">
       <c:if test="${!empty pool.box.locationBarcode}">${pool.box.locationBarcode},</c:if>
       <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.box.id}"/>'>${pool.box.alias}, ${pool.boxPosition}</a></c:if>
     </td>
@@ -221,7 +228,7 @@
       <h1>Notes</h1>
       <ul class="sddm">
         <li>
-          <a onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
+          <a id="notesMenuHandle" onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
             <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
           </a>
 
@@ -250,7 +257,7 @@
           </c:forEach>
         </div>
       </c:if>
-      <div id="addPoolNoteDialog" title="Create new Note"></div>
+      <div id="addNoteDialog" title="Create new Note"></div>
     </div>
     <br/>
 </c:if>
@@ -492,7 +499,6 @@ Sequencing Parameters: <select id="orderParameterId"></select>
 </div>
 
 <script type="text/javascript">
-  Utils.ui.addMaxDatePicker("creationDate", 0);
   jQuery(document).ready(function () {
     jQuery('#alias').simplyCountable({
       counter: '#aliasCounter',

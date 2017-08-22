@@ -39,7 +39,7 @@ public class IdBarcodeDialog extends FormPage<IdBarcodeDialog.Field> {
 
   }
 
-  @FindBy(xpath = "//div[@id='addNoteDialog']/..")
+  @FindBy(xpath = "//div[@id='changeIdBarcodeDialog']/..")
   private WebElement dialogContainer;
   private final WebElement submitButton;
   private final WebElement cancelButton;

@@ -107,7 +107,7 @@
     <c:if test="${library.id != 0}">
       <ul class="barcode-ddm">
         <li>
-          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
+          <a id="idBarcodeMenuHandle" onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
             <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
             <span id="idBarcode" style="float:right"></span>
           </a>
@@ -123,7 +123,7 @@
         </li>
       </ul>
     </c:if>
-    <div id="changeLibraryIdBarcodeDialog" title="Assign New Barcode"></div>
+    <div id="changeIdBarcodeDialog" title="Assign New Barcode"></div>
     <c:if test="${not empty library.identificationBarcode}">
       <script type="text/javascript">
         jQuery(document).ready(function () {
