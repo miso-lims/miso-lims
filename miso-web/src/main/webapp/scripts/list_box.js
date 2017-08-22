@@ -40,9 +40,9 @@ ListTarget.box = {
   createColumns : function(config, projectId) {
     return [
         ListUtils
-            .idHyperlinkColumn("Name", "box", "id", Utils.array.getName, 1),
+            .idHyperlinkColumn("Name", "box", "id", Utils.array.getName, 1, true),
         ListUtils.labelHyperlinkColumn("Alias", "box", Utils.array.getId,
-            "alias", 0),
+            "alias", 0, true),
         {
           "sTitle" : "Location",
           "mData" : "locationBarcode",

@@ -1248,6 +1248,7 @@ public class Dtos {
     }
     dto.setIdentificationBarcode(from.getDilutionBarcode());
     dto.setIndexIds(from.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
+    dto.setTargetedSequencingId(from.getTargetedSequencingId());
 
     LibraryDto ldto = new LibraryDto();
     ldto.setId(from.getLibraryId());

@@ -63,11 +63,6 @@ ListTarget.study = {
         "handler" : function() {
           window.location = "/miso/experimentwizard/new/" + projectId;
         }
-      }, {
-        "name" : "Create Pools",
-        "handler" : function() {
-          window.location = "/miso/poolwizard/new/" + projectId;
-        }
       }, ];
     } else {
       return [];
@@ -76,9 +71,9 @@ ListTarget.study = {
   createColumns : function(config, projectId) {
     return [
         ListUtils.idHyperlinkColumn("Name", "study", "id", Utils.array.getName,
-            1),
+            1, true),
         ListUtils.labelHyperlinkColumn("Alias", "study", Utils.array.getId,
-            "alias", 0), {
+            "alias", 0, true), {
           "sTitle" : "Description",
           "mData" : "description",
           "include" : true,

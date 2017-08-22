@@ -1133,6 +1133,7 @@ AS SELECT
     d.lastUpdated AS lastModified,
     d.creationDate AS created,
     d.dilutionUserName AS creatorName,
+    d.targetedSequencingId AS targetedSequencingId,
     modUser.loginName AS lastModifierName,
     d.preMigrationId AS preMigrationId,
     l.libraryId AS libraryId,
