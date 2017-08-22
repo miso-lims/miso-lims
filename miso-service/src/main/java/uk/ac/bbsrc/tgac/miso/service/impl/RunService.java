@@ -3,13 +3,12 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -101,6 +100,6 @@ public interface RunService extends PaginatedDataSource<Run> {
    * @throws MisoNamingException
    */
   boolean processNotification(Run run, int laneCount, String containerSerialNumber, String sequencerName,
-      Predicate<SequencingParameters> filterParameters, IntFunction<Optional<String>> laneContents) throws IOException, MisoNamingException;
+      Predicate<SequencingParameters> filterParameters, GetLaneContents laneContents) throws IOException, MisoNamingException;
 
 }

@@ -8,12 +8,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -38,6 +36,7 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
@@ -529,7 +528,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
   @Override
   public boolean processNotification(Run source, int laneCount, String containerSerialNumber, String sequencerName,
-      Predicate<SequencingParameters> filterParameters, IntFunction<Optional<String>> getLaneContents)
+      Predicate<SequencingParameters> filterParameters, GetLaneContents getLaneContents)
       throws IOException, MisoNamingException {
     final Date now = new Date();
     User user = securityManager.getUserByLoginName("notification");
@@ -687,7 +686,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private boolean updateContainerFromNotification(final Run target, User user, int laneCount, String containerSerialNumber,
-      final SequencerReference sequencer, final IntFunction<Optional<String>> getLaneContents) throws IOException {
+      final SequencerReference sequencer, final GetLaneContents getLaneContents) throws IOException {
     final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
     switch (containers.size()) {
     case 0:
@@ -720,9 +719,9 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     return false;
   }
 
-  private void updatePartitionContents(final IntFunction<Optional<String>> getLaneContents, SequencerPartitionContainer newContainer) {
+  private void updatePartitionContents(final GetLaneContents getLaneContents, SequencerPartitionContainer newContainer) {
     newContainer.getPartitions().stream().filter(partition -> partition.getPool() == null)
-        .forEach(partition -> getLaneContents.apply(partition.getPartitionNumber()).filter(s -> !LimsUtils.isStringBlankOrNull(s))
+        .forEach(partition -> getLaneContents.getLaneContents(partition.getPartitionNumber()).filter(s -> !LimsUtils.isStringBlankOrNull(s))
             .map(WhineyFunction.log(log, poolService::getByBarcode)).ifPresent(partition::setPool));
   }
 
