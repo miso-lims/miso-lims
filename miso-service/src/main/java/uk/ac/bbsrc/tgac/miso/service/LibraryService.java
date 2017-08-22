@@ -47,8 +47,6 @@ public interface LibraryService extends PaginatedDataSource<Library> {
 
   List<Library> listByAlias(String alias) throws IOException;
 
-  List<Library> listWithLimit(long limit) throws IOException;
-
   List<Library> searchByCreationDate(Date from, Date to) throws IOException;
 
   List<Library> listBySampleId(long sampleId) throws IOException;

@@ -116,12 +116,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public Collection<Run> listWithLimit(long limit) throws IOException {
-    Collection<Run> runs = runDao.listAllWithLimit(limit);
-    return authorizationManager.filterUnreadable(runs);
-  }
-
-  @Override
   public Collection<Run> listBySearch(String query) throws IOException {
     Collection<Run> runs = runDao.listBySearch(query);
     return authorizationManager.filterUnreadable(runs);

@@ -187,14 +187,6 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, Paginate
   Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException;
 
   /**
-   * List all persisted objects
-   *
-   * @return Collection<Library>
-   * @throws IOException when the objects cannot be retrieved
-   */
-  Collection<Library> listAllWithLimit(long limit) throws IOException;
-
-  /**
    * Return the Library associated with a given positionId
    *
    * @param positionId of type long
