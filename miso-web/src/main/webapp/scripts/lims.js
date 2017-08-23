@@ -421,20 +421,22 @@ Utils.ui = {
     }
     jQuery("#" + id).toggle("blind", {}, 500);
   },
+  
+  goodDateFormat: 'yy-mm-dd',
 
   addDatePicker: function (id) {
-    jQuery("#" + id).datepicker({dateFormat: 'dd/mm/yy', showButtonPanel: true});
+    jQuery("#" + id).datepicker({dateFormat: Utils.ui.goodDateFormat, showButtonPanel: true});
   },
 
   addMaxDatePicker: function (id, maxDateOffset) {
-    jQuery("#" + id).datepicker({dateFormat: 'dd/mm/yy', showButtonPanel: true, maxDate: maxDateOffset});
+    jQuery("#" + id).datepicker({dateFormat: Utils.ui.goodDateFormat, showButtonPanel: true, maxDate: maxDateOffset});
   },
   
   addDateTimePicker: function (id) {
     jQuery("#" + id).datetimepicker({
       controlType: 'select',
       oneLine: true,
-      dateFormat: 'dd/mm/yy',
+      dateFormat: Utils.ui.goodDateFormat,
       timeFormat: 'HH:mm'
     });
   },
@@ -485,8 +487,8 @@ Utils.fileUpload = {
 };
 
 Utils.validation = {
-  dateRegex: '^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)[0-9]{2}$',
-  dateTimeRegex: '^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)[0-9]{2} ([01][0-9]|2[0-3]):[0-5][0-9]$',
+  dateRegex: '^(19|20)[0-9]{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$',
+  dateTimeRegex: '^(19|20)[0-9]{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):[0-5][0-9]$',
   sanitizeRegex: '^[^<>&]*$',
   alphanumRegex: '^[-\\w]*$',
   unicodeWordRegex: '^[\\p{L}0-9_\\^\\-\\.\\s]+$',

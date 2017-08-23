@@ -529,7 +529,7 @@
         <c:forEach items="${library.libraryQCs}" var="qc">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
             <td>${qc.qcCreator}</td>
-            <td><fmt:formatDate value="${qc.qcDate}"/></td>
+            <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
             <td>${qc.qcType.name}</td>
 
             <fmt:formatNumber var="resultsRounded"

@@ -425,7 +425,7 @@ public class DashboardHelperService {
                 + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
             b.append("Name: <b>" + s.getProject().getName() + "</b><br/>");
             b.append("Alias: <b>" + s.getProject().getAlias() + "</b><br/>");
-            b.append("Last Received: <b>" + LimsUtils.getDateAsString(s.getReceivedDate()) + "</b><br/>");
+            b.append("Last Received: <b>" + LimsUtils.formatDate(s.getReceivedDate()) + "</b><br/>");
             b.append("</div>");
 
             uniqueProjects.add(s.getProject().getId());

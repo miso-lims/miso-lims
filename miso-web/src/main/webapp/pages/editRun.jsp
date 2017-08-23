@@ -246,7 +246,7 @@
             </c:when>
             <c:otherwise>
               <td id="startDate">
-                <fmt:formatDate pattern="dd/MM/yyyy" value="${run.startDate}"/>
+                <fmt:formatDate pattern="yyyy-MM-dd" value="${run.startDate}"/>
               </td>
             </c:otherwise>
           </c:choose>
@@ -261,12 +261,12 @@
             </c:when>
             <c:otherwise>
               <td id="completionDate">
-                <fmt:formatDate pattern="dd/MM/yyyy" value="${run.completionDate}"/>
+                <fmt:formatDate pattern="yyyy-MM-dd" value="${run.completionDate}"/>
               </td>
             </c:otherwise>
           </c:choose>
           <td>
-            <fmt:formatDate value="${run.lastModified}" dateStyle="long" pattern="dd/MM/yyyy HH:mm:ss"/>
+            <fmt:formatDate value="${run.lastModified}" dateStyle="long" pattern="yyyy-MM-dd HH:mm:ss"/>
           </td>
         </tr>
         </tbody>
@@ -382,7 +382,7 @@
       <c:forEach items="${run.runQCs}" var="qc">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td>${qc.qcCreator}</td>
-          <td><fmt:formatDate value="${qc.qcDate}"/></td>
+          <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
           <td>${qc.qcType.name}</td>
           <td>
             <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="fCount">

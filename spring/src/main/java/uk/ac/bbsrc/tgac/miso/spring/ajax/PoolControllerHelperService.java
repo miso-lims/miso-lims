@@ -23,13 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
 
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -148,7 +147,7 @@ public class PoolControllerHelperService {
           pool.setQcPassed(true);
         }
         newQc.setQcCreator(json.getString("qcCreator"));
-        newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
+        newQc.setQcDate(parseDate(json.getString("qcDate")));
         newQc.setQcType(poolService.getPoolQcType(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
         pool.addQc(newQc);
@@ -159,7 +158,7 @@ public class PoolControllerHelperService {
         for (PoolQC qc : pool.getPoolQCs()) {
           sb.append("<tr>");
           sb.append("<td>" + qc.getQcCreator() + "</td>");
-          sb.append("<td>" + qc.getQcDate() + "</td>");
+          sb.append("<td>" + formatDate(qc.getQcDate()) + "</td>");
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
           sb.append("<td>" + qc.getResults() + " " + qc.getQcType().getUnits() + "</td>");
           sb.append("</tr>");

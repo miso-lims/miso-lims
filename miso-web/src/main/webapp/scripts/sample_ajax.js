@@ -114,9 +114,9 @@ var Sample = Sample || {
 
     // Date of Receipt validation: ensure date is of correct form
     jQuery('#receiveddatepicker').attr('class', 'form-control');
-    jQuery('#receiveddatepicker').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#receiveddatepicker').attr('data-date-format', 'YYYY-MM-DD');
     jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
 
     // Sample Type validation
     jQuery('#sampleTypes').attr('class', 'form-control');
@@ -312,6 +312,7 @@ Sample.qc = {
       var column6 = jQuery('#sampleQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Sample.qc.addSampleQC();'/>Add</a>";
 
+      jQuery("#sampleQcDate").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
       Utils.ui.addMaxDatePicker("sampleQcDate", 0);
 
       Fluxion.doAjax(

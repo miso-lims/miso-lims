@@ -314,45 +314,6 @@ Project.ui = {
     }
   },
 
-  processBulkEmPcrTable: function (json) {
-    Utils.ui.reenableButton('bulkEmPcrButton', "Save EmPCRs");
-
-    var a = json.saved;
-    for (var i = 0; i < a.length; i++) {
-      jQuery('#librarydils_table').find("tr:gt(0)").each(function () {
-        if (jQuery(this).attr("dilutionId") === a[i].dilutionId) {
-          jQuery(this).removeClass('row_selected');
-          jQuery(this).addClass('row_saved');
-          jQuery(this).find("td").each(function () {
-            jQuery(this).css('background', '#CCFF99');
-            if (jQuery(this).hasClass('rowSelect')) {
-              jQuery(this).removeClass('rowSelect');
-              jQuery(this).removeAttr('name');
-            }
-          });
-        }
-      });
-    }
-
-    if (json.errors) {
-      var errors = json.errors;
-      var errorStr = "";
-      for (var j = 0; j < errors.length; j++) {
-        errorStr += errors[j].error + "\n";
-        jQuery('#librarydils_table').find("tr:gt(0)").each(function () {
-          if (jQuery(this).attr("dilutionId") === errors[j].dilutionId) {
-            jQuery(this).find("td").each(function () {
-              jQuery(this).css('background', '#EE9966');
-            });
-          }
-        });
-      }
-      alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
-    } else {
-      Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
-    }
-  },
-
   receiveSelectedSamples: function (ids) {
     if (confirm("Are you sure you want to receive selected samples?")) {
       Fluxion.doAjax(

@@ -23,11 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -191,9 +189,8 @@ public class FlexReportingControllerHelperService {
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
             if (project.getCreationDate() != null) {
 
-              DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-              Date startDate = df.parse(from);
-              Date endDate = df.parse(to);
+              Date startDate = parseDate(from);
+              Date endDate = parseDate(to);
               Date creationDate = project.getCreationDate();
 
               if ((creationDate.after(startDate) && creationDate.before(endDate)) || creationDate.equals(startDate)
@@ -345,9 +342,8 @@ public class FlexReportingControllerHelperService {
 
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
             if (run.getCompletionDate() != null) {
-              DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-              Date startDate = df.parse(from);
-              Date endDate = df.parse(to);
+              Date startDate = parseDate(from);
+              Date endDate = parseDate(to);
               Date runDate = run.getCompletionDate();
 
               if ((runDate.after(startDate) && runDate.before(endDate)) || runDate.equals(startDate) || runDate.equals(endDate)) {
@@ -563,9 +559,8 @@ public class FlexReportingControllerHelperService {
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
             if (sample.getReceivedDate() != null) {
 
-              DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-              Date startDate = df.parse(from);
-              Date endDate = df.parse(to);
+              Date startDate = parseDate(from);
+              Date endDate = parseDate(to);
               Date receivedDate = sample.getReceivedDate();
 
               if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate)
@@ -714,9 +709,8 @@ public class FlexReportingControllerHelperService {
     JSONArray jsonArray = new JSONArray();
     try {
       Collection<Library> libraries = null;
-      DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-      Date startDate = df.parse(from);
-      Date endDate = df.parse(to);
+      Date startDate = parseDate(from);
+      Date endDate = parseDate(to);
       if (!isStringEmptyOrNull(searchStr)) {
         libraries = libraryService.listBySearch(searchStr);
       } else {
@@ -872,7 +866,7 @@ public class FlexReportingControllerHelperService {
       jsonArray.add(
           "['" + library.getSample().getProject().getName() + "','" + library.getName() + "','" + library.getAlias() + "','"
               + library.getDescription() + "','" + library.getPlatformType() + "','" + library.getLibraryType().getDescription() + "','"
-              + qc + "','" + LimsUtils.getDateAsString(library.getCreationTime()) + "','" + library.getSample().getName() + "','"
+              + qc + "','" + LimsUtils.formatDate(library.getCreationTime()) + "','" + library.getSample().getName() + "','"
               + sampleQC
               + "','" + scientificName + "']");
     }
@@ -931,9 +925,8 @@ public class FlexReportingControllerHelperService {
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
             if (run.getCompletionDate() != null) {
 
-              DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-              Date startDate = df.parse(from);
-              Date endDate = df.parse(to);
+              Date startDate = parseDate(from);
+              Date endDate = parseDate(to);
               Date receivedDate = run.getCompletionDate();
 
               if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate)
@@ -944,9 +937,8 @@ public class FlexReportingControllerHelperService {
           } else if (!isStringEmptyOrNull(runStartedFrom) && !isStringEmptyOrNull(runStartedTo)) {
             if (run.getStartDate() != null) {
 
-              DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-              Date startDate = df.parse(runStartedFrom);
-              Date endDate = df.parse(runStartedTo);
+              Date startDate = parseDate(runStartedFrom);
+              Date endDate = parseDate(runStartedTo);
               Date startedDate = run.getStartDate();
 
               if ((startedDate.after(startDate) && startedDate.before(endDate)) || startedDate.equals(startDate)
@@ -1067,7 +1059,7 @@ public class FlexReportingControllerHelperService {
                         jsonArray.add(
                             JsonSanitizer.sanitize(
                                 "[\"" + run.getName() + "\",\"" + (run.getAlias().replace("+", "-")) + "\",\""
-                                    + ( LimsUtils.getDateAsString(run.getStartDate()) + "\",\""
+                                    + ( LimsUtils.formatDate(run.getStartDate()) + "\",\""
                                    + pool.getName() + "\",\"" + spp.getPartitionNumber() + "\",\""
                                     + dilution.getProjectName() + "\",\""
                                     + projectMap.get(dilution.getProjectId()) + "\",\""

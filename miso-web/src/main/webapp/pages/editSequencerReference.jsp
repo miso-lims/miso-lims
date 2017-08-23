@@ -133,13 +133,13 @@
           <td>
             <c:choose>
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <form:input path="dateCommissioned" id="datecommissionedpicker" placeholder="DD/MM/YYYY" class="validateable"/>
+                <form:input path="dateCommissioned" id="datecommissionedpicker" placeholder="YYYY-MM-DD" class="validateable"/>
                 <script type="text/javascript">
                   Utils.ui.addDatePicker("datecommissionedpicker");
                 </script>
               </c:when>
               <c:otherwise>
-                <fmt:formatDate value="${sequencerReference.dateCommissioned}" pattern="dd/MM/yyyy"/>
+                <fmt:formatDate value="${sequencerReference.dateCommissioned}" pattern="yyyy-MM-dd"/>
               </c:otherwise>
             </c:choose>
           </td>
@@ -168,13 +168,13 @@
           <td>
             <c:choose>
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <form:input path="dateDecommissioned" id="datedecommissionedpicker" placeholder="DD/MM/YYYY" class="validateable"/>
+                <form:input path="dateDecommissioned" id="datedecommissionedpicker" placeholder="YYYY-MM-DD" class="validateable"/>
                 <script type="text/javascript">
                   Utils.ui.addDatePicker("datedecommissionedpicker");
                 </script>
               </c:when>
               <c:otherwise>
-                <fmt:formatDate value="${sequencerReference.dateDecommissioned}" pattern="dd/MM/yyyy"/>
+                <fmt:formatDate value="${sequencerReference.dateDecommissioned}" pattern="yyyy-MM-dd"/>
               </c:otherwise>
             </c:choose>
           </td>

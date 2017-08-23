@@ -73,7 +73,7 @@
                         </tr>
                         <tr>
                             <td>Date:</td>
-                            <td><input type="text" name="Date" size="30" value="<fmt:formatDate value='${now}' pattern='dd/MM/yyyy'/>"/></td>
+                            <td><input type="text" name="Date" size="30" value="<fmt:formatDate value='${now}' pattern='yyyy-MM-dd'/>"/></td>
                         </tr>
                         <tr>
                             <td>Workflow:</td>
