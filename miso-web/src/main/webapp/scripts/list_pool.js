@@ -50,6 +50,9 @@ ListTarget.pool = {
         {
           "sTitle" : "Description",
           "mData" : "description",
+          "mRender" : function(data, type, full) {
+            return (data ? data : "") + (full.duplicateIndices ? " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDICES)</strong></span>" : "");
+          },
           "include" : true,
           "iSortPriority" : 0
         },

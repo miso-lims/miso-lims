@@ -209,6 +209,13 @@
   jQuery(document).ready(function () {
     // Attach Parsley form validator
     Validate.attachParsley('#pool-form');
+
+    // store duplicate indices sequences
+    Pool.duplicateIndices = ${pool.hasDuplicateIndices()};
+    Pool.duplicateIndicesSequences = [];
+    <c:forEach items="${pool.getDuplicateIndicesSequences()}" var="item">
+      Pool.duplicateIndicesSequences.push("${item}");
+    </c:forEach>
   });
 </script>
 </form:form>
