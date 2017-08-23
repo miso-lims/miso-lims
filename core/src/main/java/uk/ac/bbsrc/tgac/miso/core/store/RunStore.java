@@ -130,15 +130,6 @@ public interface RunStore extends Store<Run>, Remover<Run>, PaginatedDataSource<
    */
   List<Run> listBySequencerId(long sequencerReferenceId) throws IOException;
 
-  /**
-   * List all persisted objects
-   *
-   * @param the maximum number of objects to return. If this is negative, no limit will be set
-   * @return Collection<Run>
-   * @throws IOException when the objects cannot be retrieved
-   */
-  Collection<Run> listAllWithLimit(long limit) throws IOException;
-
   void saveAll(Collection<Run> runs) throws IOException;
 
   /**

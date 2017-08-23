@@ -243,12 +243,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   }
 
   @Override
-  public List<Library> listWithLimit(long limit) throws IOException {
-    Collection<Library> libraries = libraryDao.listAllWithLimit(limit);
-    return authorizationManager.filterUnreadable(libraries);
-  }
-
-  @Override
   public List<Library> searchByCreationDate(Date from, Date to) throws IOException {
     Collection<Library> libraries = libraryDao.searchByCreationDate(from, to);
     return authorizationManager.filterUnreadable(libraries);

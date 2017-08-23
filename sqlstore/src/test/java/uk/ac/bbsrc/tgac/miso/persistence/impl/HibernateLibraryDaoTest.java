@@ -172,13 +172,6 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllWithLimit() throws Exception {
-    List<Library> libraries = dao.listAllWithLimit(5);
-    assertEquals("not within limit", 5, libraries.size());
-
-  }
-
-  @Test
   public void testCount() throws Exception {
     assertEquals("count incorrect", 14, dao.count());
   }

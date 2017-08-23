@@ -194,15 +194,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
   }
 
   @Override
-  public Collection<Sample> listAllWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.setMaxResults((int) limit);
-    @SuppressWarnings("unchecked")
-    List<Sample> records = criteria.list();
-    return records;
-  }
-
-  @Override
   public Collection<Sample> listByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(SampleImpl.class);
     criteria.add(Restrictions.eq("alias", alias));

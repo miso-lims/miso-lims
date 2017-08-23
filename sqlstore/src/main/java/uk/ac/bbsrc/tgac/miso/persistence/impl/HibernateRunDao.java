@@ -238,16 +238,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public List<Run> listAllWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.addOrder(Order.desc("id"));
-    criteria.setMaxResults((int) limit);
-    @SuppressWarnings("unchecked")
-    List<Run> records = criteria.list();
-    return withWatcherGroup(records);
-  }
-
-  @Override
   public void saveAll(Collection<Run> runs) throws IOException {
     log.debug(">>> Entering saveAll with " + runs.size() + " runs");
     for (Run run : runs) {

@@ -39,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
-import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -112,12 +111,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   public Collection<Run> list() throws IOException {
     Collection<Run> allRuns = runDao.listAll();
     return authorizationManager.filterUnreadable(allRuns);
-  }
-
-  @Override
-  public Collection<Run> listWithLimit(long limit) throws IOException {
-    Collection<Run> runs = runDao.listAllWithLimit(limit);
-    return authorizationManager.filterUnreadable(runs);
   }
 
   @Override
@@ -400,8 +393,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setSequencerReference(source.getSequencerReference());
     if (isIlluminaRun(target)) {
       applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
-    } else if (isPacBioRun(target)) {
-      applyPacBioChanges((PacBioRun) target, (PacBioRun) source);
     } else if (isLS454Run(target)) {
       applyLS454Changes((LS454Run) target, (LS454Run) source);
     } else if (isSolidRun(target)) {
@@ -415,9 +406,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setNumCycles(source.getNumCycles());
     target.setScoreCycle(source.getScoreCycle());
     target.setPairedEnd(source.getPairedEnd());
-  }
-
-  private void applyPacBioChanges(PacBioRun target, PacBioRun source) throws IOException {
   }
 
   private void applyLS454Changes(LS454Run target, LS454Run source) throws IOException {

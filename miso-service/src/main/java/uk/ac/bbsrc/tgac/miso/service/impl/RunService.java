@@ -21,8 +21,6 @@ public interface RunService extends PaginatedDataSource<Run> {
 
   Collection<Run> list() throws IOException;
 
-  Collection<Run> listWithLimit(long limit) throws IOException;
-
   int count() throws IOException;
 
   Map<String, Integer> getRunColumnSizes() throws IOException;

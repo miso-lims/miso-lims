@@ -708,12 +708,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   @Override
-  public Collection<Sample> listWithLimit(long limit) throws IOException {
-    Collection<Sample> samples = sampleDao.listAllWithLimit(limit);
-    return authorizationManager.filterUnreadable(samples);
-  }
-
-  @Override
   public Collection<Sample> listByReceivedDate(long limit) throws IOException {
     Collection<Sample> samples = sampleDao.listAllByReceivedDate(limit);
     return authorizationManager.filterUnreadable(samples);
