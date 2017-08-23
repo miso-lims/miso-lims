@@ -235,7 +235,7 @@
     <tr>
       <td>Date of receipt:</td>
       <td>
-        <form:input path="receivedDate" id="receiveddatepicker" placeholder="DD/MM/YYYY"/>
+        <form:input path="receivedDate" id="receiveddatepicker" placeholder="YYYY-MM-DD"/>
         <script type="text/javascript">
           Utils.ui.addDatePicker("receiveddatepicker");
         </script>
@@ -736,7 +736,7 @@
             <c:forEach items="${sample.sampleQCs}" var="qc">
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
                 <td>${qc.qcCreator}</td>
-                <td><fmt:formatDate value="${qc.qcDate}"/></td>
+                <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
                 <td>${qc.qcType.name}</td>
                 <fmt:formatNumber var="resultsRounded" value="${qc.results}" maxFractionDigits="2" />
                 <td id="results${qc.id}">${resultsRounded} ${qc.qcType.units}</td>

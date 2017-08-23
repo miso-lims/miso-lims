@@ -279,7 +279,7 @@ public class ListTablesIT extends AbstractIT {
     ListPage page = getList(listTarget);
     DataTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals("found expected number of columns", targetColumns.size(), headings.size());
+    assertEquals("number of columns", targetColumns.size(), headings.size());
     for (String col : targetColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
@@ -297,7 +297,7 @@ public class ListTablesIT extends AbstractIT {
     }
 
     List<String> headings = table.getColumnHeadings();
-    assertEquals("found expected number of columns", targetColumns.size(), headings.size());
+    assertEquals("number of columns", targetColumns.size(), headings.size());
     for (String col : targetColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
@@ -329,7 +329,7 @@ public class ListTablesIT extends AbstractIT {
     headings.forEach(heading -> {
       // sort one way
       page.sortByColumn(heading);
-      assertTrue("sort once on column '" + heading + "' without errors", LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
+        assertTrue("first sort on column '" + heading, LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
       // if there are at least two rows, ensure that sort was correct
       if (!table.isTableEmpty()) {
         int numRows = table.countRows();
@@ -341,7 +341,7 @@ public class ListTablesIT extends AbstractIT {
           findFirstTwoNonMatchingValues(table, heading, ascRow1Val, ascRow2Val);
           // sort the other way
           page.sortByColumn(heading);
-          assertTrue("sort twice on column '" + heading + "' without errors", LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
+            assertTrue("second sort on column '" + heading, LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
           findFirstTwoNonMatchingValues(table, heading, descRow1Val, descRow2Val);
 
           // compare results if they are not equal

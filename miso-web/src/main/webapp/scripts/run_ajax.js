@@ -87,8 +87,8 @@ var Run = Run || {
     if (!document.getElementById('startDate').disabled) {
        jQuery('#startDate').attr('class', 'form-control');
        jQuery('#startDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-       jQuery('#startDate').attr('data-date-format', 'DD/MM/YYYY');
-       jQuery('#startDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+       jQuery('#startDate').attr('data-date-format', 'YYYY-MM-DD');
+       jQuery('#startDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
        jQuery('#startDate').attr('required', 'true');
     } else {
        jQuery('#startDate').removeAttr('required');
@@ -97,8 +97,8 @@ var Run = Run || {
     if (!document.getElementById('completionDate').disabled) {
         jQuery('#completionDate').attr('class', 'form-control');
         jQuery('#completionDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-        jQuery('#completionDate').attr('data-date-format', 'DD/MM/YYYY');
-        jQuery('#completionDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+        jQuery('#completionDate').attr('data-date-format', 'YYYY-MM-DD');
+        jQuery('#completionDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
         jQuery('#completionDate').attr('required',  'true');
     } else {
         jQuery('#completionDate').removeAttr('required');
@@ -252,6 +252,7 @@ Run.qc = {
       var column8 = jQuery('#runQcTable')[0].rows[1].insertCell(-1);
       column8.innerHTML = "<a href='javascript:void(0);' onclick='Run.qc.addRunQC(this);'/>Add</a>";
 
+      jQuery("#runQcDate").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
       Utils.ui.addMaxDatePicker("runQcDate", 0);
 
       Fluxion.doAjax(

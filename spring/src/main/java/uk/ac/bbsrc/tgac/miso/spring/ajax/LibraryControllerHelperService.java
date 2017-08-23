@@ -23,13 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
 
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -357,7 +356,7 @@ public class LibraryControllerHelperService {
         Long libraryId = Long.parseLong(json.getString("libraryId"));
         Library library = libraryService.get(libraryId);
         LibraryQC newQc = new LibraryQCImpl();
-        newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
+        newQc.setQcDate(parseDate(json.getString("qcDate")));
         newQc.setQcType(libraryService.getLibraryQcType(json.getLong("qcType")));
         newQc.setResults(Double.parseDouble(json.getString("results")));
         libraryService.addQc(library, newQc);
@@ -367,7 +366,7 @@ public class LibraryControllerHelperService {
         for (LibraryQC qc : library.getLibraryQCs()) {
           sb.append("<tr>");
           sb.append("<td>" + qc.getQcCreator() + "</td>");
-          sb.append("<td>" + qc.getQcDate() + "</td>");
+          sb.append("<td>" + formatDate(qc.getQcDate()) + "</td>");
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
           sb.append("<td>" + LimsUtils.round(qc.getResults(), 2) + " " + qc.getQcType().getUnits() + "</td>");
           sb.append("</tr>");

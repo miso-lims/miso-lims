@@ -149,6 +149,7 @@ Library.qc = {
       var column6 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/>Add</a>";
 
+      jQuery("#libraryQcDate").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
       Utils.ui.addMaxDatePicker("libraryQcDate", 0);
 
       Fluxion.doAjax(

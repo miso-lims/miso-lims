@@ -367,8 +367,6 @@
 </div>
 
 <script type="text/javascript">
-  Utils.ui.addMaxDatePicker("creationDate", 0);
-
   jQuery(function () {
     jQuery("#poolList").sortable({
       revert: true

@@ -39,17 +39,17 @@ var ServiceRecord = ServiceRecord || {
     jQuery('#referenceNumber').attr('data-parsley-maxlength', '30');
     
     jQuery('#serviceDatePicker').attr('required', 'true');
-    jQuery('#serviceDatePicker').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#serviceDatePicker').attr('data-date-format', 'YYYY-MM-DD');
     jQuery('#serviceDatePicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('#serviceDatePicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    jQuery('#serviceDatePicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
     
-    jQuery('#shutdownTime').attr('data-date-format', 'DD/MM/YYYY hh:mm');
+    jQuery('#shutdownTime').attr('data-date-format', 'YYYY-MM-DD hh:mm');
     jQuery('#shutdownTime').attr('data-parsley-pattern', Utils.validation.dateTimeRegex);
-    jQuery('#shutdownTime').attr('data-parsley-error-message', 'Time must be of form DD/MM/YYYY hh:mm');
+    jQuery('#shutdownTime').attr('data-parsley-error-message', 'Time must be of form YYYY-MM-DD hh:mm');
     
-    jQuery('#restoredTime').attr('data-date-format', 'DD/MM/YYYY hh:mm');
+    jQuery('#restoredTime').attr('data-date-format', 'YYYY-MM-DD hh:mm');
     jQuery('#restoredTime').attr('data-parsley-pattern', Utils.validation.dateTimeRegex);
-    jQuery('#restoredTime').attr('data-parsley-error-message', 'Time must be of form DD/MM/YYYY hh:mm');
+    jQuery('#restoredTime').attr('data-parsley-error-message', 'Time must be of form YYYY-MM-DD hh:mm');
     
     jQuery('#serviceRecordForm').parsley();
     jQuery('#serviceRecordForm').parsley().validate();

@@ -158,7 +158,7 @@
     <td class="h">Creation Date:*</td>
     <td><c:choose>
       <c:when test="${pool.id != 0}">
-        <fmt:formatDate pattern="dd/MM/yy" type="both" value="${pool.creationDate}"/>
+        <fmt:formatDate pattern="yyyy-MM-dd" type="both" value="${pool.creationDate}"/>
       </c:when>
       <c:otherwise><form:input path="creationDate"/></c:otherwise>
     </c:choose>
@@ -302,7 +302,7 @@
           <c:forEach items="${pool.poolQCs}" var="qc">
             <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
               <td>${qc.qcCreator}</td>
-              <td><fmt:formatDate value="${qc.qcDate}"/></td>
+              <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
               <td>${qc.qcType.name}</td>
               <td id="result${qc.id}">${qc.results} ${qc.qcType.units}</td>
               <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)

@@ -46,6 +46,7 @@ import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -225,7 +226,6 @@ public class LimsUtils {
     final int BUFFER = 2048;
 
     try {
-      BufferedOutputStream dest = null;
       FileInputStream fis = new FileInputStream(source);
       ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
       ZipEntry entry;
@@ -246,12 +246,12 @@ public class LimsUtils {
           int count;
           byte data[] = new byte[BUFFER];
           FileOutputStream fos = new FileOutputStream(outputFile);
-          dest = new BufferedOutputStream(fos, BUFFER);
-          while ((count = zis.read(data, 0, BUFFER)) != -1) {
-            dest.write(data, 0, count);
+          try (BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER)) {
+            while ((count = zis.read(data, 0, BUFFER)) != -1) {
+              dest.write(data, 0, count);
+            }
+            dest.flush();
           }
-          dest.flush();
-          dest.close();
         }
       }
       zis.close();
@@ -462,9 +462,42 @@ public class LimsUtils {
     return getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd"));
   }
 
-  public static String getDateAsString(Date date) {
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    return df.format(date);
+  public static String formatDate(Date date) {
+    return date == null ? null : getDateFormat().format(date);
+  }
+
+  public static Date parseDate(String dateString) {
+    if (isStringEmptyOrNull(dateString)) {
+      return null;
+    }
+    try {
+      return getDateFormat().parse(dateString);
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("Invalid date string");
+    }
+  }
+
+  public static String formatDateTime(Date date) {
+    return date == null ? null : getDateTimeFormat().format(date);
+  }
+
+  public static Date parseDateTime(String dateString) {
+    if (isStringEmptyOrNull(dateString)) {
+      return null;
+    }
+    try {
+      return getDateTimeFormat().parse(dateString);
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("Invalid datetime string");
+    }
+  }
+
+  public static DateFormat getDateFormat() {
+    return new SimpleDateFormat("yyyy-MM-dd");
+  }
+
+  public static DateFormat getDateTimeFormat() {
+    return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   }
 
   private static final Pattern linePattern = Pattern.compile(".*\r?\n");
@@ -765,11 +798,7 @@ public class LimsUtils {
     return toBadDate(localDate, ZoneId.systemDefault());
   }
 
-  public static Date toBadDate(LocalDateTime localDate, ZoneId timezone) {
-    return localDate == null ? null : toBadDate(localDate.toLocalDate());
-  }
-
   public static Date toBadDate(LocalDateTime localDate) {
-    return toBadDate(localDate, ZoneId.systemDefault());
+    return localDate == null ? null : toBadDate(localDate.toLocalDate());
   }
 }

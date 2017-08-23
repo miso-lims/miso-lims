@@ -290,10 +290,10 @@ public class ExternalSectionControllerHelperService {
           jsonArray.add("['" + run.getName() + "','"
               + (run.getHealth() != null ? run.getHealth().getKey() : "") + "','"
               + (run.getStartDate() != null
-                  ? LimsUtils.getDateAsString(run.getStartDate()) : "")
+                  ? LimsUtils.formatDate(run.getStartDate()) : "")
               + "','"
               + (run.getCompletionDate() != null
-                  ? LimsUtils.getDateAsString(run.getCompletionDate()) : "")
+                  ? LimsUtils.formatDate(run.getCompletionDate()) : "")
               + "','" + (run.getSequencerReference().getPlatform().getPlatformType() != null
                   ? run.getSequencerReference().getPlatform().getPlatformType().getKey() : "")
               + "','" + sb.toString() + "']");

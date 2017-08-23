@@ -70,8 +70,8 @@ var Pool = Pool || {
     jQuery('#creationDate').attr('class', 'form-control');
     jQuery('#creationDate').attr('required', 'true');
     jQuery('#creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('#creationDate').attr('data-date-format', 'DD/MM/YYYY');
-    jQuery('#creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    jQuery('#creationDate').attr('data-date-format', 'YYYY-MM-DD');
+    jQuery('#creationDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
 
     // Volume validation
     jQuery('#volume').attr('class', 'form-control');
@@ -109,6 +109,7 @@ Pool.qc = {
       var column6 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.qc.addPoolQC();'/>Add</a>";
 
+      jQuery("#poolQcDate").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
       Utils.ui.addMaxDatePicker("poolQcDate", 0);
 
       Fluxion.doAjax(
