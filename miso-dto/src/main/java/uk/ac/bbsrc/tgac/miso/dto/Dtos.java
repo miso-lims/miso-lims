@@ -1248,6 +1248,7 @@ public class Dtos {
     }
     dto.setIdentificationBarcode(from.getDilutionBarcode());
     dto.setIndexIds(from.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
+    dto.setTargetedSequencingId(from.getTargetedSequencingId());
 
     LibraryDto ldto = new LibraryDto();
     ldto.setId(from.getLibraryId());
@@ -1674,6 +1675,10 @@ public class Dtos {
 
   private static void setIlluminaRunValues(IlluminaNotificationDto from, IlluminaRun to) {
     to.setPairedEnd(from.isPairedEndRun());
+    to.setNumCycles(from.getNumCycles());
+    to.setImgCycle(from.getImgCycle());
+    to.setCallCycle(from.getCallCycle());
+    to.setScoreCycle(from.getScoreCycle());
   }
 
   private static void setCommonRunValues(NotificationDto from, Run to) {

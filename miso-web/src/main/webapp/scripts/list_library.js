@@ -35,17 +35,17 @@ ListTarget.library = {
   createColumns : function(config, projectId) {
     return [
         ListUtils.idHyperlinkColumn("Name", "library", "id",
-            Utils.array.getName, 1),
+            Utils.array.getName, 1, true),
         ListUtils.labelHyperlinkColumn("Alias", "library", Utils.array.getId,
-            "alias", 0),
+            "alias", 0, true),
         ListUtils.idHyperlinkColumn("Sample Name", "sample", "parentSampleId",
             function(library) {
               return "SAM" + library.parentSampleId;
-            }, 0),
+            }, 0, true),
         ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(
             library) {
           return library.parentSampleId;
-        }, "parentSampleAlias", 0),
+        }, "parentSampleAlias", 0, true),
         {
           "sTitle" : "QC Passed",
           "mData" : "qcPassed",

@@ -7,9 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -24,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
  */
 public final class Main {
 
-  public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
+  public static void main(String[] args) throws IOException {
     if (args.length == 0) {
       System.err.println(
           "Usage: java -DplatformType=ILLUMINA -Dname=default -Dtz=America/Toronto -Dparameters={} uk.ac.bbsrc.tgac.miso.runscanner.Main /path/to/run/folder");
@@ -74,6 +73,7 @@ public final class Main {
     }
 
     try {
+      mapper.enable(SerializationFeature.INDENT_OUTPUT);
       mapper.writeValue(System.out, results);
     } catch (IOException e) {
       e.printStackTrace();

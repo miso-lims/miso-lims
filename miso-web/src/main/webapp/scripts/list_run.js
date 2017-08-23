@@ -55,9 +55,9 @@ ListTarget.run = {
   createColumns : function(config, projectId) {
     return [
         ListUtils
-            .idHyperlinkColumn("Name", "run", "id", Utils.array.getName, 1),
+            .idHyperlinkColumn("Name", "run", "id", Utils.array.getName, 1, true),
         ListUtils.labelHyperlinkColumn("Alias", "run", Utils.array.getId,
-            "alias", 0), {
+            "alias", 0, true), {
           "sTitle" : "Status",
           "mData" : "status",
           "mRender" : function(data, type, full) {

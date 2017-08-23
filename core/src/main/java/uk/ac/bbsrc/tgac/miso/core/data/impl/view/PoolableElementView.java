@@ -95,6 +95,8 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private String creatorName;
 
+  private Long targetedSequencingId;
+
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
 
@@ -413,6 +415,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     if (getDilutionId() < t.getDilutionId()) return -1;
     if (getDilutionId() > t.getDilutionId()) return 1;
     return 0;
+  }
+
+  public Long getTargetedSequencingId() {
+    return targetedSequencingId;
+  }
+
+  public void setTargetedSequencingId(Long targetedSequencingId) {
+    this.targetedSequencingId = targetedSequencingId;
   }
 
 }

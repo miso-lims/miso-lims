@@ -204,6 +204,9 @@ void add_global_chart(
 
 std::string format(const illumina::interop::model::summary::metric_stat &stat,
                    const float scale = 1) {
+  if (std::isnan(stat.mean())) {
+    return "N/A";
+  }
   std::stringstream output;
   output << std::setprecision(2) << stat.mean() / scale << " ± "
          << stat.stddev() / scale;
@@ -378,12 +381,15 @@ int main(int argc, const char **argv) {
   illumina::interop::logic::summary::summarize_run_metrics(run, run_summary,
                                                            true);
 
-  result["imgCycle"] = (Json::Value::Int)length(
-      run_summary.cycle_state().extracted_cycle_range());
-  result["scoreCycle"] =
-      (Json::Value::Int)length(run_summary.cycle_state().qscored_cycle_range());
-  result["callCycle"] =
-      (Json::Value::Int)length(run_summary.cycle_state().called_cycle_range());
+  result["imgCycle"] = (Json::Value::Int)run_summary.cycle_state()
+                           .extracted_cycle_range()
+                           .last_cycle();
+  result["scoreCycle"] = (Json::Value::Int)run_summary.cycle_state()
+                             .qscored_cycle_range()
+                             .last_cycle();
+  result["callCycle"] = (Json::Value::Int)run_summary.cycle_state()
+                            .called_cycle_range()
+                            .last_cycle();
 
   /* If there's an extraction metric with a end date, use that, reformatted as a
    * "YYYY-mm-dd" string. There can be multiple extractions, so pick the last

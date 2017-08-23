@@ -69,7 +69,6 @@ import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -298,12 +297,12 @@ public class DashboardHelperService {
     try {
       Collection<Run> runs;
       if (!isStringEmptyOrNull(searchStr)) {
-        runs = new ArrayList<>(runService.list(0, 0, false, "id",
+        runs = new ArrayList<>(runService.list(0, 0, false, "startDate",
             PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
               // Discard errors
             })));
       } else {
-        runs = new ArrayList<>(runService.list(0, 50, false, "id"));
+        runs = new ArrayList<>(runService.list(0, 50, false, "startDate"));
       }
 
       StringBuilder b = new StringBuilder();

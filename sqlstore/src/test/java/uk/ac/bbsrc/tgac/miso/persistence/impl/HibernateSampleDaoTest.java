@@ -25,9 +25,9 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -114,12 +114,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     Sample retrieved = dao.get(id);
     assertEquals("sample name does not match", sampleName, retrieved.getName());
     assertEquals("did not update sample", sizeBefore, dao.listAll().size());
-  }
-
-  @Test
-  public void testListAllWithLimit() throws Exception {
-    Collection<Sample> samples = dao.listAllWithLimit(3);
-    assertEquals(3, samples.size());
   }
 
   @Test

@@ -1,9 +1,22 @@
+# 0.2.85
+
+Changes:
+
+ * order runs in home page widget by start date
+ * Replace library dilution table with a dialog box
+ * Delete notification server (_configuration change in miso.properties_)
+ * Only update completion date if run is marked as done
+
 # 0.2.84
 
 Changes:
 
  * Fix off-by-one error when creating new flow cells from run scanner
  * Switch to single column when run page is narrow
+
+Bad:
+
+ * Bugs in runscanner
 
 # 0.2.83
 

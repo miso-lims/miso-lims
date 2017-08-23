@@ -297,6 +297,8 @@ FOR EACH ROW
   END IF;
   END//
 
+DROP TRIGGER IF EXISTS RunChangePacBio//
+
 DROP TRIGGER IF EXISTS RunChangeLS454//
 CREATE TRIGGER RunChangeLS454 BEFORE UPDATE ON RunLS454
 FOR EACH ROW
@@ -1131,6 +1133,7 @@ AS SELECT
     d.lastUpdated AS lastModified,
     d.creationDate AS created,
     d.dilutionUserName AS creatorName,
+    d.targetedSequencingId AS targetedSequencingId,
     modUser.loginName AS lastModifierName,
     d.preMigrationId AS preMigrationId,
     l.libraryId AS libraryId,

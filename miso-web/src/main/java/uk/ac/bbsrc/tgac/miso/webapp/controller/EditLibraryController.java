@@ -642,6 +642,11 @@ public class EditLibraryController {
     model.put("libraryPools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
     model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatLog(log, p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
+    model.put("libraryDilutions", library.getLibraryDilutions().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode config = mapper.createObjectNode();
+    config.putPOJO("library", Dtos.asDto(library));
+    model.put("libraryDilutionsConfig", mapper.writeValueAsString(config));
 
     populateDesigns(model,
         LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
