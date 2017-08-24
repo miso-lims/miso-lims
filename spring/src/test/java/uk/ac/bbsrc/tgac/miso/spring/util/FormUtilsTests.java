@@ -43,6 +43,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -53,10 +54,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 public class FormUtilsTests {
@@ -64,7 +65,7 @@ public class FormUtilsTests {
   @Mock
   private LibraryService libraryService;
   @Mock
-  private LibraryQcStore libraryQcStore;
+  private QualityControlService qcService;
   @Mock
   private SampleService sampleService;
   @Mock
@@ -125,7 +126,7 @@ public class FormUtilsTests {
       User u = new UserImpl();
       u.setLoginName("testBulkImportUser");
       List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputOdsFile, u, sampleService, libraryService,
-          sampleQcStore, libraryQcStore, namingScheme, new MockFormTestIndexService());
+          qcService, namingScheme, new MockFormTestIndexService());
       assertFalse(samples.isEmpty());
     } finally {
       if (testSampleBulkInputOdsFile != null && testSampleBulkInputOdsFile.exists()) {
@@ -144,7 +145,7 @@ public class FormUtilsTests {
       User u = new UserImpl();
       u.setLoginName("testBulkImportUser");
       List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputXlsFile, u, sampleService, libraryService,
-          sampleQcStore, libraryQcStore, namingScheme, new MockFormTestIndexService());
+          qcService, namingScheme, new MockFormTestIndexService());
       assertFalse(samples.isEmpty());
     } finally {
       if (testSampleBulkInputXlsFile != null && testSampleBulkInputXlsFile.exists()) {
@@ -228,7 +229,7 @@ public class FormUtilsTests {
     qt.setDescription("Quantitation of DNA, RNA and protein, manufacturered by Invitrogen");
     qt.setUnits("ng/&#181;l");
     
-    Mockito.when(sampleQcStore.getSampleQcTypeByName(Mockito.anyString())).thenReturn(qt);
+    Mockito.when(qcService.getQcType(Mockito.eq(QcTarget.Sample), Mockito.anyString())).thenReturn(qt);
   }
 
   public void mockLibraryQcTypeByName() throws Exception {
@@ -238,7 +239,7 @@ public class FormUtilsTests {
     qt.setDescription("Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent");
     qt.setUnits("nM");
     
-    Mockito.when(libraryQcStore.getLibraryQcTypeByName(Mockito.anyString())).thenReturn(qt);
+    Mockito.when(qcService.getQcType(Mockito.eq(QcTarget.Library), Mockito.anyString())).thenReturn(qt);
   }
 
   public void mockLibrariesBySampleId() throws Exception {

@@ -15,14 +15,15 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolQCDao;
 
 public class HibernatePoolQcDaoTest extends AbstractDAOTest {
   
@@ -46,15 +47,15 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
   
   @Test
   public void testGet() throws IOException {
-    PoolQC qc = dao.get(1L);
+    PoolQC qc = (PoolQC) dao.get(1L);
     assertNotNull(qc);
     assertEquals(1L, qc.getId());
-    assertEquals("person", qc.getQcCreator());
+    assertEquals("admin", qc.getCreator().getLoginName());
     assertEquals(Double.valueOf(12.3D), qc.getResults());
     Calendar cal = Calendar.getInstance(); 
     cal.set(2016, 2, 18, 0, 0, 0);
     Calendar qcCal = Calendar.getInstance();
-    qcCal.setTime(qc.getQcDate());
+    qcCal.setTime(qc.getDate());
     assertEquals(cal.get(Calendar.YEAR), qcCal.get(Calendar.YEAR));
     assertEquals(cal.get(Calendar.MONTH), qcCal.get(Calendar.MONTH));
     assertEquals(cal.get(Calendar.DAY_OF_MONTH), qcCal.get(Calendar.DAY_OF_MONTH));
@@ -65,94 +66,48 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
     assertNull(dao.get(100L));
   }
   
-  @Test
-  public void testListAll() throws IOException {
-    assertEquals(3, dao.listAll().size());
-  }
   
-  @Test
-  public void testCount() throws IOException {
-    assertEquals(3, dao.count());
-  }
-  
-  @Test
-  public void testListByPoolId() throws IOException {
-    assertEquals(2, dao.listByPoolId(1L).size());
-  }
-  
-  @Test
-  public void testListAllPoolQcTypes() throws IOException {
-    assertEquals(4, dao.listAllPoolQcTypes().size());
-  }
-  
-  @Test
-  public void testGetPoolQcTypeById() throws IOException {
-    assertNotNull(dao.getPoolQcTypeById(8L));
-  }
-  
-  @Test
-  public void testGetPoolQcTypeByIdNone() throws IOException {
-    assertNull(dao.getPoolQcTypeById(100L));
-  }
-  
-  @Test
-  public void testGetPoolQcTypeByName() throws IOException {
-    assertNotNull(dao.getPoolQcTypeByName("poolQcType1"));
-  }
-  
-  @Test
-  public void testGetPoolQcTypeByNameNone() throws IOException {
-    assertNull(dao.getPoolQcTypeByName("poolQcType100"));
-  }
-  
-  @Test
-  public void testGetPoolQcTypeByNameNull() throws IOException {
-    assertNull(dao.getPoolQcTypeByName(null));
-  }
-  
-  @Test
-  public void testRemove() throws IOException {
-    PoolQC qc = dao.get(1L);
-    assertNotNull(qc);
-    assertTrue(dao.remove(qc));
-    assertNull(dao.get(1L));
-  }
   
   @Test
   public void testSaveNew() throws IOException, MalformedPoolException {
     long autoIncrementId = nextAutoIncrementId;
-    PoolQC qc = new PoolQCImpl();
+    PoolQC qc = new PoolQC();
     Pool pool = new PoolImpl();
     pool.setId(1L);
     qc.setPool(pool);
-    qc.setQcCreator("me");
-    qc.setQcDate(new Date());
+    User mockUser = new UserImpl();
+    mockUser.setUserId(1L);
+    qc.setCreator(mockUser);
+    qc.setDate(new Date());
     QcType type = new QcType();
     type.setQcTypeId(8L);
-    qc.setQcType(type);
+    qc.setType(type);
     assertNull(dao.get(autoIncrementId));
     assertEquals(autoIncrementId, dao.save(qc));
-    PoolQC saved = dao.get(autoIncrementId);
+    PoolQC saved = (PoolQC) dao.get(autoIncrementId);
     nextAutoIncrementId++;
-    assertEquals(qc.getQcCreator(), saved.getQcCreator());
-    assertEquals(qc.getQcType().getQcTypeId(), saved.getQcType().getQcTypeId());
+    assertEquals(qc.getCreator(), saved.getCreator());
+    assertEquals(qc.getType().getQcTypeId(), saved.getType().getQcTypeId());
   }
   
   @Test
   public void testSaveUpdate() throws IOException, MalformedPoolException {
-    PoolQC qc = dao.get(1L);
+    PoolQC qc = (PoolQC) dao.get(1L);
     assertNotNull(qc);
-    qc.setQcCreator("me");
+    User mockUser = new UserImpl();
+    mockUser.setUserId(1L);
+
+    qc.setCreator(mockUser);
     qc.setResults(99.99);
     Pool pool = new PoolImpl();
     pool.setId(1L);
     qc.setPool(pool);
     QcType type = new QcType();
     type.setQcTypeId(101L);
-    qc.setQcType(type);
+    qc.setType(type);
     assertEquals(1L, dao.save(qc));
-    PoolQC saved = dao.get(1L);
-    assertEquals(qc.getQcCreator(), saved.getQcCreator());
+    PoolQC saved = (PoolQC) dao.get(1L);
+    assertEquals(qc.getCreator(), saved.getCreator());
     assertEquals(qc.getResults(), saved.getResults());
   }
   

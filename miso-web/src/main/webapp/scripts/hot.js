@@ -370,7 +370,6 @@ var HotUtils = {
         }
         table.sort(sortColIndex);
       }
-      ;
       var button = document.createElement('input');
       button.type = 'button';
       button.id = 'sort' + sortOption.sortTarget;
@@ -811,6 +810,42 @@ var HotUtils = {
     };
   },
 
+  makeQcActions : function(qcTarget) {
+    return [
+        null,
+        {
+          name : 'Add QCs',
+          action : function(items) {
+            Utils
+                .showDialog(
+                    'Add QCs',
+                    'Add',
+                    [ {
+                      property : 'copies',
+                      type : 'int',
+                      label : 'QCs per ' + qcTarget,
+                      value : 1
+                    }, ],
+                    function(result) {
+                      window.location = window.location.origin + '/miso/qc/bulk/addFrom/' + qcTarget + '?' + jQuery
+                          .param({
+                            entityIds : items.map(Utils.array.getId).join(','),
+                            copies : result.copies
+                          
+                          });
+                    });
+          }
+        },
+        {
+          name : 'Edit QCs',
+          action : function(items) {
+            window.location = window.location.origin + '/miso/qc/bulk/editFrom/' + qcTarget + '?' + jQuery
+                .param({
+                  entityIds : items.map(Utils.array.getId).join(',')
+                });
+          }
+        }, ];
+  },
 };
 
 HotTarget = {};

@@ -48,8 +48,6 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -150,28 +148,6 @@ public class LibraryRestController extends RestController {
       throw new RestException("No such library.", Status.NOT_FOUND);
     }
     library = Dtos.to(libraryDto);
-    library.setId(id);
-    if (libraryDto.getQcQubit() != null) {
-      LibraryQC qc = new LibraryQCImpl();
-      qc.setQcType(libraryService.getLibraryQcTypeByName("Qubit"));
-      if (libraryDto.getQcQubit() == null) throw new IllegalArgumentException("Cannot create QC with null results");
-      qc.setResults(Double.valueOf(libraryDto.getQcQubit()));
-      libraryService.addQc(library, qc);
-    }
-    if (libraryDto.getQcTapeStation() != null) {
-      LibraryQC qc = new LibraryQCImpl();
-      qc.setQcType(libraryService.getLibraryQcTypeByName("Tape Station"));
-      if (libraryDto.getQcTapeStation() == null) throw new IllegalArgumentException("Cannot create QC with null results");
-      qc.setResults(Double.valueOf(libraryDto.getQcTapeStation()));
-      libraryService.addQc(library, qc);
-    }
-    if (libraryDto.getQcQPcr() != null) {
-      LibraryQC qc = new LibraryQCImpl();
-      qc.setQcType(libraryService.getLibraryQcTypeByName("qPCR"));
-      if (libraryDto.getQcQPcr() == null) throw new IllegalArgumentException("Cannot create QC with null results");
-      qc.setResults(Double.valueOf(libraryDto.getQcQPcr()));
-      libraryService.addQc(library, qc);
-    }
     libraryService.update(library);
     return getLibraryById(id);
   }

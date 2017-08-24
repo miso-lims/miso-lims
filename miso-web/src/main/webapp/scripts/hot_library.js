@@ -404,13 +404,7 @@ HotTarget.library = (function() {
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
           HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume,
               'volume', false),
-          HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false),
-          HotUtils.makeColumnForFloat('New Qubit (ng/&#181;l)', !create,
-              'qcQubit', false),
-          HotUtils.makeColumnForFloat('New TapeStation (bp)', !create,
-              'qcTapeStation', false),
-          HotUtils.makeColumnForFloat('New qPCR (mol/&#181;l)', !create,
-              'qcQPcr', false), ];
+          HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), ];
     },
     
     bulkActions : [
@@ -431,7 +425,7 @@ HotTarget.library = (function() {
                   ids : items.map(Utils.array.getId).join(',')
                 });
           }
-        }, HotUtils.printAction('library'), ],
+        }, HotUtils.printAction('library'), ].concat(HotUtils.makeQcActions("Library")),
   
   };
 })();

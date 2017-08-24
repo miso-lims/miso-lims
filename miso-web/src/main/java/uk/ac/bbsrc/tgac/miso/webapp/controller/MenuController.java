@@ -79,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
@@ -147,6 +148,8 @@ public class MenuController implements ServletContextAware {
   private TargetedSequencingService targetedSequencingService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private QualityControlService qcService;
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
 
@@ -306,8 +309,7 @@ public class MenuController implements ServletContextAware {
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);
     createArray(mapper, baseUri, node, "indexFamilies", indexFamilies, Dtos::asDto);
-    createArray(mapper, baseUri, node, "sampleQcTypes", sampleService.listSampleQcTypes(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "libraryQcTypes", libraryService.listLibraryQcTypes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");

@@ -679,9 +679,9 @@ public class EditSampleController {
 
         model.put("sampleLibraries", sample.getLibraries().stream().map(Dtos::asDto).collect(Collectors.toList()));
         Set<Pool> pools = sample.getLibraries().stream()
-            .flatMap(WhineyFunction.flatLog(log, library -> poolService.listByLibraryId(library.getId())))
+            .flatMap(WhineyFunction.flatRethrow(library -> poolService.listByLibraryId(library.getId())))
             .distinct().collect(Collectors.toSet());
-        List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatLog(log, pool -> runService.listByPoolId(pool.getId())))
+        List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
             .map(Dtos::asDto)
             .collect(Collectors.toList());
         model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));

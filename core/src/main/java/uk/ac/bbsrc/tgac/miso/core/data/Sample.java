@@ -48,7 +48,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.0.2
  */
 public interface Sample
-    extends SecurableByProfile, Locatable, Comparable<Sample>, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable {
+    extends SecurableByProfile, Locatable, Comparable<Sample>, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable,
+    QualityControllable<SampleQC> {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
@@ -188,14 +189,6 @@ public interface Sample
   public Collection<Library> getLibraries();
 
   /**
-   * Registers that a SampleQC has been carried out on this Library
-   * 
-   * @param sampleQc
-   *          of type SampleQC
-   */
-  public void addQc(SampleQC sampleQc);
-
-  /**
    * Returns the sampleType of this Sample object.
    * 
    * @return String sampleType.
@@ -240,13 +233,6 @@ public interface Sample
    *          qcPassed.
    */
   public void setQcPassed(Boolean qcPassed);
-
-  /**
-   * Returns the sampleQCs carried out on this Sample object.
-   * 
-   * @return Collection<SampleQC> sampleQCs.
-   */
-  public Collection<SampleQC> getSampleQCs();
 
   /**
    * Registers a collection of QCs to this Sample object.

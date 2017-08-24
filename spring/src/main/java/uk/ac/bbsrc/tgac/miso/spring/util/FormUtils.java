@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -69,14 +69,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -87,10 +86,9 @@ import uk.ac.bbsrc.tgac.miso.core.exception.DeliveryFormException;
 import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
@@ -593,9 +591,8 @@ public class FormUtils {
     }
   }
 
-  // TODO: use Sample QC and Library QC Services instead of Stores (when they exist)
   private static List<Sample> processSampleInputODS(OdfSpreadsheetDocument oDoc, User u, SampleService sampleService,
-      LibraryService libraryService, SampleQcStore sampleQcStore, LibraryQcStore libraryQcStore, NamingScheme namingScheme,
+      LibraryService libraryService, QualityControlService qcService, NamingScheme namingScheme,
       IndexService indexService) throws Exception {
     List<Sample> samples = new ArrayList<>();
     OdfTable oTable = oDoc.getTableList().get(0);
@@ -706,12 +703,12 @@ public class FormUtils {
 
           // add pool, if any
           processPool(poolNumberCell, poolConvertedMolarityCell, pools);
-          processSampleQC(sampleQcCell, s, u, sampleQcStore);
+          processSampleQC(sampleQcCell, s, u, qcService);
 
           Library library = processLibrary(libraryQcCell, libraryDescriptionCell, libraryQcPassFailCell, s, pt, lt, ls, lst, paired,
               namingScheme);
           if (library != null) {
-            processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, libraryQcStore);
+            processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, qcService);
             processIndices(indexFamilyCell, indicesCell, library, indexService);
             processDilutions(dilutionMolarityCell, library, pools.get(poolNumberCell), u);
             log.info("Added library: " + library.toString());
@@ -727,7 +724,7 @@ public class FormUtils {
 
   // TODO: use Sample QC and Library QC Services instead of Stores (when they exist)
   private static List<Sample> processSampleInputXLSX(XSSFWorkbook wb, User u, SampleService sampleService, LibraryService libraryService,
-      SampleQcStore sampleQcStore, LibraryQcStore libraryQcStore, NamingScheme namingScheme, IndexService indexService) throws Exception {
+      QualityControlService qcService, NamingScheme namingScheme, IndexService indexService) throws Exception {
     List<Sample> samples = new ArrayList<>();
     XSSFSheet sheet = wb.getSheetAt(0);
     int rows = sheet.getPhysicalNumberOfRows();
@@ -841,12 +838,12 @@ public class FormUtils {
 
         // add pool, if any
         processPool(poolNumberCell, poolConvertedMolarityCell, pools);
-        processSampleQC(sampleQcCell, s, u, sampleQcStore);
+        processSampleQC(sampleQcCell, s, u, qcService);
 
         Library library = processLibrary(libraryQcCell, libraryDescriptionCell, libraryQcPassFailCell, s, pt, lt, ls, lst, paired,
             namingScheme);
         if (library != null) {
-          processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, libraryQcStore);
+          processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, qcService);
           processIndices(indexKitCell, indexTagsCell, library, indexService);
           processDilutions(dilutionMolarityCell, library, pools.get(poolNumberCell), u);
           log.info("Added library: " + library.toString());
@@ -883,18 +880,18 @@ public class FormUtils {
     }
   }
 
-  private static void processSampleQC(String sampleQc, Sample s, User u, SampleQcStore sampleQcStore) throws Exception {
+  private static void processSampleQC(String sampleQc, Sample s, User u, QualityControlService qcService) throws Exception {
     // process sample QC
     if (!isStringEmptyOrNull(sampleQc)) {
       try {
-        SampleQC sqc = new SampleQCImpl();
+        SampleQC sqc = new SampleQC();
         sqc.setSample(s);
         sqc.setResults(Double.valueOf(sampleQc));
-        sqc.setQcCreator(u.getLoginName());
-        sqc.setQcDate(new Date());
-        sqc.setQcType(sampleQcStore.getSampleQcTypeByName("QuBit"));
-        if (!s.getSampleQCs().contains(sqc)) {
-          s.addQc(sqc);
+        sqc.setCreator(u);
+        sqc.setDate(new Date());
+        sqc.setType(qcService.getQcType(QcTarget.Sample, "QuBit"));
+        if (s.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == sqc.getType().getQcTypeId())) {
+          qcService.createQC(sqc);
           log.info("Added sample QC: " + sqc.toString());
         }
       } catch (NumberFormatException nfe) {
@@ -937,7 +934,7 @@ public class FormUtils {
   }
 
   private static void processLibraryQC(String libraryQc, String libraryQcMolarity, String libraryQcInsertSize, Library library, User u,
-      LibraryQcStore libraryQcStore) throws Exception {
+      QualityControlService qcService) throws Exception {
     if (!isStringEmptyOrNull(libraryQcMolarity)) {
       int insertSize = 0;
       try {
@@ -955,29 +952,29 @@ public class FormUtils {
       }
 
       try {
-        LibraryQC lqc = new LibraryQCImpl();
+        LibraryQC lqc = new LibraryQC();
         lqc.setLibrary(library);
         lqc.setResults(Double.valueOf(libraryQcMolarity));
-        lqc.setQcCreator(u.getLoginName());
-        lqc.setQcDate(new Date());
-        QcType lqct = libraryQcStore.getLibraryQcTypeByName(libraryQc);
+        lqc.setCreator(u);
+        lqc.setDate(new Date());
+        QcType lqct = qcService.getQcType(QcTarget.Library, libraryQc);
         if (lqct != null) {
-          lqc.setQcType(libraryQcStore.getLibraryQcTypeByName(libraryQc));
-          if (!library.getLibraryQCs().contains(lqc)) {
-            library.addQc(lqc);
+          lqc.setType(qcService.getQcType(QcTarget.Library, libraryQc));
+          if (library.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == lqc.getType().getQcTypeId())) {
+            qcService.createQC(lqc);
             log.info("Added library QC: " + lqc.toString());
           }
         } else {
           throw new InputFormException("No such Library QC type '" + libraryQc + "'");
         }
 
-        LibraryQC lis = new LibraryQCImpl();
+        LibraryQC lis = new LibraryQC();
         lis.setLibrary(library);
         lis.setResults((double) insertSize);
-        lis.setQcCreator(u.getLoginName());
-        lis.setQcDate(new Date());
-        QcType lisqct = libraryQcStore.getLibraryQcTypeByName("Insert Size");
-        lis.setQcType(lisqct);
+        lis.setCreator(u);
+        lis.setDate(new Date());
+        QcType lisqct = qcService.getQcType(QcTarget.Library, "Insert Size");
+        lis.setType(lisqct);
         if (lisqct == null) {
           throw new InputFormException("No such Library QC type 'Insert Size'");
         }
@@ -1036,13 +1033,13 @@ public class FormUtils {
   }
 
   public static List<Sample> importSampleInputSpreadsheet(File inPath, User u, SampleService sampleService, LibraryService libraryService,
-      SampleQcStore sampleQcStore, LibraryQcStore libraryQcStore, NamingScheme namingScheme, IndexService indexService) throws Exception {
+      QualityControlService qcService, NamingScheme namingScheme, IndexService indexService) throws Exception {
     if (inPath.getName().endsWith(".xlsx")) {
       XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inPath));
-      return processSampleInputXLSX(wb, u, sampleService, libraryService, sampleQcStore, libraryQcStore, namingScheme, indexService);
+      return processSampleInputXLSX(wb, u, sampleService, libraryService, qcService, namingScheme, indexService);
     } else if (inPath.getName().endsWith(".ods")) {
       OdfSpreadsheetDocument oDoc = (OdfSpreadsheetDocument) OdfDocument.loadDocument(inPath);
-      return processSampleInputODS(oDoc, u, sampleService, libraryService, sampleQcStore, libraryQcStore, namingScheme, indexService);
+      return processSampleInputODS(oDoc, u, sampleService, libraryService, qcService, namingScheme, indexService);
     } else {
       throw new UnsupportedOperationException("Cannot process bulk input files other than xls, xlsx, and ods.");
     }

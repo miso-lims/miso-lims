@@ -181,7 +181,7 @@ public class PrinterRestController extends RestController {
 
     return COMMA.splitAsStream(ids)//
         .map(Long::parseLong)//
-        .map(WhineyFunction.log(log, fetcher))//
+        .map(WhineyFunction.rethrow(fetcher))//
         .filter(barcodable -> !LimsUtils.isStringBlankOrNull(barcodable.getIdentificationBarcode()))//
         .filter(printer::printBarcode)//
         .count();

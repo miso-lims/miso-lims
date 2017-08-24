@@ -1,11 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
+
 public class QcTypeDto {
 
   private Long id;
   private String name;
   private String description;
-  private String qcTarget;
+  @Enumerated(EnumType.STRING)
+  private QcTarget qcTarget;
   private String units;
   private Integer precisionAfterDecimal;
   private boolean archived;
@@ -34,11 +40,11 @@ public class QcTypeDto {
     this.description = description;
   }
 
-  public String getQcTarget() {
+  public QcTarget getQcTarget() {
     return qcTarget;
   }
 
-  public void setQcTarget(String qcTarget) {
+  public void setQcTarget(QcTarget qcTarget) {
     this.qcTarget = qcTarget;
   }
 

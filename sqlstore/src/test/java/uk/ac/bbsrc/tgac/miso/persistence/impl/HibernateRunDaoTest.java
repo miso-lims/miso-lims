@@ -54,7 +54,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -344,7 +343,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     Mockito.when(sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(Matchers.anyLong())).thenReturn(mockContainers);
 
     List<RunQC> mockQcs = new ArrayList<>();
-    mockQcs.add(Mockito.mock(RunQCImpl.class));
+    mockQcs.add(Mockito.mock(RunQC.class));
     Mockito.when(runQcDAO.listByRunId(Matchers.anyLong())).thenReturn(mockQcs);
   }
 

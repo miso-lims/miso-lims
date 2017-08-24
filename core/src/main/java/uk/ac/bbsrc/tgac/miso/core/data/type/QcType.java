@@ -26,10 +26,14 @@ package uk.ac.bbsrc.tgac.miso.core.data.type;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 
 /**
  * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC
@@ -53,7 +57,8 @@ public class QcType implements Comparable<QcType>, Serializable {
   private String name;
   private String description;
   /** Refers to the entity to which this QcType can be applied (e.g. Sample, Pool, Run) */
-  private String qcTarget;
+  @Enumerated(EnumType.STRING)
+  private QcTarget qcTarget;
   private String units;
   private Integer precisionAfterDecimal;
   private boolean archived;
@@ -120,7 +125,7 @@ public class QcType implements Comparable<QcType>, Serializable {
    * 
    * @return String qcTarget.
    */
-  public String getQcTarget() {
+  public QcTarget getQcTarget() {
     return qcTarget;
   }
 
@@ -130,7 +135,7 @@ public class QcType implements Comparable<QcType>, Serializable {
    * @param qcTarget
    *          qcTarget.
    */
-  public void setQcTarget(String qcTarget) {
+  public void setQcTarget(QcTarget qcTarget) {
     this.qcTarget = qcTarget;
   }
 

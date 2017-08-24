@@ -43,7 +43,7 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
 
     @Override
     protected Stream<Model> load(List<Long> modelIds) throws IOException {
-      return modelIds.stream().map(WhineyFunction.log(log, AbstractInstituteDefaultsController.this::get)).sorted(new AliasComparator<>());
+      return modelIds.stream().map(WhineyFunction.rethrow(AbstractInstituteDefaultsController.this::get)).sorted(new AliasComparator<>());
     }
 
     @Override

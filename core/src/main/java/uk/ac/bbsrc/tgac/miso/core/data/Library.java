@@ -51,7 +51,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.0.2
  */
 public interface Library
-    extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable {
+    extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable,
+    QualityControllable<LibraryQC> {
 
   /** Field UNSAVED_ID */
   public static final long UNSAVED_ID = 0L;
@@ -135,21 +136,6 @@ public interface Library
    * @return Collection<Note> notes.
    */
   public Collection<Note> getNotes();
-
-  /**
-   * Registers that a LibraryQC has been carried out on this Library
-   * 
-   * @param libraryQC
-   *          of type LibraryQC
-   */
-  public void addQc(LibraryQC libraryQC);
-
-  /**
-   * Returns the libraryQCs of this Library object.
-   * 
-   * @return Collection<LibraryQC> libraryQCs.
-   */
-  public Collection<LibraryQC> getLibraryQCs();
 
   /**
    * Registers that a LibraryDilution has been carried out using this Library

@@ -142,7 +142,7 @@ ListUtils = (function() {
       }
       
       staticActions.concat(bulkActions.map(function(bulkAction) {
-        return {
+        return bulkAction ? {
           name : bulkAction.name,
           handler : function() {
             if (ListState[elementId].selected.length == 0) {
@@ -151,7 +151,7 @@ ListUtils = (function() {
             }
             bulkAction.action(ListState[elementId].selected);
           }
-        };
+        } : null;
       })).forEach(function(buttonDescription) {
         var button;
         if (buttonDescription) {

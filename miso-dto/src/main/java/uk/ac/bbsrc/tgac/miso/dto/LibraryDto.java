@@ -45,11 +45,8 @@ public class LibraryDto implements WritableUrls {
   private String url;
   private String volume;
   private Long boxId;
-  private List<LibraryQcDto> qcs;
+  private List<QcDto> qcs;
   private Integer dnaSize;
-  private String qcQubit;
-  private String qcTapeStation;
-  private String qcQPcr;
 
   public String getAlias() {
     return alias;
@@ -163,7 +160,7 @@ public class LibraryDto implements WritableUrls {
     return qcPassed;
   }
 
-  public List<LibraryQcDto> getQcs() {
+  public List<QcDto> getQcs() {
     return qcs;
   }
 
@@ -288,7 +285,7 @@ public class LibraryDto implements WritableUrls {
     this.qcPassed = qcPassed;
   }
 
-  public void setQcs(List<LibraryQcDto> qcs) {
+  public void setQcs(List<QcDto> qcs) {
     this.qcs = qcs;
   }
 
@@ -311,29 +308,5 @@ public class LibraryDto implements WritableUrls {
   @Override
   public void writeUrls(URI baseUri) {
     setUrl(WritableUrls.buildUriPath(baseUri, "/rest/library/{id}", getId()));
-  }
-
-  public String getQcQubit() {
-    return qcQubit;
-  }
-
-  public void setQcQubit(String qcQubit) {
-    this.qcQubit = qcQubit;
-  }
-
-  public String getQcTapeStation() {
-    return qcTapeStation;
-  }
-
-  public void setQcTapeStation(String qcTapeStation) {
-    this.qcTapeStation = qcTapeStation;
-  }
-
-  public String getQcQPcr() {
-    return qcQPcr;
-  }
-
-  public void setQcQPcr(String qcQPcr) {
-    this.qcQPcr = qcQPcr;
   }
 }

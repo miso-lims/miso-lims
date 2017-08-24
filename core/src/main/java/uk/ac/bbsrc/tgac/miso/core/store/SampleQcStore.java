@@ -23,53 +23,5 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import java.io.IOException;
-import java.util.Collection;
-
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-
-/**
- * Defines a DAO interface for storing SampleQCs
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
-public interface SampleQcStore extends Store<SampleQC>, Remover<SampleQC> {
-  /**
-   * List all SampleQCs performed on a Sample given a parent Sample ID
-   * 
-   * @param sampleId
-   *          of type long
-   * @return Collection<SampleQC>
-   * @throws IOException
-   *           when
-   */
-  Collection<SampleQC> listBySampleId(long sampleId) throws IOException;
-
-  /**
-   * Get the QcType descriptor for a given type ID
-   * 
-   * @param qcTypeId
-   * @return the QcType with the given ID, or null if none exists
-   * @throws IOException
-   */
-  QcType getSampleQcTypeById(long qcTypeId) throws IOException;
-
-  /**
-   * Get the QcType descriptor for a given type name
-   * 
-   * @param qcName
-   * @return the QcType with the given name, or null if none exists
-   * @throws IOException
-   */
-  QcType getSampleQcTypeByName(String qcName) throws IOException;
-
-  /**
-   * Get all QcType descriptors for {@link uk.ac.bbsrc.tgac.miso.core.data.Sample} objects
-   * 
-   * @return Collection<QcType>
-   * @throws IOException
-   */
-  Collection<QcType> listAllSampleQcTypes() throws IOException;
+public interface SampleQcStore extends QcTargetStore {
 }

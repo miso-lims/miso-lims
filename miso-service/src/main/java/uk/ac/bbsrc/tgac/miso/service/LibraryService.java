@@ -9,12 +9,10 @@ import java.util.Map;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface LibraryService extends PaginatedDataSource<Library> {
@@ -78,17 +76,5 @@ public interface LibraryService extends PaginatedDataSource<Library> {
   void addNote(Library library, Note note) throws IOException;
 
   void deleteNote(Library library, Long noteId) throws IOException;
-
-  Collection<QcType> listLibraryQcTypes() throws IOException;
-
-  void addQc(Library library, LibraryQC qc) throws IOException;
-
-  void deleteQc(Library library, Long qcId) throws IOException;
-
-  QcType getLibraryQcType(long qcTypeId) throws IOException;
-
-  QcType getLibraryQcTypeByName(String qcTypeName) throws IOException;
-
-  LibraryQC getLibraryQC(long qcId) throws IOException;
 
 }

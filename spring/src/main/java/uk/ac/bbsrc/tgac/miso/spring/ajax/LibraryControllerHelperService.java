@@ -50,17 +50,13 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -241,137 +237,6 @@ public class LibraryControllerHelperService {
     return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
   }
 
-  public JSONObject getLibraryQcTypes(HttpSession session, JSONObject json) {
-    try {
-      StringBuilder sb = new StringBuilder();
-      Collection<QcType> types = libraryService.listLibraryQcTypes();
-      for (QcType s : types) {
-        sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
-      }
-      Map<String, Object> map = new HashMap<>();
-      map.put("types", sb.toString());
-      return JSONUtils.JSONObjectResponse(map);
-    } catch (IOException e) {
-      log.error("cannot list all library QC types", e);
-    }
-    return JSONUtils.SimpleJSONError("Cannot list all Library QC Types");
-  }
-
-  public JSONObject addLibraryQC(HttpSession session, JSONObject json) {
-    try {
-      for (Object k : json.keySet()) {
-        String key = (String) k;
-        if (isStringEmptyOrNull(json.getString(key))) {
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
-        }
-      }
-      if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
-        Long libraryId = Long.parseLong(json.getString("libraryId"));
-        Library library = libraryService.get(libraryId);
-        LibraryQC newQc = new LibraryQCImpl();
-        newQc.setQcDate(parseDate(json.getString("qcDate")));
-        newQc.setQcType(libraryService.getLibraryQcType(json.getLong("qcType")));
-        newQc.setResults(Double.parseDouble(json.getString("results")));
-        libraryService.addQc(library, newQc);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th></tr>");
-        for (LibraryQC qc : library.getLibraryQCs()) {
-          sb.append("<tr>");
-          sb.append("<td>" + qc.getQcCreator() + "</td>");
-          sb.append("<td>" + formatDate(qc.getQcDate()) + "</td>");
-          sb.append("<td>" + qc.getQcType().getName() + "</td>");
-          sb.append("<td>" + LimsUtils.round(qc.getResults(), 2) + " " + qc.getQcType().getUnits() + "</td>");
-          sb.append("</tr>");
-        }
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Library QC to this Library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Library QC to this Library: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONError("Cannot add LibraryQC");
-  }
-
-  public JSONObject bulkAddLibraryQCs(HttpSession session, JSONObject json) {
-    try {
-      JSONArray qcs = JSONArray.fromObject(json.getString("qcs"));
-      // validate
-      boolean ok = true;
-      for (JSONObject qc : (Iterable<JSONObject>) qcs) {
-        String qcType = qc.getString("qcType");
-        String results = qc.getString("results");
-        String qcCreator = qc.getString("qcCreator");
-        String qcDate = qc.getString("qcDate");
-
-        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator) || isStringEmptyOrNull(qcDate)) {
-          ok = false;
-        }
-      }
-
-      // persist
-      if (ok) {
-        Map<String, Object> map = new HashMap<>();
-        JSONArray a = new JSONArray();
-        JSONArray errors = new JSONArray();
-        for (JSONObject qc : (Iterable<JSONObject>) qcs) {
-          JSONObject j = addLibraryQC(session, qc);
-          j.put("libraryId", qc.getString("libraryId"));
-          if (j.has("error")) {
-            errors.add(j);
-          } else {
-            a.add(j);
-          }
-        }
-        map.put("saved", a);
-        if (!errors.isEmpty()) {
-          map.put("errors", errors);
-        }
-        return JSONUtils.JSONObjectResponse(map);
-      } else {
-        log.error("Failed to add Library QC to this Library: one of the required fields of the selected QCs is missing or invalid");
-        return JSONUtils.SimpleJSONError(
-            "Failed to add Library QC to this Library: one of the required fields of the selected QCs is missing or invalid");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Library QC to this Library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Library QC to this Library: " + e.getMessage());
-    }
-  }
-
-  public JSONObject changeLibraryQCRow(HttpSession session, JSONObject json) {
-    try {
-      JSONObject response = new JSONObject();
-      Long qcId = Long.parseLong(json.getString("qcId"));
-      LibraryQC libraryQc = libraryService.getLibraryQC(qcId);
-      Long libraryId = Long.parseLong(json.getString("libraryId"));
-
-      response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "'/>");
-      response.put("edit",
-          "<a href='javascript:void(0);' onclick='Library.qc.editLibraryQC(\"" + qcId + "\",\"" + libraryId + "\");'>Save</a>");
-      return response;
-    } catch (Exception e) {
-      log.error("Failed to display library QC of this library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to display library QC of this library: " + e.getMessage());
-    }
-  }
-
-  public JSONObject editLibraryQC(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
-        Long qcId = Long.parseLong(json.getString("qcId"));
-        LibraryQC libraryQc = libraryService.getLibraryQC(qcId);
-
-        libraryQc.setResults(Double.parseDouble(json.getString("result")));
-        libraryService.addQc(libraryService.get(libraryQc.getLibrary().getId()), libraryQc);
-
-      }
-      return JSONUtils.SimpleJSONResponse("done");
-    } catch (Exception e) {
-      log.error("Failed to add library QC to this library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add library QC to this library: " + e.getMessage());
-    }
-  }
 
   public JSONObject deleteLibrary(HttpSession session, JSONObject json) {
     if (json.has("libraryId")) {

@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
@@ -59,13 +60,13 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 
@@ -162,17 +163,17 @@ public class ValueTypeLookupTest {
     Mockito.when(iDao.list(0, 0, true, "id")).thenReturn(inds);
     Mockito.when(mgr.getIndexDao()).thenReturn(iDao);
 
-    HibernateSampleQcDao sqcDao = Mockito.mock(HibernateSampleQcDao.class);
+    QualityControlService qcService = Mockito.mock(QualityControlService.class);
     List<QcType> sqcs = new ArrayList<>();
     sqcs.add(makeQcType(VALID_LONG, VALID_STRING));
-    Mockito.when(sqcDao.listAllSampleQcTypes()).thenReturn(sqcs);
-    Mockito.when(mgr.getSampleQcDao()).thenReturn(sqcDao);
+    Mockito.when(qcService.listQcTypes(Mockito.eq(QcTarget.Sample))).thenReturn(sqcs);
 
     HibernateLibraryQcDao lqcDao = Mockito.mock(HibernateLibraryQcDao.class);
     List<QcType> lqcs = new ArrayList<>();
     lqcs.add(makeQcType(VALID_LONG, VALID_STRING));
-    Mockito.when(lqcDao.listAllLibraryQcTypes()).thenReturn(lqcs);
-    Mockito.when(mgr.getLibraryQcDao()).thenReturn(lqcDao);
+    Mockito.when(qcService.listQcTypes(Mockito.eq(QcTarget.Library))).thenReturn(lqcs);
+
+    Mockito.when(mgr.getQualityControlService()).thenReturn(qcService);
 
     HibernateSequencerReferenceDao seqRefDao = Mockito.mock(HibernateSequencerReferenceDao.class);
     List<SequencerReference> seqRefs = new ArrayList<>();

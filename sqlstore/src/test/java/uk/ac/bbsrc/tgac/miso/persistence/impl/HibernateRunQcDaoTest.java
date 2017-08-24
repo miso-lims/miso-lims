@@ -20,13 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.datetime.DateFormatter;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -56,8 +54,8 @@ public class HibernateRunQcDaoTest extends AbstractDAOTest {
 
   @Test
   public void testSave() throws Exception {
-    RunQC runQC = new RunQCImpl();
-    runQC.setId(AbstractQC.UNSAVED_ID);
+    RunQC runQC = new RunQC();
+    runQC.setId(RunQC.UNSAVED_ID);
     runQC.setQcCreator("creator");
     runQC.setDoNotProcess(true);
     runQC.setInformation("information");

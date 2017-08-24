@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 
@@ -36,7 +36,7 @@ public class HibernateRunQcDao implements RunQcStore {
   @Override
   public long save(RunQC runQc) throws IOException {
     long id;
-    if (runQc.getId() == RunQCImpl.UNSAVED_ID) {
+    if (runQc.getId() == RunQC.UNSAVED_ID) {
       id = (long) currentSession().save(runQc);
     } else {
       currentSession().update(runQc);
@@ -47,12 +47,12 @@ public class HibernateRunQcDao implements RunQcStore {
 
   @Override
   public RunQC get(long id) throws IOException {
-    return (RunQC) currentSession().get(RunQCImpl.class, id);
+    return (RunQC) currentSession().get(RunQC.class, id);
   }
 
   @Override
   public Collection<RunQC> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunQCImpl.class);
+    Criteria criteria = currentSession().createCriteria(RunQC.class);
     @SuppressWarnings("unchecked")
     List<RunQC> records = criteria.list();
     return records;
@@ -60,7 +60,7 @@ public class HibernateRunQcDao implements RunQcStore {
 
   @Override
   public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunQCImpl.class);
+    Criteria criteria = currentSession().createCriteria(RunQC.class);
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
   }
 
@@ -78,7 +78,7 @@ public class HibernateRunQcDao implements RunQcStore {
 
   @Override
   public Collection<RunQC> listByRunId(long runId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(RunQCImpl.class);
+    Criteria criteria = currentSession().createCriteria(RunQC.class);
     criteria.add(Restrictions.eq("run.id", runId));
     @SuppressWarnings("unchecked")
     Collection<RunQC> records = criteria.list();
@@ -88,7 +88,7 @@ public class HibernateRunQcDao implements RunQcStore {
   @Override
   public QcType getRunQcTypeById(long qcTypeId) throws IOException {
     Criteria criteria = currentSession().createCriteria(QcType.class);
-    criteria.add(Restrictions.eq("qcTarget", "Run"));
+    criteria.add(Restrictions.eq("qcTarget", QcTarget.Run));
     criteria.add(Restrictions.eq("id", qcTypeId));
     return (QcType) criteria.uniqueResult();
   }
@@ -96,7 +96,7 @@ public class HibernateRunQcDao implements RunQcStore {
   @Override
   public QcType getRunQcTypeByName(String qcName) throws IOException {
     Criteria criteria = currentSession().createCriteria(QcType.class);
-    criteria.add(Restrictions.eq("qcTarget", "Run"));
+    criteria.add(Restrictions.eq("qcTarget", QcTarget.Run));
     criteria.add(Restrictions.eq("name", qcName));
     return (QcType) criteria.uniqueResult();
   }
@@ -104,7 +104,7 @@ public class HibernateRunQcDao implements RunQcStore {
   @Override
   public Collection<QcType> listAllRunQcTypes() throws IOException {
     Criteria criteria = currentSession().createCriteria(QcType.class);
-    criteria.add(Restrictions.eq("qcTarget", "Run"));
+    criteria.add(Restrictions.eq("qcTarget", QcTarget.Run));
     @SuppressWarnings("unchecked")
     Collection<QcType> records = criteria.list();
     return records;

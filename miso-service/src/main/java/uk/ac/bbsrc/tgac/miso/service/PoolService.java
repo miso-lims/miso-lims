@@ -9,9 +9,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface PoolService extends PaginatedDataSource<Pool> {
@@ -42,13 +40,9 @@ public interface PoolService extends PaginatedDataSource<Pool> {
 
   public long save(Pool pool) throws IOException;
 
-  public long savePoolQC(PoolQC poolQC) throws IOException;
-
   public void saveNote(Pool pool, Note note) throws IOException;
 
   public Pool get(long poolId) throws IOException;
-
-  public PoolQC getPoolQC(long poolQcId) throws IOException;
 
   public Pool getByBarcode(String barcode) throws IOException;
 
@@ -57,9 +51,5 @@ public interface PoolService extends PaginatedDataSource<Pool> {
   public void addPoolWatcher(Pool pool, User watcher) throws IOException;
 
   public void removePoolWatcher(Pool pool, User watcher) throws IOException;
-
-  QcType getPoolQcType(long qcTypeId) throws IOException;
-
-  Collection<QcType> listPoolQcTypes() throws IOException;
 
 }

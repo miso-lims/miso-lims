@@ -492,84 +492,10 @@
 </form:form>
 <br/>
 <c:if test="${library.id != 0}">
-<h1>
-  <span id="qcsTotalCount">
-  </span>
-</h1>
-<ul class="sddm">
-  <li>
-    <a id="qcMenuHandle" onmouseover="mopen('qcMenu')" onmouseout="mclosetime()">Options
-      <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-    </a>
-
-    <div id="qcMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-      <a href='javascript:void(0);' class="add" onclick="Library.qc.insertLibraryQCRow(${library.id}); return false;">Add Library QC</a>
-    </div>
-  </li>
-</ul>
-<div style="clear:both">
-  <div id="addLibraryQC"></div>
-  <form id='addQcForm'>
-    <table class="list" id="libraryQcTable">
-      <thead>
-      <tr>
-        <th>QCed By</th>
-        <th>QC Date</th>
-        <th>Method</th>
-        <th>Results</th>
-        <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-          <th align="center">Edit</th>
-        </c:if>
-      </tr>
-      </thead>
-      <tbody>
-      <c:if test="${not empty library.libraryQCs}">
-        <c:forEach items="${library.libraryQCs}" var="qc">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${qc.qcCreator}</td>
-            <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
-            <td>${qc.qcType.name}</td>
-
-            <fmt:formatNumber var="resultsRounded"
-              value="${qc.results}"
-              maxFractionDigits="${qc.qcType.precisionAfterDecimal}" />
-
-            <td id="result${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
-            <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                        or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <td id="edit${qc.id}" align="center">
-                <a href="javascript:void(0);" onclick="Library.qc.changeLibraryQCRow('${qc.id}','${library.id}')">
-                  <span class="ui-icon ui-icon-pencil"></span>
-                </a>
-              </td>
-            </c:if>
-          </tr>
-        </c:forEach>
-      </c:if>
-      </tbody>
-    </table>
-    <input type='hidden' id='qcLibraryId' name='id' value='${library.id}'/>
-  </form>
-</div>
-
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    jQuery("#libraryQcTable").tablesorter({
-      headers: {
-      }
-    });
-
-    var qcsCount = jQuery('#libraryQcTable>tbody>tr:visible').length;
-    jQuery('#qcsTotalCount').html(qcsCount + (qcsCount == 1 ? ' QC' : ' QCs'));
-    var libDilsCount = jQuery('#libraryDilutionTable>tbody>tr:visible').length;
-    jQuery('#ldsTotalCount').html(libDilsCount + (libDilsCount == 1 ? ' Library Dilution' : ' Library Dilutions'));
-  });
-</script>
-
-  <miso:list-section name="Dilutions" target="dilution" items="${libraryDilutions}" config="${libraryDilutionsConfig}"/>
-  <miso:list-section name="Pools" target="pool" items="${libraryPools}"/>
-  <miso:list-section name="Runs" target="run" items="${libraryRuns}"/>
+  <miso:qcs id="list_qcs" item="${library}"/>
+  <miso:list-section id="list_dilution" name="Dilutions" target="dilution" items="${libraryDilutions}" config="${libraryDilutionsConfig}"/>
+  <miso:list-section id="list_pool" name="Pools" target="pool" items="${libraryPools}"/>
+  <miso:list-section id="list_run" name="Runs" target="run" items="${libraryRuns}"/>
   <miso:changelog item="${library}"/>
 </c:if>
 <div id="dialog"></div>
