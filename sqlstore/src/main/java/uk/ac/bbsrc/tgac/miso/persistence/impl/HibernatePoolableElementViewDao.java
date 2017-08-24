@@ -94,6 +94,8 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "dilutionId";
     case "name":
       return "dilutionName";
+    case "volume":
+      return "dilutionVolume";
     case "library.id":
       return "libraryId";
     case "library.alias":

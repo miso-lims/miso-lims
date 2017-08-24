@@ -12,6 +12,7 @@ public class DilutionDto implements WritableUrls {
   private String identificationBarcode;
   private String locationLabel;
   private String concentration;
+  private String volume;
   private String creationDate;
   private String dilutionCreatorName;
   private Long targetedSequencingId;
@@ -123,6 +124,14 @@ public class DilutionDto implements WritableUrls {
 
   public void setIndexIds(List<Long> indexIds) {
     this.indexIds = indexIds;
+  }
+
+  public String getVolume() {
+    return volume;
+  }
+
+  public void setVolume(String volume) {
+    this.volume = volume;
   }
 
 }

@@ -1207,6 +1207,7 @@ public class Dtos {
     dto.setName(from.getName());
     dto.setDilutionUserName(from.getDilutionCreator());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
+    dto.setVolume(from.getVolume() == null ? null : from.getVolume().toString());
     if (from.getCreationDate() != null) {
       dto.setCreationDate(formatDate(from.getCreationDate()));
     }
@@ -1239,6 +1240,7 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getDilutionBarcode());
     dto.setIndexIds(from.getIndices().stream().map(Index::getId).collect(Collectors.toList()));
     dto.setTargetedSequencingId(from.getTargetedSequencingId());
+    dto.setVolume(from.getDilutionVolume() == null ? null : from.getDilutionVolume().toString());
 
     LibraryDto ldto = new LibraryDto();
     ldto.setId(from.getLibraryId());
@@ -1275,6 +1277,7 @@ public class Dtos {
     }
     to.setIdentificationBarcode(from.getIdentificationBarcode());
     to.setConcentration(from.getConcentration() == null ? null : Double.valueOf(from.getConcentration()));
+    to.setVolume(from.getVolume() == null ? null : Double.valueOf(from.getVolume()));
     to.setLibrary(to(from.getLibrary()));
     to.setDilutionCreator(from.getDilutionUserName());
     to.setCreationDate(parseDate(from.getCreationDate()));

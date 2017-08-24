@@ -148,6 +148,12 @@ ListTarget.dilution = {
           "iSortPriority" : 0
         },
         {
+          "sTitle" : "Volume",
+          "mData" : "volume",
+          "include" : true,
+          "iSortPriority" : 0
+        },
+        {
           "sTitle" : "Targeted Sequencing",
           "mData" : "targetedSequencingId",
           "include" : Constants.isDetailedSample,

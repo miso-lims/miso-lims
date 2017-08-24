@@ -21,6 +21,7 @@ public class BulkDilutionPage extends HeaderFooterPage {
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String LIBRARY_ALIAS = "Library Alias";
     public static final String CONCENTRATION = "Conc. (nM)";
+    public static final String VOLUME = "Volume";
     public static final String CREATION_DATE = "Creation Date";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
 

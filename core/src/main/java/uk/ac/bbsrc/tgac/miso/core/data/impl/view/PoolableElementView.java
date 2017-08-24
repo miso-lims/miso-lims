@@ -42,6 +42,8 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private String dilutionBarcode;
 
+  private Double dilutionVolume;
+
   private Long preMigrationId;
 
   @Temporal(TemporalType.DATE)
@@ -112,6 +114,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     v.setDilutionConcentration(dilution.getConcentration());
     v.setDilutionId(dilution.getId());
     v.setDilutionName(dilution.getName());
+    v.setDilutionVolume(dilution.getVolume());
     v.setLastModified(dilution.getLastModified());
     v.setPreMigrationId(dilution.getPreMigrationId());
     
@@ -423,6 +426,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setTargetedSequencingId(Long targetedSequencingId) {
     this.targetedSequencingId = targetedSequencingId;
+  }
+
+  public Double getDilutionVolume() {
+    return dilutionVolume;
+  }
+
+  public void setDilutionVolume(Double dilutionVolume) {
+    this.dilutionVolume = dilutionVolume;
   }
 
 }
