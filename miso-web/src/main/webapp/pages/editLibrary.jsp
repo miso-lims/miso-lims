@@ -462,11 +462,11 @@
     <h1>Notes</h1>
     <ul class="sddm">
       <li>
-        <a onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
+        <a id="notesMenuHandle" onmouseover="mopen('notesMenu')" onmouseout="mclosetime()">Options
           <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
         </a>
 
-        <div id="notesmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+        <div id="notesMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
           <a onclick="Library.ui.showLibraryNoteDialog(${library.id});" href="javascript:void(0);" class="add">Add Note</a>
         </div>
       </li>
@@ -499,11 +499,11 @@
 </h1>
 <ul class="sddm">
   <li>
-    <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
+    <a id="qcMenuHandle" onmouseover="mopen('qcMenu')" onmouseout="mclosetime()">Options
       <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
     </a>
 
-    <div id="qcmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+    <div id="qcMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
       <a href='javascript:void(0);' class="add" onclick="Library.qc.insertLibraryQCRow(${library.id}); return false;">Add Library QC</a>
     </div>
   </li>

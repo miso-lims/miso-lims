@@ -2,6 +2,8 @@
 ALTER TABLE LibraryDesign DROP CONSTRAINT `uk_libraryDesign_name`;
 ALTER TABLE LibraryDesign ADD CONSTRAINT `uk_libraryDesign_name_sampleClass` UNIQUE (`name`, `sampleClassId`);
 
+DELETE FROM Note;
+
 INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
 VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
 
@@ -553,7 +555,14 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (304, 5),
   (305, 6),
   (306, 9);
-  
+
+INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
+  (1, '2017-08-22', 1, 'LIB110005 existing note', 1);
+
+DELETE FROM Library_Note;
+INSERT INTO Library_Note(library_libraryId, notes_noteId) VALUES
+  (110005, 1);
+
 INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated) VALUES
 (1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 'admin', 2, 1, '2017-07-20 09:01:00'),
 (304, 'LDI304', 7.97, 304, '300304', '2017-08-14', 'admin', 1, 1, '2017-08-14 12:25:00'),

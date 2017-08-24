@@ -3,11 +3,14 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
@@ -17,7 +20,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage.AddNoteDialog;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage.Field;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.Note;
 
 public class LibraryPageIT extends AbstractIT {
 
@@ -292,6 +297,67 @@ public class LibraryPageIT extends AbstractIT {
     assertNotEquals("Paired End", page.getField(Field.LIBRARY_TYPE));
     assertEquals("No indices", page.getField(Field.INDEX_FAMILY));
     assertEquals("No index (null)", page.getField(Field.INDEX_1));
+  }
+
+  @Test
+  public void testCancelAddNote() throws Exception {
+    LibraryPage page = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);
+    AddNoteDialog dialog = page.openAddNoteDialog();
+    assertTrue(dialog.isDisplayed());
+    dialog.setField(AddNoteDialog.Field.INTERNAL_ONLY, "true");
+    dialog.setField(AddNoteDialog.Field.TEXT, "test note");
+    dialog.cancel();
+    assertFalse(dialog.isDisplayed());
+  }
+
+  @Test
+  public void testAddNoteInvalid() throws Exception {
+    LibraryPage page = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);
+    AddNoteDialog dialog = page.openAddNoteDialog();
+    assertTrue(dialog.isDisplayed());
+    // submit invalid note (no text)
+    LibraryPage page2 = dialog.submit();
+    assertNull(page2);
+    // dialog remains open
+    assertTrue(dialog.isDisplayed());
+  }
+
+  @Test
+  public void testAddNote() throws Exception {
+    LibraryPage page1 = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);
+    final String text = "test note";
+    Predicate<Note> expectedText = note -> text.equals(note.getText());
+
+    List<Note> initialNotes = page1.getNotes();
+    assertFalse(initialNotes.stream().anyMatch(expectedText));
+
+    AddNoteDialog dialog = page1.openAddNoteDialog();
+    dialog.setField(AddNoteDialog.Field.INTERNAL_ONLY, "true");
+    dialog.setField(AddNoteDialog.Field.TEXT, text);
+    assertEquals("true", dialog.getField(AddNoteDialog.Field.INTERNAL_ONLY));
+    assertEquals("test note", dialog.getField(AddNoteDialog.Field.TEXT));
+    LibraryPage page2 = dialog.submit();
+
+    List<Note> afterAddNotes = page2.getNotes();
+    assertEquals(initialNotes.size() + 1, afterAddNotes.size());
+    assertTrue(afterAddNotes.stream().anyMatch(expectedText));
+  }
+
+  @Test
+  @Ignore
+  // TODO: enable after sorting out chromedriver issue with javascript alerts
+  public void testDeleteNote() throws Exception {
+    LibraryPage page1 = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);
+    final String text = "LIB110005 existing note";
+    Predicate<Note> expectedText = note -> text.equals(note.getText());
+
+    List<Note> initialNotes = page1.getNotes();
+    assertTrue(initialNotes.stream().anyMatch(expectedText));
+
+    LibraryPage page2 = page1.deleteNote(text);
+    List<Note> afterDeleteNotes = page2.getNotes();
+    assertEquals(initialNotes.size() - 1, afterDeleteNotes.size());
+    assertFalse(afterDeleteNotes.stream().anyMatch(expectedText));
   }
 
   private static final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();

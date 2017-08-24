@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -147,7 +146,6 @@ public abstract class AbstractPage extends AbstractElement {
     element.click();
     element.clear();
     element.sendKeys(input);
-    element.sendKeys(Keys.ESCAPE);
   }
 
   protected static void setCheckbox(Boolean check, WebElement element) {
@@ -161,7 +159,6 @@ public abstract class AbstractPage extends AbstractElement {
     element.click();
     Select select = new Select(element);
     select.selectByVisibleText(input);
-    element.sendKeys(Keys.ESCAPE);
   }
 
   protected static String getSelectedDropdownText(WebElement element) {
