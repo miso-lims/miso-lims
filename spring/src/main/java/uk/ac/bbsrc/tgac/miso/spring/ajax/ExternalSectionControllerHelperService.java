@@ -236,8 +236,8 @@ public class ExternalSectionControllerHelperService {
       JSONArray jsonArray = new JSONArray();
       for (Sample sample : sampleService.listByProjectId(projectId)) {
         String sampleQubit = "not available";
-        if (sampleService.listSampleQCsBySampleId(sample.getId()).size() > 0) {
-          ArrayList<SampleQC> sampleQcList = new ArrayList<>(sampleService.listSampleQCsBySampleId(sample.getId()));
+        if (sample.getQCs().size() > 0) {
+          ArrayList<SampleQC> sampleQcList = new ArrayList<>(sample.getQCs());
           SampleQC lastQc = sampleQcList.get(sampleQcList.size() - 1);
           sampleQubit = (lastQc.getResults() != null ? lastQc.getResults().toString() + " ng/µl" : "not available");
         }

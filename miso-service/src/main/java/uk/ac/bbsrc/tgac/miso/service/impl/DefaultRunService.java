@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Lists;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
@@ -46,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -243,14 +241,14 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   @Override
   public void bulkAddQcs(Run run) throws IOException {
     for (RunQC qc : run.getRunQCs()) {
-      if (qc.getId() == AbstractQC.UNSAVED_ID) addQc(run, qc);
+      if (qc.getId() == RunQC.UNSAVED_ID) addQc(run, qc);
       // TODO: make QCs updatable too
     }
   }
 
   @Override
   public void deleteQc(Run run, Long qcId) throws IOException {
-    if (qcId == null || qcId.equals(SampleQCImpl.UNSAVED_ID)) {
+    if (qcId == null || qcId.equals(RunQC.UNSAVED_ID)) {
       throw new IllegalArgumentException("Cannot delete an unsaved Run QC");
     }
     Run managed = runDao.get(run.getId());
@@ -710,7 +708,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   private void updatePartitionContents(final GetLaneContents getLaneContents, SequencerPartitionContainer newContainer) {
     newContainer.getPartitions().stream().filter(partition -> partition.getPool() == null)
         .forEach(partition -> getLaneContents.getLaneContents(partition.getPartitionNumber()).filter(s -> !LimsUtils.isStringBlankOrNull(s))
-            .map(WhineyFunction.log(log, poolService::getByBarcode)).ifPresent(partition::setPool));
+            .map(WhineyFunction.rethrow(poolService::getByBarcode)).ifPresent(partition::setPool));
   }
 
   private boolean updateHealthFromNotification(Run source, final Run target, User user) {

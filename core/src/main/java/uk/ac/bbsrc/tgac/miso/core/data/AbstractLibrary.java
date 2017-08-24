@@ -60,7 +60,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
@@ -123,7 +122,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
           @JoinColumn(name = "index_indexId", nullable = false) })
   private List<Index> indices = new ArrayList<>();
 
-  @OneToMany(targetEntity = LibraryQCImpl.class, mappedBy = "library", cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = LibraryQC.class, mappedBy = "library", cascade = CascadeType.ALL)
   private final Collection<LibraryQC> libraryQCs = new TreeSet<>();
 
   @OneToMany(targetEntity = LibraryDilution.class, mappedBy = "library", cascade = CascadeType.ALL)
@@ -315,13 +314,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
-  public void addQc(LibraryQC libraryQc) {
-    this.libraryQCs.add(libraryQc);
-    libraryQc.setLibrary(this);
-  }
-
-  @Override
-  public Collection<LibraryQC> getLibraryQCs() {
+  public Collection<LibraryQC> getQCs() {
     return libraryQCs;
   }
 
@@ -562,6 +555,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public QcTarget getQcTarget() {
+    return QcTarget.Library;
+  }
+
+  @Override
   public Integer getDnaSize() {
     return dnaSize;
   }
@@ -616,5 +614,4 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(qcPassed, other.qcPassed)
         .isEquals();
   }
-
 }

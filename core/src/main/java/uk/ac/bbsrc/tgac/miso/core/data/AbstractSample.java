@@ -57,7 +57,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
@@ -89,7 +88,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToMany(targetEntity = LibraryImpl.class, mappedBy = "sample")
   private final Collection<Library> libraries = new HashSet<>();
 
-  @OneToMany(targetEntity = SampleQCImpl.class, mappedBy = "sample", cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = SampleQC.class, mappedBy = "sample", cascade = CascadeType.ALL)
   private Collection<SampleQC> sampleQCs = new TreeSet<>();
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
@@ -299,13 +298,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public void addQc(SampleQC sampleQc) {
-    this.sampleQCs.add(sampleQc);
-    sampleQc.setSample(this);
-  }
-
-  @Override
-  public Collection<SampleQC> getSampleQCs() {
+  public Collection<SampleQC> getQCs() {
     return sampleQCs;
   }
 
@@ -371,7 +364,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @Override
   public boolean isDeletable() {
-    return getId() != AbstractSample.UNSAVED_ID && getLibraries().isEmpty() && getNotes().isEmpty() && getSampleQCs().isEmpty();
+    return getId() != AbstractSample.UNSAVED_ID && getLibraries().isEmpty() && getNotes().isEmpty() && getQCs().isEmpty();
   }
 
   @Override
@@ -472,4 +465,8 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
         .isEquals();
   }
 
+  @Override
+  public QcTarget getQcTarget() {
+    return QcTarget.Sample;
+  }
 }

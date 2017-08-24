@@ -49,8 +49,6 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String CONCENTRATION = "Conc. (ng/µl)";
     public static final String QC_STATUS = "QC Status";
     public static final String DNASE_TREATED = "DNAse";
-    public static final String NEW_RIN = "New RIN";
-    public static final String NEW_DV200 = "New DV200";
     public static final String QC_NOTE = "QC Note";
     public static final String PURPOSE = "Purpose";
 

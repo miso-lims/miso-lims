@@ -241,7 +241,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
 
-    Collection<SampleQC> qcs = new TreeSet<>(sample.getSampleQCs());
+    Collection<SampleQC> qcs = new TreeSet<>(sample.getQCs());
     addSampleNoteDetails(sample);
 
     if (isDetailedSample(sample)) {
@@ -331,8 +331,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
     Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
     for (SampleQC qc : qcs) {
       qc.setSample(sample);
-      qc.setQcCreator(migrationUser.getFullName());
-      qc.setQcDate(date);
+      qc.setCreator(migrationUser);
+      qc.setDate(date);
     }
   }
 
@@ -381,7 +381,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     library.inheritPermissions(library.getSample().getProject());
     valueTypeLookup.resolveAll(library);
     library.setLastModifier(migrationUser);
-    Collection<LibraryQC> qcs = new TreeSet<>(library.getLibraryQCs());
+    Collection<LibraryQC> qcs = new TreeSet<>(library.getQCs());
 
     for (Note note : library.getNotes()) {
       note.setCreationDate(timeStamp);
@@ -416,8 +416,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
     Date date = (replaceChangeLogs && library.getChangeLog() != null) ? getLatestChangeDate(library) : timeStamp;
     for (LibraryQC qc : qcs) {
       qc.setLibrary(library);
-      qc.setQcCreator(migrationUser.getFullName());
-      qc.setQcDate(date);
+      qc.setCreator(migrationUser);
+      qc.setDate(date);
     }
   }
 

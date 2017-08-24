@@ -76,7 +76,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
       Columns.EXTERNAL_NAME, Columns.IDENTITY_ALIAS, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
       Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER, Columns.TIMES_RECEIVED,
       Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
-      Columns.VOLUME, Columns.CONCENTRATION, Columns.DNASE_TREATED, Columns.NEW_RIN, Columns.NEW_DV200, Columns.QC_STATUS,
+      Columns.VOLUME, Columns.CONCENTRATION, Columns.DNASE_TREATED, Columns.QC_STATUS,
       Columns.QC_NOTE);
 
   private static final Set<String> gDnaAliquotColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
@@ -91,7 +91,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
       Columns.EXTERNAL_NAME, Columns.IDENTITY_ALIAS, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
       Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER, Columns.TIMES_RECEIVED,
       Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
-      Columns.VOLUME, Columns.CONCENTRATION, Columns.DNASE_TREATED, Columns.NEW_RIN, Columns.NEW_DV200, Columns.QC_STATUS,
+      Columns.VOLUME, Columns.CONCENTRATION, Columns.DNASE_TREATED, Columns.QC_STATUS,
       Columns.QC_NOTE, Columns.PURPOSE);
 
   private static final long projectId = 1L;
@@ -702,8 +702,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     rnaStock.put(Columns.DNASE_TREATED, "True");
     rnaStock.put(Columns.VOLUME, "10.0");
     rnaStock.put(Columns.CONCENTRATION, "3.75");
-    rnaStock.put(Columns.NEW_RIN, "2.7");
-    rnaStock.put(Columns.NEW_DV200, "92.55");
     rnaStock.put(Columns.QC_STATUS, "Ready");
 
     rnaStock.forEach((k, v) -> table.enterText(k, 0, v));
@@ -723,22 +721,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
 
     assertAllForStock(rnaStock, getIdForRow(table, 0), true, true);
     assertRnaStockSampleAttributes(rnaStock, created);
-
-    // verify QCs
-    Collection<SampleQC> sampleQcs = created.getSampleQCs();
-    assertEquals(2, sampleQcs.size());
-    for (SampleQC qc : sampleQcs) {
-      switch (qc.getQcType().getName()) {
-      case "RIN":
-        assertEquals(rnaStock.get(Columns.NEW_RIN).toString(), qc.getResults().toString());
-        break;
-      case "DV200":
-        assertEquals(rnaStock.get(Columns.NEW_DV200).toString(), qc.getResults().toString());
-        break;
-      default:
-        throw new IllegalArgumentException("Found unexpected QC of type " + qc.getQcType().getName());
-      }
-    }
   }
 
   @Test
@@ -768,7 +750,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     rnaStock.put(Columns.DNASE_TREATED, "True");
     rnaStock.put(Columns.VOLUME, "10.0");
     rnaStock.put(Columns.CONCENTRATION, "3.75");
-    rnaStock.put(Columns.NEW_RIN, "2.7");
     rnaStock.put(Columns.QC_STATUS, "Ready");
 
     rnaStock.forEach((k, v) -> table.enterText(k, 0, v));
@@ -959,8 +940,6 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     rnaAliquot.put(Columns.VOLUME, "10.0");
     rnaAliquot.put(Columns.CONCENTRATION, "3.75");
     rnaAliquot.put(Columns.QC_STATUS, "Ready");
-    rnaAliquot.put(Columns.NEW_RIN, "2.7");
-    rnaAliquot.put(Columns.NEW_DV200, "92.55");
     rnaAliquot.put(Columns.PURPOSE, "Validation");
 
     rnaAliquot.forEach((k, v) -> table.enterText(k, 0, v));

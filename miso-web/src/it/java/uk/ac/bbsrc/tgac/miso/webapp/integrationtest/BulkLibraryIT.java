@@ -36,7 +36,6 @@ public class BulkLibraryIT extends AbstractIT {
       Columns.SAMPLE_LOCATION, Columns.DESCRIPTION, Columns.DESIGN, Columns.CODE, Columns.PLATFORM, Columns.LIBRARY_TYPE, Columns.SELECTION,
       Columns.STRATEGY, Columns.INDEX_FAMILY, Columns.INDEX_1, Columns.INDEX_2, Columns.KIT_DESCRIPTOR, Columns.QC_PASSED, Columns.SIZE,
       Columns.VOLUME, Columns.CONCENTRATION);
-  private static final Set<String> qcColumns = Sets.newHashSet(Columns.QUBIT, Columns.TAPE_STATION, Columns.QPCR);
 
   private static final String NO_INDEX_FAMILY = "No indices";
   private static final String NO_INDEX = "No index";
@@ -53,11 +52,8 @@ public class BulkLibraryIT extends AbstractIT {
     BulkLibraryPage page = BulkLibraryPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(100001L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(commonColumns.size() + qcColumns.size(), headings.size());
+    assertEquals(commonColumns.size(), headings.size());
     for (String col : commonColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    for (String col : qcColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -522,43 +518,6 @@ public class BulkLibraryIT extends AbstractIT {
     saveAndAssertSuccess(table2);
     DetailedLibrary saved2 = (DetailedLibrary) getSession().get(LibraryImpl.class, 100004L);
     assertEquals(descEdit2, saved2.getDescription());
-  }
-
-  @Test
-  public void testAddQcs() {
-    BulkLibraryPage page = BulkLibraryPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(100001L));
-    HandsOnTable table = page.getTable();
-
-    DetailedLibrary original = (DetailedLibrary) getSession().get(LibraryImpl.class, 100001L);
-    assertTrue(original.getLibraryQCs().isEmpty());
-
-    assertTrue(isStringEmptyOrNull(table.getText(Columns.QUBIT, 0)));
-    assertTrue(isStringEmptyOrNull(table.getText(Columns.TAPE_STATION, 0)));
-    assertTrue(isStringEmptyOrNull(table.getText(Columns.QPCR, 0)));
-
-    Map<String, String> attrs = Maps.newLinkedHashMap();
-    attrs.put(Columns.QUBIT, "12.34");
-    attrs.put(Columns.TAPE_STATION, "234");
-    attrs.put(Columns.QPCR, "5.55");
-    fillRow(table, 0, attrs);
-    assertColumnValues(table, 0, attrs, "pre-save");
-    saveAndAssertSuccess(table);
-
-    DetailedLibrary updated = (DetailedLibrary) getSession().get(LibraryImpl.class, 100001L);
-    assertEquals(3, updated.getLibraryQCs().size());
-
-    Optional<LibraryQC> qubitMaybe = updated.getLibraryQCs().stream().filter(qc -> "Qubit".equals(qc.getQcType().getName())).findFirst();
-    assertTrue(qubitMaybe.isPresent());
-    assertEquals(Double.valueOf(attrs.get(Columns.QUBIT)), qubitMaybe.get().getResults());
-
-    Optional<LibraryQC> tapeStationMaybe = updated.getLibraryQCs().stream().filter(qc -> "Tape Station".equals(qc.getQcType().getName()))
-        .findFirst();
-    assertTrue(tapeStationMaybe.isPresent());
-    assertEquals(Double.valueOf(attrs.get(Columns.TAPE_STATION)), tapeStationMaybe.get().getResults());
-
-    Optional<LibraryQC> qPcrMaybe = updated.getLibraryQCs().stream().filter(qc -> "qPCR".equals(qc.getQcType().getName())).findFirst();
-    assertTrue(qPcrMaybe.isPresent());
-    assertEquals(Double.valueOf(attrs.get(Columns.QPCR)), qPcrMaybe.get().getResults());
   }
 
   @Test

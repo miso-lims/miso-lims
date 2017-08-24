@@ -402,14 +402,21 @@ Box.ui = {
     var toolbar = jQuery('#listingBoxablesToolbar');
     toolbar.empty();
     actions.forEach(function(action) {
-      var button = jQuery('<a />', {
-        'class': 'ui-button ui-state-default',
-        title: action.title || '',
-        text: action.name
-      });
-      button.click(function() {
-        action.action(items);
-      });
+      var button;
+      if (action) {
+        button = jQuery('<a />', {
+          'class': 'ui-button ui-state-default',
+          title: action.title || '',
+          text: action.name
+        });
+        button.click(function() {
+          action.action(items);
+        });
+      } else {
+        button = jQuery('<span />', {
+          'class': 'ui-state-default',
+        });
+      }
       button.appendTo(toolbar);
     });
   },

@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
@@ -53,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -79,8 +80,9 @@ public class DownloadController {
 
   @Autowired
   private LibraryService libraryService;
+
   @Autowired
-  private SampleService sampleService;
+  private QualityControlService qcService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -147,8 +149,8 @@ public class DownloadController {
   protected void downloadSampleQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
       throws Exception {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    SampleQC qc = sampleService.getSampleQC(id);
-    if (qc.userCanRead(user)) {
+    SampleQC qc = (SampleQC) qcService.get(QcTarget.Sample, id);
+    if (qc.getSample().userCanRead(user)) {
       lookupAndRetrieveFile(SampleQC.class, id.toString(), hashcode, response);
     } else {
       throw new SecurityException("Access denied");

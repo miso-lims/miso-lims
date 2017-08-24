@@ -69,9 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
@@ -171,21 +169,6 @@ public class EditProjectController {
     return requestManager.getProjectColumnSizes();
   }
 
-  @ModelAttribute("sampleQcTypesString")
-  public String sampleTypesString() throws IOException {
-    List<String> types = new ArrayList<>();
-    for (QcType s : sampleService.listSampleQcTypes()) {
-      types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");
-    }
-    Collections.sort(types);
-    return LimsUtils.join(types, ",");
-  }
-
-  @ModelAttribute("sampleQCUnits")
-  public String sampleQCUnits() throws IOException {
-    return SampleQCImpl.UNITS;
-  }
-
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
     return PoolImpl.CONCENTRATION_UNITS;
@@ -194,17 +177,6 @@ public class EditProjectController {
   @ModelAttribute("libraryDilutionUnits")
   public String libraryDilutionUnits() {
     return LibraryDilution.UNITS;
-  }
-
-  @ModelAttribute("libraryQcTypesString")
-  public String libraryTypesString() throws IOException {
-    List<String> types = new ArrayList<>();
-    List<QcType> libraryQcTypes = new ArrayList<>(libraryService.listLibraryQcTypes());
-    Collections.sort(libraryQcTypes);
-    for (QcType s : libraryQcTypes) {
-      types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");
-    }
-    return LimsUtils.join(types, ",");
   }
 
   @RequestMapping(value = "/graph/{projectId}", method = RequestMethod.GET)
@@ -259,7 +231,7 @@ public class EditProjectController {
               }
               librariesJSON.put(library.getName(), dilutionsJSON);
             } else {
-              if (library.getLibraryQCs().size() > 0) {
+              if (library.getQCs().size() > 0) {
                 librariesJSON.put(library.getName(), "1");
               } else {
                 librariesJSON.put(library.getName(), "0");

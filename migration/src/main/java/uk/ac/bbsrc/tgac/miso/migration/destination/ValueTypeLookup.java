@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -124,8 +125,8 @@ public class ValueTypeLookup {
     setLibraryDesigns(misoServiceManager.getLibraryDesignDao().getLibraryDesigns());
     setLibraryDesignCodes(misoServiceManager.getLibraryDesignCodeDao().getLibraryDesignCodes());
     setIndices(misoServiceManager.getIndexDao().list(0, 0, true, "id"));
-    setSampleQcTypes(misoServiceManager.getSampleQcDao().listAllSampleQcTypes());
-    setLibraryQcTypes(misoServiceManager.getLibraryQcDao().listAllLibraryQcTypes());
+    setSampleQcTypes(misoServiceManager.getQualityControlService().listQcTypes(QcTarget.Sample));
+    setLibraryQcTypes(misoServiceManager.getQualityControlService().listQcTypes(QcTarget.Library));
     setSequencers(misoServiceManager.getSequencerReferenceDao().listAll());
     setSubprojects(misoServiceManager.getSubprojectDao().getSubproject());
     setDetailedQcStatuses(misoServiceManager.getDetailedQcStatusDao().getDetailedQcStatus());
@@ -802,11 +803,11 @@ public class ValueTypeLookup {
    * @throws IOException if no value is found matching the available data in sample
    */
   public void resolveAll(Sample sample) throws IOException {
-    for (SampleQC qc : sample.getSampleQCs()) {
-      QcType type = resolveForSample(qc.getQcType());
+    for (SampleQC qc : sample.getQCs()) {
+      QcType type = resolveForSample(qc.getType());
       if (type == null)
-        throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getQcType().getQcTypeId(), qc.getQcType().getName()));
-      qc.setQcType(type);
+        throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getType().getQcTypeId(), qc.getType().getName()));
+      qc.setType(type);
     }
 
     if (LimsUtils.isDetailedSample(sample)) {
@@ -943,11 +944,11 @@ public class ValueTypeLookup {
       }
       library.setIndices(resolvedIndices);
     }
-    for (LibraryQC qc : library.getLibraryQCs()) {
-      QcType type = resolveForLibrary(qc.getQcType());
+    for (LibraryQC qc : library.getQCs()) {
+      QcType type = resolveForLibrary(qc.getType());
       if (type == null)
-        throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getQcType().getQcTypeId(), qc.getQcType().getName()));
-      qc.setQcType(type);
+        throw new IOException(String.format("QcType not found: id=%d, name=%s", qc.getType().getQcTypeId(), qc.getType().getName()));
+      qc.setType(type);
     }
     if (LimsUtils.isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;

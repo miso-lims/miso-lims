@@ -314,7 +314,7 @@
   });
 </script>
 
-  <miso:list-section name="Runs" target="run" items="${containerRuns}"/>
+  <miso:list-section id="list_run" name="Runs" target="run" items="${containerRuns}"/>
   <miso:changelog item="${container}"/>
 </div>
 </div>

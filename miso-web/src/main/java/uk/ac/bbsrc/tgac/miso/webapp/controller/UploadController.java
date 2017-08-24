@@ -62,10 +62,9 @@ import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
@@ -94,9 +93,7 @@ public class UploadController {
   @Autowired
   private SampleService sampleService;
   @Autowired
-  private SampleQcStore sampleQcStore;
-  @Autowired
-  private LibraryQcStore libraryQcStore;
+  private QualityControlService qcService;
 
   public void setTagBarcodeService(IndexService tagBarcodeService) {
     this.tagBarcodeService = tagBarcodeService;
@@ -128,14 +125,6 @@ public class UploadController {
 
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
-  }
-
-  public void setSampleQcStore(SampleQcStore sampleQcStore) {
-    this.sampleQcStore = sampleQcStore;
-  }
-
-  public void setLibraryQcStore(LibraryQcStore libraryQcStore) {
-    this.libraryQcStore = libraryQcStore;
   }
 
   public void uploadFile(Class<?> type, String qualifier, MultipartFile fileItem) throws IOException {
@@ -208,8 +197,7 @@ public class UploadController {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, sampleService, libraryService, sampleQcStore,
-            libraryQcStore,
+        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, sampleService, libraryService, qcService,
             namingScheme, tagBarcodeService);
 
         ObjectMapper mapper = new ObjectMapper();

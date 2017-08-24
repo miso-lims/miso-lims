@@ -31,14 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
@@ -61,13 +55,9 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -124,180 +114,6 @@ public class SampleControllerHelperService {
     } catch (Exception e) {
       log.error("Exception in validateSampleAlias", e);
       throw e;
-    }
-  }
-
-  public JSONObject getSampleQCUsers(HttpSession session, JSONObject json) {
-    try {
-      Collection<String> users = new HashSet<>();
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      users.add(user.getFullName());
-
-      if (json.has("sampleId") && !isStringEmptyOrNull(json.getString("sampleId"))) {
-        Long sampleId = Long.parseLong(json.getString("sampleId"));
-        Sample sample = sampleService.get(sampleId);
-
-        Project p = sample.getProject();
-        if (p.userCanRead(user)) {
-          for (ProjectOverview po : p.getOverviews()) {
-            if (po.getSampleGroup() != null) {
-              if (po.getSamples().contains(sample)) {
-                users.add(po.getPrincipalInvestigator());
-              }
-            }
-          }
-        }
-      }
-      StringBuilder sb = new StringBuilder();
-      for (String name : users) {
-        sb.append("<option value='" + name + "'>" + name + "</option>");
-      }
-      Map<String, Object> map = new HashMap<>();
-      map.put("qcUserOptions", sb.toString());
-      map.put("sampleId", json.getString("sampleId"));
-      return JSONUtils.JSONObjectResponse(map);
-    } catch (IOException e) {
-      log.error("Failed to get available users for this Sample QC: ", e);
-      return JSONUtils.SimpleJSONError("Failed to get available users for this Sample QC: " + e.getMessage());
-    }
-  }
-
-  public JSONObject getSampleQcTypes(HttpSession session, JSONObject json) {
-    try {
-      StringBuilder sb = new StringBuilder();
-      Collection<QcType> types = sampleService.listSampleQcTypes();
-      for (QcType s : types) {
-        sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
-      }
-      Map<String, Object> map = new HashMap<>();
-      map.put("types", sb.toString());
-      return JSONUtils.JSONObjectResponse(map);
-    } catch (IOException e) {
-      log.error("get sample qc type", e);
-    }
-    return JSONUtils.SimpleJSONError("Cannot list all Sample QC Types");
-  }
-
-  public JSONObject addSampleQC(HttpSession session, JSONObject json) {
-    try {
-      for (Object k : json.keySet()) {
-        String key = (String) k;
-        if (json.get(key) == null || isStringEmptyOrNull(json.getString(key))) {
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
-        }
-      }
-      if (json.has("sampleId") && !isStringEmptyOrNull(json.getString("sampleId"))) {
-        Long sampleId = Long.parseLong(json.getString("sampleId"));
-        Sample sample = sampleService.get(sampleId);
-        if (json.get("qcPassed") != null) {
-          if ("true".equals(json.getString("qcPassed"))) {
-            sample.setQcPassed(true);
-          } else if ("false".equals(json.getString("qcPassed"))) {
-            sample.setQcPassed(false);
-          }
-        }
-
-        SampleQC newQc = new SampleQCImpl();
-        newQc.setQcCreator(json.getString("qcCreator"));
-        newQc.setQcDate(parseDate(json.getString("qcDate")));
-        newQc.setQcType(sampleService.getSampleQcType(json.getLong("qcType")));
-        newQc.setResults(Double.parseDouble(json.getString("results")));
-        sample.addQc(newQc);
-        sampleService.addQc(sample, newQc);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th></tr>");
-        for (SampleQC qc : sample.getSampleQCs()) {
-          sb.append("<tr>");
-          sb.append("<td>" + qc.getQcCreator() + "</td>");
-          sb.append("<td>" + formatDate(qc.getQcDate()) + "</td>");
-          sb.append("<td>" + qc.getQcType().getName() + "</td>");
-          sb.append("<td>" + LimsUtils.round(qc.getResults(), 2) + " " + qc.getQcType().getUnits() + "</td>");
-          sb.append("</tr>");
-        }
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Sample QC to this sample: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Sample QC to this sample: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONError("Cannot add SampleQC");
-  }
-
-  public JSONObject changeSampleQCRow(HttpSession session, JSONObject json) {
-    try {
-      JSONObject response = new JSONObject();
-      Long qcId = Long.parseLong(json.getString("qcId"));
-      SampleQC sampleQc = sampleService.getSampleQC(qcId);
-      response.put("results", "<input type='text' id='" + qcId + "' value='" + sampleQc.getResults() + "'/>");
-      response.put("edit", "<a href='javascript:void(0);' onclick='Sample.qc.editSampleQC(\"" + qcId + "\");'>Save</a>");
-      return response;
-    } catch (Exception e) {
-      log.error("Failed to display Sample QC of this sample: ", e);
-      return JSONUtils.SimpleJSONError("Failed to display Sample QC of this sample: " + e.getMessage());
-    }
-  }
-
-  public JSONObject editSampleQC(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
-        Long qcId = Long.parseLong(json.getString("qcId"));
-        SampleQC sampleQc = sampleService.getSampleQC(qcId);
-        sampleQc.setResults(Double.parseDouble(json.getString("result")));
-        Sample sample = sampleQc.getSample();
-        sampleService.addQc(sample, sampleQc);
-        return JSONUtils.SimpleJSONResponse("OK");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Sample QC to this sample: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Sample QC to this sample: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONError("Cannot add SampleQC");
-  }
-
-  public JSONObject bulkAddSampleQCs(HttpSession session, JSONObject json) {
-    try {
-      JSONArray qcs = JSONArray.fromObject(json.getString("qcs"));
-      // validate
-      boolean ok = true;
-      for (JSONObject qc : (Iterable<JSONObject>) qcs) {
-        String qcType = qc.getString("qcType");
-        String results = qc.getString("results");
-        String qcCreator = qc.getString("qcCreator");
-        String qcDate = qc.getString("qcDate");
-
-        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator) || isStringEmptyOrNull(qcDate)) {
-          ok = false;
-        }
-      }
-
-      // persist
-      if (ok) {
-        Map<String, Object> map = new HashMap<>();
-        JSONArray a = new JSONArray();
-        JSONArray errors = new JSONArray();
-        for (JSONObject qc : (Iterable<JSONObject>) qcs) {
-          JSONObject j = addSampleQC(session, qc);
-          j.put("sampleId", qc.getString("sampleId"));
-          if (j.has("error")) {
-            errors.add(j);
-          } else {
-            a.add(j);
-          }
-        }
-        map.put("saved", a);
-        if (!errors.isEmpty()) {
-          map.put("errors", errors);
-        }
-        return JSONUtils.JSONObjectResponse(map);
-      } else {
-        log.error("Failed to add Sample QC to this Library: one of the required fields of the selected QCs is missing or invalid");
-        return JSONUtils.SimpleJSONError(
-            "Failed to add Sample QC to this Library: one of the required fields of the selected QCs is missing or invalid");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Sample QC to this sample: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Sample QC to this sample: " + e.getMessage());
     }
   }
 
@@ -556,33 +372,6 @@ public class SampleControllerHelperService {
       }
     } else {
       return JSONUtils.SimpleJSONError("Only logged-in users can remove objects.");
-    }
-  }
-
-  public JSONObject getSampleLastQCRequest(HttpSession session, JSONObject json) {
-    Long sampleId = json.getLong("sampleId");
-    return JSONUtils.SimpleJSONResponse(getSampleLastQC(sampleId));
-  }
-
-  public String getSampleLastQC(Long sampleId) {
-    try {
-      String sampleQCValue = "NA";
-      Collection<SampleQC> sampleQCs = sampleService.listSampleQCsBySampleId(sampleId);
-      if (sampleQCs.size() > 0) {
-        List<SampleQC> list = new ArrayList<>(sampleQCs);
-        Collections.sort(list, new Comparator<SampleQC>() {
-          @Override
-          public int compare(SampleQC sqc1, SampleQC sqc2) {
-            return (int) sqc1.getId() - (int) sqc2.getId();
-          }
-        });
-        SampleQC sampleQC = list.get(list.size() - 1);
-        sampleQCValue = sampleQC.getResults().toString();
-      }
-      return sampleQCValue;
-    } catch (IOException e) {
-      log.debug("Failed", e);
-      return "Failed: " + e.getMessage();
     }
   }
 

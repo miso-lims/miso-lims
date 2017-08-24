@@ -57,12 +57,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -180,9 +178,6 @@ public class SampleController extends RestController {
       }
       Sample sample = Dtos.to(sampleDto);
       id = sampleService.create(sample);
-
-      addAnyQCs(sampleDto, sample);
-
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating sample. ", e);
       RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
@@ -223,7 +218,6 @@ public class SampleController extends RestController {
     Sample sample = Dtos.to(sampleDto);
     sample.setId(id);
     sampleService.update(sample);
-    addAnyQCs(sampleDto, sample);
     return getSample(id, b);
   }
 
@@ -263,22 +257,4 @@ public class SampleController extends RestController {
     allIdentities.put("matchingIdentities", matchingIdentities);
     return allIdentities;
   }
-
-  private void addAnyQCs(SampleDto sampleDto, Sample sample) throws IOException {
-    if (sampleDto.getQcRin() != null) {
-      SampleQC qc = new SampleQCImpl();
-      qc.setQcType(sampleService.getSampleQcTypeByName("RIN"));
-      if (sampleDto.getQcRin() == null) throw new IllegalArgumentException("Cannot create QC with null results");
-      qc.setResults(Double.valueOf(sampleDto.getQcRin()));
-      sampleService.addQc(sample, qc);
-    }
-    if (sampleDto.getQcDv200() != null) {
-      SampleQC qc = new SampleQCImpl();
-      qc.setQcType(sampleService.getSampleQcTypeByName("DV200"));
-      if (sampleDto.getQcDv200() == null) throw new IllegalArgumentException("Cannot create QC with null results");
-      qc.setResults(Double.valueOf(sampleDto.getQcDv200()));
-      sampleService.addQc(sample, qc);
-    }
-  }
-
 }

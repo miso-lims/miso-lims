@@ -23,66 +23,85 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.Serializable;
 import java.util.Date;
 
-import com.eaglegenomics.simlims.core.Securable;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
-/**
- * A QC represents a validation step carried out on a given model object, e.g. a {@link Library} via a {@link LibraryQC}, a {@link Sample}
- * via a {@link SampleQC}, or a {@link Run} via a {@link RunQC}
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
-public interface QC extends Securable, Comparable<QC>, Deletable {
-  public long getId();
+@MappedSuperclass
+public abstract class QC implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-  public void setId(long id);
+  public static final Long UNSAVED_ID = 0L;
 
-  /**
-   * Returns the qcCreator of this QC object.
-   * 
-   * @return String qcCreator.
-   */
-  public String getQcCreator();
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator")
+  private User creator;
 
-  /**
-   * Sets the qcCreator of this QC object.
-   * 
-   * @param creator
-   *          qcCreator.
-   */
-  public void setQcCreator(String creator);
+  @Temporal(TemporalType.DATE)
+  private Date date = new Date();
 
-  /**
-   * Returns the qcMethod of this QC object.
-   * 
-   * @return String qcMethod.
-   */
-  public QcType getQcType();
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long qcId = QC.UNSAVED_ID;
 
-  /**
-   * Sets the QcType of this QC object.
-   * 
-   * @param type
-   *          type.
-   */
-  public void setQcType(QcType type);
+  private Double results;
 
-  /**
-   * Returns the qcDate of this QC object.
-   * 
-   * @return Date qcDate.
-   */
-  public Date getQcDate();
+  @ManyToOne
+  @JoinColumn(name = "type")
+  private QcType type;
 
-  /**
-   * Sets the qcDate of this QC object.
-   * 
-   * @param date
-   *          qcDate.
-   */
-  public void setQcDate(Date date);
+  public User getCreator() {
+    return creator;
+  }
+
+  public Date getDate() {
+    return date;
+  }
+
+  public abstract QualityControlEntity getEntity();
+
+  public long getId() {
+    return qcId;
+  }
+
+  public Double getResults() {
+    return results;
+  }
+
+  public QcType getType() {
+    return type;
+  }
+
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  public void setDate(Date date) {
+    this.date = date;
+  }
+
+  public void setId(long qcId) {
+    this.qcId = qcId;
+  }
+
+  public void setResults(Double results) {
+    this.results = results;
+  }
+
+  public void setType(QcType type) {
+    this.type = type;
+  }
 }

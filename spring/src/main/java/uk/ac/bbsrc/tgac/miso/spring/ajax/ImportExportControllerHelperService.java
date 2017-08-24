@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -60,13 +60,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -75,7 +74,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -84,6 +82,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
@@ -99,7 +98,7 @@ import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 public class ImportExportControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(ImportExportControllerHelperService.class);
   @Autowired
-  private RequestManager requestManager;
+  private QualityControlService qcService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -227,20 +226,19 @@ public class ImportExportControllerHelperService {
       try {
         if (s != null) {
           if (jsonArrayElement.get(6) != null) {
-            SampleQC sqc = new SampleQCImpl();
+            SampleQC sqc = new SampleQC();
             sqc.setSample(s);
             sqc.setResults(jsonArrayElement.getDouble(6));
-            sqc.setQcCreator(user.getLoginName());
-            sqc.setQcDate(date);
-            QcType qcType = sampleService.getSampleQcTypeByName("Picogreen");
+            sqc.setCreator(user);
+            sqc.setDate(date);
+            QcType qcType = qcService.getQcType(QcTarget.Sample, "Picogreen");
             if (qcType != null) {
-              sqc.setQcType(qcType);
+              sqc.setType(qcType);
             } else {
-              sqc.setQcType(sampleService.getSampleQcTypeByName("QuBit"));
+              sqc.setType(qcService.getQcType(QcTarget.Sample, "QuBit"));
             }
-            if (!s.getSampleQCs().contains(sqc)) {
-              s.addQc(sqc);
-              sampleService.addQc(s, sqc);
+            if (s.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == sqc.getType().getQcTypeId())) {
+              qcService.createQC(sqc);
               log.info("Added sample QC: " + sqc.toString());
             }
             if (jsonArrayElement.get(7) != null && !isStringEmptyOrNull(jsonArrayElement.getString(7))) {
@@ -372,16 +370,15 @@ public class ImportExportControllerHelperService {
               libraryService.create(library);
               if (jsonArrayElement.get(5) != null && !isStringEmptyOrNull(jsonArrayElement.getString(5))) {
                 try {
-                  LibraryQC lqc = new LibraryQCImpl();
+                  LibraryQC lqc = new LibraryQC();
                   lqc.setLibrary(library);
                   lqc.setResults(Double.valueOf(jsonArrayElement.getString(5)));
-                  lqc.setQcCreator(user.getLoginName());
-                  lqc.setQcDate(new Date());
-                  lqc.setQcType(libraryService.getLibraryQcTypeByName("Qubit"));
+                  lqc.setCreator(user);
+                  lqc.setDate(new Date());
+                  lqc.setType(qcService.getQcType(QcTarget.Library, "Qubit"));
 
-                  if (!library.getLibraryQCs().contains(lqc)) {
-                    library.addQc(lqc);
-                    libraryService.addQc(library, lqc);
+                  if (library.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == lqc.getType().getQcTypeId())) {
+                    qcService.createQC(lqc);
                     log.info("Added library QC: " + lqc.toString());
                   }
 
@@ -400,14 +397,13 @@ public class ImportExportControllerHelperService {
 
               if (jsonArrayElement.get(7) != null && !isStringEmptyOrNull(jsonArrayElement.getString(7))) {
                 try {
-                  LibraryQC lqc = new LibraryQCImpl();
+                  LibraryQC lqc = new LibraryQC();
                   lqc.setLibrary(library);
                   lqc.setResults(Double.valueOf(jsonArrayElement.getString(7)));
-                  lqc.setQcType(libraryService.getLibraryQcTypeByName("Bioanalyzer"));
+                  lqc.setType(qcService.getQcType(QcTarget.Library, "Bioanalyzer"));
 
-                  if (!library.getLibraryQCs().contains(lqc)) {
-                    library.addQc(lqc);
-                    libraryService.addQc(library, lqc);
+                  if (library.getQCs().stream().noneMatch(existing -> existing.getType().getQcTypeId() == lqc.getType().getQcTypeId())) {
+                    qcService.createQC(lqc);
                     log.info("Added library QC: " + lqc.toString());
                   }
 
@@ -612,10 +608,6 @@ public class ImportExportControllerHelperService {
       return JSONUtils.SimpleJSONError("Failed to retrieve library types given platform type: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONError("Cannot resolve LibraryType from selected Platform");
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
   }
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {

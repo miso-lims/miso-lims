@@ -1165,7 +1165,7 @@ public class FlexReportingControllerHelperService {
           libraryJSON.put("name", "Libraries");
 
           for (Library library : libraries) {
-            if (library.getLibraryQCs().size() > 0) {
+            if (library.getQCs().size() > 0) {
               librariesArray.add(
                   JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '1'}"));
             } else {

@@ -27,7 +27,6 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
 @SuppressWarnings("serial")
 public class ChangeLogTag extends RequestContextAwareTag {
-  private static long id;
   private Object item;
 
   @Override
@@ -39,8 +38,8 @@ public class ChangeLogTag extends RequestContextAwareTag {
     ObjectMapper mapper = new ObjectMapper();
 
     pageContext.getOut().append(String.format(
-        "<br/><h1>Changes</h1><table id='changelog%1$d' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createStaticTable('changelog%1$d', ListTarget.changelog, {}, %2$s);});</script>",
-        id++, mapper.writeValueAsString(item.getChangeLog().stream().map(Dtos::asDto).collect(Collectors.toList()))));
+        "<br/><h1>Changes</h1><table id='changelog' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createStaticTable('changelog', ListTarget.changelog, {}, %1$s);});</script>",
+        mapper.writeValueAsString(item.getChangeLog().stream().map(Dtos::asDto).collect(Collectors.toList()))));
     return SKIP_BODY;
   }
 

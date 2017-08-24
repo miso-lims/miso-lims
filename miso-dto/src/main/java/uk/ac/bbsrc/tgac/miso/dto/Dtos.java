@@ -41,8 +41,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -77,7 +79,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
@@ -90,7 +91,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
@@ -563,8 +563,8 @@ public class Dtos {
     copySampleFields(from, dto);
     dto.setAccession(from.getAccession());
 
-    if (from.getSampleQCs() != null && !from.getSampleQCs().isEmpty()) {
-      dto.setQcs(asSampleQcDtos(from.getSampleQCs()));
+    if (from.getQCs() != null && !from.getQCs().isEmpty()) {
+      dto.setQcs(asQcDtos(from.getQCs()));
     }
     return dto;
   }
@@ -603,12 +603,6 @@ public class Dtos {
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());
       to.getProject().setProjectId(from.getProjectId());
-    }
-
-    if (from.getQcs() != null && !from.getQcs().isEmpty()) {
-      for (SampleQcDto qcDto : from.getQcs()) {
-        to.addQc(to(qcDto));
-      }
     }
     return to;
   }
@@ -1062,8 +1056,8 @@ public class Dtos {
     }
     dto.setDnaSize(from.getDnaSize());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    if (from.getLibraryQCs() != null && !from.getLibraryQCs().isEmpty()) {
-      dto.setQcs(asLibraryQcDtos(from.getLibraryQCs()));
+    if (from.getQCs() != null && !from.getQCs().isEmpty()) {
+      dto.setQcs(asQcDtos(from.getQCs()));
     }
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
@@ -1137,12 +1131,6 @@ public class Dtos {
     to.setDnaSize(from.getDnaSize());
     to.setLocationBarcode(from.getLocationBarcode());
     to.setCreationDate(parseDate(from.getCreationDate()));
-
-    if (from.getQcs() != null && !from.getQcs().isEmpty()) {
-      for (LibraryQcDto qcDto : from.getQcs()) {
-        to.addQc(to(qcDto));
-      }
-    }
 
     return to;
   }
@@ -1429,55 +1417,21 @@ public class Dtos {
     return to;
   }
 
-  public static SampleQcDto asDto(SampleQC from) {
-    SampleQcDto dto = new SampleQcDto();
+  public static QcDto asDto(QC from) {
+    QcDto dto = new QcDto();
     dto.setId(from.getId());
-    dto.setQcDate(formatDate(from.getQcDate()));
-    dto.setQcCreator(from.getQcCreator());
-    dto.setQcType(asDto(from.getQcType()));
+    dto.setDate(formatDate(from.getDate()));
+    dto.setCreator(from.getCreator().getFullName());
+    dto.setType(asDto(from.getType()));
     dto.setResults(from.getResults());
-    dto.setSampleId(from.getSample().getId());
+    dto.setEntityId(from.getEntity().getId());
+    dto.setEntityAlias(from.getEntity().getAlias());
     return dto;
   }
 
-  public static SampleQC to(SampleQcDto from) {
-    SampleQC to = new SampleQCImpl();
-    if (from.getId() != null) to.setId(from.getId());
-    to.setQcType(to(from.getQcType()));
-    to.setResults(from.getResults());
-    return to;
-  }
-
-  public static LibraryQcDto asDto(LibraryQC from) {
-    LibraryQcDto dto = new LibraryQcDto();
-    dto.setId(from.getId());
-    dto.setQcDate(formatDate(from.getQcDate()));
-    dto.setQcCreator(from.getQcCreator());
-    dto.setQcType(asDto(from.getQcType()));
-    dto.setResults(from.getResults());
-    dto.setLibraryId(from.getLibrary().getId());
-    return dto;
-  }
-
-  public static LibraryQC to(LibraryQcDto from) {
-    LibraryQC to = new LibraryQCImpl();
-    if (from.getId() != null) to.setId(from.getId());
-    to.setQcType(to(from.getQcType()));
-    to.setResults(from.getResults());
-    return to;
-  }
-
-  public static List<SampleQcDto> asSampleQcDtos(Collection<SampleQC> qcSubset) {
-    List<SampleQcDto> dtoList = new ArrayList<>();
-    for (SampleQC qc : qcSubset) {
-      dtoList.add(asDto(qc));
-    }
-    return dtoList;
-  }
-
-  public static List<LibraryQcDto> asLibraryQcDtos(Collection<LibraryQC> qcSubset) {
-    List<LibraryQcDto> dtoList = new ArrayList<>();
-    for (LibraryQC qc : qcSubset) {
+  public static List<QcDto> asQcDtos(Collection<? extends QC> qcSubset) {
+    List<QcDto> dtoList = new ArrayList<>();
+    for (QC qc : qcSubset) {
       dtoList.add(asDto(qc));
     }
     return dtoList;
@@ -1803,6 +1757,42 @@ public class Dtos {
     to.setName(dto.getName());
     to.setPlatform(to(dto.getPlatform()));
     to.setSerialNumber(dto.getSerialNumber());
+    return to;
+  }
+
+  public static QC to(QcDto dto) {
+    QC to;
+    switch (dto.getType().getQcTarget()) {
+    case Library:
+      LibraryQC newLibraryQc = new LibraryQC();
+      Library ownerLibrary = new LibraryImpl();
+      ownerLibrary.setId(dto.getEntityId());
+      newLibraryQc.setLibrary(ownerLibrary);
+      to = newLibraryQc;
+      break;
+    case Sample:
+      SampleQC newSampleQc = new SampleQC();
+      Sample ownerSample = new SampleImpl();
+      ownerSample.setId(dto.getEntityId());
+      newSampleQc.setSample(ownerSample);
+      to = newSampleQc;
+      break;
+    case Pool:
+      PoolQC newPoolQc = new PoolQC();
+      Pool ownerPool = new PoolImpl();
+      ownerPool.setId(dto.getEntityId());
+      newPoolQc.setPool(ownerPool);
+      to = newPoolQc;
+      break;
+    default:
+      throw new IllegalArgumentException("No such QC target: " + dto.getType().getQcTarget());
+    }
+    if (dto.getId() != null) {
+      to.setId(dto.getId());
+    }
+    to.setDate(parseDate(dto.getDate()));
+    to.setResults(dto.getResults());
+    to.setType(to(dto.getType()));
     return to;
   }
 

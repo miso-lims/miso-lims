@@ -82,6 +82,6 @@ HotTarget.pool = {
                 ids : items.map(Utils.array.getId).join(',')
               });
         }
-      }, HotUtils.printAction('pool'), ],
+      }, HotUtils.printAction('pool'), ].concat(HotUtils.makeQcActions("Pool")),
 
 };

@@ -26,8 +26,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @SuppressWarnings("serial")
 public class ListSectionTag extends RequestContextAwareTag {
-  private static long id;
   private String config;
+
   private Object items;
 
   private String name;
@@ -47,8 +47,8 @@ public class ListSectionTag extends RequestContextAwareTag {
     ObjectMapper mapper = new ObjectMapper();
 
     pageContext.getOut().append(String.format(
-        "<br/><h1>%2$s</h1><table id='list%1$d' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createStaticTable('list%1$d', ListTarget.%3$s, %5$s, %4$s);});</script>",
-        id++, name, target, mapper.writeValueAsString(items), LimsUtils.isStringBlankOrNull(config) ? "{}" : config));
+        "<br/><h1>%2$s</h1><table id='%1$s' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createStaticTable('%1$s', ListTarget.%3$s, %5$s, %4$s);});</script>",
+        getId(), name, target, mapper.writeValueAsString(items), LimsUtils.isStringBlankOrNull(config) ? "{}" : config));
     return SKIP_BODY;
   }
 

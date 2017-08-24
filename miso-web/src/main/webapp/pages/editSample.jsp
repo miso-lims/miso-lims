@@ -695,86 +695,21 @@
 </form:form>
 
 <c:if test="${sample.id != 0}">
-  <a id="sampleqc"></a>
-
-  <h1>
-    <span id="qcsTotalCount"></span>
-  </h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="qcmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='javascript:void(0);' class="add"
-           onclick="Sample.qc.generateSampleQCRow(${sample.id}); return false;">Add Sample QC</a>
-      </div>
-    </li>
-  </ul>
-    <div style="clear:both">
-      <div id="addSampleQC"></div>
-      <form id='addQcForm'>
-        <table class="list in" id="sampleQcTable">
-          <thead>
-          <tr>
-            <th>QCed By</th>
-            <th>QC Date</th>
-            <th>Method</th>
-            <th>Results</th>
-            <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                  or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <th align="center">Edit</th>
-            </c:if>
-          </tr>
-          </thead>
-          <tbody>
-          <c:if test="${not empty sample.sampleQCs}">
-            <c:forEach items="${sample.sampleQCs}" var="qc">
-              <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                <td>${qc.qcCreator}</td>
-                <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
-                <td>${qc.qcType.name}</td>
-                <fmt:formatNumber var="resultsRounded" value="${qc.results}" maxFractionDigits="2" />
-                <td id="results${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
-                <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                          or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
-                                                          onclick="Sample.qc.changeSampleQCRow('${qc.id}','${sample.id}')">
-                    <span class="ui-icon ui-icon-pencil"></span></a></td>
-                </c:if>
-              </tr>
-            </c:forEach>
-          </c:if>
-          </tbody>
-        </table>
-        <input type='hidden' id='sampleId' name='id' value='${sample.id}'/>
-      </form>
-      <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#sampleQcTable').tablesorter();
-        var totalQcsCount = jQuery('#sampleQcTable>tbody>tr:visible').length;
-        jQuery('#qcsTotalCount').html(totalQcsCount + (totalQcsCount == 1 ? ' QC' : ' QCs'));
-      });
-      </script>
-    </div>
-  <br/>
-  <a id="library"></a>
+  <miso:qcs id="list_qc" item="${sample}"/>
 
   <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
-    <miso:list-section name="Libraries" target="library" items="${sampleLibraries}"/>
+    <miso:list-section id="list_library" name="Libraries" target="library" items="${sampleLibraries}"/>
   </c:if>
 
   <c:if test="${detailedSample}">
-    <miso:list-section name="Relationships" target="sample" items="${sampleRelations}"/>
+    <miso:list-section id="list_relation" name="Relationships" target="sample" items="${sampleRelations}"/>
   </c:if>
 
-  <miso:list-section name="Pools" target="pool" items="${samplePools}"/>
-  <miso:list-section name="Runs" target="run" items="${sampleRuns}"/>
+  <miso:list-section id="list_pool" name="Pools" target="pool" items="${samplePools}"/>
+  <miso:list-section id="list_run" name="Runs" target="run" items="${sampleRuns}"/>
   <miso:changelog item="${sample}"/>
 </c:if>
+<div id="dialog"></div>
 </div>
 
 </div>

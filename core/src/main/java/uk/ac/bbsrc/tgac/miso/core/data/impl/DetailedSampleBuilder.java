@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -155,14 +156,13 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public void addQc(SampleQC sampleQc) {
-    this.sampleQCs.add(sampleQc);
-    sampleQc.setSample(this);
+  public Collection<SampleQC> getQCs() {
+    return sampleQCs;
   }
 
   @Override
-  public Collection<SampleQC> getSampleQCs() {
-    return sampleQCs;
+  public QcTarget getQcTarget() {
+    return QcTarget.Sample;
   }
 
   @Override
@@ -959,5 +959,4 @@ public class DetailedSampleBuilder
   public void setStain(Stain stain) {
     this.stain = stain;
   }
-
 }

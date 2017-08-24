@@ -125,22 +125,6 @@ var Project = Project || {
 };
 
 Project.ui = {
-  editProjectTrafficLight: function (projectId) {
-    Fluxion.doAjax(
-      'projectControllerHelperService',
-      'editProjectTrafficLight',
-      {
-        'projectId': projectId,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#pro' + projectId + 'traf').html(json.html);
-        }
-      }
-    );
-  },
-
   processSampleDeliveryForm: function (projectId, plate, ids) {
     Fluxion.doAjax(
       'projectControllerHelperService',

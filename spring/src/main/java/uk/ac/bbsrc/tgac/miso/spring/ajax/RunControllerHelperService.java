@@ -62,7 +62,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -307,7 +306,7 @@ public class RunControllerHelperService {
           }
         }
 
-        RunQC newQc = new RunQCImpl();
+        RunQC newQc = new RunQC();
         newQc.setQcCreator(json.getString("qcCreator"));
         newQc.setQcDate(parseDate(json.getString("qcDate")));
         newQc.setQcType(runService.getRunQcType(json.getLong("qcType")));

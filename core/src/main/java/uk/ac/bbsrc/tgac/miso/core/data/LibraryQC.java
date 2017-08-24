@@ -12,62 +12,45 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 
-/**
- * A QC that is specifically carried out on a given {@link Library}
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public interface LibraryQC extends QC, Serializable {
-  /**
-   * Returns the library of this LibraryQC object.
-   * 
-   * @return Library library.
-   */
-  @JsonBackReference(value = "qclibrary")
-  public Library getLibrary();
+@Entity
+@Table(name = "LibraryQC")
+public class LibraryQC extends QC {
 
-  /**
-   * Sets the library of this LibraryQC object.
-   * 
-   * @param library
-   *          library.
-   */
-  public void setLibrary(Library library);
+  private static final long serialVersionUID = 1L;
 
-  /**
-   * Returns the results of this QC object.
-   * 
-   * @return Double results.
-   */
-  public Double getResults();
+  @ManyToOne(targetEntity = LibraryImpl.class)
+  @JoinColumn(name = "library_libraryId")
+  private Library library;
 
-  /**
-   * Sets the results of this QC object.
-   * 
-   * @param results
-   *          results.
-   */
-  public void setResults(Double results);
+  public Library getLibrary() {
+    return library;
+  }
+
+  public void setLibrary(Library library) {
+    this.library = library;
+  }
+
+  @Override
+  public QualityControllable<?> getEntity() {
+    return library;
+  }
+
 }

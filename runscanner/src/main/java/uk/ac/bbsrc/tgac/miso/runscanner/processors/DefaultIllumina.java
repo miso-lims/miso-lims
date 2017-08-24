@@ -103,7 +103,7 @@ public final class DefaultIllumina extends RunProcessor {
     dto.setPoolNames(Optional.of(new File(runDirectory, "SampleSheet.csv"))//
         .filter(File::canRead)//
         .map(File::toPath)
-        .map(WhineyFunction.log(log, Files::lines))//
+        .map(WhineyFunction.rethrow(Files::lines))//
         .orElse(Stream.empty())//
         .filter(LimsUtils.rejectUntil(line -> line.startsWith("Sample_ID,")))//
         .map(COMMA::split)//
