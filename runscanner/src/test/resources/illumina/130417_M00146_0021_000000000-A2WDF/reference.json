@@ -1,1 +1,34 @@
-{"class":"uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto","runAlias":"130417_M00146_0021_000000000-A2WDF","sequencerName":"M00146","containerSerialNumber":"000000000-A2WDF","laneCount":1,"healthType":"Completed","startDate":[2013,4,17,0,0],"completionDate":[2013,4,18,10,36,31],"pairedEndRun":true,"software":"Interop: v1.0.25-11-g2085c7b Instrument: 0","callCycle":242,"chemistry":"UNKNOWN","imgCycle":242,"numCycles":242,"readLength":121,"scoreCycle":242}
+{
+  "callCycle": 242,
+  "chemistry": "UNKNOWN",
+  "class": "uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto",
+  "completionDate": [
+    2013,
+    4,
+    18,
+    10,
+    36,
+    31
+  ],
+  "containerSerialNumber": "000000000-A2WDF",
+  "healthType": "Completed",
+  "imgCycle": 242,
+  "laneCount": 1,
+  "numCycles": 242,
+  "pairedEndRun": true,
+  "poolNames": {
+    "1": "Unique_Sample_ID"
+  },
+  "readLength": 121,
+  "runAlias": "130417_M00146_0021_000000000-A2WDF",
+  "scoreCycle": 242,
+  "sequencerName": "M00146",
+  "software": "Interop: v1.0.25-11-g2085c7b Instrument: 0",
+  "startDate": [
+    2013,
+    4,
+    17,
+    0,
+    0
+  ]
+}

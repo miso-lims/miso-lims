@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -800,5 +801,21 @@ public class LimsUtils {
 
   public static Date toBadDate(LocalDateTime localDate) {
     return localDate == null ? null : toBadDate(localDate.toLocalDate());
+  }
+
+  public static <T> Predicate<T> rejectUntil(Predicate<T> check) {
+    return new Predicate<T>() {
+      private boolean state = false;
+
+      @Override
+      public boolean test(T t) {
+        if (state) {
+          return true;
+        }
+        state = check.test(t);
+        return false;
+      }
+
+    };
   }
 }
