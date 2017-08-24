@@ -394,7 +394,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
         }
       }
     }
-    if (duplicateSequences.size() > 0) {
+    if (duplicateSequences.isEmpty()) {
       duplicateIndicesSequences = duplicateSequences;
       return true;
     } else {
