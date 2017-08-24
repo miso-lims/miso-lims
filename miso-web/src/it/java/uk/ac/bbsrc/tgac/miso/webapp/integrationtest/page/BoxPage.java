@@ -2,39 +2,42 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.Select;
 
-public class BoxPage extends HeaderFooterPage {
+public class BoxPage extends FormPage<BoxPage.Field> {
 
-  public static class Fields {
-    public static final String ID = "ID";
-    public static final String ALIAS = "alias";
-    public static final String DESCRIPTION = "description";
-    public static final String USE = "use";
-    public static final String SIZE = "size";
-    public static final String LOCATION = "location";
+  public static enum Field implements FormPage.FieldElement {
+    ID(By.id("id"), FieldType.LABEL), //
+    NAME(By.id("name"), FieldType.LABEL), //
+    ALIAS(By.id("alias"), FieldType.TEXT), //
+    DESCRIPTION(By.id("description"), FieldType.TEXT), //
+    USE(By.id("boxUse"), FieldType.DROPDOWN), //
+    SIZE(By.id("boxSize"), FieldType.DROPDOWN), //
+    LOCATION(By.id("location"), FieldType.TEXT);
 
-    private Fields() {
-      throw new IllegalStateException("Util class not intended for instantiation");
+    private final By selector;
+    private final FieldType type;
+
+    private Field(By selector, FieldType type) {
+      this.selector = selector;
+      this.type = type;
+    }
+
+    @Override
+    public By getSelector() {
+      return selector;
+    }
+
+    @Override
+    public FieldType getType() {
+      return type;
     }
   }
 
-  @FindBy(id = "id")
-  private WebElement idLabel;
-  @FindBy(id = "alias")
-  private WebElement aliasLabel;
-  @FindBy(id = "description")
-  private WebElement descriptionLabel;
-  @FindBy(id = "boxUse")
-  private WebElement boxUseLabel;
-  @FindBy(id = "boxSize")
-  private WebElement boxSizeLabel;
-  @FindBy(id = "location")
-  private WebElement locationLabel;
   @FindBy(id = "save")
   private WebElement saveButton;
 
@@ -59,54 +62,6 @@ public class BoxPage extends HeaderFooterPage {
 
   public BoxVisualization getVisualization() {
     return visualization;
-  }
-
-  public String getId() {
-    return idLabel.getText();
-  }
-
-  public String getAlias() {
-    return aliasLabel.getAttribute("value");
-  }
-
-  public void setAlias(String alias) {
-    setText(alias, aliasLabel);
-  }
-
-  public String getDescription() {
-    return descriptionLabel.getAttribute("value");
-  }
-
-  public void setDescription(String description) {
-    setText(description, descriptionLabel);
-  }
-
-  public String getBoxUse() {
-    return getSelectedDropdownText(boxUseLabel);
-  }
-
-  public void setBoxUse(String boxUse) {
-    setDropdown(boxUse, boxUseLabel);
-  }
-
-  public String getBoxSize() {
-    if (boxSizeLabel instanceof Select) {
-      return getSelectedDropdownText(boxSizeLabel);
-    } else {
-      return boxSizeLabel.getText();
-    }
-  }
-
-  public void setBoxSize(String boxSize) {
-    setDropdown(boxSize, boxSizeLabel);
-  }
-
-  public String getLocation() {
-    return locationLabel.getAttribute("value");
-  }
-
-  public void setLocation(String location) {
-    setText(location, locationLabel);
   }
 
   public BoxPage clickSave() {

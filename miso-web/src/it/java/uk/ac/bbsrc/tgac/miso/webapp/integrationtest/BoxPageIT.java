@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
+import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.assertFieldValues;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BoxPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BoxPage.Fields;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BoxPage.Field;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BoxVisualization;
 
 public class BoxPageIT extends AbstractIT {
@@ -34,30 +35,30 @@ public class BoxPageIT extends AbstractIT {
     BoxPage page = getBoxPage(null);
     assertNotNull(page);
 
-    Map<String, String> unsaved = new HashMap<>();
-    unsaved.put(Fields.ID, "Unsaved");
-    unsaved.put(Fields.ALIAS, "New Box");
-    unsaved.put(Fields.DESCRIPTION, "Test");
-    unsaved.put(Fields.USE, "Storage");
-    unsaved.put(Fields.SIZE, "10 × 10");
-    unsaved.put(Fields.LOCATION, "Here");
+    Map<Field, String> unsaved = new HashMap<>();
+    unsaved.put(Field.ALIAS, "New Box");
+    unsaved.put(Field.DESCRIPTION, "Test");
+    unsaved.put(Field.USE, "Storage");
+    unsaved.put(Field.SIZE, "10 × 10");
+    unsaved.put(Field.LOCATION, "Here");
+    page.setFields(unsaved);
 
-    assertEquals("Box ID is unsaved", unsaved.get(Fields.ID), page.getId());
-    page.setAlias(unsaved.get(Fields.ALIAS));
-    page.setDescription(unsaved.get(Fields.DESCRIPTION));
-    page.setBoxUse(unsaved.get(Fields.USE));
-    page.setBoxSize(unsaved.get(Fields.SIZE));
-    page.setLocation(unsaved.get(Fields.LOCATION));
-
+    assertEquals("Box ID is unsaved", "Unsaved", page.getField(Field.ID));
+    assertFieldValues("changes pre-save", unsaved, page);
     BoxPage savedPage = page.clickSave();
+    // assert all except box size, which is no longer editable after save
+    assertEquals("alias post-save", unsaved.get(Field.ALIAS), savedPage.getField(Field.ALIAS));
+    assertEquals("description post-save", unsaved.get(Field.DESCRIPTION), savedPage.getField(Field.DESCRIPTION));
+    assertEquals("use post-save", unsaved.get(Field.USE), savedPage.getField(Field.USE));
+    assertEquals("location post-save", unsaved.get(Field.LOCATION), savedPage.getField(Field.LOCATION));
 
-    Box box = (Box) getSession().get(BoxImpl.class, Long.valueOf(savedPage.getId()));
-    assertNotEquals("Box ID is now a number", unsaved.get(Fields.ID), box.getId());
-    assertEquals("confirm box alias", unsaved.get(Fields.ALIAS), box.getAlias());
-    assertEquals("confirm box description", unsaved.get(Fields.DESCRIPTION), box.getDescription());
-    assertEquals("confirm box use", unsaved.get(Fields.USE), box.getUse().getAlias());
-    assertEquals("confirm box size", unsaved.get(Fields.SIZE), box.getSize().getRowsByColumns());
-    assertEquals("confirm box location", unsaved.get(Fields.LOCATION), box.getLocationBarcode());
+    Box box = (Box) getSession().get(BoxImpl.class, Long.valueOf(savedPage.getField(Field.ID)));
+    assertNotEquals("Box ID is now a number", "Unsaved", box.getId());
+    assertEquals("confirm box alias", unsaved.get(Field.ALIAS), box.getAlias());
+    assertEquals("confirm box description", unsaved.get(Field.DESCRIPTION), box.getDescription());
+    assertEquals("confirm box use", unsaved.get(Field.USE), box.getUse().getAlias());
+    assertEquals("confirm box size", unsaved.get(Field.SIZE), box.getSize().getRowsByColumns());
+    assertEquals("confirm box location", unsaved.get(Field.LOCATION), box.getLocationBarcode());
   }
 
   @Test
@@ -65,24 +66,23 @@ public class BoxPageIT extends AbstractIT {
     BoxPage page = getBoxPage(502L);
     assertNotNull(page);
 
-    Map<String, String> changed = new HashMap<>();
-    changed.put(Fields.ALIAS, "Changed alias");
-    changed.put(Fields.ALIAS, "Changed Box");
-    changed.put(Fields.DESCRIPTION, "Changed Description");
-    changed.put(Fields.USE, "Libraries");
-    changed.put(Fields.LOCATION, "Changed Location");
+    Map<Field, String> changed = new HashMap<>();
+    changed.put(Field.ALIAS, "Changed alias");
+    changed.put(Field.ALIAS, "Changed Box");
+    changed.put(Field.DESCRIPTION, "Changed Description");
+    changed.put(Field.USE, "Libraries");
+    changed.put(Field.LOCATION, "Changed Location");
+    page.setFields(changed);
 
-    page.setAlias(changed.get(Fields.ALIAS));
-    page.setDescription(changed.get(Fields.DESCRIPTION));
-    page.setBoxUse(changed.get(Fields.USE));
-    page.setLocation(changed.get(Fields.LOCATION));
-    page.clickSave();
+    assertFieldValues("pre-save changes", changed, page);
+    BoxPage savedPage = page.clickSave();
+    assertFieldValues("post-save changes", changed, savedPage);
 
     Box box = (Box) getSession().get(BoxImpl.class, 502L);
-    assertEquals(changed.get(Fields.ALIAS), box.getAlias());
-    assertEquals(changed.get(Fields.DESCRIPTION), box.getDescription());
-    assertEquals(changed.get(Fields.USE), box.getUse().getAlias());
-    assertEquals(changed.get(Fields.LOCATION), box.getLocationBarcode());
+    assertEquals(changed.get(Field.ALIAS), box.getAlias());
+    assertEquals(changed.get(Field.DESCRIPTION), box.getDescription());
+    assertEquals(changed.get(Field.USE), box.getUse().getAlias());
+    assertEquals(changed.get(Field.LOCATION), box.getLocationBarcode());
   }
 
   @Test

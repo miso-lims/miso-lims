@@ -786,7 +786,7 @@ Library.ui = {
   },
 
   deleteLibraryNote: function (libraryId, noteId) {
-    if (confirm("Are you sure you want to delete this note?")) {
+    var deleteIt = function() {
       Fluxion.doAjax(
         'libraryControllerHelperService',
         'deleteLibraryNote',
@@ -800,6 +800,10 @@ Library.ui = {
         }
       );
     }
+    Utils.showConfirmDialog('Delete Note', 'Delete',
+      ["Are you sure you want to delete this note?"],
+      deleteIt
+    );
   },
 
   changeDesign: function(callback) {
