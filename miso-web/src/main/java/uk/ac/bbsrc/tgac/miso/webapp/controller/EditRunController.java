@@ -55,7 +55,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -135,28 +134,6 @@ public class EditRunController {
           if (p.getPool() != null && p.getPool().getPoolableElementViews().size() > 1) {
             return true;
           }
-        }
-      }
-    }
-    return false;
-  }
-
-  public Boolean hasOperationsQcPassed(Run run) throws IOException {
-    if (run != null && run.getId() != Run.UNSAVED_ID) {
-      for (RunQC qc : run.getRunQCs()) {
-        if ("SeqOps QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  public Boolean hasInformaticsQcPassed(Run run) throws IOException {
-    if (run != null && run.getId() != Run.UNSAVED_ID) {
-      for (RunQC qc : run.getRunQCs()) {
-        if ("SeqInfo QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
-          return true;
         }
       }
     }
