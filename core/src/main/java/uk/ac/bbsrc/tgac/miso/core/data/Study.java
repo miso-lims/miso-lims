@@ -27,11 +27,6 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -42,10 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-@JsonIgnoreProperties({ "securityProfile" })
 public interface Study extends SecurableByProfile, Comparable<Study>, Deletable, Nameable, ChangeLoggable, Aliasable, Serializable {
 
   /** Field PREFIX */
@@ -58,7 +49,6 @@ public interface Study extends SecurableByProfile, Comparable<Study>, Deletable,
    * 
    * @return Project project.
    */
-  @JsonBackReference(value = "project")
   public Project getProject();
 
   /**
@@ -153,7 +143,6 @@ public interface Study extends SecurableByProfile, Comparable<Study>, Deletable,
    * 
    * @return Collection<Experiment> experiments.
    */
-  // @JsonManagedReference(value="experiments")
   public Collection<Experiment> getExperiments();
 
   /**

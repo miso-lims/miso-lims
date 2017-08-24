@@ -29,10 +29,6 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
@@ -51,10 +47,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeName("sample")
-@JsonIgnoreProperties({ "securityProfile", "submissionDocument", "children", "parent" })
 public interface Sample
     extends SecurableByProfile, Locatable, Comparable<Sample>, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable {
 
@@ -137,7 +129,6 @@ public interface Sample
    * 
    * @return Project project.
    */
-  // @JsonBackReference(value="project")
   public Project getProject();
 
   /**
@@ -194,7 +185,6 @@ public interface Sample
    * 
    * @return Collection<Library> libraries.
    */
-  // @JsonManagedReference
   public Collection<Library> getLibraries();
 
   /**

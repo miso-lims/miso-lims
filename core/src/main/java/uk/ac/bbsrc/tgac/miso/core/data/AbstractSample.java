@@ -54,8 +54,6 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -86,15 +84,12 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "project_projectId")
-  @JsonBackReference
   private Project project;
 
   @OneToMany(targetEntity = LibraryImpl.class, mappedBy = "sample")
-  @JsonManagedReference
   private final Collection<Library> libraries = new HashSet<>();
 
   @OneToMany(targetEntity = SampleQCImpl.class, mappedBy = "sample", cascade = CascadeType.ALL)
-  @JsonManagedReference
   private Collection<SampleQC> sampleQCs = new TreeSet<>();
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)

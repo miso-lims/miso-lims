@@ -43,8 +43,6 @@ import org.w3c.dom.Document;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -70,11 +68,9 @@ public class StudyImpl implements Study {
 
   @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "project_projectId")
-  @JsonBackReference
   private Project project = null;
 
   @OneToMany(targetEntity = ExperimentImpl.class, mappedBy = "study")
-  @JsonManagedReference
   private Collection<Experiment> experiments = new HashSet<>();
 
   @Id

@@ -1,10 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 
-@JsonIgnoreProperties({ "sample" })
 public interface SampleStock extends DetailedSample {
 
   public static String CATEGORY_NAME = "Stock";

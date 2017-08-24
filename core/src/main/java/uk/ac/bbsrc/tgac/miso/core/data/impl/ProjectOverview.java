@@ -57,11 +57,6 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -77,10 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-@JsonIgnoreProperties({ "project", "samples", "libraries", "runs", "qcPassedSamples" })
 @Entity
 @Table(name = "ProjectOverview")
 public class ProjectOverview implements Watchable, Nameable, Serializable {
@@ -133,7 +124,6 @@ public class ProjectOverview implements Watchable, Nameable, Serializable {
 
   @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "project_projectId")
-  @JsonBackReference
   private Project project;
 
   @ManyToMany(targetEntity = SampleImpl.class)

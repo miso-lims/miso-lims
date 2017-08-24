@@ -33,12 +33,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -52,10 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
  * @date 03-Aug-2011
  * @since 0.0.3
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-@JsonIgnoreProperties({ "securityProfile", "container" })
 @Entity
 @Table(name = "_Partition")
 public class PartitionImpl implements Partition {
@@ -75,12 +65,10 @@ public class PartitionImpl implements Partition {
   @JoinTable(name = "SequencerPartitionContainer_Partition", joinColumns = {
       @JoinColumn(name = "partitions_partitionId") }, inverseJoinColumns = {
           @JoinColumn(name = "container_containerId") })
-  @JsonBackReference
   private SequencerPartitionContainer sequencerPartitionContainer = null;
 
   @ManyToOne(targetEntity = PoolImpl.class)
   @JoinColumn(name = "pool_poolId")
-  @JsonBackReference
   Pool pool = null;
 
   public PartitionImpl() {

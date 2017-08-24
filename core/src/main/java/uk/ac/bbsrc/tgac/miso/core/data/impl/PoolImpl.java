@@ -64,7 +64,6 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -114,7 +113,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private String description;
 
   @OneToMany(targetEntity = ExperimentImpl.class, mappedBy = "pool")
-  @JsonManagedReference
   private Collection<Experiment> experiments = new HashSet<>();
 
   @Column(length = ID_BARCODE_LENGTH)
@@ -159,7 +157,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private long poolId = PoolImpl.UNSAVED_ID;
 
   @OneToMany(targetEntity = PoolQCImpl.class, mappedBy = "pool")
-  @JsonManagedReference
   private final Collection<PoolQC> poolQCs = new TreeSet<>();
 
   @OneToOne(optional = true)
