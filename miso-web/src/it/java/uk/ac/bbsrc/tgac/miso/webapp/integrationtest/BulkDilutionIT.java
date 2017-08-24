@@ -27,7 +27,7 @@ public class BulkDilutionIT extends AbstractIT {
   private static final Logger log = LoggerFactory.getLogger(BulkDilutionIT.class);
 
   private static final Set<String> columns = Sets.newHashSet(Columns.NAME, Columns.ID_BARCODE, Columns.LIBRARY_ALIAS,
-      Columns.CONCENTRATION, Columns.CREATION_DATE, Columns.TARGETED_SEQUENCING);
+      Columns.CONCENTRATION, Columns.CREATION_DATE, Columns.VOLUME, Columns.TARGETED_SEQUENCING);
 
   private static final String NO_TAR_SEQ = "(None)";
 
@@ -119,6 +119,7 @@ public class BulkDilutionIT extends AbstractIT {
     Map<String, String> attrs = Maps.newLinkedHashMap();
     attrs.put(Columns.ID_BARCODE, "11223344");
     attrs.put(Columns.CONCENTRATION, "4.56");
+    attrs.put(Columns.VOLUME, "9.77");
     attrs.put(Columns.CREATION_DATE, "2017-08-14");
     attrs.put(Columns.TARGETED_SEQUENCING, "Test TarSeq One");
 
@@ -140,6 +141,9 @@ public class BulkDilutionIT extends AbstractIT {
 
     table2.enterText(Columns.CONCENTRATION, 0, "5.67");
     attrs.put(Columns.CONCENTRATION, "5.67");
+    
+    table2.enterText(Columns.VOLUME, 0, "10.5");
+    attrs.put(Columns.VOLUME, "10.5");
     saveAndAssertSuccess(table2);
     assertColumnValues(table2, 0, attrs, "edit post-save");
     LibraryDilution saved2 = (LibraryDilution) getSession().get(LibraryDilution.class, newId);
@@ -189,6 +193,7 @@ public class BulkDilutionIT extends AbstractIT {
     testDilutionAttribute(Columns.ID_BARCODE, attributes, dilution, LibraryDilution::getIdentificationBarcode);
     testDilutionAttribute(Columns.LIBRARY_ALIAS, attributes, dilution, dil -> dil.getLibrary().getAlias());
     testDilutionAttribute(Columns.CONCENTRATION, attributes, dilution, dil-> dil.getConcentration().toString());
+    testDilutionAttribute(Columns.VOLUME, attributes, dilution, dil-> dil.getVolume().toString());
     testDilutionAttribute(Columns.CREATION_DATE, attributes, dilution, dil -> dil.getCreationDate().toString());
     testDilutionAttribute(Columns.TARGETED_SEQUENCING, attributes, dilution, dil -> {
       if (dil.getTargetedSequencing() == null) {
