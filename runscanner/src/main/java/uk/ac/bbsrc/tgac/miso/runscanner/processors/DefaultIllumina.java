@@ -3,11 +3,14 @@ package uk.ac.bbsrc.tgac.miso.runscanner.processors;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.xpath.XPathConstants;
@@ -22,8 +25,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
+import uk.ac.bbsrc.tgac.miso.runscanner.Pair;
 import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
 
 /**
@@ -66,6 +72,8 @@ public final class DefaultIllumina extends RunProcessor {
     return Arrays.stream(root.listFiles(f -> f.isDirectory() && !f.getName().equals("Instrument")));
   }
 
+  private static final Pattern COMMA = Pattern.compile(",");
+
   @Override
   public NotificationDto process(File runDirectory, TimeZone tz) throws IOException {
     // Call the C++ program to do the real work and write a notification DTO to standard output. The C++ object has no direct binding to the
@@ -90,6 +98,18 @@ public final class DefaultIllumina extends RunProcessor {
         .filter(file -> file.exists() && file.canRead()).findAny().flatMap(RunProcessor::parseXml)
         .flatMap(parameters -> Arrays.stream(IlluminaChemistry.values()).filter(chemistry -> chemistry.test(parameters)).findFirst())
         .orElse(IlluminaChemistry.UNKNOWN));
+
+    // See if we can figure out a sample sheet
+    dto.setPoolNames(Optional.of(new File(runDirectory, "SampleSheet.csv"))//
+        .filter(File::canRead)//
+        .map(File::toPath)
+        .map(WhineyFunction.log(log, Files::lines))//
+        .orElse(Stream.empty())//
+        .filter(LimsUtils.rejectUntil(line -> line.startsWith("Sample_ID,")))//
+        .map(COMMA::split)//
+        .map(Pair.number(1))
+        .filter(pair -> pair.getValue().length > 0)//
+        .collect(Collectors.toMap(Entry::getKey, e -> e.getValue()[0])));
 
     // The Illumina library can't distinguish between a failed run and one that either finished or is still going. Scan the logs, if
     // available to determine if the run failed.
