@@ -209,13 +209,6 @@
   jQuery(document).ready(function () {
     // Attach Parsley form validator
     Validate.attachParsley('#pool-form');
-
-    // store duplicate indices sequences
-    Pool.duplicateIndices = ${pool.hasDuplicateIndices()};
-    Pool.duplicateIndicesSequences = [];
-    <c:forEach items="${pool.getDuplicateIndicesSequences()}" var="item">
-      Pool.duplicateIndicesSequences.push("${item}");
-    </c:forEach>
   });
 </script>
 </form:form>
@@ -479,7 +472,7 @@
   
   <script type="text/javascript">
       jQuery(document).ready(function () {
-          ListUtils.createTable('includedTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : false });
+          ListUtils.createTable('includedTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : false, duplicateIndicesSequences : ${duplicateIndicesSequences} });
           ListUtils.createTable('availableTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : true });
       });
   </script>

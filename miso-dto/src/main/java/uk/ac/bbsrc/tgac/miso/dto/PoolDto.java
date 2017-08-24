@@ -17,7 +17,7 @@ public class PoolDto implements WritableUrls {
   private String locationLabel;
   private Boolean readyToRun;
   private Boolean qcPassed;
-  private Boolean duplicateIndices;
+  private boolean duplicateIndices;
   private Set<String> duplicateIndicesSequences;
   private Integer avgInsertSize;
   private Set<DilutionDto> pooledElements;
@@ -54,7 +54,7 @@ public class PoolDto implements WritableUrls {
     return description;
   }
 
-  public Boolean getDuplicateIndices() {
+  public boolean getDuplicateIndices() {
     return duplicateIndices;
   }
 
@@ -118,12 +118,10 @@ public class PoolDto implements WritableUrls {
     this.creationDate = creationDate;
   }
 
-  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setDescription(String description) {
     this.description = description;
   }
 
-  @JsonInclude(JsonInclude.Include.ALWAYS)
   public void setDuplicateIndices(Boolean duplicateIndices) {
     this.duplicateIndices = duplicateIndices;
   }

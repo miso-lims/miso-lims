@@ -89,7 +89,7 @@ ListTarget.poolelements = {
               }));
             }, []).map(function(index) {
               return index.label + 
-                ((Pool.duplicateIndices && Pool.duplicateIndicesSequences.indexOf(index.sequence) != -1) ? 
+                ((config.duplicateIndicesSequences && config.duplicateIndicesSequences.indexOf(index.sequence) != -1) ? 
                   " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDEX)</strong></span>" :
                   "");
             }).join();

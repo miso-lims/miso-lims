@@ -179,9 +179,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private String units = "";
 
   @Transient
-  private Set<String> duplicateIndicesSequences = Collections.emptySet();
-
-  @Transient
   // not Hibernate-managed
   private Group watchGroup;
 
@@ -385,21 +382,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean hasDuplicateIndices() {
-    Set<String> indices = new HashSet<>();
-    Set<String> duplicateSequences = new HashSet<>();
-    for (PoolableElementView item : getPoolableElementViews()) {
-      if (hasDuplicateIndices(indices, item)) {
-        for (Index index : item.getIndices()) {
-          duplicateSequences.add(index.getSequence());
-        }
-      }
-    }
-    if (duplicateSequences.isEmpty()) {
-      duplicateIndicesSequences = duplicateSequences;
-      return true;
-    } else {
-      return false;
-    }
+    return !getDuplicateIndicesSequences().isEmpty();
   }
 
   private boolean hasDuplicateIndices(Set<String> indices, PoolableElementView item) {
@@ -412,7 +395,16 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public Set<String> getDuplicateIndicesSequences() {
-    return duplicateIndicesSequences;
+    Set<String> indices = new HashSet<>();
+    Set<String> duplicateSequences = new HashSet<>();
+    for (PoolableElementView item : getPoolableElementViews()) {
+      if (hasDuplicateIndices(indices, item)) {
+        for (Index index : item.getIndices()) {
+          duplicateSequences.add(index.getSequence());
+        }
+      }
+    }
+    return duplicateSequences.isEmpty() ? Collections.emptySet() : duplicateSequences;
   }
 
   @Override
