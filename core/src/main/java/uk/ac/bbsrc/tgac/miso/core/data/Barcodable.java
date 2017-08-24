@@ -26,8 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * This interface simply describes an object that can be barcoded to denote its identity, i.e. have an identification String that represents
  * a scannable barcode. For physical barcode printing purposes, Barcodable objects can be assigned names and label text fields which can be
@@ -42,7 +40,6 @@ public interface Barcodable extends Nameable {
    * 
    * @return String labelText.
    */
-  @JsonIgnore
   public String getLabelText();
 
   /**

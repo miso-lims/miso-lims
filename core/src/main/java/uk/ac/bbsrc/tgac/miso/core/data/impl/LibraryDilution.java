@@ -47,11 +47,6 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -74,10 +69,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @Entity
 @Table(name = "LibraryDilution")
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-@JsonIgnoreProperties({ "securityProfile" })
 public class LibraryDilution
     implements SecurableByProfile, Barcodable, Comparable<LibraryDilution>, Deletable, Nameable, Boxable, Serializable {
 
@@ -102,7 +93,6 @@ public class LibraryDilution
 
   @ManyToOne(targetEntity = LibraryImpl.class)
   @JoinColumn(name = "library_libraryId")
-  @JsonBackReference
   private Library library;
 
   @ManyToOne(cascade = CascadeType.ALL)

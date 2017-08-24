@@ -49,7 +49,6 @@ import org.hibernate.annotations.BatchSize;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -122,7 +121,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @OneToMany(targetEntity = PartitionImpl.class, mappedBy = "sequencerPartitionContainer", cascade = CascadeType.ALL)
   @OrderBy("partitionNumber")
-  @JsonIgnore
   private List<Partition> partitions = new ArrayList<>();
 
   /**

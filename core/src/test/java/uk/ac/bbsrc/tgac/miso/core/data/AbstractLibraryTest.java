@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
@@ -12,8 +11,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class AbstractLibraryTest {
@@ -55,15 +52,5 @@ public class AbstractLibraryTest {
     final SecurityProfile mockSecurityProfile = Mockito.mock(SecurityProfile.class);
     when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
     al.inheritPermissions(parent);
-  }
-
-  @Test
-  public final void testLibrarySerialization() throws Exception {
-    Sample sample = new SampleImpl();
-    Library library = new LibraryImpl();
-    library.setSample(sample);
-    library.setAlias("TestLib");
-    String mappedLib = mapper.writer().writeValueAsString(library);
-    assertThat(mappedLib, containsString("TestLib"));
   }
 }

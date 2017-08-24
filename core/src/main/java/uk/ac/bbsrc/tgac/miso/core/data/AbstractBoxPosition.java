@@ -6,8 +6,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 
 @MappedSuperclass
@@ -17,7 +15,6 @@ public abstract class AbstractBoxPosition implements Serializable {
 
   @ManyToOne(targetEntity = BoxImpl.class)
   @JoinColumn(name = "boxId")
-  @JsonBackReference
   private Box box;
 
   private String position;

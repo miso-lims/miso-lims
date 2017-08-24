@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * Defines a contract whereby an implementing class is able to be deleted
  * 
@@ -38,6 +36,5 @@ public interface Deletable {
    * 
    * @return boolean true if able to be deleted successfully
    */
-  @JsonIgnore
   public boolean isDeletable();
 }

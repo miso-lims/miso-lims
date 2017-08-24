@@ -40,8 +40,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -68,7 +66,6 @@ public class IndexFamily implements Serializable {
   private Boolean archived;
   @OneToMany(targetEntity = Index.class, mappedBy = "family")
   @OrderBy("position, name")
-  @JsonManagedReference
   private List<Index> indices;
   @Column(nullable = false)
   private String name;

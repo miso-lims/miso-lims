@@ -25,12 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 /**
  * A Partition represents a compartment on a {@link SequencerPartitionContainer} on a sequencing platform, e.g. a lane on Illumina, a
  * chamber on 454, or a SMRT cell on a PacBio.
@@ -40,10 +34,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-@JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
 public interface Partition extends Identifiable, Comparable<Partition>, Deletable, Serializable {
   /**
    * Returns the sequencerPartitionContainer of this Partition object.
@@ -88,7 +78,6 @@ public interface Partition extends Identifiable, Comparable<Partition>, Deletabl
    * 
    * @return Pool pool.
    */
-  @JsonManagedReference(value = "pool")
   public Pool getPool();
 
   /**

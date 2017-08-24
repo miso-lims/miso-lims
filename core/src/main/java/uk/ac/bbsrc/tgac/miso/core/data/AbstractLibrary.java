@@ -58,8 +58,6 @@ import org.hibernate.annotations.FetchMode;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
@@ -126,11 +124,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private List<Index> indices = new ArrayList<>();
 
   @OneToMany(targetEntity = LibraryQCImpl.class, mappedBy = "library", cascade = CascadeType.ALL)
-  @JsonManagedReference
   private final Collection<LibraryQC> libraryQCs = new TreeSet<>();
 
   @OneToMany(targetEntity = LibraryDilution.class, mappedBy = "library", cascade = CascadeType.ALL)
-  @JsonManagedReference
   private final Collection<LibraryDilution> libraryDilutions = new HashSet<>();
 
   @ManyToOne(cascade = CascadeType.ALL)
@@ -139,7 +135,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @ManyToOne(targetEntity = SampleImpl.class)
   @JoinColumn(name = "sample_sampleId")
-  @JsonBackReference
   private Sample sample;
 
   @ManyToOne

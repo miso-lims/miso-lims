@@ -2,8 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public interface DetailedSample extends Sample {
 
   public DetailedSample getParent();
@@ -12,7 +10,6 @@ public interface DetailedSample extends Sample {
 
   public Set<DetailedSample> getChildren();
 
-  @JsonIgnore
   public void setChildren(Set<DetailedSample> children);
 
   SampleClass getSampleClass();
@@ -90,6 +87,7 @@ public interface DetailedSample extends Sample {
   /**
    * @return the old LIMS' ID for this sample prior to being migrated to MISO
    */
+  @Override
   Long getPreMigrationId();
   
   void setPreMigrationId(Long preMigrationId);
