@@ -26,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -1809,6 +1810,21 @@ public class Dtos {
     ReferenceGenomeDto dto = new ReferenceGenomeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
+    return dto;
+  }
+
+  public static ExperimentDto asDto(Experiment from) {
+    ExperimentDto dto = new ExperimentDto();
+    dto.setId(from.getId());
+    dto.setAccession(from.getAccession());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    dto.setName(from.getName());
+    dto.setPlatform(asDto(from.getPlatform()));
+    dto.setPool(asDto(from.getPool(), true));
+    dto.setRun(asDto(from.getRun()));
+    dto.setStudy(asDto(from.getStudy()));
+    dto.setTitle(from.getTitle());
     return dto;
   }
 }

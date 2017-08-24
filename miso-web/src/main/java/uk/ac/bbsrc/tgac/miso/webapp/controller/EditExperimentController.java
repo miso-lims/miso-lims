@@ -60,6 +60,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
@@ -120,8 +122,8 @@ public class EditExperimentController {
   }
 
   @RequestMapping(value = "/rest/{experimentId}", method = RequestMethod.GET)
-  public @ResponseBody Experiment jsonRest(@PathVariable Long experimentId) throws IOException {
-    return experimentService.get(experimentId);
+  public @ResponseBody ExperimentDto jsonRest(@PathVariable Long experimentId) throws IOException {
+    return Dtos.asDto(experimentService.get(experimentId));
   }
 
   @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
