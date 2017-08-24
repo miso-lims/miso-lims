@@ -382,13 +382,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public boolean hasDuplicateIndices() {
-    Set<String> indices = new HashSet<>();
-    for (PoolableElementView item : getPoolableElementViews()) {
-      if (hasDuplicateIndices(indices, item)) {
-        return true;
-      }
-    }
-    return false;
+    return !getDuplicateIndicesSequences().isEmpty();
   }
 
   private boolean hasDuplicateIndices(Set<String> indices, PoolableElementView item) {
@@ -397,6 +391,20 @@ public class PoolImpl extends AbstractBoxable implements Pool {
       totalIndex.append(index.getSequence());
     }
     return !indices.add(totalIndex.toString());
+  }
+
+  @Override
+  public Set<String> getDuplicateIndicesSequences() {
+    Set<String> indices = new HashSet<>();
+    Set<String> duplicateSequences = new HashSet<>();
+    for (PoolableElementView item : getPoolableElementViews()) {
+      if (hasDuplicateIndices(indices, item)) {
+        for (Index index : item.getIndices()) {
+          duplicateSequences.add(index.getSequence());
+        }
+      }
+    }
+    return duplicateSequences.isEmpty() ? Collections.emptySet() : duplicateSequences;
   }
 
   @Override

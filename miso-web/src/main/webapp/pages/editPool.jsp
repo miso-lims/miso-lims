@@ -472,7 +472,7 @@
   
   <script type="text/javascript">
       jQuery(document).ready(function () {
-          ListUtils.createTable('includedTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : false });
+          ListUtils.createTable('includedTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : false, duplicateIndicesSequences : ${duplicateIndicesSequences} });
           ListUtils.createTable('availableTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : true });
       });
   </script>

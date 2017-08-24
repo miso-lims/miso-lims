@@ -1310,9 +1310,11 @@ public class Dtos {
         }
       }
       dto.setPooledElements(pooledElements);
+      dto.setDuplicateIndicesSequences(from.getDuplicateIndicesSequences());
     } else {
       dto.setPooledElements(Collections.emptySet());
     }
+    dto.setDuplicateIndices(from.hasDuplicateIndices());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());

@@ -88,7 +88,10 @@ ListTarget.poolelements = {
                 return data.indexOf(index.id) != -1;
               }));
             }, []).map(function(index) {
-              return index.label;
+              return index.label + 
+                ((config.duplicateIndicesSequences && config.duplicateIndicesSequences.indexOf(index.sequence) != -1) ? 
+                  " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDEX)</strong></span>" :
+                  "");
             }).join();
           }
         }, {

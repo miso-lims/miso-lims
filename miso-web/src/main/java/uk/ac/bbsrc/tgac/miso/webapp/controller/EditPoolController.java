@@ -194,6 +194,8 @@ public class EditPoolController {
       model.put("runsJSON", mapper.writeValueAsString(
           poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId))));
 
+      model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
+
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
