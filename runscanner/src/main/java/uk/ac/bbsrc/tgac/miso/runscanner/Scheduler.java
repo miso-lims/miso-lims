@@ -203,7 +203,7 @@ public class Scheduler {
   private final AtomicInteger epoch = new AtomicInteger();
 
   // The paths that threw an exception while processing.
-  private final Set<File> failed = new ConcurrentSkipListSet<>();
+  private final Map<File, Instant> failed = new ConcurrentHashMap<>();
 
   // The paths for which we have a notification to send.
   private final Map<File, FinishedWork> finishedWork = new ConcurrentHashMap<>();
@@ -254,7 +254,7 @@ public class Scheduler {
   }
 
   public Set<File> getFailedDirectories() {
-    return failed;
+    return failed.keySet();
   }
 
   public Set<File> getFinishedDirectories() {
@@ -296,7 +296,8 @@ public class Scheduler {
    * sequencer)
    */
   private boolean isUnprocessed(File directory) {
-    return !workToDo.contains(directory) && !processing.contains(directory) && !failed.contains(directory)
+    return !workToDo.contains(directory) && !processing.contains(directory)
+        && (!failed.containsKey(directory) || Duration.between(failed.get(directory), Instant.now()).toMinutes() > 20)
         && (!finishedWork.containsKey(directory) || finishedWork.get(directory).shouldRerun());
   }
 
@@ -324,11 +325,12 @@ public class Scheduler {
         work.dto = dto;
         work.epoch = epoch.incrementAndGet();
         finishedWork.put(directory, work);
+        failed.remove(directory);
         epochGauge.set(work.epoch);
       } catch (Exception e) {
         log.error("Failed to process run: " + directory.getPath(), e);
         errors.labels(processor.getPlatformType().name()).inc();
-        failed.add(directory);
+        failed.put(directory, Instant.now());
       }
       processTime.labels(processor.getPlatformType().name(), instrumentName).observe((System.nanoTime() - runStartTime) / 1e9);
       processing.remove(directory);
