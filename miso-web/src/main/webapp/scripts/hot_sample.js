@@ -30,14 +30,14 @@ HotTarget.sample = (function() {
   };
   
   var getSelectedIdentity = function(flatObj) {
-	if (!flatObj.potentialIdentities) {
+    if (!flatObj.potentialIdentities) {
       return null;
-	}
+    }
     return Utils.array.findFirstOrNull(function(item) {
       return item.label == flatObj.identityAlias;
     }, flatObj.potentialIdentities);
   }
-  
+
   return {
     
     createUrl : '/miso/rest/tree/sample/',
@@ -198,7 +198,10 @@ HotTarget.sample = (function() {
             type : (config.hasProject ? 'text' : 'dropdown'),
             source : (function() {
               if ((!config.projects || config.projects.length == 0) && config.create && !config.propagate && !config.hasProject) {
-                /* projects list failed to generate when it should have, and we can't proceed. Notify the user. */
+                /*
+                 * projects list failed to generate when it should have, and we
+                 * can't proceed. Notify the user.
+                 */
                 var serverErrorMessages = document
                     .getElementById('serverErrors');
                 serverErrorMessages.innerHTML = '<p>Failed to generate list of projects. Please notify your MISO administrators.</p>';
@@ -211,7 +214,10 @@ HotTarget.sample = (function() {
               var projectLabels = (config.projects ? config.projects.sort(
                   Utils.sorting.standardSort(comparator)).map(function(item) {
                 return item[label];
-              }) : []); /* use empty array if projects are not provided (should only happen during propagate or edit) */
+              }) : []); /*
+                         * use empty array if projects are not provided (should
+                         * only happen during propagate or edit)
+                         */
               return projectLabels;
             })(),
             unpack : function(sam, flat, setCellMeta) {
@@ -280,7 +286,8 @@ HotTarget.sample = (function() {
             pack : function(sam, flat, errorHandler) {
               if (!getSelectedIdentity(flat)) {
                 sam.externalName = flat.externalName;
-              } // else externalName will come from an existing Identity via the Identity Alias column
+              } // else externalName will come from an existing Identity via the
+                // Identity Alias column
             }
           },
           {
@@ -297,15 +304,14 @@ HotTarget.sample = (function() {
                 setData) {
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
               var selectedProject = config.project || Utils.array
-                    .findFirstOrNull(
-                        function(project) {
-                          return project[label] == flat.projectAlias;
-                        }, config.projects);
+                  .findFirstOrNull(function(project) {
+                    return project[label] == flat.projectAlias;
+                  }, config.projects);
               if (selectedProject == null) {
-              	// the user needs to select a project
-              	setData("Delete external name, select a project, then re-enter external name.");
-              	return;
-              } 
+                // the user needs to select a project
+                setData("Delete external name, select a project, then re-enter external name.");
+                return;
+              }
               if (!Utils.validation.isEmpty(flat.externalName)) {
                 setData('(...searching...)');
                 getIdentities(HotUtils.counter);
@@ -329,7 +335,6 @@ HotTarget.sample = (function() {
                           // the original request
                           if (data.requestCounter == requestCounter) {
                             var potentialIdentities = [];
-                            
                             
                             if (selectedProject == null) {
                               // let the user know they need to select a project
@@ -355,8 +360,7 @@ HotTarget.sample = (function() {
                             
                             var indexOfMatchingIdentityInProject = -1;
                             for (i = 0; i < data.matchingIdentities.length; i++) {
-                              if (data.matchingIdentities[i].projectId == selectedProject.id 
-                                  && data.matchingIdentities[i].externalName == flat.externalName) {
+                              if (data.matchingIdentities[i].projectId == selectedProject.id && data.matchingIdentities[i].externalName == flat.externalName) {
                                 indexOfMatchingIdentityInProject = i;
                                 break;
                               }
@@ -387,11 +391,13 @@ HotTarget.sample = (function() {
               if (selectedIdentity) {
                 sam.parentAlias = selectedIdentity.alias;
                 sam.externalName = selectedIdentity.externalName;
-              } // else externalName is for a new Identity and will come from the External Name column
+              } // else externalName is for a new Identity and will come from
+                // the External Name column
             }
           },
-          HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;', show['Identity'], true,
-              'donorSex', Constants.donorSexes, 'Unknown'),
+          HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;',
+              show['Identity'], true, 'donorSex', Constants.donorSexes,
+              'Unknown'),
           
           // Detailed sample columns
           {
@@ -434,8 +440,7 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForInt('Tube Number', show['Tissue'],
               'tubeNumber', HotUtils.validator.requiredNumber),
           HotUtils.makeColumnForConstantsList('Lab', show['Tissue'],
-              'labComposite', 'labId', 'id', 'label',
-              Constants.labs, false),
+              'labComposite', 'labId', 'id', 'label', Constants.labs, false),
           HotUtils.makeColumnForText('Ext. Inst. Identifier', show['Tissue'],
               'externalInstituteIdentifier', {
                 validator : HotUtils.validator.optionalTextNoSpecialChars
@@ -468,7 +473,7 @@ HotTarget.sample = (function() {
             data : 'stainName',
             type : 'dropdown',
             trimDropdown : false,
-            source : function () {
+            source : function() {
               var stains = Constants.stains.sort(function(a, b) {
                 return (a.category || '').localeCompare(b.category || '');
               }).map(function(s) {
@@ -489,8 +494,7 @@ HotTarget.sample = (function() {
             },
             pack : function(sam, flat, errorHandler) {
               sam.stain = Utils.array.findFirstOrNull(Utils.array
-                  .namePredicate(flat.stainName), 
-                      Constants.stains);
+                  .namePredicate(flat.stainName), Constants.stains);
             },
             include : show['Tissue Processing'] && config.targetSampleClass.alias == 'Slide'
           },
@@ -525,7 +529,8 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForFloat('Conc. (ng/&#181;l)',
               (show['Stock'] || show['Aliquot']), 'concentration'),
           HotUtils.makeColumnForFloat('New RIN', config.rnaSamples, 'qcRin'),
-          HotUtils.makeColumnForFloat('New DV200', config.rnaSamples, 'qcDv200'),
+          HotUtils
+              .makeColumnForFloat('New DV200', config.rnaSamples, 'qcDv200'),
           
           // QC status columns for detailed and non-detailed samples
           {
@@ -736,6 +741,6 @@ HotTarget.sample = (function() {
               (result.target || targets[0]).action(result.replicates);
             });
           }
-        }, ]
+        }, HotUtils.printAction('sample'), ]
   };
 })();

@@ -82,7 +82,7 @@
 	             onmouseover="mcancelclosetime()"
 	             onmouseout="mclosetime()">
 	          <a href="javascript:void(0);"
-	             onclick="Box.barcode.printBoxBarcodes(${box.id});">Print</a>
+	             onclick="Utils.printDialog('box', [${box.id}]);">Print</a>
 	          <c:if test="${not autoGenerateIdBarcodes}">
 	            <a href="javascript:void(0);" 
 	               onclick="Box.ui.showBoxIdBarcodeChangeDialog(${box.id}, '${box.identificationBarcode}');">Assign New Barcode</a>
@@ -110,7 +110,6 @@
 	    </script>
     </c:if>
   </div>
-  <div id="printServiceSelectDialog" title="Select a Printer"></div>
 </div>
 <div id="boxInfo">
   <table class="in">

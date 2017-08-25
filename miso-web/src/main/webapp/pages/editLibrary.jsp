@@ -114,7 +114,7 @@
 
           <div id="idBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
             <a href="javascript:void(0);"
-               onclick="Library.barcode.printLibraryBarcodes(${library.id});">Print</a>
+               onclick="Utils.printDialog('library', [${library.id}]);">Print</a>
             <c:if test="${not autoGenerateIdBarcodes}">
               <a href="javascript:void(0);"
                onclick="Library.barcode.showLibraryIdBarcodeChangeDialog(${library.id}, '${library.identificationBarcode}');">Update Barcode</a>
@@ -141,7 +141,6 @@
       </script>
     </c:if>
   </div>
-  <div id="printServiceSelectDialog" title="Select a Printer"></div>
 </div>
 
 <table class="in">

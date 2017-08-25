@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -79,11 +78,8 @@ import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
-import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
-import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -102,8 +98,6 @@ public class PoolControllerHelperService {
   private PoolService poolService;
   @Autowired
   private MisoFilesManager misoFileManager;
-  @Autowired
-  private PrinterService printerService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -364,36 +358,6 @@ public class PoolControllerHelperService {
     }
   }
 
-  public JSONObject printPoolBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new BarcodePrintAssister<Pool>() {
-
-      @Override
-      public Pool fetch(long id) throws IOException {
-        return poolService.get(id);
-      }
-
-      @Override
-      public void store(Pool item) throws IOException {
-        poolService.save(item);
-      }
-
-      @Override
-      public String getGroupName() {
-        return "pools";
-      }
-
-      @Override
-      public String getIdName() {
-        return "poolId";
-      }
-
-      @Override
-      public Iterable<Pool> fetchAll(long projectId) throws IOException {
-        return Collections.emptyList();
-      }
-    });
-  }
-
   public JSONObject changePoolIdBarcode(HttpSession session, JSONObject json) {
     Long poolId = json.getLong("poolId");
     String idBarcode = json.getString("identificationBarcode");
@@ -594,10 +558,6 @@ public class PoolControllerHelperService {
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
-  }
-
-  public void setPrinterService(PrinterService printerService) {
-    this.printerService = printerService;
   }
 
   public void setExperimentService(ExperimentService experimentService) {

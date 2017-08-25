@@ -17,6 +17,8 @@ import org.apache.commons.lang.NotImplementedException;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -1718,11 +1720,11 @@ public class Dtos {
     return dto;
   }
 
-  public static Printer to(PrinterDto dto) {
+  public static Printer to(PrinterDto dto) throws JsonProcessingException {
     Printer to = new Printer();
     to.setId(dto.getId());
     to.setBackend(Backend.valueOf(dto.getBackend()));
-    to.setConfiguration(dto.getConfiguration().asText());
+    to.setConfiguration(new ObjectMapper().writeValueAsString(dto.getConfiguration()));
     to.setDriver(Driver.valueOf(dto.getDriver()));
     to.setEnabled(dto.isAvailable());
     to.setName(dto.getName());

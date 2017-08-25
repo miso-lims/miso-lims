@@ -176,28 +176,25 @@ HotTarget.library = (function() {
           },
           {
             header : 'Sample Location',
-            data: 'sampleBoxPositionLabel',
-            type: 'text',
-            readOnly: true,
-            include: config.sortableLocation,
+            data : 'sampleBoxPositionLabel',
+            type : 'text',
+            readOnly : true,
+            include : config.sortableLocation,
             unpack : function(sam, flat, setCellMeta) {
               flat.sampleBoxPositionLabel = sam.sampleBoxPositionLabel;
             },
             pack : function(sam, flat, errorHandler) {
               sam.sampleBoxPositionLabel = flat.sampleBoxPositionLabel;
             },
-            customSorting : [
-              {
-                buttonText : 'Sort by Sample Location (rows)',
-                sortTarget : 'rows',
-                sortFunc : HotUtils.sorting.rowSort
-              },
-              {
-                buttonText : 'Sort by Sample Location (columns)',
-                sortTarget : 'columns',
-                sortFunc : HotUtils.sorting.colSort
-              }
-            ],
+            customSorting : [ {
+              buttonText : 'Sort by Sample Location (rows)',
+              sortTarget : 'rows',
+              sortFunc : HotUtils.sorting.rowSort
+            }, {
+              buttonText : 'Sort by Sample Location (columns)',
+              sortTarget : 'columns',
+              sortFunc : HotUtils.sorting.colSort
+            } ],
             sortIndicator : true
           },
           HotUtils.makeColumnForText('Matrix Barcode',
@@ -408,12 +405,12 @@ HotTarget.library = (function() {
           HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume,
               'volume', false),
           HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false),
-          HotUtils.makeColumnForFloat('New Qubit (ng/&#181;l)', !create, 'qcQubit',
-              false),
+          HotUtils.makeColumnForFloat('New Qubit (ng/&#181;l)', !create,
+              'qcQubit', false),
           HotUtils.makeColumnForFloat('New TapeStation (bp)', !create,
               'qcTapeStation', false),
-          HotUtils.makeColumnForFloat('New qPCR (mol/&#181;l)', !create, 'qcQPcr',
-              false), ];
+          HotUtils.makeColumnForFloat('New qPCR (mol/&#181;l)', !create,
+              'qcQPcr', false), ];
     },
     
     bulkActions : [
@@ -434,7 +431,7 @@ HotTarget.library = (function() {
                   ids : items.map(Utils.array.getId).join(',')
                 });
           }
-        }, ],
+        }, HotUtils.printAction('library'), ],
   
   };
 })();

@@ -125,7 +125,7 @@
               onmouseout="mclosetime()">
 
             <a href="javascript:void(0);"
-               onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
+               onclick="Utils.printDialog('sample', [${sample.id}]);">Print</a>
             <c:if test="${not autoGenerateIdBarcodes}">
               <a href="javascript:void(0);"
                onclick="Sample.ui.showSampleIdBarcodeChangeDialog(${sample.id}, '${sample.identificationBarcode}');">Update Barcode</a>
@@ -154,7 +154,6 @@
       </script>
     </c:if>
   </div>
-  <div id="printServiceSelectDialog" title="Select a Printer"></div>
 </div>
 <div>
   <table class="in" <c:if test="${detailedSample && sample.isSynthetic()}">style="background-color: #ddd"</c:if>>

@@ -41,9 +41,7 @@ HotTarget.dilution = {
         HotUtils.makeColumnForFloat(
             'Conc. (' + Constants.libraryDilutionConcentrationUnits + ')',
             true, 'concentration', true),
-        HotUtils.makeColumnForFloat(
-            'Volume',
-            true, 'volume', false),
+        HotUtils.makeColumnForFloat('Volume', true, 'volume', false),
         {
           header : 'Creation Date',
           data : 'creationDate',
@@ -134,6 +132,6 @@ HotTarget.dilution = {
               });
         },
         allowOnLibraryPage : true
-      }, ],
+      }, HotUtils.printAction('dilution'), ],
 
 };

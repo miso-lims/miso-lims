@@ -367,6 +367,45 @@ var Utils = Utils || {
             }
         });
     },
+    printDialog: function(type, ids) {
+        Utils
+            .ajaxWithDialog(
+                'Getting Printers',
+                'GET',
+                window.location.origin + '/miso/rest/printer',
+                null,
+                function(printers) {
+                  Utils
+                      .showWizardDialog(
+                          'Select Printer',
+                          printers
+                              .filter(function(printer) {
+                                return printer.available;
+                              })
+                              .map(
+                                  function(printer) {
+                                    return {
+                                      name : printer.name,
+                                      handler : function() {
+                                        Utils
+                                            .ajaxWithDialog(
+                                                'Printing',
+                                                'POST',
+                                                window.location.origin + '/miso/rest/printer/' + printer.id + '?' + jQuery
+                                                    .param({
+                                                      type : type,
+                                                      ids : ids.join(',')
+                                                    })
+                                                , null, function(result) {
+                                                    Utils.showOkDialog('Printing', [
+                                                       result == ids.length ? 'Printing successful.' : (result + ' of ' + ids.length + ' printed.')
+                                                    ]);
+                                                });
+                                      }
+                                    };
+                                  }));
+                });
+    },
     
       
   /**
