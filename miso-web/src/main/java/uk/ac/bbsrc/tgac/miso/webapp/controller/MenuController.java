@@ -178,11 +178,6 @@ public class MenuController implements ServletContextAware {
     return "/pages/adminMenu.jsp";
   }
 
-  @RequestMapping("/custombarcode")
-  public String custombarcode() {
-    return "/pages/customBarcodePrinting.jsp";
-  }
-
   @RequestMapping("/myAccount")
   public ModelAndView myAccountMenu(ModelMap model) {
     try {

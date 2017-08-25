@@ -361,9 +361,9 @@ var Utils = Utils || {
                 dialog.dialog("close");
                 callback(data, textStatus, xhr);
             },
-            'error' : function(xhr, textStatus) {
+            'error' : function(xhr, textStatus, errorThrown) {
                 dialog.dialog("close");
-                alert('Sadness: ' + textStatus);
+                Utils.showOkDialog(title, [ 'Error: ' + errorThrown ]);
             }
         });
     },
