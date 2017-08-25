@@ -486,7 +486,7 @@
         </c:forEach>
       </div>
     </c:if>
-    <div id="addLibraryNoteDialog" title="Create new Note"></div>
+    <div id="addNoteDialog" title="Create new Note"></div>
   </div>
 </c:if>
 </form:form>

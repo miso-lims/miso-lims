@@ -19,8 +19,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage.AddNoteDialog;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage.Field;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.AddNoteDialog;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.Note;
 
 public class LibraryPageIT extends AbstractIT {
@@ -301,7 +301,7 @@ public class LibraryPageIT extends AbstractIT {
   @Test
   public void testCancelAddNote() throws Exception {
     LibraryPage page = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);
-    AddNoteDialog dialog = page.openAddNoteDialog();
+    AddNoteDialog<LibraryPage> dialog = page.getNotesSection().openAddNoteDialog();
     assertTrue(dialog.isDisplayed());
     dialog.setField(AddNoteDialog.Field.INTERNAL_ONLY, "true");
     dialog.setField(AddNoteDialog.Field.TEXT, "test note");
@@ -312,7 +312,7 @@ public class LibraryPageIT extends AbstractIT {
   @Test
   public void testAddNoteInvalid() throws Exception {
     LibraryPage page = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);
-    AddNoteDialog dialog = page.openAddNoteDialog();
+    AddNoteDialog<LibraryPage> dialog = page.getNotesSection().openAddNoteDialog();
     assertTrue(dialog.isDisplayed());
     // submit invalid note (no text)
     LibraryPage page2 = dialog.submit();
@@ -327,17 +327,17 @@ public class LibraryPageIT extends AbstractIT {
     final String text = "test note";
     Predicate<Note> expectedText = note -> text.equals(note.getText());
 
-    List<Note> initialNotes = page1.getNotes();
+    List<Note> initialNotes = page1.getNotesSection().getNotes();
     assertFalse(initialNotes.stream().anyMatch(expectedText));
 
-    AddNoteDialog dialog = page1.openAddNoteDialog();
+    AddNoteDialog<LibraryPage> dialog = page1.getNotesSection().openAddNoteDialog();
     dialog.setField(AddNoteDialog.Field.INTERNAL_ONLY, "true");
     dialog.setField(AddNoteDialog.Field.TEXT, text);
     assertEquals("true", dialog.getField(AddNoteDialog.Field.INTERNAL_ONLY));
     assertEquals("test note", dialog.getField(AddNoteDialog.Field.TEXT));
     LibraryPage page2 = dialog.submit();
 
-    List<Note> afterAddNotes = page2.getNotes();
+    List<Note> afterAddNotes = page2.getNotesSection().getNotes();
     assertEquals(initialNotes.size() + 1, afterAddNotes.size());
     assertTrue(afterAddNotes.stream().anyMatch(expectedText));
   }
@@ -349,11 +349,11 @@ public class LibraryPageIT extends AbstractIT {
     final String text = "LIB110005 existing note";
     Predicate<Note> expectedText = note -> text.equals(note.getText());
 
-    List<Note> initialNotes = page1.getNotes();
+    List<Note> initialNotes = page1.getNotesSection().getNotes();
     assertTrue(initialNotes.stream().anyMatch(expectedText));
 
-    LibraryPage page2 = page1.deleteNote(text);
-    List<Note> afterDeleteNotes = page2.getNotes();
+    LibraryPage page2 = page1.getNotesSection().deleteNote(text);
+    List<Note> afterDeleteNotes = page2.getNotesSection().getNotes();
     assertEquals(initialNotes.size() - 1, afterDeleteNotes.size());
     assertFalse(afterDeleteNotes.stream().anyMatch(expectedText));
   }

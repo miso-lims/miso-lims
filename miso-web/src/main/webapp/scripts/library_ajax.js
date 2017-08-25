@@ -615,7 +615,7 @@ Library.ui = {
 
   showLibraryNoteDialog: function (libraryId) {
     var self = this;
-    jQuery('#addLibraryNoteDialog')
+    jQuery('#addNoteDialog')
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='internalOnly'>Internal Only?</label>" +
@@ -625,7 +625,7 @@ Library.ui = {
             "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />" +
             "</fieldset></form>");
 
-    jQuery('#addLibraryNoteDialog').dialog({
+    jQuery('#addNoteDialog').dialog({
       width: 400,
       modal: true,
       resizable: false,
