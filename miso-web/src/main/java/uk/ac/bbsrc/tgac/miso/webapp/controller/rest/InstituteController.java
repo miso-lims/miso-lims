@@ -11,17 +11,15 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
@@ -76,28 +74,25 @@ public class InstituteController extends RestController {
   
   @RequestMapping(value = "/institute", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createInstitute(@RequestBody InstituteDto instituteDto, UriComponentsBuilder uriBuilder) throws IOException {
+  public InstituteDto createInstitute(@RequestBody InstituteDto instituteDto, UriComponentsBuilder uriBuilder) throws IOException {
     Institute institute = Dtos.to(instituteDto);
     Long id = instituteService.create(institute);
-    UriComponents uriComponents = uriBuilder.path("/institute/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    return getInstitute(id, uriBuilder);
   }
   
   @RequestMapping(value = "/institute/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateInstitute(@PathVariable("id") Long id, @RequestBody InstituteDto instituteDto, 
+  public InstituteDto updateInstitute(@PathVariable("id") Long id, @RequestBody InstituteDto instituteDto,
       UriComponentsBuilder uriBuilder) throws IOException {
     Institute institute = Dtos.to(instituteDto);
     institute.setId(id);
     instituteService.update(institute);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return getInstitute(id, uriBuilder);
   }
   
   @RequestMapping(value = "/institute/{id}", method = RequestMethod.DELETE)
-  @ResponseBody
-  public ResponseEntity<?> deleteInstitute(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+  @ResponseStatus(code = HttpStatus.OK)
+  public void deleteInstitute(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     try {
       instituteService.delete(id);
     } catch (IOException e) {
@@ -109,7 +104,6 @@ public class InstituteController extends RestController {
         throw e;
       }
     }
-    return new ResponseEntity<>(HttpStatus.OK);
   }
   
 }

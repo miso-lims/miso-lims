@@ -146,7 +146,7 @@ ListUtils = (function() {
           name : bulkAction.name,
           handler : function() {
             if (ListState[elementId].selected.length == 0) {
-              alert('Nothing selected.');
+              Utils.showOkDialog(bulkAction.name, ['Nothing selected.']);
               return;
             }
             bulkAction.action(ListState[elementId].selected);

@@ -5,13 +5,9 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface Institute extends Serializable {
+public interface Institute extends Serializable, Aliasable {
 
-  Long getId();
-
-  void setId(Long id);
-
-  String getAlias();
+  void setId(long id);
 
   void setAlias(String alias);
 

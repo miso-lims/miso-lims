@@ -24,9 +24,11 @@ public class TissueTypeImpl implements TissueType {
 
   private static final long serialVersionUID = 1L;
 
+  public static final long UNSAVED_ID = 0L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long tissueTypeId;
+  private Long tissueTypeId = UNSAVED_ID;
 
   @Column(unique = true, nullable = false)
   private String alias;

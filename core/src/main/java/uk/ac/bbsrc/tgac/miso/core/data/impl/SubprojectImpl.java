@@ -24,10 +24,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 public class SubprojectImpl implements Subproject {
 
   private static final long serialVersionUID = 1L;
+  public static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long subprojectId;
+  private long subprojectId = UNSAVED_ID;
 
   @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "projectId", nullable = false)
@@ -36,7 +37,7 @@ public class SubprojectImpl implements Subproject {
   @Column(unique = true, nullable = false)
   private String alias;
 
-  @Column(nullable = false)
+  @Column
   private String description;
 
   @Column(nullable = false)
@@ -62,12 +63,12 @@ public class SubprojectImpl implements Subproject {
   private Long referenceGenomeId;
 
   @Override
-  public Long getId() {
+  public long getId() {
     return subprojectId;
   }
 
   @Override
-  public void setId(Long subprojectId) {
+  public void setId(long subprojectId) {
     this.subprojectId = subprojectId;
   }
 

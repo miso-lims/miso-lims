@@ -65,20 +65,6 @@
           <a href="<c:url value='/miso/flexreports'/>">Reports</a><br/>
         </div>
       </div>
-      <c:if test="${detailedSample}">
-      <sec:authorize access="hasRole('ROLE_ADMIN')">
-        <div class="portlet">
-          <div class="portlet-header">Institute Defaults</div>
-          <div class="portlet-content">
-            <a href="<c:url value='/miso/admin/instituteDefaults#tissuematerial'/>">Tissue Materials</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#samplepurpose'/>">Sample Purposes</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#subproject'/>">Subprojects</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#institute'/>">Institutes</a><br/>
-            <a href="<c:url value='/miso/admin/instituteDefaults#lab'/>">Labs</a><br/>
-          </div>
-        </div>
-      </sec:authorize>
-      </c:if>
     </div>
     <div id="dialog"></div>
   </div>

@@ -24,57 +24,48 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 
 @Controller
 public class ListGroupsController {
 
-  private final ListItemsPage groupsPage = new ListItemsPage("group") {
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      config.put("isAdmin", user.isAdmin());
-      config.put("isTech", Arrays.asList(user.getRoles()).contains("ROLE_TECH"));
-    }
-
-  };
+  private final ListItemsPage groupsPage = new ListItemsPageWithAuthorization("group", this::getSecurityManager);
 
   @Autowired
   private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @ModelAttribute("title")
-  public String title() {
-    return "Groups";
-  }
 
   @RequestMapping("/admin/groups")
   public ModelAndView adminListGroups(ModelMap model) throws IOException {
     return groupsPage.list(model, securityManager.listAllGroups().stream().map(Dtos::asDto));
   }
 
+  public SecurityManager getSecurityManager() {
+    return securityManager;
+  }
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
+
   @RequestMapping("/tech/groups")
   public ModelAndView techListGroups(ModelMap model) throws IOException {
     return groupsPage.list(model, securityManager.listAllGroups().stream().map(Dtos::asDto));
+  }
+
+  @ModelAttribute("title")
+  public String title() {
+    return "Groups";
   }
 }

@@ -24,9 +24,11 @@ public class TissueOriginImpl implements TissueOrigin {
 
   private static final long serialVersionUID = 1L;
 
+  public static final long UNSAVED_ID = 0L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long tissueOriginId;
+  private long tissueOriginId = UNSAVED_ID;
 
   @Column(unique = true, nullable = false)
   private String alias;
@@ -51,12 +53,12 @@ public class TissueOriginImpl implements TissueOrigin {
   private Date lastUpdated;
 
   @Override
-  public Long getId() {
+  public long getId() {
     return tissueOriginId;
   }
 
   @Override
-  public void setId(Long tissueOriginId) {
+  public void setId(long tissueOriginId) {
     this.tissueOriginId = tissueOriginId;
   }
 

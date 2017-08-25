@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -34,17 +34,15 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
@@ -99,37 +97,36 @@ public class SubprojectController extends RestController {
 
   @RequestMapping(value = "/referencegenomes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Collection<ReferenceGenome> getReferenceGenomeOptions(UriComponentsBuilder uriComponentsBuilder, HttpServletResponse response) throws IOException {
+  public Collection<ReferenceGenome> getReferenceGenomeOptions(UriComponentsBuilder uriComponentsBuilder, HttpServletResponse response)
+      throws IOException {
     return referenceGenomeService.listAllReferenceGenomeTypes();
   }
 
   @RequestMapping(value = "/subproject", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createSubproject(@RequestBody SubprojectDto subprojectDto, UriComponentsBuilder b, HttpServletResponse response)
+  public SubprojectDto createSubproject(@RequestBody SubprojectDto subprojectDto, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response)
       throws IOException {
     Subproject subproject = Dtos.to(subprojectDto);
     Long id = subprojectService.create(subproject, subprojectDto.getParentProjectId());
-    UriComponents uriComponents = b.path("/subproject/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    return getSubproject(id, uriBuilder, response);
   }
 
   @RequestMapping(value = "/subproject/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateSubproject(@PathVariable("id") Long id, @RequestBody SubprojectDto subprojectDto,
+  public SubprojectDto updateSubproject(@PathVariable("id") Long id, @RequestBody SubprojectDto subprojectDto,
+      UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
     Subproject subproject = Dtos.to(subprojectDto);
     subproject.setId(id);
     subprojectService.update(subproject);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return getSubproject(id, uriBuilder, response);
   }
 
   @RequestMapping(value = "/subproject/{id}", method = RequestMethod.DELETE)
-  @ResponseBody
-  public ResponseEntity<?> deleteSubproject(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+  @ResponseStatus(code = HttpStatus.OK)
+  public void deleteSubproject(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     subprojectService.delete(id);
-    return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @RequestMapping(value = "/subproject/{id}/groups", method = RequestMethod.GET, produces = { "application/json" })

@@ -5,13 +5,9 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface Subproject extends Serializable {
+public interface Subproject extends Serializable, Aliasable {
 
-  Long getId();
-
-  void setId(Long subprojectId);
-
-  String getAlias();
+  void setId(long subprojectId);
 
   void setAlias(String alias);
 

@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
@@ -245,7 +246,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
 
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
-      if (detailed.getSubproject() != null && detailed.getSubproject().getId() == null) {
+      if (detailed.getSubproject() != null && detailed.getSubproject().getId() == SubprojectImpl.UNSAVED_ID) {
         // New subproject
         createSubproject(detailed.getSubproject(), detailed.getProject());
       }
@@ -652,7 +653,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Updating run " + to.getId());
     to.setCompletionDate(from.getCompletionDate());
     to.setHealth(from.getHealth());
-
 
     if (to.getSequencerPartitionContainers().size() != 1) {
       throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",

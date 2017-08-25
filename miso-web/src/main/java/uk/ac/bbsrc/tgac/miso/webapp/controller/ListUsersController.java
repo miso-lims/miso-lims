@@ -24,13 +24,11 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.ldap.userdetails.InetOrgPerson;
 import org.springframework.stereotype.Controller;
@@ -39,13 +37,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 
 @Controller
 public class ListUsersController {
@@ -63,16 +59,7 @@ public class ListUsersController {
   @Qualifier("sessionRegistry")
   private SessionRegistry sessionRegistry;
 
-  private final ListItemsPage usersPage = new ListItemsPage("user") {
-
-    @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      config.put("isAdmin", user.isAdmin());
-      config.put("isTech", Arrays.asList(user.getRoles()).contains("ROLE_TECH"));
-    }
-
-  };
+  private final ListItemsPage usersPage = new ListItemsPageWithAuthorization("user", this::getSecurityManager);
 
   @RequestMapping("/admin/users")
   public ModelAndView adminListUsers(ModelMap model) throws IOException {
@@ -83,6 +70,10 @@ public class ListUsersController {
 
     return usersPage.list(model,
         securityManager.listAllUsers().stream().map(Dtos::asDto).peek(user -> user.setLoggedIn(loggedIn.contains(user.getLoginName()))));
+  }
+
+  public SecurityManager getSecurityManager() {
+    return securityManager;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

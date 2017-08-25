@@ -62,7 +62,7 @@ public interface Library
     extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable {
 
   /** Field UNSAVED_ID */
-  public static final Long UNSAVED_ID = 0L;
+  public static final long UNSAVED_ID = 0L;
   /** Field PREFIX */
   public static final String PREFIX = "LIB";
 

@@ -101,7 +101,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       if (!hasTemporaryAlias(library)) {
         validateAliasOrThrow(library);
       }
-      Long newId = libraryDao.save(library);
+      long newId = libraryDao.save(library);
       
       Library managed = libraryDao.get(newId);
       

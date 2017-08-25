@@ -1,9 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.List;
@@ -46,9 +43,9 @@ public class HibernateLabDaoTest extends AbstractDAOTest {
   public void testGetSingleLab() {
     Lab l = dao.getLab(1L);
     assertNotNull(l);
-    assertEquals(Long.valueOf(1L), l.getId());
+    assertEquals(1L, l.getId());
     assertEquals("Lab A1", l.getAlias());
-    assertEquals(Long.valueOf(1L), l.getInstitute().getId());
+    assertEquals(1L, l.getInstitute().getId());
   }
 
   @Test
