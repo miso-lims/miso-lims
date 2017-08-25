@@ -56,8 +56,7 @@ var Tissue = Tissue || {
     var SPtable = [];
     var id, alias, endpoint, temp, rowId;
     // if data is coming in from AJAX request, store it in Defaults.all
-    if (xhr) Defaults.all.samplePurposesDtos = JSON.parse(xhr.responseText);
-    Tissue.createTable(Defaults.all.samplePurposesDtos, 'SP', 'allPurposes', 'Purpose', SPtable);
+    Tissue.createTable(JSON.parse(xhr.responseText), 'SP', 'allPurposes', 'Purpose', SPtable);
   },
 
   createTable: function (data, option, tableBodyId, word, table) {
