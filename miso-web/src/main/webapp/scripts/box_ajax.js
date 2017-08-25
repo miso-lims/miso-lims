@@ -415,18 +415,6 @@ Box.ui = {
   },
 
   editBoxIdBarcode: function (span, id) {
-    Fluxion.doAjax(
-      'loggedActionService',
-      'logAction',
-      {
-        'objectId': id,
-        'objectType': 'Box',
-        'action': 'editBoxIdBarcode',
-        'url': ajaxurl
-      },
-      {}
-    );
-
     var v = span.find('a').text();
     if (v && v !== "") {
       span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");

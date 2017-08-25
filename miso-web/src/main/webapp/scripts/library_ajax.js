@@ -236,18 +236,6 @@ Library.qc = {
 
 Library.barcode = {
   editLibraryBarcode: function(span, id) {
-    Fluxion.doAjax(
-      'loggedActionService',
-      'logAction',
-      {
-        'objectId': id,
-        'objectType': 'Library',
-        'action': 'editLibraryIdBarcode',
-        'url': ajaxurl
-      },
-      {}
-    );
-
     var v = span.find('a').text();
     if (v && v !== "") {
       span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");

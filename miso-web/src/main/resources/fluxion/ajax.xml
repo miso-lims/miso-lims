@@ -79,9 +79,6 @@
   <bean id="experimentSearchService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentSearchService">
     </bean>
 
-  <bean id="loggedActionService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.logging.LoggedActionService">
-  </bean>
-
   <bean id="flexReportingControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.FlexReportingControllerHelperService">
   </bean>
 
