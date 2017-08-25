@@ -5,13 +5,9 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface TissueMaterial extends Serializable {
+public interface TissueMaterial extends Serializable, Aliasable {
 
-  Long getId();
-
-  void setId(Long tissueMaterialId);
-
-  String getAlias();
+  void setId(long tissueMaterialId);
 
   void setAlias(String alias);
 

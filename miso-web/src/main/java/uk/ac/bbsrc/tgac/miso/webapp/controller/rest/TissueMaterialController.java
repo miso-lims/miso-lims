@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -33,17 +33,15 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -99,31 +97,28 @@ public class TissueMaterialController extends RestController {
 
   @RequestMapping(value = "/tissuematerial", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createTissueMaterial(@RequestBody TissueMaterialDto tissueMaterialDto, UriComponentsBuilder b,
+  public TissueMaterialDto createTissueMaterial(@RequestBody TissueMaterialDto tissueMaterialDto, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
     TissueMaterial tissueMaterial = Dtos.to(tissueMaterialDto);
     Long id = tissueMaterialService.create(tissueMaterial);
-    UriComponents uriComponents = b.path("/tissuematerial/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    return getTissueMaterial(id, uriBuilder, response);
   }
 
   @RequestMapping(value = "/tissuematerial/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateTissueMaterial(@PathVariable("id") Long id, @RequestBody TissueMaterialDto tissueMaterialDto,
+  public TissueMaterialDto updateTissueMaterial(@PathVariable("id") Long id, @RequestBody TissueMaterialDto tissueMaterialDto,
+      UriComponentsBuilder uriBuilder,
       HttpServletResponse response) throws IOException {
     TissueMaterial tissueMaterial = Dtos.to(tissueMaterialDto);
     tissueMaterial.setId(id);
     tissueMaterialService.update(tissueMaterial);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return getTissueMaterial(id, uriBuilder, response);
   }
 
   @RequestMapping(value = "/tissuematerial/{id}", method = RequestMethod.DELETE)
-  @ResponseBody
-  public ResponseEntity<?> deleteTissueMaterial(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+  @ResponseStatus(code = HttpStatus.OK)
+  public void deleteTissueMaterial(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     tissueMaterialService.delete(id);
-    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 }

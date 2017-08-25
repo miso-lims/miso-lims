@@ -24,10 +24,12 @@ public class InstituteImpl implements Institute {
 
   private static final long serialVersionUID = 1L;
 
+  public static final long UNSAVED_ID = 0;
+
   @Id
   @Column(name = "instituteId")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private long id = UNSAVED_ID;
   
   @Column(nullable = false)
   private String alias;
@@ -49,12 +51,12 @@ public class InstituteImpl implements Institute {
   private Date lastUpdated;
 
   @Override
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
   @Override
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 

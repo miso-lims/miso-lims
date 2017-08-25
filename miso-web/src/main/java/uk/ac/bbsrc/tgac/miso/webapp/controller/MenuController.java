@@ -79,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
@@ -146,6 +147,8 @@ public class MenuController implements ServletContextAware {
   private TargetedSequencingService targetedSequencingService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private ReferenceGenomeService referenceGenomeService;
 
   @Autowired
   private StudyService studyService;
@@ -161,11 +164,6 @@ public class MenuController implements ServletContextAware {
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
     return autoGenerateIdBarcodes;
-  }
-
-  @ModelAttribute("detailedSample")
-  public Boolean isDetailedSampleEnabled() {
-    return detailedSample;
   }
 
   @RequestMapping("/tech/menu")
@@ -235,12 +233,6 @@ public class MenuController implements ServletContextAware {
     return "/pages/activityMenu.jsp";
   }
 
-  @RequestMapping("/admin/instituteDefaults")
-  public ModelAndView tissueOptions(ModelMap model) {
-    model.put("title", "Institute Defaults");
-    return new ModelAndView("/pages/instituteDefaults.jsp", model);
-  }
-
   @Override
   public void setServletContext(ServletContext servletContext) {
     this.servletContext = servletContext;
@@ -271,7 +263,7 @@ public class MenuController implements ServletContextAware {
     URI baseUri = uriBuilder.build().toUri();
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode node = mapper.createObjectNode();
-    node.put("isDetailedSample", isDetailedSampleEnabled());
+    node.put("isDetailedSample", detailedSample);
     node.put("automaticBarcodes", autoGenerateIdentificationBarcodes());
     node.put("automaticSampleAlias", namingScheme.hasSampleAliasGenerator());
     node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
@@ -316,6 +308,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "indexFamilies", indexFamilies, Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleQcTypes", sampleService.listSampleQcTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryQcTypes", libraryService.listLibraryQcTypes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");
     Collection<PlatformType> activePlatformTypes = platformService.listActivePlatformTypes();

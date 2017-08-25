@@ -229,7 +229,6 @@ public class EditLibraryController {
     return namingScheme != null && namingScheme.hasLibraryAliasGenerator();
   }
 
-  @ModelAttribute("detailedSample")
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
   }

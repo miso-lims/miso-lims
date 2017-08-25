@@ -78,7 +78,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private static final long serialVersionUID = 1L;
 
   protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
-  public static final Long UNSAVED_ID = 0L;
+  public static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

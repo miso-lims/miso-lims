@@ -249,18 +249,10 @@ public class EditSampleController {
     return namingScheme != null && namingScheme.hasSampleAliasGenerator();
   }
 
-  @Value("${miso.autoGenerateIdentificationBarcodes}")
-  private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
 
-  @ModelAttribute("autoGenerateIdBarcodes")
-  public Boolean autoGenerateIdentificationBarcodes() {
-    return autoGenerateIdBarcodes;
-  }
-
-  @ModelAttribute("detailedSample")
-  public Boolean isDetailedSampleEnabled() {
+  private Boolean isDetailedSampleEnabled() {
     return detailedSample;
   }
 

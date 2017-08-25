@@ -150,6 +150,7 @@ public class LibraryRestController extends RestController {
       throw new RestException("No such library.", Status.NOT_FOUND);
     }
     library = Dtos.to(libraryDto);
+    library.setId(id);
     if (libraryDto.getQcQubit() != null) {
       LibraryQC qc = new LibraryQCImpl();
       qc.setQcType(libraryService.getLibraryQcTypeByName("Qubit"));

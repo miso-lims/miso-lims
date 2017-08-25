@@ -40,9 +40,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -505,7 +510,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       if (sai.getDetailedQcStatus() != null && sai.getDetailedQcStatus().getId() != null) {
         sai.setDetailedQcStatus(detailedQcStatusDao.getDetailedQcStatus(sai.getDetailedQcStatus().getId()));
       }
-      if (sai.getSubproject() != null && sai.getSubproject().getId() != null) {
+      if (sai.getSubproject() != null && sai.getSubproject().getId() != SubprojectImpl.UNSAVED_ID) {
         sai.setSubproject(subProjectDao.getSubproject(sai.getSubproject().getId()));
       }
       if (isTissueProcessingSample(sai) && sai instanceof SampleSlide) {
@@ -520,22 +525,22 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       }
       if (isAliquotSample(sai)) {
         SampleAliquot sa = (SampleAliquot) sai;
-        if (sa.getSamplePurpose() != null && sa.getSamplePurpose().getId() != null) {
+        if (sa.getSamplePurpose() != null && sa.getSamplePurpose().getId() != SubprojectImpl.UNSAVED_ID) {
           sa.setSamplePurpose(samplePurposeDao.getSamplePurpose(sa.getSamplePurpose().getId()));
         }
       }
       if (isTissueSample(sai)) {
         SampleTissue st = (SampleTissue) sai;
-        if (st.getTissueMaterial() != null && st.getTissueMaterial().getId() != null) {
+        if (st.getTissueMaterial() != null && st.getTissueMaterial().getId() != TissueMaterialImpl.UNSAVED_ID) {
           st.setTissueMaterial(tissueMaterialDao.getTissueMaterial(st.getTissueMaterial().getId()));
         }
-        if (st.getTissueOrigin() != null && st.getTissueOrigin().getId() != null) {
+        if (st.getTissueOrigin() != null && st.getTissueOrigin().getId() != TissueOriginImpl.UNSAVED_ID) {
           st.setTissueOrigin(tissueOriginDao.getTissueOrigin(st.getTissueOrigin().getId()));
         }
-        if (st.getTissueType() != null && st.getTissueType().getId() != null) {
+        if (st.getTissueType() != null && st.getTissueType().getId() != TissueTypeImpl.UNSAVED_ID) {
           st.setTissueType(tissueTypeDao.getTissueType(st.getTissueType().getId()));
         }
-        if (st.getLab() != null && st.getLab().getId() != null) {
+        if (st.getLab() != null && st.getLab().getId() != LabImpl.UNSAVED_ID) {
           st.setLab(labService.get(st.getLab().getId()));
         }
       }

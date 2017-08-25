@@ -73,7 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 public class SequencerPartitionContainerImpl implements SequencerPartitionContainer {
 
   private static final long serialVersionUID = 1L;
-  public static final Long UNSAVED_ID = 0L;
+  public static final long UNSAVED_ID = 0L;
 
   public static final int DEFAULT_PARTITION_LIMIT = 8;
 

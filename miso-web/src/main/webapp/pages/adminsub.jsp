@@ -46,6 +46,17 @@
         <li><a href="<c:url value="/miso/studies"/>">Studies</a></li>
         <li><a href="<c:url value="/miso/printers"/>">Printers</a></li>
     </ul>
+
+    <c:if test="${detailedSample}">
+      <h2>Institute Defaults</h2>
+      <ul class="bullets">
+          <li><a href="<c:url value="/miso/tissuematerial/list"/>">Tissue Materials</a></li>
+          <li><a href="<c:url value="/miso/samplepurpose/list"/>">Sample Purposes</a></li>
+          <li><a href="<c:url value="/miso/subproject/list"/>">Subprojects</a></li>
+          <li><a href="<c:url value="/miso/institute/list"/>">Institutes</a></li>
+          <li><a href="<c:url value="/miso/lab/list"/>">Labs</a></li>
+      </ul>
+    </c:if>
 	
 	<sec:authorize access="hasRole('ROLE_ADMIN')">
 	  <h2>User Administration</h2>

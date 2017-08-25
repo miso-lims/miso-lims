@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -1802,5 +1803,12 @@ public class Dtos {
     to.setPlatform(to(dto.getPlatform()));
     to.setSerialNumber(dto.getSerialNumber());
     return to;
+  }
+
+  public static ReferenceGenomeDto asDto(ReferenceGenome from) {
+    ReferenceGenomeDto dto = new ReferenceGenomeDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    return dto;
   }
 }

@@ -24,9 +24,11 @@ public class SamplePurposeImpl implements SamplePurpose {
 
   private static final long serialVersionUID = 1L;
 
+  public static final long UNSAVED_ID = 0;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long samplePurposeId;
+  private long samplePurposeId = UNSAVED_ID;
 
   @Column(unique = true, nullable = false)
   private String alias;
@@ -48,12 +50,12 @@ public class SamplePurposeImpl implements SamplePurpose {
   private Date lastUpdated;
 
   @Override
-  public Long getId() {
+  public long getId() {
     return samplePurposeId;
   }
 
   @Override
-  public void setId(Long samplePurposeId) {
+  public void setId(long samplePurposeId) {
     this.samplePurposeId = samplePurposeId;
   }
 

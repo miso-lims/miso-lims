@@ -7,9 +7,9 @@ import com.eaglegenomics.simlims.core.User;
 
 public interface TissueOrigin extends Serializable {
 
-  public Long getId();
+  public long getId();
 
-  public void setId(Long tissueOriginId);
+  public void setId(long tissueOriginId);
 
   public String getAlias();
 

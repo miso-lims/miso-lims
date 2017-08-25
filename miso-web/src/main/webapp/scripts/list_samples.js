@@ -90,7 +90,8 @@ ListTarget.sample = {
             Utils.showDialog('Create Samples', 'Create', fields, function(
                 result) {
               if (result.quantity < 1) {
-                alert("That's a peculiar number of samples to create.");
+                Utils.showOkDialog('Create Samples', ["That's a peculiar number of samples to create."]);
+                return;
               }
               if (!Constants.isDetailedSample && result.quantity == 1) {
                 window.location = '/miso/sample/new' + (projectId
