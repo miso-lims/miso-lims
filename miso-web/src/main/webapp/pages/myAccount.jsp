@@ -39,25 +39,14 @@
     <div class="column">
       <sec:authorize access="hasRole('ROLE_ADMIN')">
         <div class="portlet">
-          <div class="portlet-header">MISO Configuration</div>
+          <div class="portlet-header">Administration</div>
           <div class="portlet-content">
-              <%--
-              <a href="<c:url value='/miso/admin/configuration/general'/>">General</a><br/>
-              <a href="<c:url value='/miso/admin/configuration/database'/>">Database</a><br/>
-              <a href="<c:url value='/miso/admin/configuration/security'/>">Security</a><br/>
-              --%>
-            <a href="<c:url value='/miso/printers'/>">Barcode Printers</a>
+            <a href="javascript:void(0);" onclick="Admin.clearCache();">Clear Cache</a><br/>
+            <c:if test="${autoGenerateIdBarcodes}">
+              <a href="javascript:void(0);" onclick="Admin.regenBarcodes();">Regenerate All Barcodes</a><br/>
+            </c:if>
           </div>
         </div>
-
-        <c:if test="${autoGenerateIdBarcodes}">
-          <div class="portlet">
-            <div class="portlet-header">Barcode Administration</div>
-            <div class="portlet-content">
-              <a href="javascript:void(0);" onclick="regenAllBarcodes();">Regenerate All Barcodes</a><br/>
-            </div>
-          </div>
-        </c:if>
       </sec:authorize>
 
       <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_SUBMITTER')">
@@ -70,14 +59,6 @@
         </div>
       </sec:authorize>
 
-      <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_TECH')">
-        <div class="portlet">
-          <div class="portlet-header">Custom Barcode</div>
-          <div class="portlet-content">
-            <a href="<c:url value='/miso/custombarcode'/>">Custom Barcode Printing</a><br/>
-          </div>
-        </div>
-      </sec:authorize>
       <div class="portlet">
         <div class="portlet-header">Reporting</div>
         <div class="portlet-content">
@@ -99,55 +80,11 @@
       </sec:authorize>
       </c:if>
     </div>
-
+    <div id="dialog"></div>
   </div>
 </div>
 
 <script type="text/javascript">
-  function regenAllBarcodes() {
-    Fluxion.doAjax(
-      'barcodeHelperService',
-      'regenerateAllBarcodes',
-      {'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery("body").append(json.html);
-        jQuery("#dialog").dialog("destroy");
-
-        jQuery("#dialog-message").dialog({
-          modal: true,
-          buttons: {
-            Ok: function () {
-              jQuery(this).dialog('close');
-            }
-          }
-        });
-      }
-      }
-    );
-  }
-
-  function reindexAlertManagers() {
-    Fluxion.doAjax(
-      'cacheHelperService',
-      'reindexAlertManagers',
-      {'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery("body").append(json.html);
-        jQuery("#dialog").dialog("destroy");
-
-        jQuery("#dialog-message").dialog({
-          modal: true,
-          buttons: {
-            Ok: function () {
-              jQuery(this).dialog('close');
-            }
-          }
-        });
-      }
-      }
-    );
-  }
-
   jQuery(function () {
     jQuery(".column").sortable({
       connectWith: '.column',

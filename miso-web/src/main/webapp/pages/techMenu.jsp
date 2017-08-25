@@ -29,12 +29,6 @@
     <h1>Technician Menu</h1>
 
     <div class="column">
-      <div class="portlet">
-        <div class="portlet-header">Barcode Printing</div>
-        <div class="portlet-content">
-          <a href="<c:url value="/miso/custombarcode"/>">Custom Barcode Printing</a><br/>
-        </div>
-      </div>
     </div>
   </div>
 </div>
