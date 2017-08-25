@@ -22,23 +22,14 @@
  */
 
 var Defaults = Defaults || {
-  all: null,
   
   getDefaults: function () {
-    Options.makeXhrRequest('GET', '/miso/rest/ui/sampleoptions', Defaults.makeTables);
-  },
-  
-  makeTables: function (xhr) {
-    if (xhr.status == 200) {
-      Defaults.all = JSON.parse(xhr.responseText);
-    
-      Tissue.createTissueMaterialsTable();
-      Tissue.createSamplePurposesTable();
-      Subproject.getReferenceGenomeOptions();
-      Subproject.getProjects();
-      Lab.createLabsTable();
-      Lab.createInstitutesTable();
-    }
+	Tissue.getTissueMaterials();
+    Tissue.getSamplePurposes();
+    Subproject.getReferenceGenomeOptions();
+    Subproject.getProjects();
+    Lab.getLabs();
+    Lab.getInstitutes();
     // expand table if anchor link was clicked
     var clickedAnchor = window.location.hash.substr(1);
     if (clickedAnchor && document.getElementById(clickedAnchor)) {
@@ -58,8 +49,7 @@ var Tissue = Tissue || {
     var id, alias, endpoint, temp, rowId;
     
     // if data is coming in from AJAX request, store it in Defaults.all
-    if (xhr) Defaults.all.tissueMaterialsDtos = JSON.parse(xhr.responseText);
-    Tissue.createTable(Defaults.all.tissueMaterialsDtos, 'TM', 'allMaterials', 'Material', TMtable);
+    Tissue.createTable(JSON.parse(xhr.responseText), 'TM', 'allMaterials', 'Material', TMtable);
   },
 
   createSamplePurposesTable: function (xhr) {
