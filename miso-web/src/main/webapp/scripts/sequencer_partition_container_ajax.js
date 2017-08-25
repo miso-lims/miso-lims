@@ -67,46 +67,6 @@ var Container = Container || {
     }
   },
 
-  deleteContainer: function (id) {
-    if (confirm("Are you sure you want to delete this Container?")) {
-      Fluxion.doAjax(
-        'containerControllerHelperService',
-        'checkContainer',
-        {
-          'containerId': id, 'url': ajaxurl
-        },
-        {
-          'doOnSuccess': function (json) {
-            if (json.response == 'yes') {
-              if (confirm("This container is in a completed run, are you sure to delete it?")) {
-                Container.confirmedDeleteContainer(id);
-              }
-            }
-            else {
-              Container.confirmedDeleteContainer(id);
-            }
-          }
-        }
-      );
-    }
-  },
-
-  confirmedDeleteContainer: function (id) {
-    Fluxion.doAjax(
-      'containerControllerHelperService',
-      'deleteContainer',
-      {
-        'containerId': id, 'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          alert(json.response);
-          window.location.href = "/miso/containers";
-        }
-      }
-    );
-  },
-  
   validateContainer: function () {
     Validate.cleanFields('#container-form');
     jQuery('#container-form').parsley().destroy();
