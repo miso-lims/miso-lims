@@ -48,10 +48,7 @@ import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
-import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
 @Ajaxified
@@ -66,9 +63,6 @@ public class BoxControllerHelperService {
 
   @Autowired
   private MisoFilesManager misoFileManager;
-
-  @Autowired
-  private PrinterService printerService;
 
   @Autowired
   private BoxScanner boxScanner;
@@ -567,43 +561,6 @@ public class BoxControllerHelperService {
   }
 
   /**
-   * Send 2D identificationBarcode to printer.
-   * 
-   * @param HttpSession
-   *          session, JSONObject json
-   * @return JSON message indicating success or error
-   */
-  public JSONObject printBoxBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new BarcodePrintAssister<Box>() {
-
-      @Override
-      public Box fetch(long id) throws IOException {
-        return boxService.get(id);
-      }
-
-      @Override
-      public void store(Box item) throws IOException {
-        boxService.save(item);
-      }
-
-      @Override
-      public String getGroupName() {
-        return "boxes";
-      }
-
-      @Override
-      public String getIdName() {
-        return "boxId";
-      }
-
-      @Override
-      public Iterable<Box> fetchAll(long projectId) throws IOException {
-        throw new UnsupportedOperationException();
-      }
-    });
-  }
-
-  /**
    * Change the box identificationBarcode to a user-entered value. Only valid if autogenerateIdentificationBarcode = true in miso.properties
    * 
    * @param HttpSession
@@ -873,11 +830,6 @@ public class BoxControllerHelperService {
   @CoverageIgnore
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
-  }
-
-  @CoverageIgnore
-  public void setPrinterService(PrinterService printerService) {
-    this.printerService = printerService;
   }
 
   @CoverageIgnore

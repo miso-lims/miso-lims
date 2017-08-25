@@ -76,10 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
-import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -91,38 +88,6 @@ import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAss
  */
 @Ajaxified
 public class SampleControllerHelperService {
-  public static final class SampleBarcodeAssister implements BarcodePrintAssister<Sample> {
-    private final SampleService sampleService;
-
-    public SampleBarcodeAssister(SampleService sampleService) {
-      this.sampleService = sampleService;
-    }
-
-    @Override
-    public Iterable<Sample> fetchAll(long projectId) throws IOException {
-      return sampleService.listByProjectId(projectId);
-    }
-
-    @Override
-    public Sample fetch(long id) throws IOException {
-      return sampleService.get(id);
-    }
-
-    @Override
-    public void store(Sample item) throws IOException {
-      sampleService.update(item);
-    }
-
-    @Override
-    public String getGroupName() {
-      return "samples";
-    }
-
-    @Override
-    public String getIdName() {
-      return "sampleId";
-    }
-  }
 
   protected static final Logger log = LoggerFactory.getLogger(SampleControllerHelperService.class);
   @Autowired
@@ -133,8 +98,6 @@ public class SampleControllerHelperService {
   private SampleService sampleService;
   @Autowired
   private MisoFilesManager misoFileManager;
-  @Autowired
-  private PrinterService printerService;
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
@@ -457,10 +420,6 @@ public class SampleControllerHelperService {
     }
   }
 
-  public JSONObject printSampleBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new SampleBarcodeAssister(sampleService));
-  }
-
   public JSONObject changeSampleLocation(HttpSession session, JSONObject json) {
     Long sampleId = json.getLong("sampleId");
     String locationBarcode = json.getString("locationBarcode");
@@ -637,10 +596,6 @@ public class SampleControllerHelperService {
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
-  }
-
-  public void setPrinterService(PrinterService printerService) {
-    this.printerService = printerService;
   }
 
   public void setSampleNamingScheme(NamingScheme namingScheme) {

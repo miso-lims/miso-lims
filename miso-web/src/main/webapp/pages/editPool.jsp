@@ -74,7 +74,7 @@
                onmouseover="mcancelclosetime()"
                onmouseout="mclosetime()">
             <a href="javascript:void(0);"
-               onclick="Pool.barcode.printPoolBarcodes(${pool.id});">Print</a>
+               onclick="Utils.printDialog('pool', [${pool.id}]);">Print</a>
             <c:if test="${not autoGenerateIdBarcodes}">
               <a href="javascript:void(0);"
                onclick="Pool.barcode.showPoolIdBarcodeChangeDialog(${pool.id}, '${pool.identificationBarcode}');">Update Barcode</a>
@@ -102,7 +102,6 @@
     </c:if>
   </div>
 </div>
-<div id="printServiceSelectDialog" title="Select a Printer"></div>
 <table class="in">
   <tr>
     <td class="h">Pool ID:</td>

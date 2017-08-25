@@ -58,7 +58,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -67,13 +66,8 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.PrinterService;
-import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
-import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAssister;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -85,87 +79,15 @@ import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.BarcodePrintAss
  */
 @Ajaxified
 public class LibraryControllerHelperService {
-  public static final class LibraryDilutionBarcodeAssister implements BarcodePrintAssister<LibraryDilution> {
-    private final LibraryDilutionService dilutionService;
-
-    public LibraryDilutionBarcodeAssister(LibraryDilutionService dilutionService) {
-      super();
-      this.dilutionService = dilutionService;
-    }
-
-    @Override
-    public LibraryDilution fetch(long id) throws IOException {
-      return dilutionService.get(id);
-    }
-
-    @Override
-    public void store(LibraryDilution item) throws IOException {
-      dilutionService.update(item);
-    }
-
-    @Override
-    public String getGroupName() {
-      return "dilutions";
-    }
-
-    @Override
-    public String getIdName() {
-      return "dilutionId";
-    }
-
-    @Override
-    public Iterable<LibraryDilution> fetchAll(long projectId) throws IOException {
-      return dilutionService.list(0, 0, false, "id", PaginationFilter.project(projectId));
-    }
-  }
-
-  public static final class LibraryBarcodeAssister implements BarcodePrintAssister<Library> {
-    private final LibraryService libraryService;
-
-    public LibraryBarcodeAssister(LibraryService libraryService) {
-      super();
-      this.libraryService = libraryService;
-    }
-
-    @Override
-    public Library fetch(long id) throws IOException {
-      return libraryService.get(id);
-    }
-
-    @Override
-    public void store(Library library) throws IOException {
-      libraryService.update(library);
-    }
-
-    @Override
-    public String getGroupName() {
-      return "libraries";
-    }
-
-    @Override
-    public String getIdName() {
-      return "libraryId";
-    }
-
-    @Override
-    public Iterable<Library> fetchAll(long projectId) throws IOException {
-      return libraryService.listByProjectId(projectId);
-    }
-  }
-
   protected static final Logger log = LoggerFactory.getLogger(LibraryControllerHelperService.class);
   @Autowired
   private SecurityManager securityManager;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
-  private PrinterService printerService;
-  @Autowired
   private NamingScheme namingScheme;
   @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private LibraryDilutionService dilutionService;
   @Autowired
   private BoxService boxService;
 
@@ -263,15 +185,6 @@ public class LibraryControllerHelperService {
       log.error("get library barcode", e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to generate temp file for barcode");
     }
-  }
-
-  public JSONObject printLibraryBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json, new LibraryBarcodeAssister(libraryService));
-  }
-
-  public JSONObject printLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json,
-        new LibraryDilutionBarcodeAssister(dilutionService));
   }
 
   public JSONObject changeLibraryLocation(HttpSession session, JSONObject json) {
@@ -483,19 +396,11 @@ public class LibraryControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrinterService(PrinterService printerService) {
-    this.printerService = printerService;
-  }
-
   public void setLibraryNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
   }
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
-  }
-
-  public void setDilutionService(LibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
   }
 }

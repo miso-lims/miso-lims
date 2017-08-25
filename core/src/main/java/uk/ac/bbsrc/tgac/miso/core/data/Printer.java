@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -70,12 +69,6 @@ public class Printer implements Deletable, Serializable {
 
   public boolean printBarcode(Barcodable b) {
     return backend.print(driver.encode(b).getBytes(Charsets.US_ASCII), configuration);
-  }
-
-  public void printBarcode(List<Barcodable> items) {
-    for (Barcodable item : items) {
-      printBarcode(item);
-    }
   }
 
   public void setBackend(Backend backend) {

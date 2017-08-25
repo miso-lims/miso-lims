@@ -490,64 +490,6 @@ Sample.library = {
   },
 };
 
-Sample.barcode = {
-  printSampleBarcodes: function () {
-    var samples = [];
-    for (var i = 0; i < arguments.length; i++) {
-      samples[i] = {'sampleId': arguments[i]};
-    }
-
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                  json.services +
-                  "</select></fieldset></form>");
-
-          jQuery('#printServiceSelectDialog').dialog({
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function () {
-                Fluxion.doAjax(
-                  'sampleControllerHelperService',
-                  'printSampleBarcodes',
-                  {
-                    'printerId': jQuery('#serviceSelect').val(),
-                    'samples': samples,
-                    'url': ajaxurl
-                  },
-                  {
-                    'doOnSuccess': function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function () {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        },
-        'doOnError': function (json) {
-          alert(json.error);
-        }
-      }
-    );
-  }
-};
-
 Sample.options = {
   
   getSampleGroupsBySubProjectId: function(subProjectId) {

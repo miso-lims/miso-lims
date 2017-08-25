@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,22 +18,42 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PrinterDto;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 @Controller
 @RequestMapping("/rest/printer")
 
 public class PrinterRestController extends RestController {
+  private static final Pattern COMMA = Pattern.compile(",");
   private static final Logger log = LoggerFactory.getLogger(PrinterRestController.class);
+
+  @Autowired
+  private BoxService boxService;
+
+  @Autowired
+  private ContainerService containerService;
+
+  @Autowired
+  private LibraryDilutionService dilutionService;
+
   private final JQueryDataTableBackend<Printer, PrinterDto> jQueryBackend = new JQueryDataTableBackend<Printer, PrinterDto>() {
 
     @Override
@@ -48,7 +69,13 @@ public class PrinterRestController extends RestController {
   };
 
   @Autowired
+  private LibraryService libraryService;
+
+  @Autowired
   private PrinterService printerService;
+
+  @Autowired
+  private SampleService sampleService;
 
   @RequestMapping(method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
@@ -90,11 +117,11 @@ public class PrinterRestController extends RestController {
 
   @RequestMapping(value = "{printerId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody PrinterDto get(@PathVariable Long printerId) throws IOException {
-    Printer s = printerService.get(printerId);
-    if (s == null) {
+    Printer printer = printerService.get(printerId);
+    if (printer == null) {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
     }
-    return Dtos.asDto(s);
+    return Dtos.asDto(printer);
   }
 
   @RequestMapping(method = RequestMethod.GET, headers = { "Content-type=application/json" })
@@ -120,5 +147,43 @@ public class PrinterRestController extends RestController {
         throw new RestException("Cannot resolve printer with name: " + id + " : " + e.getMessage());
       }
     }
+  }
+
+  @RequestMapping(value = "{printerId}", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @ResponseBody
+  public long submit(@PathVariable("printerId") Long printerId, @RequestParam("type") String type, @RequestParam("ids") String ids)
+      throws IOException {
+    Printer printer = printerService.get(printerId);
+    if (printer == null) {
+      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
+    }
+    WhineyFunction<Long, Barcodable> fetcher;
+
+    switch (type) {
+    case "box":
+      fetcher = boxService::get;
+      break;
+    case "container":
+      fetcher = containerService::get;
+      break;
+    case "dilution":
+      fetcher = dilutionService::get;
+      break;
+    case "library":
+      fetcher = libraryService::get;
+      break;
+    case "sample":
+      fetcher = sampleService::get;
+      break;
+    default:
+      throw new IllegalArgumentException("Unknown barcodeable type: " + type);
+    }
+
+    return COMMA.splitAsStream(ids)//
+        .map(Long::parseLong)//
+        .map(WhineyFunction.log(log, fetcher))//
+        .filter(barcodable -> !LimsUtils.isStringBlankOrNull(barcodable.getIdentificationBarcode()))//
+        .filter(printer::printBarcode)//
+        .count();
   }
 }
