@@ -863,7 +863,7 @@ Pool.orders = Pool.orders || {
 
   'createOrder': function(order) {
      document.getElementById('orderPartitions').value = 1;
-     Pool.orders.setOptionsForPlatform(Defaults.all.platforms[0].id, null);
+     Pool.orders.setOptionsForPlatform(Constants.platforms[0].id, null);
      Pool.orders.editingOrderId = 0;
      Pool.orders.showDialog();
   },
