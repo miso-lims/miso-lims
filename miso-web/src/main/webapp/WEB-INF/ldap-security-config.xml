@@ -140,7 +140,7 @@
     <property name="authenticationSuccessHandler" ref="successHandler" />
   </bean>
   <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
-    <property name="defaultTargetUrl" value="/miso/mainMenu" />
+    <property name="useReferer" value="true" />
   </bean>
   <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
     <property name="defaultFailureUrl" value="/login.jsp?login_error=1" />
