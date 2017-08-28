@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -167,7 +168,7 @@ public class DefaultLibraryDilutionService
   private void applyChanges(LibraryDilution target, LibraryDilution source) {
     target.setConcentration(source.getConcentration());
     target.setTargetedSequencing(source.getTargetedSequencing());
-    target.setIdentificationBarcode(source.getIdentificationBarcode());
+    target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setVolume(source.getVolume());
   }
 

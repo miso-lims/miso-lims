@@ -14,6 +14,7 @@ public class BoxPage extends FormPage<BoxPage.Field> {
     ID(By.id("id"), FieldType.LABEL), //
     NAME(By.id("name"), FieldType.LABEL), //
     ALIAS(By.id("alias"), FieldType.TEXT), //
+    BARCODE(By.id("identificationBarcode"), FieldType.TEXT), //
     DESCRIPTION(By.id("description"), FieldType.TEXT), //
     USE(By.id("boxUse"), FieldType.DROPDOWN), //
     SIZE(By.id("boxSize"), FieldType.DROPDOWN), //

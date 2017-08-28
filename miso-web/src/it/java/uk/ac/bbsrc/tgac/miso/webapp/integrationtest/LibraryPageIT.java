@@ -44,6 +44,7 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.ID, "110001");
     fields.put(Field.NAME, "LIB110001");
     fields.put(Field.ALIAS, "1LIB_0001_Ly_P_PE_251_WG");
+    fields.put(Field.BARCODE, "libbar110001");
     fields.put(Field.DESCRIPTION, "libdesc110001");
     fields.put(Field.CREATION_DATE, "2017-07-24");
     fields.put(Field.PLATFORM, "Illumina");
@@ -70,6 +71,7 @@ public class LibraryPageIT extends AbstractIT {
     // make changes
     Map<Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.ALIAS, "1LIB_0001_Ly_P_PE_151_WG");
+    changes.put(Field.BARCODE, "newbarcode");
     changes.put(Field.DESCRIPTION, "libdesc_changed_110001");
     changes.put(Field.LIBRARY_TYPE, "Total RNA");
     changes.put(Field.DESIGN_CODE, "MR");
@@ -111,6 +113,7 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.ID, "110002");
     fields.put(Field.NAME, "LIB110002");
     fields.put(Field.ALIAS, "1LIB_0001_Ly_P_PE_252_WG");
+    fields.put(Field.BARCODE, "libbar110002");
     fields.put(Field.DESCRIPTION, "libdesc110002");
     fields.put(Field.CREATION_DATE, "2017-07-24");
     fields.put(Field.PLATFORM, "Illumina");
@@ -136,6 +139,7 @@ public class LibraryPageIT extends AbstractIT {
 
     // make changes
     Map<Field, String> changes = Maps.newLinkedHashMap();
+    changes.put(Field.BARCODE, null);
     changes.put(Field.DESCRIPTION, null);
     changes.put(Field.DESIGN, "(None)");
     changes.put(Field.SELECTION, "(None)");
@@ -173,6 +177,7 @@ public class LibraryPageIT extends AbstractIT {
     fields.put(Field.ID, "110003");
     fields.put(Field.NAME, "LIB110003");
     fields.put(Field.ALIAS, "1LIB_0001_Ly_P_PE_253_WG");
+    fields.put(Field.BARCODE, null);
     fields.put(Field.DESCRIPTION, null);
     fields.put(Field.CREATION_DATE, "2017-07-24");
     fields.put(Field.PLATFORM, "Illumina");
@@ -197,6 +202,7 @@ public class LibraryPageIT extends AbstractIT {
 
     // make changes
     Map<Field, String> changes = Maps.newLinkedHashMap();
+    changes.put(Field.BARCODE, "preciouspreciousbarcode");
     changes.put(Field.DESCRIPTION, "lib_110003_desc");
     changes.put(Field.DESIGN, "WG");
     changes.put(Field.INDEX_FAMILY, "No indices");
@@ -368,6 +374,7 @@ public class LibraryPageIT extends AbstractIT {
     assertAttribute(Field.ID, expectedValues, Long.toString(lib.getId()));
     assertAttribute(Field.NAME, expectedValues, lib.getName());
     assertAttribute(Field.ALIAS, expectedValues, lib.getAlias());
+    assertAttribute(Field.BARCODE, expectedValues, lib.getIdentificationBarcode());
     assertAttribute(Field.DESCRIPTION, expectedValues, lib.getDescription());
     assertAttribute(Field.CREATION_DATE, expectedValues, dateFormatter.print(lib.getCreationDate().getTime()));
     assertAttribute(Field.PLATFORM, expectedValues, lib.getPlatformType().getKey());

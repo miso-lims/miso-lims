@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
@@ -71,7 +72,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   private void applyChanges(Box from, Box to) throws IOException {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
-    to.setIdentificationBarcode(from.getIdentificationBarcode());
+    to.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(from.getIdentificationBarcode()));
     to.setLocationBarcode(from.getLocationBarcode());
     to.setUse(boxStore.getUseById(from.getUse().getId()));
   }

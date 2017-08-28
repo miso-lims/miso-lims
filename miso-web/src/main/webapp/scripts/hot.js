@@ -802,7 +802,7 @@ var HotUtils = {
   
   printAction : function(type) {
     return {
-      name : 'Print',
+      name : 'Print Barcode(s)',
       action : function(items) {
         Utils.printDialog(type, items.map(Utils.array.getId));
       },

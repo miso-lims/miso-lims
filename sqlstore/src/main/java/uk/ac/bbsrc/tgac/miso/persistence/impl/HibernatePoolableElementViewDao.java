@@ -96,6 +96,8 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
       return "dilutionName";
     case "volume":
       return "dilutionVolume";
+    case "identificationBarcode":
+      return "dilutionBarcode";
     case "library.id":
       return "libraryId";
     case "library.alias":
@@ -113,7 +115,7 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
     case "concentration":
       return "dilutionConcentration";
     default:
-    return original;
+      return original;
     }
   }
 

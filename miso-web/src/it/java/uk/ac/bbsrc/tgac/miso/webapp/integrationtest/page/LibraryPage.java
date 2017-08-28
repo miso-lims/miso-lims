@@ -17,6 +17,7 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
     ID(By.id("libraryId"), FieldType.LABEL),
     NAME(By.id("name"), FieldType.LABEL),
     ALIAS(By.id("alias"), FieldType.TEXT),
+    BARCODE(By.id("identificationBarcode"), FieldType.TEXT),
     DESCRIPTION(By.id("description"), FieldType.TEXT),
     CREATION_DATE(By.id("creationDate"), FieldType.LABEL),
     PLATFORM(By.id("platformTypes"), FieldType.DROPDOWN),
@@ -60,14 +61,12 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
 
   private static final By QCS_MENU_SELECTOR = By.id("notesMenuHandle");
   private static final By DILUTIONS_MENU_SELECTOR = By.id("notesMenuHandle");
-  private static final By ID_BARCODE_MENU_SELECTOR = By.id("idBarcodeMenuHandle");
 
   @FindBy(id = "save")
   private WebElement saveButton;
 
   private final HoverMenu qcsMenu;
   private final HoverMenu dilutionsMenu;
-  private final HoverMenu barcodeMenu;
   private final NotesSection<LibraryPage> notesSection;
 
   public LibraryPage(WebDriver driver) {
@@ -76,7 +75,6 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
     waitWithTimeout().until(titleContains("Library "));
     qcsMenu = new HoverMenu(getDriver(), QCS_MENU_SELECTOR);
     dilutionsMenu = new HoverMenu(getDriver(), DILUTIONS_MENU_SELECTOR);
-    barcodeMenu = new HoverMenu(getDriver(), ID_BARCODE_MENU_SELECTOR);
     notesSection = new NotesSection<>(driver, LibraryPage::new);
   }
 

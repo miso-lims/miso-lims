@@ -44,6 +44,9 @@
   <button type="button" class="fg-button ui-state-default ui-corner-all"
           onclick="return Container.validateContainer();">Save</button>
 </h1>
+<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+  <c:if test="${container.id != 0 && not empty container.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('container', [${container.id}]);">Print Barcode</span></c:if>
+</div>
 
 <div class="bs-callout bs-callout-warning hidden">
   <h2>Oh snap!</h2>

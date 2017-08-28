@@ -215,14 +215,6 @@ public class LimsUtils {
     }
   }
 
-  public static String lookupLocation(String locationBarcode) {
-    // TODO - proper lookup!
-    /*
-     * if (locationBarcode is valid) { retrieve text representation of location and return } else { return null; }
-     */
-    return locationBarcode;
-  }
-
   public static boolean unzipFile(File source, File destination) {
     final int BUFFER = 2048;
 

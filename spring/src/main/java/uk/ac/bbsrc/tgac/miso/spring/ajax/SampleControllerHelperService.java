@@ -23,23 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
-import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
-import org.krysalis.barcode4j.BarcodeDimension;
-import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,18 +45,12 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
-import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
@@ -87,11 +72,7 @@ public class SampleControllerHelperService {
   @Autowired
   private SampleService sampleService;
   @Autowired
-  private MisoFilesManager misoFileManager;
-  @Autowired
   private NamingScheme namingScheme;
-  @Autowired
-  private BoxService boxService;
 
   public JSONObject validateSampleAlias(HttpSession session, JSONObject json) {
     try {
@@ -196,109 +177,6 @@ public class SampleControllerHelperService {
     }
   }
 
-  public JSONObject getSampleBarcode(HttpSession session, JSONObject json) {
-    Long sampleId = json.getLong("sampleId");
-    File temploc = getBarcodeFileLocation(session);
-    try {
-      Sample sample = sampleService.get(sampleId);
-      BarcodeFactory barcodeFactory = new BarcodeFactory();
-      barcodeFactory.setPointPixels(1.5f);
-      barcodeFactory.setBitmapResolution(600);
-      RenderedImage bi = null;
-
-      if (json.has("barcodeGenerator")) {
-        BarcodeDimension dim = new BarcodeDimension(100, 100);
-        if (json.has("dimensionWidth") && json.has("dimensionHeight")) {
-          dim = new BarcodeDimension(json.getDouble("dimensionWidth"), json.getDouble("dimensionHeight"));
-        }
-        BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
-        if (bg != null) {
-          bi = barcodeFactory.generateBarcode(sample, bg, dim);
-        } else {
-          return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
-        }
-      } else {
-        bi = barcodeFactory.generateSquareDataMatrix(sample, 400);
-      }
-
-      if (bi != null) {
-        File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
-        if (ImageIO.write(bi, "png", tempimage)) {
-          return JSONUtils.JSONObjectResponse("img", tempimage.getName());
-        }
-        return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      } else {
-        return JSONUtils.SimpleJSONError("Sample has no parseable barcode");
-      }
-    } catch (IOException e) {
-      log.error("cannot access: " + temploc.getAbsolutePath(), e);
-      return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to access " + temploc.getAbsolutePath());
-    }
-  }
-
-  public JSONObject changeSampleLocation(HttpSession session, JSONObject json) {
-    Long sampleId = json.getLong("sampleId");
-    String locationBarcode = json.getString("locationBarcode");
-
-    try {
-      String newLocation = LimsUtils.lookupLocation(locationBarcode);
-      if (newLocation != null) {
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Sample sample = sampleService.get(sampleId);
-        String oldLocation = sample.getLocationBarcode();
-        sample.setLocationBarcode(newLocation);
-
-        Note note = new Note();
-        note.setInternalOnly(true);
-        note.setText("Location changed from " + oldLocation + " to " + newLocation + " by " + user.getLoginName() + " on " + new Date());
-        sampleService.addNote(sample, note);
-        sampleService.update(sample);
-      } else {
-        return JSONUtils.SimpleJSONError("New location barcode not recognised");
-      }
-    } catch (IOException e) {
-      log.error("change sample location", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("Note saved successfully");
-  }
-
-  public JSONObject changeSampleIdBarcode(HttpSession session, JSONObject json) {
-    long sampleId = json.getLong("sampleId");
-    String idBarcode = json.getString("identificationBarcode");
-
-    try {
-      if (isStringEmptyOrNull(idBarcode)) {
-        // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
-        idBarcode = null;
-      } else {
-        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays.asList(idBarcode)));
-        if (!previouslyBarcodedItems.isEmpty() && (
-            previouslyBarcodedItems.size() != 1
-                || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.SAMPLE
-                || previouslyBarcodedItems.get(0).getId().getTargetId() != sampleId)) {
-          BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
-          String error = String.format(
-              "Could not change sample identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
-              idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
-          log.debug(error);
-          return JSONUtils.SimpleJSONError(error);
-        }
-      }
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Sample sample = sampleService.get(sampleId);
-      sample.setIdentificationBarcode(idBarcode);
-      sample.setLastModifier(user);
-      sampleService.update(sample);
-    } catch (IOException e) {
-      log.debug("Could not change Sample identificationBarcode: " + e.getMessage());
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("New Identification Barcode successfully assigned.");
-  }
-
   public JSONObject lookupNCBIScientificName(HttpSession session, JSONObject json) {
     String taxon = TaxonomyUtils.checkScientificNameAtNCBI(json.getString("scientificName"));
     if (taxon != null) {
@@ -381,10 +259,6 @@ public class SampleControllerHelperService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }
-
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
   }
 
   public void setSampleNamingScheme(NamingScheme namingScheme) {

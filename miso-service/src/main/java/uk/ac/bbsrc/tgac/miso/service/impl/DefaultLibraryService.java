@@ -480,7 +480,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
    */
   private void applyChanges(Library target, Library source) throws IOException {
     target.setDescription(source.getDescription());
-    target.setIdentificationBarcode(source.getIdentificationBarcode());
+    target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setLocationBarcode(source.getLocationBarcode());
     target.setInitialConcentration(source.getInitialConcentration());
     target.setPlatformType(source.getPlatformType());
