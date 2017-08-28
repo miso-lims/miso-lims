@@ -50,7 +50,7 @@ public class IlluminaNotificationDto extends NotificationDto {
 
   @Override
   public Optional<String> getLaneContents(int lane) {
-    return poolNames.containsKey(lane) ? Optional.of(poolNames.get(lane)) : Optional.empty();
+    return poolNames != null && poolNames.containsKey(lane) ? Optional.of(poolNames.get(lane)) : Optional.empty();
   }
 
   public int getNumCycles() {
