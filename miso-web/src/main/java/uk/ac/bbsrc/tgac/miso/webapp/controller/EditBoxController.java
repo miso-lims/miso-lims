@@ -108,7 +108,7 @@ public class EditBoxController {
         if (box == null) {
           throw new SecurityException("No such Box");
         }
-        model.put("title", box.getAlias());
+        model.put("title", "Box " + box.getId());
       }
       if (!box.userCanRead(user)) {
         throw new SecurityException("Permission denied.");

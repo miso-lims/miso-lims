@@ -5,7 +5,6 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -185,9 +184,8 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
         WebElement html = getHtmlElement();
         WebElement deleteButton = noteElement.findElement(DELETE_NOTE_SELECTOR);
         deleteButton.click();
-        waitUntil(alertIsPresent());
-        Alert jsConfirm = getDriver().switchTo().alert();
-        jsConfirm.accept();
+        waitUntil(visibilityOf(getDriver().findElement(By.id("ok"))));
+        getDriver().findElement(By.id("ok")).click();
         waitForPageRefresh(html);
         return new LibraryPage(getDriver());
       }

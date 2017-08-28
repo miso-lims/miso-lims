@@ -1923,3 +1923,18 @@ button.disabled {
 	-ms-user-select: none;
 	user-select: none;
 }
+
+.boxVisColHeader {
+	width: 30px;
+	text-align: center;
+	font-weight: bold;
+}
+	
+.boxVisRowHeader {
+	height: 30px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.boxVisCell {
+}

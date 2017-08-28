@@ -125,12 +125,12 @@
     </tr>
     <tr>
       <td>Name:</td>
-      <td>
+      <td><span id="name">
         <c:choose>
           <c:when test="${box.id != 0}">${box.name}</c:when>
           <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
-      </td>
+      </span></td>
     </tr>
     <tr>
       <td class="h">Alias:</td>
@@ -260,6 +260,8 @@
     }, 100);
   });
 </script>
+
+<div id="dialog"></div>
 
 <div id="boxContentsList" style="clear:both;">
   <table id="listingBoxablesTable" class="display"></table>

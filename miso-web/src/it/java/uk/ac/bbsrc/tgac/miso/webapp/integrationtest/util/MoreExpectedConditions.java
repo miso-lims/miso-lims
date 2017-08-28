@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -11,6 +12,10 @@ public class MoreExpectedConditions {
 
   public static ExpectedCondition<Boolean> textDoesNotContain(WebElement element, String text) {
     return (driver) -> !element.getText().contains(text);
+  }
+
+  public static ExpectedCondition<Boolean> elementDoesNotExist(By selector) {
+    return (driver) -> driver.findElements(selector).size() == 0;
   }
 
 }

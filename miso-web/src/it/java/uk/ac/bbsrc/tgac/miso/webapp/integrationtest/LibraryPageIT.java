@@ -10,7 +10,6 @@ import java.util.function.Predicate;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
@@ -344,7 +343,6 @@ public class LibraryPageIT extends AbstractIT {
   }
 
   @Test
-  @Ignore
   // TODO: enable after sorting out chromedriver issue with javascript alerts
   public void testDeleteNote() throws Exception {
     LibraryPage page1 = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);

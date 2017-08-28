@@ -94,12 +94,20 @@ public abstract class AbstractPage extends AbstractElement {
     DROPDOWN() {
       @Override
       protected String getValue(WebDriver driver, By selector) {
+        WebElement element = driver.findElement(selector);
+        if (!isDropdown(element)) {
+          return element.getText();
+        }
         return getSelectedDropdownText(driver.findElement(selector));
       }
 
       @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         setDropdown(value, driver.findElement(selector));
+      }
+
+      private boolean isDropdown(WebElement element) {
+        return "select".equals(element.getTagName());
       }
     };
 
