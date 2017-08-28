@@ -184,7 +184,7 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
         WebElement html = getHtmlElement();
         WebElement deleteButton = noteElement.findElement(DELETE_NOTE_SELECTOR);
         deleteButton.click();
-        waitExplicitly(500);
+        waitUntil(visibilityOf(getDriver().findElement(By.id("ok"))));
         getDriver().findElement(By.id("ok")).click();
         waitForPageRefresh(html);
         return new LibraryPage(getDriver());

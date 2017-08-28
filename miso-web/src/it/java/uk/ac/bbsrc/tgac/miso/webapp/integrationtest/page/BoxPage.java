@@ -65,8 +65,9 @@ public class BoxPage extends FormPage<BoxPage.Field> {
   }
 
   public BoxPage clickSave() {
+    WebElement html = getHtmlElement();
     saveButton.click();
-    waitWithTimeout().until(titleContains("Box "));
+    waitForPageRefresh(html);
     return new BoxPage(getDriver());
   }
 

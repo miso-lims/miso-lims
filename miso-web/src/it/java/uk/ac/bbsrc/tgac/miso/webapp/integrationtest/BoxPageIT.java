@@ -47,10 +47,7 @@ public class BoxPageIT extends AbstractIT {
     assertFieldValues("changes pre-save", unsaved, page);
     BoxPage savedPage = page.clickSave();
     // assert all except box size, which is no longer editable after save
-    assertEquals("alias post-save", unsaved.get(Field.ALIAS), savedPage.getField(Field.ALIAS));
-    assertEquals("description post-save", unsaved.get(Field.DESCRIPTION), savedPage.getField(Field.DESCRIPTION));
-    assertEquals("use post-save", unsaved.get(Field.USE), savedPage.getField(Field.USE));
-    assertEquals("location post-save", unsaved.get(Field.LOCATION), savedPage.getField(Field.LOCATION));
+    assertFieldValues("changes post-save", unsaved, savedPage);
 
     Box box = (Box) getSession().get(BoxImpl.class, Long.valueOf(savedPage.getField(Field.ID)));
     assertNotEquals("Box ID is now a number", "Unsaved", box.getId());
@@ -111,7 +108,7 @@ public class BoxPageIT extends AbstractIT {
     assertTrue("empty position is empty", visualization.isEmptyPosition(position));
     visualization.selectPosition(position);
     visualization.lookupBarcode("Bad Barcode");
-    visualization.updatePosition(false);
+    assertFalse(visualization.isUpdatePositionButtonClickable());
 
     Box box = (Box) getSession().get(BoxImpl.class, 500L);
     BoxableView itemAtPosition = box.getBoxable(position);

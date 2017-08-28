@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.MoreExpectedConditions.elementDoesNotExist;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,6 +61,10 @@ public class BoxVisualization extends AbstractElement {
     return target.getAttribute("title").contains("Empty");
   }
 
+  public boolean isUpdatePositionButtonClickable() {
+    return updatePositionButton.isEnabled();
+  }
+
   public String getPositionTitle(String position) {
     WebElement target = getPosition(getRowLabel(position), getColLabel(position));
     return target.getAttribute("title");
@@ -91,16 +96,17 @@ public class BoxVisualization extends AbstractElement {
     barcodeInput.sendKeys(barcode);
     barcodeInput.sendKeys(Keys.ESCAPE);
     barcodeLookupButton.click();
-    waitExplicitly(1000);
-    if (!getDriver().findElements(By.id("ok")).isEmpty()) {
-      WebElement okButton = getDriver().findElement(By.id("ok"));
+    waitUntil(elementDoesNotExist(By.id("ajaxLoader")));
+    WebElement okButton = findElementIfExists(By.id("ok"));
+    if (okButton != null) {
       okButton.click();
+    } else {
+      waitUntil(elementToBeClickable(barcodeLookupButton));
     }
-    waitUntil(elementToBeClickable(barcodeLookupButton));
   }
 
   public void updatePosition(boolean requireConfirmation) {
-    if (updatePositionButton.getAttribute("disabled") == null) {
+    if (updatePositionButton.isEnabled()) {
       // click the button if it's clickable, otherwise do nothing
       updatePositionButton.click();
       if (requireConfirmation) {
@@ -109,29 +115,31 @@ public class BoxVisualization extends AbstractElement {
         waitUntil(invisibilityOf(okButton));
       }
       waitUntil(elementToBeClickable(updatePositionButton));
+    } else {
+      throw new IllegalStateException("updatePositionButton is not clickable");
     }
   }
 
   public void removeTube() {
-    if (removeTubeButton.getAttribute("disabled") == null) {
+    if (removeTubeButton.isEnabled()) {
       removeTubeButton.click();
     } else {
-      log.error("* * * * * * * * * Error: removeTubeButton is not clickable * * * * * * * * * ");
+      throw new IllegalStateException("Error: removeTubeButton is not clickable");
     }
     confirmAndWaitForRefresh();
   }
 
   public void discardTube() {
-    if (discardTubeButton.getAttribute("disabled") == null) {
+    if (discardTubeButton.isEnabled()) {
       discardTubeButton.click();
     } else {
-      log.error("* * * * * * * * * Error: discardTubeButton is not clickable * * * * * * * * * ");
+      throw new IllegalStateException("Error: discardTubeButton is not clickable");
     }
     confirmAndWaitForRefresh();
   }
 
   protected void confirmAndWaitForRefresh() {
-    waitExplicitly(1000);
+    waitUntil(visibilityOf(getDriver().findElement(By.id("ok"))));
     confirmDialog();
     waitUntil(stalenessOf(getDriver().findElement(By.tagName("html"))));
   }

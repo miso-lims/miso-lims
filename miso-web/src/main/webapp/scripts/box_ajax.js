@@ -145,7 +145,7 @@ var Box = Box || {
       Utils.showOkDialog('Empty barcode', ['Please enter a barcode']);
     } else {
       jQuery('#lookupBarcode').prop('disabled', true).addClass('disabled');
-      jQuery('#warningMessages').html('<img src="/styles/images/ajax-loader.gif" alt="Loading" />');
+      jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
       Fluxion.doAjax(
         'boxControllerHelperService',
         'lookupBoxableByBarcode',

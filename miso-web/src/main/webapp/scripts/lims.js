@@ -154,8 +154,7 @@ var Utils = Utils || {
     while (dialogArea.hasChildNodes()) {
       dialogArea.removeChild(dialogArea.lastChild);
     }
-  
-    var output = {};
+
     fields.forEach(function(field) {
       var p = document.createElement('P');
       p.textContent = field;
@@ -184,8 +183,7 @@ var Utils = Utils || {
       while (dialogArea.hasChildNodes()) {
           dialogArea.removeChild(dialogArea.lastChild);
       }
-      
-      var output = {};
+
       fields.forEach(function(field) {
           var p = document.createElement('P');
           p.textContent = field;
