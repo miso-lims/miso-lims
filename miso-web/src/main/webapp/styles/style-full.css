@@ -357,7 +357,7 @@ table.minimal tr {
     border-bottom: 1px solid #CDCDCD;
 }
 
-td.right {
+.right {
     text-align: right;
 }
 

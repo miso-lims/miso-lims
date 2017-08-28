@@ -124,6 +124,12 @@ ListTarget.dilution = {
           return dilution.library.id;
         }, "library.alias", 0, !config.library),
         {
+          "sTitle" : "Matrix Barcode",
+          "mData" : "identificationBarcode",
+          "include" : true,
+          "iSortPriority" : 0
+        },
+        {
           "sTitle" : "Creator",
           "mData" : "dilutionUserName",
           "include" : true,

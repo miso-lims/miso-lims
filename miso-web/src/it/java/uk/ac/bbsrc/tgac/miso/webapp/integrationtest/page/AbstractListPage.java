@@ -64,6 +64,7 @@ public interface AbstractListPage {
     public static final String COMMISSIONED = "Commissioned";
     public static final String DECOMMISSIONED = "Decommissioned";
     public static final String VOLUME = "Volume";
+    public static final String MATRIX_BARCODE = "Matrix Barcode";
   }
 
   public static class ListTarget {

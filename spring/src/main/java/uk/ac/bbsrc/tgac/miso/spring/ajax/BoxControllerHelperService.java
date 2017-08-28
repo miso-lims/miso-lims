@@ -1,8 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
-
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,11 +13,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
-import org.krysalis.barcode4j.BarcodeDimension;
-import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +31,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
@@ -511,81 +504,6 @@ public class BoxControllerHelperService {
     } else {
       return JSONUtils.SimpleJSONError("Only logged-in admins can discard boxes.");
     }
-  }
-
-  /**
-   * Generates the printable 2D identificationBarcode for the Box.
-   * 
-   * @param HttpSession
-   *          session, JSONObject json
-   * @return JSON response containing the name of the newly-generated 2D identificationBarcode image on disk
-   */
-  public JSONObject getBoxBarcode(HttpSession session, JSONObject json) {
-    Long boxId = json.getLong("boxId");
-    File temploc = getBarcodeFileLocation(session);
-    try {
-      Box box = boxService.get(boxId);
-      BarcodeFactory barcodeFactory = new BarcodeFactory();
-      barcodeFactory.setPointPixels(1.5f);
-      barcodeFactory.setBitmapResolution(600);
-      RenderedImage bi = null;
-
-      if (json.has("barcodeGenerator")) {
-        BarcodeDimension dim = new BarcodeDimension(100, 100);
-        if (json.has("dimensionWidth") && json.has("dimensionHeight")) {
-          dim = new BarcodeDimension(json.getDouble("dimensionWidth"), json.getDouble("dimensionHeight"));
-        }
-        BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
-        if (bg != null) {
-          bi = barcodeFactory.generateBarcode(box, bg, dim);
-        } else {
-          return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
-        }
-      } else {
-        bi = barcodeFactory.generateSquareDataMatrix(box, 400);
-      }
-
-      if (bi != null) {
-        File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
-        if (ImageIO.write(bi, "png", tempimage)) {
-          return JSONUtils.JSONObjectResponse("img", tempimage.getName());
-        }
-        return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      } else {
-        return JSONUtils.SimpleJSONError("Sample has no parseable barcode");
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to access " + temploc.getAbsolutePath());
-    }
-  }
-
-  /**
-   * Change the box identificationBarcode to a user-entered value. Only valid if autogenerateIdentificationBarcode = true in miso.properties
-   * 
-   * @param HttpSession
-   *          session, JSONObject json
-   * @return JSON message indicating success or error
-   */
-  public JSONObject changeBoxIdBarcode(HttpSession session, JSONObject json) {
-    Long boxId = json.getLong("boxId");
-    String idBarcode = json.getString("identificationBarcode");
-
-    try {
-      if (!"".equals(idBarcode)) {
-        Box box = boxService.get(boxId);
-        box.setIdentificationBarcode(idBarcode);
-        box.setLastModifier(authorizationManager.getCurrentUser());
-        boxService.save(box);
-      } else {
-        return JSONUtils.SimpleJSONError("New identification barcode cannot be blank.");
-      }
-    } catch (IOException e) {
-      log.debug("Error getting or saving box", e);
-      return JSONUtils.SimpleJSONError("Error saving new box barcode. Please try again.");
-    }
-
-    return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
   }
 
   /**

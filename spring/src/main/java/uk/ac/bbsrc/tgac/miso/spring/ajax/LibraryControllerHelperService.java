@@ -23,24 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
-import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
-import org.krysalis.barcode4j.BarcodeDimension;
-import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,15 +42,9 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 /**
@@ -79,13 +61,9 @@ public class LibraryControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private MisoFilesManager misoFileManager;
-  @Autowired
   private NamingScheme namingScheme;
   @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private BoxService boxService;
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -143,101 +121,6 @@ public class LibraryControllerHelperService {
     }
   }
 
-  public JSONObject getLibraryBarcode(HttpSession session, JSONObject json) {
-    Long libraryId = json.getLong("libraryId");
-    File temploc = getBarcodeFileLocation(session);
-    try {
-      Library library = libraryService.get(libraryId);
-      BarcodeFactory barcodeFactory = new BarcodeFactory();
-      barcodeFactory.setPointPixels(1.5f);
-      barcodeFactory.setBitmapResolution(600);
-      RenderedImage bi = null;
-
-      if (json.has("barcodeGenerator")) {
-        BarcodeDimension dim = new BarcodeDimension(100, 100);
-        if (json.has("dimensionWidth") && json.has("dimensionHeight")) {
-          dim = new BarcodeDimension(json.getDouble("dimensionWidth"), json.getDouble("dimensionHeight"));
-        }
-        BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
-        if (bg != null) {
-          bi = barcodeFactory.generateBarcode(library, bg, dim);
-        } else {
-          return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
-        }
-      } else {
-        bi = barcodeFactory.generateSquareDataMatrix(library, 400);
-      }
-
-      if (bi != null) {
-        File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
-        if (ImageIO.write(bi, "png", tempimage)) {
-          return JSONUtils.JSONObjectResponse("img", tempimage.getName());
-        }
-        return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      } else {
-        return JSONUtils.SimpleJSONError("Library has no parseable barcode");
-      }
-    } catch (IOException e) {
-      log.error("get library barcode", e);
-      return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to generate temp file for barcode");
-    }
-  }
-
-  public JSONObject changeLibraryLocation(HttpSession session, JSONObject json) {
-    Long libraryId = json.getLong("libraryId");
-    String locationBarcode = json.getString("locationBarcode");
-
-    try {
-      String newLocation = LimsUtils.lookupLocation(locationBarcode);
-      if (newLocation != null) {
-        Library library = libraryService.get(libraryId);
-        library.setLocationBarcode(newLocation);
-        libraryService.update(library);
-      } else {
-        return JSONUtils.SimpleJSONError("New location barcode not recognised");
-      }
-    } catch (IOException e) {
-      log.error("change library location", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("Note saved successfully");
-  }
-
-  public JSONObject changeLibraryIdBarcode(HttpSession session, JSONObject json) {
-    Long libraryId = json.getLong("libraryId");
-    String idBarcode = json.getString("identificationBarcode");
-
-    try {
-      if (isStringEmptyOrNull(idBarcode)) {
-        // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
-        idBarcode = null;
-      } else {
-        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays.asList(idBarcode)));
-        if (!previouslyBarcodedItems.isEmpty() && (
-            previouslyBarcodedItems.size() != 1
-                || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.LIBRARY
-                || previouslyBarcodedItems.get(0).getId().getTargetId() != libraryId)) {
-          BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
-          String error = String.format(
-              "Could not change library identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
-              idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
-          log.debug(error);
-          return JSONUtils.SimpleJSONError(error);
-        }
-      }
-      Library library = libraryService.get(libraryId);
-      library.setIdentificationBarcode(idBarcode);
-      libraryService.update(library);
-    } catch (IOException e) {
-      log.debug("Could not change Library identificationBarcode: " + e.getMessage());
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
-  }
-
-
   public JSONObject deleteLibrary(HttpSession session, JSONObject json) {
     if (json.has("libraryId")) {
       Long libraryId = json.getLong("libraryId");
@@ -255,10 +138,6 @@ public class LibraryControllerHelperService {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
   }
 
   public void setLibraryNamingScheme(NamingScheme namingScheme) {

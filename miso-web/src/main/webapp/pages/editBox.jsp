@@ -53,6 +53,9 @@
   </c:choose> Box
   <button id="save" type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Box.validateBox();">Save</button>
 </h1>
+<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+  <c:if test="${box.id != 0 && not empty box.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('box', [${box.id}]);">Print Barcode</span></c:if>
+</div>
 
 <div class="sectionDivider"  onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
@@ -66,51 +69,6 @@
 </div>
 
 <h2>Box Information</h2>
-
-<div class="barcodes">
-  <div class="barcodeArea ui-corner-all">
-    <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Barcode</span>
-    <c:if test="${box.id != 0}">
-	    <ul class="barcode-ddm">
-	      <li>
-	        <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
-	          <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-	          <span id="idBarcode" style="float:right"></span>
-	        </a>
-	
-	        <div id="idBarcodeMenu"
-	             onmouseover="mcancelclosetime()"
-	             onmouseout="mclosetime()">
-	          <a href="javascript:void(0);"
-	             onclick="Utils.printDialog('box', [${box.id}]);">Print</a>
-	          <c:if test="${not autoGenerateIdBarcodes}">
-	            <a href="javascript:void(0);" 
-	               onclick="Box.ui.showBoxIdBarcodeChangeDialog(${box.id}, '${box.identificationBarcode}');">Assign New Barcode</a>
-	          </c:if>
-	        </div>
-	      </li>
-	    </ul>
-	  </c:if>
-    <div id="changeBoxIdBarcodeDialog" title="Assign New Barcode"></div>
-	  <c:if test="${not empty box.identificationBarcode}">
-	    <script type="text/javascript">
-	      jQuery(document).ready(function () {
-	        Fluxion.doAjax(
-	          'boxControllerHelperService',
-	          'getBoxBarcode',
-	          {
-	            'boxId':${box.id},
-	            'url': ajaxurl
-	          },
-	          {'doOnSuccess': function (json) {
-	            jQuery('#idBarcode').html("<img style='height:30px; border:0;' title='${box.identificationBarcode}' src='<c:url value='/temp/'/>" + json.img + "'/>");
-	          }
-	        });
-	      });
-	    </script>
-    </c:if>
-  </div>
-</div>
 <div id="boxInfo">
   <table class="in">
     <tr>
@@ -139,6 +97,12 @@
       <td class="h">Description:</td>
       <td><form:input id="description" path="description" class="validateable"/><span id="descriptionCounter" class="counter"></span></td>
     </tr>
+    <c:if test="${not autoGenerateIdBarcodes}">
+      <tr>
+        <td class="h">Matrix Barcode:</td>
+        <td><form:input id="identificationBarcode" path="identificationBarcode" name="identificationBarcode"/></td>
+      </tr>
+    </c:if>
     <tr>
       <td class="h">Box Use:</td>
       <td><miso:select id="boxUse" path="use" items="${boxUses}" itemLabel="alias" itemValue="id"/></td>

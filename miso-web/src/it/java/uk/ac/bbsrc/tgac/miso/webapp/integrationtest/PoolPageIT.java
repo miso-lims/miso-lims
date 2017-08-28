@@ -19,7 +19,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.Field;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.AddNoteDialog;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.IdBarcodeDialog;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.Note;
 
 public class PoolPageIT extends AbstractIT {
@@ -37,6 +36,7 @@ public class PoolPageIT extends AbstractIT {
     Map<PoolPage.Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "Unsaved");
     fields.put(Field.NAME, "Unsaved");
+    fields.put(Field.BARCODE, null);
     fields.put(Field.DESCRIPTION, null);
     fields.put(Field.QC_PASSED, null);
     fields.put(Field.READY_TO_RUN, Boolean.TRUE.toString());
@@ -75,6 +75,7 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.ID, "120001");
     fields.put(Field.NAME, "IPO120001");
     fields.put(Field.ALIAS, "1IPO_POOL_1");
+    fields.put(Field.BARCODE, "ipobar120001");
     fields.put(Field.DESCRIPTION, "ipodesc120001");
     fields.put(Field.PLATFORM, PlatformType.ILLUMINA.getKey());
     fields.put(Field.CONCENTRATION, "6.5");
@@ -113,6 +114,7 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.ID, "120002");
     fields.put(Field.NAME, "IPO120002");
     fields.put(Field.ALIAS, "1IPO_POOL_2");
+    fields.put(Field.BARCODE, null);
     fields.put(Field.DESCRIPTION, null);
     fields.put(Field.PLATFORM, PlatformType.ILLUMINA.getKey());
     fields.put(Field.CONCENTRATION, "6.5");
@@ -125,6 +127,7 @@ public class PoolPageIT extends AbstractIT {
     assertFieldValues("initial values", fields, page1);
 
     Map<PoolPage.Field, String> changes = Maps.newLinkedHashMap();
+    changes.put(Field.BARCODE, "ITS:A:BAR:CODE");
     changes.put(Field.DESCRIPTION, "added desc");
     changes.put(Field.QC_PASSED, Boolean.TRUE.toString());
     changes.put(Field.VOLUME, "9.99");
@@ -148,6 +151,7 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.ID, "120003");
     fields.put(Field.NAME, "IPO120003");
     fields.put(Field.ALIAS, "1IPO_POOL_3");
+    fields.put(Field.BARCODE, "ipobar120003");
     fields.put(Field.DESCRIPTION, "ipodesc120003");
     fields.put(Field.PLATFORM, PlatformType.ILLUMINA.getKey());
     fields.put(Field.CONCENTRATION, "6.5");
@@ -160,6 +164,7 @@ public class PoolPageIT extends AbstractIT {
     assertFieldValues("initial values", fields, page1);
 
     Map<PoolPage.Field, String> changes = Maps.newLinkedHashMap();
+    changes.put(Field.BARCODE, null);
     changes.put(Field.DESCRIPTION, null);
     changes.put(Field.QC_PASSED, null);
     changes.put(Field.VOLUME, null);
@@ -197,41 +202,6 @@ public class PoolPageIT extends AbstractIT {
     Pool savedPool = (Pool) getSession().get(PoolImpl.class, 120004L);
     assertTrue(savedPool.isDiscarded());
     assertEquals(new Double(0D), savedPool.getVolume());
-  }
-
-  @Test
-  public void testIdBarcode() throws Exception {
-    final String EMPTY = "";
-
-    // initially null
-    PoolPage page1 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 120005L);
-    assertNull(page1.getIdBarcode());
-    IdBarcodeDialog dialog1 = page1.openAssignBarcodeDialog();
-    assertEquals(EMPTY, dialog1.getField(IdBarcodeDialog.Field.CURRENT));
-    assertEquals(EMPTY, dialog1.getField(IdBarcodeDialog.Field.INPUT));
-    String addedBarcode = "120005_added";
-    dialog1.setField(IdBarcodeDialog.Field.INPUT, addedBarcode);
-
-    // add barcode
-    PoolPage page2 = dialog1.submit(PoolPage::new);
-    assertEquals(addedBarcode, page2.getIdBarcode());
-    IdBarcodeDialog dialog2 = page2.openAssignBarcodeDialog();
-    assertEquals(addedBarcode, dialog2.getField(IdBarcodeDialog.Field.CURRENT));
-    assertEquals(EMPTY, dialog2.getField(IdBarcodeDialog.Field.INPUT));
-    String changedBarcode = "120005_changed";
-    dialog2.setField(IdBarcodeDialog.Field.INPUT, changedBarcode);
-
-    // change barcode
-    PoolPage page3 = dialog2.submit(PoolPage::new);
-    assertEquals(changedBarcode, page3.getIdBarcode());
-    IdBarcodeDialog dialog3 = page3.openAssignBarcodeDialog();
-    assertEquals(changedBarcode, dialog3.getField(IdBarcodeDialog.Field.CURRENT));
-    assertEquals(EMPTY, dialog3.getField(IdBarcodeDialog.Field.INPUT));
-    dialog3.setField(IdBarcodeDialog.Field.INPUT, null);
-
-    // remove barcode
-    PoolPage page4 = dialog3.submit(PoolPage::new);
-    assertNull(page4.getIdBarcode());
   }
 
   @Test

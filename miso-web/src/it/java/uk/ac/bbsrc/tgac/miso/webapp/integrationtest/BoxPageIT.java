@@ -37,6 +37,7 @@ public class BoxPageIT extends AbstractIT {
 
     Map<Field, String> unsaved = new HashMap<>();
     unsaved.put(Field.ALIAS, "New Box");
+    unsaved.put(Field.BARCODE, "newbarcode");
     unsaved.put(Field.DESCRIPTION, "Test");
     unsaved.put(Field.USE, "Storage");
     unsaved.put(Field.SIZE, "10 × 10");
@@ -51,6 +52,7 @@ public class BoxPageIT extends AbstractIT {
     Box box = (Box) getSession().get(BoxImpl.class, Long.valueOf(savedPage.getField(Field.ID)));
     assertNotEquals("Box ID is now a number", "Unsaved", box.getId());
     assertEquals("confirm box alias", unsaved.get(Field.ALIAS), box.getAlias());
+    assertEquals("confirm box barcode", unsaved.get(Field.BARCODE), box.getIdentificationBarcode());
     assertEquals("confirm box description", unsaved.get(Field.DESCRIPTION), box.getDescription());
     assertEquals("confirm box use", unsaved.get(Field.USE), box.getUse().getAlias());
     assertEquals("confirm box size", unsaved.get(Field.SIZE), box.getSize().getRowsByColumns());
@@ -65,6 +67,7 @@ public class BoxPageIT extends AbstractIT {
     Map<Field, String> changed = new HashMap<>();
     changed.put(Field.ALIAS, "Changed alias");
     changed.put(Field.ALIAS, "Changed Box");
+    changed.put(Field.BARCODE, "Changed Barcode");
     changed.put(Field.DESCRIPTION, "Changed Description");
     changed.put(Field.USE, "Libraries");
     changed.put(Field.LOCATION, "Changed Location");
@@ -76,6 +79,7 @@ public class BoxPageIT extends AbstractIT {
 
     Box box = (Box) getSession().get(BoxImpl.class, 502L);
     assertEquals(changed.get(Field.ALIAS), box.getAlias());
+    assertEquals(changed.get(Field.BARCODE), box.getIdentificationBarcode());
     assertEquals(changed.get(Field.DESCRIPTION), box.getDescription());
     assertEquals(changed.get(Field.USE), box.getUse().getAlias());
     assertEquals(changed.get(Field.LOCATION), box.getLocationBarcode());
