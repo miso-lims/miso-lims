@@ -23,28 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
-import java.nio.CharBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,17 +32,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
@@ -81,12 +53,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -100,48 +70,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
  * @since 0.0.2
  */
 public class LimsUtils {
-  public static final long SYSTEM_USER_ID = 0;
 
   private static final Logger log = LoggerFactory.getLogger(LimsUtils.class);
-
-  public static String unicodeify(String barcode) {
-    log.debug("ORIGINAL :: " + barcode);
-    StringBuilder b = new StringBuilder();
-    int count = 0;
-    for (Character c : barcode.toCharArray()) {
-      if (Character.UnicodeBlock.of(c) != Character.UnicodeBlock.BASIC_LATIN) {
-        int codePoint = Character.codePointAt(barcode, count);
-        b.append("[U:$").append(String.format("%04x", codePoint).toUpperCase()).append("]");
-      } else {
-        b.append(c);
-      }
-      count++;
-    }
-    log.debug("UNICODED :: " + b.toString());
-    return b.toString();
-  }
-
-  public static boolean isUrlValid(URL url) {
-    try {
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      connection.setRequestMethod("HEAD");
-      int responseCode = connection.getResponseCode();
-      return (responseCode == 200);
-    } catch (IOException e) {
-      log.error("is URL valid", e);
-    }
-    return false;
-  }
-
-  public static boolean isUrlValid(URI uri) {
-    try {
-      URL url = uri.toURL();
-      return isUrlValid(url);
-    } catch (Exception e) {
-      log.error("is URL valid", e);
-    }
-    return false;
-  }
 
   public static boolean isStringEmptyOrNull(String s) {
     return "".equals(s) || s == null;
@@ -153,160 +83,6 @@ public class LimsUtils {
 
   public static String nullifyStringIfBlank(String s) {
     return (isStringBlankOrNull(s) ? null : s);
-  }
-
-  /**
-   * Join a collection, akin to Perl's join(), using a given delimiter to produce a single String
-   * 
-   * @param s of type Collection
-   * @param delimiter of type String
-   * @return String
-   * @throws IllegalArgumentException
-   */
-  public static String join(Iterable<?> s, String delimiter) throws IllegalArgumentException {
-    if (s == null) {
-      throw new IllegalArgumentException("Collection to join must not be null");
-    }
-    StringBuffer buffer = new StringBuffer();
-    boolean first = true;
-    for (Object o : s) {
-      if (first) {
-        first = false;
-      } else {
-        buffer.append(delimiter);
-      }
-      buffer.append(o);
-    }
-    return buffer.toString();
-  }
-
-  /**
-   * Join an Array, akin to Perl's join(), using a given delimiter to produce a single String
-   * 
-   * @param s of type Object[]
-   * @param delimiter of type String
-   * @return String
-   */
-  public static String join(Object[] s, String delimiter) {
-    StringBuffer buffer = new StringBuffer();
-    for (int i = 0; i < s.length; i++) {
-      buffer.append(s[i]);
-      if (i < s.length - 1) {
-        buffer.append(delimiter);
-      }
-    }
-    return buffer.toString();
-  }
-
-  public static String findHyperlinks(String text) {
-    if (!LimsUtils.isStringEmptyOrNull(text)) {
-      Pattern p = Pattern.compile(
-          "(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))");
-      Matcher m = p.matcher(text);
-
-      StringBuffer sb = new StringBuffer();
-      while (m.find()) {
-        m.appendReplacement(sb, "<a href='$0'>$0</a>");
-      }
-      m.appendTail(sb);
-      return sb.toString();
-    } else {
-      return "";
-    }
-  }
-
-  public static boolean unzipFile(File source, File destination) {
-    final int BUFFER = 2048;
-
-    try {
-      FileInputStream fis = new FileInputStream(source);
-      ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
-      ZipEntry entry;
-      while ((entry = zis.getNextEntry()) != null) {
-        File outputFile = null;
-
-        if (destination != null && destination.exists() && destination.isDirectory()) {
-          outputFile = new File(destination, entry.getName());
-        } else {
-          outputFile = new File(entry.getName());
-        }
-
-        if (entry.isDirectory()) {
-          log.info("Extracting directory: " + entry.getName());
-          LimsUtils.checkDirectory(outputFile, true);
-        } else {
-          log.info("Extracting file: " + entry.getName());
-          int count;
-          byte data[] = new byte[BUFFER];
-          FileOutputStream fos = new FileOutputStream(outputFile);
-          try (BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER)) {
-            while ((count = zis.read(data, 0, BUFFER)) != -1) {
-              dest.write(data, 0, count);
-            }
-            dest.flush();
-          }
-        }
-      }
-      zis.close();
-    } catch (Exception e) {
-      log.error("location lookup", e);
-      return false;
-    }
-    return true;
-  }
-
-  public static void zipFiles(Set<File> files, File outpath) throws IOException {
-    // Create a buffer for reading the files
-    byte[] buf = new byte[1024];
-
-    ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outpath));
-
-    // Compress the files
-    for (File f : files) {
-      FileInputStream in = new FileInputStream(f);
-
-      // Add ZIP entry to output stream.
-      out.putNextEntry(new ZipEntry(f.getName()));
-
-      // Transfer bytes from the file to the ZIP file
-      int len;
-      while ((len = in.read(buf)) > 0) {
-        out.write(buf, 0, len);
-      }
-
-      // Complete the entry
-      out.closeEntry();
-      in.close();
-    }
-
-    // Complete the ZIP file
-    out.close();
-  }
-
-  public static void writeFile(InputStream in, File path) throws IOException {
-    OutputStream out = null;
-    try {
-      out = new FileOutputStream(path);
-      try {
-        byte[] buf = new byte[16884];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-          out.write(buf, 0, len);
-        }
-      } catch (IOException e) {
-        log.error("Could not write file: " + path.getAbsolutePath(), e);
-      } finally {
-        try {
-          in.close();
-        } catch (IOException e) {
-          // ignore
-        }
-      }
-    } finally {
-      if (out != null) {
-        out.close();
-      }
-    }
   }
 
   /**
@@ -342,109 +118,6 @@ public class LimsUtils {
       }
     }
     return storageOk;
-  }
-
-  /**
-   * Similar to checkDirectory, but for single files.
-   * 
-   * @param path of type File
-   * @return boolean true if the file exists, false if not
-   * @throws IOException when the file doesn't exist
-   */
-  public static boolean checkFile(File path) throws IOException {
-    boolean storageOk = path.exists();
-    if (!storageOk) {
-      StringBuilder sb = new StringBuilder("The file [" + path.toString() + "] doesn't exist.");
-      throw new IOException(sb.toString());
-    } else {
-      log.info("File (" + path + ") OK.");
-    }
-    return storageOk;
-  }
-
-  /**
-   * Helper method to parse and store output from a given process' stdout and stderr
-   * 
-   * @param process of type Process
-   * @return Map<String, String>
-   * @throws IOException when
-   */
-  static Map<String, String> checkPipes(Process process) throws IOException {
-    HashMap<String, String> r = new HashMap<>();
-    String error = LimsUtils.processStdErr(process);
-    if (isStringEmptyOrNull(error)) {
-      String out = LimsUtils.processStdOut(process);
-      log.debug(out);
-      r.put("ok", out);
-    } else {
-      log.error(error);
-      r.put("error", error);
-    }
-    return r;
-  }
-
-  /**
-   * Reads the contents of an InputStream into a String
-   * 
-   * @param in of type InputStream
-   * @return String
-   * @throws IOException when
-   */
-  public static String inputStreamToString(InputStream in) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    String line;
-    BufferedReader br = new BufferedReader(new InputStreamReader(in));
-    while ((line = br.readLine()) != null) {
-      sb.append(line);
-    }
-    return sb.toString();
-  }
-
-  /**
-   * Reads the contents of an File into a String
-   * 
-   * @param f of type File
-   * @return String
-   * @throws IOException when
-   */
-  public static String fileToString(File f) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    String line;
-    BufferedReader br = new BufferedReader(new FileReader(f));
-    while ((line = br.readLine()) != null) {
-      sb.append(line);
-    }
-    br.close();
-    return sb.toString();
-  }
-
-  public static File stringToFile(String s, File f) throws IOException {
-    PrintWriter p = new PrintWriter(f);
-    p.println(s);
-    safeClose(p);
-    return f;
-  }
-
-  /**
-   * Process stdout from a given Process and concat it to a single String
-   * 
-   * @param p of type Process
-   * @return String
-   * @throws IOException when
-   */
-  private static String processStdOut(Process p) throws IOException {
-    return inputStreamToString(p.getInputStream());
-  }
-
-  /**
-   * Process stderr from a given Process and concat it to a single String
-   * 
-   * @param p of type Process
-   * @return String
-   * @throws IOException when
-   */
-  private static String processStdErr(Process p) throws IOException {
-    return inputStreamToString(p.getErrorStream());
   }
 
   public static String getCurrentDateAsString(DateFormat df) {
@@ -493,119 +166,12 @@ public class LimsUtils {
     return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   }
 
-  private static final Pattern linePattern = Pattern.compile(".*\r?\n");
-
-  private static Matcher grep(CharBuffer cb, Pattern pattern) {
-    Matcher lm = linePattern.matcher(cb); // Line matcher
-    Matcher pm = null; // Pattern matcher
-    while (lm.find()) {
-      CharSequence cs = lm.group(); // The current line
-      if (pm == null)
-        pm = pattern.matcher(cs);
-      else
-        pm.reset(cs);
-      if (pm.find()) {
-        return pm;
-      }
-      if (lm.end() == cb.limit()) break;
-    }
-    return null;
-  }
-
-  public static Matcher tailGrep(File f, Pattern p, int lines) throws IOException, FileNotFoundException {
-    // Open the file and then get a channel from the stream
-    FileInputStream fis = new FileInputStream(f);
-    FileChannel fc = fis.getChannel();
-    try {
-      // Get the file's size and then map it into memory
-      int sz = (int) fc.size();
-      MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, sz);
-
-      long cnt = 0;
-      long i = 0;
-      for (i = sz - 1; i >= 0; i--) {
-        if (bb.get((int) i) == '\n') {
-          cnt++;
-          if (cnt == lines + 1) break;
-        }
-      }
-
-      fis.close();
-      int offset = (int) i + 1;
-
-      if (offset >= bb.limit()) throw new NoSuchElementException();
-      ByteArrayOutputStream sb = new ByteArrayOutputStream();
-      while (offset < bb.limit()) {
-        for (; offset < bb.limit(); offset++) {
-          sb.write(bb.get(offset));
-        }
-      }
-
-      // Decode the file into a char buffer
-      CharBuffer cb = CharBuffer.wrap(sb.toString());
-
-      // Perform the search
-      return grep(cb, p);
-    } catch (IOException e) {
-      throw e;
-    } finally {
-      // Close the channel and the stream
-      safeClose(fc);
-    }
-  }
-
-  // put this anywhere you like in your common code.
-  public static void safeClose(Closeable c) {
-    try {
-      c.close();
-    } catch (Throwable t) {
-      log.error("safe close", t);
-    }
-  }
-
-  public static String capitalise(String s) {
-    return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-  }
-
   public static void inheritUsersAndGroups(SecurableByProfile child, SecurityProfile parentProfile) {
     SecurityProfile childProfile = child.getSecurityProfile();
     childProfile.setReadGroups(parentProfile.getReadGroups());
     childProfile.setWriteGroups(parentProfile.getWriteGroups());
     childProfile.setReadUsers(parentProfile.getReadUsers());
     childProfile.setWriteUsers(parentProfile.getWriteUsers());
-  }
-
-  public static String getSimpleCurrentDate() {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-    return sdf.format(new Date());
-  }
-
-  public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, Sample parent, Sample child) {
-    if (parent == null && !isDetailedSample(child)) {
-      return true; // Simple sample has no relationships.
-    }
-    if (!isDetailedSample(child) || !isDetailedSample(parent)) {
-      return false;
-    }
-    return isValidRelationship(
-        relations,
-        ((DetailedSample) parent).getSampleClass(),
-        ((DetailedSample) child).getSampleClass());
-  }
-
-  private static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
-    for (SampleValidRelationship relation : relations) {
-      if (relation.getParent().getId() == parent.getId() && relation.getChild().getId() == child.getId()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public static double round(double value, int numberOfDigitsAfterDecimalPoint) {
-    BigDecimal bigDecimal = new BigDecimal(value);
-    bigDecimal = bigDecimal.setScale(numberOfDigitsAfterDecimalPoint, BigDecimal.ROUND_HALF_UP);
-    return bigDecimal.doubleValue();
   }
 
   public static boolean isDetailedSample(Sample sample) {

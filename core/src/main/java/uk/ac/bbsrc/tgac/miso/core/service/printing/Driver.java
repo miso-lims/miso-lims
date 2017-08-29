@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * All know printer models that can print barcode labels
@@ -50,8 +49,12 @@ public enum Driver {
         sb.append("T 29,2,0,5,pt4;[DATE]\n");
         appendTruncated(sb, 20, alias);
 
-        sb.append("T 17,8,0,5,pt6;").append(LimsUtils.unicodeify(alias)).append("\n");
-        sb.append("T 17,11,0,5,pt6;").append(LimsUtils.unicodeify(name)).append("\n");
+        sb.append("T 17,8,0,5,pt6;");
+        appendBradyEscapedUnicode(sb, alias);
+        sb.append("\n");
+        sb.append("T 17,11,0,5,pt6;");
+        appendBradyEscapedUnicode(sb, name);
+        sb.append("\n");
         sb.append("A 1\n");
       } catch (UnsupportedEncodingException e) {
         log.error("get raw state", e);
@@ -103,12 +106,20 @@ public enum Driver {
         sb.append("B 17,1,0,DATAMATRIX+RECT,0.25;").append(barcode64).append("\n");
         sb.append("T 29,2,0,5,pt4;[DATE]\n");
         appendTruncated(sb, 17, name);
-        sb.append("T 17,8,0,5,pt6;").append(LimsUtils.unicodeify(alias)).append("\n");
-        sb.append("T 17,11,0,5,pt6;").append(LimsUtils.unicodeify(name)).append("\n");
+        sb.append("T 17,8,0,5,pt6;");
+        appendBradyEscapedUnicode(sb, alias);
+        sb.append("\n");
+        sb.append("T 17,11,0,5,pt6;");
+        appendBradyEscapedUnicode(sb, name);
+        sb.append("\n");
         sb.append("A 1").append("\n");
         appendTruncated(sb, 17, alias);
-        sb.append("T 17,8,0,5,pt6;").append(LimsUtils.unicodeify(alias)).append("\n");
-        sb.append("T 17,11,0,5,pt6;").append(LimsUtils.unicodeify(name)).append("\n");
+        sb.append("T 17,8,0,5,pt6;");
+        appendBradyEscapedUnicode(sb, alias);
+        sb.append("\n");
+        sb.append("T 17,11,0,5,pt6;");
+        appendBradyEscapedUnicode(sb, name);
+        sb.append("\n");
         sb.append("A 1\n");
       } catch (UnsupportedEncodingException e) {
         log.error("get raw state", e);
@@ -119,12 +130,22 @@ public enum Driver {
   };
   private static Logger log = LoggerFactory.getLogger(Driver.class);
 
+  private static void appendBradyEscapedUnicode(StringBuilder b, String text) {
+    text.codePoints().forEachOrdered(codePoint -> {
+      if (codePoint < 128) {
+        b.appendCodePoint(codePoint);
+      } else {
+        b.append("[U:$").append(String.format("%04X", codePoint)).append("]");
+      }
+    });
+  }
+
   protected static void appendTruncated(StringBuilder sb, int length, String str) {
     if (str.length() >= length) {
-      sb.append(str, 0, length - 2);
+      appendBradyEscapedUnicode(sb, str.substring(0, length - 2));
       sb.append("...");
     } else {
-      sb.append(str);
+      appendBradyEscapedUnicode(sb, str);
     }
   }
 

@@ -73,6 +73,27 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   private static final Logger log = LoggerFactory.getLogger(DefaultSampleService.class);
 
+  public static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, Sample parent, Sample child) {
+    if (parent == null && !isDetailedSample(child)) {
+      return true; // Simple sample has no relationships.
+    }
+    if (!isDetailedSample(child) || !isDetailedSample(parent)) {
+      return false;
+    }
+    return isValidRelationship(
+        relations,
+        ((DetailedSample) parent).getSampleClass(),
+        ((DetailedSample) child).getSampleClass());
+  }
+
+  private static boolean isValidRelationship(Iterable<SampleValidRelationship> relations, SampleClass parent, SampleClass child) {
+    for (SampleValidRelationship relation : relations) {
+      if (relation.getParent().getId() == parent.getId() && relation.getChild().getId() == child.getId()) {
+        return true;
+      }
+    }
+    return false;
+  }
   @Autowired
   private SampleDao sampleDao;
   @Autowired
@@ -531,7 +552,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   private void validateHierarchy(DetailedSample sample) throws IOException {
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
-    if (!LimsUtils.isValidRelationship(sampleValidRelationships, sample.getParent(), sample)) {
+    if (!isValidRelationship(sampleValidRelationships, sample.getParent(), sample)) {
       throw new IllegalArgumentException("Parent " + sample.getParent().getSampleClass().getAlias()
           + " not permitted to have a child of type " + sample.getSampleClass().getAlias());
     }

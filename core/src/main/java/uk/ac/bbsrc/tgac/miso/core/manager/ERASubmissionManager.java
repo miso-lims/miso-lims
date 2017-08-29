@@ -25,9 +25,11 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
 import java.security.cert.CertificateException;
@@ -90,7 +92,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.TGACIlluminaFilepathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.TransferMethod;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 
 /**
@@ -783,6 +784,22 @@ public class ERASubmissionManager implements SubmissionManager {
     return null;
   }
 
+  /**
+   * Reads the contents of an InputStream into a String
+   * 
+   * @param in of type InputStream
+   * @return String
+   * @throws IOException when
+   */
+  private static String inputStreamToString(InputStream in) throws IOException {
+    StringBuilder sb = new StringBuilder();
+    String line;
+    BufferedReader br = new BufferedReader(new InputStreamReader(in));
+    while ((line = br.readLine()) != null) {
+      sb.append(line);
+    }
+    return sb.toString();
+  }
   // TODO(apmasell): These files no longer get written to disk, so this method doesn't work.
   @Override
   public String prettifySubmissionMetadata(Submission submission) throws SubmissionException {
@@ -817,7 +834,7 @@ public class ERASubmissionManager implements SubmissionManager {
         if (f.getName().contains("submission" + dateStr)) {
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraSubmission.xsl");
           if (in != null) {
-            String xsl = LimsUtils.inputStreamToString(in);
+            String xsl = inputStreamToString(in);
             sb.append(SubmissionUtils.xslTransform(SubmissionUtils.transform(f, true), xsl));
           }
         }
@@ -827,7 +844,7 @@ public class ERASubmissionManager implements SubmissionManager {
         if (f.getName().contains("study" + dateStr)) {
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraStudy.xsl");
           if (in != null) {
-            String xsl = LimsUtils.inputStreamToString(in);
+            String xsl = inputStreamToString(in);
             sb.append(SubmissionUtils.xslTransform(SubmissionUtils.transform(f, true), xsl));
           }
         }
@@ -837,7 +854,7 @@ public class ERASubmissionManager implements SubmissionManager {
         if (f.getName().contains("sample" + dateStr)) {
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraSample.xsl");
           if (in != null) {
-            String xsl = LimsUtils.inputStreamToString(in);
+            String xsl = inputStreamToString(in);
             sb.append(SubmissionUtils.xslTransform(SubmissionUtils.transform(f, true), xsl));
           }
         }
@@ -847,7 +864,7 @@ public class ERASubmissionManager implements SubmissionManager {
         if (f.getName().contains("experiment" + dateStr)) {
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraExperiment.xsl");
           if (in != null) {
-            String xsl = LimsUtils.inputStreamToString(in);
+            String xsl = inputStreamToString(in);
             sb.append(SubmissionUtils.xslTransform(SubmissionUtils.transform(f, true), xsl));
           }
         }
@@ -857,7 +874,7 @@ public class ERASubmissionManager implements SubmissionManager {
         if (f.getName().contains("run" + dateStr)) {
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraRun.xsl");
           if (in != null) {
-            String xsl = LimsUtils.inputStreamToString(in);
+            String xsl = inputStreamToString(in);
             sb.append(SubmissionUtils.xslTransform(SubmissionUtils.transform(f, true), xsl));
           }
         }

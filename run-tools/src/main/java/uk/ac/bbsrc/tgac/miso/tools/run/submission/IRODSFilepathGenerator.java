@@ -59,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * User: davey Date: 08/10/12 Time: 15:15
@@ -113,7 +112,7 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
                 .addOrderByGenQueryField(RodsGenQueryEnum.COL_DATA_NAME, GenQueryOrderByField.OrderByType.ASC);
             IRODSGenQueryFromBuilder irodsQuery = builder.exportIRODSQueryFromBuilder(1);
             collateResults(queryExecutorAO.executeIRODSQuery(irodsQuery, 0), filePaths);
-            log.info(LimsUtils.join(filePaths, " , "));
+            log.info(String.join(" , ", filePaths));
           } catch (GenQueryBuilderException e) {
             log.error("error building query", e);
             throw new JargonException("error building query", e);

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -39,6 +41,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpSession;
 
@@ -73,7 +77,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGeneratorResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadJob;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
@@ -227,7 +230,7 @@ public class SubmissionControllerHelperService {
       }
 
       File zipFile = misoFileManager.getNewFile(Submission.class, submission.getName(), "bundle" + dateStr + ".zip");
-      LimsUtils.zipFiles(filesToZip, zipFile);
+      zipFiles(filesToZip, zipFile);
 
       File f = misoFileManager.getFile(Submission.class, submission.getName(), zipFile.getName());
 
@@ -236,6 +239,34 @@ public class SubmissionControllerHelperService {
       log.error("failed to generate submission metadata zip file", e);
       return JSONUtils.SimpleJSONError("Failed to generate submission metadata zip file: " + e.getMessage());
     }
+  }
+
+  private static void zipFiles(Set<File> files, File outpath) throws IOException {
+    // Create a buffer for reading the files
+    byte[] buf = new byte[1024];
+
+    ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outpath));
+
+    // Compress the files
+    for (File f : files) {
+      FileInputStream in = new FileInputStream(f);
+
+      // Add ZIP entry to output stream.
+      out.putNextEntry(new ZipEntry(f.getName()));
+
+      // Transfer bytes from the file to the ZIP file
+      int len;
+      while ((len = in.read(buf)) > 0) {
+        out.write(buf, 0, len);
+      }
+
+      // Complete the entry
+      out.closeEntry();
+      in.close();
+    }
+
+    // Complete the ZIP file
+    out.close();
   }
 
   /*
@@ -456,7 +487,7 @@ public class SubmissionControllerHelperService {
                     sb.append("/>");
                     // adds the Partition info: number, name, experiments etc.
                     sb.append("<b>Partition " + part.getPartitionNumber() + "</b> : " + part.getPool().getName() + " ("
-                        + LimsUtils.join(involvedExperiments, ",") + ")");
+                        + String.join(",", involvedExperiments) + ")");
 
                     // creates HTML for list of library dilutions and corresponding datafiles.
                     // gets all the dilutions in that partition's pool.
