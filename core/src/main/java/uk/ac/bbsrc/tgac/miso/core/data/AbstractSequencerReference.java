@@ -46,7 +46,6 @@ import javax.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 
 /**
@@ -72,7 +71,7 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   @Column(nullable = false)
   private String name;
 
-  @ManyToOne(targetEntity = PlatformImpl.class)
+  @ManyToOne(targetEntity = Platform.class)
   @JoinColumn(name = "platformId", nullable = false)
   private Platform platform;
 

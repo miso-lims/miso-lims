@@ -22,7 +22,6 @@
  */
 
 var Pool = Pool || {
-
   validatePool: function () {
     Validate.cleanFields('#pool-form');
     jQuery('#pool-form').parsley().destroy();

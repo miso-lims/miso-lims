@@ -51,14 +51,12 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
@@ -84,12 +82,9 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   @Mock
   private SequencerReferenceStore sequencerReferenceDAO;
   @Mock
-  private RunQcStore runQcDAO;
-  @Mock
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
   @Mock
   private HibernateChangeLogDao changeLogDAO;
-
 
   @InjectMocks
   private HibernateRunDao dao;
@@ -341,16 +336,11 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     List<SequencerPartitionContainer> mockContainers = new ArrayList<>();
     mockContainers.add(Mockito.mock(SequencerPartitionContainerImpl.class));
     Mockito.when(sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(Matchers.anyLong())).thenReturn(mockContainers);
-
-    List<RunQC> mockQcs = new ArrayList<>();
-    mockQcs.add(Mockito.mock(RunQC.class));
-    Mockito.when(runQcDAO.listByRunId(Matchers.anyLong())).thenReturn(mockQcs);
   }
 
   private void assertNonLazyThings(Run run) {
     assertNotNull(run);
     assertFalse(run.getSequencerPartitionContainers().isEmpty());
-    assertFalse(run.getRunQCs().isEmpty());
   }
 
   @Test
@@ -393,7 +383,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     List<Run> runs = dao.list(0, 2, true, "id", PaginationFilter.query("; DROP TABLE Run;"));
     assertEquals(0L, runs.size());
   }
-
 
   @Test
   public void testListOffsetBadLimit() throws IOException {

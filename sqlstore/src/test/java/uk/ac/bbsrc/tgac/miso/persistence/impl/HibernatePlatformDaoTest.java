@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
@@ -40,9 +41,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
 
 public class HibernatePlatformDaoTest extends AbstractDAOTest {
 
@@ -150,7 +149,7 @@ public class HibernatePlatformDaoTest extends AbstractDAOTest {
     oldPlatform.setPlatformType(oldPlatform.getPlatformType());
     oldPlatform.setInstrumentModel("Illumina HiSeq 2500");
     oldPlatform.setDescription("4-channel flow cell");
-    oldPlatform.setNumContainers(1);
+    oldPlatform.setPartitionSizes(Collections.singleton(1));
 
     assertEquals(16L, dao.save(oldPlatform));
     Platform savedPlatform = dao.get(16L);
@@ -177,9 +176,9 @@ public class HibernatePlatformDaoTest extends AbstractDAOTest {
   }
 
   Platform makePlatform(String instrumentModel, String description, Integer numContainers) {
-    Platform platform = new PlatformImpl();
+    Platform platform = new Platform();
     platform.setDescription(description);
-    platform.setNumContainers(numContainers);
+    platform.setPartitionSizes(Collections.singleton(numContainers));
     platform.setInstrumentModel(instrumentModel);
     platform.setPlatformType(PlatformType.get("PacBio"));
     return platform;

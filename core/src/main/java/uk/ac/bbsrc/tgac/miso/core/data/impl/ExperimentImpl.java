@@ -97,7 +97,7 @@ public class ExperimentImpl implements Experiment {
   @Column(nullable = false)
   private String name;
 
-  @ManyToOne(targetEntity = PlatformImpl.class)
+  @ManyToOne(targetEntity = Platform.class)
   @JoinColumn(name = "platform_platformId")
   private Platform platform;
 

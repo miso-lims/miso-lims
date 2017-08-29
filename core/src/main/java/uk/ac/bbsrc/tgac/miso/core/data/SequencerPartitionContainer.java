@@ -137,5 +137,4 @@ public interface SequencerPartitionContainer
   public Date getCreationTime();
 
   public void setCreationTime(Date creationTime);
-
 }

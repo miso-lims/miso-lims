@@ -39,7 +39,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 
@@ -73,12 +72,12 @@ public class HibernatePlatformDao implements PlatformStore {
 
   @Override
   public Platform get(long id) throws IOException {
-    return (Platform) currentSession().get(PlatformImpl.class, id);
+    return (Platform) currentSession().get(Platform.class, id);
   }
 
   @Override
   public List<Platform> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(PlatformImpl.class);
+    Criteria criteria = currentSession().createCriteria(Platform.class);
     @SuppressWarnings("unchecked")
     List<Platform> records = criteria.list();
     return records;
@@ -86,20 +85,20 @@ public class HibernatePlatformDao implements PlatformStore {
 
   @Override
   public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(PlatformImpl.class);
+    Criteria criteria = currentSession().createCriteria(Platform.class);
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
   }
 
   @Override
   public Platform getByModel(String model) throws IOException {
-    Criteria criteria = currentSession().createCriteria(PlatformImpl.class);
+    Criteria criteria = currentSession().createCriteria(Platform.class);
     criteria.add(Restrictions.eq("instrumentModel", model));
     return (Platform) criteria.uniqueResult();
   }
 
   @Override
   public List<Platform> listByName(String name) throws IOException {
-    Criteria criteria = currentSession().createCriteria(PlatformImpl.class);
+    Criteria criteria = currentSession().createCriteria(Platform.class);
     criteria.add(Restrictions.eq("platformType", PlatformType.get(name)));
     @SuppressWarnings("unchecked")
     List<Platform> records = criteria.list();
@@ -108,7 +107,7 @@ public class HibernatePlatformDao implements PlatformStore {
 
   @Override
   public List<PlatformType> listDistinctPlatformNames() throws IOException {
-    Criteria criteria = currentSession().createCriteria(PlatformImpl.class);
+    Criteria criteria = currentSession().createCriteria(Platform.class);
     criteria.setProjection(Projections.distinct(Projections.property("platformType")));
     @SuppressWarnings("unchecked")
     List<PlatformType> records = criteria.list();

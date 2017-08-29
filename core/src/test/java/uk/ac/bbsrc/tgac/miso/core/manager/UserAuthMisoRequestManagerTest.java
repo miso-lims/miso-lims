@@ -1146,16 +1146,6 @@ public class UserAuthMisoRequestManagerTest {
 
   /**
    * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#deleteRunQC(uk.ac.bbsrc.tgac.miso.core.data.RunQC)} .
-   */
-
-  @Test
-  public void testDeleteRunQC() throws IOException {
-    // TODO: Implement.
-  }
-
-  /**
-   * Test method for
    * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#deleteSampleQC(uk.ac.bbsrc.tgac.miso.core.data.SampleQC)} .
    */
 

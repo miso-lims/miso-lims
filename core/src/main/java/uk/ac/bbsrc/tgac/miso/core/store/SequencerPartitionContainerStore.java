@@ -93,4 +93,6 @@ public interface SequencerPartitionContainerStore extends Remover<SequencerParti
   Collection<Partition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException;
 
   Partition getPartitionById(long partitionId);
+
+  public void update(Partition partition);
 }

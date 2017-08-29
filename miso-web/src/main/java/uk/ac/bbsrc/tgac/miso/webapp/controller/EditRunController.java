@@ -25,8 +25,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -50,20 +48,27 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.service.impl.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
@@ -93,6 +98,8 @@ public class EditRunController {
   private RunService runService;
   @Autowired
   private PlatformService platformService;
+  @Autowired
+  private PartitionQCService partitionQCService;
 
   @Autowired
   private SequencerReferenceService sequencerReferenceService;
@@ -140,13 +147,15 @@ public class EditRunController {
     return false;
   }
 
-  @RequestMapping(value = "/new/{platformTypeName}", method = RequestMethod.GET)
-  public ModelAndView newUnassignedRun(@PathVariable String platformTypeName, ModelMap model) throws IOException {
-    PlatformType platformType = PlatformType.valueOf(platformTypeName);
+  @RequestMapping(value = "/new/{srId}", method = RequestMethod.GET)
+  public ModelAndView newUnassignedRun(@PathVariable Long srId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     // clear any existing run in the model
     model.addAttribute("run", null);
-    return setupForm(platformType.createRun(user), platformType, model);
+    SequencerReference sequencerReference = sequencerReferenceService.get(srId);
+    Run run = sequencerReference.getPlatform().getPlatformType().createRun(user);
+    run.setSequencerReference(sequencerReference);
+    return setupForm(run, model);
 
   }
 
@@ -164,19 +173,18 @@ public class EditRunController {
   public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
     Run run = runService.get(runId);
 
-    return setupForm(run, run.getSequencerReference().getPlatform().getPlatformType(), model);
+    return setupForm(run, model);
 
   }
 
   @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable String runAlias, ModelMap model) throws IOException {
     Run run = runService.getRunByAlias(runAlias);
-    return setupForm(run, run.getSequencerReference().getPlatform().getPlatformType(), model);
+    return setupForm(run, model);
 
   }
 
-  public ModelAndView setupForm(Run run, PlatformType platformType, ModelMap model) throws IOException {
-    model.put("platformType", platformType);
+  public ModelAndView setupForm(Run run, ModelMap model) throws IOException {
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -208,26 +216,39 @@ public class EditRunController {
         throw new SecurityException("Permission denied.");
       }
 
-      model.put("sequencerReferences", sequencerReferenceService.listByPlatformType(platformType));
-      if (run.getSequencerReference() != null) {
-        model.put("sequencingParameters",
-            sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getId()));
+      model.put("sequencingParameters",
+          sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getId()));
 
-      } else {
-        model.put("sequencingParameters", Collections.emptyList());
-      }
+      model.put("runContainers", run.getSequencerPartitionContainers().stream().map(Dtos::asDto).collect(Collectors.toList()));
+      model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
+          .map(WhineyFunction.rethrow(partition -> {
+            PartitionDto dto = Dtos.asDto(partition);
+            PartitionQC qc = partitionQCService.get(run, partition);
+            if (qc != null) {
+              dto.setQcType(qc.getType().getId());
+              dto.setQcNotes(qc.getNotes());
+            } else {
+              dto.setQcNotes("");
+            }
+            return dto;
+          })).collect(Collectors.toList()));
 
       model.put("formObj", run);
       model.put("run", run);
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
+      model.put("isWatching", run.getWatchers().contains(user));
 
-      Map<Long, String> runMap = new HashMap<>();
-      if (run.getWatchers().contains(user)) {
-        runMap.put(run.getId(), user.getLoginName());
-      }
-      model.put("overviewMap", runMap);
+      ObjectMapper mapper = new ObjectMapper();
+      ObjectNode partitionConfig = mapper.createObjectNode();
+      partitionConfig.put("platformType", run.getPlatformType().name());
+      partitionConfig.put("platformId", run.getSequencerReference().getPlatform().getId());
+      partitionConfig.put("runId", run.getId());
+      partitionConfig.put("isFull", run.isFull());
+      partitionConfig.put("showContainer", true);
+      partitionConfig.put("sequencingParametersId", run.getSequencingParameters() == null ? 0 : run.getSequencingParameters().getId());
+      model.put("partitionConfig", mapper.writeValueAsString(partitionConfig));
 
       return new ModelAndView("/pages/editRun.jsp", model);
     } catch (IOException ex) {

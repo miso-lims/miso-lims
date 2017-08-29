@@ -10,9 +10,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
@@ -72,23 +70,11 @@ public interface RunService extends PaginatedDataSource<Run> {
 
   void deleteNote(Run run, Long noteId) throws IOException;
 
-  void addQc(Run run, RunQC qc) throws IOException;
-
-  void bulkAddQcs(Run run) throws IOException;
-
-  void deleteQc(Run run, Long qcId) throws IOException;
-
-  Collection<QcType> listRunQcTypes() throws IOException;
-
   Long create(Run run) throws IOException;
 
   void update(Run run) throws IOException;
 
   void saveRuns(Collection<Run> runs) throws IOException;
-
-  QcType getRunQcType(long qcTypeId) throws IOException;
-
-  QcType getRunQcTypeByName(String qcTypeName) throws IOException;
 
   /**
    * Save a scanned run to the database or update the run if it exists.

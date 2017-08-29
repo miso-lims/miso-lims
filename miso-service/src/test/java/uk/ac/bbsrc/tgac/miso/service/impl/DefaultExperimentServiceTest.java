@@ -21,8 +21,8 @@ import org.mockito.stubbing.Answer;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -69,7 +69,7 @@ public class DefaultExperimentServiceTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
-    experiment.setPlatform(new PlatformImpl());
+    experiment.setPlatform(new Platform());
     experiment.getPlatform().setId(2L);
     experiment.setPool(new PoolImpl());
     experiment.getPool().setId(3L);

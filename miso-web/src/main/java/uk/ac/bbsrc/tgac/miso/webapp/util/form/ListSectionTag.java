@@ -29,6 +29,7 @@ public class ListSectionTag extends RequestContextAwareTag {
   private boolean alwaysShow;
 
   private String config;
+
   private Object items;
 
   private String name;

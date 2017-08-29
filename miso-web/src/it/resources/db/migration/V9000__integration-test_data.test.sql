@@ -313,11 +313,33 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (12, 2, 'B04',      'TTTAAA', 2);
 
 DELETE FROM SequencingParameters;
+DELETE FROM PlatformSizes;
 DELETE FROM Platform;
 INSERT INTO Platform (platformId, name, instrumentModel, numContainers) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1),
   (3, 'PACBIO', 'PacBio RS II', 1);
+
+INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
+  (1, 4),
+  (1, 8),
+  (2, 1),
+  (3, 1),
+  (3, 2),
+  (3, 3),
+  (3, 4),
+  (3, 5),
+  (3, 6),
+  (3, 7),
+  (3, 8),
+  (3, 9),
+  (3, 10),
+  (3, 11),
+  (3, 12),
+  (3, 13),
+  (3, 14),
+  (3, 15),
+  (3, 16);
 
 DELETE FROM SequencerReference;
 INSERT INTO SequencerReference (referenceId, name, platformId, ip) VALUES

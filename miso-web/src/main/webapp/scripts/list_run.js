@@ -43,9 +43,36 @@ ListTarget.run = {
           .findFirstOrNull(Utils.array.namePredicate(config.platformType),
               Constants.platformTypes), 'key');
       return [ {
-        name : "Add " + platformKey + " Run",
+        name : "Create " + platformKey + " Run",
         handler : function() {
-          window.location = '/miso/run/new/' + config.platformType;
+          Utils
+              .ajaxWithDialog(
+                  'Getting Sequencer',
+                  'Get',
+                  '/miso/rest/sequencer',
+                  null,
+                  function(sequencers) {
+                    
+                    Utils
+                        .showWizardDialog(
+                            "Create " + platformKey + " Run",
+                            sequencers
+                                .filter(
+                                    function(sequencer) {
+                                      return sequencer.platform.platformType == config.platformType && !sequencer.dateDecommissioned;
+                                    })
+                                .sort(Utils.sorting.standardSort('name'))
+                                .map(
+                                    function(sequencer) {
+                                      return {
+                                        name : sequencer.name + " (" + sequencer.platform.instrumentModel + ")",
+                                        handler : function() {
+                                          window.location = '/miso/run/new/' + sequencer.id;
+                                        }
+                                      };
+                                      
+                                    }));
+                  });
         }
       } ];
     } else {
@@ -54,8 +81,8 @@ ListTarget.run = {
   },
   createColumns : function(config, projectId) {
     return [
-        ListUtils
-            .idHyperlinkColumn("Name", "run", "id", Utils.array.getName, 1, true),
+        ListUtils.idHyperlinkColumn("Name", "run", "id", Utils.array.getName,
+            1, true),
         ListUtils.labelHyperlinkColumn("Alias", "run", Utils.array.getId,
             "alias", 0, true), {
           "sTitle" : "Status",

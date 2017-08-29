@@ -19,7 +19,6 @@ import javax.persistence.TemporalType;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 @Entity
@@ -53,7 +52,7 @@ public class SequencingParameters implements Serializable
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long parametersId;
 
-  @ManyToOne(targetEntity = PlatformImpl.class)
+  @ManyToOne(targetEntity = Platform.class)
   @JoinColumn(name = "platformId")
   private Platform platform;
 

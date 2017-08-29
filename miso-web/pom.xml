@@ -299,23 +299,7 @@
               <cssFinalFile>style.css</cssFinalFile>
               <jsSourceDir>scripts</jsSourceDir>
               <jsSourceFiles>
-                <jsSourceFile>lims.js</jsSourceFile>
-                <jsSourceFile>search.js</jsSourceFile>
-                <jsSourceFile>experiment_ajax.js</jsSourceFile>
-                <jsSourceFile>library_ajax.js</jsSourceFile>
-                <jsSourceFile>pool_ajax.js</jsSourceFile>
-                <jsSourceFile>project_ajax.js</jsSourceFile>
-                <jsSourceFile>reporting_ajax.js</jsSourceFile>
-                <jsSourceFile>run_ajax.js</jsSourceFile>
-                <jsSourceFile>sample_ajax.js</jsSourceFile>
-                <jsSourceFile>sequencer_partition_container_ajax.js</jsSourceFile>
-                <jsSourceFile>sequencer_reference_ajax.js</jsSourceFile>
-                <jsSourceFile>study_ajax.js</jsSourceFile>
-                <jsSourceFile>parsley_form_validations.js</jsSourceFile>
-                <jsSourceFile>multi_select_drag_drop.js</jsSourceFile>
-                <jsSourceFile>menus.js</jsSourceFile>
                 <jsSourceFile>jquery/datatables/js/jquery.dataTables.min.js</jsSourceFile>
-                <jsSourceFile>datatables_utils.js</jsSourceFile>
               </jsSourceFiles>
               <jsSourceIncludes>
                 <jsSourceInclude>*.js</jsSourceInclude>
