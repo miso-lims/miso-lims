@@ -26,7 +26,10 @@ package uk.ac.bbsrc.tgac.miso.spring.util;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -37,6 +40,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -55,12 +60,38 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 public class FormUtilsTests {
+  private static Logger log = LoggerFactory.getLogger(FormUtilsTests.class);
+
+  public static void writeFile(InputStream in, File path) throws IOException {
+    OutputStream out = null;
+    try {
+      out = new FileOutputStream(path);
+      try {
+        byte[] buf = new byte[16884];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+          out.write(buf, 0, len);
+        }
+      } catch (IOException e) {
+        log.error("Could not write file: " + path.getAbsolutePath(), e);
+      } finally {
+        try {
+          in.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
+    } finally {
+      if (out != null) {
+        out.close();
+      }
+    }
+  }
 
   @Mock
   private LibraryService libraryService;
@@ -122,7 +153,7 @@ public class FormUtilsTests {
     try {
       testSampleBulkInputOdsFile = File.createTempFile("test-sampleBulkInputOds", ".ods");
       InputStream in = FormUtilsTests.class.getClassLoader().getResourceAsStream("test-bulk_input.ods");
-      LimsUtils.writeFile(in, testSampleBulkInputOdsFile);
+      writeFile(in, testSampleBulkInputOdsFile);
       User u = new UserImpl();
       u.setLoginName("testBulkImportUser");
       List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputOdsFile, u, sampleService, libraryService,
@@ -141,7 +172,7 @@ public class FormUtilsTests {
     try {
       testSampleBulkInputXlsFile = File.createTempFile("test-sampleBulkInputXls", ".xlsx");
       InputStream in = FormUtilsTests.class.getClassLoader().getResourceAsStream("test-bulk_input.xlsx");
-      LimsUtils.writeFile(in, testSampleBulkInputXlsFile);
+      writeFile(in, testSampleBulkInputXlsFile);
       User u = new UserImpl();
       u.setLoginName("testBulkImportUser");
       List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputXlsFile, u, sampleService, libraryService,
