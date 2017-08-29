@@ -29,7 +29,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -59,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -68,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.PlatformDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
@@ -86,6 +90,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
@@ -94,6 +99,7 @@ import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
+import uk.ac.bbsrc.tgac.miso.service.impl.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -152,6 +158,10 @@ public class MenuController implements ServletContextAware {
   private QualityControlService qcService;
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
+  @Autowired
+  private SequencerReferenceService sequencerService;
+  @Autowired
+  private PartitionQCService partitionQCService;
 
   @Autowired
   private StudyService studyService;
@@ -280,7 +290,14 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "librarySelections", libraryService.listLibrarySelectionTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryStrategies", libraryService.listLibraryStrategyTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryDesignCodes", libraryDesignCodeService.list(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "platforms", platformService.list(), Dtos::asDto);
+    Set<Long> activePlatforms = sequencerService.list().stream().filter(SequencerReference::isActive)
+        .map(sequencer -> sequencer.getPlatform().getId())
+        .collect(Collectors.toSet());
+    createArray(mapper, baseUri, node, "platforms", platformService.list(), platform -> {
+      PlatformDto dto = Dtos.asDto(platform);
+      dto.setActive(activePlatforms.contains(platform.getId()));
+      return dto;
+    });
     createArray(mapper, baseUri, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleClasses", sampleClassService.getAll(), model -> {
       SampleClassDto dto = Dtos.asDto(model);
@@ -310,6 +327,7 @@ public class MenuController implements ServletContextAware {
     indexFamilies.add(IndexFamily.NULL);
     createArray(mapper, baseUri, node, "indexFamilies", indexFamilies, Dtos::asDto);
     createArray(mapper, baseUri, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "partitionQcTypes", partitionQCService.listTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");

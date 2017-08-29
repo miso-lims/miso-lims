@@ -25,14 +25,13 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
 
 /**
  * @author Chris Salt
@@ -73,7 +72,7 @@ public class HibernateExperimentDaoTest extends AbstractDAOTest {
   public void testSave() throws IOException, MisoNamingException {
     Experiment experiment = new ExperimentImpl();
     experiment.setName("TEMPORARY_XXX");
-    experiment.setPlatform(new PlatformImpl());
+    experiment.setPlatform(new Platform());
     experiment.setStudy(new StudyImpl());
     User user = new UserImpl();
     user.setUserId(1L);

@@ -258,33 +258,6 @@ public class PoolControllerHelperService {
     }
   }
 
-  public JSONObject deletePool(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("error getting currently logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("poolId")) {
-        Long poolId = json.getLong("poolId");
-        try {
-          poolService.delete(poolService.get(poolId));
-          return JSONUtils.SimpleJSONResponse("Pool deleted");
-        } catch (IOException e) {
-          log.error("cannot delete pool", e);
-          return JSONUtils.SimpleJSONError("Cannot delete pool: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No pool specified to delete.");
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
-    }
-  }
-
   public JSONObject deletePoolNote(HttpSession session, JSONObject json) {
     Long poolId = json.getLong("poolId");
     Long noteId = json.getLong("noteId");

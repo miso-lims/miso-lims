@@ -37,6 +37,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
@@ -79,7 +81,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -1468,11 +1469,12 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setInstrumentModel(from.getInstrumentModel());
     dto.setNumContainers(from.getNumContainers());
+    dto.setPartitionSizes(from.getPartitionSizes());
     return dto;
   }
 
   public static Platform to(PlatformDto from) {
-    Platform to = new PlatformImpl();
+    Platform to = new Platform();
     to.setId(from.getId());
     to.setPlatformType(PlatformType.get(from.getPlatformType()));
     to.setDescription(from.getDescription());
@@ -1800,6 +1802,23 @@ public class Dtos {
     ReferenceGenomeDto dto = new ReferenceGenomeDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
+    return dto;
+  }
+
+  public static PartitionDto asDto(Partition from) {
+    PartitionDto dto = new PartitionDto();
+    dto.setId(from.getId());
+    dto.setContainerName(from.getSequencerPartitionContainer().getIdentificationBarcode());
+    dto.setPartitionNumber(from.getPartitionNumber());
+    dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), false));
+    return dto;
+  }
+
+  public static PartitionQCTypeDto asDto(PartitionQCType from) {
+    PartitionQCTypeDto dto = new PartitionQCTypeDto();
+    dto.setId(from.getId());
+    dto.setDescription(from.getDescription());
+    dto.setNoteRequired(from.isNoteRequired());
     return dto;
   }
 

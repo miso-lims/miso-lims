@@ -94,7 +94,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
-  @ManyToOne(targetEntity = PlatformImpl.class)
+  @ManyToOne(targetEntity = Platform.class)
   @JoinColumn(name = "platform", nullable = false)
   private Platform platform;
 

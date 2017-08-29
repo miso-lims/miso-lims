@@ -52,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.integration.AnalysisQueryService;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
@@ -156,7 +156,7 @@ public class AnalysisController {
 
       map.put(
           "sample-sheet-string",
-          RunProcessingUtils.buildIlluminaDemultiplexCSV(run, f, "1.8.2", user.getFullName()).replaceAll("\n", "\\\n"));
+          SampleSheet.CASAVA_1_8.createSampleSheet(run, user).replaceAll("\n", "\\\n"));
 
       map.put("contaminant-list", "ecoli,phix_174,human_chr17,arabidopsis_chloroplast,vectors");
 

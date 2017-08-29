@@ -39,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -48,11 +47,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -78,8 +75,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   private RunStore runDao;
   @Autowired
   private ChangeLogService changeLogService;
-  @Autowired
-  private RunQcStore runQcDao;
   @Autowired
   private SecurityManager securityManager;
   @Autowired
@@ -170,14 +165,15 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     if (!managedRun.userCanRead(managedWatcher)) {
       throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot see this run.");
     }
-    runDao.addWatcher(run, watcher);
+    runDao.addWatcher(managedRun, watcher);
   }
 
   @Override
   public void removeRunWatcher(Run run, User watcher) throws IOException {
     User managedWatcher = securityManager.getUserById(watcher.getUserId());
+    Run managedRun = runDao.get(run.getId());
     authorizationManager.throwIfNonAdminOrMatchingOwner(managedWatcher);
-    runDao.removeWatcher(run, managedWatcher);
+    runDao.removeWatcher(managedRun, managedWatcher);
   }
 
   @Override
@@ -219,66 +215,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public void addQc(Run run, RunQC qc) throws IOException {
-    if (qc.getQcType() == null || qc.getQcType().getQcTypeId() == null) {
-      throw new IllegalArgumentException("QC Type cannot be null");
-    }
-    QcType managedQcType = runQcDao.getRunQcTypeById(qc.getQcType().getQcTypeId());
-    if (managedQcType == null) {
-      throw new IllegalArgumentException("QC Type " + qc.getQcType().getQcTypeId() + " is not applicable for runs");
-    }
-    qc.setQcType(managedQcType);
-    qc.setQcCreator(authorizationManager.getCurrentUsername());
-
-    Run managed = get(run.getId());
-    authorizationManager.throwIfNotWritable(managed);
-
-    managed.addQc(qc);
-    managed.setLastModifier(authorizationManager.getCurrentUser());
-    runDao.save(managed);
-  }
-
-  @Override
-  public void bulkAddQcs(Run run) throws IOException {
-    for (RunQC qc : run.getRunQCs()) {
-      if (qc.getId() == RunQC.UNSAVED_ID) addQc(run, qc);
-      // TODO: make QCs updatable too
-    }
-  }
-
-  @Override
-  public void deleteQc(Run run, Long qcId) throws IOException {
-    if (qcId == null || qcId.equals(RunQC.UNSAVED_ID)) {
-      throw new IllegalArgumentException("Cannot delete an unsaved Run QC");
-    }
-    Run managed = runDao.get(run.getId());
-    authorizationManager.throwIfNotWritable(managed);
-    RunQC deleteQc = null;
-    for (RunQC qc : managed.getRunQCs()) {
-      if (qc.getId() == qcId) {
-        deleteQc = qc;
-        break;
-      }
-    }
-    if (deleteQc == null) throw new IOException("QC " + qcId + " not found for Run " + run.getId());
-    authorizationManager.throwIfNonAdminOrMatchingOwner(securityManager.getUserByLoginName(deleteQc.getQcCreator()));
-    managed.getRunQCs().remove(deleteQc);
-    managed.setLastModifier(authorizationManager.getCurrentUser());
-    runQcDao.remove(deleteQc);
-    runDao.save(managed);
-  }
-
-  @Override
-  public QcType getRunQcType(long qcTypeId) throws IOException {
-    return runQcDao.getRunQcTypeById(qcTypeId);
-  }
-
-  @Override
-  public QcType getRunQcTypeByName(String qcTypeName) throws IOException {
-    return runQcDao.getRunQcTypeByName(qcTypeName);
-  }
-
-  @Override
   public Long create(Run run) throws IOException {
     authorizationManager.throwIfNotWritable(run);
     saveContainers(run);
@@ -296,7 +232,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     Run updatedRun = get(run.getId());
     authorizationManager.throwIfNotWritable(updatedRun);
     saveContainers(run);
-    if (!run.getRunQCs().isEmpty()) bulkAddQcs(run);
     applyChanges(updatedRun, run);
     setChangeDetails(updatedRun);
     loadChildEntities(updatedRun);
@@ -463,21 +398,12 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public Collection<QcType> listRunQcTypes() throws IOException {
-    return runQcDao.listAllRunQcTypes();
-  }
-
-  @Override
   public Map<String, Integer> getRunColumnSizes() throws IOException {
     return runDao.getRunColumnSizes();
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  public void setRunQcDao(RunQcStore runQcDao) {
-    this.runQcDao = runQcDao;
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {
@@ -551,6 +477,10 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       throw new IllegalArgumentException("No such sequencer: " + sequencerName);
     }
     target.setSequencerReference(sequencer);
+
+    if (!sequencer.getPlatform().getPartitionSizes().contains(laneCount)) {
+      throw new IllegalArgumentException("Invalid number of partitions: " + laneCount);
+    }
 
     isMutated |= updateContainerFromNotification(target, user, laneCount, containerSerialNumber, sequencer, getLaneContents);
     isMutated |= updateHealthFromNotification(source, target, user);

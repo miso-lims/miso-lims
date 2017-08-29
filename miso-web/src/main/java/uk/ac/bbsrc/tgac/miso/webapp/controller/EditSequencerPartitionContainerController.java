@@ -24,8 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -45,16 +45,13 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
@@ -66,77 +63,13 @@ public class EditSequencerPartitionContainerController {
   protected static final Logger log = LoggerFactory.getLogger(EditSequencerPartitionContainerController.class);
 
   @Autowired
-  private SecurityManager securityManager;
-
-  @Autowired
-  private ChangeLogService changeLogService;
-  @Autowired
   private ContainerService containerService;
   @Autowired
   private PlatformService platformService;
   @Autowired
   private RunService runService;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setContainerService(ContainerService containerService) {
-    this.containerService = containerService;
-  }
-
-  public void setPlatformService(PlatformService platformService) {
-    this.platformService = platformService;
-  }
-
-  public void setRunService(RunService runService) {
-    this.runService = runService;
-  }
-
-  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
-  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return changeLogService.listAll("SequencerPartitionContainer");
-  }
-
-  @ModelAttribute("platformTypes")
-  public Collection<String> populatePlatformTypes() {
-    return PlatformType.getKeys();
-  }
-
-  @ModelAttribute("platforms")
-  public Collection<Platform> populatePlatforms() throws IOException {
-    return platformService.list();
-  }
-
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
-  public ModelAndView setupForm(ModelMap model) throws IOException {
-    return setupForm(SequencerPartitionContainerImpl.UNSAVED_ID, model);
-  }
-
-  @RequestMapping(value = "/{containerId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long containerId, ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      SequencerPartitionContainer container = null;
-      if (containerId == SequencerPartitionContainerImpl.UNSAVED_ID) {
-        container = new SequencerPartitionContainerImpl(user);
-        model.put("title", "New Container");
-      } else {
-        container = containerService.get(containerId);
-        model.put("title", container.getPlatform().getPlatformType().getContainerName() + " " + containerId);
-      }
-
-      model.put("formObj", container);
-      model.put("container", container);
-      model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
-      return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show container", ex);
-      }
-      throw ex;
-    }
-  }
+  @Autowired
+  private SecurityManager securityManager;
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer container, ModelMap model, SessionStatus session)
@@ -163,5 +96,51 @@ public class EditSequencerPartitionContainerController {
       }
       throw ex;
     }
+  }
+
+  public void setContainerService(ContainerService containerService) {
+    this.containerService = containerService;
+  }
+
+  public void setPlatformService(PlatformService platformService) {
+    this.platformService = platformService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
+
+  @RequestMapping(value = "/new/{platformId}", method = RequestMethod.GET)
+  public ModelAndView setupForm(@PathVariable("platformId") Long platformId, @RequestParam("count") int partitionCount, ModelMap model)
+      throws IOException {
+    SequencerPartitionContainer container = new SequencerPartitionContainerImpl();
+    container.setPlatform(platformService.get(platformId));
+
+    model.put("title", "New " + container.getPlatform().getPlatformType().getContainerName());
+
+    if (!container.getPlatform().getPartitionSizes().contains(partitionCount)) {
+      throw new IllegalArgumentException("Invalid number of partitions: " + partitionCount);
+    }
+    container.setPartitions(
+        IntStream.range(0, partitionCount).mapToObj(number -> new PartitionImpl(container, number + 1)).collect(Collectors.toList()));
+    return setupForm(container, model);
+  }
+
+  @RequestMapping(value = "/{containerId}", method = RequestMethod.GET)
+  public ModelAndView setupForm(@PathVariable Long containerId, ModelMap model) throws IOException {
+    SequencerPartitionContainer container = containerService.get(containerId);
+    model.put("title", container.getPlatform().getPlatformType().getContainerName() + " " + containerId);
+    return setupForm(container, model);
+  }
+
+  private ModelAndView setupForm(SequencerPartitionContainer container, ModelMap model) throws IOException {
+    model.put("container", container);
+    model.put("containerPartitions", container.getPartitions().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
+    return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
   }
 }

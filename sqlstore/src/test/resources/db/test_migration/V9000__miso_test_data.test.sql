@@ -463,12 +463,6 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
 (4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55');
 
-DELETE FROM RunQC;
-INSERT INTO `RunQC`(`run_runId`, `qcCreator`, `qcDate`, `qcMethod`, `information`, `doNotProcess`)
-VALUES ( 1, 'username1', '2016-01-26', 1, 'information1', 1),
-( 2, 'username2', '2016-02-26', 2, 'information2', 0),
-( 3, 'username3', '2015-03-26', 3, 'information3', 1);
-
 DELETE FROM `_Partition`;
 INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`)
 VALUES (1,1,1);
@@ -491,13 +485,11 @@ INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `pa
 VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(3,17),(3,18),(3,19),
 (3,20),(3,21),(3,22),(3,23),(3,24),(4,25),(4,26),(4,27),(4,28),(4,29),(4,30),(4,31),(4,32);
 
-DELETE FROM RunQC_Partition;
-INSERT INTO `RunQC_Partition`(`runQc_runQcId`, `partition_partitionId`)
-VALUES (1, 1);
-
 DELETE FROM `Run_SequencerPartitionContainer`;
 INSERT INTO `Run_SequencerPartitionContainer`(`Run_runId`, `containers_containerId`) 
 VALUES (1,1),(2,2),(3,3),(4,4);
+
+INSERT INTO Run_Partition_QC(runId, partitionId, partitionQcTypeId, notes) VALUES (1, 1, 1, 'it is written');
 
 DELETE FROM `BoxSize`;
 INSERT INTO `BoxSize` (`boxSizeId`, `rows`, `columns`, `scannable`)

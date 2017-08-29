@@ -212,4 +212,9 @@ public class HibernateSequencerPartitionContainerDao
   public String getFriendlyName() {
     return "Container";
   }
+
+  @Override
+  public void update(Partition partition) {
+    currentSession().update(partition);
+  }
 }

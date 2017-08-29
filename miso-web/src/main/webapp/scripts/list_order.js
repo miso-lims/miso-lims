@@ -81,42 +81,56 @@ ListTarget.order = {
     return [ {
       name : "Create",
       handler : function() {
-        Utils.showWizardDialog('Create Order', Constants.platforms.filter(
-            function(platform) {
-              return platform.platformType == platformType.name; // TODO &&
-              // platformType.active
-            }).map(
-            function(platform) {
-              return {
-                name : platform.instrumentModel,
-                handler : function() {
-                  Utils.showDialog('Create Order', 'Save', [
-                      {
-                        type : "select",
-                        label : "Sequencing Parameters",
-                        property : "parameters",
-                        values : Constants.sequencingParameters
-                            .filter(function(parameters) {
-                              return parameters.platform.id == platform.id;
-                            }),
-                        getLabel : Utils.array.getName
-                      }, {
-                        type : "int",
-                        label : platformType.partitionName + " Count",
-                        property : "count",
-                        value : 1
-                      } ], function(results) {
-                    
-                    Utils.ajaxWithDialog('Creating Order', 'POST',
-                        '/miso/rest/poolorder', {
-                          "poolId" : config.poolId,
-                          "partitions" : results.count,
-                          "parameters" : results.parameters,
-                        }, Utils.page.pageReload);
-                  });
-                }
-              };
-            }));
+        Utils
+            .showWizardDialog(
+                'Create Order',
+                Constants.platforms
+                    .filter(
+                        function(platform) {
+                          return platform.platformType == platformType.name && platform.active;
+                        })
+                    .map(
+                        function(platform) {
+                          return {
+                            name : platform.instrumentModel,
+                            handler : function() {
+                              Utils
+                                  .showDialog(
+                                      'Create Order',
+                                      'Save',
+                                      [
+                                          {
+                                            type : "select",
+                                            label : "Sequencing Parameters",
+                                            property : "parameters",
+                                            values : Constants.sequencingParameters
+                                                .filter(function(parameters) {
+                                                  return parameters.platform.id == platform.id;
+                                                }),
+                                            getLabel : Utils.array.getName
+                                          },
+                                          {
+                                            type : "int",
+                                            label : platformType.partitionName + " Count",
+                                            property : "count",
+                                            value : 1
+                                          } ],
+                                      function(results) {
+                                        
+                                        Utils
+                                            .ajaxWithDialog(
+                                                'Creating Order',
+                                                'POST',
+                                                '/miso/rest/poolorder',
+                                                {
+                                                  "poolId" : config.poolId,
+                                                  "partitions" : results.count,
+                                                  "parameters" : results.parameters,
+                                                }, Utils.page.pageReload);
+                                      });
+                            }
+                          };
+                        }));
       }
     } ];
   },

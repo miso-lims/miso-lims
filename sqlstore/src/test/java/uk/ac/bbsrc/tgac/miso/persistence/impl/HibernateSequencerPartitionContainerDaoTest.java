@@ -49,7 +49,6 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
@@ -146,7 +145,7 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     spc.setSecurityProfile(profile);
     Mockito.when(profile.getProfileId()).thenReturn(1L);
-    Platform platform = Mockito.mock(PlatformImpl.class);
+    Platform platform = Mockito.mock(Platform.class);
     spc.setPlatform(platform);
     Mockito.when(platform.getId()).thenReturn(1L);
     spc.setLastModifier(emptyUser);
@@ -199,7 +198,7 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     pc.setSecurityProfile(profile);
     pc.setIdentificationBarcode(identificationBarcode);
     pc.setLocationBarcode("location");
-    Platform platform = new PlatformImpl();
+    Platform platform = new Platform();
     platform.setId(1L);
     pc.setPlatform(platform);
     pc.setCreationTime(now);

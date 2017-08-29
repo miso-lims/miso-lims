@@ -143,5 +143,4 @@ public interface RunStore extends Store<Run>, Remover<Run>, PaginatedDataSource<
   public void addWatcher(Run run, User watcher);
 
   public void removeWatcher(Run run, User watcher);
-
 }

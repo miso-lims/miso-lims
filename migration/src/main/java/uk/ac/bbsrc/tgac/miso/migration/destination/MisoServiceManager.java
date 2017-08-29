@@ -39,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateQcTypeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
@@ -115,7 +114,6 @@ public class MisoServiceManager {
   private HibernatePlatformDao platformDao;
   private HibernateStudyDao studyDao;
   private HibernateRunDao runDao;
-  private HibernateRunQcDao runQcDao;
   private HibernateSequencerPartitionContainerDao sequencerPartitionContainerDao;
   private HibernateSequencerReferenceDao sequencerReferenceDao;
   private HibernateBoxDao boxDao;
@@ -224,7 +222,6 @@ public class MisoServiceManager {
     m.setDefaultProjectDao();
     m.setDefaultDetailedQcStatusDao();
     m.setDefaultRunDao();
-    m.setDefaultRunQcDao();
     m.setDefaultSampleClassDao();
     m.setDefaultSampleClassService();
     m.setDefaultSampleDao();
@@ -875,25 +872,6 @@ public class MisoServiceManager {
     if (runService != null) runService.setRunDao(runDao);
   }
 
-  public HibernateRunQcDao getRunQcDao() {
-    return runQcDao;
-  }
-
-  public void setRunQcDao(HibernateRunQcDao runQcDao) {
-    this.runQcDao = runQcDao;
-    updateRunQcDaoDependencies();
-  }
-
-  public void setDefaultRunQcDao() {
-    HibernateRunQcDao dao = new HibernateRunQcDao();
-    dao.setSessionFactory(sessionFactory);
-    setRunQcDao(dao);
-  }
-
-  private void updateRunQcDaoDependencies() {
-    if (runService != null) runService.setRunQcDao(runQcDao);
-  }
-
   public HibernateSequencerPartitionContainerDao getSequencerPartitionContainerDao() {
     return sequencerPartitionContainerDao;
   }
@@ -1401,7 +1379,6 @@ public class MisoServiceManager {
     DefaultRunService service = new DefaultRunService();
     service.setAuthorizationManager(authorizationManager);
     service.setRunDao(runDao);
-    service.setRunQcDao(runQcDao);
     service.setSecurityManager(securityManager);
     service.setNamingScheme(getNamingScheme());
     service.setSecurityProfileStore(securityProfileDao);
