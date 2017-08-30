@@ -149,6 +149,7 @@ Library.qc = {
       var column6 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/>Add</a>";
 
+      jQuery("#libraryQcDate").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
       Utils.ui.addMaxDatePicker("libraryQcDate", 0);
 
       Fluxion.doAjax(
@@ -235,18 +236,6 @@ Library.qc = {
 
 Library.barcode = {
   editLibraryBarcode: function(span, id) {
-    Fluxion.doAjax(
-      'loggedActionService',
-      'logAction',
-      {
-        'objectId': id,
-        'objectType': 'Library',
-        'action': 'editLibraryIdBarcode',
-        'url': ajaxurl
-      },
-      {}
-    );
-
     var v = span.find('a').text();
     if (v && v !== "") {
       span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");
@@ -290,118 +279,6 @@ Library.barcode = {
       },
       {
         'doOnSuccess': Utils.page.pageReload
-      }
-    );
-  },
-
-  printLibraryBarcodes: function () {
-    var libraries = [];
-    for (var i = 0; i < arguments.length; i++) {
-      libraries[i] = {'libraryId': arguments[i]};
-    }
-
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                  json.services +
-                  "</select></fieldset></form>");
-
-          jQuery('#printServiceSelectDialog').dialog({
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function () {
-                Fluxion.doAjax(
-                  'libraryControllerHelperService',
-                  'printLibraryBarcodes',
-                  {
-                    'printerId': jQuery('#serviceSelect').val(),
-                    'libraries': libraries,
-                    'url': ajaxurl
-                  },
-                  {
-                    'doOnSuccess': function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function () {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        },
-        'doOnError': function (json) {
-          alert(json.error);
-        }
-      }
-    );
-  },
-
-  printDilutionBarcode: function (dilutionId, platform) {
-    var dilutions = [];
-    dilutions[0] = {'dilutionId': dilutionId};
-
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Dilution',
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                  json.services +
-                  "</select></fieldset></form>");
-
-          jQuery('#printServiceSelectDialog').dialog({
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function () {
-                Fluxion.doAjax(
-                  'libraryControllerHelperService',
-                  'printLibraryDilutionBarcodes',
-                  {
-                    'printerId': jQuery('#serviceSelect').val(),
-                    'dilutions': dilutions,
-                    'platform': platform,
-                    'url': ajaxurl
-                  },
-                  {
-                    'doOnSuccess': function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function () {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        },
-        'doOnError': function (json) {
-          alert(json.error);
-        }
       }
     );
   },
@@ -785,7 +662,7 @@ Library.ui = {
   },
 
   deleteLibraryNote: function (libraryId, noteId) {
-    if (confirm("Are you sure you want to delete this note?")) {
+    var deleteIt = function() {
       Fluxion.doAjax(
         'libraryControllerHelperService',
         'deleteLibraryNote',
@@ -799,6 +676,10 @@ Library.ui = {
         }
       );
     }
+    Utils.showConfirmDialog('Delete Note', 'Delete',
+      ["Are you sure you want to delete this note?"],
+      deleteIt
+    );
   },
 
   changeDesign: function(callback) {

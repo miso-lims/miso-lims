@@ -177,7 +177,7 @@ function bulkSampleQcTable(tableName) {
         placeholder: '',
         style: 'inherit',
         datepicker: {
-          dateFormat: 'dd/mm/yy',
+          dateFormat: Utils.ui.goodDateFormat,
           showButtonPanel: true,
           maxDate: 0
         },

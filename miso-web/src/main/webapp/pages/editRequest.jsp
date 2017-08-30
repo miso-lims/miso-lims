@@ -42,11 +42,11 @@
         </tr>
         <tr>
           <td>Creation date:</td>
-          <td><fmt:formatDate value="${request.creationDate}"/></td>
+          <td><fmt:formatDate pattern="yyyy-MM-dd" value="${request.creationDate}"/></td>
         </tr>
         <tr>
           <td>Last execution date:</td>
-          <td><fmt:formatDate value="${request.lastExecutionDate}"/></td>
+          <td><fmt:formatDate pattern="yyyy-MM-dd" value="${request.lastExecutionDate}"/></td>
         </tr>
         <tr>
           <td>Execution count:</td>

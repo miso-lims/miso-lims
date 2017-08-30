@@ -3,9 +3,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -18,6 +16,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class PacBioNotificationDtoTest {
 
@@ -55,11 +54,8 @@ public class PacBioNotificationDtoTest {
   @Test
   public void testConvertToUtilDate() throws ParseException {
     NotificationDto dto = fullyPopulatedPacBioNotificationDto("RUN_B");
-
     Run run = Dtos.to(dto, null);
-
-    DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-    assertThat(dto.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE), is(format.format(run.getStartDate())));
+    assertThat(dto.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE), is(LimsUtils.formatDate(run.getStartDate())));
   }
 
   static PacBioNotificationDto fullyPopulatedPacBioNotificationDto(String sequencerName) {

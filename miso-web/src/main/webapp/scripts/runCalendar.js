@@ -685,7 +685,7 @@ function getyear(date) {
 function addRestrictedDatePicker(id) {
   var year = jQuery('input:radio[name=calendarYear]:checked').val();
 
-  jQuery("#" + id).datepicker({dateFormat: 'dd/mm/yy', showButtonPanel: true,
+  jQuery("#" + id).datepicker({dateFormat: Utils.ui.goodDateFormat, showButtonPanel: true,
                                 minDate: new Date(year, 0, 1),
                                 maxDate: new Date(year, 11, 31)
 
@@ -697,7 +697,7 @@ function addRestrictedDatePicker(id) {
 function editRestrictedDatePicker(id) {
   var year = jQuery('input:radio[name=calendarYear]:checked').val();
 
-  jQuery("#" + id).datepicker('change', {dateFormat: 'dd/mm/yy', showButtonPanel: true,
+  jQuery("#" + id).datepicker('change', {dateFormat: Utils.ui.goodDateFormat, showButtonPanel: true,
     minDate: new Date(year, 0, 1),
     maxDate: new Date(year, 11, 31)
 

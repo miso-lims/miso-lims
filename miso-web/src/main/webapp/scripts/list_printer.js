@@ -105,7 +105,7 @@ ListTarget.printer = {
                     return {
                       type : "text",
                       label : key,
-                      property : "key"
+                      property : key
                     };
                   }), save);
             }

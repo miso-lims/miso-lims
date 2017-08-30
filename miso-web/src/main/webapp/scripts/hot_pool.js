@@ -69,7 +69,8 @@ HotTarget.pool = {
             'concentration', true),
         HotUtils.makeColumnForFloat('Volume (&#181;l)', true, 'volume', false),
         HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
-        HotUtils.makeColumnForBoolean('Ready to Run?', true, 'readyToRun', true) ];
+        HotUtils
+            .makeColumnForBoolean('Ready to Run?', true, 'readyToRun', true) ];
   },
   
   bulkActions : [
@@ -81,6 +82,6 @@ HotTarget.pool = {
                 ids : items.map(Utils.array.getId).join(',')
               });
         }
-      }, ],
+      }, HotUtils.printAction('pool'), ],
 
 };

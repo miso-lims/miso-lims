@@ -185,7 +185,7 @@ public class ExternalRestController extends RestController {
         sb.append(",");
 
         sb.append("'receivedDate':'"
-            + (sample.getReceivedDate() != null ? LimsUtils.getDateAsString(sample.getReceivedDate()) : "not available") + "'");
+            + (sample.getReceivedDate() != null ? LimsUtils.formatDate(sample.getReceivedDate()) : "not available") + "'");
         sb.append(",");
         sb.append("'sampleType':'" + (sample.getSampleType() != null ? sample.getSampleType() : "") + "'");
         sb.append(",");

@@ -39,11 +39,11 @@
   <c:forEach items="${request.notes}" var="note">
     <c:choose>
       <c:when test="${not note.internalOnly}">
-        <li><fmt:formatDate value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
+        <li><fmt:formatDate pattern="yyyy-MM-dd" value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
       </c:when>
       <c:otherwise>
         <sec:authorize access="hasRole('ROLE_INTERNAL')">
-          <li><fmt:formatDate value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
+          <li><fmt:formatDate pattern="yyyy-MM-dd" value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
         </sec:authorize>
       </c:otherwise>
     </c:choose>

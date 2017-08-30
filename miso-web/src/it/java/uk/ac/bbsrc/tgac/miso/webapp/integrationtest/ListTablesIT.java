@@ -31,7 +31,7 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SAMPLE_NAME,
       Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDICES, Columns.LOCATION, Columns.LAST_MODIFIED);
   private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
-      Columns.LIBRARY_ALIAS, Columns.CREATOR, Columns.CREATION_DATE, Columns.PLATFORM, Columns.DIL_CONCENTRATION,
+      Columns.LIBRARY_ALIAS, Columns.CREATOR, Columns.CREATION_DATE, Columns.PLATFORM, Columns.DIL_CONCENTRATION, Columns.VOLUME,
       Columns.TARGETED_SEQUENCING);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.POOL_CONCENTRATION, Columns.LOCATION,
@@ -42,7 +42,7 @@ public class ListTablesIT extends AbstractIT {
       Columns.LAST_RUN_ALIAS, Columns.LAST_SEQUENCER, Columns.LAST_MODIFIED);
   private static final Set<String> runsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.STATUS,
       Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED);
-  private static final Set<String> boxesColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.LOCATION,
+  private static final Set<String> boxesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.LOCATION,
       Columns.ITEMS_CAPACITY, Columns.SIZE);
   private static final Set<String> sequencersColumns = Sets.newHashSet(Columns.NAME, Columns.PLATFORM, Columns.MODEL, Columns.COMMISSIONED,
       Columns.DECOMMISSIONED, Columns.SERIAL_NUMBER);
@@ -95,6 +95,43 @@ public class ListTablesIT extends AbstractIT {
     preferredTab.put(ListTarget.INDICES, Tabs.ILLUMINA);
     sortOnTab = Collections.unmodifiableMap(preferredTab);
   }
+
+  private static final Comparator<String> standardComparator = (s1, s2) -> s1.compareTo(s2);
+
+  /**
+   * Comparator for QC Passed columns, which render the boolean values as symbols.
+   */
+  private static final Comparator<String> qcPassedComparator = (qcPassed1, qcPassed2) -> {
+    return Integer.compare(getQcPassedValue(qcPassed1), getQcPassedValue(qcPassed2));
+  };
+
+  private static int getQcPassedValue(String symbol) {
+    switch (symbol) {
+    case "?":
+      return -1;
+    case "✘":
+      return 0;
+    case "✔":
+      return 1;
+    default:
+      throw new IllegalArgumentException("Invalid QC Passed symbol");
+    }
+  }
+
+  private static final String NAME_REGEX = "^[A-Z]{3}\\d+$";
+  /**
+   * Compares names with the same prefix by number (e.g. SAM8 and SAM10 compare as 8 and 10, ignoring the 'SAM').
+   * If the names don't match the entity name pattern, they are compared regularly as Strings
+   */
+  private static final Comparator<String> nameNumericComparator = (name1, name2) -> {
+    if (name1.matches(NAME_REGEX) && name2.matches(NAME_REGEX) && name1.substring(0, 3).equals(name2.substring(0, 3))) {
+      int id1 = Integer.parseInt(name1.substring(3, name1.length()));
+      int id2 = Integer.parseInt(name2.substring(3, name2.length()));
+      return Integer.compare(id1, id2);
+    } else {
+      return standardComparator.compare(name1, name2);
+    }
+  };
 
   @Before
   public void setup() {
@@ -279,7 +316,7 @@ public class ListTablesIT extends AbstractIT {
     ListPage page = getList(listTarget);
     DataTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals("found expected number of columns", targetColumns.size(), headings.size());
+    assertEquals("number of columns", targetColumns.size(), headings.size());
     for (String col : targetColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
@@ -297,7 +334,7 @@ public class ListTablesIT extends AbstractIT {
     }
 
     List<String> headings = table.getColumnHeadings();
-    assertEquals("found expected number of columns", targetColumns.size(), headings.size());
+    assertEquals("number of columns", targetColumns.size(), headings.size());
     for (String col : targetColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
@@ -326,72 +363,48 @@ public class ListTablesIT extends AbstractIT {
 
   private void sortColumns(DataTable table, AbstractListPage page) {
     List<String> headings = table.getSortableColumnHeadings();
-    headings.forEach(heading -> {
+    for (String heading : headings) {
       // sort one way
       page.sortByColumn(heading);
-      assertTrue("sort once on column '" + heading + "' without errors", LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
+      assertTrue("first sort on column '" + heading, LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
       // if there are at least two rows, ensure that sort was correct
-      if (!table.isTableEmpty()) {
-        int numRows = table.countRows();
-        String ascRow1Val = "";
-        String ascRow2Val = "";
-        String descRow1Val = "";
-        String descRow2Val = "";
-        if (numRows > 1) {
-          findFirstTwoNonMatchingValues(table, heading, ascRow1Val, ascRow2Val);
-          // sort the other way
-          page.sortByColumn(heading);
-          assertTrue("sort twice on column '" + heading + "' without errors", LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
-          findFirstTwoNonMatchingValues(table, heading, descRow1Val, descRow2Val);
+      if (!table.isTableEmpty() && table.countRows() > 1) {
+        int sort1 = compareFirstTwoNonMatchingValues(table, heading);
+        // sort the other way
+        page.sortByColumn(heading);
+        assertTrue("second sort on column '" + heading, LimsUtils.isStringEmptyOrNull(page.getErrors().getText()));
+        int sort2 = compareFirstTwoNonMatchingValues(table, heading);
 
-          // compare results if they are not equal
-          if (!ascRow1Val.equals(ascRow2Val) || !descRow2Val.equals(descRow2Val)) {
-            Comparator<String> columnComparator = (heading.equals(Columns.QC_PASSED) ? new QcPassedComparator() : new StandardComparator());
-            assertNotEquals(
-                heading + " sort broken. asc1: '" + ascRow1Val + "'. asc2: '" + ascRow2Val + "'. desc1: '" + descRow1Val + "'. desc2: '"
-                    + descRow2Val + "'",
-                columnComparator.compare(ascRow1Val, ascRow2Val) >= 0,
-                columnComparator.compare(descRow1Val, descRow2Val) >= 0);
-          }
+        // compare results (if either is 0, value of the other can be anything though)
+        if (sort1 != 0) {
+          assertTrue(heading + " column second sort order should differ from first", sort2 == 0 || sort1 > 0 != sort2 > 0);
         }
       }
-    });
-  }
-
-  private void findFirstTwoNonMatchingValues(DataTable table, String heading, String row1Val, String row2Val) {
-    int num = 0;
-    row1Val = table.getTextAtCell(heading, num).toLowerCase();
-    num += 1;
-    row2Val = table.getTextAtCell(heading, num).toLowerCase();
-    while (row1Val.equals(row2Val) && table.countRows() - num > 1) {
-      row1Val = table.getTextAtCell(heading, num).toLowerCase();
-      num += 1;
-      row2Val = table.getTextAtCell(heading, num).toLowerCase();
     }
   }
 
-  /**
-   * Standard comparator
-   */
-  static class StandardComparator implements Comparator<String> {
-    @Override
-    public int compare(String s1, String s2) {
-      return s1.compareTo(s2);
+  private int compareFirstTwoNonMatchingValues(DataTable table, String heading) {
+    String row1Val = table.getTextAtCell(heading, 0);
+    String row2Val = table.getTextAtCell(heading, 1);
+    for (int rowNum = 2; row1Val.equals(row2Val) && rowNum < table.countRows(); rowNum++) {
+      row1Val = row2Val;
+      row2Val = table.getTextAtCell(heading, rowNum);
+    }
+    Comparator<String> columnComparator = getComparator(heading);
+    return columnComparator.compare(row1Val, row2Val);
+  }
+
+  private static Comparator<String> getComparator(String column) {
+    switch (column) {
+    case Columns.QC_PASSED:
+      return qcPassedComparator;
+    case Columns.LIBRARY_NAME:
+    case Columns.NAME:
+    case Columns.SAMPLE_NAME:
+      return nameNumericComparator;
+    default:
+      return standardComparator;
     }
   }
 
-  /**
-   * Comparator for QC Passed columns, which render the boolean values as symbols.
-   */
-  static class QcPassedComparator implements Comparator<String> {
-    @Override
-    public int compare(String s1, String s2) {
-      final Map<String, Boolean> qcPassed = new HashMap<>();
-      qcPassed.put("?", null);
-      qcPassed.put("✔", true);
-      qcPassed.put("✘", false);
-
-      return qcPassed.get(s1).compareTo(qcPassed.get(s2));
-    }
-  }
 }

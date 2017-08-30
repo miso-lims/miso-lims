@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -163,8 +162,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     assertEquals("sample alias type does not match", "TEST_0002_Bn_P_nn_1-1_D_1", sample.getAlias());
     assertEquals("sample scientific name does not match", "Homo sapiens", sample.getScientificName());
     assertNull("sample scientific name does not match", sample.getTaxonIdentifier());
-    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    assertEquals("sample location type does not match", "2014-01-17", df.format(sample.getReceivedDate()));
+    assertEquals("sample location type does not match", "2014-01-17", LimsUtils.formatDate(sample.getReceivedDate()));
   }
 
   @Test

@@ -36,7 +36,7 @@ ListTarget.container = {
       "handler" : function() {
         window.location = "/miso/container/new";
       }
-    } ];
+    }, HotUtils.printAction('container'), ];
   },
   createColumns : function(config, projectId) {
     return [

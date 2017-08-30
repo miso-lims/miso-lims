@@ -7,7 +7,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class PacBioNotificationDto extends NotificationDto {
 
-  public Map<String, String> poolNames;
+  private Map<String, String> poolNames;
 
   @Override
   public boolean equals(Object obj) {

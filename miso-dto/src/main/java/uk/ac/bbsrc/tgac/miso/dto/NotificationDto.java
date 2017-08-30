@@ -182,7 +182,7 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
     } else if (!startDate.equals(other.startDate)) return false;
     return true;
   }
-  
+
   @Override
   public Optional<String> getLaneContents(int lane) {
     return Optional.empty();

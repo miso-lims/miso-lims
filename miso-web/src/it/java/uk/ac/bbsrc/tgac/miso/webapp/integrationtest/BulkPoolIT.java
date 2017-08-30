@@ -405,7 +405,7 @@ public class BulkPoolIT extends AbstractIT {
   private static void assertPoolAttributes(Map<String, String> attributes, Pool pool) {
     assertEntityAttribute(Columns.ALIAS, attributes, pool, Pool::getAlias);
     assertEntityAttribute(Columns.BARCODE, attributes, pool, Pool::getIdentificationBarcode);
-    assertEntityAttribute(Columns.CREATE_DATE, attributes, pool, p -> LimsUtils.getDateAsString(p.getCreationDate()));
+    assertEntityAttribute(Columns.CREATE_DATE, attributes, pool, p -> LimsUtils.formatDate(p.getCreationDate()));
     assertEntityAttribute(Columns.CONCENTRATION, attributes, pool, p -> p.getConcentration().toString());
     assertEntityAttribute(Columns.VOLUME, attributes, pool, p -> p.getVolume() == null ? null : p.getVolume().toString());
     assertEntityAttribute(Columns.QC_PASSED, attributes, pool, p -> getQcPassedString(p.getQcPassed()));

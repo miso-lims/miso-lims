@@ -60,6 +60,7 @@ public interface AbstractListPage {
     public static final String MODEL = "Model";
     public static final String COMMISSIONED = "Commissioned";
     public static final String DECOMMISSIONED = "Decommissioned";
+    public static final String VOLUME = "Volume";
   }
 
   public static class ListTarget {

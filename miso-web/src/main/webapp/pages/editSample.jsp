@@ -125,7 +125,7 @@
               onmouseout="mclosetime()">
 
             <a href="javascript:void(0);"
-               onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
+               onclick="Utils.printDialog('sample', [${sample.id}]);">Print</a>
             <c:if test="${not autoGenerateIdBarcodes}">
               <a href="javascript:void(0);"
                onclick="Sample.ui.showSampleIdBarcodeChangeDialog(${sample.id}, '${sample.identificationBarcode}');">Update Barcode</a>
@@ -154,7 +154,6 @@
       </script>
     </c:if>
   </div>
-  <div id="printServiceSelectDialog" title="Select a Printer"></div>
 </div>
 <div>
   <table class="in" <c:if test="${detailedSample && sample.isSynthetic()}">style="background-color: #ddd"</c:if>>
@@ -235,7 +234,7 @@
     <tr>
       <td>Date of receipt:</td>
       <td>
-        <form:input path="receivedDate" id="receiveddatepicker" placeholder="DD/MM/YYYY"/>
+        <form:input path="receivedDate" id="receiveddatepicker" placeholder="YYYY-MM-DD"/>
         <script type="text/javascript">
           Utils.ui.addDatePicker("receiveddatepicker");
         </script>
@@ -742,7 +741,7 @@
             <c:forEach items="${sample.sampleQCs}" var="qc">
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
                 <td>${qc.qcCreator}</td>
-                <td><fmt:formatDate value="${qc.qcDate}"/></td>
+                <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
                 <td>${qc.qcType.name}</td>
                 <fmt:formatNumber var="resultsRounded" value="${qc.results}" maxFractionDigits="2" />
                 <td id="results${qc.id}">${resultsRounded} ${qc.qcType.units}</td>

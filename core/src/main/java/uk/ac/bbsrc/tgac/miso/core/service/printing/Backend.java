@@ -64,13 +64,18 @@ public enum Backend {
 
         if (!ftp.changeWorkingDirectory("/execute")) {
           log.error("Desired path does not exist on the server");
+          ftp.logout();
+          ftp.disconnect();
           return false;
         }
-        OutputStream stream = ftp.storeFileStream(content.hashCode() + ".dat");
-        stream.write(content);
+        try (OutputStream stream = ftp.storeFileStream(content.hashCode() + ".LBL")) {
+          stream.write(content);
+        }
 
-        if (!FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
+        if (!ftp.completePendingCommand() || !FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
           log.error("Error storing file");
+          ftp.logout();
+          ftp.disconnect();
           return false;
         }
         ftp.logout();
@@ -81,10 +86,23 @@ public enum Backend {
       }
       return false;
     }
+  },
+  DEBUG() {
+    @Override
+    public boolean print(byte[] content, JsonNode configuration) {
+      StringBuilder buffer = new StringBuilder();
+      buffer.append("Printing debug output:");
+      for (byte b : content) {
+        buffer.append(String.format(" %02x", b));
+      }
+      log.error(buffer.toString());
+      return true;
+    }
   };
   private static final Logger log = LoggerFactory.getLogger(Backend.class);
 
   private final List<String> configurationKeys;
+
   private Backend(String... keys) {
     configurationKeys = Collections.unmodifiableList(Arrays.asList(keys));
   }

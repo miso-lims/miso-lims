@@ -188,7 +188,7 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     editable.put(Columns.TUBE_NUMBER, "200");
     editable.put(Columns.LAB, "Pathology (University Health Network)");
     editable.put(Columns.EXT_INST_ID, "changed");
-   editable.put(Columns.TISSUE_MATERIAL, "Blood");
+    editable.put(Columns.TISSUE_MATERIAL, "Blood");
     editable.put(Columns.REGION, "changed");
     editable.put(Columns.QC_STATUS, "Refused Consent");
 

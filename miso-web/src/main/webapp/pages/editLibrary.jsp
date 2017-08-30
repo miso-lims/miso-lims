@@ -114,7 +114,7 @@
 
           <div id="idBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
             <a href="javascript:void(0);"
-               onclick="Library.barcode.printLibraryBarcodes(${library.id});">Print</a>
+               onclick="Utils.printDialog('library', [${library.id}]);">Print</a>
             <c:if test="${not autoGenerateIdBarcodes}">
               <a href="javascript:void(0);"
                onclick="Library.barcode.showLibraryIdBarcodeChangeDialog(${library.id}, '${library.identificationBarcode}');">Update Barcode</a>
@@ -141,7 +141,6 @@
       </script>
     </c:if>
   </div>
-  <div id="printServiceSelectDialog" title="Select a Printer"></div>
 </div>
 
 <table class="in">
@@ -468,11 +467,11 @@
     <h1>Notes</h1>
     <ul class="sddm">
       <li>
-        <a onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
+        <a id="notesMenuHandle" onmouseover="mopen('notesMenu')" onmouseout="mclosetime()">Options
           <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
         </a>
 
-        <div id="notesmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+        <div id="notesMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
           <a onclick="Library.ui.showLibraryNoteDialog(${library.id});" href="javascript:void(0);" class="add">Add Note</a>
         </div>
       </li>
@@ -505,11 +504,11 @@
 </h1>
 <ul class="sddm">
   <li>
-    <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
+    <a id="qcMenuHandle" onmouseover="mopen('qcMenu')" onmouseout="mclosetime()">Options
       <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
     </a>
 
-    <div id="qcmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+    <div id="qcMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
       <a href='javascript:void(0);' class="add" onclick="Library.qc.insertLibraryQCRow(${library.id}); return false;">Add Library QC</a>
     </div>
   </li>
@@ -535,7 +534,7 @@
         <c:forEach items="${library.libraryQCs}" var="qc">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
             <td>${qc.qcCreator}</td>
-            <td><fmt:formatDate value="${qc.qcDate}"/></td>
+            <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
             <td>${qc.qcType.name}</td>
 
             <fmt:formatNumber var="resultsRounded"

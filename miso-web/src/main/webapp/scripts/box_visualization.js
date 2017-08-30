@@ -140,10 +140,10 @@ var BoxVisual = function() {
 
     var tBody = jQuery('<tBody>');
     var tRow = jQuery('<tr>');
-    var tCell = jQuery('<td>');
-    tCell.css('width', '30px');
-    tCell.css('height', '30px');
-    tRow.append(tCell);
+    var emptyCornerCell = jQuery('<th>');
+    emptyCornerCell.css('width', '30px');
+    emptyCornerCell.css('height', '30px');
+    tRow.append(emptyCornerCell);
 
     var makeColSelectEventData = function(col) {
       return {'col': col};
@@ -154,27 +154,25 @@ var BoxVisual = function() {
     };
     
     for (var col = 1; col <= self.size.cols; col++) {
-      tCell = jQuery('<td>').text(col).css('font-weight', 'bold');
-      tCell.css('width', '30px');
-      tCell.css('text-align', 'center');
-      tCell.click(makeColSelectEventData(col), self.selectCol);
-      tRow.append(tCell);
+      var thCell = jQuery('<th>').text(col);
+      thCell.addClass('boxVisColHeader');
+      thCell.click(makeColSelectEventData(col), self.selectCol);
+      tRow.append(thCell);
     }
     tBody.append(tRow);
 
     for (var row = 1; row <= self.size.rows; row++) {
       tRow = jQuery('<tr>');
       tRow.attr('id', self.div.substring(1)+'Row'+row);
-      tCell = jQuery('<td>');
-      tCell.css('height','30px');
-      tCell.css('text-align','center');
-      tCell.text(Box.utils.getRowLetter(row)).css('font-weight','bold');
+      var tCell = jQuery('<td>');
+      tCell.addClass('boxVisRowHeader');
+      tCell.text(Box.utils.getRowLetter(row));
       tCell.click(makeRowSelectEventData(row), self.selectRow);
       tRow.append(tCell);
 
       for (col = 1; col <= self.size.cols; col++) {
         tCell = jQuery('<td>');
-        tCell.addClass('Col'+col);
+        tCell.addClass('Col'+col + ' boxVisCell');
         self.position[row][col] = self.getBoxPosition(row, col, tCell);
         tRow.append(self.position[row][col].cell);
       }

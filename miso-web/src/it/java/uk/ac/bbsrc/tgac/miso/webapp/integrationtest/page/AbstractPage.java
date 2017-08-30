@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -34,6 +33,15 @@ public abstract class AbstractPage extends AbstractElement {
     },
     TEXT() {
       @Override
+      protected String getValue(WebDriver driver, By selector) {
+        WebElement element = driver.findElement(selector);
+        if (!isTextBox(element)) {
+          return element.getText();
+        }
+        return super.getValue(driver, selector);
+      }
+
+      @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         setText(value == null ? "" : value, driver.findElement(selector));
       }
@@ -41,10 +49,14 @@ public abstract class AbstractPage extends AbstractElement {
       @Override
       protected boolean isEditable(WebElement element) {
         // some text fields are changed to non-input tags if read-only
-        if (!"input".equals(element.getTagName())) {
+        if (!isTextBox(element)) {
           return false;
         }
         return super.isEditable(element);
+      }
+
+      private boolean isTextBox(WebElement element) {
+        return "input".equals(element.getTagName());
       }
     },
     RADIO() {
@@ -82,12 +94,20 @@ public abstract class AbstractPage extends AbstractElement {
     DROPDOWN() {
       @Override
       protected String getValue(WebDriver driver, By selector) {
+        WebElement element = driver.findElement(selector);
+        if (!isDropdown(element)) {
+          return element.getText();
+        }
         return getSelectedDropdownText(driver.findElement(selector));
       }
 
       @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         setDropdown(value, driver.findElement(selector));
+      }
+
+      private boolean isDropdown(WebElement element) {
+        return "select".equals(element.getTagName());
       }
     };
 
@@ -147,7 +167,6 @@ public abstract class AbstractPage extends AbstractElement {
     element.click();
     element.clear();
     element.sendKeys(input);
-    element.sendKeys(Keys.ESCAPE);
   }
 
   protected static void setCheckbox(Boolean check, WebElement element) {
@@ -161,7 +180,6 @@ public abstract class AbstractPage extends AbstractElement {
     element.click();
     Select select = new Select(element);
     select.selectByVisibleText(input);
-    element.sendKeys(Keys.ESCAPE);
   }
 
   protected static String getSelectedDropdownText(WebElement element) {

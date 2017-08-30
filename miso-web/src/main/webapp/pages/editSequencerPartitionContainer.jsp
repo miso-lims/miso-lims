@@ -43,11 +43,6 @@
   </c:choose>
   <button type="button" class="fg-button ui-state-default ui-corner-all"
           onclick="return Container.validateContainer();">Save</button>
-  <sec:authorize access="hasRole('ROLE_ADMIN')">
-      <c:if test="${container.id != 0}">
-          <button type="button" onclick="Container.deleteContainer(${container.id})" class="fg-button ui-state-default ui-corner-all">Delete</button>
-      </c:if>
-  </sec:authorize>
 </h1>
 
 <div class="bs-callout bs-callout-warning hidden">

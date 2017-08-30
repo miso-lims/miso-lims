@@ -114,9 +114,9 @@ var Sample = Sample || {
 
     // Date of Receipt validation: ensure date is of correct form
     jQuery('#receiveddatepicker').attr('class', 'form-control');
-    jQuery('#receiveddatepicker').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#receiveddatepicker').attr('data-date-format', 'YYYY-MM-DD');
     jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
 
     // Sample Type validation
     jQuery('#sampleTypes').attr('class', 'form-control');
@@ -312,6 +312,7 @@ Sample.qc = {
       var column6 = jQuery('#sampleQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Sample.qc.addSampleQC();'/>Add</a>";
 
+      jQuery("#sampleQcDate").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
       Utils.ui.addMaxDatePicker("sampleQcDate", 0);
 
       Fluxion.doAjax(
@@ -487,64 +488,6 @@ Sample.library = {
     }
     return ok;
   },
-};
-
-Sample.barcode = {
-  printSampleBarcodes: function () {
-    var samples = [];
-    for (var i = 0; i < arguments.length; i++) {
-      samples[i] = {'sampleId': arguments[i]};
-    }
-
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                  json.services +
-                  "</select></fieldset></form>");
-
-          jQuery('#printServiceSelectDialog').dialog({
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function () {
-                Fluxion.doAjax(
-                  'sampleControllerHelperService',
-                  'printSampleBarcodes',
-                  {
-                    'printerId': jQuery('#serviceSelect').val(),
-                    'samples': samples,
-                    'url': ajaxurl
-                  },
-                  {
-                    'doOnSuccess': function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function () {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        },
-        'doOnError': function (json) {
-          alert(json.error);
-        }
-      }
-    );
-  }
 };
 
 Sample.options = {
@@ -729,18 +672,6 @@ Sample.ui = {
   },
   
   editSampleIdBarcode: function (span, id) {
-    Fluxion.doAjax(
-      'loggedActionService',
-      'logAction',
-      {
-        'objectId': id,
-        'objectType': 'Sample',
-        'action': 'editSampleIdBarcode',
-        'url': ajaxurl
-      },
-      {}
-    );
-
     var v = span.find('a').text();
     if (v && v !== "") {
       span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");

@@ -35,13 +35,13 @@ var Sequencer = Sequencer || {
     
     jQuery('#ipAddress').attr('required', 'true');
     
-    jQuery('#datecommissionedpicker').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#datecommissionedpicker').attr('data-date-format', 'YYYY-MM-DD');
     jQuery('#datecommissionedpicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('#datecommissionedpicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    jQuery('#datecommissionedpicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
     
-    jQuery('#datedecommissionedpicker').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#datedecommissionedpicker').attr('data-date-format', 'YYYY-MM-DD');
     jQuery('#datedecommissionedpicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('#datedecommissionedpicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    jQuery('#datedecommissionedpicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
     
     jQuery('#upgradedSequencerReference').attr('type', 'number');
     jQuery('#upgradedSequencerReference').attr('data-parsley-error-message', 'Upgrade must refer to an existing sequencer.');
@@ -110,7 +110,7 @@ Sequencer.ui = {
   
   showDecommissioned : function() {
     if (jQuery("#datedecommissionedpicker").val() == "") {
-      jQuery("#datedecommissionedpicker").val(jQuery.datepicker.formatDate('dd/mm/yy', new Date()));
+      jQuery("#datedecommissionedpicker").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
     }
     jQuery("#decommissionedRow").show();
   },

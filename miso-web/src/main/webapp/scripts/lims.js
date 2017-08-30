@@ -148,6 +148,72 @@ var Utils = Utils || {
       }
     }
   },
+  
+  showOkDialog: function(title, fields) {
+    var dialogArea = document.getElementById('dialog');
+    while (dialogArea.hasChildNodes()) {
+      dialogArea.removeChild(dialogArea.lastChild);
+    }
+
+    fields.forEach(function(field) {
+      var p = document.createElement('P');
+      p.textContent = field;
+      dialogArea.appendChild(p);
+    });
+    
+    var dialog = jQuery('#dialog').dialog({
+      autoOpen: true,
+      width: 500,
+      title: title,
+      modal: true,
+      buttons: {
+        'OK': {
+          id: 'ok',
+          text: 'OK',
+          click: function () {
+            dialog.dialog("close");
+          }
+        }
+      }
+    });
+  },
+  
+  showConfirmDialog: function(title, okButton, fields, callback) {
+      var dialogArea = document.getElementById('dialog');
+      while (dialogArea.hasChildNodes()) {
+          dialogArea.removeChild(dialogArea.lastChild);
+      }
+
+      fields.forEach(function(field) {
+          var p = document.createElement('P');
+          p.textContent = field;
+          dialogArea.appendChild(p);
+      });
+      
+      var buttons = {};
+      buttons[okButton] = {
+        id: 'ok',
+        text: okButton,
+        click: function () {
+          dialog.dialog("close");
+          callback();
+        }
+      };
+      buttons["Cancel"] = {
+        id: 'cancel',
+        text: 'Cancel',
+        click: function () {
+          dialog.dialog("close");
+        }
+      };
+      var dialog = jQuery('#dialog').dialog({
+          autoOpen: true,
+          width: 500,
+          title: title,
+          modal: true,
+          buttons: buttons
+      });
+  },
   showDialog: function(title, okButton, fields, callback) {
       var dialogArea = document.getElementById('dialog');
       while (dialogArea.hasChildNodes()) {
@@ -295,11 +361,50 @@ var Utils = Utils || {
                 dialog.dialog("close");
                 callback(data, textStatus, xhr);
             },
-            'error' : function(xhr, textStatus) {
+            'error' : function(xhr, textStatus, errorThrown) {
                 dialog.dialog("close");
-                alert('Sadness: ' + textStatus);
+                Utils.showOkDialog(title, [ 'Error: ' + errorThrown ]);
             }
         });
+    },
+    printDialog: function(type, ids) {
+        Utils
+            .ajaxWithDialog(
+                'Getting Printers',
+                'GET',
+                window.location.origin + '/miso/rest/printer',
+                null,
+                function(printers) {
+                  Utils
+                      .showWizardDialog(
+                          'Select Printer',
+                          printers
+                              .filter(function(printer) {
+                                return printer.available;
+                              })
+                              .map(
+                                  function(printer) {
+                                    return {
+                                      name : printer.name,
+                                      handler : function() {
+                                        Utils
+                                            .ajaxWithDialog(
+                                                'Printing',
+                                                'POST',
+                                                window.location.origin + '/miso/rest/printer/' + printer.id + '?' + jQuery
+                                                    .param({
+                                                      type : type,
+                                                      ids : ids.join(',')
+                                                    })
+                                                , null, function(result) {
+                                                    Utils.showOkDialog('Printing', [
+                                                       result == ids.length ? 'Printing successful.' : (result + ' of ' + ids.length + ' printed.')
+                                                    ]);
+                                                });
+                                      }
+                                    };
+                                  }));
+                });
     },
     
       
@@ -421,20 +526,22 @@ Utils.ui = {
     }
     jQuery("#" + id).toggle("blind", {}, 500);
   },
+  
+  goodDateFormat: 'yy-mm-dd',
 
   addDatePicker: function (id) {
-    jQuery("#" + id).datepicker({dateFormat: 'dd/mm/yy', showButtonPanel: true});
+    jQuery("#" + id).datepicker({dateFormat: Utils.ui.goodDateFormat, showButtonPanel: true});
   },
 
   addMaxDatePicker: function (id, maxDateOffset) {
-    jQuery("#" + id).datepicker({dateFormat: 'dd/mm/yy', showButtonPanel: true, maxDate: maxDateOffset});
+    jQuery("#" + id).datepicker({dateFormat: Utils.ui.goodDateFormat, showButtonPanel: true, maxDate: maxDateOffset});
   },
   
   addDateTimePicker: function (id) {
     jQuery("#" + id).datetimepicker({
       controlType: 'select',
       oneLine: true,
-      dateFormat: 'dd/mm/yy',
+      dateFormat: Utils.ui.goodDateFormat,
       timeFormat: 'HH:mm'
     });
   },
@@ -485,8 +592,8 @@ Utils.fileUpload = {
 };
 
 Utils.validation = {
-  dateRegex: '^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)[0-9]{2}$',
-  dateTimeRegex: '^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)[0-9]{2} ([01][0-9]|2[0-3]):[0-5][0-9]$',
+  dateRegex: '^(19|20)[0-9]{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$',
+  dateTimeRegex: '^(19|20)[0-9]{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):[0-5][0-9]$',
   sanitizeRegex: '^[^<>&]*$',
   alphanumRegex: '^[-\\w]*$',
   unicodeWordRegex: '^[\\p{L}0-9_\\^\\-\\.\\s]+$',

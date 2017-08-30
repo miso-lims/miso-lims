@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -149,7 +148,7 @@ public class EditProjectController {
 
   @InitBinder
   public void initBinder(WebDataBinder binder) {
-    CustomDateEditor cde = new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true);
+    CustomDateEditor cde = new CustomDateEditor(LimsUtils.getDateFormat(), true);
     binder.registerCustomEditor(Date.class, cde);
   }
 

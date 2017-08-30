@@ -64,12 +64,9 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
-import uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
 /**
@@ -90,15 +87,11 @@ public class ProjectControllerHelperService {
   @Autowired
   private IssueTrackerManager issueTrackerManager;
   @Autowired
-  private PrinterService printerService;
-  @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private LibraryDilutionService dilutionService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -124,16 +117,8 @@ public class ProjectControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
 
-  public void setPrinterService(PrinterService printerService) {
-    this.printerService = printerService;
-  }
-
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
-  }
-
-  public void setDilutionService(LibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
   }
 
   public void setSampleService(SampleService sampleService) {
@@ -420,36 +405,6 @@ public class ProjectControllerHelperService {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
-  }
-
-  public JSONObject printAllSampleBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printAllBarcodes(printerService, json,
-        new SampleControllerHelperService.SampleBarcodeAssister(sampleService));
-  }
-
-  public JSONObject printSelectedSampleBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json,
-        new SampleControllerHelperService.SampleBarcodeAssister(sampleService));
-  }
-
-  public JSONObject printAllLibraryBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printAllBarcodes(printerService, json,
-        new LibraryControllerHelperService.LibraryBarcodeAssister(libraryService));
-  }
-
-  public JSONObject printSelectedLibraryBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json,
-        new LibraryControllerHelperService.LibraryBarcodeAssister(libraryService));
-  }
-
-  public JSONObject printAllLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printAllBarcodes(printerService, json,
-        new LibraryControllerHelperService.LibraryDilutionBarcodeAssister(dilutionService));
-  }
-
-  public JSONObject printSelectedLibraryDilutionBarcodes(HttpSession session, JSONObject json) {
-    return ControllerHelperServiceUtils.printBarcodes(printerService, json,
-        new LibraryControllerHelperService.LibraryDilutionBarcodeAssister(dilutionService));
   }
 
   public JSONObject generateSampleDeliveryForm(HttpSession session, JSONObject json) {

@@ -38,7 +38,7 @@ var HotUtils = {
      */
     optionalNumber : function(value, callback) {
       return callback(Utils.validation.isEmpty(value) || Handsontable.helper
-    	  .isNumeric(value));
+          .isNumeric(value));
     },
     
     /**
@@ -365,10 +365,12 @@ var HotUtils = {
       var rowCount = table.countRows();
       function sortListener() {
         for (var i = 0; i < rowCount; i++) {
-          table.setCellMeta(i, sortColIndex, 'sortFunction', sortOption.sortFunc);
+          table.setCellMeta(i, sortColIndex, 'sortFunction',
+              sortOption.sortFunc);
         }
         table.sort(sortColIndex);
-      };
+      }
+      ;
       var button = document.createElement('input');
       button.type = 'button';
       button.id = 'sort' + sortOption.sortTarget;
@@ -430,7 +432,8 @@ var HotUtils = {
                 columns.forEach(function(c, colIndex) {
                   if (c.unpackAfterSave) {
                     c.unpack(item, flatObj, function(key, val) {
-                      // Do nothing. We're unpacking only - not setting cell meta
+                      // Do nothing. We're unpacking only - not setting cell
+                      // meta
                     });
                   }
                 });
@@ -537,7 +540,8 @@ var HotUtils = {
                         if (xhr.readyState === XMLHttpRequest.DONE) {
                           if (xhr.status === 200 || xhr.status === 201) {
                             data[index] = JSON.parse(xhr.response);
-                            updateFlatObjAfterSave(flatObjects[index], data[index]);
+                            updateFlatObjAfterSave(flatObjects[index],
+                                data[index]);
                             flatObjects[index].saved = true;
                           } else {
                             try {
@@ -577,13 +581,16 @@ var HotUtils = {
       }
     },
     
-    /** Sorts by box column: A01, B01, A02, H02, B03. Useful for applying indices to libraries using the Sciclone machine. */
+    /**
+     * Sorts by box column: A01, B01, A02, H02, B03. Useful for applying indices
+     * to libraries using the Sciclone machine.
+     */
     colSort : function(sortOrder) {
       return function(a, b) {
         // a & b are each an array: [row_index, element_value]
         return Utils.sorting.sortBoxPositions(a[1], b[1], false);
       }
-    }      
+    }
   },
   
   showServerErrors : function(response, serverStatus) {
@@ -666,7 +673,7 @@ var HotUtils = {
     };
     return baseobj;
   },
-
+  
   makeColumnForBoolean : function(headerName, include, property, required) {
     return {
       header : headerName,
@@ -774,7 +781,8 @@ var HotUtils = {
     return baseobj;
   },
   
-  makeColumnForEnum : function(headerName, include, required, property, source, defaultValue) {
+  makeColumnForEnum : function(headerName, include, required, property, source,
+      defaultValue) {
     return {
       'header' : headerName,
       'data' : property,
@@ -791,7 +799,18 @@ var HotUtils = {
         obj[property] = flat[property];
       }
     }
-  }
+  },
+  
+  printAction : function(type) {
+    return {
+      name : 'Print',
+      action : function(items) {
+        Utils.printDialog(type, items.map(Utils.array.getId));
+      },
+      allowOnLibraryPage : true
+    };
+  },
+
 };
 
 HotTarget = {};
