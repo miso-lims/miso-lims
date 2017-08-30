@@ -1,3 +1,15 @@
+# 0.2.86
+
+Changes:
+
+ * Print barcodes from list pages
+ * Add volume column to dilutions
+ * Removed container delete button
+ * Automatically link Pools to Illumina Runs based on sample sheet
+ * Increased indicators for duplicate indices in a Pool
+ * Fixed sorting project list by name
+ * Standardised date/time formats (yyyy-MM-dd and yyyy-MM-dd HH:mm:ss)
+
 # 0.2.85
 
 Changes:
