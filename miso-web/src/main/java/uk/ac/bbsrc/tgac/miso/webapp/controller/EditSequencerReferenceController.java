@@ -93,7 +93,7 @@ public class EditSequencerReferenceController {
 
     model.put("sequencerReference", sr);
     model.put("sequencerServiceRecords", serviceRecords);
-    model.put("title", "Edit Sequencer");
+    model.put("title", "Sequencer " + sr.getId());
     String ip = sr.getIpAddress() == null ? "" : sr.getIpAddress().toString();
     model.put("trimmedIpAddress", ip.startsWith("/") ? ip.substring(1) : ip);
     return new ModelAndView("/pages/editSequencerReference.jsp", model);

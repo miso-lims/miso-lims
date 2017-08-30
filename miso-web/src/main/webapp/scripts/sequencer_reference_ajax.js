@@ -132,6 +132,14 @@ Sequencer.ui = {
     }
   },
   
+  addServiceRecord : function(isDecommissioned, sequencerId) {
+    if (!isDecommissioned) {
+       window.location = '/miso/sequencer/servicerecord/new/' + sequencerId;
+    } else {
+      Utils.showOkDialog('Error adding Service Record', ['Cannot add Service Records to a retired sequencer.']);
+    }
+  },
+  
   deleteServiceRecord : function(recordId, successfunc) {
     if (confirm("Are you sure you really want to delete service record "+recordId+"? This operation is permanent!")) {
       Fluxion.doAjax(

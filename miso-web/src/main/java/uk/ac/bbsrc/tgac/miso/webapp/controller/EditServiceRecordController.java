@@ -50,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 
@@ -75,17 +74,11 @@ public class EditServiceRecordController {
       return key;
     }
   }
-  
-  @Autowired
-  private RequestManager requestManager;
+
   @Autowired
   private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private FilesManager filesManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
@@ -113,6 +106,7 @@ public class EditServiceRecordController {
     if (sr != null) {
       model.put(ModelKeys.RECORD.getKey(), sr);
       model.put(ModelKeys.FILES.getKey(), populateServiceRecordFiles(sr));
+      model.put("title", "Service Record " + sr.getId());
     } else {
       throw new IOException("No such Service Record");
     }
@@ -128,6 +122,7 @@ public class EditServiceRecordController {
     SequencerServiceRecord record = new SequencerServiceRecordImpl();
     record.setSequencerReference(sequencer);
     model.put(ModelKeys.RECORD.getKey(), record);
+    model.put("title", "New Service Record");
     return new ModelAndView("/pages/editServiceRecord.jsp", model);
   }
   

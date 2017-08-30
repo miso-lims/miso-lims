@@ -59,9 +59,32 @@ public abstract class AbstractPage extends AbstractElement {
         return "input".equals(element.getTagName());
       }
     },
+    TEXTAREA() {
+      @Override
+      protected String getValue(WebDriver driver, By selector) {
+        WebElement element = driver.findElement(selector);
+        if (!isTextArea(element)) {
+          return element.getText();
+        }
+        return super.getValue(driver, selector);
+      }
+
+      @Override
+      protected void setValue(WebDriver driver, By selector, String value) {
+        setText(value == null ? "" : value, driver.findElement(selector));
+      }
+
+      private boolean isTextArea(WebElement element) {
+        return "textarea".equals(element.getTagName());
+      }
+    },
     RADIO() {
       @Override
       protected String getValue(WebDriver driver, By selector) {
+        WebElement element = driver.findElement(selector);
+        if (!isRadioButtons(element)) {
+          return element.getText();
+        }
         return getSelectedRadioButtonValue(driver.findElements(selector));
       }
 
@@ -74,6 +97,10 @@ public abstract class AbstractPage extends AbstractElement {
       protected boolean isEditable(WebDriver driver, By selector) {
         List<WebElement> buttons = driver.findElements(selector);
         return !buttons.isEmpty() && buttons.stream().anyMatch((element) -> element.isDisplayed() && element.isEnabled());
+      }
+
+      private boolean isRadioButtons(WebElement element) {
+        return "radio".equals(element.getAttribute("type"));
       }
     },
     CHECKBOX() {
@@ -116,6 +143,35 @@ public abstract class AbstractPage extends AbstractElement {
 
       private boolean isDropdown(WebElement element) {
         return "select".equals(element.getTagName());
+      }
+    },
+    DATEPICKER() {
+      @Override
+      protected String getValue(WebDriver driver, By selector) {
+        WebElement element = driver.findElement(selector);
+        if (!isTextBox(element)) {
+          return element.getText();
+        }
+        return super.getValue(driver, selector);
+      }
+
+      @Override
+      protected void setValue(WebDriver driver, By selector, String value) {
+        setText(value == null ? "" : value, driver.findElement(selector));
+        ((JavascriptExecutor) driver).executeScript("jQuery('.ui-datepicker').hide();");
+      }
+
+      @Override
+      protected boolean isEditable(WebElement element) {
+        // some text fields are changed to non-input tags if read-only
+        if (!isTextBox(element)) {
+          return false;
+        }
+        return super.isEditable(element);
+      }
+
+      private boolean isTextBox(WebElement element) {
+        return "input".equals(element.getTagName());
       }
     };
 
@@ -196,7 +252,8 @@ public abstract class AbstractPage extends AbstractElement {
   }
 
   protected static void setRadioButton(String input, List<WebElement> buttons) {
-    WebElement targetButton = buttons.stream().filter(button -> button.getAttribute("value").equals(input)).findAny().orElse(null);
+    WebElement targetButton = buttons.stream().filter(button -> button.getAttribute("value").equalsIgnoreCase((input)))
+        .findAny().orElse(null);
     if (targetButton == null) throw new IllegalArgumentException("Could not find radio button with label " + input);
     targetButton.click();
   }
