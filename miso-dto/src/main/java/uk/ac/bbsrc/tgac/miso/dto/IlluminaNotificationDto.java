@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,10 +13,10 @@ public class IlluminaNotificationDto extends NotificationDto {
   private int callCycle;
   private IlluminaChemistry chemistry;
   private int imgCycle;
+  private List<Integer> indexLengths;
   private int numCycles;
   private Map<Integer, String> poolNames;
   private int readLength;
-
   private int scoreCycle;
 
   @Override
@@ -27,6 +28,9 @@ public class IlluminaNotificationDto extends NotificationDto {
     if (callCycle != other.callCycle) return false;
     if (chemistry != other.chemistry) return false;
     if (imgCycle != other.imgCycle) return false;
+    if (indexLengths == null) {
+      if (other.indexLengths != null) return false;
+    } else if (!indexLengths.equals(other.indexLengths)) return false;
     if (numCycles != other.numCycles) return false;
     if (poolNames == null) {
       if (other.poolNames != null) return false;
@@ -48,6 +52,10 @@ public class IlluminaNotificationDto extends NotificationDto {
     return imgCycle;
   }
 
+  public List<Integer> getIndexLengths() {
+    return indexLengths;
+  }
+
   @Override
   public Optional<String> getLaneContents(int lane) {
     return poolNames != null && poolNames.containsKey(lane) ? Optional.of(poolNames.get(lane)) : Optional.empty();
@@ -62,10 +70,10 @@ public class IlluminaNotificationDto extends NotificationDto {
     return PlatformType.ILLUMINA;
   }
 
+
   public Map<Integer, String> getPoolNames() {
     return poolNames;
   }
-
 
   public int getReadLength() {
     return readLength;
@@ -82,6 +90,7 @@ public class IlluminaNotificationDto extends NotificationDto {
     result = prime * result + callCycle;
     result = prime * result + ((chemistry == null) ? 0 : chemistry.hashCode());
     result = prime * result + imgCycle;
+    result = prime * result + ((indexLengths == null) ? 0 : indexLengths.hashCode());
     result = prime * result + numCycles;
     result = prime * result + ((poolNames == null) ? 0 : poolNames.hashCode());
     result = prime * result + readLength;
@@ -99,6 +108,10 @@ public class IlluminaNotificationDto extends NotificationDto {
 
   public void setImgCycle(int imgCycle) {
     this.imgCycle = imgCycle;
+  }
+
+  public void setIndexLengths(List<Integer> indexLengths) {
+    this.indexLengths = indexLengths;
   }
 
   public void setNumCycles(int numCycles) {
@@ -125,12 +138,12 @@ public class IlluminaNotificationDto extends NotificationDto {
 
   @Override
   public String toString() {
-    return "IlluminaNotificationDto [callCycle=" + callCycle + ", chemistry=" + chemistry + ", imgCycle=" + imgCycle + ", numCycles="
-        + numCycles + ", readLength=" + readLength + ", scoreCycle=" + scoreCycle + ", poolNames=" + poolNames + ", getRunAlias()="
-        + getRunAlias() + ", getSequencerName()=" + getSequencerName() + ", getContainerSerialNumber()=" + getContainerSerialNumber()
-        + ", getLaneCount()=" + getLaneCount() + ", getHealthType()=" + getHealthType() + ", getSequencerFolderPath()="
-        + getSequencerFolderPath() + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()=" + getSoftware() + ", getStartDate()="
-        + getStartDate() + ", getCompletionDate()=" + getCompletionDate() + "]";
+    return "IlluminaNotificationDto [callCycle=" + callCycle + ", chemistry=" + chemistry + ", imgCycle=" + imgCycle + ", indexLengths="
+        + indexLengths + ", numCycles=" + numCycles + ", poolNames=" + poolNames + ", readLength=" + readLength + ", scoreCycle=" + scoreCycle
+        + ", getRunAlias()=" + getRunAlias() + ", getSequencerName()=" + getSequencerName() + ", getContainerSerialNumber()="
+        + getContainerSerialNumber() + ", getLaneCount()=" + getLaneCount() + ", getHealthType()=" + getHealthType()
+        + ", getSequencerFolderPath()=" + getSequencerFolderPath() + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()="
+        + getSoftware() + ", getStartDate()=" + getStartDate() + ", getCompletionDate()=" + getCompletionDate() + "]";
   }
 
 }

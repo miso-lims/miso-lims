@@ -13,6 +13,9 @@
   "containerSerialNumber": "HLFFJBGX2",
   "healthType": "Completed",
   "imgCycle": 158,
+  "indexLengths": [
+    8
+  ],
   "laneCount": 4,
   "numCycles": 158,
   "pairedEndRun": true,
