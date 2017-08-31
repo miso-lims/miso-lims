@@ -1,3 +1,9 @@
+# 0.2.87
+
+Changes:
+
+ * Bug fixes
+
 # 0.2.86
 
 Changes:
@@ -9,6 +15,11 @@ Changes:
  * Increased indicators for duplicate indices in a Pool
  * Fixed sorting project list by name
  * Standardised date/time formats (yyyy-MM-dd and yyyy-MM-dd HH:mm:ss)
+
+Bad:
+
+ * Error saving Sequencer Service Records
+ * Bad date format for dilution last modified on Edit Pool page
 
 # 0.2.85
 
