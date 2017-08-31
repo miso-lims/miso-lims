@@ -35,7 +35,6 @@
         ListUtils.createTable("listingTable", ${targetType}, ${projectId}, ${config});
       });
     </script>
-    <div id="dialog"></div>
   </div>
 </div>
 <%@ include file="adminsub.jsp" %>

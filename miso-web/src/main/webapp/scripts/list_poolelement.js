@@ -21,7 +21,7 @@
  * *********************************************************************
  */
 
-ListTarget.poolelements = {
+ListTarget.poolelement = {
   name : 'Dilutions',
   createUrl : function(config, projectId) {
     return '/miso/rest/librarydilution/dt/pool/' + config.poolId + '/' + (config.add

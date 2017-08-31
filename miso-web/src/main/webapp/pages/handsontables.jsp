@@ -89,8 +89,6 @@
       target.requestConfiguration(${config}, function(config) { HotUtils.makeTable(target, ${create}, ${input}, config); });
     });
   </script>
-  <div id="dialog"></div>
-
 </div>
 </div>
 <%@ include file="adminsub.jsp" %>
