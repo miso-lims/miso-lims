@@ -260,8 +260,6 @@
   });
 </script>
 
-<div id="dialog"></div>
-
 <div id="boxContentsList" style="clear:both;">
   <table id="listingBoxablesTable" class="display"></table>
 </div>
@@ -293,8 +291,6 @@
     });
   });
 </script>
-<div id="dialog"></div>
-
 <%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>
 

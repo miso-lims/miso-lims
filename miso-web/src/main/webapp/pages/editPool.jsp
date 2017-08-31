@@ -314,114 +314,13 @@
 <br/>
 
 <c:if test="${pool.id != 0}">
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#orders_arrowclick'), 'orders');">
-  Orders
-  <div id="orders_arrowclick" class="toggleLeftDown"></div>
-</div>
-<div id="orders" style="display:block">
-  <h1>Requested Orders</h1>
-  <span onclick="Pool.orders.createOrder()" class="sddm fg-button ui-state-default ui-corner-all">Add Order</span>
-
-  <table class="display no-border" id="edit-order-table"></table>
-
-  <br/>
-  <h1>Order Status</h1>
-  <table class="display no-border" id="order-completion-table"></table>
-</div>
-  <br/>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runs');">
-  Runs
-  <div id="runs_arrowclick" class="toggleLeftDown"></div>
-</div>
-<div id="runs" style="display:block;">
-  <br/>
-  <h1>Runs</h1>
-  <div id="runsDatatableDiv">
-      <table class="display full-width no-border" id="runsDatatable">
-      </table>
-  </div>
-</div>
-
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    jQuery('#runsDatatable').dataTable({
-      "aaData": ${runsJSON},
-      "aaSorting": [
-        [0, 'desc']
-      ],
-      "aoColumns": [
-        {
-          "sTitle" : "Name",
-          "mData" : "name",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
-          }
-        },
-        {
-          "sTitle" : "Alias",
-          "mData" : "alias",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
-          }
-        },
-        { "sTitle" : "Status", "mData" : "status" },
-        { "sTitle" : "Start Date", "mData" : "startDate" },
-        { "sTitle" : "End Date", "mData" : "endDate" },
-        { "sTitle" : "Type", "mData" : "platformType" },
-        { "sTitle" : "Parameters", "mData" : "parameters.name" },
-        { "sTitle" : "Last Modified", "mData" : "lastModified" }
-      ],
-      "iDisplayLength": 50,
-      "bJQueryUI": true,
-      "bRetrieve": true,
-      "sPaginationType": "full_numbers"
-    });
-  });
-</script>
+  <miso:list-section id="list_order" name="Requested Orders" target="order" alwaysShow="true" items="${orders}" config="{ poolId: ${pool.id}, platformType: '${pool.platformType.name()}' }"/>
+  <miso:list-section-ajax id="list_completion" name="Order Status" target="completion" config="{ poolId: ${pool.id} }"/>
+  <miso:list-section id="list_run" name="Runs" target="run" items="${runs}"/>
+  <miso:list-section-ajax id="list_included" name="Included Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences} }"/>
+  <miso:list-section-ajax id="list_available" name="Available Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
 </c:if>
-
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pooled_arrowclick'), 'pooled');">
-  Pooled Elements
-  <div id="pooled_arrowclick" class="toggleLeftDown"></div>
-</div>
-<div id="pooled" style="display:block">
-<h1>Dilutions</h1>
-<c:choose>
-<c:when test="${pool.id == 0}">
-<p>Please save the pool before adding dilutions.</p>
-</c:when>
-<c:otherwise>
-  <h2>Included:</h2>
-  <div id="pooledList">
-    <table class="display no-border full-width" id="includedTable"></table>
-  </div>
-
-  <h2 class="hrule">Available:</h2>
-  
-  <div id="elementSelectDatatableDiv">
-    <table class="display no-border full-width" id="availableTable"></table>
-  </div>
-  
-  <script type="text/javascript">
-      jQuery(document).ready(function () {
-          ListUtils.createTable('includedTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : false, duplicateIndicesSequences : ${duplicateIndicesSequences} });
-          ListUtils.createTable('availableTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : true });
-      });
-  </script>
-</c:otherwise>
-</c:choose>
-</div>
-
 <miso:changelog item="${pool}"/>
-
-<div id="dialog"></div>
-<div id="order-dialog" title="Order" hidden="true">
-<span id="partitionName">${pool.platformType.partitionName}s</span>: <input type="text" name="partitions" value="1" id="orderPartitions" /><br/>
-Platform: <select id="orderPlatformId" onchange="Pool.orders.changePlatform()"><c:forEach items="${platforms}" var="platform"><option value="${platform.id}">${platform.nameAndModel}</option></c:forEach></select><br/>
-Sequencing Parameters: <select id="orderParameterId"></select>
-</div>
 
 </div>
 </div>
@@ -441,10 +340,6 @@ Sequencing Parameters: <select id="orderParameterId"></select>
       countDirection: 'down'
     });
   });
-  Defaults = { 'all': {}};
-  Defaults.all.sequencingParameters = ${sequencingParametersJson};
-  Defaults.all.platforms = [ <c:forEach items="${platforms}" var="platform">{ 'id' : ${platform.id}, 'nameAndModel' : '${platform.nameAndModel}'}, </c:forEach> ];
-  Pool.orders.makeTable(${pool.id});
 </script>
 
 <%@ include file="adminsub.jsp" %>

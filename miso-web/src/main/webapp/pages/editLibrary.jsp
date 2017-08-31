@@ -498,7 +498,6 @@
   <miso:list-section id="list_run" name="Runs" target="run" items="${libraryRuns}"/>
   <miso:changelog item="${library}"/>
 </c:if>
-<div id="dialog"></div>
 </div>
 </div>
 

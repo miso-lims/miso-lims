@@ -132,7 +132,6 @@ ListTarget.completion = {
           "sTitle" : "Last Modified",
           "mData" : "lastUpdated",
           "iSortPriority" : 2,
-          "iSortPriority" : 0,
           "include" : true
         } ];
   }

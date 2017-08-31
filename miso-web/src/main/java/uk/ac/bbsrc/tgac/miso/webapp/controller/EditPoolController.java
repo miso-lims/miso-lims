@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
@@ -108,6 +109,8 @@ public class EditPoolController {
   private PoolService poolService;
   @Autowired
   private RunService runService;
+  @Autowired
+  private PoolOrderService poolOrderService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -190,10 +193,11 @@ public class EditPoolController {
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       model.put("platforms", getFilteredPlatforms(pool.getPlatformType()));
 
-      ObjectMapper mapper = new ObjectMapper();
-      model.put("runsJSON", mapper.writeValueAsString(
-          poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId))));
+      model.put("runs", poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asRunDtos(runService.listByPoolId(poolId)));
+      model.put("orders",
+          poolId == PoolImpl.UNSAVED_ID ? Collections.emptyList() : Dtos.asPoolOrderDtos(poolOrderService.getByPool(poolId)));
 
+      ObjectMapper mapper = new ObjectMapper();
       model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
 
       return new ModelAndView("/pages/editPool.jsp", model);

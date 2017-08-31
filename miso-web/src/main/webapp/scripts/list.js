@@ -192,6 +192,7 @@ ListUtils = (function() {
             'data' : aoData,
             'success' : function(data, textStatus, xhr) {
               errorMessage.innerText = data.sError;
+              errorMessage.style.visibility = data.sError ? "visible" : "hidden";
               ListState[elementId].data = data.aaData;
               columns.forEach(function(column, index) {
                 if (!column.visibilityFilter) {
@@ -207,6 +208,7 @@ ListUtils = (function() {
               filterbox.prop('disabled', false);
             },
             'error' : function(xhr, statusText, errorThrown) {
+              errorMessage.style.visibility = "visible";
               errorMessage.innerText = errorThrown;
               ListState[elementId].data = [];
               updateSelectedLabel(ListState[elementId]);
@@ -227,6 +229,7 @@ ListUtils = (function() {
           errorMessage, columns) {
         options.aaData = data;
         ListState[elementId].data = data;
+        errorMessage.style.visibility = "hidden";
       });
     },
     _checkEventHandler : function(isChecked, ev, data, elementId) {

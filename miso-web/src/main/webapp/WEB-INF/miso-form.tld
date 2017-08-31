@@ -239,6 +239,12 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<description>Show even if there are no contents</description>
+			<name>alwaysShow</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<description>The Collection of DTOs to put in the table</description>
 			<name>items</name>
 			<required>true</required>
@@ -248,6 +254,38 @@
 			<description>The configuration JSON object to be passed to the front end.</description>
 			<name>config</name>
 			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<dynamic-attributes>false</dynamic-attributes>
+	</tag>
+
+	<tag>
+		<description>Renders a list with a section header from a remote data source.</description>
+		<name>list-section-ajax</name>
+		<tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.AjaxListSectionTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<description>Id for the table</description>
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>The matching target type from "ListTargets"</description>
+			<name>target</name>
+			<required>true</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>The section name</description>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>The configuration JSON object to be passed to the front end.</description>
+			<name>config</name>
+			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<dynamic-attributes>false</dynamic-attributes>
