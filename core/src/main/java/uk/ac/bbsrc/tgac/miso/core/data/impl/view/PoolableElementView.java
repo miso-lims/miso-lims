@@ -46,7 +46,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private Long preMigrationId;
 
-  @Temporal(TemporalType.DATE)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
 
   @Temporal(TemporalType.DATE)

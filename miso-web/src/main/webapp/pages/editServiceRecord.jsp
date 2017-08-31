@@ -127,7 +127,7 @@
         <tr>
           <td class="h">Instrument Shutdown Time:</td>
           <td>
-            <form:input path="shutdownTime" id="shutdownTime" placeholder="YYYY-MM-DD HH:mm"/>
+            <form:input path="shutdownTime" id="shutdownTime" placeholder="YYYY-MM-DD HH:mm:ss"/>
             <script type="text/javascript">
               Utils.ui.addDateTimePicker("shutdownTime");
             </script>
@@ -136,7 +136,7 @@
         <tr>
           <td class="h">Instrument Restored Time:</td>
           <td>
-            <form:input path="restoredTime" id="restoredTime" placeholder="YYYY-MM-DD HH:mm"/>
+            <form:input path="restoredTime" id="restoredTime" placeholder="YYYY-MM-DD HH:mm:ss"/>
             <script type="text/javascript">
               Utils.ui.addDateTimePicker("restoredTime");
             </script>
