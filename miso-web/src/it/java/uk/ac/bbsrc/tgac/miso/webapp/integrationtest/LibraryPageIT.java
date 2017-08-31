@@ -17,10 +17,15 @@ import com.google.common.collect.Maps;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage.AddNoteDialog;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage.Field;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.AddNoteDialog;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.Note;
 
 public class LibraryPageIT extends AbstractIT {
@@ -301,7 +306,7 @@ public class LibraryPageIT extends AbstractIT {
   @Test
   public void testCancelAddNote() throws Exception {
     LibraryPage page = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);
-    AddNoteDialog dialog = page.openAddNoteDialog();
+    AddNoteDialog<LibraryPage> dialog = page.getNotesSection().openAddNoteDialog();
     assertTrue(dialog.isDisplayed());
     dialog.setField(AddNoteDialog.Field.INTERNAL_ONLY, "true");
     dialog.setField(AddNoteDialog.Field.TEXT, "test note");
@@ -312,7 +317,7 @@ public class LibraryPageIT extends AbstractIT {
   @Test
   public void testAddNoteInvalid() throws Exception {
     LibraryPage page = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);
-    AddNoteDialog dialog = page.openAddNoteDialog();
+    AddNoteDialog<LibraryPage> dialog = page.getNotesSection().openAddNoteDialog();
     assertTrue(dialog.isDisplayed());
     // submit invalid note (no text)
     LibraryPage page2 = dialog.submit();
@@ -327,33 +332,32 @@ public class LibraryPageIT extends AbstractIT {
     final String text = "test note";
     Predicate<Note> expectedText = note -> text.equals(note.getText());
 
-    List<Note> initialNotes = page1.getNotes();
+    List<Note> initialNotes = page1.getNotesSection().getNotes();
     assertFalse(initialNotes.stream().anyMatch(expectedText));
 
-    AddNoteDialog dialog = page1.openAddNoteDialog();
+    AddNoteDialog<LibraryPage> dialog = page1.getNotesSection().openAddNoteDialog();
     dialog.setField(AddNoteDialog.Field.INTERNAL_ONLY, "true");
     dialog.setField(AddNoteDialog.Field.TEXT, text);
     assertEquals("true", dialog.getField(AddNoteDialog.Field.INTERNAL_ONLY));
     assertEquals("test note", dialog.getField(AddNoteDialog.Field.TEXT));
     LibraryPage page2 = dialog.submit();
 
-    List<Note> afterAddNotes = page2.getNotes();
+    List<Note> afterAddNotes = page2.getNotesSection().getNotes();
     assertEquals(initialNotes.size() + 1, afterAddNotes.size());
     assertTrue(afterAddNotes.stream().anyMatch(expectedText));
   }
 
   @Test
-  // TODO: enable after sorting out chromedriver issue with javascript alerts
   public void testDeleteNote() throws Exception {
     LibraryPage page1 = LibraryPage.get(getDriver(), getBaseUrl(), 110005L);
     final String text = "LIB110005 existing note";
     Predicate<Note> expectedText = note -> text.equals(note.getText());
 
-    List<Note> initialNotes = page1.getNotes();
+    List<Note> initialNotes = page1.getNotesSection().getNotes();
     assertTrue(initialNotes.stream().anyMatch(expectedText));
 
-    LibraryPage page2 = page1.deleteNote(text);
-    List<Note> afterDeleteNotes = page2.getNotes();
+    LibraryPage page2 = page1.getNotesSection().deleteNote(text);
+    List<Note> afterDeleteNotes = page2.getNotesSection().getNotes();
     assertEquals(initialNotes.size() - 1, afterDeleteNotes.size());
     assertFalse(afterDeleteNotes.stream().anyMatch(expectedText));
   }
@@ -361,45 +365,41 @@ public class LibraryPageIT extends AbstractIT {
   private static final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
 
   private static void assertDetailedLibraryAttributes(Map<Field, String> expectedValues, DetailedLibrary lib) {
-    assertAttribute(Field.ID, expectedValues.get(Field.ID), Long.toString(lib.getId()));
-    assertAttribute(Field.NAME, expectedValues.get(Field.NAME), lib.getName());
-    assertAttribute(Field.ALIAS, expectedValues.get(Field.ALIAS), lib.getAlias());
-    assertAttribute(Field.DESCRIPTION, expectedValues.get(Field.DESCRIPTION), lib.getDescription());
-    assertAttribute(Field.CREATION_DATE, expectedValues.get(Field.CREATION_DATE), dateFormatter.print(lib.getCreationDate().getTime()));
-    assertAttribute(Field.PLATFORM, expectedValues.get(Field.PLATFORM), lib.getPlatformType().getKey());
-    assertAttribute(Field.LIBRARY_TYPE, expectedValues.get(Field.LIBRARY_TYPE), lib.getLibraryType().getDescription());
-    assertAttribute(Field.DESIGN, expectedValues.get(Field.DESIGN),
-        lib.getLibraryDesign() == null ? "(None)" : lib.getLibraryDesign().getName());
-    assertAttribute(Field.DESIGN_CODE, expectedValues.get(Field.DESIGN_CODE),
-        lib.getLibraryDesignCode() == null ? null : lib.getLibraryDesignCode().getCode());
-    assertAttribute(Field.SELECTION, expectedValues.get(Field.SELECTION),
-        lib.getLibrarySelectionType() == null ? "(None)" : lib.getLibrarySelectionType().getName());
-    assertAttribute(Field.STRATEGY, expectedValues.get(Field.STRATEGY),
-        lib.getLibraryStrategyType() == null ? "(None)" : lib.getLibraryStrategyType().getName());
-    assertAttribute(Field.INDEX_FAMILY, expectedValues.get(Field.INDEX_FAMILY),
+    assertAttribute(Field.ID, expectedValues, Long.toString(lib.getId()));
+    assertAttribute(Field.NAME, expectedValues, lib.getName());
+    assertAttribute(Field.ALIAS, expectedValues, lib.getAlias());
+    assertAttribute(Field.DESCRIPTION, expectedValues, lib.getDescription());
+    assertAttribute(Field.CREATION_DATE, expectedValues, dateFormatter.print(lib.getCreationDate().getTime()));
+    assertAttribute(Field.PLATFORM, expectedValues, lib.getPlatformType().getKey());
+    assertAttribute(Field.LIBRARY_TYPE, expectedValues, lib.getLibraryType().getDescription());
+    assertAttribute(Field.DESIGN, expectedValues, nullValueOrGet(lib.getLibraryDesign(), LibraryDesign::getName, "(None)"));
+    assertAttribute(Field.DESIGN_CODE, expectedValues, nullOrGet(lib.getLibraryDesignCode(), LibraryDesignCode::getCode));
+    assertAttribute(Field.SELECTION, expectedValues,
+        nullValueOrGet(lib.getLibrarySelectionType(), LibrarySelectionType::getName, "(None)"));
+    assertAttribute(Field.STRATEGY, expectedValues,
+        nullValueOrGet(lib.getLibraryStrategyType(), LibraryStrategyType::getName, "(None)"));
+    assertAttribute(Field.INDEX_FAMILY, expectedValues,
         lib.getIndices() == null || lib.getIndices().isEmpty() ? "No indices" : lib.getIndices().get(0).getFamily().getName());
     if (expectedValues.containsKey(Field.INDEX_1)) {
-      assertAttribute(Field.INDEX_1, expectedValues.get(Field.INDEX_1), getIndexString(lib, 1));
+      assertAttribute(Field.INDEX_1, expectedValues, getIndexString(lib, 1));
     }
     if (expectedValues.containsKey(Field.INDEX_2)) {
-      assertAttribute(Field.INDEX_2, expectedValues.get(Field.INDEX_2), getIndexString(lib, 2));
+      assertAttribute(Field.INDEX_2, expectedValues, getIndexString(lib, 2));
     }
-    assertAttribute(Field.QC_PASSED,
-        expectedValues.get(Field.QC_PASSED), lib.getQcPassed() == null ? null : lib.getQcPassed().toString());
-    assertAttribute(Field.LOW_QUALITY, expectedValues.get(Field.LOW_QUALITY), Boolean.toString(lib.isLowQuality()));
-    assertAttribute(Field.SIZE, expectedValues.get(Field.SIZE), lib.getDnaSize() == null ? null : lib.getDnaSize().toString());
-    assertAttribute(Field.VOLUME, expectedValues.get(Field.VOLUME), lib.getVolume() == null ? null : lib.getVolume().toString());
-    assertAttribute(Field.DISCARDED, expectedValues.get(Field.DISCARDED), Boolean.toString(lib.isDiscarded()));
-    assertAttribute(Field.LOCATION, expectedValues.get(Field.LOCATION), lib.getLocationBarcode());
-    assertAttribute(Field.KIT, expectedValues.get(Field.KIT), lib.getKitDescriptor() == null ? null : lib.getKitDescriptor().getName());
-    assertAttribute(Field.CONCENTRATION, expectedValues.get(Field.CONCENTRATION),
-        lib.getInitialConcentration() == null ? null : lib.getInitialConcentration().toString());
-    assertAttribute(Field.ARCHIVED, expectedValues.get(Field.ARCHIVED), lib.getArchived().toString());
+    assertAttribute(Field.QC_PASSED, expectedValues, nullOrToString(lib.getQcPassed()));
+    assertAttribute(Field.LOW_QUALITY, expectedValues, Boolean.toString(lib.isLowQuality()));
+    assertAttribute(Field.SIZE, expectedValues, nullOrToString(lib.getDnaSize()));
+    assertAttribute(Field.VOLUME, expectedValues, nullOrToString(lib.getVolume()));
+    assertAttribute(Field.DISCARDED, expectedValues, Boolean.toString(lib.isDiscarded()));
+    assertAttribute(Field.LOCATION, expectedValues, lib.getLocationBarcode());
+    assertAttribute(Field.KIT, expectedValues, nullOrGet(lib.getKitDescriptor(), KitDescriptor::getName));
+    assertAttribute(Field.CONCENTRATION, expectedValues, nullOrToString(lib.getInitialConcentration()));
+    assertAttribute(Field.ARCHIVED, expectedValues, lib.getArchived().toString());
   }
 
   private static String getIndexString(Library lib, int position) {
     Index index = lib.getIndices().stream().filter(i -> i.getPosition() == position).findFirst().orElse(null);
-    return index == null ? "No index (null)" : index.getLabel();
+    return nullValueOrGet(index, Index::getLabel, "No index (null)");
   }
 
 }

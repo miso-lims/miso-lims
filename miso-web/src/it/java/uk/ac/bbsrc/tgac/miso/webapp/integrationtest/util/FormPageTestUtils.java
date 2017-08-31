@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.util.Map;
+import java.util.function.Function;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.FormPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.FormPage.FieldElement;
@@ -26,12 +27,32 @@ public class FormPageTestUtils {
     });
   }
 
-  public static void assertAttribute(Object field, String expected, String actual) {
+  public static <T extends FieldElement> void assertAttribute(T field, Map<T, String> expectedValues, String actual) {
+    if (!expectedValues.containsKey(field)) {
+      return;
+    }
+    String expected = expectedValues.get(field);
     if (expected == null) {
-      assertTrue(String.format("persisted attribute expected empty '%s'", field), isStringEmptyOrNull(actual));
+      assertTrue(String.format("persisted attribute expected empty '%s', actual %s", field, actual), isStringEmptyOrNull(actual));
     } else {
       assertEquals(String.format("persisted attribute '%s'", field), expected, actual);
     }
+  }
+
+  public static String nullOrToString(Object maybeNull) {
+    return maybeNull == null ? null : maybeNull.toString();
+  }
+
+  public static <T> String nullOrGet(T maybeNull, Function<T, String> getter) {
+    return maybeNull == null ? null : getter.apply(maybeNull);
+  }
+
+  public static <T> String nullValueOrGet(T maybeNull, Function<T, String> getter, String nullValue) {
+    return maybeNull == null ? nullValue : getter.apply(maybeNull);
+  }
+
+  public static String replaceIfNull(String maybeNull, String nullValue) {
+    return maybeNull == null ? nullValue : maybeNull;
   }
 
 }

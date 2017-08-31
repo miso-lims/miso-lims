@@ -14,20 +14,22 @@ import org.openqa.selenium.interactions.Actions;
 public class HoverMenu extends AbstractElement {
 
   private static final Pattern openMenuFunction = Pattern.compile(".*mopen\\(\\'(.*)\\'\\).*");
+  private static final By handleSelector = By.className("ui-icon-triangle-1-s");
   private static final By optionsSelector = By.tagName("a");
 
-  private final WebElement menu;
+  private final WebElement handle;
   private final WebElement optionsDiv;
 
   public HoverMenu(WebDriver driver, By selector) {
     super(driver);
-    menu = driver.findElement(selector);
+    WebElement menu = driver.findElement(selector);
     String onmouseover = menu.getAttribute("onmouseover");
     Matcher m = openMenuFunction.matcher(onmouseover);
     if (!m.matches()) {
       throw new IllegalStateException("The element found using this selector does not seem to be a hover menu");
     }
     String optionsDivId = m.group(1);
+    handle = menu.findElement(handleSelector);
     optionsDiv = driver.findElement(By.id(optionsDivId));
   }
 
@@ -44,7 +46,7 @@ public class HoverMenu extends AbstractElement {
   
   private void open() {
     if (!optionsDiv.isDisplayed()) {
-      new Actions(getDriver()).moveToElement(menu).build().perform();
+      new Actions(getDriver()).moveToElement(handle).build().perform();
     }
     waitUntil(visibilityOf(optionsDiv));
   }

@@ -244,15 +244,15 @@ Library.barcode = {
 
   showLibraryIdBarcodeChangeDialog: function (libraryId, libraryIdBarcode) {
     var self = this;
-    jQuery('#changeLibraryIdBarcodeDialog')
+    jQuery('#changeIdBarcodeDialog')
       .html("<form>" +
             "<fieldset class='dialog'>" +
-            "<strong><label>Current Barcode: </label></strong>" + libraryIdBarcode +
-            "<br /><strong><label for='notetext'>New Barcode:</label></strong>" +
+            "<strong><label>Current Barcode: </label></strong><span id='idBarcodeCurrent'>" + libraryIdBarcode +
+            "</span><br /><strong><label for='notetext'>New Barcode:</label></strong>" +
             "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
             "</fieldset></form>");
 
-    jQuery('#changeLibraryIdBarcodeDialog').dialog({
+    jQuery('#changeIdBarcodeDialog').dialog({
       width: 400,
       modal: true,
       resizable: false,
@@ -615,7 +615,7 @@ Library.ui = {
 
   showLibraryNoteDialog: function (libraryId) {
     var self = this;
-    jQuery('#addLibraryNoteDialog')
+    jQuery('#addNoteDialog')
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='internalOnly'>Internal Only?</label>" +
@@ -625,7 +625,7 @@ Library.ui = {
             "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />" +
             "</fieldset></form>");
 
-    jQuery('#addLibraryNoteDialog').dialog({
+    jQuery('#addNoteDialog').dialog({
       width: 400,
       modal: true,
       resizable: false,

@@ -40,7 +40,7 @@ public abstract class AbstractPage extends AbstractElement {
         }
         return super.getValue(driver, selector);
       }
-
+      
       @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         setText(value == null ? "" : value, driver.findElement(selector));
@@ -54,7 +54,7 @@ public abstract class AbstractPage extends AbstractElement {
         }
         return super.isEditable(element);
       }
-
+      
       private boolean isTextBox(WebElement element) {
         return "input".equals(element.getTagName());
       }
@@ -104,6 +104,14 @@ public abstract class AbstractPage extends AbstractElement {
       @Override
       protected void setValue(WebDriver driver, By selector, String value) {
         setDropdown(value, driver.findElement(selector));
+      }
+
+      @Override
+      protected boolean isEditable(WebElement element) {
+        if (!isDropdown(element)) {
+          return false;
+        }
+        return super.isEditable(element);
       }
 
       private boolean isDropdown(WebElement element) {

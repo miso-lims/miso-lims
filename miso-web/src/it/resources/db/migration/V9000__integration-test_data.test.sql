@@ -2,8 +2,6 @@
 ALTER TABLE LibraryDesign DROP CONSTRAINT `uk_libraryDesign_name`;
 ALTER TABLE LibraryDesign ADD CONSTRAINT `uk_libraryDesign_name_sampleClass` UNIQUE (`name`, `sampleClassId`);
 
-DELETE FROM Note;
-
 INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
 VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
 
@@ -337,6 +335,7 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (4, 'PRO4', 'Project To Change', 'DELTA', '2017-08-04', 'integration test project for changing fields', 2, 'PROPOSED', 2, '2017-08-04 15:12:00'),
   (100001, 'PRO100001', 'BulkLibraryIT', 'LIBT', '2017-07-24', 'bulk library test project', 1, 'ACTIVE', 1, '2017-07-24 16:11:00'),
   (110001, 'PRO110001', 'SingleLibraryIT', '1LIB', '2017-08-16', 'single library test project', 1, 'ACTIVE', 1, '2017-08-16 16:11:00'),
+  (120001, 'PRO120001', 'SinglePoolIT', '1IPO', '2017-08-22', 'single pool test project', 1, 'ACTIVE', 1, '2017-08-22 16:35:00'),
   (200001, 'PRO200001', 'BulkPoolIT', 'IPOT', '2017-08-15', 'bulk Pool test project', 1, 'ACTIVE', 1, '2017-08-15 12:22:00'),
   (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 1, 'ACTIVE', 1, '2017-08-09 11:51:00'),
   (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 1, 'ACTIVE', 1, '2017-08-14 11:54:00'),
@@ -378,6 +377,10 @@ INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_pro
   (110002, 110001, 'SAM110002', '1LIB_0001_Ly_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (110003, 110001, 'SAM110003', '1LIB_0001_Ly_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (110004, 110001, 'SAM110004', '1LIB_0001_Ly_P_1-1_D1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (120001, 120001, 'SAM120001', '1IPO_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (120002, 120001, 'SAM120002', '1IPO_0001_Ly_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (120003, 120001, 'SAM120003', '1IPO_0001_Ly_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
+  (120004, 120001, 'SAM120004', '1IPO_0001_Ly_P_1-1_D1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (200001, 200001, 'SAM200001', 'IPOT_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (200002, 200001, 'SAM200002', 'IPOT_0001_Pa_P_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
   (200003, 200001, 'SAM200003', 'IPOT_0001_Pa_P_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00'),
@@ -419,6 +422,10 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
   (110002, 23, NULL, 1, 0), -- Tissue
   (110003, 11, NULL, 1, 0), -- gDNA (stock)
   (110004, 15, NULL, 1, 0), -- gDNA (aliquot)
+  (120001, 1, NULL, 1, 0),  -- Identity
+  (120002, 23, NULL, 1, 0), -- Tissue
+  (120003, 11, NULL, 1, 0), -- gDNA (stock)
+  (120004, 15, NULL, 1, 0), -- gDNA (aliquot)
   (200001, 1, NULL, 1, 0),  -- Identity
   (200002, 23, NULL, 1, 0), -- Tissue
   (200003, 11, NULL, 1, 0), -- gDNA (stock)
@@ -443,6 +450,7 @@ INSERT INTO Identity (sampleId, externalName, donorSex) VALUES
   (1, 'TEST_external_1', 'MALE'),
   (100001, 'LIBT_identity1', 'UNKNOWN'),
   (110001, '1LIB_identity1', 'UNKNOWN'),
+  (120001, '1IPO_identity1', 'UNKNOWN'),
   (200001, 'IPOT_identity1', 'UNKNOWN'),
   (201, 'SORT_identity_1', 'UNKNOWN'),
   (301, 'DILT_identity_1', 'FEMALE'),
@@ -452,6 +460,7 @@ INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, externalInst
   (2, 1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2),
   (100002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (110002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  (120002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (200002, 3, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (202, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (302, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL),
@@ -472,6 +481,7 @@ INSERT INTO `SampleStock` (sampleId, strStatus, dnaseTreated) VALUES
 (10, 'PASS', 0),
 (100003, 'NOT_SUBMITTED', 0),
 (110003, 'NOT_SUBMITTED', 0),
+(120003, 'NOT_SUBMITTED', 0),
 (200003, 'NOT_SUBMITTED', 0),
 (203, 'NOT_SUBMITTED', 0),
 (303, 'NOT_SUBMITTED', 0),
@@ -486,6 +496,7 @@ INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 (14, 3),
 (100004, NULL),
 (110004, NULL),
+(120004, NULL),
 (200004, NULL),
 (204, NULL),
 (205, NULL),
@@ -517,6 +528,10 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, 5, NULL, NULL),
   (110005, 'LIB110005', '1LIB_0001_Ly_P_PE_255_WG', NULL,           'libdesc110005', 1, 110004, 'ILLUMINA', 1, NULL, NULL, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, 5, NULL, NULL),
+  (120001, 'LIB120001', '1IPO_0001_Ly_P_PE_251_WG', 'libbar120001', 'libdesc120001', 1, 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL),
+  (120002, 'LIB120002', '1IPO_0001_Ly_P_PE_252_WG', 'libbar120002', 'libdesc120002', 1, 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
+    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    252,  4,    6.3, 'lib_location_120002'),
   (200001, 'LIB200001', 'IPOT_0001_Pa_P_PE_251_WG', 'libbar200001', 'libdesc200001', 1, 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 0,    251,  2.5,  10, NULL),
   (200002, 'LIB200002', 'IPOT_0001_Pa_P_PE_252_WG', 'libbar200002', 'libdesc200002', 1, 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
@@ -549,6 +564,8 @@ INSERT INTO DetailedLibrary(libraryId, kitDescriptorId, archived, libraryDesign,
   (110003, 1, 0, NULL, 7),
   (110004, 1, 0, NULL, 7),
   (110005, 1, 0, NULL, 3),
+  (120001, 1, 0, NULL, 7),
+  (120002, 1, 0, 1, 7),
   (200001, 1, 0, NULL, 7),
   (200002, 1, 0, 1, 7),
   (204, 1, 0, NULL, 7),
@@ -571,36 +588,42 @@ INSERT INTO Library_Index(library_libraryId, index_indexId) VALUES
   (110002, 9),
   (110005, 5),
   (110005, 9),
+  (120001, 1),
+  (120002, 2),
   (304, 5),
   (305, 6),
   (306, 9);
-
-INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
-  (1, '2017-08-22', 1, 'LIB110005 existing note', 1);
-
-DELETE FROM Library_Note;
-INSERT INTO Library_Note(library_libraryId, notes_noteId) VALUES
-  (110005, 1);
 
 INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated) VALUES
 (1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 'admin', 2, 1, '2017-07-20 09:01:00'),
 (304, 'LDI304', 7.97, 304, '300304', '2017-08-14', 'admin', 1, 1, '2017-08-14 12:25:00'),
 (305, 'LDI305', 7.97, 305, '300305', '2017-08-14', 'admin', 1, 1, '2017-08-14 12:25:00'),
+(120001, 'LDI120001', 4, 120001, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
+(120002, 'LDI120002', 4, 120002, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
 (200001, 'LDI200001', 4, 200001, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
 (200002, 'LDI200002', 3, 200002, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
 (504, 'LDI504', 5.9, 504, 'TIB_Dil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00'),
 (505, 'LDI505', 3.3, 504, 'TIB_replaceDil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00');
 
-INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, creationDate, securityProfile_profileId, platformType, ready, lastModifier, creator, created, lastModified, qcPassed) VALUES
-(1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', '2017-07-20', 2, 'ILLUMINA', 1, 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
-(200001, 6.5, 12, 'IPO200001', 'IPOT_POOL_1', 'ipobar200001', '2017-08-15', 2, 'ILLUMINA', 0, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
-(200002, 6.5, NULL, 'IPO200002', 'IPOT_POOL_2', NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', NULL),
-(200003, 6.5, 7.92, 'IPO200003', 'IPOT_POOL_3', 'ipobar200003', '2017-08-15', 2, 'ILLUMINA', 1, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
-(200004, 6.5, 7.92, 'IPO200004', 'IPOT_POOL_4', 'ipobar200004', '2017-08-15', 2, 'ILLUMINA', 1, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
-(501, 2.2, NULL, 'IPO501', 'TIB_Pool', 'TIB_Pool', '2017-08-15', 1, 'ILLUMINA', 1, 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00', 1);
+INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, ready, lastModifier, creator, created, lastModified, qcPassed) VALUES
+(1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 2, 'ILLUMINA', 1, 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
+(501, 2.2, NULL, 'IPO501', 'TIB_Pool', 'TIB_Pool', NULL, '2017-08-15', 1, 'ILLUMINA', 1, 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00', 1),
+(120001, 6.5, 12, 'IPO120001', '1IPO_POOL_1', 'ipobar120001', 'ipodesc120001', '2017-08-15', 2, 'ILLUMINA', 0, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(120002, 6.5, NULL, 'IPO120002', '1IPO_POOL_2', NULL, NULL, '2017-08-15', 2, 'ILLUMINA', 0, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', NULL),
+(120003, 6.5, 12, 'IPO120003', '1IPO_POOL_3', 'ipobar120003', 'ipodesc120003', '2017-08-15', 2, 'ILLUMINA', 0, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(120004, 6.5, 12, 'IPO120004', '1IPO_POOL_4', 'ipobar120004', 'ipodesc120004', '2017-08-15', 2, 'ILLUMINA', 0, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(120005, 6.5, 12, 'IPO120005', '1IPO_POOL_5', NULL, 'ipodesc120005', '2017-08-15', 2, 'ILLUMINA', 0, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(200001, 6.5, 12, 'IPO200001', 'IPOT_POOL_1', 'ipobar200001', NULL, '2017-08-15', 2, 'ILLUMINA', 0, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 0),
+(200002, 6.5, NULL, 'IPO200002', 'IPOT_POOL_2', NULL, NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', NULL),
+(200003, 6.5, 7.92, 'IPO200003', 'IPOT_POOL_3', 'ipobar200003', NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1),
+(200004, 6.5, 7.92, 'IPO200004', 'IPOT_POOL_4', 'ipobar200004', NULL, '2017-08-15', 2, 'ILLUMINA', 1, 1, 1, '2017-08-15 10:01:00', '2017-08-15 10:01:00', 1);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1),
+(120001, 120001),
+(120001, 120002),
+(120002, 120001),
+(120002, 120002),
 (200001, 200001),
 (200001, 200002),
 (200002, 200001),
@@ -640,3 +663,16 @@ INSERT INTO RunIllumina (runId, pairedEnd) VALUES (1, 1);
 INSERT INTO RunPacBio (runId) VALUES (2);
 
 INSERT INTO Run_SequencerPartitionContainer (Run_runId, containers_containerId) VALUES (1, 1), (2, 2);
+
+DELETE FROM Note;
+INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
+  (1, '2017-08-22', 1, 'LIB110005 existing note', 1),
+  (2, '2017-08-25', 1, 'IPO120001 existing note', 1);
+
+DELETE FROM Library_Note;
+INSERT INTO Library_Note(library_libraryId, notes_noteId) VALUES
+  (110005, 1);
+
+DELETE FROM Pool_Note;
+INSERT INTO Pool_Note(pool_poolId, notes_noteId) VALUES
+  (120001, 2);

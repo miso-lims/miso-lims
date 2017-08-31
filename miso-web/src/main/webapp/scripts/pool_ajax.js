@@ -431,7 +431,7 @@ Pool.ui = {
 
   showPoolNoteDialog: function (poolId) {
     var self = this;
-    jQuery('#addPoolNoteDialog')
+    jQuery('#addNoteDialog')
       .html("<form>" +
         "<fieldset class='dialog'>" +
         "<label for='internalOnly'>Internal Only?</label>" +
@@ -441,7 +441,7 @@ Pool.ui = {
         "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />" +
         "</fieldset></form>");
 
-    jQuery('#addPoolNoteDialog').dialog({
+    jQuery('#addNoteDialog').dialog({
       width: 400,
       modal: true,
       resizable: false,
@@ -478,7 +478,7 @@ Pool.ui = {
   },
 
   deletePoolNote: function (poolId, noteId) {
-    if (confirm("Are you sure you want to delete this note?")) {
+    var deleteIt = function() {
       Fluxion.doAjax(
         'poolControllerHelperService',
         'deletePoolNote',
@@ -492,7 +492,11 @@ Pool.ui = {
         }
       );
     }
-  },
+    Utils.showConfirmDialog('Delete Note', 'Delete',
+      ["Are you sure you want to delete this note?"],
+      deleteIt
+    );
+  }
 };
 
 Pool.search = {
@@ -561,15 +565,15 @@ Pool.barcode = {
 
   showPoolIdBarcodeChangeDialog: function (poolId, poolIdBarcode) {
     var self = this;
-    jQuery('#changePoolIdBarcodeDialog')
+    jQuery('#changeIdBarcodeDialog')
       .html("<form>" +
             "<fieldset class='dialog'>" +
-            "<strong><label>Current Barcode: </label></strong>" + poolIdBarcode +
-            "<br /><strong><label for='notetext'>New Barcode:</label></strong>" +
+            "<strong><label>Current Barcode: </label></strong><span id='idBarcodeCurrent'>" + poolIdBarcode +
+            "</span><br /><strong><label for='notetext'>New Barcode:</label></strong>" +
             "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
             "</fieldset></form>");
 
-    jQuery('#changePoolIdBarcodeDialog').dialog({
+    jQuery('#changeIdBarcodeDialog').dialog({
       width: 400,
       modal: true,
       resizable: false,
