@@ -35,10 +35,12 @@ applications.
 
 |Interface|Description|
 |-------|-----------|
+|[Aliasable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Aliasable.java)|Defines objects that have a human-readable identifying 'alias' field|
 |[Barcodable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Barcodable.java)|Defines whether an implementing object is able to be identified by a barcode string. This interface also defines a label text property which can be used to provide abstraction of a number of member properties into a printable string.|
 |[Boxable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Boxable.java)|Defines whether an implementing object can be stored in a [Box](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Box.java)|
 |[ChangeLoggable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/ChangeLoggable.java)|Defines objects that have change logs written to the database|
 |[Deletable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Deletable.java)|Defines whether an implementing object is deletable by the system. The isDeletable() method defines a contract for ascertaining whether the object has any dependencies that prevent it from being removed, e.g. child members.|
+|[Identifiable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Identifiable.java)|Defines objects which have an unique ID field. This ID is used as the database primary key|
 |[Locatable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Locatable.java)|Defines whether an implementing object is able to be located by a barcode string, e.g. a freezer shelf barcode.|
 |[Nameable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java)|Defines whether an implementing object is able to be identified by a unique long and named by a string. This name may or may not be unique depending on the given [MisoNamingScheme](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/MisoNamingScheme.java) applied (see [Naming Schemes](#DeveloperManual-NamingSchemes)). This interface is heavily used in MISO for all persistable objects.|
 |[Securable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/com/eaglegenomics/simlims/core/Securable.java)|Defines whether an object can be read from or written to, given a User.|
@@ -71,8 +73,8 @@ to wrap up the synonymous objects so that SRA XMLs can be generated (see [ENA De
 MISO objects are secured based on a SecurityProfile associated with that object. SecurityProfiles control access based on a single
 overarching owner, which always has full access (read/write/delete). Users can then be registered with that object's SecurityProfile that
 enable them to read or write information. Similarly, read and write access can be specified at the Group level. The _allowAllInternal_ flag
-states that any User with the ROLE_INTERNAL role (see LINK User Roles) is able to read and write to this object, regardless of the Group
-that the User is a part of.
+states that any User with the ROLE_INTERNAL role is able to read and write to this object, regardless of the Group that the User is a part
+of.
 
 ## Enumerated Types
 
@@ -93,9 +95,9 @@ These concrete enums are intended to provide collections of relatively static in
 
 ### Database definition types
 
-Unlike their enum conterparts, these type definitions are instances of database entities, and as such are user-editable from within the
-MISO interface. The reason for this is because these types follow the enumerations specified in the
-[Experiment SRA common schema](ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.experiment.xsd), and are more liable to change.
+Unlike their enum conterparts, these type definitions are instances of database entities. The primary reason for this is to simplify
+management of types that may be institute-specific. Another is that some of these types follow the enumerations specified in the
+[Experiment SRA common schema](ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.experiment.xsd), and are liable to change.
 
 * LibrarySelectionType
 * LibraryStrategyType
@@ -106,8 +108,8 @@ MISO interface. The reason for this is because these types follow the enumeratio
 
 All [Nameable](https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java) entities
 in MISO should conform to a Naming Scheme. This ensures consistency of human-readable names across entity space, and allows centralised
-validation with no requirement of extra code (backend or frontend) on an external developer's part. Sample and Library has an alias
-attribute which are also handled by naming scheme.
+validation with no requirement of extra code (backend or frontend) on an external developer's part. The alias attribute on Sample and
+Library can also be generated and/or validated by the naming scheme.
 
 ### Interfaces
 
@@ -139,8 +141,8 @@ MISO will attempt to check and create these paths if not.
 
 This manager provides a mechanism to standardise file output into specific directories based on Java object types (simple class names,
 lowercased) and qualifiers. These qualifiers are a simple string which can be kept constant by the implementor for a given field, e.g.
-object entity ID. So, for example, sample delivery forms can be generated and stored under a Project type and qualifier (see LINK Sample
-Delivery Forms). The code to do this looks something like:
+object entity ID. So, for example, sample delivery forms can be generated and stored under a Project type and qualifier. The code to do
+this looks something like:
 
 
 ```java
@@ -257,7 +259,7 @@ from the database. To ensure data consistency, all database access in MISO shoul
 DAOs directly. Beyond data storage and retrieval via the DAO's, the Service layer's responsibilities include
 
 * Authorization checks using an AuthorizationManager
-* Name generation via using a NamingScheme
+* Name generation using a NamingScheme
 * Validation in cases where database constraints are not strong enough
 * Updating timestamps and userId fields such as creationDate and lastModifier
 * Ensuring that only fields which should be modifiable can be modified
