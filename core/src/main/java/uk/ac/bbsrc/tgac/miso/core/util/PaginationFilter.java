@@ -312,6 +312,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter readyToRun(boolean readyToRun) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByReadyToRun(item, readyToRun, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter sampleClass(String name) {
     return new PaginationFilter() {
 
@@ -328,6 +338,16 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationBySequencerId(item, id, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter sequencingParameters(long parametersId) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationBySequencingParametersId(item, parametersId, errorHandler);
       }
     };
   }

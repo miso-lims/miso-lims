@@ -311,6 +311,11 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
+  public void restrictPaginationByReadyToRun(Criteria criteria, boolean readyToRun, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("readyToRun", readyToRun));
+  }
+
+  @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:

@@ -217,8 +217,18 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByReadyToRun(Criteria criteria, boolean readyToRun, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be filtered by ready to run.");
+  }
+
+  @Override
   default void restrictPaginationBySequencerId(Criteria criteria, long id, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " cannot be filtered by sequencer.");
+  }
+
+  @Override
+  default void restrictPaginationBySequencingParametersId(Criteria criteria, long id, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be filtered by sequencing parameters.");
   }
 
   @Override

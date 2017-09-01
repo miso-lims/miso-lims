@@ -108,6 +108,12 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
   }
 
   @Override
+  public void restrictPaginationBySequencingParametersId(Criteria criteria, long id, Consumer<String> errorHandler) {
+    criteria.createAlias("sequencingParameters", "sequencingParameters");
+    criteria.add(Restrictions.eqOrIsNull("sequencingParameters.id", id));
+  }
+
+  @Override
   public String getFriendlyName() {
     return "Pool";
   }
