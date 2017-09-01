@@ -87,7 +87,6 @@ public class SequencerPageIT extends AbstractIT {
     fields.put(Field.IP_ADDRESS, "127.0.0.1");
     fields.put(Field.STATUS, "production");
     assertFieldValues("loaded", fields, page);
-    
 
     // make changes
     Map<Field, String> changes = Maps.newLinkedHashMap();
@@ -117,22 +116,22 @@ public class SequencerPageIT extends AbstractIT {
   private static final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
 
   private static void assertSequencerReferenceAttributes(Map<Field, String> expectedValues, SequencerReference sr) {
-    assertAttribute(Field.ID, expectedValues.get(Field.ID), Long.toString(sr.getId()));
-    assertAttribute(Field.NAME, expectedValues.get(Field.NAME), sr.getName());
-    assertAttribute(Field.PLATFORM, expectedValues.get(Field.PLATFORM), sr.getPlatform().getNameAndModel());
-    assertAttribute(Field.SERIAL_NUMBER, expectedValues.get(Field.SERIAL_NUMBER), sr.getSerialNumber());
-    assertAttribute(Field.IP_ADDRESS, expectedValues.get(Field.IP_ADDRESS),
+    assertAttribute(Field.ID, expectedValues, Long.toString(sr.getId()));
+    assertAttribute(Field.NAME, expectedValues, sr.getName());
+    assertAttribute(Field.PLATFORM, expectedValues, sr.getPlatform().getNameAndModel());
+    assertAttribute(Field.SERIAL_NUMBER, expectedValues, sr.getSerialNumber());
+    assertAttribute(Field.IP_ADDRESS, expectedValues,
         (sr.getIpAddress() == null ? "" : sr.getIpAddress().toString()));
-    assertAttribute(Field.COMMISSIONED, expectedValues.get(Field.COMMISSIONED), dateFormatter.print(sr.getDateCommissioned().getTime()));
-    assertAttribute(Field.STATUS, expectedValues.get(Field.STATUS).toLowerCase(),
+    assertAttribute(Field.COMMISSIONED, expectedValues, dateFormatter.print(sr.getDateCommissioned().getTime()));
+    assertAttribute(Field.STATUS, expectedValues,
         (sr.getUpgradedSequencerReference() != null ? "Upgraded" : (sr.getDateDecommissioned() != null ? "Retired" : "Production"))
             .toLowerCase());
     if (expectedValues.containsKey(Field.DECOMMISSIONED)) {
-      assertAttribute(Field.DECOMMISSIONED, expectedValues.get(Field.DECOMMISSIONED),
+      assertAttribute(Field.DECOMMISSIONED, expectedValues,
           (sr.getDateDecommissioned() == null ? null : dateFormatter.print(sr.getDateDecommissioned().getTime())));
     }
     if (expectedValues.containsKey(Field.UPGRADED_REF)) {
-      assertAttribute(Field.UPGRADED_REF, expectedValues.get(Field.UPGRADED_REF), sr.getUpgradedSequencerReference().getName());
+      assertAttribute(Field.UPGRADED_REF, expectedValues, sr.getUpgradedSequencerReference().getName());
     }
   }
 

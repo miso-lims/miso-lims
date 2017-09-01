@@ -45,7 +45,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
@@ -85,7 +84,7 @@ public class EditServiceRecordController {
   }
   
   public Map<Integer, String> populateServiceRecordFiles(SequencerServiceRecord record) throws IOException {
-    if (record.getId() != AbstractSequencerServiceRecord.UNSAVED_ID) {
+    if (record.getId() != SequencerServiceRecordImpl.UNSAVED_ID) {
       Map<Integer, String> fileMap = new HashMap<>();
       for (String s : filesManager.getFileNames(SequencerServiceRecord.class, String.valueOf(record.getId()))) {
         fileMap.put(s.hashCode(), s);

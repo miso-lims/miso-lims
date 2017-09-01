@@ -16,7 +16,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -45,7 +44,7 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
   @Override
   public long save(SequencerServiceRecord ssr) throws IOException {
     long id;
-    if (ssr.getId() == AbstractSequencerServiceRecord.UNSAVED_ID) {
+    if (ssr.getId() == SequencerServiceRecordImpl.UNSAVED_ID) {
       if (ssr.getSequencerReference().getDateDecommissioned() != null)
         throw new IOException("Cannot add service records to a retired sequencer!");
 
