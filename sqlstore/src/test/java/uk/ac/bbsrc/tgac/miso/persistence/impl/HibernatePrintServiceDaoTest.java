@@ -70,7 +70,7 @@ public class HibernatePrintServiceDaoTest extends AbstractDAOTest {
     printer.setName(NEW_NAME);
     printer.setBackend(Backend.CUPS);
     printer.setConfiguration("blah, blah, blah");
-    printer.setDriver(Driver.BRADY_M80);
+    printer.setDriver(Driver.BRADY_1D);
     printer.setEnabled(true);
     long id = dao.save(printer);
     Printer fetchedPrinter = dao.get(id);
