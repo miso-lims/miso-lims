@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +30,13 @@ import uk.ac.bbsrc.tgac.miso.core.util.TransmissionUtils;
  * Transfer method to send data to a printer.
  */
 public enum Backend {
+  BRADY_FTP("host", "pin") {
+    @Override
+    public boolean print(byte[] content, JsonNode configuration) {
+      return sendFtpFile(configuration.get("host").asText(), "root", configuration.get("pin").asText(), "/execute",
+          Arrays.hashCode(content) + ".LBL", content);
+    }
+  },
   CUPS() {
     @Override
     public boolean print(byte[] content, JsonNode configuration) {
@@ -48,46 +56,8 @@ public enum Backend {
       return false;
     }
   },
-  FTP("host", "username", "password") {
-    @Override
-    public boolean print(byte[] content, JsonNode configuration) {
-      String host = configuration.get("host").asText();
-      String username = configuration.get("username").asText();
-      String password = configuration.get("password").asText();
-
-      try {
-        FTPClient ftp = TransmissionUtils.ftpConnect(host, username, password);
-        if (ftp == null || !ftp.isConnected()) {
-          log.error("FTP client isn't connected. Please supply a client that has connected to the host.");
-          return false;
-        }
-
-        if (!ftp.changeWorkingDirectory("/execute")) {
-          log.error("Desired path does not exist on the server");
-          ftp.logout();
-          ftp.disconnect();
-          return false;
-        }
-        try (OutputStream stream = ftp.storeFileStream(content.hashCode() + ".LBL")) {
-          stream.write(content);
-        }
-
-        if (!ftp.completePendingCommand() || !FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-          log.error("Error storing file");
-          ftp.logout();
-          ftp.disconnect();
-          return false;
-        }
-        ftp.logout();
-        ftp.disconnect();
-        return true;
-      } catch (IOException e) {
-        log.error("Failed to FTP", e);
-      }
-      return false;
-    }
-  },
   DEBUG() {
+    @SuppressWarnings({ "squid:S2629", "squid:S1172" })
     @Override
     public boolean print(byte[] content, JsonNode configuration) {
       StringBuilder buffer = new StringBuilder();
@@ -98,8 +68,67 @@ public enum Backend {
       log.error(buffer.toString());
       return true;
     }
+  },
+  RAW_TCP("host", "port") {
+
+    @Override
+    public boolean print(byte[] content, JsonNode configuration) {
+      String host = configuration.get("host").asText();
+      int port = configuration.get("port").asInt();
+      try (Socket socket = new Socket(host, port)) {
+        socket.getOutputStream().write(content);
+      } catch (IOException e) {
+        log.error("Failed to print to socket", e);
+        return false;
+      }
+      return true;
+    }
+
+  },
+  ZEBRA_FTP("host", "password") {
+    @Override
+    public boolean print(byte[] content, JsonNode configuration) {
+      return sendFtpFile(configuration.get("host").asText(), "admin", configuration.get("password").asText(),
+          null, Arrays.hashCode(content) + ".ZPL", content);
+    }
+
   };
   private static final Logger log = LoggerFactory.getLogger(Backend.class);
+
+  protected static boolean sendFtpFile(String host, String username, String password, String directory, String filename, byte[] content) {
+
+    try {
+      FTPClient ftp = TransmissionUtils.ftpConnect(host, username, password);
+      if (ftp == null || !ftp.isConnected()) {
+        log.error("FTP client isn't connected. Please supply a client that has connected to the host.");
+        return false;
+      }
+
+      try {
+        if (directory == null) {// Do Nothing
+
+        } else if (!ftp.changeWorkingDirectory(directory)) {
+          log.error("Desired path does not exist on the server");
+          return false;
+        }
+        try (OutputStream stream = ftp.storeFileStream(filename)) {
+          stream.write(content);
+        }
+
+        if (!ftp.completePendingCommand() || !FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
+          log.error("Error storing file");
+          return false;
+        }
+        return true;
+      } finally {
+        ftp.logout();
+        ftp.disconnect();
+      }
+    } catch (IOException e) {
+      log.error("Failed to FTP", e);
+    }
+    return false;
+  }
 
   private final List<String> configurationKeys;
 
