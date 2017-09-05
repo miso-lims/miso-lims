@@ -48,10 +48,7 @@ public class PoolPickerResponse {
       WhineyFunction<T, PoolPickerEntry> transform,
       PaginationFilter... filters) throws IOException {
 
-    List<String> errors = new ArrayList<>();
-    Consumer<String> errorHandler = message -> {
-      errors.add(message);
-    };
+    Consumer<String> errorHandler = message -> errors.add(message);
     
     Map<Long, List<PoolPickerEntry>> groupedByPool = source.list(errorHandler, 0, limit, sortOrder, sortColumn, filters)
         .stream().map(WhineyFunction.log(log, transform)).collect(Collectors.groupingBy(entry -> entry.getPool().getId()));

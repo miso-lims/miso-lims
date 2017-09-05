@@ -253,9 +253,8 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public PoolPickerResponse getPickersBySearch(@RequestParam("platform") String platform, @RequestParam("query") String query)
       throws IOException {
-    PlatformType platformType = PlatformType.get(platform);
     return getPoolPickerWithFilters(100,
-        PaginationFilter.platformType(platformType),
+        PaginationFilter.platformType(PlatformType.valueOf(platform)),
         PaginationFilter.query(query));
   }
 
@@ -263,8 +262,8 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public PoolPickerResponse getPickersByReadyToRun(@RequestParam("platform") String platform,
       @RequestParam("readyToRun") boolean readyToRun) throws IOException {
-    PlatformType platformType = PlatformType.get(platform);
-    return getPoolPickerWithFilters(100, PaginationFilter.platformType(platformType),
+    return getPoolPickerWithFilters(100,
+        PaginationFilter.platformType(PlatformType.valueOf(platform)),
         PaginationFilter.readyToRun(readyToRun));
   }
 
@@ -272,9 +271,8 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public PoolPickerResponse getPickersBySearch(@RequestParam("platform") String platform)
       throws IOException {
-    PlatformType platformType = PlatformType.get(platform);
     return getPoolPickerWithFilters(20,
-        PaginationFilter.platformType(platformType));
+        PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
   private PoolPickerResponse getPoolPickerWithFilters(Integer limit, PaginationFilter... filters) throws IOException {

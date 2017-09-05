@@ -166,7 +166,7 @@ public class PoolOrderRestController extends RestController {
   @ResponseBody
   public PoolPickerResponse getPickersByUnfulfilled(@RequestParam("platform") String platform) throws IOException {
     return getPoolPickerWithFilters(100,
-        PaginationFilter.platformType(PlatformType.get(platform)),
+        PaginationFilter.platformType(PlatformType.valueOf(platform)),
         PaginationFilter.fulfilled(false));
   }
 
@@ -176,7 +176,7 @@ public class PoolOrderRestController extends RestController {
       @RequestParam("seqParamsId") Long paramsId,
       @RequestParam("fulfilled") boolean fulfilled) throws IOException {
     return getPoolPickerWithFilters(100,
-        PaginationFilter.platformType(PlatformType.get(platform)),
+        PaginationFilter.platformType(PlatformType.valueOf(platform)),
         PaginationFilter.fulfilled(fulfilled),
         PaginationFilter.sequencingParameters(paramsId));
   }
@@ -187,7 +187,7 @@ public class PoolOrderRestController extends RestController {
     return ppr;
   }
 
-  private static PoolPickerEntry orderTransform(PoolOrderCompletion order) throws IOException {
+  private static PoolPickerEntry orderTransform(PoolOrderCompletion order) {
     return new PoolPickerEntry(Dtos.asDto(order.getPool(), true), Collections.singletonList(Dtos.asDto(order)));
   }
 }
