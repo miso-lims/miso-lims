@@ -80,7 +80,7 @@ public class ListTablesIT extends AbstractIT {
   }
 
   private static final Set<String> completionHeaders = Sets.newHashSet(Columns.COMPLETED, Columns.REQUESTED,
-      Columns.RUNNING, Columns.REMAINING, Columns.FAILED);
+      Columns.RUNNING, Columns.REMAINING, Columns.FAILED, Columns.STARTED, Columns.STOPPED, Columns.UNKNOWN);
 
   // some tabs have no data, so we want to ensure we do all sort tests on tabs with data
   private static final Map<String, String> sortOnTab;
