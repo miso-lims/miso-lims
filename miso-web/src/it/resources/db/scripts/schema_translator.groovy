@@ -19,7 +19,7 @@ final String productionScriptPattern = '^(V\\d{4}_.*|afterMigrate)\\.sql$'
 final String testSchemaDir = basedir + '/target/test-classes/db/migration/'
 
 Files.createDirectories(Paths.get(testSchemaDir))
-for (File file : productionSchemaDir.listFiles() + new File(basedir + '/target/classes/db/migration/afterMigrate.sql')) {
+for (File file : productionSchemaDir.listFiles() + new File(basedir + '/target/classes/db/migration/afterMigrate.sql') + new File(basedir + '/target/classes/db/migration/beforeMigrate.sql')) {
   if (!file.isFile()) {
     continue
   }
