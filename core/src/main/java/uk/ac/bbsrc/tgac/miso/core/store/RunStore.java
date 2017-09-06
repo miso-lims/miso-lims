@@ -130,8 +130,6 @@ public interface RunStore extends Store<Run>, Remover<Run>, PaginatedDataSource<
    */
   List<Run> listBySequencerId(long sequencerReferenceId) throws IOException;
 
-  void saveAll(Collection<Run> runs) throws IOException;
-
   /**
    * @return a map containing all column names and max lengths from the Run table
    * @throws IOException
