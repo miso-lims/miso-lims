@@ -315,41 +315,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     dao.save(null);
   }
 
-  @Test
-  public void testSaveAll() throws MisoNamingException, IOException {
-    List<Run> runs = new ArrayList<>();
-    Run run1 = makeRun("TestRun1");
-    Run run2 = makeRun("TestRun2");
-    runs.add(run1);
-    runs.add(run2);
-
-    assertNull(dao.getByAlias(run1.getAlias()));
-    assertNull(dao.getByAlias(run2.getAlias()));
-    dao.saveAll(runs);
-
-    Run savedRun1 = dao.getByAlias(run1.getAlias());
-    assertNotNull(savedRun1);
-    assertEquals(run1.getAlias(), savedRun1.getAlias());
-
-    Run savedRun2 = dao.getByAlias(run2.getAlias());
-    assertNotNull(savedRun2);
-    assertEquals(run2.getAlias(), savedRun2.getAlias());
-  }
-
-  @Test
-  public void testSaveAllNone() throws IOException {
-    int originalCount = dao.count();
-    List<Run> runs = new ArrayList<>();
-    dao.saveAll(runs);
-    assertSame(originalCount, dao.count());
-  }
-
-  @Test
-  public void testSaveAllNull() throws IOException {
-    exception.expect(NullPointerException.class);
-    dao.saveAll(null);
-  }
-
   private Run makeRun(String alias) {
     SecurityProfile profile = (SecurityProfile) sessionFactory.getCurrentSession().get(SecurityProfile.class, 3L);
     SequencerReference sequencer = emptySR;
