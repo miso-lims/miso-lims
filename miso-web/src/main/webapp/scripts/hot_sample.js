@@ -190,7 +190,10 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForEnum('Sample Type', true, true, 'sampleType',
               Constants.sampleTypes, null),
           HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
-            validator : HotUtils.validator.requiredTextNoSpecialChars
+            validator : HotUtils.validator.requiredTextNoSpecialChars,
+            unpack : function(obj, flat, setCellMeta) {
+              flat.scientificName = obj.scientificName || config.defaultSciName;
+            }
           }),
           {
             header : 'Project',
