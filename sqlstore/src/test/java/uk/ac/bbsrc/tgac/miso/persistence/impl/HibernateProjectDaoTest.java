@@ -199,6 +199,14 @@ public class HibernateProjectDaoTest extends AbstractDAOTest {
     assertEquals(alias, p.getAlias());
   }
 
+  @Test
+  public void testGetByShortName() throws IOException {
+    String expected = "TEST1";
+    Project p = projectDAO.getByShortName(expected);
+    assertNotNull(p);
+    assertEquals(expected, p.getShortName());
+  }
+
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao#getByStudyId(long)}.
    * 

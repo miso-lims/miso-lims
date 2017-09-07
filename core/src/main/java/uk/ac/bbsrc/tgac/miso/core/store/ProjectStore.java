@@ -50,6 +50,8 @@ public interface ProjectStore extends Store<Project> {
    */
   Project getByAlias(String alias) throws IOException;
 
+  Project getByShortName(String shortName) throws IOException;
+
   /**
    * Get a parent Project related to a Study given a Study ID
    * 
