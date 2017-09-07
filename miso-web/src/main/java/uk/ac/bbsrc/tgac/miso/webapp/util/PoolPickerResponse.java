@@ -7,9 +7,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -17,8 +14,6 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
 
 public class PoolPickerResponse {
-
-  private static final Logger log = LoggerFactory.getLogger(PoolPickerResponse.class);
 
   public static class PoolPickerEntry {
     private final List<PoolOrderCompletionDto> orders;
@@ -51,7 +46,7 @@ public class PoolPickerResponse {
     Consumer<String> errorHandler = message -> errors.add(message);
     
     Map<Long, List<PoolPickerEntry>> groupedByPool = source.list(errorHandler, 0, limit, sortOrder, sortColumn, filters)
-        .stream().map(WhineyFunction.log(log, transform)).collect(Collectors.groupingBy(entry -> entry.getPool().getId()));
+        .stream().map(WhineyFunction.rethrow(transform)).collect(Collectors.groupingBy(entry -> entry.getPool().getId()));
     items = groupedByPool.values().stream().map(listOfPicks -> {
       List<PoolOrderCompletionDto> completionsByPool = listOfPicks.stream().flatMap(pick -> pick.getOrders().stream())
           .collect(Collectors.toList());
