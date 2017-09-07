@@ -37,4 +37,9 @@ public class DefaultPoolOrderCompletionService implements PoolOrderCompletionSer
         x -> x.getPool());
   }
 
+  @Override
+  public List<PoolOrderCompletion> getByPoolId(Long poolId) throws IOException {
+    return authorizationManager.filterUnreadable(poolOrderCompletionDao.list(0, 100, false, "remaining", PaginationFilter.pool(poolId)),
+        x -> x.getPool());
+  }
 }

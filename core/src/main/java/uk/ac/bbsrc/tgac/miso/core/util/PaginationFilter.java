@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
+@SuppressWarnings("squid:S1604")
 public abstract interface PaginationFilter {
   public final static List<AgoMatcher> AGO_MATCHERS = Arrays.asList(new AgoMatcher("h(|ours?)", 3600),
       new AgoMatcher("d(|ays?)", 3600 * 24));
@@ -312,6 +313,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter readyToRun(boolean readyToRun) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByReadyToRun(item, readyToRun, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter sampleClass(String name) {
     return new PaginationFilter() {
 
@@ -328,6 +339,16 @@ public abstract interface PaginationFilter {
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationBySequencerId(item, id, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter sequencingParameters(long parametersId) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationBySequencingParametersId(item, parametersId, errorHandler);
       }
     };
   }
