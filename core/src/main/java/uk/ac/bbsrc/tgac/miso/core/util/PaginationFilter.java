@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
+@SuppressWarnings("squid:S1604")
 public abstract interface PaginationFilter {
   public final static List<AgoMatcher> AGO_MATCHERS = Arrays.asList(new AgoMatcher("h(|ours?)", 3600),
       new AgoMatcher("d(|ays?)", 3600 * 24));
