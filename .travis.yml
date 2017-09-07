@@ -44,3 +44,12 @@ cache:
   directories:
     - "$HOME/.sonar/cache"
     - "$HOME/.m2"
+
+notifications:
+  email: false
+  slack:
+    rooms:
+      secure: Op3cFjj8lw8y5I+Bh4Hq0yt4G9Rx2GNOuwo6onjHGRrlODIPvFE0GCD+aEWmB76qcH/Lq/9NRf86Ik2tWnQbBRrwkH7bcJjmK05DvRFP3gvqIMiReHKugdYcthMnI+ep2PX+tiUMt3OwLAT9F2tpmOjEm2oG6DRsJ45oN/iUpVo=
+    on_success: change
+    on_failure: always
+
