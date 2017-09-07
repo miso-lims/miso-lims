@@ -102,6 +102,13 @@ public class HibernateProjectDao implements ProjectStore {
   }
 
   @Override
+  public Project getByShortName(String shortName) throws IOException {
+    Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
+    criteria.add(Restrictions.eq("shortName", shortName));
+    return withWatcherGroup((Project) criteria.uniqueResult());
+  }
+
+  @Override
   public Project getByStudyId(long studyId) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
     criteria.createAlias("studies", "study");

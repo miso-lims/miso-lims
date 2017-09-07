@@ -146,12 +146,10 @@ INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_gro
 
 DELETE FROM `ProjectOverview`;
 DELETE FROM `Project`;
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
-VALUES (1,'2015-08-27 15:40:15','Test project','PRO1',1,'ACTIVE','TEST1','2015-08-27 19:40:40', 1);
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
-VALUES (2,'2013-11-27 12:20:15','Test project2','PRO2',1,'ACTIVE','TEST2','2015-11-30 15:23:18', 1);
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
-VALUES (3,'2016-01-27 11:11:15','Test project3','PRO3',1,'ACTIVE','TEST3','2016-02-22 10:43:18', 2);
+INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `shortName`, `lastUpdated`, `referenceGenomeId`) VALUES
+(1,'2015-08-27 15:40:15','Test project','PRO1',1,'ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1),
+(2,'2013-11-27 12:20:15','Test project2','PRO2',1,'ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1),
+(3,'2016-01-27 11:11:15','Test project3','PRO3',1,'ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2);
 
 INSERT INTO ProjectOverview(overviewId, principalInvestigator, startDate, project_projectId)
 VALUES

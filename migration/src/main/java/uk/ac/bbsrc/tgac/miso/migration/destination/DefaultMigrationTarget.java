@@ -182,21 +182,28 @@ public class DefaultMigrationTarget implements MigrationTarget {
     for (Project project : projects) {
       project.setSecurityProfile(new SecurityProfile(migrationUser));
       valueTypeLookup.resolveAll(project);
-      // Make sure there's a study
-      if (project.getStudies() == null) project.setStudies(new HashSet<Study>());
-      if (project.getStudies().isEmpty()) {
-        Study study = new StudyImpl();
-        study.setAlias((project.getShortName() == null ? project.getAlias() : project.getShortName()) + " study");
-        study.setDescription("");
-        study.setStudyType(other);
-        study.setLastModifier(migrationUser);
-        project.getStudies().add(study);
-      }
-      project.setId(serviceManager.getRequestManager().saveProject(project));
-      for (Study study : project.getStudies()) {
-        study.setProject(project);
-        study.inheritPermissions(project);
-        study.setId(serviceManager.getStudyService().save(study));
+      Project existing = serviceManager.getProjectDao().getByShortName(project.getShortName());
+      if (existing != null) {
+        project.setId(existing.getId());
+      } else {
+        // Make sure there's a study
+        if (project.getStudies() == null) project.setStudies(new HashSet<Study>());
+        if (project.getStudies().isEmpty()) {
+          Study study = new StudyImpl();
+          study.setAlias((project.getShortName() == null ? project.getAlias() : project.getShortName()) + " study");
+          study.setDescription("");
+          study.setStudyType(other);
+          study.setLastModifier(migrationUser);
+          project.getStudies().add(study);
+        }
+
+        project.setId(serviceManager.getRequestManager().saveProject(project));
+
+        for (Study study : project.getStudies()) {
+          study.setProject(project);
+          study.inheritPermissions(project);
+          study.setId(serviceManager.getStudyService().save(study));
+        }
       }
       log.debug("Saved project " + project.getAlias());
     }
