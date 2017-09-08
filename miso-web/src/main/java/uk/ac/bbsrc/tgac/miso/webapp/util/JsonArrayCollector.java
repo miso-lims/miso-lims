@@ -30,7 +30,19 @@ public class JsonArrayCollector implements Collector<java.lang.String, StringBui
 
   @Override
   public BinaryOperator<StringBuilder> combiner() {
-    return (primary, secondary) -> primary.append(secondary);
+    return (primary, secondary) -> {
+      if (primary.length() == 0 && secondary.length() == 0) {
+        return primary;
+      }
+      if (secondary.length() == 0) {
+        return primary;
+      }
+      if (primary.length() == 0) {
+        return secondary;
+      }
+      return primary.append(".concat(").append(secondary).append(")");
+    };
+
   }
 
   @Override
