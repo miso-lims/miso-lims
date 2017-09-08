@@ -51,4 +51,7 @@ done
 if [ -f "${NEXT}" ]
 then
 	git add "${NEXT}"
+	echo "Created migration ${NEXT}."
+else
+	echo "There were no migrations to compact."
 fi
