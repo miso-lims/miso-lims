@@ -373,7 +373,7 @@ HotTarget.library = (function() {
             trimDropdown : false,
             validator : HotUtils.validator.requiredAutocomplete,
             source : [ '' ],
-            include : true,
+            include : Constants.isDetailedSample,
             unpack : function(lib, flat, setCellMeta) {
               flat.kitDescriptorName = Utils.array.maybeGetProperty(Utils.array
                   .findFirstOrNull(
