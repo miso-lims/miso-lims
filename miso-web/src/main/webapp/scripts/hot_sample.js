@@ -17,6 +17,9 @@ HotTarget.sample = (function() {
    * IDs (of parent samples)
    */
   var getChildSampleClasses = function(sampleClasses) {
+    if (sampleClasses.length == 0) {
+      return [];
+    }
     return Constants.sampleClasses
         .filter(function(childClass) {
           return sampleClasses
