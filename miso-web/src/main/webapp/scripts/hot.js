@@ -767,9 +767,11 @@ var HotUtils = {
     baseobj.data = property;
     baseobj.type = 'text';
     baseobj.include = include;
-    baseobj.unpack = function(obj, flat, setCellMeta) {
-      flat[property] = obj[property] || null;
-    };
+    if (!baseobj.hasOwnProperty('unpack')) {
+      baseobj.unpack = function(obj, flat, setCellMeta) {
+        flat[property] = obj[property] || null;
+      };
+    }
     baseobj.pack = function(obj, flat, errorHandler) {
       if (!Utils.validation.isEmpty(flat[property])) {
         obj[property] = flat[property];

@@ -251,9 +251,16 @@ public class EditSampleController {
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
+  @Value("${miso.defaults.sample.bulk.scientificname:}")
+  private String defaultSciName;
 
   private Boolean isDetailedSampleEnabled() {
     return detailedSample;
+  }
+
+  @ModelAttribute("defaultSciName")
+  public String getDefaultSciName() {
+    return defaultSciName != null ? defaultSciName : "";
   }
 
   @ModelAttribute("stains")
@@ -981,6 +988,7 @@ public class EditSampleController {
       } else {
         config.putPOJO("project", Dtos.asDto(project));
       }
+      config.put("defaultSciName", defaultSciName);
     }
   };
 
