@@ -251,7 +251,7 @@ public class EditSampleController {
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
-  @Value("${miso.defaults.sample.bulk.scientificname}")
+  @Value("${miso.defaults.sample.bulk.scientificname:}")
   private String defaultSciName;
 
   private Boolean isDetailedSampleEnabled() {
