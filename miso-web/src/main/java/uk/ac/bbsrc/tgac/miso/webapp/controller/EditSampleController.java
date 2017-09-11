@@ -878,9 +878,13 @@ public class EditSampleController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      config.putPOJO("targetSampleClass", Dtos.asDto(sampleClass));
-      config.putPOJO("sourceSampleClass", Dtos.asDto(sampleClass));
-      config.put("dnaseTreatable", sampleClass.getDNAseTreatable());
+      if (sampleClass != null) {
+        config.putPOJO("targetSampleClass", Dtos.asDto(sampleClass));
+        config.putPOJO("sourceSampleClass", Dtos.asDto(sampleClass));
+        config.put("dnaseTreatable", sampleClass.getDNAseTreatable());
+      } else {
+        config.put("dnaseTreatable", false);
+      }
       config.put("propagate", false);
       config.put("edit", true);
     }
