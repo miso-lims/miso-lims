@@ -242,7 +242,7 @@
     </tr>
     <tr>
       <td class="h">Scientific Name:*</td>
-      <td><form:input id="scientificName" path="scientificName"/><span id="scientificNameCounter" class="counter"></span>
+      <td><form:input id="scientificName" path="scientificName" value="${sample.scientificName.length() > 0 ? sample.scientificName : defaultSciName}" /><span id="scientificNameCounter" class="counter"></span>
         <c:if test="${sessionScope.taxonLookupEnabled}">
         <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), Sample.validateNCBITaxon, 1000, 2);</script>
         </c:if>

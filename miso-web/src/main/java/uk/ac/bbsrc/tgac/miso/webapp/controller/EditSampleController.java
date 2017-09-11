@@ -258,6 +258,11 @@ public class EditSampleController {
     return detailedSample;
   }
 
+  @ModelAttribute("defaultSciName")
+  public String getDefaultSciName() {
+    return defaultSciName != null ? defaultSciName : "";
+  }
+
   @ModelAttribute("stains")
   public List<Stain> populateStains() {
     return stainService.list();
