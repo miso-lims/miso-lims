@@ -9,15 +9,15 @@
         <meta name="description" content="An open-source LIMS for NGS sequencing centres">
 
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="/css/syntax.css">
-        <link rel="stylesheet" href="/css/main.css">
+        <link rel="stylesheet" href="/miso-lims/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/css/main.css">
     </head>
     <body>
 <a href="https://github.com/TGAC/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
         <div class="container">
             <div class="row">
                 <div id="header" class="col-sm-12">
-                    <h2><a class="brand" href="/"><img src="/images/MISO.png"/>MISO</a>
+                    <h2><a class="brand" href="/miso-lims/"><img src="/miso-lims/images/MISO.png"/>MISO</a>
     <small>An open-source LIMS for NGS sequencing centres</small>
 </h2>
 
@@ -29,7 +29,7 @@
                 
                     <div id="navigation" class="col-sm-2">
                         <ul class="nav nav-list">
-    <!--<li><a href="/">Home</a></li>-->
+    <!--<li><a href="/miso-lims/">Home</a></li>-->
     
         
         
@@ -43,7 +43,7 @@
             
                 <li class="nav-header">User Guides</li>
             
-            <li data-order="1"><a href="/usr/user-manual.html">User Manual</a></li>
+            <li data-order="1"><a href="/miso-lims/usr/user-manual.html">User Manual</a></li>
         
     
         
@@ -53,10 +53,10 @@
             
                 <li class="nav-header">Admin Guides</li>
             
-            <li data-order=""><a href="/adm/external-webapp.html">Configuring the external webapp</a></li>
+            <li data-order=""><a href="/miso-lims/adm/external-webapp.html">Configuring the external webapp</a></li>
         
             
-            <li data-order=""><a href="/adm/admin-manual.html">Administrator's Manual</a></li>
+            <li data-order=""><a href="/miso-lims/adm/admin-manual.html">Administrator's Manual</a></li>
         
     
         
@@ -66,22 +66,22 @@
             
                 <li class="nav-header">Developer Guides</li>
             
-            <li data-order=""><a href="/dev/rest-testing.html">REST Testing</a></li>
+            <li data-order=""><a href="/miso-lims/dev/rest-testing.html">REST Testing</a></li>
         
             
-            <li data-order=""><a href="/dev/maven-artifacts.html">Maven artifacts</a></li>
+            <li data-order=""><a href="/miso-lims/dev/maven-artifacts.html">Maven artifacts</a></li>
         
             
-            <li data-order=""><a href="/dev/kit-tracking.html">Kit Tracking</a></li>
+            <li data-order=""><a href="/miso-lims/dev/kit-tracking.html">Kit Tracking</a></li>
         
             
-            <li data-order=""><a href="/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+            <li data-order=""><a href="/miso-lims/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
         
             
-            <li data-order=""><a href="/dev/code-style.html">Code Style</a></li>
+            <li data-order=""><a href="/miso-lims/dev/code-style.html">Code Style</a></li>
         
             
-            <li data-order=""><a href="/dev/developers-manual.html">Developer's Manual</a></li>
+            <li data-order=""><a href="/miso-lims/dev/developers-manual.html">Developer's Manual</a></li>
         
     
         
@@ -91,7 +91,7 @@
             
                 <li class="nav-header">Reference</li>
             
-            <li data-order=""><a href="/ref/rest-api.html">REST API</a></li>
+            <li data-order=""><a href="/miso-lims/ref/rest-api.html">REST API</a></li>
         
     
         
@@ -217,7 +217,7 @@
 
 <h2 id="project">Project</h2>
 
-<p>A MISO project is a collection of studies, samples, and libraries. Each project has a <em>prefix</em> and an <em>ID</em>. The project ID becomes the suffix of the project’s name_,_ e.g. <strong>PRO1, PRO2</strong>. The project name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any project is **<a href="http://your.miso.host/miso/project/">http://your.miso.host/miso/project/</a><project_id>**.</project_id></p>
+<p>A MISO project is a collection of studies, samples, and libraries. Each project has a <em>prefix</em> and an <em>ID</em>. The project ID becomes the suffix of the project’s name_,_ e.g. <strong>PRO1, PRO2</strong>. The project name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any project is **<a href="http://your.miso.host/miso/project/">http://your.miso.host/miso/project/</a><project_ID>**.</project_ID></p>
 
 <h3 id="creating-a-project">Creating a project</h3>
 
@@ -251,10 +251,10 @@
 </ul>
 
 <h3 id="adding-a-study">Adding a study</h3>
-<p>You will need to create a single study for your project in order to make MISO happy.<br />
-* On the Project page, click on the Studies section divider to expand it.<br />
-* Hover over the Options menu and click Add new Study.<br />
-* Enter study details: alias, description, study type. Click <strong>Save</strong> in top right corner.<br />
+<p>You will need to create a single study for your project in order to make MISO happy.
+* On the Project page, click on the Studies section divider to expand it.
+* Hover over the Options menu and click Add new Study.
+* Enter study details: alias, description, study type. Click <strong>Save</strong> in top right corner.
 * Click on project alias at top left of Edit Study page.</p>
 
 <h3 id="adding-a-project-overview">Adding a Project Overview</h3>

@@ -9,15 +9,15 @@
         <meta name="description" content="An open-source LIMS for NGS sequencing centres">
 
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="/css/syntax.css">
-        <link rel="stylesheet" href="/css/main.css">
+        <link rel="stylesheet" href="/miso-lims/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/css/main.css">
     </head>
     <body>
 <a href="https://github.com/TGAC/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
         <div class="container">
             <div class="row">
                 <div id="header" class="col-sm-12">
-                    <h2><a class="brand" href="/"><img src="/images/MISO.png"/>MISO</a>
+                    <h2><a class="brand" href="/miso-lims/"><img src="/miso-lims/images/MISO.png"/>MISO</a>
     <small>An open-source LIMS for NGS sequencing centres</small>
 </h2>
 
@@ -29,7 +29,7 @@
                 
                     <div id="navigation" class="col-sm-2">
                         <ul class="nav nav-list">
-    <!--<li><a href="/">Home</a></li>-->
+    <!--<li><a href="/miso-lims/">Home</a></li>-->
     
         
         
@@ -43,7 +43,7 @@
             
                 <li class="nav-header">User Guides</li>
             
-            <li data-order="1"><a href="/usr/user-manual.html">User Manual</a></li>
+            <li data-order="1"><a href="/miso-lims/usr/user-manual.html">User Manual</a></li>
         
     
         
@@ -53,10 +53,10 @@
             
                 <li class="nav-header">Admin Guides</li>
             
-            <li data-order=""><a href="/adm/external-webapp.html">Configuring the external webapp</a></li>
+            <li data-order=""><a href="/miso-lims/adm/external-webapp.html">Configuring the external webapp</a></li>
         
             
-            <li data-order=""><a href="/adm/admin-manual.html">Administrator's Manual</a></li>
+            <li data-order=""><a href="/miso-lims/adm/admin-manual.html">Administrator's Manual</a></li>
         
     
         
@@ -66,22 +66,22 @@
             
                 <li class="nav-header">Developer Guides</li>
             
-            <li data-order=""><a href="/dev/rest-testing.html">REST Testing</a></li>
+            <li data-order=""><a href="/miso-lims/dev/rest-testing.html">REST Testing</a></li>
         
             
-            <li data-order=""><a href="/dev/maven-artifacts.html">Maven artifacts</a></li>
+            <li data-order=""><a href="/miso-lims/dev/maven-artifacts.html">Maven artifacts</a></li>
         
             
-            <li data-order=""><a href="/dev/kit-tracking.html">Kit Tracking</a></li>
+            <li data-order=""><a href="/miso-lims/dev/kit-tracking.html">Kit Tracking</a></li>
         
             
-            <li data-order=""><a href="/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+            <li data-order=""><a href="/miso-lims/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
         
             
-            <li data-order=""><a href="/dev/code-style.html">Code Style</a></li>
+            <li data-order=""><a href="/miso-lims/dev/code-style.html">Code Style</a></li>
         
             
-            <li data-order=""><a href="/dev/developers-manual.html">Developer's Manual</a></li>
+            <li data-order=""><a href="/miso-lims/dev/developers-manual.html">Developer's Manual</a></li>
         
     
         
@@ -91,7 +91,7 @@
             
                 <li class="nav-header">Reference</li>
             
-            <li data-order=""><a href="/ref/rest-api.html">REST API</a></li>
+            <li data-order=""><a href="/miso-lims/ref/rest-api.html">REST API</a></li>
         
     
         
@@ -113,18 +113,18 @@
 </div>
 
 <h1 id="running-a-miso-instance">Running a MISO Instance</h1>
-<p>MISO requires some configuration directly in the source code. While we plan to<br />
-change this over time, running an instance of MISO will require building and<br />
+<p>MISO requires some configuration directly in the source code. While we plan to
+change this over time, running an instance of MISO will require building and
 deploying a fork of the code base with customisations.</p>
 
 <h1 id="prerequisites">Prerequisites</h1>
-<p>For each service, which may be put on the same machine, the following tools are<br />
+<p>For each service, which may be put on the same machine, the following tools are
 required:</p>
 
 <p>All:</p>
 
 <ul>
-  <li>JDK 7</li>
+  <li>JDK 8</li>
 </ul>
 
 <p>Application Server:</p>
@@ -136,7 +136,7 @@ required:</p>
 <p>Database Server:</p>
 
 <ul>
-  <li>mySQL 5</li>
+  <li>MySQL 5.7</li>
   <li>Flyway</li>
 </ul>
 
@@ -161,19 +161,19 @@ required:</p>
 <p>Proceed to set up a build environment.</p>
 
 <h1 id="setting-up-the-build-environment">Setting Up the Build Environment</h1>
-<p>One or more machines should be set up to build MISO. A typical Linux system will<br />
+<p>One or more machines should be set up to build MISO. A typical Linux system will
 work.</p>
 
 <p>You will need:</p>
 
 <ul>
-  <li>JDK 7.0</li>
+  <li>JDK 8.0</li>
   <li><a href="http://maven.apache.org/download.html">Maven 3.0.5</a> or later</li>
   <li>Git</li>
 </ul>
 
-<p>For development purposes, Eclipse is recommended and it might be useful to set<br />
-up the server environments for testing. There is an automatic code formatting<br />
+<p>For development purposes, Eclipse is recommended and it might be useful to set
+up the server environments for testing. There is an automatic code formatting
 configuration available for Eclipse.</p>
 
 <p>Locally, create a checkout:</p>
@@ -183,12 +183,12 @@ git remote add tgac git@github.com:TGAC/miso-lims.git
 </code></pre>
 
 <h1 id="setting-up-the-database-server">Setting Up the Database Server</h1>
-<p>The database server needs to have <a href="https://www.mysql.com/">MySQL 5</a>. The tool<br />
-<a href="https://flywaydb.org/">Flyway</a> must also be present to migrate the database as<br />
-the application is developed, but it can be installed on a different server so<br />
+<p>The database server needs to have <a href="https://www.mysql.com/">MySQL 5.7</a>. The tool
+<a href="https://flywaydb.org/">Flyway</a> must also be present to migrate the database as
+the application is developed, but it can be installed on a different server so
 long as it can access the database server.</p>
 
-<p>The default password in the following <code>IDENTIFIED BY</code> clauses should be<br />
+<p>The default password in the following <code>IDENTIFIED BY</code> clauses should be
 changed.</p>
 
 <p>Once installed, start the MySQL console and create the database:</p>
@@ -203,7 +203,7 @@ USE lims;
 GRANT ALL ON `lims`.* TO 'tgaclims'@'localhost' IDENTIFIED BY 'tgaclims';
 </code></pre>
 
-<p>If your database and Tomcat install are on different machines, then you will<br />
+<p>If your database and Tomcat install are on different machines, then you will
 need to add a grant privilege to the MISO database from your remote machine:</p>
 
 <pre><code>GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server';
@@ -215,8 +215,8 @@ GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server' IDENTIFIED BY '
 <h1 id="setting-up-the-application-server">Setting Up the Application Server</h1>
 <p>The application server needs <a href="https://tomcat.apache.org/download-80.cgi">Tomcat 8</a>.</p>
 
-<p>Create a file called <code>ROOT.xml</code> in the following directory<br />
-<code>$CATALINA_HOME/conf/Catalina/localhost</code>, creating the directory if necessary,<br />
+<p>Create a file called <code>ROOT.xml</code> in the following directory
+<code>$CATALINA_HOME/conf/Catalina/localhost</code>, creating the directory if necessary,
 and populate it with the following information:</p>
 
 <pre><code>&lt;Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT" debug="1"&gt;
@@ -236,7 +236,7 @@ and populate it with the following information:</p>
   url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;amp;zeroDateTimeBehavior=convertToNull&amp;amp;useUnicode=true&amp;amp;characterEncoding=UTF-8"
   username="tgaclims"
   password="tgaclims"/&gt;
-  &lt;Parameter name="miso.propertiesFile" value="file:${CATALINA_HOME}/conf/Catalina/localhost/miso.properties" override="false"/&gt;
+  &lt;Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/&gt;
   &lt;Parameter name="miso.name" value="Test"/&gt;
 &lt;/Context&gt;
 </code></pre>
@@ -246,31 +246,28 @@ and populate it with the following information:</p>
 <pre><code>url="jdbc:mysql://your.database.server:3306/lims"
 </code></pre>
 
-<p>Also, set the <code>miso.name</code> parameter to something to help distinguish testing<br />
+<p>Also, set the <code>miso.name</code> parameter to something to help distinguish testing
 and production copies of MISO.</p>
 
-<p>If your Tomcat install has the <code>autoDeploy="true"</code> flag set in <code>server.xml</code>, if<br />
-you delete the <code>webapps/ROOT</code> directory and the <code>ROOT.war</code> file, Tomcat will<br />
-delete the context <code>ROOT.xml</code> file. Either set autoDeploy to false, and<br />
-manually deploy your webapp, or make the <code>ROOT.xml</code> file undeletable by using<br />
-<code>chattr +i</code> (<code>chattr -i</code> will undo this operation). <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=40050">Upstream<br />
+<p>If your Tomcat install has the <code>autoDeploy="true"</code> flag set in <code>server.xml</code>, if
+you delete the <code>webapps/ROOT</code> directory and the <code>ROOT.war</code> file, Tomcat will
+delete the context <code>ROOT.xml</code> file. Either set autoDeploy to false, and
+manually deploy your webapp, or make the <code>ROOT.xml</code> file undeletable by using
+<code>chattr +i</code> (<code>chattr -i</code> will undo this operation). <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=40050">Upstream
 bug</a></p>
 
-<p>Copy <code>$MISO_SRC/miso-web/src/main/resources/external/miso.properties</code> to<br />
-<code>${CATALINA_HOME}/conf/Catalina/localhost/miso.properties</code>. Review and edit<br />
+<p>Copy <code>$MISO_SRC/miso-web/src/main/resources/external/miso.properties</code> to
+<code>${CATALINA_HOME}/conf/Catalina/localhost/miso.properties</code>. Review and edit
 this file as appropriate.</p>
 
 <ul>
-  <li>The naming schemes will determine how MISO checks if object names (especially<br />
-samples, libraries) are valid. If you do not want to use one of the supplied<br />
-ones (TGAC’s standard, OICR’s standard, or no checks), you will have to write<br />
-one or more specific to your organisation. See Naming Schemes below for more<br />
+  <li>The naming schemes will determine how MISO checks if object names (especially
+samples, libraries) are valid. If you do not want to use one of the supplied
+ones (TGAC’s standard, OICR’s standard, or no checks), you will have to write
+one or more specific to your organisation. See Naming Schemes below for more
 information.</li>
-  <li>If using a notification server, change <code>miso.notification.interop.enabled</code><br />
-to <code>true</code> and change the host and port for your notification server<br />
- (see Setting Up the Notification Server below).</li>
-  <li>If using a bulk barcode scanner (only VisionMate is supported at present), <br />
-set <code>miso.boxscanner.enabled</code> to <code>true</code> and change the host and port for your<br />
+  <li>If using a bulk barcode scanner (only VisionMate is supported at present), 
+set <code>miso.boxscanner.enabled</code> to <code>true</code> and change the host and port for your
 VisionMate server.</li>
 </ul>
 
@@ -288,7 +285,7 @@ curl -O https://repos.tgac.ac.uk/miso/common/jndi-file-factory-1.0.jar
 
 <p>Create the directory <code>/storage/miso</code> and download the default MISO configuration files.</p>
 
-  	cd /storage/miso<br />
+  	cd /storage/miso
 <pre><code>curl https://repos.tgac.ac.uk/miso/latest/miso_userspace_properties.tar.gz | tar xvfz -
 </code></pre>
 
@@ -322,20 +319,19 @@ curl -O https://repos.tgac.ac.uk/miso/common/jndi-file-factory-1.0.jar
 </table>
 
 <h2 id="security-environment">Security Environment</h2>
-<p>MISO can use either LDAP or JDBC as an authentication mechanism. The mechanism<br />
-is set in both <code>/storage/miso/security.properties</code> and the<br />
-<code>$CATALINA_HOME/bin/setenv.sh</code> or <code>/etc/default/tomcat8</code> files and both must be<br />
-the same.</p>
+<p>MISO can use either LDAP (<code>ldap</code>), Active Directory LDAP (<code>ad</code>), or JDBC
+(<code>jdbc</code>) as an authentication mechanism. This is set by the <code>-Dsecurity.method</code>
+noted in the previous section.</p>
 
-<p>If you are using JDBC (aka storing usernames and passwords in the database), set the <br />
-security method to <code>jdbc</code>.<br />
+<p>If you are using JDBC (aka storing usernames and passwords in the database), set the 
+security method to <code>jdbc</code>.
 The default configuration should work properly.</p>
 
-<p>For using LDAP, set the security method to <code>ldap</code>. Additional settings are<br />
+<p>For using LDAP, set the security method to <code>ldap</code>. Additional settings are
 needed for LDAP in the <code>security.properties</code>. Talk to your LDAP administrator.</p>
 
-<p>To use Active Directory, a specific kind of LDAP, set the security method to<br />
-<code>ad</code>. Three additional settings are needed for Active Directory in the <br />
+<p>To use Active Directory, a specific kind of LDAP, set the security method to
+<code>ad</code>. Three additional settings are needed for Active Directory in the 
 <code>security.properties</code> file.</p>
 
 <table>
@@ -361,32 +357,32 @@ needed for LDAP in the <code>security.properties</code>. Talk to your LDAP admin
   </tbody>
 </table>
 
-<p>The search for a user is done against <code>userPrincipalName</code> which takes the form of<br />
-an email address. To login the user will type their username and to do the lookup<br />
-their username will be added to the domain specified in the property<br />
+<p>The search for a user is done against <code>userPrincipalName</code> which takes the form of
+an email address. To login the user will type their username and to do the lookup
+their username will be added to the domain specified in the property
 <code>security.ad.emailDomain</code>.</p>
 
-<p>Use the <code>security.ad.url</code> property to indicate the url for the Active Directory.<br />
-Some valid examples are: <code>ad.oicr.on.ca</code>, <code>ldap://ad.oicr.on.ca:389</code> and<br />
+<p>Use the <code>security.ad.url</code> property to indicate the url for the Active Directory.
+Some valid examples are: <code>ad.oicr.on.ca</code>, <code>ldap://ad.oicr.on.ca:389</code> and
 <code>ldaps://ad.oicr.on.ca:636</code>.</p>
 
-<p>The groups used by MISO are <code>ROLE_INTERNAL</code> for regular users, <code>ROLE_EXTERNAL</code> for<br />
-external collaborators and <code>ROLE_ADMIN</code> for administrators. If you find these names<br />
-too general you may wish to add a prefix before adding these groups to your Active<br />
-Directory. For example <code>MISO_ROLE_INTERNAL</code> gives a clearer indication as to what <br />
-the group is used for. In this case you will need to set the property<br />
-<code>security.ad.stripRolePrefix</code> to the value <code>MISO_</code> to allow MISO to ignore the<br />
+<p>The groups used by MISO are <code>ROLE_INTERNAL</code> for regular users, <code>ROLE_EXTERNAL</code> for
+external collaborators and <code>ROLE_ADMIN</code> for administrators. If you find these names
+too general you may wish to add a prefix before adding these groups to your Active
+Directory. For example <code>MISO_ROLE_INTERNAL</code> gives a clearer indication as to what 
+the group is used for. In this case you will need to set the property
+<code>security.ad.stripRolePrefix</code> to the value <code>MISO_</code> to allow MISO to ignore the
 prefix.</p>
 
-<p>If using JDBC, once running, you should change the passwords of the <code>admin</code> and<br />
+<p>If using JDBC, once running, you should change the passwords of the <code>admin</code> and
 <code>notification</code> accounts.</p>
 
 <h2 id="naming-schemes">Naming Schemes</h2>
-<p>MISO Naming Schemes are used to validate and generate entity String fields. They are<br />
-used for all <code>name</code> fields, and some <code>alias</code> fields. You may configure a base naming<br />
+<p>MISO Naming Schemes are used to validate and generate entity String fields. They are
+used for all <code>name</code> fields, and some <code>alias</code> fields. You may configure a base naming
 scheme, and customize it by switching validators and generators in <code>miso.properties</code>.</p>
 
-<p>The options for <code>miso.naming.scheme</code> are <code>default</code> and <code>oicr</code>, which have these<br />
+<p>The options for <code>miso.naming.scheme</code> are <code>default</code> and <code>oicr</code>, which have these
 default configurations:</p>
 
 <table>
@@ -421,7 +417,7 @@ default configurations:</p>
     <tr>
       <td>Library Alias Generator</td>
       <td>DefaultLibraryAliasGenerator</td>
-      <td>none</td>
+      <td>OicrLibraryAliasGenerator</td>
     </tr>
     <tr>
       <td>Library Alias Validator</td>
@@ -441,17 +437,19 @@ default configurations:</p>
   </tbody>
 </table>
 
-<p>If the naming scheme you’ve selected has configurable components, you may configure them<br />
+<p>If the naming scheme you’ve selected has configurable components, you may configure them
 as follows.</p>
 
 <h3 id="misonaminggeneratornameablename"><code>miso.naming.generator.nameable.name</code></h3>
 
 <table>
-  <tbody>
+  <thead>
     <tr>
-      <td>Option</td>
-      <td>Example</td>
+      <th>Option</th>
+      <th>Example</th>
     </tr>
+  </thead>
+  <tbody>
     <tr>
       <td>default</td>
       <td>SAM1</td>
@@ -466,12 +464,14 @@ as follows.</p>
 <h3 id="misonaminggeneratorsamplealias"><code>miso.naming.generator.sample.alias</code></h3>
 
 <table>
-  <tbody>
+  <thead>
     <tr>
-      <td>Option</td>
-      <td>Example</td>
-      <td>Note</td>
+      <th>Option</th>
+      <th>Example</th>
+      <th>Note</th>
     </tr>
+  </thead>
+  <tbody>
     <tr>
       <td>oicr</td>
       <td>PROJ_0001_Ad_P_nn_1-1</td>
@@ -483,12 +483,14 @@ as follows.</p>
 <h3 id="misonaminggeneratorlibraryalias"><code>miso.naming.generator.library.alias</code></h3>
 
 <table>
-  <tbody>
+  <thead>
     <tr>
-      <td>Option</td>
-      <td>Example</td>
-      <td>Note</td>
+      <th>Option</th>
+      <th>Example</th>
+      <th>Note</th>
     </tr>
+  </thead>
+  <tbody>
     <tr>
       <td>default</td>
       <td>XX_LYY-1</td>
@@ -497,7 +499,7 @@ as follows.</p>
     <tr>
       <td>oicr</td>
       <td>PROJ_0001_Ad_P_PE_300_WG</td>
-      <td>for use with DetailedSample only. depends on sample alias passing oicr validator</td>
+      <td>For use with DetailedSample only. Depends on sample alias passing oicr validator</td>
     </tr>
   </tbody>
 </table>
@@ -505,15 +507,17 @@ as follows.</p>
 <h3 id="misonamingvalidatornameablename"><code>miso.naming.validator.nameable.name</code></h3>
 
 <table>
-  <tbody>
+  <thead>
     <tr>
-      <td>Option</td>
-      <td>Detail</td>
-      <td>Allow null</td>
-      <td>Allow duplicates</td>
-      <td>Custom Regex</td>
-      <td>Custom Duplication</td>
+      <th>Option</th>
+      <th>Detail</th>
+      <th>Allow null</th>
+      <th>Allow duplicates</th>
+      <th>Custom Regex</th>
+      <th>Custom Duplication</th>
     </tr>
+  </thead>
+  <tbody>
     <tr>
       <td>default</td>
       <td>Matches ‘default’ generator, or custom regex</td>
@@ -525,7 +529,7 @@ as follows.</p>
     <tr>
       <td>allowany</td>
       <td>Only checks that the name is not null</td>
-      <td>yes</td>
+      <td>no</td>
       <td>yes</td>
       <td>no</td>
       <td>no</td>
@@ -536,15 +540,17 @@ as follows.</p>
 <h3 id="misonamingvalidatorsamplealias"><code>miso.naming.validator.sample.alias</code></h3>
 
 <table>
-  <tbody>
+  <thead>
     <tr>
-      <td>Option</td>
-      <td>Detail</td>
-      <td>Allow null</td>
-      <td>Allow duplicates</td>
-      <td>Custom Regex</td>
-      <td>Custom Duplication</td>
+      <th>Option</th>
+      <th>Detail</th>
+      <th>Allow null</th>
+      <th>Allow duplicates</th>
+      <th>Custom Regex</th>
+      <th>Custom Duplication</th>
     </tr>
+  </thead>
+  <tbody>
     <tr>
       <td>default</td>
       <td>Default regex: <code>([A-z0-9]+)_S([A-z0-9]+)_(.*)</code></td>
@@ -556,7 +562,7 @@ as follows.</p>
     <tr>
       <td>allowany</td>
       <td>Only checks that the alias is not null</td>
-      <td>yes</td>
+      <td>no</td>
       <td>yes</td>
       <td>no</td>
       <td>no</td>
@@ -575,15 +581,17 @@ as follows.</p>
 <h3 id="misonamingvalidatorlibraryalias"><code>miso.naming.validator.library.alias</code></h3>
 
 <table>
-  <tbody>
+  <thead>
     <tr>
-      <td>Option</td>
-      <td>Detail</td>
-      <td>Allow null</td>
-      <td>Allow duplicates</td>
-      <td>Custom Regex</td>
-      <td>Custom Duplication</td>
+      <th>Option</th>
+      <th>Detail</th>
+      <th>Allow null</th>
+      <th>Allow duplicates</th>
+      <th>Custom Regex</th>
+      <th>Custom Duplication</th>
     </tr>
+  </thead>
+  <tbody>
     <tr>
       <td>default</td>
       <td>Matches ‘default’ generator</td>
@@ -595,7 +603,7 @@ as follows.</p>
     <tr>
       <td>allowany</td>
       <td>Only checks that the alias is not null</td>
-      <td>yes</td>
+      <td>no</td>
       <td>yes</td>
       <td>no</td>
       <td>no</td>
@@ -614,15 +622,17 @@ as follows.</p>
 <h3 id="misonamingvalidatorprojectshortname"><code>miso.naming.validator.project.shortName</code></h3>
 
 <table>
-  <tbody>
+  <thead>
     <tr>
-      <td>Option</td>
-      <td>Detail</td>
-      <td>Allow null</td>
-      <td>Allow duplicates</td>
-      <td>Custom Regex</td>
-      <td>Custom Duplication</td>
+      <th>Option</th>
+      <th>Detail</th>
+      <th>Allow null</th>
+      <th>Allow duplicates</th>
+      <th>Custom Regex</th>
+      <th>Custom Duplication</th>
     </tr>
+  </thead>
+  <tbody>
     <tr>
       <td>allowany</td>
       <td>Optional field, no format specified</td>
@@ -642,14 +652,14 @@ as follows.</p>
   </tbody>
 </table>
 
-<p>If a validator accepts custom regex, it can be configured via <code>&lt;base property&gt;.regex</code>.<br />
-e.g. <code>miso.naming.validator.nameable.name.regex:.*</code> to allow any name. A custom validator<br />
-must be specified for this property to be enabled - the naming scheme’s default validator<br />
+<p>If a validator accepts custom regex, it can be configured via <code>&lt;base property&gt;.regex</code>.
+e.g. <code>miso.naming.validator.nameable.name.regex:.*</code> to allow any name. A custom validator
+must be specified for this property to be enabled - the naming scheme’s default validator
 will not be altered.</p>
 
-<p>If a validator accepts custom duplication, that can be configured via<br />
-<code>&lt;base property&gt;.duplicates</code>. e.g. <code>miso.naming.validator.library.alias.duplicates:true</code><br />
-to allow duplicate library aliases. A custom validator must be specified for this<br />
+<p>If a validator accepts custom duplication, that can be configured via
+<code>&lt;base property&gt;.duplicates</code>. e.g. <code>miso.naming.validator.library.alias.duplicates:true</code>
+to allow duplicate library aliases. A custom validator must be specified for this
 property to be enabled - the naming scheme’s default validator will not be altered.</p>
 
 <p>Existing naming schemes:</p>
@@ -680,7 +690,7 @@ property to be enabled - the naming scheme’s default validator will not be alt
       <td>DefaultSampleNamingScheme</td>
       <td>Samples</td>
       <td>None built in</td>
-      <td>TGAC’s standard</td>
+      <td>TGAC/EI’s standard</td>
     </tr>
     <tr>
       <td>OicrSampleNamingScheme</td>
@@ -705,16 +715,16 @@ property to be enabled - the naming scheme’s default validator will not be alt
 
 <p>A Sample alias generator may also be configured via <code>miso.naming.generator.sample.alias</code></p>
 
-<p>The values used in these options refer to classes in the <code>uk.ac.bbsrc.tgac.miso.core.service.naming</code><br />
-Java package. To create a new naming scheme option, create a new class in this package that extends <br />
-<code>MisoNamingScheme&lt;T&gt;</code>. To create a new Sample alias generator, extend <code>NameGenerator&lt;Sample&gt;</code>.<br />
-Extending the functionality to validate and/or generate additional fields is possible, but will<br />
+<p>The values used in these options refer to classes in the <code>uk.ac.bbsrc.tgac.miso.core.service.naming</code>
+Java package. To create a new naming scheme option, create a new class in this package that extends 
+<code>MisoNamingScheme&lt;T&gt;</code>. To create a new Sample alias generator, extend <code>NameGenerator&lt;Sample&gt;</code>.
+Extending the functionality to validate and/or generate additional fields is possible, but will
 require modifications at the Service layer as well.</p>
 
 <h1 id="setting-up-the-notification-server">Setting Up the Notification Server</h1>
-<p>The notification server is a Java daemon that scans the paths containing<br />
-sequencer output. It is not required for a functioning MISO install, but<br />
-without it, sequencer runs must be added manually. Configuration for<br />
+<p>The notification server is a Java daemon that scans the paths containing
+sequencer output. It is not required for a functioning MISO install, but
+without it, sequencer runs must be added manually. Configuration for
 <code>systemd</code>-based Linux systems is provided here.</p>
 
 <p>Create the default configuration:</p>
@@ -738,8 +748,8 @@ sudo systemctl enable miso-notification.service
 sudo systemctl start miso-notification.service
 </code></pre>
 
-<p>The service should start up. You can inspect <code>stdout</code> in<br />
-<code>/srv/notification-server/notification/notification.log</code> file, and <code>stderr</code> by<br />
+<p>The service should start up. You can inspect <code>stdout</code> in
+<code>/srv/notification-server/notification/notification.log</code> file, and <code>stderr</code> by
 <code>sudo journalctl -f -u miso-notification</code>.</p>
 
 <h1 id="building-the-applicaton">Building the Applicaton</h1>
@@ -777,7 +787,7 @@ sudo systemctl start miso-notification.service
 <pre><code>cd ${FLYWAY}
 rm -f lib/sqlstore-*.jar
 unzip -xjo $CATALINA_HOME/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d lib
-./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration migrate
+./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate
 </code></pre>
 
 <h1 id="building-the-docker-image">Building the Docker image</h1>
