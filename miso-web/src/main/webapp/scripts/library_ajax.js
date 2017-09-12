@@ -126,203 +126,6 @@ var Library = Library || {
 
 };
 
-Library.qc = {
-  insertLibraryQCRow: function (libraryId, includeId) {
-    if (!jQuery('#libraryQcTable').attr("qcInProgress")) {
-      jQuery('#libraryQcTable').attr("qcInProgress", "true");
-
-      jQuery('#libraryQcTable')[0].insertRow(1);
-      //QCId  QCed By  	QC Date  	Method  	Results
-
-      if (includeId) {
-        var column1 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
-        column1.innerHTML = "<input type='hidden' id='libraryId' name='libraryId' value='" + libraryId + "'/>";
-      }
-      var column2 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
-      column2.innerHTML = "<input id='libraryQcUser' name='libraryQcUser' type='hidden' value='" + jQuery('#currentUser')[0].innerHTML + "'/>" + jQuery('#currentUser')[0].innerHTML;
-      var column3 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='libraryQcDate' name='libraryQcDate' type='text'/>";
-      var column4 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
-      column4.innerHTML = "<select id='libraryQcType' name='libraryQcType' onchange='Library.qc.changeLibraryQcUnits(this);'/>";
-      var column5 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
-      column5.innerHTML = "<input id='libraryQcResults' name='libraryQcResults' type='text'/><span id='units'/>";
-      var column6 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
-      column6.innerHTML = "<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/>Add</a>";
-
-      jQuery("#libraryQcDate").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
-      Utils.ui.addMaxDatePicker("libraryQcDate", 0);
-
-      Fluxion.doAjax(
-        'libraryControllerHelperService',
-        'getLibraryQcTypes',
-        {
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': function (json) {
-            jQuery('#libraryQcType').html(json.types);
-            jQuery('#units').html(jQuery('#libraryQcType option:first').attr("units"));
-          }
-        }
-      );
-    }
-    else {
-      alert("Cannot add another QC when one is already in progress.");
-    }
-  },
-
-  changeLibraryQcUnits: function () {
-    jQuery('#units').html(jQuery('#libraryQcType').find(":selected").attr("units"));
-  },
-
-  addLibraryQC: function () {
-    var f = Utils.mappifyForm("addQcForm");
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'addLibraryQC',
-      {
-        'libraryId': f.id,
-        'qcCreator': f.libraryQcUser,
-        'qcDate': f.libraryQcDate,
-        'qcType': f.libraryQcType,
-        'results': f.libraryQcResults,
-        'url': ajaxurl
-      },
-      {
-        'updateElement': 'libraryQcTable',
-        'doOnSuccess': function () {
-          jQuery('#libraryQcTable').removeAttr("qcInProgress");
-        }
-      }
-    );
-  },
-
-  changeLibraryQCRow: function (qcId, libraryId) {
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'changeLibraryQCRow',
-      {
-        'libraryId': libraryId,
-        'qcId': qcId,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#result' + qcId).html(json.results);
-          jQuery('#insert' + qcId).html(json.insertSize);
-          jQuery('#edit' + qcId).html(json.edit);
-        }
-      }
-    );
-  },
-
-  editLibraryQC: function (qcId, libraryId) {
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'editLibraryQC',
-      {
-        'libraryId': libraryId,
-        'qcId': qcId,
-        'result': jQuery('#results' + qcId).val(),
-        'insertSize': jQuery('#insertSize' + qcId).val(),
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': Utils.page.pageReload
-      }
-    );
-  }
-};
-
-Library.barcode = {
-  editLibraryBarcode: function(span, id) {
-    var v = span.find('a').text();
-    if (v && v !== "") {
-      span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");
-    }
-  },
-
-  showLibraryIdBarcodeChangeDialog: function (libraryId, libraryIdBarcode) {
-    var self = this;
-    jQuery('#changeLibraryIdBarcodeDialog')
-      .html("<form>" +
-            "<fieldset class='dialog'>" +
-            "<strong><label>Current Barcode: </label></strong>" + libraryIdBarcode +
-            "<br /><strong><label for='notetext'>New Barcode:</label></strong>" +
-            "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
-            "</fieldset></form>");
-
-    jQuery('#changeLibraryIdBarcodeDialog').dialog({
-      width: 400,
-      modal: true,
-      resizable: false,
-      buttons: {
-        "Save": function () {
-          self.changeLibraryIdBarcode(libraryId, jQuery('#idBarcodeInput').val());
-          jQuery(this).dialog('close');
-        },
-        "Cancel": function () {
-          jQuery(this).dialog('close');
-        }
-      }
-    });
-  },
-
-  changeLibraryIdBarcode: function (libraryId, idBarcode) {
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'changeLibraryIdBarcode',
-      {
-        'libraryId': libraryId,
-        'identificationBarcode': idBarcode,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': Utils.page.pageReload
-      }
-    );
-  },
-
-  showLibraryLocationChangeDialog: function (libraryId) {
-    var self = this;
-    jQuery('#changeLibraryLocationDialog')
-      .html("<form>" +
-            "<fieldset class='dialog'>" +
-            "<label for='notetext'>New Location:</label>" +
-            "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
-            "</fieldset></form>");
-
-    jQuery('#changeLibraryLocationDialog').dialog({
-      width: 400,
-      modal: true,
-      resizable: false,
-      buttons: {
-        "Save": function () {
-          self.changeLibraryLocation(libraryId, jQuery('#locationBarcodeInput').val());
-          jQuery(this).dialog('close');
-        },
-        "Cancel": function () {
-          jQuery(this).dialog('close');
-        }
-      }
-    });
-  },
-
-  changeLibraryLocation: function (libraryId, barcode) {
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'changeLibraryLocation',
-      {
-        'libraryId': libraryId,
-        'locationBarcode': barcode,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': Utils.page.pageReload
-      }
-    );
-  }
-};
 
 Library.ui = {
   updateConcentrationUnits: function() {
@@ -615,7 +418,7 @@ Library.ui = {
 
   showLibraryNoteDialog: function (libraryId) {
     var self = this;
-    jQuery('#addLibraryNoteDialog')
+    jQuery('#addNoteDialog')
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='internalOnly'>Internal Only?</label>" +
@@ -625,7 +428,7 @@ Library.ui = {
             "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />" +
             "</fieldset></form>");
 
-    jQuery('#addLibraryNoteDialog').dialog({
+    jQuery('#addNoteDialog').dialog({
       width: 400,
       modal: true,
       resizable: false,

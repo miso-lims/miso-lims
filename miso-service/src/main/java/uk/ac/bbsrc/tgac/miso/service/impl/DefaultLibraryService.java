@@ -32,20 +32,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -77,8 +73,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   @Autowired
   private LibraryDesignCodeService libraryDesignCodeService;
   @Autowired
-  private LibraryQcStore libraryQcDao;
-  @Autowired
   private IndexService indexService;
   @Autowired
   private SampleService sampleService;
@@ -101,7 +95,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       if (!hasTemporaryAlias(library)) {
         validateAliasOrThrow(library);
       }
-      Long newId = libraryDao.save(library);
+      long newId = libraryDao.save(library);
       
       Library managed = libraryDao.get(newId);
       
@@ -316,11 +310,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   }
 
   @Override
-  public Collection<QcType> listLibraryQcTypes() throws IOException {
-    return libraryQcDao.listAllLibraryQcTypes();
-  }
-
-  @Override
   public void addNote(Library library, Note note) throws IOException {
     Library managed = libraryDao.get(library.getId());
     authorizationManager.throwIfNotWritable(managed);
@@ -350,64 +339,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
     libraryDao.save(managed);
-  }
-
-  @Override
-  public void addQc(Library library, LibraryQC qc) throws IOException {
-    if (qc.getQcType() == null || qc.getQcType().getQcTypeId() == null) {
-      throw new IllegalArgumentException("QC Type cannot be null");
-    }
-    QcType managedQcType = libraryQcDao.getLibraryQcTypeById(qc.getQcType().getQcTypeId());
-    if (managedQcType == null) {
-      throw new IllegalArgumentException("QC Type " + qc.getQcType().getQcTypeId() + " is not applicable for libraries");
-    }
-    qc.setQcType(managedQcType);
-    qc.setQcCreator(authorizationManager.getCurrentUsername());
-
-    Library managed = libraryDao.get(library.getId());
-    authorizationManager.throwIfNotWritable(managed);
-    // TODO: update concentration if QC is of relevant type
-    managed.addQc(qc);
-    setChangeDetails(managed);
-    libraryDao.save(managed);
-  }
-
-  @Override
-  public void deleteQc(Library library, Long qcId) throws IOException {
-    if (qcId == null || qcId.equals(LibraryQCImpl.UNSAVED_ID)) {
-      throw new IllegalArgumentException("Cannot delete an unsaved Library QC");
-    }
-    Library managed = libraryDao.get(library.getId());
-    authorizationManager.throwIfNotWritable(managed);
-    LibraryQC deleteQc = null;
-    for (LibraryQC qc : managed.getLibraryQCs()) {
-      if (qc.getId() == qcId) {
-        deleteQc = qc;
-        break;
-      }
-    }
-    if (deleteQc == null) throw new IOException("QC " + qcId + " not found for Library " + library.getId());
-    authorizationManager.throwIfNonAdminOrMatchingOwner(securityManager.getUserByLoginName(deleteQc.getQcCreator()));
-    managed.getLibraryQCs().remove(deleteQc);
-    setChangeDetails(managed);
-    libraryDao.save(managed);
-  }
-
-  @Override
-  public QcType getLibraryQcType(long qcTypeId) throws IOException {
-    return libraryQcDao.getLibraryQcTypeById(qcTypeId);
-  }
-
-  @Override
-  public QcType getLibraryQcTypeByName(String qcTypeName) throws IOException {
-    return libraryQcDao.getLibraryQcTypeByName(qcTypeName);
-  }
-
-  @Override
-  public LibraryQC getLibraryQC(long qcId) throws IOException {
-    LibraryQC qc = libraryQcDao.get(qcId);
-    authorizationManager.throwIfNotReadable(qc.getLibrary());
-    return qc;
   }
 
   /**
@@ -549,7 +480,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
    */
   private void applyChanges(Library target, Library source) throws IOException {
     target.setDescription(source.getDescription());
-    target.setIdentificationBarcode(source.getIdentificationBarcode());
+    target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     target.setLocationBarcode(source.getLocationBarcode());
     target.setInitialConcentration(source.getInitialConcentration());
     target.setPlatformType(source.getPlatformType());
@@ -660,10 +591,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
 
   public void setLibraryDesignCodeService(LibraryDesignCodeService libraryDesignCodeService) {
     this.libraryDesignCodeService = libraryDesignCodeService;
-  }
-
-  public void setLibraryQcDao(LibraryQcStore libraryQcStore) {
-    this.libraryQcDao = libraryQcStore;
   }
 
   public void setIndexService(IndexService indexService) {

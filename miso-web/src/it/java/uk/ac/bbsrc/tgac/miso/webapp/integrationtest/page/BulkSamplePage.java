@@ -36,7 +36,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String TIMES_RECEIVED = "Times Received";
     public static final String TUBE_NUMBER = "Tube Number";
     public static final String LAB = "Lab";
-    public static final String EXT_INST_ID = "Ext. Inst. Identifier";
+    public static final String SECONDARY_ID = "Secondary ID";
     public static final String TISSUE_MATERIAL = "Material";
     public static final String REGION = "Region";
     public static final String SLIDES = "Slides";
@@ -49,8 +49,6 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String CONCENTRATION = "Conc. (ng/µl)";
     public static final String QC_STATUS = "QC Status";
     public static final String DNASE_TREATED = "DNAse";
-    public static final String NEW_RIN = "New RIN";
-    public static final String NEW_DV200 = "New DV200";
     public static final String QC_NOTE = "QC Note";
     public static final String PURPOSE = "Purpose";
 

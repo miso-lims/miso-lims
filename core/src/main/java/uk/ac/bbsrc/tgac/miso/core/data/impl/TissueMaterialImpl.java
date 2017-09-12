@@ -23,10 +23,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 public class TissueMaterialImpl implements TissueMaterial {
 
   private static final long serialVersionUID = 1L;
+  public static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long tissueMaterialId;
+  private long tissueMaterialId = UNSAVED_ID;
 
   @Column(unique = true, nullable = false)
   private String alias;
@@ -48,12 +49,12 @@ public class TissueMaterialImpl implements TissueMaterial {
   private Date lastUpdated;
 
   @Override
-  public Long getId() {
+  public long getId() {
     return tissueMaterialId;
   }
 
   @Override
-  public void setId(Long tissueMaterialId) {
+  public void setId(long tissueMaterialId) {
     this.tissueMaterialId = tissueMaterialId;
   }
 

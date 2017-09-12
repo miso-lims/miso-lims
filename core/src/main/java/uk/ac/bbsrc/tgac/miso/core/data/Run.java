@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -58,7 +57,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -142,9 +140,6 @@ public abstract class Run
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long runId = UNSAVED_ID;
 
-  @OneToMany(targetEntity = RunQCImpl.class, mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Collection<RunQC> runQCs = new TreeSet<>();
-
   @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = new SecurityProfile();
@@ -187,11 +182,6 @@ public abstract class Run
 
   public void addNote(Note note) {
     this.notes.add(note);
-  }
-
-  public void addQc(RunQC runQC) {
-    this.runQCs.add(runQC);
-    runQC.setRun(this);
   }
 
   public void addSequencerPartitionContainer(SequencerPartitionContainer f) {
@@ -318,10 +308,6 @@ public abstract class Run
     return notes;
   }
 
-  public Collection<RunQC> getRunQCs() {
-    return runQCs;
-  }
-
   @Override
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
@@ -388,7 +374,11 @@ public abstract class Run
 
   @Override
   public boolean isDeletable() {
-    return getId() != AbstractQC.UNSAVED_ID;
+    return getId() != Run.UNSAVED_ID;
+  }
+
+  public boolean isFull() {
+    return containers.size() >= sequencerReference.getPlatform().getNumContainers();
   }
 
   @Override
@@ -438,10 +428,6 @@ public abstract class Run
 
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
-  }
-
-  public void setQCs(Collection<RunQC> qcs) {
-    this.runQCs = qcs;
   }
 
   @Override

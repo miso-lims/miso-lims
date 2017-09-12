@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -47,7 +46,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
@@ -55,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
@@ -70,8 +67,6 @@ public class EditStudyController {
   @Autowired
   private RequestManager requestManager;
 
-  @Autowired
-  private ChangeLogService changeLogService;
   @Autowired
   private StudyService studyService;
 
@@ -94,11 +89,6 @@ public class EditStudyController {
     }
   }
 
-  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
-  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
-    return changeLogService.listAll("Study");
-  }
-
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return studyService.getColumnSizes();
@@ -112,11 +102,6 @@ public class EditStudyController {
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     return setupForm(StudyImpl.UNSAVED_ID, projectId, model);
-  }
-
-  @RequestMapping(value = "/rest/{studyId}", method = RequestMethod.GET)
-  public @ResponseBody Study jsonRest(@PathVariable Long studyId) throws IOException {
-    return studyService.get(studyId);
   }
 
   @RequestMapping(value = "/{studyId}", method = RequestMethod.GET)

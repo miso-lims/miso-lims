@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -37,7 +37,7 @@ public class DtosTest {
     assertNotNull(tissue.getSampleClass());
     assertEquals(Long.valueOf(2L), tissue.getSampleClass().getId());
     assertNotNull(tissue.getTissueOrigin());
-    assertEquals(Long.valueOf(4L), tissue.getTissueOrigin().getId());
+    assertEquals(4L, tissue.getTissueOrigin().getId());
     assertNotNull(tissue.getTissueType());
     assertEquals(Long.valueOf(5L), tissue.getTissueType().getId());
 
@@ -76,7 +76,7 @@ public class DtosTest {
     assertNotNull(tissue.getSampleClass());
     assertEquals(Long.valueOf(2L), tissue.getSampleClass().getId());
     assertNotNull(tissue.getTissueOrigin());
-    assertEquals(Long.valueOf(4L), tissue.getTissueOrigin().getId());
+    assertEquals(4L, tissue.getTissueOrigin().getId());
     assertNotNull(tissue.getTissueType());
     assertEquals(Long.valueOf(5L), tissue.getTissueType().getId());
 

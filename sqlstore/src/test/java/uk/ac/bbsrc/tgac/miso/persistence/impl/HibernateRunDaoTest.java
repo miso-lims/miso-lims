@@ -51,15 +51,12 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
@@ -85,12 +82,9 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   @Mock
   private SequencerReferenceStore sequencerReferenceDAO;
   @Mock
-  private RunQcStore runQcDAO;
-  @Mock
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
   @Mock
   private HibernateChangeLogDao changeLogDAO;
-
 
   @InjectMocks
   private HibernateRunDao dao;
@@ -315,41 +309,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     dao.save(null);
   }
 
-  @Test
-  public void testSaveAll() throws MisoNamingException, IOException {
-    List<Run> runs = new ArrayList<>();
-    Run run1 = makeRun("TestRun1");
-    Run run2 = makeRun("TestRun2");
-    runs.add(run1);
-    runs.add(run2);
-
-    assertNull(dao.getByAlias(run1.getAlias()));
-    assertNull(dao.getByAlias(run2.getAlias()));
-    dao.saveAll(runs);
-
-    Run savedRun1 = dao.getByAlias(run1.getAlias());
-    assertNotNull(savedRun1);
-    assertEquals(run1.getAlias(), savedRun1.getAlias());
-
-    Run savedRun2 = dao.getByAlias(run2.getAlias());
-    assertNotNull(savedRun2);
-    assertEquals(run2.getAlias(), savedRun2.getAlias());
-  }
-
-  @Test
-  public void testSaveAllNone() throws IOException {
-    int originalCount = dao.count();
-    List<Run> runs = new ArrayList<>();
-    dao.saveAll(runs);
-    assertSame(originalCount, dao.count());
-  }
-
-  @Test
-  public void testSaveAllNull() throws IOException {
-    exception.expect(NullPointerException.class);
-    dao.saveAll(null);
-  }
-
   private Run makeRun(String alias) {
     SecurityProfile profile = (SecurityProfile) sessionFactory.getCurrentSession().get(SecurityProfile.class, 3L);
     SequencerReference sequencer = emptySR;
@@ -377,16 +336,11 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     List<SequencerPartitionContainer> mockContainers = new ArrayList<>();
     mockContainers.add(Mockito.mock(SequencerPartitionContainerImpl.class));
     Mockito.when(sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(Matchers.anyLong())).thenReturn(mockContainers);
-
-    List<RunQC> mockQcs = new ArrayList<>();
-    mockQcs.add(Mockito.mock(RunQCImpl.class));
-    Mockito.when(runQcDAO.listByRunId(Matchers.anyLong())).thenReturn(mockQcs);
   }
 
   private void assertNonLazyThings(Run run) {
     assertNotNull(run);
     assertFalse(run.getSequencerPartitionContainers().isEmpty());
-    assertFalse(run.getRunQCs().isEmpty());
   }
 
   @Test
@@ -429,7 +383,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     List<Run> runs = dao.list(0, 2, true, "id", PaginationFilter.query("; DROP TABLE Run;"));
     assertEquals(0L, runs.size());
   }
-
 
   @Test
   public void testListOffsetBadLimit() throws IOException {

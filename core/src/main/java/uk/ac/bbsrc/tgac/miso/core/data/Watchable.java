@@ -27,7 +27,6 @@ import java.util.Set;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A Watchable object can be assigned watchers that will receive alerts upon the occurence of defined events.
@@ -42,7 +41,6 @@ public interface Watchable {
    * 
    * @return the Set of watchers for this object
    */
-  @JsonIgnore
   Set<User> getWatchers();
 
   /**
@@ -65,7 +63,6 @@ public interface Watchable {
    * 
    * @return a String representing the watchable identifier for this object
    */
-  @JsonIgnore
   String getWatchableIdentifier();
 
   public void setWatchGroup(Group watchGroup);

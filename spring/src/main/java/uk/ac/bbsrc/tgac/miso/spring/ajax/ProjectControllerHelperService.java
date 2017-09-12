@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -50,14 +49,11 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -66,7 +62,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
 /**
@@ -94,8 +89,6 @@ public class ProjectControllerHelperService {
   private LibraryService libraryService;
   @Autowired
   private SampleService sampleService;
-  @Autowired
-  private RunService runService;
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
@@ -123,10 +116,6 @@ public class ProjectControllerHelperService {
 
   public void setSampleService(SampleService sampleService) {
     this.sampleService = sampleService;
-  }
-
-  public void setRunService(RunService runService) {
-    this.runService = runService;
   }
 
   public JSONObject validateProjectShortName(HttpSession session, JSONObject json) {
@@ -325,87 +314,6 @@ public class ProjectControllerHelperService {
     }
   }
 
-  private String checkSamples(Long projectId) throws IOException {
-    final Collection<Sample> samples = sampleService.listByProjectId(projectId);
-    if (samples.size() > 0) {
-      int pass = 0;
-      for (final Sample s : samples) {
-        if (s.getQcPassed() != null) {
-          if (s.getQcPassed()) {
-            pass++;
-          }
-        }
-      }
-      if (pass == samples.size()) {
-        return "green";
-      } else {
-        return "yellow";
-      }
-    } else {
-      return "gray";
-    }
-  }
-
-  private String checkLibraries(Long projectId) throws IOException {
-    int pass = 0;
-    final Collection<Library> libs = libraryService.listByProjectId(projectId);
-    if (libs.size() > 0) {
-      for (final Library l : libs) {
-        if (l.getLibraryQCs().size() > 0) {
-          pass += l.getLibraryQCs().size();
-        }
-      }
-      if (pass >= libs.size()) {
-        return "green";
-      } else {
-        return "yellow";
-      }
-    } else {
-      return "gray";
-    }
-  }
-
-  private String checkRuns(Long projectId) throws IOException {
-    int pass = 0;
-    final Collection<Run> runs = runService.listByProjectId(projectId);
-    if (runs.size() > 0) {
-      for (final Run run : runs) {
-        if (run.getHealth() == HealthType.Completed) {
-          pass++;
-        }
-      }
-
-      if (pass == runs.size()) {
-        return "green";
-      } else {
-        return "yellow";
-      }
-    } else {
-      return "gray";
-    }
-  }
-
-  public JSONObject editProjectTrafficLight(HttpSession session, JSONObject json) {
-    final Long projectId = json.getLong("projectId");
-    final StringBuffer b = new StringBuffer();
-    try {
-      final String trafSample = checkSamples(projectId);
-      final String trafLib = checkLibraries(projectId);
-      final String trafRun = checkRuns(projectId);
-
-      b.append("<div id=\"projectstatustrafficlight\">\n" + "        <table class=\"traf\">\n"
-          + "<thead><tr><th width=\"33%\">Samples</th><th width=\"33%\">Libraries</th><th width=\"33%\">Runs</th></tr></thead>"
-          + "            <tbody>\n" + "            <tr>\n" + "                <td width=\"33%\"><img src=\"/styles/images/status/"
-          + trafSample + ".png\"/></td>\n" + "                <td width=\"33%\"><img src=\"/styles/images/status/" + trafLib
-          + ".png\"/></td>\n" + "                <td width=\"33%\"><img src=\"/styles/images/status/" + trafRun + ".png\"/></td>\n"
-          + "            </tr>\n" + "            </tbody>\n" + "        </table>\n" + "</div>");
-
-      return JSONUtils.JSONObjectResponse("html", b.toString());
-    } catch (final IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-  }
 
   public JSONObject generateSampleDeliveryForm(HttpSession session, JSONObject json) {
     Boolean plate = false;

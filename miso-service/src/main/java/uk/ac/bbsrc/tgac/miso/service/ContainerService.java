@@ -31,4 +31,6 @@ public interface ContainerService extends PaginatedDataSource<SequencerPartition
 
   Partition getPartition(long partitionId) throws IOException;
 
+  void update(Partition partition) throws IOException;
+
 }

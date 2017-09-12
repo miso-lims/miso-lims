@@ -26,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -36,12 +37,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -75,8 +81,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -88,7 +92,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleLCMTubeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSlideImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
@@ -561,8 +564,8 @@ public class Dtos {
     copySampleFields(from, dto);
     dto.setAccession(from.getAccession());
 
-    if (from.getSampleQCs() != null && !from.getSampleQCs().isEmpty()) {
-      dto.setQcs(asSampleQcDtos(from.getSampleQCs()));
+    if (from.getQCs() != null && !from.getQCs().isEmpty()) {
+      dto.setQcs(asQcDtos(from.getQCs()));
     }
     return dto;
   }
@@ -601,12 +604,6 @@ public class Dtos {
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());
       to.getProject().setProjectId(from.getProjectId());
-    }
-
-    if (from.getQcs() != null && !from.getQcs().isEmpty()) {
-      for (SampleQcDto qcDto : from.getQcs()) {
-        to.addQc(to(qcDto));
-      }
     }
     return to;
   }
@@ -738,7 +735,7 @@ public class Dtos {
     SampleTissueDto dto = new SampleTissueDto();
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
-    dto.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
+    dto.setSecondaryIdentifier(from.getSecondaryIdentifier());
     dto.setRegion(from.getRegion());
     dto.setTubeNumber(from.getTubeNumber());
     if (from.getLab() != null) {
@@ -762,7 +759,7 @@ public class Dtos {
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
     to.setRegion(nullifyStringIfBlank(from.getRegion()));
-    to.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
+    to.setSecondaryIdentifier(from.getSecondaryIdentifier());
     if (from.getTissueOriginId() != null) {
       TissueOrigin tissueOrigin = new TissueOriginImpl();
       tissueOrigin.setId(from.getTissueOriginId());
@@ -1060,8 +1057,8 @@ public class Dtos {
     }
     dto.setDnaSize(from.getDnaSize());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    if (from.getLibraryQCs() != null && !from.getLibraryQCs().isEmpty()) {
-      dto.setQcs(asLibraryQcDtos(from.getLibraryQCs()));
+    if (from.getQCs() != null && !from.getQCs().isEmpty()) {
+      dto.setQcs(asQcDtos(from.getQCs()));
     }
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
@@ -1135,12 +1132,6 @@ public class Dtos {
     to.setDnaSize(from.getDnaSize());
     to.setLocationBarcode(from.getLocationBarcode());
     to.setCreationDate(parseDate(from.getCreationDate()));
-
-    if (from.getQcs() != null && !from.getQcs().isEmpty()) {
-      for (LibraryQcDto qcDto : from.getQcs()) {
-        to.addQc(to(qcDto));
-      }
-    }
 
     return to;
   }
@@ -1427,55 +1418,21 @@ public class Dtos {
     return to;
   }
 
-  public static SampleQcDto asDto(SampleQC from) {
-    SampleQcDto dto = new SampleQcDto();
+  public static QcDto asDto(QC from) {
+    QcDto dto = new QcDto();
     dto.setId(from.getId());
-    dto.setQcDate(formatDate(from.getQcDate()));
-    dto.setQcCreator(from.getQcCreator());
-    dto.setQcType(asDto(from.getQcType()));
+    dto.setDate(formatDate(from.getDate()));
+    dto.setCreator(from.getCreator().getFullName());
+    dto.setType(asDto(from.getType()));
     dto.setResults(from.getResults());
-    dto.setSampleId(from.getSample().getId());
+    dto.setEntityId(from.getEntity().getId());
+    dto.setEntityAlias(from.getEntity().getAlias());
     return dto;
   }
 
-  public static SampleQC to(SampleQcDto from) {
-    SampleQC to = new SampleQCImpl();
-    if (from.getId() != null) to.setId(from.getId());
-    to.setQcType(to(from.getQcType()));
-    to.setResults(from.getResults());
-    return to;
-  }
-
-  public static LibraryQcDto asDto(LibraryQC from) {
-    LibraryQcDto dto = new LibraryQcDto();
-    dto.setId(from.getId());
-    dto.setQcDate(formatDate(from.getQcDate()));
-    dto.setQcCreator(from.getQcCreator());
-    dto.setQcType(asDto(from.getQcType()));
-    dto.setResults(from.getResults());
-    dto.setLibraryId(from.getLibrary().getId());
-    return dto;
-  }
-
-  public static LibraryQC to(LibraryQcDto from) {
-    LibraryQC to = new LibraryQCImpl();
-    if (from.getId() != null) to.setId(from.getId());
-    to.setQcType(to(from.getQcType()));
-    to.setResults(from.getResults());
-    return to;
-  }
-
-  public static List<SampleQcDto> asSampleQcDtos(Collection<SampleQC> qcSubset) {
-    List<SampleQcDto> dtoList = new ArrayList<>();
-    for (SampleQC qc : qcSubset) {
-      dtoList.add(asDto(qc));
-    }
-    return dtoList;
-  }
-
-  public static List<LibraryQcDto> asLibraryQcDtos(Collection<LibraryQC> qcSubset) {
-    List<LibraryQcDto> dtoList = new ArrayList<>();
-    for (LibraryQC qc : qcSubset) {
+  public static List<QcDto> asQcDtos(Collection<? extends QC> qcSubset) {
+    List<QcDto> dtoList = new ArrayList<>();
+    for (QC qc : qcSubset) {
       dtoList.add(asDto(qc));
     }
     return dtoList;
@@ -1512,11 +1469,12 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setInstrumentModel(from.getInstrumentModel());
     dto.setNumContainers(from.getNumContainers());
+    dto.setPartitionSizes(from.getPartitionSizes());
     return dto;
   }
 
   public static Platform to(PlatformDto from) {
-    Platform to = new PlatformImpl();
+    Platform to = new Platform();
     to.setId(from.getId());
     to.setPlatformType(PlatformType.get(from.getPlatformType()));
     to.setDescription(from.getDescription());
@@ -1802,5 +1760,80 @@ public class Dtos {
     to.setPlatform(to(dto.getPlatform()));
     to.setSerialNumber(dto.getSerialNumber());
     return to;
+  }
+
+  public static QC to(QcDto dto) {
+    QC to;
+    switch (dto.getType().getQcTarget()) {
+    case Library:
+      LibraryQC newLibraryQc = new LibraryQC();
+      Library ownerLibrary = new LibraryImpl();
+      ownerLibrary.setId(dto.getEntityId());
+      newLibraryQc.setLibrary(ownerLibrary);
+      to = newLibraryQc;
+      break;
+    case Sample:
+      SampleQC newSampleQc = new SampleQC();
+      Sample ownerSample = new SampleImpl();
+      ownerSample.setId(dto.getEntityId());
+      newSampleQc.setSample(ownerSample);
+      to = newSampleQc;
+      break;
+    case Pool:
+      PoolQC newPoolQc = new PoolQC();
+      Pool ownerPool = new PoolImpl();
+      ownerPool.setId(dto.getEntityId());
+      newPoolQc.setPool(ownerPool);
+      to = newPoolQc;
+      break;
+    default:
+      throw new IllegalArgumentException("No such QC target: " + dto.getType().getQcTarget());
+    }
+    if (dto.getId() != null) {
+      to.setId(dto.getId());
+    }
+    to.setDate(parseDate(dto.getDate()));
+    to.setResults(dto.getResults());
+    to.setType(to(dto.getType()));
+    return to;
+  }
+
+  public static ReferenceGenomeDto asDto(ReferenceGenome from) {
+    ReferenceGenomeDto dto = new ReferenceGenomeDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    return dto;
+  }
+
+  public static PartitionDto asDto(Partition from) {
+    PartitionDto dto = new PartitionDto();
+    dto.setId(from.getId());
+    dto.setContainerName(from.getSequencerPartitionContainer().getIdentificationBarcode());
+    dto.setPartitionNumber(from.getPartitionNumber());
+    dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), false));
+    return dto;
+  }
+
+  public static PartitionQCTypeDto asDto(PartitionQCType from) {
+    PartitionQCTypeDto dto = new PartitionQCTypeDto();
+    dto.setId(from.getId());
+    dto.setDescription(from.getDescription());
+    dto.setNoteRequired(from.isNoteRequired());
+    return dto;
+  }
+
+  public static ExperimentDto asDto(Experiment from) {
+    ExperimentDto dto = new ExperimentDto();
+    dto.setId(from.getId());
+    dto.setAccession(from.getAccession());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    dto.setName(from.getName());
+    dto.setPlatform(asDto(from.getPlatform()));
+    dto.setPool(asDto(from.getPool(), true));
+    dto.setRun(asDto(from.getRun()));
+    dto.setStudy(asDto(from.getStudy()));
+    dto.setTitle(from.getTitle());
+    return dto;
   }
 }

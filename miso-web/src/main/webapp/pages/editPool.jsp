@@ -42,8 +42,11 @@
 <sessionConversation:insertSessionConversationId attributeName="pool"/>
 <h1><c:choose><c:when
     test="${pool.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose> Pool
-  <button type="button" onclick="return Pool.validatePool();" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button id="save" type="button" onclick="return Pool.validatePool();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
+<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+  <c:if test="${pool.id != 0 && not empty pool.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('pool', [${pool.id}]);">Print Barcode</span></c:if>
+</div>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
@@ -58,54 +61,10 @@
 </div>
 
 <h2>Pool Information</h2>
-
-<div class="barcodes">
-  <div class="barcodeArea ui-corner-all">
-    <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Barcode</span>
-    <c:if test="${pool.id != 0}">
-      <ul class="barcode-ddm">
-        <li>
-          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
-            <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-            <span id="idBarcode" style="float:right"></span>
-          </a>
-
-          <div id="idBarcodeMenu"
-               onmouseover="mcancelclosetime()"
-               onmouseout="mclosetime()">
-            <a href="javascript:void(0);"
-               onclick="Utils.printDialog('pool', [${pool.id}]);">Print</a>
-            <c:if test="${not autoGenerateIdBarcodes}">
-              <a href="javascript:void(0);"
-               onclick="Pool.barcode.showPoolIdBarcodeChangeDialog(${pool.id}, '${pool.identificationBarcode}');">Update Barcode</a>
-            </c:if>
-          </div>
-        </li>
-      </ul>
-    </c:if>
-    <div id="changePoolIdBarcodeDialog" title="Assign New Barcode"></div>
-    <c:if test="${not empty pool.identificationBarcode}">
-      <script type="text/javascript">
-        jQuery(document).ready(function () {
-          Fluxion.doAjax(
-            'poolControllerHelperService',
-            'getPoolBarcode',
-            {'poolId':${pool.id},
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              jQuery('#idBarcode').html("<img style='height:30px; border:0;' alt='${pool.identificationBarcode}' title='${pool.identificationBarcode}' src='<c:url value='/temp/'/>" + json.img + "'/>");
-            }
-            });
-        });
-      </script>
-    </c:if>
-  </div>
-</div>
 <table class="in">
   <tr>
     <td class="h">Pool ID:</td>
-    <td>
+    <td id="poolId">
       <c:choose>
         <c:when test="${pool.id != 0}">${pool.id}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
@@ -121,7 +80,7 @@
   </tr>
   <tr>
     <td class="h">Name:</td>
-    <td>
+    <td id="name">
       <c:choose>
         <c:when test="${pool.id != 0}">${pool.name}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
@@ -136,12 +95,18 @@
     <td class="h">Description:</td>
     <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span></td>
   </tr>
+  <c:if test="${not autoGenerateIdBarcodes}">
+    <tr>
+      <td class="h">Matrix Barcode:</td>
+      <td><form:input id="identificationBarcode" path="identificationBarcode" name="identificationBarcode"/></td>
+    </tr>
+  </c:if>
   <tr>
     <td>Platform Type:</td>
     <td>
       <c:choose>
         <c:when test="${pool.id != 0}">
-          ${pool.platformType.key}
+          <span id="platformType">${pool.platformType.key}</span>
         </c:when>
         <c:otherwise>
           <form:select id="platformType" path="platformType" items="${platformTypes}"/>
@@ -157,9 +122,16 @@
     <td class="h">Creation Date:*</td>
     <td><c:choose>
       <c:when test="${pool.id != 0}">
-        <fmt:formatDate pattern="yyyy-MM-dd" type="both" value="${pool.creationDate}"/>
+        <span id="creationDate">
+          <fmt:formatDate pattern="yyyy-MM-dd" type="both" value="${pool.creationDate}"/>
+        </span>
       </c:when>
-      <c:otherwise><form:input path="creationDate"/></c:otherwise>
+      <c:otherwise>
+        <form:input id="creationDate" path="creationDate"/>
+        <script type="text/javascript">
+          Utils.ui.addMaxDatePicker("creationDate", 0);
+        </script>
+      </c:otherwise>
     </c:choose>
     </td>
   </tr>
@@ -193,7 +165,7 @@
   </tr>
   <tr>
     <td class="h">Location:</td>
-    <td>
+    <td id="location">
       <c:if test="${!empty pool.box.locationBarcode}">${pool.box.locationBarcode},</c:if>
       <c:if test="${!empty pool.boxPosition}"><a href='<c:url value="/miso/box/${pool.box.id}"/>'>${pool.box.alias}, ${pool.boxPosition}</a></c:if>
     </td>
@@ -221,7 +193,7 @@
       <h1>Notes</h1>
       <ul class="sddm">
         <li>
-          <a onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
+          <a id="notesMenuHandle" onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
             <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
           </a>
 
@@ -250,86 +222,14 @@
           </c:forEach>
         </div>
       </c:if>
-      <div id="addPoolNoteDialog" title="Create new Note"></div>
+      <div id="addNoteDialog" title="Create new Note"></div>
     </div>
     <br/>
 </c:if>
 <!-- notes end -->
 
 <c:if test="${pool.id != 0}">
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#qcs_arrowclick'), 'qcs');">
-    QCs
-    <div id="qcs_arrowclick" class="toggleLeftDown"></div>
-  </div>
-  <div id="qcs" style="display:none;">
-  <h1>
-    <span id="qcsTotalCount">
-    </span>
-  </h1>
-  <ul class="sddm">
-    <li><a
-        onmouseover="mopen('qcmenu')"
-        onmouseout="mclosetime()">Options <span style="float:right"
-                                                class="ui-icon ui-icon-triangle-1-s"></span></a>
-
-      <div id="qcmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='javascript:void(0);' class="add"
-           onclick="Pool.qc.insertPoolQCRow(${pool.id}); return false;">Add Pool QC</a>
-      </div>
-    </li>
-  </ul>
-  <div style="clear:both">
-    <div id="addPoolQC"></div>
-    <div id='addQcForm'>
-      <table class="list" id="poolQcTable">
-        <thead>
-        <tr>
-          <th>QCed By</th>
-          <th>QC Date</th>
-          <th>Method</th>
-          <th>Results</th>
-          <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-            <th align="center">Edit</th>
-          </c:if>
-        </tr>
-        </thead>
-        <tbody>
-        <c:if test="${not empty pool.poolQCs}">
-          <c:forEach items="${pool.poolQCs}" var="qc">
-            <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-              <td>${qc.qcCreator}</td>
-              <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
-              <td>${qc.qcType.name}</td>
-              <td id="result${qc.id}">${qc.results} ${qc.qcType.units}</td>
-              <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                        or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
-                                                        onclick="Pool.qc.changePoolQCRow('${qc.id}','${pool.id}')">
-                  <span class="ui-icon ui-icon-pencil"></span></a></td>
-              </c:if>
-            </tr>
-          </c:forEach>
-        </c:if>
-        </tbody>
-      </table>
-      <input type='hidden' id='qcPoolId' name='id' value='${pool.id}'/>
-    </div>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery("#poolQcTable").tablesorter({
-          headers: {
-          }
-        });
-
-        var qcsCount = jQuery('#poolQcTable>tbody>tr:visible').length;
-        jQuery('#qcsTotalCount').html(qcsCount + (qcsCount == 1 ? ' QC' : ' QCs'));
-      });
-    </script>
-  </div>
-  </div>
+<miso:qcs id="list_qcs" item="${pool}"/>
 </c:if>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#experiments_arrowclick'), 'experiments');">
@@ -379,120 +279,18 @@
 <br/>
 
 <c:if test="${pool.id != 0}">
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#orders_arrowclick'), 'orders');">
-  Orders
-  <div id="orders_arrowclick" class="toggleLeftDown"></div>
-</div>
-<div id="orders" style="display:block">
-  <h1>Requested Orders</h1>
-  <span onclick="Pool.orders.createOrder()" class="sddm fg-button ui-state-default ui-corner-all">Add Order</span>
-
-  <table class="display no-border" id="edit-order-table"></table>
-
-  <br/>
-  <h1>Order Status</h1>
-  <table class="display no-border" id="order-completion-table"></table>
-</div>
-  <br/>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runs');">
-  Runs
-  <div id="runs_arrowclick" class="toggleLeftDown"></div>
-</div>
-<div id="runs" style="display:block;">
-  <br/>
-  <h1>Runs</h1>
-  <div id="runsDatatableDiv">
-      <table class="display full-width no-border" id="runsDatatable">
-      </table>
-  </div>
-</div>
-
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    jQuery('#runsDatatable').dataTable({
-      "aaData": ${runsJSON},
-      "aaSorting": [
-        [0, 'desc']
-      ],
-      "aoColumns": [
-        {
-          "sTitle" : "Name",
-          "mData" : "name",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
-          }
-        },
-        {
-          "sTitle" : "Alias",
-          "mData" : "alias",
-          "mRender": function (data, type, full) {
-            return "<a href=\"/miso/run/" + full.id + "\">" + data + "</a>";
-          }
-        },
-        { "sTitle" : "Status", "mData" : "status" },
-        { "sTitle" : "Start Date", "mData" : "startDate" },
-        { "sTitle" : "End Date", "mData" : "endDate" },
-        { "sTitle" : "Type", "mData" : "platformType" },
-        { "sTitle" : "Parameters", "mData" : "parameters.name" },
-        { "sTitle" : "Last Modified", "mData" : "lastModified" }
-      ],
-      "iDisplayLength": 50,
-      "bJQueryUI": true,
-      "bRetrieve": true,
-      "sPaginationType": "full_numbers"
-    });
-  });
-</script>
+  <miso:list-section id="list_order" name="Requested Orders" target="order" alwaysShow="true" items="${orders}" config="{ poolId: ${pool.id}, platformType: '${pool.platformType.name()}' }"/>
+  <miso:list-section-ajax id="list_completion" name="Order Status" target="completion" config="{ poolId: ${pool.id} }"/>
+  <miso:list-section id="list_run" name="Runs" target="run" items="${runs}"/>
+  <miso:list-section-ajax id="list_included" name="Included Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences} }"/>
+  <miso:list-section-ajax id="list_available" name="Available Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
 </c:if>
-
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pooled_arrowclick'), 'pooled');">
-  Pooled Elements
-  <div id="pooled_arrowclick" class="toggleLeftDown"></div>
-</div>
-<div id="pooled" style="display:block">
-<h1>Dilutions</h1>
-<c:choose>
-<c:when test="${pool.id == 0}">
-<p>Please save the pool before adding dilutions.</p>
-</c:when>
-<c:otherwise>
-  <h2>Included:</h2>
-  <div id="pooledList">
-    <table class="display no-border full-width" id="includedTable"></table>
-  </div>
-
-  <h2 class="hrule">Available:</h2>
-  
-  <div id="elementSelectDatatableDiv">
-    <table class="display no-border full-width" id="availableTable"></table>
-  </div>
-  
-  <script type="text/javascript">
-      jQuery(document).ready(function () {
-          ListUtils.createTable('includedTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : false, duplicateIndicesSequences : ${duplicateIndicesSequences} });
-          ListUtils.createTable('availableTable', ListTarget.poolelements, null, { "poolId" : ${pool.id}, "add" : true });
-      });
-  </script>
-</c:otherwise>
-</c:choose>
-</div>
-
 <miso:changelog item="${pool}"/>
 
-<div id="dialog"></div>
-<div id="order-dialog" title="Order" hidden="true">
-<span id="partitionName">${pool.platformType.partitionName}s</span>: <input type="text" name="partitions" value="1" id="orderPartitions" /><br/>
-Platform: <select id="orderPlatformId" onchange="Pool.orders.changePlatform()"><c:forEach items="${platforms}" var="platform"><option value="${platform.id}">${platform.nameAndModel}</option></c:forEach></select><br/>
-Sequencing Parameters: <select id="orderParameterId"></select>
-</div>
-
 </div>
 </div>
 
 <script type="text/javascript">
-  Utils.ui.addMaxDatePicker("creationDate", 0);
   jQuery(document).ready(function () {
     jQuery('#alias').simplyCountable({
       counter: '#aliasCounter',
@@ -507,10 +305,6 @@ Sequencing Parameters: <select id="orderParameterId"></select>
       countDirection: 'down'
     });
   });
-  Defaults = { 'all': {}};
-  Defaults.all.sequencingParameters = ${sequencingParametersJson};
-  Defaults.all.platforms = [ <c:forEach items="${platforms}" var="platform">{ 'id' : ${platform.id}, 'nameAndModel' : '${platform.nameAndModel}'}, </c:forEach> ];
-  Pool.orders.makeTable(${pool.id});
 </script>
 
 <%@ include file="adminsub.jsp" %>

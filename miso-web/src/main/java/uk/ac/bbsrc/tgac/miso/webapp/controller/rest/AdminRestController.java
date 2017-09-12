@@ -39,7 +39,7 @@ public class AdminRestController extends DefaultRestController {
       response.target = target;
       response.updated = source.list(0, 0, true, "id").stream().peek(x -> response.total++)
           .filter(item -> isStringEmptyOrNull(item.getIdentificationBarcode())).peek(x -> response.blank++)
-          .peek(WhineyConsumer.log(log, update))
+          .peek(WhineyConsumer.rethrow(update))
           .count();
       return response;
 

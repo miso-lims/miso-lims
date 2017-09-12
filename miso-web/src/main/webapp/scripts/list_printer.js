@@ -81,7 +81,7 @@ ListTarget.printer = {
             }
           } ], function(printer) {
             if (!printer.name) {
-              alert('A printer needs a name.');
+              Utils.showOkDialog('Create Printer', ['A printer needs a name.']);
               return;
             }
             var save = function(printerConfig) {

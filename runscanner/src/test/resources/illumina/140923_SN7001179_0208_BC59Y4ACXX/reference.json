@@ -13,6 +13,8 @@
   "containerSerialNumber": "C59Y4ACXX",
   "healthType": "Completed",
   "imgCycle": 202,
+  "indexLengths": [
+  ],
   "laneCount": 8,
   "numCycles": 202,
   "pairedEndRun": true,

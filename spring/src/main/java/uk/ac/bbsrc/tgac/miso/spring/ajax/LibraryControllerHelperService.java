@@ -23,24 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
-import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
-import org.krysalis.barcode4j.BarcodeDimension;
-import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,23 +38,13 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 
 /**
@@ -83,13 +61,9 @@ public class LibraryControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private MisoFilesManager misoFileManager;
-  @Autowired
   private NamingScheme namingScheme;
   @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private BoxService boxService;
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -147,232 +121,6 @@ public class LibraryControllerHelperService {
     }
   }
 
-  public JSONObject getLibraryBarcode(HttpSession session, JSONObject json) {
-    Long libraryId = json.getLong("libraryId");
-    File temploc = getBarcodeFileLocation(session);
-    try {
-      Library library = libraryService.get(libraryId);
-      BarcodeFactory barcodeFactory = new BarcodeFactory();
-      barcodeFactory.setPointPixels(1.5f);
-      barcodeFactory.setBitmapResolution(600);
-      RenderedImage bi = null;
-
-      if (json.has("barcodeGenerator")) {
-        BarcodeDimension dim = new BarcodeDimension(100, 100);
-        if (json.has("dimensionWidth") && json.has("dimensionHeight")) {
-          dim = new BarcodeDimension(json.getDouble("dimensionWidth"), json.getDouble("dimensionHeight"));
-        }
-        BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
-        if (bg != null) {
-          bi = barcodeFactory.generateBarcode(library, bg, dim);
-        } else {
-          return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
-        }
-      } else {
-        bi = barcodeFactory.generateSquareDataMatrix(library, 400);
-      }
-
-      if (bi != null) {
-        File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
-        if (ImageIO.write(bi, "png", tempimage)) {
-          return JSONUtils.JSONObjectResponse("img", tempimage.getName());
-        }
-        return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      } else {
-        return JSONUtils.SimpleJSONError("Library has no parseable barcode");
-      }
-    } catch (IOException e) {
-      log.error("get library barcode", e);
-      return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to generate temp file for barcode");
-    }
-  }
-
-  public JSONObject changeLibraryLocation(HttpSession session, JSONObject json) {
-    Long libraryId = json.getLong("libraryId");
-    String locationBarcode = json.getString("locationBarcode");
-
-    try {
-      String newLocation = LimsUtils.lookupLocation(locationBarcode);
-      if (newLocation != null) {
-        Library library = libraryService.get(libraryId);
-        library.setLocationBarcode(newLocation);
-        libraryService.update(library);
-      } else {
-        return JSONUtils.SimpleJSONError("New location barcode not recognised");
-      }
-    } catch (IOException e) {
-      log.error("change library location", e);
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("Note saved successfully");
-  }
-
-  public JSONObject changeLibraryIdBarcode(HttpSession session, JSONObject json) {
-    Long libraryId = json.getLong("libraryId");
-    String idBarcode = json.getString("identificationBarcode");
-
-    try {
-      if (isStringEmptyOrNull(idBarcode)) {
-        // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
-        idBarcode = null;
-      } else {
-        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays.asList(idBarcode)));
-        if (!previouslyBarcodedItems.isEmpty() && (
-            previouslyBarcodedItems.size() != 1
-                || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.LIBRARY
-                || previouslyBarcodedItems.get(0).getId().getTargetId() != libraryId)) {
-          BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
-          String error = String.format(
-              "Could not change library identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
-              idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
-          log.debug(error);
-          return JSONUtils.SimpleJSONError(error);
-        }
-      }
-      Library library = libraryService.get(libraryId);
-      library.setIdentificationBarcode(idBarcode);
-      libraryService.update(library);
-    } catch (IOException e) {
-      log.debug("Could not change Library identificationBarcode: " + e.getMessage());
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
-  }
-
-  public JSONObject getLibraryQcTypes(HttpSession session, JSONObject json) {
-    try {
-      StringBuilder sb = new StringBuilder();
-      Collection<QcType> types = libraryService.listLibraryQcTypes();
-      for (QcType s : types) {
-        sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
-      }
-      Map<String, Object> map = new HashMap<>();
-      map.put("types", sb.toString());
-      return JSONUtils.JSONObjectResponse(map);
-    } catch (IOException e) {
-      log.error("cannot list all library QC types", e);
-    }
-    return JSONUtils.SimpleJSONError("Cannot list all Library QC Types");
-  }
-
-  public JSONObject addLibraryQC(HttpSession session, JSONObject json) {
-    try {
-      for (Object k : json.keySet()) {
-        String key = (String) k;
-        if (isStringEmptyOrNull(json.getString(key))) {
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
-        }
-      }
-      if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
-        Long libraryId = Long.parseLong(json.getString("libraryId"));
-        Library library = libraryService.get(libraryId);
-        LibraryQC newQc = new LibraryQCImpl();
-        newQc.setQcDate(parseDate(json.getString("qcDate")));
-        newQc.setQcType(libraryService.getLibraryQcType(json.getLong("qcType")));
-        newQc.setResults(Double.parseDouble(json.getString("results")));
-        libraryService.addQc(library, newQc);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th></tr>");
-        for (LibraryQC qc : library.getLibraryQCs()) {
-          sb.append("<tr>");
-          sb.append("<td>" + qc.getQcCreator() + "</td>");
-          sb.append("<td>" + formatDate(qc.getQcDate()) + "</td>");
-          sb.append("<td>" + qc.getQcType().getName() + "</td>");
-          sb.append("<td>" + LimsUtils.round(qc.getResults(), 2) + " " + qc.getQcType().getUnits() + "</td>");
-          sb.append("</tr>");
-        }
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Library QC to this Library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Library QC to this Library: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONError("Cannot add LibraryQC");
-  }
-
-  public JSONObject bulkAddLibraryQCs(HttpSession session, JSONObject json) {
-    try {
-      JSONArray qcs = JSONArray.fromObject(json.getString("qcs"));
-      // validate
-      boolean ok = true;
-      for (JSONObject qc : (Iterable<JSONObject>) qcs) {
-        String qcType = qc.getString("qcType");
-        String results = qc.getString("results");
-        String qcCreator = qc.getString("qcCreator");
-        String qcDate = qc.getString("qcDate");
-
-        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator) || isStringEmptyOrNull(qcDate)) {
-          ok = false;
-        }
-      }
-
-      // persist
-      if (ok) {
-        Map<String, Object> map = new HashMap<>();
-        JSONArray a = new JSONArray();
-        JSONArray errors = new JSONArray();
-        for (JSONObject qc : (Iterable<JSONObject>) qcs) {
-          JSONObject j = addLibraryQC(session, qc);
-          j.put("libraryId", qc.getString("libraryId"));
-          if (j.has("error")) {
-            errors.add(j);
-          } else {
-            a.add(j);
-          }
-        }
-        map.put("saved", a);
-        if (!errors.isEmpty()) {
-          map.put("errors", errors);
-        }
-        return JSONUtils.JSONObjectResponse(map);
-      } else {
-        log.error("Failed to add Library QC to this Library: one of the required fields of the selected QCs is missing or invalid");
-        return JSONUtils.SimpleJSONError(
-            "Failed to add Library QC to this Library: one of the required fields of the selected QCs is missing or invalid");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Library QC to this Library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Library QC to this Library: " + e.getMessage());
-    }
-  }
-
-  public JSONObject changeLibraryQCRow(HttpSession session, JSONObject json) {
-    try {
-      JSONObject response = new JSONObject();
-      Long qcId = Long.parseLong(json.getString("qcId"));
-      LibraryQC libraryQc = libraryService.getLibraryQC(qcId);
-      Long libraryId = Long.parseLong(json.getString("libraryId"));
-
-      response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "'/>");
-      response.put("edit",
-          "<a href='javascript:void(0);' onclick='Library.qc.editLibraryQC(\"" + qcId + "\",\"" + libraryId + "\");'>Save</a>");
-      return response;
-    } catch (Exception e) {
-      log.error("Failed to display library QC of this library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to display library QC of this library: " + e.getMessage());
-    }
-  }
-
-  public JSONObject editLibraryQC(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
-        Long qcId = Long.parseLong(json.getString("qcId"));
-        LibraryQC libraryQc = libraryService.getLibraryQC(qcId);
-
-        libraryQc.setResults(Double.parseDouble(json.getString("result")));
-        libraryService.addQc(libraryService.get(libraryQc.getLibrary().getId()), libraryQc);
-
-      }
-      return JSONUtils.SimpleJSONResponse("done");
-    } catch (Exception e) {
-      log.error("Failed to add library QC to this library: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add library QC to this library: " + e.getMessage());
-    }
-  }
-
   public JSONObject deleteLibrary(HttpSession session, JSONObject json) {
     if (json.has("libraryId")) {
       Long libraryId = json.getLong("libraryId");
@@ -390,10 +138,6 @@ public class LibraryControllerHelperService {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
   }
 
   public void setLibraryNamingScheme(NamingScheme namingScheme) {

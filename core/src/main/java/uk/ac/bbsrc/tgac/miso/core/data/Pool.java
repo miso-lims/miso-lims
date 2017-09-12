@@ -31,16 +31,11 @@ import java.util.Set;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -55,13 +50,9 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-@JsonIgnoreProperties({ "securityProfile", "dilutions" })
 public interface Pool
     extends SecurableByProfile, Comparable<Pool>, Barcodable, Watchable, Deletable, Boxable, Nameable, ChangeLoggable,
-    Serializable, Aliasable {
+    Serializable, Aliasable, QualityControllable<PoolQC> {
 
   /**
    * Sets the ID of this Pool object.
@@ -169,20 +160,14 @@ public interface Pool
    */
   public void setReadyToRun(boolean ready);
 
-  /**
-   * Registers that a LibraryQC has been carried out on this Library
-   * 
-   * @param poolQC of type PoolQC
-   * @throws MalformedPoolQcException when the PoolQC being added is not valid
-   */
-  public void addQc(PoolQC poolQC) throws MalformedPoolQcException;
 
   /**
    * Returns the poolQCs of this Pool object.
    * 
    * @return Collection<PoolQC> poolQCs.
    */
-  public Collection<PoolQC> getPoolQCs();
+  @Override
+  public Collection<PoolQC> getQCs();
 
   /**
    * Returns the qcPassed of this Pool object.

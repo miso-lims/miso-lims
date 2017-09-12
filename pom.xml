@@ -27,11 +27,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
-<<<<<<< HEAD
-  <version>0.2.85-oicr-SNAPSHOT</version>
-=======
-  <version>0.2.88-oicr-SNAPSHOT</version>
->>>>>>> 572087a6b81f14fe731d66482206987eb3cdef83
+  <version>0.2.88</version>
   <packaging>pom</packaging>
   <name>MISO LIMS</name>
   <url>http://tgac.github.io/miso-lims/</url>
@@ -67,7 +63,7 @@
         <role>Administrator</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>tdebat</id>
@@ -79,7 +75,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>amasella</id>
@@ -91,7 +87,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>dcooke</id>
@@ -103,7 +99,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
     <developer>
       <id>harmstrong</id>
@@ -115,7 +111,7 @@
         <role>Developer</role>
       </roles>
       <timezone>-5</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
   <modules>
@@ -135,7 +131,7 @@
     <connection>scm:git:https://www.github.com/oicr-gsi/miso-lims</connection>
     <developerConnection>scm:git:git@github.com:oicr-gsi/miso-lims</developerConnection>
     <url>http://www.github.com/oicr-gsi/miso-lims</url>
-    <tag>v0.2.85</tag>
+    <tag>v0.2.88</tag>
   </scm>
   <!-- Bug Tracker -->
   <issueManagement>
@@ -388,11 +384,6 @@
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
         <version>5.1.10</version>
-      </dependency>
-      <dependency>
-        <groupId>net.sf.barcode4j</groupId>
-        <artifactId>barcode4j</artifactId>
-        <version>2.0</version>
       </dependency>
       <dependency>
         <groupId>net.sf.json-lib</groupId>

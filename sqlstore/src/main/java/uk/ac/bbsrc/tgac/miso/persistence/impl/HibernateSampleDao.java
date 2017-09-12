@@ -222,7 +222,7 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
     String query = DbUtils.convertStringToSearchQuery(name);
     Disjunction or = Restrictions.disjunction();
     or.add(externalNameCheck(SampleIdentityImpl.class, "externalName", query));
-    or.add(externalNameCheck(SampleTissueImpl.class, "externalInstituteIdentifier", query));
+    or.add(externalNameCheck(SampleTissueImpl.class, "secondaryIdentifier", query));
     criteria.add(or);
   }
 

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -44,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -93,7 +92,7 @@ public class ExternalRestController extends RestController {
     this.sampleService = sampleService;
   }
 
-  @RequestMapping(value = "projects", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "projects", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String jsonRest() throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<Project> lp = requestManager.listAllProjects();
@@ -121,7 +120,7 @@ public class ExternalRestController extends RestController {
     return "{" + sb.toString() + "}";
   }
 
-  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String jsonRestProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     StringBuilder sb = new StringBuilder();
 
@@ -172,12 +171,8 @@ public class ExternalRestController extends RestController {
       int si = 0;
       for (Sample sample : samples) {
         si++;
-        String sampleQubit = "not available";
-        if (sampleService.listSampleQCsBySampleId(sample.getId()).size() > 0) {
-          ArrayList<SampleQC> sampleQcList = new ArrayList<>(sampleService.listSampleQCsBySampleId(sample.getId()));
-          SampleQC lastQc = sampleQcList.get(sampleQcList.size() - 1);
-          sampleQubit = (lastQc.getResults() != null ? lastQc.getResults().toString() : "");
-        }
+        String sampleQubit = sample.getQCs().stream().filter(qc -> qc.getType().getName().contains("Qubit"))
+            .sorted((a, b) -> b.getDate().compareTo(a.getDate())).findFirst().map(qc -> qc.getResults().toString()).orElse("not available");
         sb.append("{");
         sb.append("'alias':'" + sample.getAlias() + "'");
         sb.append(",");
@@ -239,10 +234,12 @@ public class ExternalRestController extends RestController {
               + (run.getStartDate() != null ? run.getStartDate().toString() : "") + "'");
           sb.append(",");
           sb.append("'completionDate':'" + (run.getCompletionDate() != null
-              ? run.getCompletionDate().toString() : "") + "'");
+              ? run.getCompletionDate().toString()
+              : "") + "'");
           sb.append(",");
           sb.append("'platformType':'" + (run.getSequencerReference().getPlatform().getPlatformType() != null
-              ? run.getSequencerReference().getPlatform().getPlatformType().getKey() : "") + "'");
+              ? run.getSequencerReference().getPlatform().getPlatformType().getKey()
+              : "") + "'");
           sb.append(",");
           sb.append("'samples':[");
           if (runSamples.size() > 0) {
@@ -268,5 +265,5 @@ public class ExternalRestController extends RestController {
 
     return "{" + sb.toString() + "}";
   }
-  
+
 }

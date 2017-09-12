@@ -28,20 +28,12 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 /**
  * A SequencerReference is a sequencing machine specifically designated with a {@link Platform}
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface SequencerReference extends Nameable, Deletable, Serializable {
   /**
    * Sets the id of this SequencerReference object.
@@ -144,7 +136,6 @@ public interface SequencerReference extends Nameable, Deletable, Serializable {
   /**
    * @return the upgraded sequencer reference, which is a new version of this same sequencer, likely renamed during an upgrade
    */
-  @JsonManagedReference
   public SequencerReference getUpgradedSequencerReference();
   
   /**

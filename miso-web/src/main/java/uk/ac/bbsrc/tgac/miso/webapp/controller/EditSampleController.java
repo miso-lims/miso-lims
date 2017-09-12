@@ -39,7 +39,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
@@ -60,16 +59,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -105,12 +100,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -122,7 +115,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
-import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
@@ -136,7 +128,6 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
@@ -148,7 +139,6 @@ import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ui.SampleOptionsController;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
@@ -172,8 +162,6 @@ public class EditSampleController {
   private NamingScheme namingScheme;
 
   @Autowired
-  private SampleOptionsController sampleOptionsController;
-  @Autowired
   private SampleService sampleService;
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
@@ -181,8 +169,6 @@ public class EditSampleController {
   private ExperimentService experimentService;
   @Autowired
   private ChangeLogService changeLogService;
-  @Autowired
-  private LibraryService libraryService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -200,10 +186,6 @@ public class EditSampleController {
 
   public void setNamingScheme(NamingScheme namingScheme) {
     this.namingScheme = namingScheme;
-  }
-
-  public void setSampleOptionsController(SampleOptionsController sampleOptionsController) {
-    this.sampleOptionsController = sampleOptionsController;
   }
 
   public void setSampleService(SampleService sampleService) {
@@ -267,40 +249,23 @@ public class EditSampleController {
     return namingScheme != null && namingScheme.hasSampleAliasGenerator();
   }
 
-  @Value("${miso.autoGenerateIdentificationBarcodes}")
-  private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
+  @Value("${miso.defaults.sample.bulk.scientificname:}")
+  private String defaultSciName;
 
-  @ModelAttribute("autoGenerateIdBarcodes")
-  public Boolean autoGenerateIdentificationBarcodes() {
-    return autoGenerateIdBarcodes;
-  }
-
-  @ModelAttribute("detailedSample")
-  public Boolean isDetailedSampleEnabled() {
+  private Boolean isDetailedSampleEnabled() {
     return detailedSample;
   }
 
-  @ModelAttribute("sampleOptions")
-  public String getSampleOptions(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
-    return mapper.writeValueAsString(sampleOptionsController.getSampleOptions(uriBuilder, response));
+  @ModelAttribute("defaultSciName")
+  public String getDefaultSciName() {
+    return defaultSciName != null ? defaultSciName : "";
   }
 
   @ModelAttribute("stains")
   public List<Stain> populateStains() {
     return stainService.list();
-  }
-
-  @ModelAttribute("qcTypes")
-  public List<QcTypeDto> getSampleQcTypes() {
-    List<QcTypeDto> qcTypes = new ArrayList<>();
-    try {
-      qcTypes = Dtos.asQcTypeDtos(sampleService.listSampleQcTypes());
-    } catch (IOException e) {
-      log.error("Error getting QC Types", e);
-    }
-    return qcTypes;
   }
 
   public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId)
@@ -376,22 +341,6 @@ public class EditSampleController {
     return sampleService.getSampleColumnSizes();
   }
 
-  @ModelAttribute("sampleTypesString")
-  public String sampleTypesString() throws IOException {
-    List<String> types = new ArrayList<>();
-    List<String> sampleTypes = new ArrayList<>(sampleService.listSampleTypes());
-    Collections.sort(sampleTypes);
-    for (String s : sampleTypes) {
-      types.add("\"" + s + "\"" + ":" + "\"" + s + "\"");
-    }
-    return LimsUtils.join(types, ",");
-  }
-
-  @ModelAttribute("sampleQCUnits")
-  public String sampleQCUnits() throws IOException {
-    return SampleQCImpl.UNITS;
-  }
-
   @ModelAttribute("libraryDilutionUnits")
   public String libraryDilutionUnits() {
     return LibraryDilution.UNITS;
@@ -400,50 +349,6 @@ public class EditSampleController {
   @ModelAttribute("poolConcentrationUnits")
   public String poolConcentrationUnits() {
     return PoolImpl.CONCENTRATION_UNITS;
-  }
-
-  @ModelAttribute("libraryQcTypesString")
-  public String libraryTypesString() throws IOException {
-    List<String> types = new ArrayList<>();
-    List<QcType> libraryQcTypes = new ArrayList<>(libraryService.listLibraryQcTypes());
-    Collections.sort(libraryQcTypes);
-    for (QcType s : libraryQcTypes) {
-      types.add("\"" + s.getQcTypeId() + "\"" + ":" + "\"" + s.getName() + "\"");
-    }
-    return LimsUtils.join(types, ",");
-  }
-
-  // Handsontable
-  @ModelAttribute("referenceDataJSON")
-  public JSONObject referenceDataJsonString() throws IOException {
-    final JSONObject hot = new JSONObject();
-    final List<String> sampleTypes = new ArrayList<>(sampleService.listSampleTypes());
-    final List<String> strStatuses = new ArrayList<>();
-    final List<String> donorSexes = new ArrayList<>();
-    final List<QcTypeDto> qcTypes = new ArrayList<>(Dtos.asQcTypeDtos(sampleService.listSampleQcTypes()));
-    JSONArray allProjects = new JSONArray();
-    for (Project fullProject : requestManager.listAllProjects()) {
-      JSONObject project = new JSONObject();
-      project.put("id", fullProject.getId());
-      project.put("alias", fullProject.getAlias());
-      project.put("name", fullProject.getName());
-      project.put("shortname", fullProject.getShortName());
-      allProjects.add(project);
-    }
-    for (String strLabel : StrStatus.getLabels()) {
-      strStatuses.add(strLabel);
-    }
-    for (String dsLabel : DonorSex.getLabels()) {
-      donorSexes.add(dsLabel);
-    }
-
-    hot.put("sampleTypes", sampleTypes);
-    hot.put("projects", allProjects);
-    hot.put("strStatuses", strStatuses);
-    hot.put("donorSexes", donorSexes);
-    hot.put("qcTypes", qcTypes);
-
-    return hot;
   }
 
   @Autowired
@@ -781,9 +686,9 @@ public class EditSampleController {
 
         model.put("sampleLibraries", sample.getLibraries().stream().map(Dtos::asDto).collect(Collectors.toList()));
         Set<Pool> pools = sample.getLibraries().stream()
-            .flatMap(WhineyFunction.flatLog(log, library -> poolService.listByLibraryId(library.getId())))
+            .flatMap(WhineyFunction.flatRethrow(library -> poolService.listByLibraryId(library.getId())))
             .distinct().collect(Collectors.toSet());
-        List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatLog(log, pool -> runService.listByPoolId(pool.getId())))
+        List<RunDto> runDtos = pools.stream().flatMap(WhineyFunction.flatRethrow(pool -> runService.listByPoolId(pool.getId())))
             .map(Dtos::asDto)
             .collect(Collectors.toList());
         model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
@@ -980,9 +885,13 @@ public class EditSampleController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      config.putPOJO("targetSampleClass", Dtos.asDto(sampleClass));
-      config.putPOJO("sourceSampleClass", Dtos.asDto(sampleClass));
-      config.put("dnaseTreatable", sampleClass.getDNAseTreatable());
+      if (sampleClass != null) {
+        config.putPOJO("targetSampleClass", Dtos.asDto(sampleClass));
+        config.putPOJO("sourceSampleClass", Dtos.asDto(sampleClass));
+        config.put("dnaseTreatable", sampleClass.getDNAseTreatable());
+      } else {
+        config.put("dnaseTreatable", false);
+      }
       config.put("propagate", false);
       config.put("edit", true);
     }
@@ -1074,15 +983,20 @@ public class EditSampleController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      if (targetSampleClass != null) config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
+      if (targetSampleClass != null) {
+        config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
+        config.put("dnaseTreatable", targetSampleClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
+      } else {
+        config.put("dnaseTreatable", false);
+      }
       config.put("create", true);
       config.put("hasProject", project != null);
-      config.put("dnaseTreatable", targetSampleClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
       if (project == null) {
         requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
       } else {
         config.putPOJO("project", Dtos.asDto(project));
       }
+      config.put("defaultSciName", defaultSciName);
     }
   };
 

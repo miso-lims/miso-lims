@@ -357,7 +357,7 @@ table.minimal tr {
     border-bottom: 1px solid #CDCDCD;
 }
 
-td.right {
+.right {
     text-align: right;
 }
 
@@ -556,7 +556,7 @@ a.dashboardresult {
     color: #555;
 }
 
-.dashboard {
+.dashboard, .pool-tile {
     font: 10px Verdana, arial, sans-serif;
     border: 1px solid lightgray;
     margin: 5px;
@@ -569,7 +569,7 @@ a.dashboardresult {
     white-space: nowrap;
 }
 
-.dashboardhighlight {
+.dashboardhighlight, .pool-tile:hover {
     font: 10px Verdana, arial, sans-serif;
     border: 1px solid lightgray;
     margin: 5px;

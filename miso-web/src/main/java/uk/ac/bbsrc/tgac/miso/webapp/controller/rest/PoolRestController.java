@@ -38,12 +38,15 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -57,13 +60,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
+import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 
 /**
  * A controller to handle all REST requests for Pools
@@ -94,6 +104,7 @@ public class PoolRestController extends RestController {
       this.remove = remove;
     }
   }
+
   private final JQueryDataTableBackend<Pool, PoolDto> jQueryBackend = new JQueryDataTableBackend<Pool, PoolDto>() {
 
     @Override
@@ -117,7 +128,11 @@ public class PoolRestController extends RestController {
   @Autowired
   private PoolService poolService;
   @Autowired
+  private ContainerService containerService;
+  @Autowired
   private PoolableElementViewService poolableElementViewService;
+  @Autowired
+  private PoolOrderCompletionService poolOrderCompletionService;
 
   public void setDilutionService(LibraryDilutionService dilutionService) {
     this.dilutionService = dilutionService;
@@ -163,6 +178,29 @@ public class PoolRestController extends RestController {
     pool.setPoolableElementViews(Stream.concat(originalMinusRemoved, added).collect(Collectors.toSet()));
     poolService.save(pool);
     return Dtos.asDto(poolService.get(poolId), true);
+  }
+
+  @RequestMapping(value = "/{poolId}/assign", method = RequestMethod.POST, produces = "application/json")
+  @ResponseStatus(code = HttpStatus.OK)
+  public void assignPool(@PathVariable Long poolId, @RequestBody List<Long> partitionIds) throws IOException {
+    Pool pool = poolId == 0 ? null : poolService.get(poolId);
+    partitionIds.stream()//
+        .map(WhineyFunction.rethrow(containerService::getPartition))//
+        .peek(partition -> {
+          if (pool != null && partition.getSequencerPartitionContainer().getPlatform().getPlatformType() != pool.getPlatformType()) {
+            throw new RestException(
+                String.format("%s %d in %s is not compatible with pool %s.",
+                    partition.getSequencerPartitionContainer().getPlatform().getPlatformType().getPartitionName(),
+                    partition.getPartitionNumber(), partition.getSequencerPartitionContainer().getIdentificationBarcode(), pool.getName()),
+                Status.BAD_REQUEST);
+          }
+          partition.setPool(pool);
+        })//
+        .forEach(WhineyConsumer.rethrow(containerService::update));
+    if (pool != null) {
+      pool.setReadyToRun(false);
+      poolService.save(pool);
+    }
   }
 
   @RequestMapping(value = "platform/{platform}", method = RequestMethod.GET, produces = "application/json")
@@ -242,4 +280,41 @@ public class PoolRestController extends RestController {
     return "[" + LimsUtils.join(names, ",") + "]";
   }
 
+  @RequestMapping(value = "/picker/search")
+  @ResponseBody
+  public PoolPickerResponse getPickersBySearch(@RequestParam("platform") String platform, @RequestParam("query") String query)
+      throws IOException {
+    return getPoolPickerWithFilters(100,
+        PaginationFilter.platformType(PlatformType.valueOf(platform)),
+        PaginationFilter.query(query));
+  }
+
+  @RequestMapping(value = "/picker/readytorun")
+  @ResponseBody
+  public PoolPickerResponse getPickersByReadyToRun(@RequestParam("platform") String platform,
+      @RequestParam("readyToRun") boolean readyToRun) throws IOException {
+    return getPoolPickerWithFilters(100,
+        PaginationFilter.platformType(PlatformType.valueOf(platform)),
+        PaginationFilter.readyToRun(readyToRun));
+  }
+
+  @RequestMapping(value = "/picker/recent")
+  @ResponseBody
+  public PoolPickerResponse getPickersBySearch(@RequestParam("platform") String platform)
+      throws IOException {
+    return getPoolPickerWithFilters(20,
+        PaginationFilter.platformType(PlatformType.valueOf(platform)));
+  }
+
+  private PoolPickerResponse getPoolPickerWithFilters(Integer limit, PaginationFilter... filters) throws IOException {
+    PoolPickerResponse ppr = new PoolPickerResponse();
+    ppr.populate(poolService, false, "lastModified", limit, this::poolTransform, filters);
+    return ppr;
+  }
+
+  private PoolPickerEntry poolTransform(Pool pool) throws IOException {
+    List<PoolOrderCompletionDto> completions = poolOrderCompletionService.getByPoolId(pool.getId()).stream()
+        .map(completion -> Dtos.asDto(completion)).collect(Collectors.toList());
+    return new PoolPickerEntry(Dtos.asDto(pool, true), completions);
+  }
 }

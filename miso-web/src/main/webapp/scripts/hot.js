@@ -370,7 +370,6 @@ var HotUtils = {
         }
         table.sort(sortColIndex);
       }
-      ;
       var button = document.createElement('input');
       button.type = 'button';
       button.id = 'sort' + sortOption.sortTarget;
@@ -768,9 +767,11 @@ var HotUtils = {
     baseobj.data = property;
     baseobj.type = 'text';
     baseobj.include = include;
-    baseobj.unpack = function(obj, flat, setCellMeta) {
-      flat[property] = obj[property] || null;
-    };
+    if (!baseobj.hasOwnProperty('unpack')) {
+      baseobj.unpack = function(obj, flat, setCellMeta) {
+        flat[property] = obj[property] || null;
+      };
+    }
     baseobj.pack = function(obj, flat, errorHandler) {
       if (!Utils.validation.isEmpty(flat[property])) {
         obj[property] = flat[property];
@@ -803,7 +804,7 @@ var HotUtils = {
   
   printAction : function(type) {
     return {
-      name : 'Print',
+      name : 'Print Barcode(s)',
       action : function(items) {
         Utils.printDialog(type, items.map(Utils.array.getId));
       },
@@ -811,6 +812,42 @@ var HotUtils = {
     };
   },
 
+  makeQcActions : function(qcTarget) {
+    return [
+        null,
+        {
+          name : 'Add QCs',
+          action : function(items) {
+            Utils
+                .showDialog(
+                    'Add QCs',
+                    'Add',
+                    [ {
+                      property : 'copies',
+                      type : 'int',
+                      label : 'QCs per ' + qcTarget,
+                      value : 1
+                    }, ],
+                    function(result) {
+                      window.location = window.location.origin + '/miso/qc/bulk/addFrom/' + qcTarget + '?' + jQuery
+                          .param({
+                            entityIds : items.map(Utils.array.getId).join(','),
+                            copies : result.copies
+                          
+                          });
+                    });
+          }
+        },
+        {
+          name : 'Edit QCs',
+          action : function(items) {
+            window.location = window.location.origin + '/miso/qc/bulk/editFrom/' + qcTarget + '?' + jQuery
+                .param({
+                  entityIds : items.map(Utils.array.getId).join(',')
+                });
+          }
+        }, ];
+  },
 };
 
 HotTarget = {};

@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -235,15 +234,6 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
-  }
-
-  @Override
-  public void saveAll(Collection<Run> runs) throws IOException {
-    log.debug(">>> Entering saveAll with " + runs.size() + " runs");
-    for (Run run : runs) {
-      save(run);
-    }
-    log.debug("<<< Exiting saveAll");
   }
 
   @Override

@@ -36,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -77,8 +76,6 @@ public class UserAuthMisoRequestManagerTest {
   private Note note;
   @Mock
   private Run run;
-  @Mock
-  private RunQC runQC;
   @Mock
   private Sample sample;
   @Mock
@@ -1144,16 +1141,6 @@ public class UserAuthMisoRequestManagerTest {
 
   @Test
   public void testDeleteRun() throws IOException {
-    // TODO: Implement.
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#deleteRunQC(uk.ac.bbsrc.tgac.miso.core.data.RunQC)} .
-   */
-
-  @Test
-  public void testDeleteRunQC() throws IOException {
     // TODO: Implement.
   }
 

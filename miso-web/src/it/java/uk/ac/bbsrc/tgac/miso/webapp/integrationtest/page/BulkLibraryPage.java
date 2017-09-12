@@ -37,9 +37,6 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String SIZE = "Size (bp)";
     public static final String VOLUME = "Vol. (µl)";
     public static final String CONCENTRATION = "Conc.";
-    public static final String QUBIT = "New Qubit (ng/µl)";
-    public static final String TAPE_STATION = "New TapeStation (bp)";
-    public static final String QPCR = "New qPCR (mol/µl)";
 
     private Columns() {
       throw new IllegalStateException("Util class not intended for instantiation");

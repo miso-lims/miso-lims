@@ -36,9 +36,9 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolOrderDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolableElementViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateQcTypeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateReferenceGenomeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRunQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
@@ -57,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.DefaultLibraryDesignCodeService;
+import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultBoxService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultContainerService;
@@ -71,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPlatformService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultQualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultRunService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
@@ -112,7 +114,6 @@ public class MisoServiceManager {
   private HibernatePlatformDao platformDao;
   private HibernateStudyDao studyDao;
   private HibernateRunDao runDao;
-  private HibernateRunQcDao runQcDao;
   private HibernateSequencerPartitionContainerDao sequencerPartitionContainerDao;
   private HibernateSequencerReferenceDao sequencerReferenceDao;
   private HibernateBoxDao boxDao;
@@ -144,6 +145,7 @@ public class MisoServiceManager {
   private DefaultPoolService poolService;
   private DefaultTargetedSequencingService targetedSequencingService;
   private DefaultBoxService boxService;
+  private DefaultQualityControlService qcService;
 
   private HibernateSampleClassDao sampleClassDao;
   private HibernateSampleDao sampleDao;
@@ -162,6 +164,7 @@ public class MisoServiceManager {
   private HibernateIndexDao indexDao;
   private HibernateSequencingParametersDao sequencingParametersDao;
   private HibernateReferenceGenomeDao referenceGenomeDao;
+  private HibernateQcTypeDao qcTypeDao;
 
   private MisoRequestManager requestManager;
 
@@ -219,7 +222,6 @@ public class MisoServiceManager {
     m.setDefaultProjectDao();
     m.setDefaultDetailedQcStatusDao();
     m.setDefaultRunDao();
-    m.setDefaultRunQcDao();
     m.setDefaultSampleClassDao();
     m.setDefaultSampleClassService();
     m.setDefaultSampleDao();
@@ -252,6 +254,7 @@ public class MisoServiceManager {
     m.setDefaultPoolableElementViewDao();
     m.setDefaultPoolableElementViewService();
     m.setDefaultBoxService();
+    m.setDefaultQualityControlService();
 
     // sigh
     m.setDefaultRequestManager();
@@ -429,7 +432,6 @@ public class MisoServiceManager {
   private void updateSecurityManagerDependencies() {
     if (requestManager != null) requestManager.setSecurityManager(securityManager);
     if (libraryService != null) libraryService.setSecurityManager(securityManager);
-    if (sampleService != null) sampleService.setSecurityManager(securityManager);
     if (runService != null) runService.setSecurityManager(securityManager);
   }
 
@@ -523,8 +525,6 @@ public class MisoServiceManager {
     svc.setTissueTypeDao(tissueTypeDao);
     svc.setSampleDao(sampleDao);
     svc.setLabService(labService);
-    svc.setSampleQcDao(sampleQcDao);
-    svc.setSecurityManager(securityManager);
     setSampleService(svc);
   }
 
@@ -589,7 +589,7 @@ public class MisoServiceManager {
   }
 
   private void updateSampleQcDaoDependencies() {
-    if (sampleService != null) sampleService.setSampleQcDao(sampleQcDao);
+    if (qcService != null) qcService.setSampleQcStore(sampleQcDao);
   }
 
   public HibernateLibraryDao getLibraryDao() {
@@ -630,7 +630,6 @@ public class MisoServiceManager {
     svc.setLibraryDao(libraryDao);
     svc.setLibraryDesignService(libraryDesignService);
     svc.setLibraryDesignCodeService(libraryDesignCodeService);
-    svc.setLibraryQcDao(libraryQcDao);
     svc.setIndexService(indexService);
     svc.setKitService(kitService);
     svc.setSampleService(sampleService);
@@ -659,7 +658,7 @@ public class MisoServiceManager {
   }
 
   private void updateLibraryQcDaoDependencies() {
-    if (libraryService != null) libraryService.setLibraryQcDao(libraryQcDao);
+    if (qcService != null) qcService.setLibraryQcStore(libraryQcDao);
   }
 
   public HibernateLibraryDilutionDao getDilutionDao() {
@@ -871,25 +870,6 @@ public class MisoServiceManager {
   private void updateRunDaoDependencies() {
     if (requestManager != null) requestManager.setRunStore(runDao);
     if (runService != null) runService.setRunDao(runDao);
-  }
-
-  public HibernateRunQcDao getRunQcDao() {
-    return runQcDao;
-  }
-
-  public void setRunQcDao(HibernateRunQcDao runQcDao) {
-    this.runQcDao = runQcDao;
-    updateRunQcDaoDependencies();
-  }
-
-  public void setDefaultRunQcDao() {
-    HibernateRunQcDao dao = new HibernateRunQcDao();
-    dao.setSessionFactory(sessionFactory);
-    setRunQcDao(dao);
-  }
-
-  private void updateRunQcDaoDependencies() {
-    if (runService != null) runService.setRunQcDao(runQcDao);
   }
 
   public HibernateSequencerPartitionContainerDao getSequencerPartitionContainerDao() {
@@ -1399,7 +1379,6 @@ public class MisoServiceManager {
     DefaultRunService service = new DefaultRunService();
     service.setAuthorizationManager(authorizationManager);
     service.setRunDao(runDao);
-    service.setRunQcDao(runQcDao);
     service.setSecurityManager(securityManager);
     service.setNamingScheme(getNamingScheme());
     service.setSecurityProfileStore(securityProfileDao);
@@ -1706,5 +1685,23 @@ public class MisoServiceManager {
 
   public BoxService getBoxService() {
     return boxService;
+  }
+
+  private void setDefaultQualityControlService() {
+    DefaultQualityControlService service = new DefaultQualityControlService();
+    service.setAuthorizationManager(authorizationManager);
+    service.setLibraryQcStore(libraryQcDao);
+    // Skip setParitionQcStore
+    // Skip setPoolQcStore
+    service.setSampleQcStore(sampleQcDao);
+    service.setQcTypeStore(qcTypeDao);
+    updateQualityServiceDependencies();
+  }
+
+  private void updateQualityServiceDependencies() {
+  }
+
+  public QualityControlService getQualityControlService() {
+    return qcService;
   }
 }

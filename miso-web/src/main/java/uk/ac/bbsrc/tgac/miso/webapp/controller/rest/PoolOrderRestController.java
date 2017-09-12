@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
@@ -27,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolOrderCompletion;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -36,6 +39,8 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 
 @Controller
 @RequestMapping("/rest")
@@ -108,14 +113,14 @@ public class PoolOrderRestController extends RestController {
   
   @RequestMapping(value = "/poolorder/dt/completions", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<PoolOrderCompletionDto> getCompletions(UriComponentsBuilder uriBuilder, HttpServletRequest request, HttpServletResponse response)
+  public DataTablesResponseDto<PoolOrderCompletionDto> getDtCompletions(UriComponentsBuilder uriBuilder, HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }
 
   @RequestMapping(value = "/poolorder/dt/completions/active", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<PoolOrderCompletionDto> getCompletionsFulfilled(UriComponentsBuilder uriBuilder, HttpServletRequest request,
+  public DataTablesResponseDto<PoolOrderCompletionDto> getDtCompletionsUnfulfilled(UriComponentsBuilder uriBuilder, HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.fulfilled(false));
@@ -157,4 +162,32 @@ public class PoolOrderRestController extends RestController {
     return poolOrderDto;
   }
 
+  @RequestMapping(value = "/poolorder/picker/active", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public PoolPickerResponse getPickersByUnfulfilled(@RequestParam("platform") String platform) throws IOException {
+    return getPoolPickerWithFilters(100,
+        PaginationFilter.platformType(PlatformType.valueOf(platform)),
+        PaginationFilter.fulfilled(false));
+  }
+
+  @RequestMapping(value = "/poolorder/picker/chemistry", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public PoolPickerResponse getPickersByChemistry(@RequestParam("platform") String platform,
+      @RequestParam("seqParamsId") Long paramsId,
+      @RequestParam("fulfilled") boolean fulfilled) throws IOException {
+    return getPoolPickerWithFilters(100,
+        PaginationFilter.platformType(PlatformType.valueOf(platform)),
+        PaginationFilter.fulfilled(fulfilled),
+        PaginationFilter.sequencingParameters(paramsId));
+  }
+
+  private PoolPickerResponse getPoolPickerWithFilters(Integer limit, PaginationFilter... filters) throws IOException {
+    PoolPickerResponse ppr = new PoolPickerResponse();
+    ppr.populate(poolOrderCompletionService, true, "lastUpdated", limit, PoolOrderRestController::orderTransform, filters);
+    return ppr;
+  }
+
+  private static PoolPickerEntry orderTransform(PoolOrderCompletion order) {
+    return new PoolPickerEntry(Dtos.asDto(order.getPool(), true), Collections.singletonList(Dtos.asDto(order)));
+  }
 }

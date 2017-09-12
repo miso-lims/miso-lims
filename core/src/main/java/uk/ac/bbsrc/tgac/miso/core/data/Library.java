@@ -30,10 +30,6 @@ import java.util.List;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -54,15 +50,12 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeName("library")
-@JsonIgnoreProperties({ "securityProfile" })
 public interface Library
-    extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable {
+    extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable,
+    QualityControllable<LibraryQC> {
 
   /** Field UNSAVED_ID */
-  public static final Long UNSAVED_ID = 0L;
+  public static final long UNSAVED_ID = 0L;
   /** Field PREFIX */
   public static final String PREFIX = "LIB";
 
@@ -143,21 +136,6 @@ public interface Library
    * @return Collection<Note> notes.
    */
   public Collection<Note> getNotes();
-
-  /**
-   * Registers that a LibraryQC has been carried out on this Library
-   * 
-   * @param libraryQC
-   *          of type LibraryQC
-   */
-  public void addQc(LibraryQC libraryQC);
-
-  /**
-   * Returns the libraryQCs of this Library object.
-   * 
-   * @return Collection<LibraryQC> libraryQCs.
-   */
-  public Collection<LibraryQC> getLibraryQCs();
 
   /**
    * Registers that a LibraryDilution has been carried out using this Library

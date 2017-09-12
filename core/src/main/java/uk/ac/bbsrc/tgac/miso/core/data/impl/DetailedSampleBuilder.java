@@ -21,13 +21,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
@@ -98,7 +99,7 @@ public class DetailedSampleBuilder
   private SampleClass tissueClass; // identifies a parent tissue class if this sample itself is not a tissue
   private TissueOrigin tissueOrigin;
   private TissueType tissueType;
-  private String externalInstituteIdentifier;
+  private String secondaryIdentifier;
   private Lab lab;
   private Integer passageNumber;
   private Integer timesReceived;
@@ -155,14 +156,13 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public void addQc(SampleQC sampleQc) {
-    this.sampleQCs.add(sampleQc);
-    sampleQc.setSample(this);
+  public Collection<SampleQC> getQCs() {
+    return sampleQCs;
   }
 
   @Override
-  public Collection<SampleQC> getSampleQCs() {
-    return sampleQCs;
+  public QcTarget getQcTarget() {
+    return QcTarget.Sample;
   }
 
   @Override
@@ -429,13 +429,13 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public String getExternalInstituteIdentifier() {
-    return externalInstituteIdentifier;
+  public String getSecondaryIdentifier() {
+    return secondaryIdentifier;
   }
 
   @Override
-  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
-    this.externalInstituteIdentifier = externalInstituteIdentifier;
+  public void setSecondaryIdentifier(String secondaryIdentifier) {
+    this.secondaryIdentifier = secondaryIdentifier;
   }
 
   @Override
@@ -928,7 +928,7 @@ public class DetailedSampleBuilder
     tissue.setPassageNumber(passageNumber);
     tissue.setTissueType(tissueType);
     tissue.setTissueOrigin(tissueOrigin);
-    tissue.setExternalInstituteIdentifier(externalInstituteIdentifier);
+    tissue.setSecondaryIdentifier(secondaryIdentifier);
     tissue.setLab(lab);
     tissue.setTissueMaterial(tissueMaterial);
     tissue.setRegion(region);
@@ -959,5 +959,4 @@ public class DetailedSampleBuilder
   public void setStain(Stain stain) {
     this.stain = stain;
   }
-
 }

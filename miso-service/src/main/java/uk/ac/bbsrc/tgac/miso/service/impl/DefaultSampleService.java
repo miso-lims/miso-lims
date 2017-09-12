@@ -24,31 +24,30 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -98,10 +97,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   private SamplePurposeDao samplePurposeDao;
   @Autowired
   private TissueMaterialDao tissueMaterialDao;
-  @Autowired
-  private SampleQcStore sampleQcDao;
-  @Autowired
-  private SecurityManager securityManager;
   @Autowired
   private LabService labService;
   @Autowired
@@ -161,14 +156,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   public void setTissueMaterialDao(TissueMaterialDao tissueMaterialDao) {
     this.tissueMaterialDao = tissueMaterialDao;
-  }
-
-  public void setSampleQcDao(SampleQcStore sampleQcDao) {
-    this.sampleQcDao = sampleQcDao;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   public void setLabService(LabService labService) {
@@ -505,7 +492,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       if (sai.getDetailedQcStatus() != null && sai.getDetailedQcStatus().getId() != null) {
         sai.setDetailedQcStatus(detailedQcStatusDao.getDetailedQcStatus(sai.getDetailedQcStatus().getId()));
       }
-      if (sai.getSubproject() != null && sai.getSubproject().getId() != null) {
+      if (sai.getSubproject() != null && sai.getSubproject().getId() != SubprojectImpl.UNSAVED_ID) {
         sai.setSubproject(subProjectDao.getSubproject(sai.getSubproject().getId()));
       }
       if (isTissueProcessingSample(sai) && sai instanceof SampleSlide) {
@@ -520,22 +507,22 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       }
       if (isAliquotSample(sai)) {
         SampleAliquot sa = (SampleAliquot) sai;
-        if (sa.getSamplePurpose() != null && sa.getSamplePurpose().getId() != null) {
+        if (sa.getSamplePurpose() != null && sa.getSamplePurpose().getId() != SubprojectImpl.UNSAVED_ID) {
           sa.setSamplePurpose(samplePurposeDao.getSamplePurpose(sa.getSamplePurpose().getId()));
         }
       }
       if (isTissueSample(sai)) {
         SampleTissue st = (SampleTissue) sai;
-        if (st.getTissueMaterial() != null && st.getTissueMaterial().getId() != null) {
+        if (st.getTissueMaterial() != null && st.getTissueMaterial().getId() != TissueMaterialImpl.UNSAVED_ID) {
           st.setTissueMaterial(tissueMaterialDao.getTissueMaterial(st.getTissueMaterial().getId()));
         }
-        if (st.getTissueOrigin() != null && st.getTissueOrigin().getId() != null) {
+        if (st.getTissueOrigin() != null && st.getTissueOrigin().getId() != TissueOriginImpl.UNSAVED_ID) {
           st.setTissueOrigin(tissueOriginDao.getTissueOrigin(st.getTissueOrigin().getId()));
         }
-        if (st.getTissueType() != null && st.getTissueType().getId() != null) {
+        if (st.getTissueType() != null && st.getTissueType().getId() != TissueTypeImpl.UNSAVED_ID) {
           st.setTissueType(tissueTypeDao.getTissueType(st.getTissueType().getId()));
         }
-        if (st.getLab() != null && st.getLab().getId() != null) {
+        if (st.getLab() != null && st.getLab().getId() != LabImpl.UNSAVED_ID) {
           st.setLab(labService.get(st.getLab().getId()));
         }
       }
@@ -578,7 +565,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public void update(Sample sample) throws IOException {
-    if (!sample.getSampleQCs().isEmpty()) bulkAddQcs(sample);
     Sample updatedSample = get(sample.getId());
     boolean validateAliasUniqueness = !updatedSample.getAlias().equals(sample.getAlias());
     authorizationManager.throwIfNotWritable(updatedSample);
@@ -616,7 +602,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     target.setDiscarded(source.isDiscarded());
     target.setVolume(source.getVolume());
     target.setLocationBarcode(source.getLocationBarcode());
-    target.setIdentificationBarcode(source.getIdentificationBarcode());
+    target.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(source.getIdentificationBarcode()));
     if (isDetailedSample(target)) {
       DetailedSample dTarget = (DetailedSample) target;
       DetailedSample dSource = (DetailedSample) source;
@@ -664,7 +650,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     target.setPassageNumber(source.getPassageNumber());
     target.setTimesReceived(source.getTimesReceived());
     target.setTubeNumber(source.getTubeNumber());
-    target.setExternalInstituteIdentifier(source.getExternalInstituteIdentifier());
+    target.setSecondaryIdentifier(source.getSecondaryIdentifier());
     target.setRegion(source.getRegion());
     target.setTissueMaterial(source.getTissueMaterial());
     target.setTissueOrigin(source.getTissueOrigin());
@@ -788,89 +774,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
     sampleDao.save(managed);
-  }
-
-  @Override
-  public void addQc(Sample sample, SampleQC qc) throws IOException {
-    if (qc.getQcType() == null || qc.getQcType().getQcTypeId() == null) {
-      throw new IllegalArgumentException("QC Type cannot be null");
-    }
-    QcType managedQcType = sampleQcDao.getSampleQcTypeById(qc.getQcType().getQcTypeId());
-    if (managedQcType == null) {
-      throw new IllegalArgumentException("QC Type " + qc.getQcType().getQcTypeId() + " is not applicable for samples");
-    }
-    qc.setQcType(managedQcType);
-    qc.setQcCreator(authorizationManager.getCurrentUsername());
-
-    Sample managed = get(sample.getId());
-    authorizationManager.throwIfNotWritable(managed);
-
-    // TODO: update concentration and/or volume if QC is of relevant type
-    managed.addQc(qc);
-    managed.setLastModifier(authorizationManager.getCurrentUser());
-    sampleDao.save(managed);
-  }
-
-  @Override
-  public void bulkAddQcs(Sample sample) throws IOException {
-    for (SampleQC qc : sample.getSampleQCs()) {
-      if (qc.getId() == AbstractQC.UNSAVED_ID) addQc(sample, qc);
-      // TODO: make QCs updatable too
-    }
-  }
-
-  @Override
-  public void deleteQc(Sample sample, Long qcId) throws IOException {
-    if (qcId == null || qcId.equals(SampleQCImpl.UNSAVED_ID)) {
-      throw new IllegalArgumentException("Cannot delete an unsaved Sample QC");
-    }
-    Sample managed = sampleDao.get(sample.getId());
-    authorizationManager.throwIfNotWritable(managed);
-    SampleQC deleteQc = null;
-    for (SampleQC qc : managed.getSampleQCs()) {
-      if (qc.getId() == qcId) {
-        deleteQc = qc;
-        break;
-      }
-    }
-    if (deleteQc == null) throw new IOException("QC " + qcId + " not found for Sample " + sample.getId());
-    authorizationManager.throwIfNonAdminOrMatchingOwner(securityManager.getUserByLoginName(deleteQc.getQcCreator()));
-    managed.getSampleQCs().remove(deleteQc);
-    managed.setLastModifier(authorizationManager.getCurrentUser());
-    sampleQcDao.remove(deleteQc);
-    sampleDao.save(managed);
-  }
-
-  @Override
-  public SampleQC getSampleQC(long sampleQcId) throws IOException {
-    SampleQC qc = sampleQcDao.get(sampleQcId);
-    authorizationManager.throwIfNotReadable(qc.getSample());
-    return qc;
-  }
-
-  @Override
-  public Collection<QcType> listSampleQcTypes() throws IOException {
-    return sampleQcDao.listAllSampleQcTypes();
-  }
-
-  @Override
-  public QcType getSampleQcType(long qcTypeId) throws IOException {
-    return sampleQcDao.getSampleQcTypeById(qcTypeId);
-  }
-
-  @Override
-  public QcType getSampleQcTypeByName(String qcTypeName) throws IOException {
-    return sampleQcDao.getSampleQcTypeByName(qcTypeName);
-  }
-
-  @Override
-  public Collection<SampleQC> listSampleQCsBySampleId(long sampleId) throws IOException {
-    Collection<SampleQC> qcs = new HashSet<>();
-    for (SampleQC qc : sampleQcDao.listBySampleId(sampleId)) {
-      if (qc.userCanRead(authorizationManager.getCurrentUser()))
-        qcs.add(qc);
-    }
-    return qcs;
   }
 
   @Override

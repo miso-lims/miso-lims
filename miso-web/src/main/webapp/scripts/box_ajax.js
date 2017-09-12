@@ -402,64 +402,23 @@ Box.ui = {
     var toolbar = jQuery('#listingBoxablesToolbar');
     toolbar.empty();
     actions.forEach(function(action) {
-      var button = jQuery('<a />', {
-        'class': 'ui-button ui-state-default',
-        title: action.title || '',
-        text: action.name
-      });
-      button.click(function() {
-        action.action(items);
-      });
+      var button;
+      if (action) {
+        button = jQuery('<a />', {
+          'class': 'ui-button ui-state-default',
+          title: action.title || '',
+          text: action.name
+        });
+        button.click(function() {
+          action.action(items);
+        });
+      } else {
+        button = jQuery('<span />', {
+          'class': 'ui-state-default',
+        });
+      }
       button.appendTo(toolbar);
     });
-  },
-
-  editBoxIdBarcode: function (span, id) {
-    var v = span.find('a').text();
-    if (v && v !== "") {
-      span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");
-    }
-  },
-
-  showBoxIdBarcodeChangeDialog: function (boxId, boxIdBarcode) {
-    var self = this;
-    jQuery('#changeBoxIdBarcodeDialog')
-      .html("<form>" +
-            "<fieldset class='dialog'>" +
-            "<strong><label>Current Barcode: </label></strong>" + boxIdBarcode +
-            "<br /><strong><label for='notetext'>New Barcode:</label></strong>" +
-            "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
-            "</fieldset></form>");
-
-    jQuery('#changeBoxIdBarcodeDialog').dialog({
-      width: 400,
-      modal: true,
-      resizable: false,
-      buttons: {
-        "Save": function () {
-          self.changeBoxIdBarcode(boxId, jQuery('#idBarcodeInput').val());
-          jQuery(this).dialog('close');
-        },
-        "Cancel": function () {
-          jQuery(this).dialog('close');
-        }
-      }
-    });
-  },
-
-  changeBoxIdBarcode: function (boxId, idBarcode) {
-    Fluxion.doAjax(
-      'boxControllerHelperService',
-      'changeBoxIdBarcode',
-      {
-        'boxId': boxId,
-        'identificationBarcode': idBarcode,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': Utils.page.pageReload
-      }
-    );
   },
 
   exportBox: function (boxId) {

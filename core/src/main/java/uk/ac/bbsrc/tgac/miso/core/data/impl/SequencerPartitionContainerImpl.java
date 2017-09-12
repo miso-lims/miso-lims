@@ -49,7 +49,6 @@ import org.hibernate.annotations.BatchSize;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -73,7 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 public class SequencerPartitionContainerImpl implements SequencerPartitionContainer {
 
   private static final long serialVersionUID = 1L;
-  public static final Long UNSAVED_ID = 0L;
+  public static final long UNSAVED_ID = 0L;
 
   public static final int DEFAULT_PARTITION_LIMIT = 8;
 
@@ -95,7 +94,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
 
-  @ManyToOne(targetEntity = PlatformImpl.class)
+  @ManyToOne(targetEntity = Platform.class)
   @JoinColumn(name = "platform", nullable = false)
   private Platform platform;
 
@@ -122,7 +121,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @OneToMany(targetEntity = PartitionImpl.class, mappedBy = "sequencerPartitionContainer", cascade = CascadeType.ALL)
   @OrderBy("partitionNumber")
-  @JsonIgnore
   private List<Partition> partitions = new ArrayList<>();
 
   /**

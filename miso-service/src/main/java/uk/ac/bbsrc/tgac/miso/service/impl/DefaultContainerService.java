@@ -210,4 +210,14 @@ public class DefaultContainerService
     this.platformService = platformService;
   }
 
+  @Override
+  public void update(Partition partition) throws IOException {
+    Partition original = containerDao.getPartitionById(partition.getId());
+    authorizationManager.throwIfNotWritable(original.getSequencerPartitionContainer());
+    Pool pool = partition.getPool() == null ? null : poolService.get(partition.getPool().getId());
+    original.setPool(pool);
+    original.getSequencerPartitionContainer().setLastModifier(authorizationManager.getCurrentUser());
+    containerDao.save(original.getSequencerPartitionContainer());
+  }
+
 }

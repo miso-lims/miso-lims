@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
@@ -181,21 +182,28 @@ public class DefaultMigrationTarget implements MigrationTarget {
     for (Project project : projects) {
       project.setSecurityProfile(new SecurityProfile(migrationUser));
       valueTypeLookup.resolveAll(project);
-      // Make sure there's a study
-      if (project.getStudies() == null) project.setStudies(new HashSet<Study>());
-      if (project.getStudies().isEmpty()) {
-        Study study = new StudyImpl();
-        study.setAlias((project.getShortName() == null ? project.getAlias() : project.getShortName()) + " study");
-        study.setDescription("");
-        study.setStudyType(other);
-        study.setLastModifier(migrationUser);
-        project.getStudies().add(study);
-      }
-      project.setId(serviceManager.getRequestManager().saveProject(project));
-      for (Study study : project.getStudies()) {
-        study.setProject(project);
-        study.inheritPermissions(project);
-        study.setId(serviceManager.getStudyService().save(study));
+      Project existing = serviceManager.getProjectDao().getByShortName(project.getShortName());
+      if (existing != null) {
+        project.setId(existing.getId());
+      } else {
+        // Make sure there's a study
+        if (project.getStudies() == null) project.setStudies(new HashSet<Study>());
+        if (project.getStudies().isEmpty()) {
+          Study study = new StudyImpl();
+          study.setAlias((project.getShortName() == null ? project.getAlias() : project.getShortName()) + " study");
+          study.setDescription("");
+          study.setStudyType(other);
+          study.setLastModifier(migrationUser);
+          project.getStudies().add(study);
+        }
+
+        project.setId(serviceManager.getRequestManager().saveProject(project));
+
+        for (Study study : project.getStudies()) {
+          study.setProject(project);
+          study.inheritPermissions(project);
+          study.setId(serviceManager.getStudyService().save(study));
+        }
       }
       log.debug("Saved project " + project.getAlias());
     }
@@ -240,12 +248,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
     sample.inheritPermissions(sample.getProject());
     valueTypeLookup.resolveAll(sample);
 
-    Collection<SampleQC> qcs = new TreeSet<>(sample.getSampleQCs());
+    Collection<SampleQC> qcs = new TreeSet<>(sample.getQCs());
     addSampleNoteDetails(sample);
 
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
-      if (detailed.getSubproject() != null && detailed.getSubproject().getId() == null) {
+      if (detailed.getSubproject() != null && detailed.getSubproject().getId() == SubprojectImpl.UNSAVED_ID) {
         // New subproject
         createSubproject(detailed.getSubproject(), detailed.getProject());
       }
@@ -330,8 +338,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
     Date date = (replaceChangeLogs && sample.getChangeLog() != null) ? getLatestChangeDate(sample) : timeStamp;
     for (SampleQC qc : qcs) {
       qc.setSample(sample);
-      qc.setQcCreator(migrationUser.getFullName());
-      qc.setQcDate(date);
+      qc.setCreator(migrationUser);
+      qc.setDate(date);
     }
   }
 
@@ -380,7 +388,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     library.inheritPermissions(library.getSample().getProject());
     valueTypeLookup.resolveAll(library);
     library.setLastModifier(migrationUser);
-    Collection<LibraryQC> qcs = new TreeSet<>(library.getLibraryQCs());
+    Collection<LibraryQC> qcs = new TreeSet<>(library.getQCs());
 
     for (Note note : library.getNotes()) {
       note.setCreationDate(timeStamp);
@@ -415,8 +423,8 @@ public class DefaultMigrationTarget implements MigrationTarget {
     Date date = (replaceChangeLogs && library.getChangeLog() != null) ? getLatestChangeDate(library) : timeStamp;
     for (LibraryQC qc : qcs) {
       qc.setLibrary(library);
-      qc.setQcCreator(migrationUser.getFullName());
-      qc.setQcDate(date);
+      qc.setCreator(migrationUser);
+      qc.setDate(date);
     }
   }
 
@@ -652,7 +660,6 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Updating run " + to.getId());
     to.setCompletionDate(from.getCompletionDate());
     to.setHealth(from.getHealth());
-
 
     if (to.getSequencerPartitionContainers().size() != 1) {
       throw new IOException(String.format("Existing run %s has unexpected number of sequencerPartitionContainers (%d)",

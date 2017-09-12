@@ -50,6 +50,9 @@ public interface AbstractListPage {
     public static final String RUNNING = "Running";
     public static final String REMAINING = "Remaining";
     public static final String FAILED = "Failed";
+    public static final String STARTED = "Started";
+    public static final String STOPPED = "Stopped";
+    public static final String UNKNOWN = "Unknown";
     public static final String TYPE = "Type";
     public static final String PRINTER = "Printer";
     public static final String DRIVER = "Driver";
@@ -61,6 +64,7 @@ public interface AbstractListPage {
     public static final String COMMISSIONED = "Commissioned";
     public static final String DECOMMISSIONED = "Decommissioned";
     public static final String VOLUME = "Volume";
+    public static final String MATRIX_BARCODE = "Matrix Barcode";
   }
 
   public static class ListTarget {

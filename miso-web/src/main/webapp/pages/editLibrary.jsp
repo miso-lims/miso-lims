@@ -50,6 +50,9 @@
     Save
   </button>
 </h1>
+<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+  <c:if test="${library.id != 0 && not empty library.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('library', [${library.id}]);">Print Barcode</span></c:if>
+</div>
 <div class="breadcrumbs">
   <ul>
     <li>
@@ -100,48 +103,6 @@
 </div>
 
 <h2>Library Information</h2>
-
-<div class="barcodes">
-  <div class="barcodeArea ui-corner-all">
-    <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Barcode</span>
-    <c:if test="${library.id != 0}">
-      <ul class="barcode-ddm">
-        <li>
-          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
-            <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-            <span id="idBarcode" style="float:right"></span>
-          </a>
-
-          <div id="idBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-            <a href="javascript:void(0);"
-               onclick="Utils.printDialog('library', [${library.id}]);">Print</a>
-            <c:if test="${not autoGenerateIdBarcodes}">
-              <a href="javascript:void(0);"
-               onclick="Library.barcode.showLibraryIdBarcodeChangeDialog(${library.id}, '${library.identificationBarcode}');">Update Barcode</a>
-            </c:if>
-          </div>
-        </li>
-      </ul>
-    </c:if>
-    <div id="changeLibraryIdBarcodeDialog" title="Assign New Barcode"></div>
-    <c:if test="${not empty library.identificationBarcode}">
-      <script type="text/javascript">
-        jQuery(document).ready(function () {
-          Fluxion.doAjax(
-            'libraryControllerHelperService',
-            'getLibraryBarcode',
-            {'libraryId':${library.id},
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              jQuery('#idBarcode').html("<img style='height:30px; border:0;' alt='${library.identificationBarcode}' title='${library.identificationBarcode}' src='<c:url value='/temp/'/>" + json.img + "'/>");
-            }
-            });
-        });
-      </script>
-    </c:if>
-  </div>
-</div>
 
 <table class="in">
 <tr>
@@ -217,6 +178,12 @@
     <form:input id="description" path="description" class="validateable"/>
     <span id="descriptionCounter" class="counter"></span></td>
 </tr>
+<c:if test="${not autoGenerateIdBarcodes}">
+  <tr>
+    <td class="h">Matrix Barcode:</td>
+    <td><form:input id="identificationBarcode" path="identificationBarcode" name="identificationBarcode"/></td>
+  </tr>
+</c:if>
 <tr>
   <td class="h">Creation date:</td>
   <td id="creationDate"><fmt:formatDate pattern="yyyy-MM-dd" type="date" value="${library.creationDate}"/></td>
@@ -492,93 +459,18 @@
         </c:forEach>
       </div>
     </c:if>
-    <div id="addLibraryNoteDialog" title="Create new Note"></div>
+    <div id="addNoteDialog" title="Create new Note"></div>
   </div>
 </c:if>
 </form:form>
 <br/>
 <c:if test="${library.id != 0}">
-<h1>
-  <span id="qcsTotalCount">
-  </span>
-</h1>
-<ul class="sddm">
-  <li>
-    <a id="qcMenuHandle" onmouseover="mopen('qcMenu')" onmouseout="mclosetime()">Options
-      <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-    </a>
-
-    <div id="qcMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-      <a href='javascript:void(0);' class="add" onclick="Library.qc.insertLibraryQCRow(${library.id}); return false;">Add Library QC</a>
-    </div>
-  </li>
-</ul>
-<div style="clear:both">
-  <div id="addLibraryQC"></div>
-  <form id='addQcForm'>
-    <table class="list" id="libraryQcTable">
-      <thead>
-      <tr>
-        <th>QCed By</th>
-        <th>QC Date</th>
-        <th>Method</th>
-        <th>Results</th>
-        <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-          <th align="center">Edit</th>
-        </c:if>
-      </tr>
-      </thead>
-      <tbody>
-      <c:if test="${not empty library.libraryQCs}">
-        <c:forEach items="${library.libraryQCs}" var="qc">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${qc.qcCreator}</td>
-            <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
-            <td>${qc.qcType.name}</td>
-
-            <fmt:formatNumber var="resultsRounded"
-              value="${qc.results}"
-              maxFractionDigits="${qc.qcType.precisionAfterDecimal}" />
-
-            <td id="result${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
-            <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                        or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <td id="edit${qc.id}" align="center">
-                <a href="javascript:void(0);" onclick="Library.qc.changeLibraryQCRow('${qc.id}','${library.id}')">
-                  <span class="ui-icon ui-icon-pencil"></span>
-                </a>
-              </td>
-            </c:if>
-          </tr>
-        </c:forEach>
-      </c:if>
-      </tbody>
-    </table>
-    <input type='hidden' id='qcLibraryId' name='id' value='${library.id}'/>
-  </form>
-</div>
-
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    jQuery("#libraryQcTable").tablesorter({
-      headers: {
-      }
-    });
-
-    var qcsCount = jQuery('#libraryQcTable>tbody>tr:visible').length;
-    jQuery('#qcsTotalCount').html(qcsCount + (qcsCount == 1 ? ' QC' : ' QCs'));
-    var libDilsCount = jQuery('#libraryDilutionTable>tbody>tr:visible').length;
-    jQuery('#ldsTotalCount').html(libDilsCount + (libDilsCount == 1 ? ' Library Dilution' : ' Library Dilutions'));
-  });
-</script>
-
-  <miso:list-section name="Dilutions" target="dilution" items="${libraryDilutions}" config="${libraryDilutionsConfig}"/>
-  <miso:list-section name="Pools" target="pool" items="${libraryPools}"/>
-  <miso:list-section name="Runs" target="run" items="${libraryRuns}"/>
+  <miso:qcs id="list_qcs" item="${library}"/>
+  <miso:list-section id="list_dilution" name="Dilutions" target="dilution" items="${libraryDilutions}" config="${libraryDilutionsConfig}"/>
+  <miso:list-section id="list_pool" name="Pools" target="pool" items="${libraryPools}"/>
+  <miso:list-section id="list_run" name="Runs" target="run" items="${libraryRuns}"/>
   <miso:changelog item="${library}"/>
 </c:if>
-<div id="dialog"></div>
 </div>
 </div>
 

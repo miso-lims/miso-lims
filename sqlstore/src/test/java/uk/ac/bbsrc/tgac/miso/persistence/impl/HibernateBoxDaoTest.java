@@ -91,7 +91,7 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     Box box = dao.get(1);
     assertEquals("box1alias", box.getAlias());
     assertEquals("box1", box.getName());
-    assertEquals(1, box.getId());
+    assertEquals(1L, box.getId());
     assertEquals("identificationbarcode1", box.getIdentificationBarcode());
     assertEquals(4, box.getSize().getRows());
     assertEquals("boxuse1", box.getUse().getAlias());

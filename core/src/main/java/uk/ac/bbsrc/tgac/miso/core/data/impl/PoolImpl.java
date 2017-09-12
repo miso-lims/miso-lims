@@ -64,7 +64,6 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -73,13 +72,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -114,7 +112,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   private String description;
 
   @OneToMany(targetEntity = ExperimentImpl.class, mappedBy = "pool")
-  @JsonManagedReference
   private Collection<Experiment> experiments = new HashSet<>();
 
   @Column(length = ID_BARCODE_LENGTH)
@@ -158,8 +155,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long poolId = PoolImpl.UNSAVED_ID;
 
-  @OneToMany(targetEntity = PoolQCImpl.class, mappedBy = "pool")
-  @JsonManagedReference
+  @OneToMany(targetEntity = PoolQC.class, mappedBy = "pool")
   private final Collection<PoolQC> poolQCs = new TreeSet<>();
 
   @OneToOne(optional = true)
@@ -211,16 +207,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void addNote(Note note) {
     this.notes.add(note);
-  }
-
-  @Override
-  public void addQc(PoolQC poolQc) throws MalformedPoolQcException {
-    this.poolQCs.add(poolQc);
-    try {
-      poolQc.setPool(this);
-    } catch (MalformedPoolException e) {
-      log.error("add QC", e);
-    }
   }
 
   @Override
@@ -336,7 +322,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public Collection<PoolQC> getPoolQCs() {
+  public Collection<PoolQC> getQCs() {
     return poolQCs;
   }
 
@@ -608,6 +594,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   public int getLongestIndex() {
     return pooledElementViews.stream().flatMap(element -> element.getIndices().stream()).mapToInt(index -> index.getSequence().length())
         .max().orElse(0);
+  }
+
+  @Override
+  public QcTarget getQcTarget() {
+    return QcTarget.Pool;
   }
 
 }

@@ -24,27 +24,18 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
-import static uk.ac.bbsrc.tgac.miso.spring.ControllerHelperServiceUtils.getBarcodeFileLocation;
 
-import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
-import org.krysalis.barcode4j.BarcodeDimension;
-import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,22 +50,14 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolQCImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
@@ -97,8 +80,6 @@ public class PoolControllerHelperService {
   @Autowired
   private PoolService poolService;
   @Autowired
-  private MisoFilesManager misoFileManager;
-  @Autowired
   private ExperimentService experimentService;
   @Autowired
   private LibraryDilutionService dilutionService;
@@ -106,136 +87,6 @@ public class PoolControllerHelperService {
   private RunService runService;
   @Autowired
   private StudyService studyService;
-  @Autowired
-  private BoxService boxService;
-
-  public JSONObject getPoolQcTypes(HttpSession session, JSONObject json) {
-    try {
-      StringBuilder sb = new StringBuilder();
-      Collection<QcType> types = poolService.listPoolQcTypes();
-      for (QcType s : types) {
-        sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
-      }
-      Map<String, Object> map = new HashMap<>();
-      map.put("types", sb.toString());
-      return JSONUtils.JSONObjectResponse(map);
-    } catch (IOException e) {
-      log.error("get pool qc types", e);
-    }
-    return JSONUtils.SimpleJSONError("Cannot list all Pool QC Types");
-  }
-
-  public JSONObject addPoolQC(HttpSession session, JSONObject json) {
-    try {
-      for (Object k : json.keySet()) {
-        String key = (String) k;
-        if (isStringEmptyOrNull(json.getString(key))) {
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
-        }
-      }
-      if (json.has("poolId") && !isStringEmptyOrNull(json.getString("poolId"))) {
-        Long poolId = Long.parseLong(json.getString("poolId"));
-        Pool pool = poolService.get(poolId);
-        PoolQC newQc = new PoolQCImpl();
-        if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
-          pool.setQcPassed(true);
-        }
-        newQc.setQcCreator(json.getString("qcCreator"));
-        newQc.setQcDate(parseDate(json.getString("qcDate")));
-        newQc.setQcType(poolService.getPoolQcType(json.getLong("qcType")));
-        newQc.setResults(Double.parseDouble(json.getString("results")));
-        pool.addQc(newQc);
-        poolService.savePoolQC(newQc);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th></tr>");
-        for (PoolQC qc : pool.getPoolQCs()) {
-          sb.append("<tr>");
-          sb.append("<td>" + qc.getQcCreator() + "</td>");
-          sb.append("<td>" + formatDate(qc.getQcDate()) + "</td>");
-          sb.append("<td>" + qc.getQcType().getName() + "</td>");
-          sb.append("<td>" + qc.getResults() + " " + qc.getQcType().getUnits() + "</td>");
-          sb.append("</tr>");
-        }
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      } else {
-        return JSONUtils.SimpleJSONError("Cannot detect parent pool ID. Cannot add PoolQC");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Pool QC to this Pool: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Pool QC to this Pool: " + e.getMessage());
-    }
-  }
-
-  public JSONObject bulkAddPoolQCs(HttpSession session, JSONObject json) {
-    try {
-      JSONArray qcs = JSONArray.fromObject(json.getString("qcs"));
-      // validate
-      boolean ok = true;
-      for (JSONObject qc : (Iterable<JSONObject>) qcs) {
-        String qcPassed = qc.getString("qcPassed");
-        String qcType = qc.getString("qcType");
-        String results = qc.getString("results");
-        String qcCreator = qc.getString("qcCreator");
-        String qcDate = qc.getString("qcDate");
-
-        if (isStringEmptyOrNull(qcPassed) || isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator)
-            || isStringEmptyOrNull(qcDate)) {
-          ok = false;
-        }
-      }
-
-      // persist
-      if (ok) {
-        Map<String, Object> map = new HashMap<>();
-        JSONArray a = new JSONArray();
-        for (JSONObject qc : (Iterable<JSONObject>) qcs) {
-          JSONObject j = addPoolQC(session, qc);
-          j.put("poolId", qc.getString("poolId"));
-          a.add(j);
-        }
-        map.put("saved", a);
-        return JSONUtils.JSONObjectResponse(map);
-      } else {
-        log.error("Failed to add Pool QC to this Pool: one of the required fields of the selected QCs is missing or invalid");
-        return JSONUtils
-            .SimpleJSONError("Failed to add Pool QC to this Pool: one of the required fields of the selected QCs is missing or invalid");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Pool QC to this Pool: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Pool QC to this Pool: " + e.getMessage());
-    }
-  }
-
-  public JSONObject changePoolQCRow(HttpSession session, JSONObject json) {
-    try {
-      JSONObject response = new JSONObject();
-      Long qcId = Long.parseLong(json.getString("qcId"));
-      PoolQC poolQc = poolService.getPoolQC(qcId);
-      response.put("results", "<input type='text' id='" + qcId + "' value='" + poolQc.getResults() + "'/>");
-      response.put("edit", "<a href='javascript:void(0);' onclick='Pool.qc.editPoolQC(\"" + qcId + "\");'>Save</a>");
-      return response;
-    } catch (Exception e) {
-      log.error("Failed to display Pool QC of this sample: ", e);
-      return JSONUtils.SimpleJSONError("Failed to display Pool QC of this sample: " + e.getMessage());
-    }
-  }
-
-  public JSONObject editPoolQC(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
-        Long qcId = Long.parseLong(json.getString("qcId"));
-        PoolQC poolQc = poolService.getPoolQC(qcId);
-        poolQc.setResults(Double.parseDouble(json.getString("result")));
-        poolService.savePoolQC(poolQc);
-        return JSONUtils.SimpleJSONResponse("OK");
-      }
-    } catch (Exception e) {
-      log.error("Failed to add Pool QC to this sample: ", e);
-      return JSONUtils.SimpleJSONError("Failed to add Pool QC to this sample: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONError("Cannot add PoolQC");
-  }
 
   private String processDilutions(Set<String> codes) throws IOException {
     StringBuilder sb = new StringBuilder();
@@ -315,82 +166,6 @@ public class PoolControllerHelperService {
       return JSONUtils.SimpleJSONError("Failed to generate barcode selection");
     }
     return JSONUtils.SimpleJSONError("Cannot select barcodes");
-  }
-
-  public JSONObject getPoolBarcode(HttpSession session, JSONObject json) {
-    Long poolId = json.getLong("poolId");
-    File temploc = getBarcodeFileLocation(session);
-    try {
-      Pool pool = poolService.get(poolId);
-      BarcodeFactory barcodeFactory = new BarcodeFactory();
-      barcodeFactory.setPointPixels(1.5f);
-      barcodeFactory.setBitmapResolution(600);
-
-      RenderedImage bi = null;
-
-      if (json.has("barcodeGenerator")) {
-        BarcodeDimension dim = new BarcodeDimension(100, 100);
-        if (json.has("dimensionWidth") && json.has("dimensionHeight")) {
-          dim = new BarcodeDimension(json.getDouble("dimensionWidth"), json.getDouble("dimensionHeight"));
-        }
-        BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
-        if (bg != null) {
-          bi = barcodeFactory.generateBarcode(pool, bg, dim);
-        } else {
-          return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
-        }
-      } else {
-        bi = barcodeFactory.generateSquareDataMatrix(pool, 400);
-      }
-
-      if (bi != null) {
-        File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
-        if (ImageIO.write(bi, "png", tempimage)) {
-          return JSONUtils.JSONObjectResponse("img", tempimage.getName());
-        }
-        return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      } else {
-        return JSONUtils.SimpleJSONError("Pool has no parseable barcode");
-      }
-    } catch (IOException e) {
-      log.error("cannot access " + temploc.getAbsolutePath(), e);
-      return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to access " + temploc.getAbsolutePath());
-    }
-  }
-
-  public JSONObject changePoolIdBarcode(HttpSession session, JSONObject json) {
-    Long poolId = json.getLong("poolId");
-    String idBarcode = json.getString("identificationBarcode");
-
-    try {
-      if (isStringEmptyOrNull(idBarcode)) {
-        // if the user accidentally deletes a barcode, the changelogs will have a record of the original barcode
-        idBarcode = null;
-      } else {
-        List<BoxableView> previouslyBarcodedItems = new ArrayList<>(boxService.getViewsFromBarcodeList(Arrays.asList(idBarcode)));
-        if (!previouslyBarcodedItems.isEmpty() && (
-            previouslyBarcodedItems.size() != 1
-                || previouslyBarcodedItems.get(0).getId().getTargetType() != Boxable.EntityType.POOL
-                || previouslyBarcodedItems.get(0).getId().getTargetId() != poolId)) {
-          BoxableView previouslyBarcodedItem = previouslyBarcodedItems.get(0);
-          String error = String.format(
-              "Could not change pool identification barcode to '%s'. This barcode is already in use by an item with the name '%s' and the alias '%s'.",
-              idBarcode, previouslyBarcodedItem.getName(), previouslyBarcodedItem.getAlias());
-          log.debug(error);
-          return JSONUtils.SimpleJSONError(error);
-        }
-      }
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = poolService.get(poolId);
-      pool.setIdentificationBarcode(idBarcode);
-      pool.setLastModifier(user);
-      poolService.save(pool);
-    } catch (IOException e) {
-      log.debug("Could not change Pool identificationBarcode: " + e.getMessage());
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-
-    return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
   }
 
   public JSONObject poolSearchExperiments(HttpSession session, JSONObject json) {
@@ -483,33 +258,6 @@ public class PoolControllerHelperService {
     }
   }
 
-  public JSONObject deletePool(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("error getting currently logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("poolId")) {
-        Long poolId = json.getLong("poolId");
-        try {
-          poolService.delete(poolService.get(poolId));
-          return JSONUtils.SimpleJSONResponse("Pool deleted");
-        } catch (IOException e) {
-          log.error("cannot delete pool", e);
-          return JSONUtils.SimpleJSONError("Cannot delete pool: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No pool specified to delete.");
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
-    }
-  }
-
   public JSONObject deletePoolNote(HttpSession session, JSONObject json) {
     Long poolId = json.getLong("poolId");
     Long noteId = json.getLong("noteId");
@@ -554,10 +302,6 @@ public class PoolControllerHelperService {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
   }
 
   public void setExperimentService(ExperimentService experimentService) {

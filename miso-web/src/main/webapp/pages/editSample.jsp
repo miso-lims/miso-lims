@@ -64,6 +64,9 @@
     Save
   </button>
 </h1>
+<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+  <c:if test="${sample.id != 0 && not empty sample.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('sample', [${sample.id}]);">Print Barcode</span></c:if>
+</div>
 
 <c:if test="${not empty sample.project}">
   <div class="breadcrumbs">
@@ -108,53 +111,6 @@
 </div>
 
 <h2>Sample Information</h2>
-
-<div class="barcodes">
-  <div class="barcodeArea ui-corner-all">
-    <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Barcode</span>
-    <c:if test="${sample.id != 0}">
-      <ul class="barcode-ddm">
-        <li>
-          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
-            <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-            <span id="idBarcode" style="float:right;"></span>
-          </a>
-
-          <div id="idBarcodeMenu"
-              onmouseover="mcancelclosetime()"
-              onmouseout="mclosetime()">
-
-            <a href="javascript:void(0);"
-               onclick="Utils.printDialog('sample', [${sample.id}]);">Print</a>
-            <c:if test="${not autoGenerateIdBarcodes}">
-              <a href="javascript:void(0);"
-               onclick="Sample.ui.showSampleIdBarcodeChangeDialog(${sample.id}, '${sample.identificationBarcode}');">Update Barcode</a>
-            </c:if>
-          </div>
-        </li>
-      </ul>
-    </c:if>
-    <div id="changeSampleIdBarcodeDialog" title="Assign New Barcode"></div>
-    <c:if test="${not empty sample.identificationBarcode}">
-      <span id="idBarcodePresent" data-idBarcodePresent="false" data-sampleId="${sample.id}" data-idbarcode="${sample.identificationBarcode}"></span>
-      <script type="text/javascript">
-        jQuery(document).ready(function () {
-          Fluxion.doAjax(
-            'sampleControllerHelperService',
-            'getSampleBarcode',
-            {
-              'sampleId':${sample.id},
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              jQuery('#idBarcode').html("<img style='height:30px; border:0;' alt='${sample.identificationBarcode}' title='${sample.identificationBarcode}' src='<c:url value='/temp/'/>" + json.img + "'/>");
-            }
-          });
-        });
-      </script>
-    </c:if>
-  </div>
-</div>
 <div>
   <table class="in" <c:if test="${detailedSample && sample.isSynthetic()}">style="background-color: #ddd"</c:if>>
     <tr>
@@ -231,6 +187,12 @@
       <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span>
       </td>
     </tr>
+    <c:if test="${not autoGenerateIdBarcodes}">
+      <tr>
+        <td class="h">Matrix Barcode:</td>
+        <td><form:input id="identificationBarcode" path="identificationBarcode" name="identificationBarcode"/></td>
+      </tr>
+    </c:if>
     <tr>
       <td>Date of receipt:</td>
       <td>
@@ -242,7 +204,7 @@
     </tr>
     <tr>
       <td class="h">Scientific Name:*</td>
-      <td><form:input id="scientificName" path="scientificName"/><span id="scientificNameCounter" class="counter"></span>
+      <td><form:input id="scientificName" path="scientificName" value="${sample.scientificName.length() > 0 ? sample.scientificName : defaultSciName}" /><span id="scientificNameCounter" class="counter"></span>
         <c:if test="${sessionScope.taxonLookupEnabled}">
         <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), Sample.validateNCBITaxon, 1000, 2);</script>
         </c:if>
@@ -507,8 +469,8 @@
               <td><form:input id="region" path="region"/></td>
             </tr>
             <tr>
-              <td class="h">External Institute Identifier:</td>
-              <td><form:input id="externalInstituteIdentifier" path="externalInstituteIdentifier"/></td>
+              <td class="h">Secondary Identifier:</td>
+              <td><form:input id="secondaryIdentifier" path="secondaryIdentifier"/></td>
             </tr>
             <tr>
               <td class="h">Lab:</td>
@@ -701,86 +663,21 @@
 </form:form>
 
 <c:if test="${sample.id != 0}">
-  <a id="sampleqc"></a>
-
-  <h1>
-    <span id="qcsTotalCount"></span>
-  </h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="qcmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='javascript:void(0);' class="add"
-           onclick="Sample.qc.generateSampleQCRow(${sample.id}); return false;">Add Sample QC</a>
-      </div>
-    </li>
-  </ul>
-    <div style="clear:both">
-      <div id="addSampleQC"></div>
-      <form id='addQcForm'>
-        <table class="list in" id="sampleQcTable">
-          <thead>
-          <tr>
-            <th>QCed By</th>
-            <th>QC Date</th>
-            <th>Method</th>
-            <th>Results</th>
-            <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                  or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <th align="center">Edit</th>
-            </c:if>
-          </tr>
-          </thead>
-          <tbody>
-          <c:if test="${not empty sample.sampleQCs}">
-            <c:forEach items="${sample.sampleQCs}" var="qc">
-              <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                <td>${qc.qcCreator}</td>
-                <td><fmt:formatDate pattern="yyyy-MM-dd" value="${qc.qcDate}"/></td>
-                <td>${qc.qcType.name}</td>
-                <fmt:formatNumber var="resultsRounded" value="${qc.results}" maxFractionDigits="2" />
-                <td id="results${qc.id}">${resultsRounded} ${qc.qcType.units}</td>
-                <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                          or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
-                                                          onclick="Sample.qc.changeSampleQCRow('${qc.id}','${sample.id}')">
-                    <span class="ui-icon ui-icon-pencil"></span></a></td>
-                </c:if>
-              </tr>
-            </c:forEach>
-          </c:if>
-          </tbody>
-        </table>
-        <input type='hidden' id='sampleId' name='id' value='${sample.id}'/>
-      </form>
-      <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#sampleQcTable').tablesorter();
-        var totalQcsCount = jQuery('#sampleQcTable>tbody>tr:visible').length;
-        jQuery('#qcsTotalCount').html(totalQcsCount + (totalQcsCount == 1 ? ' QC' : ' QCs'));
-      });
-      </script>
-    </div>
-  <br/>
-  <a id="library"></a>
+  <miso:qcs id="list_qc" item="${sample}"/>
 
   <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
-    <miso:list-section name="Libraries" target="library" items="${sampleLibraries}"/>
+    <miso:list-section id="list_library" name="Libraries" target="library" items="${sampleLibraries}"/>
   </c:if>
 
   <c:if test="${detailedSample}">
-    <miso:list-section name="Relationships" target="sample" items="${sampleRelations}"/>
+    <miso:list-section id="list_relation" name="Relationships" target="sample" items="${sampleRelations}"/>
   </c:if>
 
-  <miso:list-section name="Pools" target="pool" items="${samplePools}"/>
-  <miso:list-section name="Runs" target="run" items="${sampleRuns}"/>
+  <miso:list-section id="list_pool" name="Pools" target="pool" items="${samplePools}"/>
+  <miso:list-section id="list_run" name="Runs" target="run" items="${sampleRuns}"/>
   <miso:changelog item="${sample}"/>
 </c:if>
+<div id="dialog"></div>
 </div>
 
 </div>

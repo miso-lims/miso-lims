@@ -146,12 +146,10 @@ INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_gro
 
 DELETE FROM `ProjectOverview`;
 DELETE FROM `Project`;
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
-VALUES (1,'2015-08-27 15:40:15','Test project','PRO1',1,'ACTIVE','TEST1','2015-08-27 19:40:40', 1);
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
-VALUES (2,'2013-11-27 12:20:15','Test project2','PRO2',1,'ACTIVE','TEST2','2015-11-30 15:23:18', 1);
-INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `lastUpdated`, `referenceGenomeId`)
-VALUES (3,'2016-01-27 11:11:15','Test project3','PRO3',1,'ACTIVE','TEST3','2016-02-22 10:43:18', 2);
+INSERT INTO `Project`(`projectId`, `creationDate`, `description`, `name`, `securityProfile_profileId`, `progress`, `alias`, `shortName`, `lastUpdated`, `referenceGenomeId`) VALUES
+(1,'2015-08-27 15:40:15','Test project','PRO1',1,'ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1),
+(2,'2013-11-27 12:20:15','Test project2','PRO2',1,'ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1),
+(3,'2016-01-27 11:11:15','Test project3','PRO3',1,'ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2);
 
 INSERT INTO ProjectOverview(overviewId, principalInvestigator, startDate, project_projectId)
 VALUES
@@ -187,22 +185,22 @@ VALUES (1,NULL,'SAM1','Inherited from TEST_0001',1,'SAM1::TEST_0001_Bn_P_nn_1-1_
 (17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17');
 
 DELETE FROM `SampleQC`;
-INSERT INTO `SampleQC`(`sample_sampleId`, `qcCreator`, `qcDate`, `qcMethod`, `results`) 
-VALUES (1,'admin','2015-08-27',1,5),
-(2,'admin','2015-08-27',1,5),
-(3,'admin','2015-08-27',1,5),
-(4,'admin','2015-08-27',1,5),
-(5,'admin','2015-08-27',1,5),
-(6,'admin','2015-08-27',1,5),
-(7,'admin','2015-08-27',1,5),
-(8,'admin','2015-08-27',1,5),
-(9,'admin','2015-08-27',1,5),
-(10,'admin','2015-08-27',1,5),
-(11,'admin','2015-08-27',1,5),
-(12,'admin','2015-08-27',1,5),
-(13,'admin','2015-08-27',1,5),
-(14,'admin','2015-08-27',1,5),
-(14,'admin','2015-08-28',1,55);
+INSERT INTO `SampleQC`(`sample_sampleId`, `creator`, `date`, `type`, `results`) 
+VALUES (1,1,'2015-08-27',1,5),
+(2,1,'2015-08-27',1,5),
+(3,1,'2015-08-27',1,5),
+(4,1,'2015-08-27',1,5),
+(5,1,'2015-08-27',1,5),
+(6,1,'2015-08-27',1,5),
+(7,1,'2015-08-27',1,5),
+(8,1,'2015-08-27',1,5),
+(9,1,'2015-08-27',1,5),
+(10,1,'2015-08-27',1,5),
+(11,1,'2015-08-27',1,5),
+(12,1,'2015-08-27',1,5),
+(13,1,'2015-08-27',1,5),
+(14,1,'2015-08-27',1,5),
+(14,1,'2015-08-28',1,55);
 
 DELETE FROM SampleChangeLog;
 INSERT INTO `SampleChangeLog`(`sampleChangeLogId`, `sampleId`, `columnsChanged`, `userId`, `message`, `changeTime`)
@@ -318,22 +316,22 @@ VALUES (1,2,1,'LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27','admin','LDI1',1),
 (14,2,14,'LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27','admin','LDI14',1);
 
 DELETE FROM `LibraryQC`;
-INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `qcCreator`, `qcDate`, `qcMethod`, `results`) VALUES
- (1,1,'admin','2015-08-27',4,3),
- (2,2,'admin','2015-08-27',4,3),
- (3,3,'admin','2015-08-27',4,3),
- (4,4,'admin','2015-08-27',4,3),
- (5,5,'admin','2015-08-27',4,3),
- (6,6,'admin','2015-08-27',4,3),
- (7,7,'admin','2015-08-27',4,3),
- (8,8,'admin','2015-08-27',4,3),
- (9,9,'admin','2015-08-27',4,3),
- (10,10,'admin','2015-08-27',4,3),
- (11,11,'admin','2015-08-27',4,3),
- (12,12,'admin','2015-08-27',4,3),
- (13,13,'admin','2015-08-27',4,3),
- (14,14,'admin','2015-08-27',4,3),
- (15,2,'admin','2015-08-27',12,300);
+INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`) VALUES
+ (1,1,1,'2015-08-27',4,3),
+ (2,2,1,'2015-08-27',4,3),
+ (3,3,1,'2015-08-27',4,3),
+ (4,4,1,'2015-08-27',4,3),
+ (5,5,1,'2015-08-27',4,3),
+ (6,6,1,'2015-08-27',4,3),
+ (7,7,1,'2015-08-27',4,3),
+ (8,8,1,'2015-08-27',4,3),
+ (9,9,1,'2015-08-27',4,3),
+ (10,10,1,'2015-08-27',4,3),
+ (11,11,1,'2015-08-27',4,3),
+ (12,12,1,'2015-08-27',4,3),
+ (13,13,1,'2015-08-27',4,3),
+ (14,14,1,'2015-08-27',4,3),
+ (15,2,1,'2015-08-27',12,300);
 
 DELETE FROM `Library_Index`;
 INSERT INTO `Library_Index` 
@@ -419,10 +417,10 @@ VALUES
 (32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_32',16,1, 9);
 
 DELETE FROM `PoolQC`;
-INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `qcCreator`, `qcDate`, `qcMethod`, `results`)
-VALUES (1,1,'person','2016-03-18',1,12.3),
-(2,1,'person','2016-03-18',1,45.6),
-(3,2,'person','2016-03-18',1,7.89);
+INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `creator`, `date`, `type`, `results`)
+VALUES (1,1,1,'2016-03-18',1,12.3),
+(2,1,1,'2016-03-18',1,45.6),
+(3,2,1,'2016-03-18',1,7.89);
 
 INSERT INTO `PoolChangeLog`(`poolId`, `columnsChanged`, `userId`, `message`, `changeTime`)
 VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
@@ -465,12 +463,6 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (3, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:53'),
 (4, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:55');
 
-DELETE FROM RunQC;
-INSERT INTO `RunQC`(`run_runId`, `qcCreator`, `qcDate`, `qcMethod`, `information`, `doNotProcess`)
-VALUES ( 1, 'username1', '2016-01-26', 1, 'information1', 1),
-( 2, 'username2', '2016-02-26', 2, 'information2', 0),
-( 3, 'username3', '2015-03-26', 3, 'information3', 1);
-
 DELETE FROM `_Partition`;
 INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`)
 VALUES (1,1,1);
@@ -493,13 +485,11 @@ INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `pa
 VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(2,15),(2,16),(3,17),(3,18),(3,19),
 (3,20),(3,21),(3,22),(3,23),(3,24),(4,25),(4,26),(4,27),(4,28),(4,29),(4,30),(4,31),(4,32);
 
-DELETE FROM RunQC_Partition;
-INSERT INTO `RunQC_Partition`(`runQc_runQcId`, `partition_partitionId`)
-VALUES (1, 1);
-
 DELETE FROM `Run_SequencerPartitionContainer`;
 INSERT INTO `Run_SequencerPartitionContainer`(`Run_runId`, `containers_containerId`) 
 VALUES (1,1),(2,2),(3,3),(4,4);
+
+INSERT INTO Run_Partition_QC(runId, partitionId, partitionQcTypeId, notes) VALUES (1, 1, 1, 'it is written');
 
 DELETE FROM `BoxSize`;
 INSERT INTO `BoxSize` (`boxSizeId`, `rows`, `columns`, `scannable`)

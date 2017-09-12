@@ -198,3 +198,4 @@
     });
   </script>
 </sec:authorize>
+<div id="dialog"></div>

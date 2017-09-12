@@ -214,7 +214,7 @@ var Utils = Utils || {
           buttons: buttons
       });
   },
-  showDialog: function(title, okButton, fields, callback) {
+  showDialog: function(title, okButton, fields, callback, backHandler) {
       var dialogArea = document.getElementById('dialog');
       while (dialogArea.hasChildNodes()) {
           dialogArea.removeChild(dialogArea.lastChild);
@@ -245,6 +245,8 @@ var Utils = Utils || {
             case 'text':
                 input = document.createElement('INPUT');
                 input.setAttribute('type', 'text');
+                input.value = field.value || "";
+                output[field.property] = field.value || "";
                 input.onchange = function() {
                     output[field.property] = input.value;
                 };
@@ -295,6 +297,12 @@ var Utils = Utils || {
         dialog.dialog("close");
         callback(output);
       };
+      if (backHandler) {
+        buttons["Back"] = function() {
+          dialog.dialog("close");
+          backHandler();
+        };
+      }
       buttons["Cancel"] = function () { dialog.dialog("close"); };
       var dialog = jQuery('#dialog').dialog({
           autoOpen: true,
@@ -737,7 +745,18 @@ Utils.sorting = {
    */
   standardSort: function (property) {
     return function (a, b) {
-      return a[property].localeCompare(b[property]);
+      var first = a[property];
+      var second = b[property];
+      if (typeof first == 'number' && typeof second == 'number') {
+        return first > second ? 1 : (second > first ? -1 : 0);
+      } else if (typeof first == 'string' && typeof second == 'string') {
+        return first.localeCompare(second);
+      } else if (typeof first == 'function' || typeof second == 'function') {
+        throw 'Cannot compare function definitions; both are special in their own way'; 
+      } else {
+        // mixed case; make a best guess
+        return ('' + first).localeCompare('' + second);
+      }
     };
   },
 

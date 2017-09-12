@@ -35,7 +35,6 @@
         ListUtils.createStaticTable("listingTable", ${targetType}, ${config}, ${data});
       });
     </script>
-    <div id="dialog"></div>
   </div>
 </div>
 <%@ include file="adminsub.jsp" %>

@@ -143,8 +143,6 @@
   });
 </script>
 
-<div id="dialog"></div>
-
 <div id="projectoverviews">
 <c:if test="${project.id != 0}">
   <a class="add" href="javascript:void(0);" onclick="Project.overview.showProjectOverviewDialog(${project.id});">Add

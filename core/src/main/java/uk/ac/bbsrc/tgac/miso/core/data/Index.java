@@ -39,11 +39,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 /**
  * Indices represent adapter sequences that can be prepended to sequencable material in order to facilitate multiplexing.
  * 
@@ -51,9 +46,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @date 10-May-2011
  * @since 0.0.3
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @Entity
 @Table(name = "Indices")
 public class Index implements Nameable, Serializable {
@@ -67,7 +59,6 @@ public class Index implements Nameable, Serializable {
 
   @ManyToOne
   @JoinColumn(name = "indexFamilyId", nullable = false)
-  @JsonBackReference
   private IndexFamily family;
   @Column(nullable = false)
   private String name;

@@ -21,17 +21,14 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -53,8 +50,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   @Autowired
   private PoolStore poolStore;
   @Autowired
-  private PoolQcStore poolQcStore;
-  @Autowired
   private NamingScheme namingScheme;
   @Autowired
   private ChangeLogService changeLogService;
@@ -73,10 +68,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
 
   public void setPoolStore(PoolStore poolStore) {
     this.poolStore = poolStore;
-  }
-
-  public void setPoolQcStore(PoolQcStore poolQcStore) {
-    this.poolQcStore = poolQcStore;
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {
@@ -211,11 +202,12 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       original.setAlias(pool.getAlias());
       original.setConcentration(pool.getConcentration());
       original.setDescription(pool.getDescription());
-      original.setIdentificationBarcode(pool.getIdentificationBarcode());
+      original.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(pool.getIdentificationBarcode()));
       original.setPlatformType(pool.getPlatformType());
       original.setQcPassed(pool.getQcPassed());
       original.setReadyToRun(pool.getReadyToRun());
       original.setVolume(pool.getVolume());
+      original.setDiscarded(pool.isDiscarded());
       original.setCreationDate(pool.getCreationDate());
 
       Set<String> originalItems = extractDilutionNames(original.getPoolableElementViews());
@@ -299,17 +291,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public long savePoolQC(PoolQC poolQC) throws IOException {
-    if (poolQC.getId() != PoolImpl.UNSAVED_ID) {
-      PoolQC original = getPoolQC(poolQC.getId());
-      authorizationManager.throwIfNotWritable(original.getPool());
-      original.setResults(poolQC.getResults());
-      poolQC = original;
-    }
-    return poolQcStore.save(poolQC);
-  }
-
-  @Override
   public void saveNote(Pool pool, Note note) throws IOException {
     Pool managed = poolStore.get(pool.getId());
     authorizationManager.throwIfNotWritable(managed);
@@ -320,27 +301,10 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public QcType getPoolQcType(long qcTypeId) throws IOException {
-    return poolQcStore.getPoolQcTypeById(qcTypeId);
-  }
-
-  @Override
-  public Collection<QcType> listPoolQcTypes() throws IOException {
-    return poolQcStore.listAllPoolQcTypes();
-  }
-
-  @Override
   public Pool get(long poolId) throws IOException {
     Pool pool = poolStore.get(poolId);
     authorizationManager.throwIfNotReadable(pool);
     return pool;
-  }
-
-  @Override
-  public PoolQC getPoolQC(long poolQcId) throws IOException {
-    PoolQC qc = poolQcStore.get(poolQcId);
-    authorizationManager.throwIfNotReadable(qc.getPool());
-    return qc;
   }
 
   @Override

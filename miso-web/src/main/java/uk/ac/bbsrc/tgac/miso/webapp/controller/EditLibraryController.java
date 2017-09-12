@@ -82,7 +82,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -229,7 +228,6 @@ public class EditLibraryController {
     return namingScheme != null && namingScheme.hasLibraryAliasGenerator();
   }
 
-  @ModelAttribute("detailedSample")
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
   }
@@ -355,11 +353,6 @@ public class EditLibraryController {
       visibleFamilies.addAll(indexService.getIndexFamiliesByPlatform(library.getPlatformType()));
       model.put("indexFamilies", visibleFamilies);
     }
-  }
-
-  @ModelAttribute("libraryQCUnits")
-  public String libraryQCUnits() {
-    return LibraryQCImpl.UNITS;
   }
 
   @ModelAttribute("libraryDilutionUnits")
@@ -640,7 +633,7 @@ public class EditLibraryController {
 
     Collection<Pool> pools = poolService.listByLibraryId(library.getId());
     model.put("libraryPools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
-    model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatLog(log, p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
+    model.put("libraryRuns", pools.stream().flatMap(WhineyFunction.flatRethrow(p -> runService.listByPoolId(p.getId()))).map(Dtos::asDto)
         .collect(Collectors.toList()));
     model.put("libraryDilutions", library.getLibraryDilutions().stream().map(Dtos::asDto).collect(Collectors.toList()));
     ObjectMapper mapper = new ObjectMapper();

@@ -13,6 +13,8 @@
   "containerSerialNumber": "000000000-A2WDF",
   "healthType": "Completed",
   "imgCycle": 242,
+  "indexLengths": [
+  ],
   "laneCount": 1,
   "numCycles": 242,
   "pairedEndRun": true,

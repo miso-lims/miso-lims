@@ -31,14 +31,14 @@ public class ListTablesIT extends AbstractIT {
   private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SAMPLE_NAME,
       Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDICES, Columns.LOCATION, Columns.LAST_MODIFIED);
   private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
-      Columns.LIBRARY_ALIAS, Columns.CREATOR, Columns.CREATION_DATE, Columns.PLATFORM, Columns.DIL_CONCENTRATION, Columns.VOLUME,
+      Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.CREATOR, Columns.CREATION_DATE, Columns.PLATFORM, Columns.DIL_CONCENTRATION, Columns.VOLUME,
       Columns.TARGETED_SEQUENCING);
   private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.POOL_CONCENTRATION, Columns.LOCATION,
       Columns.LAST_MODIFIED);
   private static final Set<String> ordersColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
-      Columns.PLATFORM, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.LAST_MODIFIED);
-  private static final Set<String> containersColumns = Sets.newHashSet(Columns.SERIAL_NUMBER, Columns.LAST_RUN_NAME,
+      Columns.PLATFORM, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.REMAINING, Columns.LAST_MODIFIED);
+  private static final Set<String> containersColumns = Sets.newHashSet(Columns.SORT, Columns.SERIAL_NUMBER, Columns.LAST_RUN_NAME,
       Columns.LAST_RUN_ALIAS, Columns.LAST_SEQUENCER, Columns.LAST_MODIFIED);
   private static final Set<String> runsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.STATUS,
       Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED);
@@ -80,7 +80,7 @@ public class ListTablesIT extends AbstractIT {
   }
 
   private static final Set<String> completionHeaders = Sets.newHashSet(Columns.COMPLETED, Columns.REQUESTED,
-      Columns.RUNNING, Columns.REMAINING, Columns.FAILED);
+      Columns.RUNNING, Columns.FAILED, Columns.STARTED, Columns.STOPPED, Columns.UNKNOWN);
 
   // some tabs have no data, so we want to ensure we do all sort tests on tabs with data
   private static final Map<String, String> sortOnTab;
@@ -201,7 +201,7 @@ public class ListTablesIT extends AbstractIT {
     DataTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     // size = order columns + some number of completion state columns
-    assertTrue(ordersColumns.size() < headings.size());
+    assertTrue(ordersColumns.size() <= headings.size());
     for (String col : ordersColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }

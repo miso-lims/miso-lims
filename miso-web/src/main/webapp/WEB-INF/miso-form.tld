@@ -221,6 +221,12 @@
 		<tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.ListSectionTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
+			<description>Id for the table</description>
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<description>The matching target type from "ListTargets"</description>
 			<name>target</name>
 			<required>true</required>
@@ -230,6 +236,12 @@
 			<description>The section name</description>
 			<name>name</name>
 			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Show even if there are no contents</description>
+			<name>alwaysShow</name>
+			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
@@ -246,6 +258,59 @@
 		</attribute>
 		<dynamic-attributes>false</dynamic-attributes>
 	</tag>
+
+	<tag>
+		<description>Renders a list with a section header from a remote data source.</description>
+		<name>list-section-ajax</name>
+		<tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.AjaxListSectionTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<description>Id for the table</description>
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>The matching target type from "ListTargets"</description>
+			<name>target</name>
+			<required>true</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>The section name</description>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>The configuration JSON object to be passed to the front end.</description>
+			<name>config</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<dynamic-attributes>false</dynamic-attributes>
+	</tag>
+
+	<tag>
+		<description>Renders QC display/edit table</description>
+		<name>qcs</name>
+		<tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.QcTableTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<description>Id for the table</description>
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>The thing to build the QC table for</description>
+			<name>item</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<dynamic-attributes>false</dynamic-attributes>
+	</tag>
+
 
 	<tag>
 		<description>Renders a change log</description>

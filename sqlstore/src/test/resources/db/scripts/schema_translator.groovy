@@ -1,6 +1,7 @@
 /**
- * This script reads the production schema sql scripts, makes the changes necessary to work with H2, and saves them
- * as test resources to be used by Flyway
+ * This script reads the src migrations and the built beforeMigrate and afterMigrate sql scripts 
+ * (see concate_migrate.groovy).
+ * It then makes the changes necessary to work with H2, and saves the migrations as test resources to be used by Flyway
  */
 
 import java.io.File;
@@ -15,11 +16,12 @@ final String basedir = "${project.basedir}"
 final File productionSchemaDir = new File(basedir + '/src/main/resources/db/migration/')
 println('Translating schema files from ' + productionSchemaDir.getAbsolutePath() + '...')
 
-final String productionScriptPattern = '^(V\\d{4}_.*|afterMigrate)\\.sql$'
+final String productionScriptPattern = '^(V\\d{4}_.*|afterMigrate|beforeMigrate)\\.sql$'
 final String testSchemaDir = basedir + '/target/test-classes/db/test_migration/'
 
 Files.createDirectories(Paths.get(testSchemaDir))
-for (File file : productionSchemaDir.listFiles() + new File(basedir + '/target/classes/db/migration/afterMigrate.sql')) {
+// productionSchemaDir is in src, and beforeMigrate and afterMigrate are in the built directory
+for (File file : productionSchemaDir.listFiles() + new File(basedir + '/target/classes/db/migration/afterMigrate.sql') + new File(basedir + '/target/classes/db/migration/beforeMigrate.sql')) {
   if (!file.isFile()) {
     continue
   }

@@ -4,14 +4,14 @@ public interface SampleTissue extends DetailedSample {
 
   public static final String CATEGORY_NAME = "Tissue";
 
-  public String getExternalInstituteIdentifier();
+  public String getSecondaryIdentifier();
 
   /**
    * Sets the sample's identifying name or ID at the source Institute
    * 
-   * @param externalInstituteIdentifier
+   * @param secondaryIdentifier
    */
-  void setExternalInstituteIdentifier(String externalInstituteIdentifier);
+  void setSecondaryIdentifier(String secondaryIdentifier);
 
   Lab getLab();
 

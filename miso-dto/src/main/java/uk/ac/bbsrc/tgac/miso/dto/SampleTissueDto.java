@@ -12,7 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName(value = SampleTissue.CATEGORY_NAME)
 public class SampleTissueDto extends SampleIdentityDto {
-  private String externalInstituteIdentifier;
+  private String secondaryIdentifier;
   private Long labId;
   private String labUrl;
   private Integer passageNumber;
@@ -26,8 +26,8 @@ public class SampleTissueDto extends SampleIdentityDto {
   private String tissueTypeUrl;
   private Integer tubeNumber;
 
-  public String getExternalInstituteIdentifier() {
-    return externalInstituteIdentifier;
+  public String getSecondaryIdentifier() {
+    return secondaryIdentifier;
   }
 
   public Long getLabId() {
@@ -78,8 +78,8 @@ public class SampleTissueDto extends SampleIdentityDto {
     return tubeNumber;
   }
 
-  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
-    this.externalInstituteIdentifier = externalInstituteIdentifier;
+  public void setSecondaryIdentifier(String secondaryIdentifier) {
+    this.secondaryIdentifier = secondaryIdentifier;
   }
 
   public void setLabId(Long labId) {
