@@ -67,7 +67,7 @@ HotTarget.sample = (function() {
       var progression = [ 'Identity', 'Tissue', 'Tissue Processing', 'Stock',
           'Aliquot' ];
       // First, set all the groups of detailed columns we will show to off.
-      for (var i = 0; i <= progression.length; i++) {
+      for (var i = 0; i < progression.length; i++) {
         show[progression[i]] = false;
       }
       // Determine the indices of the first and less steps in the progression.
