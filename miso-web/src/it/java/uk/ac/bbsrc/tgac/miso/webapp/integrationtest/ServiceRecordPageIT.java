@@ -15,7 +15,6 @@ import com.google.common.collect.Maps;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.SequencerPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ServiceRecordPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ServiceRecordPage.Field;
@@ -58,7 +57,7 @@ public class ServiceRecordPageIT extends AbstractIT {
 
     String newId = page2.getField(Field.ID);
 
-    SequencerServiceRecord sr = (SequencerServiceRecord) getSession().get(SequencerServiceRecordImpl.class, Long.valueOf(newId));
+    SequencerServiceRecord sr = (SequencerServiceRecord) getSession().get(SequencerServiceRecord.class, Long.valueOf(newId));
     assertServiceRecordAttributes(fields, sr);
   }
 
@@ -95,7 +94,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    SequencerServiceRecord savedRecord = (SequencerServiceRecord) getSession().get(SequencerServiceRecordImpl.class, 150L);
+    SequencerServiceRecord savedRecord = (SequencerServiceRecord) getSession().get(SequencerServiceRecord.class, 150L);
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
@@ -128,7 +127,7 @@ public class ServiceRecordPageIT extends AbstractIT {
 
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    SequencerServiceRecord savedRecord = (SequencerServiceRecord) getSession().get(SequencerServiceRecordImpl.class, 151L);
+    SequencerServiceRecord savedRecord = (SequencerServiceRecord) getSession().get(SequencerServiceRecord.class, 151L);
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
@@ -161,7 +160,7 @@ public class ServiceRecordPageIT extends AbstractIT {
 
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    SequencerServiceRecord savedRecord = (SequencerServiceRecord) getSession().get(SequencerServiceRecordImpl.class, 152L);
+    SequencerServiceRecord savedRecord = (SequencerServiceRecord) getSession().get(SequencerServiceRecord.class, 152L);
     assertServiceRecordAttributes(fields, savedRecord);
   }
 

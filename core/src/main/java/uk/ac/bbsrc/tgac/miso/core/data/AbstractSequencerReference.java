@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 
 /**
  * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer
@@ -232,7 +231,7 @@ public abstract class AbstractSequencerReference implements SequencerReference {
     this.runs = runs;
   }
 
-  @OneToMany(targetEntity = SequencerServiceRecordImpl.class, mappedBy = "sequencerReference")
+  @OneToMany(targetEntity = SequencerServiceRecord.class, mappedBy = "sequencerReference")
   private Set<SequencerServiceRecord> serviceRecords = new HashSet<>();
 
   @Override

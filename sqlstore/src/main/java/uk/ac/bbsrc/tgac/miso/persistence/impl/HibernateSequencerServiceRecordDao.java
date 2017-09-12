@@ -17,7 +17,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -44,7 +43,7 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
   @Override
   public long save(SequencerServiceRecord ssr) throws IOException {
     long id;
-    if (ssr.getId() == SequencerServiceRecordImpl.UNSAVED_ID) {
+    if (ssr.getId() == SequencerServiceRecord.UNSAVED_ID) {
       if (ssr.getSequencerReference().getDateDecommissioned() != null)
         throw new IOException("Cannot add service records to a retired sequencer!");
 
@@ -58,12 +57,12 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
 
   @Override
   public SequencerServiceRecord get(long id) throws IOException {
-    return (SequencerServiceRecord) currentSession().get(SequencerServiceRecordImpl.class, id);
+    return (SequencerServiceRecord) currentSession().get(SequencerServiceRecord.class, id);
   }
 
   @Override
   public List<SequencerServiceRecord> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(SequencerServiceRecordImpl.class);
+    Criteria criteria = currentSession().createCriteria(SequencerServiceRecord.class);
     @SuppressWarnings("unchecked")
     List<SequencerServiceRecord> records = criteria.list();
     return records;
@@ -71,7 +70,7 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
 
   @Override
   public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(SequencerServiceRecordImpl.class);
+    Criteria criteria = currentSession().createCriteria(SequencerServiceRecord.class);
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
   }
 
@@ -110,7 +109,7 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
 
   @Override
   public List<SequencerServiceRecord> listBySequencerId(long referenceId) {
-    Criteria criteria = currentSession().createCriteria(SequencerServiceRecordImpl.class);
+    Criteria criteria = currentSession().createCriteria(SequencerServiceRecord.class);
     criteria.add(Restrictions.eq("sequencerReference.id", referenceId));
     @SuppressWarnings("unchecked")
     List<SequencerServiceRecord> records = criteria.list();
