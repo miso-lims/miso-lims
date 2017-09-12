@@ -650,7 +650,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     target.setPassageNumber(source.getPassageNumber());
     target.setTimesReceived(source.getTimesReceived());
     target.setTubeNumber(source.getTubeNumber());
-    target.setExternalInstituteIdentifier(source.getExternalInstituteIdentifier());
+    target.setSecondaryIdentifier(source.getSecondaryIdentifier());
     target.setRegion(source.getRegion());
     target.setTissueMaterial(source.getTissueMaterial());
     target.setTissueOrigin(source.getTissueOrigin());

@@ -441,8 +441,8 @@ HotTarget.sample = (function() {
               'tubeNumber', HotUtils.validator.requiredNumber),
           HotUtils.makeColumnForConstantsList('Lab', show['Tissue'],
               'labComposite', 'labId', 'id', 'label', Constants.labs, false),
-          HotUtils.makeColumnForText('Ext. Inst. Identifier', show['Tissue'],
-              'externalInstituteIdentifier', {
+          HotUtils.makeColumnForText('Secondary ID', show['Tissue'],
+              'secondaryIdentifier', {
                 validator : HotUtils.validator.optionalTextNoSpecialChars
               }),
           HotUtils.makeColumnForConstantsList('Material', show['Tissue'],

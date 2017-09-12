@@ -734,7 +734,7 @@ public class Dtos {
     SampleTissueDto dto = new SampleTissueDto();
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
-    dto.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
+    dto.setSecondaryIdentifier(from.getSecondaryIdentifier());
     dto.setRegion(from.getRegion());
     dto.setTubeNumber(from.getTubeNumber());
     if (from.getLab() != null) {
@@ -758,7 +758,7 @@ public class Dtos {
     to.setTimesReceived(from.getTimesReceived());
     to.setTubeNumber(from.getTubeNumber());
     to.setRegion(nullifyStringIfBlank(from.getRegion()));
-    to.setExternalInstituteIdentifier(from.getExternalInstituteIdentifier());
+    to.setSecondaryIdentifier(from.getSecondaryIdentifier());
     if (from.getTissueOriginId() != null) {
       TissueOrigin tissueOrigin = new TissueOriginImpl();
       tissueOrigin.setId(from.getTissueOriginId());

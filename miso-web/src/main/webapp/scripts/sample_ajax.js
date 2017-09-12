@@ -175,10 +175,10 @@ var Sample = Sample || {
       jQuery('#tissueType').attr('class', 'form-control');
       jQuery('#tissueType').attr('data-parsley-required', 'true');
       
-      // External Institute Identifier validation
-      jQuery('#externalInstituteIdentifier').attr('class', 'form-control');
-      jQuery('#externalInstituteIdentifier').attr('data-parsley-maxlength', '255');
-      jQuery('#externalInstituteIdentifier').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      // Secondary Identifier validation
+      jQuery('#secondaryIdentifier').attr('class', 'form-control');
+      jQuery('#secondaryIdentifier').attr('data-parsley-maxlength', '255');
+      jQuery('#secondaryIdentifier').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
       
       // Region validation
       jQuery('#region').attr('class', 'form-control');

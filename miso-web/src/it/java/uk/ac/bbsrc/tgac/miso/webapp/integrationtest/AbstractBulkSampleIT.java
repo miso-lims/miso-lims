@@ -82,8 +82,8 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEquals("confirm tissue material", hotAttributes.get(Columns.TISSUE_MATERIAL),
         (fromDb.getTissueMaterial() == null ? "(None)" : fromDb.getTissueMaterial().getAlias()));
     assertEquals("confirm region", hotAttributes.get(Columns.REGION), (fromDb.getRegion() == null ? "" : fromDb.getRegion()));
-    assertEquals("confirm ext inst id", hotAttributes.get(Columns.EXT_INST_ID),
-        (fromDb.getExternalInstituteIdentifier() == null ? "" : fromDb.getExternalInstituteIdentifier()));
+    assertEquals("confirm secondary id", hotAttributes.get(Columns.SECONDARY_ID),
+        (fromDb.getSecondaryIdentifier() == null ? "" : fromDb.getSecondaryIdentifier()));
     assertEquals("confirm lab", hotAttributes.get(Columns.LAB), (fromDb.getLab() == null ? "(None)" : fromDb.getLab().getItemLabel()));
     assertEquals("confirm tissue origin", hotAttributes.get(Columns.TISSUE_ORIGIN), fromDb.getTissueOrigin().getItemLabel());
     assertEquals("confirm tissue type", hotAttributes.get(Columns.TISSUE_TYPE), fromDb.getTissueType().getItemLabel());

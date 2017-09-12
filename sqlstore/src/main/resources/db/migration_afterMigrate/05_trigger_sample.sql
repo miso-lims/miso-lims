@@ -171,7 +171,7 @@ FOR EACH ROW
   BEGIN
   DECLARE log_message varchar(500) CHARACTER SET utf8;
   SET log_message = CONCAT_WS(', ',
-    CASE WHEN (NEW.externalInstituteIdentifier IS NULL) <> (OLD.externalInstituteIdentifier IS NULL) OR NEW.externalInstituteIdentifier <> OLD.externalInstituteIdentifier THEN CONCAT('external identifier: ', COALESCE(OLD.externalInstituteIdentifier, 'n/a'), ' → ', COALESCE(NEW.externalInstituteIdentifier, 'n/a')) END,
+    CASE WHEN (NEW.secondaryIdentifier IS NULL) <> (OLD.secondaryIdentifier IS NULL) OR NEW.secondaryIdentifier <> OLD.secondaryIdentifier THEN CONCAT('secondary identifier: ', COALESCE(OLD.secondaryIdentifier, 'n/a'), ' → ', COALESCE(NEW.secondaryIdentifier, 'n/a')) END,
     CASE WHEN (NEW.labId IS NULL) <> (OLD.labId IS NULL) OR NEW.labId <> OLD.labId THEN CONCAT('lab: ', COALESCE((SELECT alias FROM Lab WHERE labId = OLD.labId), 'n/a'), ' → ', COALESCE((SELECT alias FROM Lab WHERE labId = NEW.labId), 'n/a')) END,
     CASE WHEN (NEW.passageNumber IS NULL) <> (OLD.passageNumber IS NULL) OR NEW.passageNumber <> OLD.passageNumber OR (NEW.timesReceived IS NULL) <> (OLD.timesReceived IS NULL) OR NEW.timesReceived <> OLD.timesReceived OR (NEW.tubeNumber IS NULL) <> (OLD.tubeNumber IS NULL) OR NEW.tubeNumber <> OLD.tubeNumber THEN CONCAT('passage: ', COALESCE(OLD.passageNumber, 'n/a'), '-', COALESCE(OLD.timesReceived, 'n/a'), '-', COALESCE(OLD.tubeNumber, 'n/a'), ' → ', COALESCE(NEW.passageNumber, 'n/a'), '-', COALESCE(NEW.timesReceived, 'n/a'), '-', COALESCE(NEW.tubeNumber, 'n/a')) END,
     CASE WHEN (NEW.region IS NULL) <> (OLD.region IS NULL) OR NEW.region <> OLD.region THEN CONCAT('region: ', COALESCE(OLD.region, 'n/a'), ' → ', COALESCE(NEW.region, 'n/a')) END,
@@ -182,7 +182,7 @@ FOR EACH ROW
     INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
-         CASE WHEN (NEW.externalInstituteIdentifier IS NULL) <> (OLD.externalInstituteIdentifier IS NULL) OR NEW.externalInstituteIdentifier <> OLD.externalInstituteIdentifier THEN 'externalInstituteIdentifier' END,
+         CASE WHEN (NEW.secondaryIdentifier IS NULL) <> (OLD.secondaryIdentifier IS NULL) OR NEW.secondaryIdentifier <> OLD.secondaryIdentifier THEN 'secondaryIdentifier' END,
          CASE WHEN (NEW.labId IS NULL) <> (OLD.labId IS NULL) OR NEW.labId <> OLD.labId THEN 'labId' END,
          CASE WHEN (NEW.passageNumber IS NULL) <> (OLD.passageNumber IS NULL) OR NEW.passageNumber <> OLD.passageNumber THEN 'passageNumber' END,
          CASE WHEN (NEW.region IS NULL) <> (OLD.region IS NULL) OR NEW.region <> OLD.region THEN 'region' END,

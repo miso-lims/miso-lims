@@ -28,7 +28,7 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
       Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.SAMPLE_CLASS,
       Columns.GROUP_ID, Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER,
       Columns.TIMES_RECEIVED,
-      Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.QC_STATUS,
+      Columns.TUBE_NUMBER, Columns.LAB, Columns.SECONDARY_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.QC_STATUS,
       Columns.QC_NOTE);
 
   private static final Set<String> slideColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
@@ -187,7 +187,7 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     editable.put(Columns.TIMES_RECEIVED, "200");
     editable.put(Columns.TUBE_NUMBER, "200");
     editable.put(Columns.LAB, "Pathology (University Health Network)");
-    editable.put(Columns.EXT_INST_ID, "changed");
+    editable.put(Columns.SECONDARY_ID, "changed");
     editable.put(Columns.TISSUE_MATERIAL, "Blood");
     editable.put(Columns.REGION, "changed");
     editable.put(Columns.QC_STATUS, "Refused Consent");
@@ -224,7 +224,7 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     editable.put(Columns.TIMES_RECEIVED, "2");
     editable.put(Columns.TUBE_NUMBER, "2");
     editable.put(Columns.LAB, "BioBank (University Health Network)");
-    editable.put(Columns.EXT_INST_ID, "changed tube");
+    editable.put(Columns.SECONDARY_ID, "changed tube");
     editable.put(Columns.TISSUE_MATERIAL, "Blood");
     editable.put(Columns.REGION, "Pancreatic duct");
     editable.put(Columns.QC_STATUS, "Waiting: Receive Tissue");
@@ -256,7 +256,7 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     empty.put(Columns.TIMES_RECEIVED, "2");
     empty.put(Columns.TUBE_NUMBER, "2");
     empty.put(Columns.LAB, "(None)");
-    empty.put(Columns.EXT_INST_ID, "");
+    empty.put(Columns.SECONDARY_ID, "");
     empty.put(Columns.TISSUE_MATERIAL, "(None)");
     empty.put(Columns.REGION, "");
     empty.put(Columns.QC_STATUS, "Not Ready");

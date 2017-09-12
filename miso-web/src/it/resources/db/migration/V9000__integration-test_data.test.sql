@@ -456,7 +456,7 @@ INSERT INTO Identity (sampleId, externalName, donorSex) VALUES
   (301, 'DILT_identity_1', 'FEMALE'),
   (501, 'TIB_identity_1', 'UNKNOWN');
 
-INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, externalInstituteIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
+INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, secondaryIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
   (2, 1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2),
   (100002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (110002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),

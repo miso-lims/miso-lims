@@ -47,35 +47,35 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
       Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT,
       Columns.EXTERNAL_NAME, Columns.IDENTITY_ALIAS, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
       Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER, Columns.TIMES_RECEIVED,
-      Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.QC_STATUS,
+      Columns.TUBE_NUMBER, Columns.LAB, Columns.SECONDARY_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.QC_STATUS,
       Columns.QC_NOTE);
 
   private static final Set<String> slideColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT,
       Columns.EXTERNAL_NAME, Columns.IDENTITY_ALIAS, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
       Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER, Columns.TIMES_RECEIVED,
-      Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.SLIDES,
+      Columns.TUBE_NUMBER, Columns.LAB, Columns.SECONDARY_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.SLIDES,
       Columns.DISCARDS, Columns.THICKNESS, Columns.STAIN, Columns.QC_STATUS, Columns.QC_NOTE);
 
   private static final Set<String> curlsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT,
       Columns.EXTERNAL_NAME, Columns.IDENTITY_ALIAS, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
       Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER, Columns.TIMES_RECEIVED,
-      Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.QC_STATUS,
+      Columns.TUBE_NUMBER, Columns.LAB, Columns.SECONDARY_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.QC_STATUS,
       Columns.QC_NOTE);
 
   private static final Set<String> gDnaStockColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT,
       Columns.EXTERNAL_NAME, Columns.IDENTITY_ALIAS, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
       Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER, Columns.TIMES_RECEIVED,
-      Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
+      Columns.TUBE_NUMBER, Columns.LAB, Columns.SECONDARY_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
       Columns.VOLUME, Columns.CONCENTRATION, Columns.QC_STATUS, Columns.QC_NOTE);
 
   private static final Set<String> rnaStockColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT,
       Columns.EXTERNAL_NAME, Columns.IDENTITY_ALIAS, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
       Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER, Columns.TIMES_RECEIVED,
-      Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
+      Columns.TUBE_NUMBER, Columns.LAB, Columns.SECONDARY_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
       Columns.VOLUME, Columns.CONCENTRATION, Columns.DNASE_TREATED, Columns.QC_STATUS,
       Columns.QC_NOTE);
 
@@ -83,14 +83,14 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
       Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT,
       Columns.EXTERNAL_NAME, Columns.IDENTITY_ALIAS, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
       Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER, Columns.TIMES_RECEIVED,
-      Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
+      Columns.TUBE_NUMBER, Columns.LAB, Columns.SECONDARY_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
       Columns.VOLUME, Columns.CONCENTRATION, Columns.QC_STATUS, Columns.QC_NOTE, Columns.PURPOSE);
 
   private static final Set<String> rnaAliquotColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.PROJECT,
       Columns.EXTERNAL_NAME, Columns.IDENTITY_ALIAS, Columns.DONOR_SEX, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
       Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER, Columns.TIMES_RECEIVED,
-      Columns.TUBE_NUMBER, Columns.LAB, Columns.EXT_INST_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
+      Columns.TUBE_NUMBER, Columns.LAB, Columns.SECONDARY_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.STR_STATUS,
       Columns.VOLUME, Columns.CONCENTRATION, Columns.DNASE_TREATED, Columns.QC_STATUS,
       Columns.QC_NOTE, Columns.PURPOSE);
 
@@ -239,7 +239,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     tissue.put(Columns.TIMES_RECEIVED, "1");
     tissue.put(Columns.TUBE_NUMBER, "1");
     tissue.put(Columns.LAB, "BioBank (University Health Network)");
-    tissue.put(Columns.EXT_INST_ID, "tube id 1");
+    tissue.put(Columns.SECONDARY_ID, "tube id 1");
     tissue.put(Columns.TISSUE_MATERIAL, "FFPE");
     tissue.put(Columns.REGION, "Medulla oblongata");
     tissue.put(Columns.QC_STATUS, "Ready");
@@ -279,7 +279,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     tissue.put(Columns.TIMES_RECEIVED, "1");
     tissue.put(Columns.TUBE_NUMBER, "1");
     tissue.put(Columns.LAB, "BioBank (University Health Network)");
-    tissue.put(Columns.EXT_INST_ID, "tube id 1");
+    tissue.put(Columns.SECONDARY_ID, "tube id 1");
     tissue.put(Columns.TISSUE_MATERIAL, "FFPE");
     tissue.put(Columns.REGION, "Medulla oblongata");
     tissue.put(Columns.QC_STATUS, "Ready");
@@ -353,7 +353,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     slide.put(Columns.TIMES_RECEIVED, "1");
     slide.put(Columns.TUBE_NUMBER, "1");
     slide.put(Columns.LAB, "BioBank (University Health Network)");
-    slide.put(Columns.EXT_INST_ID, "tube id 1");
+    slide.put(Columns.SECONDARY_ID, "tube id 1");
     slide.put(Columns.TISSUE_MATERIAL, "FFPE");
     slide.put(Columns.REGION, "Medulla oblongata");
     slide.put(Columns.SLIDES, "7");
@@ -398,7 +398,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     slide.put(Columns.TIMES_RECEIVED, "1");
     slide.put(Columns.TUBE_NUMBER, "1");
     slide.put(Columns.LAB, "BioBank (University Health Network)");
-    slide.put(Columns.EXT_INST_ID, "tube id 1");
+    slide.put(Columns.SECONDARY_ID, "tube id 1");
     slide.put(Columns.TISSUE_MATERIAL, "FFPE");
     slide.put(Columns.REGION, "Medulla oblongata");
     slide.put(Columns.SLIDES, "7");
@@ -462,7 +462,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     curls.put(Columns.TIMES_RECEIVED, "1");
     curls.put(Columns.TUBE_NUMBER, "1");
     curls.put(Columns.LAB, "BioBank (University Health Network)");
-    curls.put(Columns.EXT_INST_ID, "tube id 1");
+    curls.put(Columns.SECONDARY_ID, "tube id 1");
     curls.put(Columns.TISSUE_MATERIAL, "FFPE");
     curls.put(Columns.REGION, "Medulla oblongata");
     curls.put(Columns.QC_STATUS, "Ready");
@@ -503,7 +503,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     curls.put(Columns.TIMES_RECEIVED, "1");
     curls.put(Columns.TUBE_NUMBER, "1");
     curls.put(Columns.LAB, "BioBank (University Health Network)");
-    curls.put(Columns.EXT_INST_ID, "tube id 1");
+    curls.put(Columns.SECONDARY_ID, "tube id 1");
     curls.put(Columns.TISSUE_MATERIAL, "FFPE");
     curls.put(Columns.REGION, "Medulla oblongata");
     curls.put(Columns.QC_STATUS, "Ready");
@@ -577,7 +577,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     gDnaStock.put(Columns.TIMES_RECEIVED, "1");
     gDnaStock.put(Columns.TUBE_NUMBER, "1");
     gDnaStock.put(Columns.LAB, "BioBank (University Health Network)");
-    gDnaStock.put(Columns.EXT_INST_ID, "tube id 1");
+    gDnaStock.put(Columns.SECONDARY_ID, "tube id 1");
     gDnaStock.put(Columns.TISSUE_MATERIAL, "FFPE");
     gDnaStock.put(Columns.REGION, "Medulla oblongata");
     gDnaStock.put(Columns.STR_STATUS, "Submitted");
@@ -621,7 +621,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     gDnaStock.put(Columns.TIMES_RECEIVED, "1");
     gDnaStock.put(Columns.TUBE_NUMBER, "1");
     gDnaStock.put(Columns.LAB, "BioBank (University Health Network)");
-    gDnaStock.put(Columns.EXT_INST_ID, "tube id 1");
+    gDnaStock.put(Columns.SECONDARY_ID, "tube id 1");
     gDnaStock.put(Columns.TISSUE_MATERIAL, "FFPE");
     gDnaStock.put(Columns.REGION, "Medulla oblongata");
     gDnaStock.put(Columns.STR_STATUS, "Submitted");
@@ -695,7 +695,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     rnaStock.put(Columns.TIMES_RECEIVED, "1");
     rnaStock.put(Columns.TUBE_NUMBER, "1");
     rnaStock.put(Columns.LAB, "BioBank (University Health Network)");
-    rnaStock.put(Columns.EXT_INST_ID, "tube id 1");
+    rnaStock.put(Columns.SECONDARY_ID, "tube id 1");
     rnaStock.put(Columns.TISSUE_MATERIAL, "FFPE");
     rnaStock.put(Columns.REGION, "Medulla oblongata");
     rnaStock.put(Columns.STR_STATUS, "Submitted");
@@ -743,7 +743,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     rnaStock.put(Columns.TIMES_RECEIVED, "1");
     rnaStock.put(Columns.TUBE_NUMBER, "1");
     rnaStock.put(Columns.LAB, "BioBank (University Health Network)");
-    rnaStock.put(Columns.EXT_INST_ID, "tube id 1");
+    rnaStock.put(Columns.SECONDARY_ID, "tube id 1");
     rnaStock.put(Columns.TISSUE_MATERIAL, "FFPE");
     rnaStock.put(Columns.REGION, "Medulla oblongata");
     rnaStock.put(Columns.STR_STATUS, "Submitted");
@@ -822,7 +822,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     gDnaAliquot.put(Columns.TIMES_RECEIVED, "1");
     gDnaAliquot.put(Columns.TUBE_NUMBER, "1");
     gDnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
-    gDnaAliquot.put(Columns.EXT_INST_ID, "tube id 1");
+    gDnaAliquot.put(Columns.SECONDARY_ID, "tube id 1");
     gDnaAliquot.put(Columns.TISSUE_MATERIAL, "FFPE");
     gDnaAliquot.put(Columns.REGION, "Medulla oblongata");
     gDnaAliquot.put(Columns.STR_STATUS, "Submitted");
@@ -868,7 +868,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     gDnaAliquot.put(Columns.TIMES_RECEIVED, "1");
     gDnaAliquot.put(Columns.TUBE_NUMBER, "1");
     gDnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
-    gDnaAliquot.put(Columns.EXT_INST_ID, "tube id 1");
+    gDnaAliquot.put(Columns.SECONDARY_ID, "tube id 1");
     gDnaAliquot.put(Columns.TISSUE_MATERIAL, "FFPE");
     gDnaAliquot.put(Columns.REGION, "Medulla oblongata");
     gDnaAliquot.put(Columns.STR_STATUS, "Submitted");
@@ -932,7 +932,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     rnaAliquot.put(Columns.TIMES_RECEIVED, "1");
     rnaAliquot.put(Columns.TUBE_NUMBER, "1");
     rnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
-    rnaAliquot.put(Columns.EXT_INST_ID, "tube id 1");
+    rnaAliquot.put(Columns.SECONDARY_ID, "tube id 1");
     rnaAliquot.put(Columns.TISSUE_MATERIAL, "FFPE");
     rnaAliquot.put(Columns.REGION, "Medulla oblongata");
     rnaAliquot.put(Columns.STR_STATUS, "Submitted");
@@ -978,7 +978,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
     rnaAliquot.put(Columns.TIMES_RECEIVED, "1");
     rnaAliquot.put(Columns.TUBE_NUMBER, "1");
     rnaAliquot.put(Columns.LAB, "BioBank (University Health Network)");
-    rnaAliquot.put(Columns.EXT_INST_ID, "tube id 1");
+    rnaAliquot.put(Columns.SECONDARY_ID, "tube id 1");
     rnaAliquot.put(Columns.TISSUE_MATERIAL, "FFPE");
     rnaAliquot.put(Columns.REGION, "Medulla oblongata");
     rnaAliquot.put(Columns.STR_STATUS, "Submitted");
