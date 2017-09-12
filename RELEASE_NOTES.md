@@ -1,3 +1,13 @@
+# 0.2.88
+
+Changes:
+
+ * Redesign Barcode, institute defaults, QC, Order, Run and Container interfaces
+ * Rename external institute identifier to secondary identifier (#1114)
+ * Fix errors in plain sample operation
+ * Allow a default scientificName (configuration change in miso.properties) (#1107)
+ * Add new printer drivers
+
 # 0.2.87
 
 Changes:
