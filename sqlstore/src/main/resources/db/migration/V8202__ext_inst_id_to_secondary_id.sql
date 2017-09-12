@@ -1,0 +1,1 @@
+ALTER TABLE SampleTissue CHANGE COLUMN externalInstituteIdentifier secondaryIdentifier VARCHAR(255) DEFAULT NULL;

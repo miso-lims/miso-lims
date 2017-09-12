@@ -19,7 +19,7 @@ public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue
 
   private static final long serialVersionUID = 1L;
 
-  private String externalInstituteIdentifier;
+  private String secondaryIdentifier;
 
   @ManyToOne(targetEntity = LabImpl.class)
   @JoinColumn(name = "labId", nullable = true)
@@ -46,8 +46,8 @@ public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue
   private Integer tubeNumber;
 
   @Override
-  public String getExternalInstituteIdentifier() {
-    return externalInstituteIdentifier;
+  public String getSecondaryIdentifier() {
+    return secondaryIdentifier;
   }
 
   @Override
@@ -91,8 +91,8 @@ public class SampleTissueImpl extends DetailedSampleImpl implements SampleTissue
   }
 
   @Override
-  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
-    this.externalInstituteIdentifier = nullifyStringIfBlank(externalInstituteIdentifier);
+  public void setSecondaryIdentifier(String secondaryIdentifier) {
+    this.secondaryIdentifier = nullifyStringIfBlank(secondaryIdentifier);
   }
 
   @Override

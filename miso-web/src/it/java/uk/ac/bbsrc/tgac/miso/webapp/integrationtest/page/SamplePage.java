@@ -68,8 +68,8 @@ public class SamplePage extends HeaderFooterPage {
   private WebElement timesReceivedLabel;
   @FindBy(id = "tubeNumber")
   private WebElement tubeNumberLabel;
-  @FindBy(id = "externalInstituteIdentifier")
-  private WebElement externalInstituteIdentifierLabel;
+  @FindBy(id = "secondaryIdentifier")
+  private WebElement secondaryIdentifierLabel;
   @FindBy(id = "lab")
   private WebElement labLabel;
   @FindBy(id = "tissueMaterial")
@@ -369,12 +369,12 @@ public class SamplePage extends HeaderFooterPage {
     setText(region, regionLabel);
   }
 
-  public String getExternalInstituteIdentifier() {
-    return externalInstituteIdentifierLabel.getAttribute("value");
+  public String getSecondaryIdentifier() {
+    return secondaryIdentifierLabel.getAttribute("value");
   }
 
-  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
-    setText(externalInstituteIdentifier, externalInstituteIdentifierLabel);
+  public void setSecondaryIdentifier(String secondaryIdentifier) {
+    setText(secondaryIdentifier, secondaryIdentifierLabel);
   }
 
   public String getLab() {

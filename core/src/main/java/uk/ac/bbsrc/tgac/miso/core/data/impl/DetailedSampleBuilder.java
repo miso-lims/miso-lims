@@ -99,7 +99,7 @@ public class DetailedSampleBuilder
   private SampleClass tissueClass; // identifies a parent tissue class if this sample itself is not a tissue
   private TissueOrigin tissueOrigin;
   private TissueType tissueType;
-  private String externalInstituteIdentifier;
+  private String secondaryIdentifier;
   private Lab lab;
   private Integer passageNumber;
   private Integer timesReceived;
@@ -429,13 +429,13 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public String getExternalInstituteIdentifier() {
-    return externalInstituteIdentifier;
+  public String getSecondaryIdentifier() {
+    return secondaryIdentifier;
   }
 
   @Override
-  public void setExternalInstituteIdentifier(String externalInstituteIdentifier) {
-    this.externalInstituteIdentifier = externalInstituteIdentifier;
+  public void setSecondaryIdentifier(String secondaryIdentifier) {
+    this.secondaryIdentifier = secondaryIdentifier;
   }
 
   @Override
@@ -928,7 +928,7 @@ public class DetailedSampleBuilder
     tissue.setPassageNumber(passageNumber);
     tissue.setTissueType(tissueType);
     tissue.setTissueOrigin(tissueOrigin);
-    tissue.setExternalInstituteIdentifier(externalInstituteIdentifier);
+    tissue.setSecondaryIdentifier(secondaryIdentifier);
     tissue.setLab(lab);
     tissue.setTissueMaterial(tissueMaterial);
     tissue.setRegion(region);

@@ -463,8 +463,8 @@
               <td><form:input id="region" path="region"/></td>
             </tr>
             <tr>
-              <td class="h">External Institute Identifier:</td>
-              <td><form:input id="externalInstituteIdentifier" path="externalInstituteIdentifier"/></td>
+              <td class="h">Secondary Identifier:</td>
+              <td><form:input id="secondaryIdentifier" path="secondaryIdentifier"/></td>
             </tr>
             <tr>
               <td class="h">Lab:</td>
