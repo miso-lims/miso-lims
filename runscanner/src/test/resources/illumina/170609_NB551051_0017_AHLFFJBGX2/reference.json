@@ -1,1 +1,32 @@
-{"class":"uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto","runAlias":"170609_NB551051_0017_AHLFFJBGX2","sequencerName":"NB551051","containerSerialNumber":"HLFFJBGX2","laneCount":4,"healthType":"Completed","startDate":[2017,6,9,0,0],"completionDate":[2017,6,10,14,8,45],"pairedEndRun":true,"software":"Interop: v1.0.25-11-g2085c7b Instrument: 0","callCycle":1,"chemistry":"NS_HIGH","imgCycle":1,"numCycles":158,"readLength":75,"scoreCycle":1}
+{
+  "callCycle": 158,
+  "chemistry": "NS_HIGH",
+  "class": "uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto",
+  "completionDate": [
+    2017,
+    6,
+    10,
+    14,
+    8,
+    45
+  ],
+  "containerSerialNumber": "HLFFJBGX2",
+  "healthType": "Completed",
+  "imgCycle": 158,
+  "laneCount": 4,
+  "numCycles": 158,
+  "pairedEndRun": true,
+  "poolNames": {},
+  "readLength": 75,
+  "runAlias": "170609_NB551051_0017_AHLFFJBGX2",
+  "scoreCycle": 158,
+  "sequencerName": "NB551051",
+  "software": "Interop: v1.0.25-11-g2085c7b Instrument: 0",
+  "startDate": [
+    2017,
+    6,
+    9,
+    0,
+    0
+  ]
+}

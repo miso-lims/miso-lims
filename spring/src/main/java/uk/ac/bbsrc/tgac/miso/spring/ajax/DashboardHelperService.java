@@ -69,7 +69,6 @@ import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
-import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -298,12 +297,12 @@ public class DashboardHelperService {
     try {
       Collection<Run> runs;
       if (!isStringEmptyOrNull(searchStr)) {
-        runs = new ArrayList<>(runService.list(0, 0, false, "id",
+        runs = new ArrayList<>(runService.list(0, 0, false, "startDate",
             PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
               // Discard errors
             })));
       } else {
-        runs = new ArrayList<>(runService.list(0, 50, false, "id"));
+        runs = new ArrayList<>(runService.list(0, 50, false, "startDate"));
       }
 
       StringBuilder b = new StringBuilder();
@@ -426,7 +425,7 @@ public class DashboardHelperService {
                 + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
             b.append("Name: <b>" + s.getProject().getName() + "</b><br/>");
             b.append("Alias: <b>" + s.getProject().getAlias() + "</b><br/>");
-            b.append("Last Received: <b>" + LimsUtils.getDateAsString(s.getReceivedDate()) + "</b><br/>");
+            b.append("Last Received: <b>" + LimsUtils.formatDate(s.getReceivedDate()) + "</b><br/>");
             b.append("</div>");
 
             uniqueProjects.add(s.getProject().getId());

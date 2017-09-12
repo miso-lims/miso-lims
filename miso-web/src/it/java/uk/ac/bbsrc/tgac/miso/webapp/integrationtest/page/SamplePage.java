@@ -2,10 +2,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.regex.Pattern;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -157,12 +153,7 @@ public class SamplePage extends HeaderFooterPage {
   }
 
   public void setReceivedDate(String receivedDate) {
-    Pattern dateFormat = Pattern.compile("[0-3]\\d/[0-1]\\d/\\d{4}");
-    if (dateFormat.matcher(receivedDate).matches()) {
-      setText(receivedDate, receivedDateInput);
-    } else {
-      throw new IllegalArgumentException("Date must be in format DD/MM/YYYY");
-    }
+    setText(receivedDate, receivedDateInput);
   }
 
   public String getScientificName() {
@@ -464,15 +455,5 @@ public class SamplePage extends HeaderFooterPage {
 
   public void setSamplePurpose(String samplePurpose) {
     setDropdown(samplePurpose, samplePurposeLabel);
-  }
-
-  public String getSensibleDate(String date) {
-    SimpleDateFormat fromUI = new SimpleDateFormat("dd/MM/yyyy");
-    SimpleDateFormat sensible = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-      return sensible.format(fromUI.parse(date));
-    } catch (ParseException e) {
-      throw new IllegalArgumentException("Very bad date format", e);
-    }
   }
 }

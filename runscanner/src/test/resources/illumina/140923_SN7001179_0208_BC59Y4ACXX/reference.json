@@ -1,1 +1,32 @@
-{"class":"uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto","runAlias":"140923_SN7001179_0208_BC59Y4ACXX","sequencerName":"SN7001179","containerSerialNumber":"C59Y4ACXX","laneCount":8,"healthType":"Completed","startDate":[2014,9,23,0,0],"completionDate":[2014,10,4,23,9,49],"pairedEndRun":true,"software":"Interop: v1.0.25-11-g2085c7b Instrument: 1","callCycle":1,"chemistry":"V3","imgCycle":1,"numCycles":202,"readLength":101,"scoreCycle":1}
+{
+  "callCycle": 202,
+  "chemistry": "V3",
+  "class": "uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto",
+  "completionDate": [
+    2014,
+    10,
+    4,
+    23,
+    9,
+    49
+  ],
+  "containerSerialNumber": "C59Y4ACXX",
+  "healthType": "Completed",
+  "imgCycle": 202,
+  "laneCount": 8,
+  "numCycles": 202,
+  "pairedEndRun": true,
+  "poolNames": {},
+  "readLength": 101,
+  "runAlias": "140923_SN7001179_0208_BC59Y4ACXX",
+  "scoreCycle": 202,
+  "sequencerName": "SN7001179",
+  "software": "Interop: v1.0.25-11-g2085c7b Instrument: 1",
+  "startDate": [
+    2014,
+    9,
+    23,
+    0,
+    0
+  ]
+}

@@ -1,5 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.Map;
+import java.util.Optional;
+
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -10,9 +13,10 @@ public class IlluminaNotificationDto extends NotificationDto {
   private IlluminaChemistry chemistry;
   private int imgCycle;
   private int numCycles;
+  private Map<Integer, String> poolNames;
   private int readLength;
-  private int scoreCycle;
 
+  private int scoreCycle;
 
   @Override
   public boolean equals(Object obj) {
@@ -24,6 +28,9 @@ public class IlluminaNotificationDto extends NotificationDto {
     if (chemistry != other.chemistry) return false;
     if (imgCycle != other.imgCycle) return false;
     if (numCycles != other.numCycles) return false;
+    if (poolNames == null) {
+      if (other.poolNames != null) return false;
+    } else if (!poolNames.equals(other.poolNames)) return false;
     if (readLength != other.readLength) return false;
     if (scoreCycle != other.scoreCycle) return false;
     return true;
@@ -41,15 +48,24 @@ public class IlluminaNotificationDto extends NotificationDto {
     return imgCycle;
   }
 
+  @Override
+  public Optional<String> getLaneContents(int lane) {
+    return poolNames != null && poolNames.containsKey(lane) ? Optional.of(poolNames.get(lane)) : Optional.empty();
+  }
+
   public int getNumCycles() {
     return numCycles;
   }
-
 
   @Override
   public PlatformType getPlatformType() {
     return PlatformType.ILLUMINA;
   }
+
+  public Map<Integer, String> getPoolNames() {
+    return poolNames;
+  }
+
 
   public int getReadLength() {
     return readLength;
@@ -67,6 +83,7 @@ public class IlluminaNotificationDto extends NotificationDto {
     result = prime * result + ((chemistry == null) ? 0 : chemistry.hashCode());
     result = prime * result + imgCycle;
     result = prime * result + numCycles;
+    result = prime * result + ((poolNames == null) ? 0 : poolNames.hashCode());
     result = prime * result + readLength;
     result = prime * result + scoreCycle;
     return result;
@@ -88,6 +105,10 @@ public class IlluminaNotificationDto extends NotificationDto {
     this.numCycles = numCycles;
   }
 
+  public void setPoolNames(Map<Integer, String> poolNames) {
+    this.poolNames = poolNames;
+  }
+
   public void setReadLength(int readLength) {
     this.readLength = readLength;
   }
@@ -104,12 +125,12 @@ public class IlluminaNotificationDto extends NotificationDto {
 
   @Override
   public String toString() {
-    return "IlluminaNotificationDto [callCycle=" + callCycle + ", imgCycle=" + imgCycle + ", numCycles=" + numCycles + ", scoreCycle="
-        + scoreCycle + ", chemistry=" + chemistry + ", readLength=" + readLength + ", getRunAlias()=" + getRunAlias()
-        + ", getSequencerName()=" + getSequencerName() + ", getContainerSerialNumber()=" + getContainerSerialNumber() + ", getLaneCount()="
-        + getLaneCount() + ", getHealthType()=" + getHealthType() + ", getSequencerFolderPath()=" + getSequencerFolderPath()
-        + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()=" + getSoftware() + ", getStartDate()=" + getStartDate()
-        + ", getCompletionDate()=" + getCompletionDate() + "]";
+    return "IlluminaNotificationDto [callCycle=" + callCycle + ", chemistry=" + chemistry + ", imgCycle=" + imgCycle + ", numCycles="
+        + numCycles + ", readLength=" + readLength + ", scoreCycle=" + scoreCycle + ", poolNames=" + poolNames + ", getRunAlias()="
+        + getRunAlias() + ", getSequencerName()=" + getSequencerName() + ", getContainerSerialNumber()=" + getContainerSerialNumber()
+        + ", getLaneCount()=" + getLaneCount() + ", getHealthType()=" + getHealthType() + ", getSequencerFolderPath()="
+        + getSequencerFolderPath() + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()=" + getSoftware() + ", getStartDate()="
+        + getStartDate() + ", getCompletionDate()=" + getCompletionDate() + "]";
   }
 
 }

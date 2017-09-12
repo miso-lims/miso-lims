@@ -23,11 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.spring;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.beans.PropertyEditorSupport;
 import java.net.InetAddress;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -349,7 +348,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     binder.registerCustomEditor(Boolean.class,
         new CustomBooleanEditor(CustomBooleanEditor.VALUE_TRUE, CustomBooleanEditor.VALUE_FALSE, true));
 
-    binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
+    binder.registerCustomEditor(Date.class, new CustomDateEditor(getDateFormat(), true));
 
     new BindingConverter<InetAddress>(InetAddress.class) {
       @Override

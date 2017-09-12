@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 
 @Controller
@@ -149,8 +149,7 @@ public class EditServiceRecordController {
   @InitBinder
   public void initBinder(WebDataBinder binder) {
     // set format for datetime data bindings
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-    CustomDateEditor dateEditor = new CustomDateEditor(dateFormat, true);
+    CustomDateEditor dateEditor = new CustomDateEditor(LimsUtils.getDateTimeFormat(), true);
     binder.registerCustomEditor(Date.class, "shutdownTime", dateEditor);
     binder.registerCustomEditor(Date.class, "restoredTime", dateEditor);
   }

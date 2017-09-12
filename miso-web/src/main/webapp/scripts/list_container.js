@@ -36,12 +36,12 @@ ListTarget.container = {
       "handler" : function() {
         window.location = "/miso/container/new";
       }
-    } ];
+    }, HotUtils.printAction('container'), ];
   },
   createColumns : function(config, projectId) {
     return [
         ListUtils.labelHyperlinkColumn("Serial Number", "container",
-            Utils.array.getId, "identificationBarcode", 1),
+            Utils.array.getId, "identificationBarcode", 1, true),
         {
           "sTitle" : "Platform",
           "mData" : "platform",
@@ -51,15 +51,15 @@ ListTarget.container = {
         ListUtils.idHyperlinkColumn("Last Run Name", "run", "lastRunId",
             function(container) {
               return "RUN" + container.lastRunId;
-            }, -1),
+            }, -1, true),
         ListUtils.labelHyperlinkColumn("Last Run Alias", "run", function(
             container) {
           return container.lastRunId;
-        }, "lastRunAlias", -1),
+        }, "lastRunAlias", -1, true),
         ListUtils.labelHyperlinkColumn("Last Sequencer Used", "sequencer",
             function(container) {
               return container.lastSequencerId;
-            }, "lastSequencerName", -1), {
+            }, "lastSequencerName", -1, true), {
           "sTitle" : "Last Modified",
           "mData" : "lastModified",
           "include" : true,

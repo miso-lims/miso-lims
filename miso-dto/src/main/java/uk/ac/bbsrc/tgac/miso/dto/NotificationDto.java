@@ -10,13 +10,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
+import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "class")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class NotificationDto implements Predicate<SequencingParameters> {
+public abstract class NotificationDto implements Predicate<SequencingParameters>, GetLaneContents {
 
   private String runAlias;
   private String sequencerFolderPath;
@@ -181,7 +182,8 @@ public abstract class NotificationDto implements Predicate<SequencingParameters>
     } else if (!startDate.equals(other.startDate)) return false;
     return true;
   }
-  
+
+  @Override
   public Optional<String> getLaneContents(int lane) {
     return Optional.empty();
   }

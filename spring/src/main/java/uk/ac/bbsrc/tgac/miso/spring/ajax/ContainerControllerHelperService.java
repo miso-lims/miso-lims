@@ -39,10 +39,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AutoPopulatingList;
 
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.google.common.collect.Sets;
 
@@ -63,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
@@ -746,55 +743,6 @@ public class ContainerControllerHelperService {
       return JSONUtils.SimpleJSONResponse("OK");
     } else {
       return JSONUtils.SimpleJSONError("No partitionId specified");
-    }
-  }
-
-  public JSONObject checkContainer(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("containerId")) {
-        Long containerId = json.getLong("containerId");
-        Collection<Run> runs = runService.listByContainerId(containerId);
-        for (Run run : runs) {
-          if (run != null && run.getHealth() == HealthType.Completed) {
-            return JSONUtils.SimpleJSONResponse("yes");
-          }
-        }
-        return JSONUtils.SimpleJSONResponse("no");
-
-      } else {
-        return JSONUtils.SimpleJSONError("No Sequencing Container specified");
-      }
-    } catch (IOException e) {
-      log.error("error getting currently logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-  }
-
-  public JSONObject deleteContainer(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("error getting currently logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("containerId")) {
-        Long containerId = json.getLong("containerId");
-        try {
-          SequencerPartitionContainer container = containerService.get(containerId);
-          containerService.delete(container.getId());
-          return JSONUtils.SimpleJSONResponse("Sequencing Container deleted");
-        } catch (IOException e) {
-          log.error("cannot delete sequencing container", e);
-          return JSONUtils.SimpleJSONError("Cannot delete Sequencing Container: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No Sequencing Container specified to delete.");
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("Only admins can delete objects.");
     }
   }
 

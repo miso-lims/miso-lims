@@ -1,9 +1,45 @@
+# 0.2.87
+
+Changes:
+
+ * Bug fixes
+
+# 0.2.86
+
+Changes:
+
+ * Print barcodes from list pages
+ * Add volume column to dilutions
+ * Removed container delete button
+ * Automatically link Pools to Illumina Runs based on sample sheet
+ * Increased indicators for duplicate indices in a Pool
+ * Fixed sorting project list by name
+ * Standardised date/time formats (yyyy-MM-dd and yyyy-MM-dd HH:mm:ss)
+
+Bad:
+
+ * Error saving Sequencer Service Records
+ * Bad date format for dilution last modified on Edit Pool page
+
+# 0.2.85
+
+Changes:
+
+ * order runs in home page widget by start date
+ * Replace library dilution table with a dialog box
+ * Delete notification server (_configuration change in miso.properties_)
+ * Only update completion date if run is marked as done
+
 # 0.2.84
 
 Changes:
 
  * Fix off-by-one error when creating new flow cells from run scanner
  * Switch to single column when run page is narrow
+
+Bad:
+
+ * Bugs in runscanner
 
 # 0.2.83
 

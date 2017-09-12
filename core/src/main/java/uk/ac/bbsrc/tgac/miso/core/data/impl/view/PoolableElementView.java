@@ -42,9 +42,11 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private String dilutionBarcode;
 
+  private Double dilutionVolume;
+
   private Long preMigrationId;
 
-  @Temporal(TemporalType.DATE)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
 
   @Temporal(TemporalType.DATE)
@@ -95,6 +97,8 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private String creatorName;
 
+  private Long targetedSequencingId;
+
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
 
@@ -110,6 +114,7 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     v.setDilutionConcentration(dilution.getConcentration());
     v.setDilutionId(dilution.getId());
     v.setDilutionName(dilution.getName());
+    v.setDilutionVolume(dilution.getVolume());
     v.setLastModified(dilution.getLastModified());
     v.setPreMigrationId(dilution.getPreMigrationId());
     
@@ -413,6 +418,22 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     if (getDilutionId() < t.getDilutionId()) return -1;
     if (getDilutionId() > t.getDilutionId()) return 1;
     return 0;
+  }
+
+  public Long getTargetedSequencingId() {
+    return targetedSequencingId;
+  }
+
+  public void setTargetedSequencingId(Long targetedSequencingId) {
+    this.targetedSequencingId = targetedSequencingId;
+  }
+
+  public Double getDilutionVolume() {
+    return dilutionVolume;
+  }
+
+  public void setDilutionVolume(Double dilutionVolume) {
+    this.dilutionVolume = dilutionVolume;
   }
 
 }

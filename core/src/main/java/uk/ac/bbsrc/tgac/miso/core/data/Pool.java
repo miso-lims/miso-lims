@@ -241,6 +241,8 @@ public interface Pool
 
   boolean hasDuplicateIndices();
 
+  Set<String> getDuplicateIndicesSequences();
+
   @Override
   void setWatchGroup(Group group);
 

@@ -278,29 +278,37 @@ ListUtils = (function() {
       updateSelectedLabel(state);
     },
     idHyperlinkColumn : function(headerName, urlFragment, id, getLabel,
-        priority) {
+        priority, include) {
       return {
         "sTitle" : headerName,
         "mData" : id,
-        "include" : true,
+        "include" : include,
         "iSortPriority" : priority,
         "bSortable" : priority >= 0,
         "mRender" : function(data, type, full) {
-          return data ? "<a href=\"/miso/" + urlFragment + "/" + data + "\">" + getLabel(full) + "</a>" : "";
+          if (type === 'display') {
+            return data ? "<a href=\"/miso/" + urlFragment + "/" + data + "\">" + getLabel(full) + "</a>" : "";
+          } else if (type === 'filter') {
+            return getLabel(full);
+          }
+          return data;
         }
       };
     },
     labelHyperlinkColumn : function(headerName, urlFragment, getId, label,
-        priority) {
+        priority, include) {
       return {
         "sTitle" : headerName,
         "mData" : label,
-        "include" : true,
+        "include" : include,
         "iSortPriority" : priority,
         "bSortDirection" : true,
         "bSortable" : priority >= 0,
         "mRender" : function(data, type, full) {
+          if (type === 'display') {
             return data ? "<a href=\"/miso/" + urlFragment + "/" + getId(full) + "\">" + data + "</a>" : "";
+          }
+          return data;
         }
       };
     },

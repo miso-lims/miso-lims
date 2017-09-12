@@ -64,19 +64,19 @@ ListTarget.poolelements = {
         ListUtils.idHyperlinkColumn("Library Name", "library", "library.id",
             function(dilution) {
               return dilution.library.name;
-            }, 0),
+            }, 0, true),
         ListUtils.labelHyperlinkColumn("Library Alias", "library", function(
             dilution) {
           return dilution.library.id;
-        }, "library.alias", 0),
+        }, "library.alias", 0, true),
         ListUtils.idHyperlinkColumn("Sample Name", "sample",
             "library.parentSampleId", function(dilution) {
               return "SAM" + dilution.library.parentSampleId;
-            }, 0),
+            }, 0, true),
         ListUtils.labelHyperlinkColumn("Sample Alias", "sample", function(
             dilution) {
           return dilution.library.parentSampleId;
-        }, "library.parentSampleAlias", 0), {
+        }, "library.parentSampleAlias", 0, true), {
           'sTitle' : 'Indices',
           'mData' : 'indexIds',
           'include' : true,
@@ -88,7 +88,10 @@ ListTarget.poolelements = {
                 return data.indexOf(index.id) != -1;
               }));
             }, []).map(function(index) {
-              return index.label;
+              return index.label + 
+                ((config.duplicateIndicesSequences && config.duplicateIndicesSequences.indexOf(index.sequence) != -1) ? 
+                  " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDEX)</strong></span>" :
+                  "");
             }).join();
           }
         }, {

@@ -32,12 +32,12 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   protected void saveSingleAndAssertSuccess(SampleHandsOnTable table) {
     HandsOnTableSaveResult result = table.save();
 
-    assertTrue("Sample was saved", result.getItemsSaved() == 1);
-    assertTrue("No errors are present", result.getServerErrors().isEmpty());
-    assertTrue("No errors are present", result.getSaveErrors().isEmpty());
+    assertTrue("Sample save", result.getItemsSaved() == 1);
+    assertTrue("Server errors", result.getServerErrors().isEmpty());
+    assertTrue("Save errors", result.getSaveErrors().isEmpty());
 
-    assertTrue("Sample name has been generated", table.getText(Columns.NAME, 0).contains("SAM"));
-    assertTrue("Sample alias has been generated", !isStringEmptyOrNull(table.getText(Columns.ALIAS, 0)));
+    assertTrue("Sample name generation", table.getText(Columns.NAME, 0).contains("SAM"));
+    assertTrue("Sample alias generation", !isStringEmptyOrNull(table.getText(Columns.ALIAS, 0)));
   }
 
   protected void assertPlainSampleAttributes(Map<String, String> hotAttributes, Sample fromDb, boolean newlyCreated) {
@@ -53,7 +53,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEquals("confirm scientific name", hotAttributes.get(Columns.SCIENTIFIC_NAME), fromDb.getScientificName());
     if (!LimsUtils.isIdentitySample(fromDb)) {
       assertEquals("confirm received date", hotAttributes.get(Columns.RECEIVE_DATE),
-          (fromDb.getReceivedDate() == null ? "" : LimsUtils.getDateAsString(fromDb.getReceivedDate())));
+          (fromDb.getReceivedDate() == null ? "" : LimsUtils.formatDate(fromDb.getReceivedDate())));
     }
   }
 

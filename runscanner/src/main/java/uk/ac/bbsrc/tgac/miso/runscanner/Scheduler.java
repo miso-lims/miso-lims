@@ -158,6 +158,7 @@ public class Scheduler {
       return result;
     }
   }
+
   private static final Gauge acceptedDirectories = Gauge.build().name("miso_runscanner_directories_accepted")
       .help("The number of directories that were readable and sent for processing in the last pass.").register();
 
@@ -180,6 +181,9 @@ public class Scheduler {
   private static final Gauge newRunsScanned = Gauge.build().name("miso_runscanner_new_runs_scanned")
       .help("The number of runs discovered in the last pass.").register();
 
+  private static final Gauge processingRuns = Gauge.build().name("miso_runscanner_processing_runs").labelNames("platform").help(
+      "The number of runs currently being processed.").register();
+
   private static final Histogram processTime = Histogram.build().buckets(1, 5, 10, 30, 60, 300, 600, 3600)
       .name("miso_runscanner_directory_process_time").help("Time to process a run directories in seconds.")
       .labelNames("platform", "instrument").register();
@@ -189,6 +193,8 @@ public class Scheduler {
 
   private static final LatencyHistogram scanTime = new LatencyHistogram("miso_runscanner_directory_scan_time",
       "Time to scan the run directories in seconds.");
+  private static final Gauge waitingRuns = Gauge.build().name("miso_runscanner_waiting_runs").help(
+      "The number of runs waiting to be processed.").labelNames("platform").register();
 
   private File configurationFile;
 
@@ -197,7 +203,7 @@ public class Scheduler {
   private final AtomicInteger epoch = new AtomicInteger();
 
   // The paths that threw an exception while processing.
-  private final Set<File> failed = new ConcurrentSkipListSet<>();
+  private final Map<File, Instant> failed = new ConcurrentHashMap<>();
 
   // The paths for which we have a notification to send.
   private final Map<File, FinishedWork> finishedWork = new ConcurrentHashMap<>();
@@ -248,7 +254,7 @@ public class Scheduler {
   }
 
   public Set<File> getFailedDirectories() {
-    return failed;
+    return failed.keySet();
   }
 
   public Set<File> getFinishedDirectories() {
@@ -290,7 +296,8 @@ public class Scheduler {
    * sequencer)
    */
   private boolean isUnprocessed(File directory) {
-    return !workToDo.contains(directory) && !processing.contains(directory) && !failed.contains(directory)
+    return !workToDo.contains(directory) && !processing.contains(directory)
+        && (!failed.containsKey(directory) || Duration.between(failed.get(directory), Instant.now()).toMinutes() > 20)
         && (!finishedWork.containsKey(directory) || finishedWork.get(directory).shouldRerun());
   }
 
@@ -299,10 +306,13 @@ public class Scheduler {
    */
   private void queueDirectory(final File directory, final RunProcessor processor, final TimeZone tz) {
     workToDo.add(directory);
+    waitingRuns.labels(processor.getPlatformType().name()).inc();
     workPool.submit(() -> {
       Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
       processing.add(directory);
+      processingRuns.labels(processor.getPlatformType().name()).inc();
       workToDo.remove(directory);
+      waitingRuns.labels(processor.getPlatformType().name()).dec();
 
       long runStartTime = System.nanoTime();
       String instrumentName = "unknown";
@@ -315,14 +325,16 @@ public class Scheduler {
         work.dto = dto;
         work.epoch = epoch.incrementAndGet();
         finishedWork.put(directory, work);
+        failed.remove(directory);
         epochGauge.set(work.epoch);
       } catch (Exception e) {
         log.error("Failed to process run: " + directory.getPath(), e);
         errors.labels(processor.getPlatformType().name()).inc();
-        failed.add(directory);
+        failed.put(directory, Instant.now());
       }
       processTime.labels(processor.getPlatformType().name(), instrumentName).observe((System.nanoTime() - runStartTime) / 1e9);
       processing.remove(directory);
+      processingRuns.labels(processor.getPlatformType().name()).dec();
     });
   }
 

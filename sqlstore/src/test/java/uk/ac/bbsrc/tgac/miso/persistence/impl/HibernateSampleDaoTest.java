@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -25,9 +24,9 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -117,12 +116,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllWithLimit() throws Exception {
-    Collection<Sample> samples = dao.listAllWithLimit(3);
-    assertEquals(3, samples.size());
-  }
-
-  @Test
   public void testListAllByReceivedDate() throws Exception {
     Collection<Sample> samples = dao.listAllByReceivedDate(99);
 
@@ -169,8 +162,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     assertEquals("sample alias type does not match", "TEST_0002_Bn_P_nn_1-1_D_1", sample.getAlias());
     assertEquals("sample scientific name does not match", "Homo sapiens", sample.getScientificName());
     assertNull("sample scientific name does not match", sample.getTaxonIdentifier());
-    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    assertEquals("sample location type does not match", "2014-01-17", df.format(sample.getReceivedDate()));
+    assertEquals("sample location type does not match", "2014-01-17", LimsUtils.formatDate(sample.getReceivedDate()));
   }
 
   @Test

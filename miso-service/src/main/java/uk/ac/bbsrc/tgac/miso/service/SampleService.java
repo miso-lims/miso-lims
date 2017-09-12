@@ -9,8 +9,8 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -50,8 +50,6 @@ public interface SampleService extends PaginatedDataSource<Sample> {
   public void deleteQc(Sample sample, Long qcId) throws IOException;
 
   Collection<QcType> listSampleQcTypes() throws IOException;
-
-  Collection<Sample> listWithLimit(long limit) throws IOException;
 
   Collection<Sample> listByReceivedDate(long limit) throws IOException;
 

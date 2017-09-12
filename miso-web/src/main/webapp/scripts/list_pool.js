@@ -44,12 +44,15 @@ ListTarget.pool = {
   createColumns : function(config, projectId) {
     return [
         ListUtils.idHyperlinkColumn("Name", "pool", "id", Utils.array.getName,
-            1),
+            1, true),
         ListUtils.labelHyperlinkColumn("Alias", "pool", Utils.array.getId,
-            "alias", 0),
+            "alias", 0, true),
         {
           "sTitle" : "Description",
           "mData" : "description",
+          "mRender" : function(data, type, full) {
+            return (data ? data : "") + (full.duplicateIndices ? " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDICES)</strong></span>" : "");
+          },
           "include" : true,
           "iSortPriority" : 0
         },

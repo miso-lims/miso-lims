@@ -70,8 +70,8 @@ var Pool = Pool || {
     jQuery('#creationDate').attr('class', 'form-control');
     jQuery('#creationDate').attr('required', 'true');
     jQuery('#creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-    jQuery('#creationDate').attr('data-date-format', 'DD/MM/YYYY');
-    jQuery('#creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    jQuery('#creationDate').attr('data-date-format', 'YYYY-MM-DD');
+    jQuery('#creationDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
 
     // Volume validation
     jQuery('#volume').attr('class', 'form-control');
@@ -109,6 +109,7 @@ Pool.qc = {
       var column6 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.qc.addPoolQC();'/>Add</a>";
 
+      jQuery("#poolQcDate").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
       Utils.ui.addMaxDatePicker("poolQcDate", 0);
 
       Fluxion.doAjax(
@@ -187,61 +188,6 @@ Pool.qc = {
         'doOnSuccess':Utils.page.pageReload
       }
     );
-  }
-};
-
-Pool.wizard = {
-  insertPoolQCRow : function() {
-    if (!jQuery('#poolQcTable').attr("qcInProgress")) {
-      jQuery('#poolQcTable').attr("qcInProgress", "true");
-
-      jQuery('#poolQcTable')[0].insertRow(1);
-      var column3 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text'/>";
-      var column4 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
-      column4.innerHTML = "<select id='poolQcType' name='poolQcType' onchange='Pool.qc.changePoolQcUnits(this);'/>";
-      var column5 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
-      column5.innerHTML = "<input id='poolQcResults' name='poolQcResults' type='text'/><span id='units'/>";
-      var column6 = jQuery('#poolQcTable')[0].rows[1].insertCell(-1);
-      column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.wizard.addPoolQC(this);'/>Add</a>";
-
-      jQuery("#poolQcDate").val(jQuery.datepicker.formatDate('dd/mm/yy', new Date()));
-      Utils.ui.addMaxDatePicker("poolQcDate", 0);
-
-      Fluxion.doAjax(
-        'poolControllerHelperService',
-        'getPoolQcTypes',
-        {
-          'url':ajaxurl
-        },
-        {
-          'doOnSuccess':function(json) {
-            jQuery('#poolQcType').html(json.types);
-            jQuery('#units').html(jQuery('#poolQcType option:first').attr("units"));
-          }
-        }
-      );
-    } else {
-      alert("Cannot add another QC when one is already in progress.");
-    }
-  },
-
-  addPoolQC : function(add) {
-    var row = jQuery(add).parent().parent();
-    jQuery(add).html("Remove");
-    jQuery(add).removeAttr("onclick");
-    jQuery(add).click(function() {
-      if (confirm("Remove this QC?")) {
-        row.remove();
-      }
-    });
-    jQuery('#poolQcTable').removeAttr("qcInProgress");
-
-    row.find(":input").each(function() {
-      var td = jQuery(this).parent();
-      jQuery(td).attr("name", jQuery(this).attr("name"));
-      jQuery(this).parent().html(jQuery(this).val());
-    });
   }
 };
 
@@ -607,18 +553,6 @@ Pool.search = {
 
 Pool.barcode = {
   editPoolIdBarcode: function (span, id) {
-    Fluxion.doAjax(
-      'loggedActionService',
-      'logAction',
-      {
-        'objectId': id,
-        'objectType': 'Pool',
-        'action': 'editPoolIdBarcode',
-        'url': ajaxurl
-      },
-      {}
-    );
-
     var v = span.find('a').text();
     if (v && v !== "") {
       span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");
@@ -665,135 +599,6 @@ Pool.barcode = {
       }
     );
   },
-
-  printPoolBarcodes : function() {
-    var pools = [];
-    for (var i = 0; i < arguments.length; i++) {
-      pools[i] = {'poolId':arguments[i]};
-    }
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'printPoolBarcodes',
-      {
-        'pools':pools,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':function (json) {
-          alert(json.response);
-        }
-      }
-    );
-  },
-
-  selectPoolBarcodesToPrint : function(tableId) {
-    if (!jQuery(tableId).hasClass("display")) {
-      //destroy current table and recreate
-      jQuery(tableId).dataTable().fnDestroy();
-      //bug fix to reset table width
-      jQuery(tableId).removeAttr("style");
-      jQuery(tableId).addClass("display");
-
-      jQuery(tableId).find('tr:first th:eq(3)').remove();
-      jQuery(tableId).find("tr").each(function() {
-        jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:eq(3)").remove();
-      });
-
-      var headers = ['rowsel',
-                     'name',
-                     'creationDate',
-                     'info'];
-
-      var oTable = jQuery(tableId).dataTable({
-        "aoColumnDefs": [
-          {
-            "bUseRendered": false,
-            "aTargets": [ 0 ]
-          }
-        ],
-        "bPaginate": false,
-        "bInfo": false,
-        "bJQueryUI": true,
-        "bAutoWidth": true,
-        "bSort": false,
-        "bFilter": false,
-        "sDom": '<<"toolbar">f>r<t>ip>'
-      });
-
-      jQuery(tableId).find("tr:first").prepend("<th>Select</th>");
-      jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
-
-      jQuery(tableId).find('.rowSelect').click(function() {
-        if (jQuery(this).parent().hasClass('row_selected')) {
-          jQuery(this).parent().removeClass('row_selected');
-        } else {
-          jQuery(this).parent().addClass('row_selected');
-        }
-      });
-
-      jQuery("div.toolbar").html("<button type='button' onclick=\"Pool.barcode.printSelectedPoolBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\">Print Selected</button>");
-      jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
-      jQuery("div.toolbar").removeClass("toolbar");
-    }
-  },
-
-  printSelectedPoolBarcodes : function(tableId) {
-    var pools = [];
-    var table = jQuery(tableId).dataTable();
-    var nodes = DatatableUtils.fnGetSelected(table);
-    for (var i = 0; i < nodes.length; i++) {
-      pools[i] = {'poolId':jQuery(nodes[i]).attr("poolId")};
-    }
-
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-              "<fieldset class='dialog'>" +
-              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-              json.services +
-              "</select></fieldset></form>");
-
-          jQuery('#printServiceSelectDialog').dialog({
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-            "Print": function() {
-              Fluxion.doAjax(
-                'poolControllerHelperService',
-                'printPoolBarcodes',
-                {
-                  'printerId':jQuery('#serviceSelect').val(),
-                  'pools':pools,
-                  'url':ajaxurl
-                },
-                {'doOnSuccess':function (json) {
-                    alert(json.response);
-                  }
-                }
-              );
-              jQuery(this).dialog('close');
-            },
-            "Cancel": function() {
-              jQuery(this).dialog('close');
-            }
-            }
-          });
-        },
-        'doOnError':function (json) {
-          alert(json.error);
-        }
-      }
-    );
-  }
 };
 
 Pool.orders = Pool.orders || {

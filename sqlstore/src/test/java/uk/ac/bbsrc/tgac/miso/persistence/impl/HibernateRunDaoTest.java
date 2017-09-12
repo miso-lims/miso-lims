@@ -117,30 +117,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAllWithLimit() throws IOException {
-    List<Run> runs = dao.listAllWithLimit(2L);
-    assertEquals(2, runs.size());
-  }
-
-  @Test
-  public void testListAllWithBiggerLimit() throws IOException {
-    List<Run> runs = dao.listAllWithLimit(50L);
-    assertTrue(runs.size() > 2);
-  }
-
-  @Test
-  public void testListAllWithZeroLimit() throws IOException {
-    List<Run> runs = dao.listAllWithLimit(0L);
-    assertTrue(runs.size() > 0);
-  }
-
-  @Test
-  public void testListAllWithNegativeLimit() throws IOException {
-    List<Run> runs = dao.listAllWithLimit(-1L);
-    assertTrue(runs.size() > 0);
-  }
-
-  @Test
   public void testRunCount() throws IOException {
     assertEquals(dao.listAll().size(), dao.count());
   }

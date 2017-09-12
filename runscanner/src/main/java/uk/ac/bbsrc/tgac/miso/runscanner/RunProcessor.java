@@ -9,6 +9,18 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
@@ -16,8 +28,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
-import uk.ac.bbsrc.tgac.miso.runscanner.processors.DefaultPacBio;
 import uk.ac.bbsrc.tgac.miso.runscanner.processors.DefaultIllumina;
+import uk.ac.bbsrc.tgac.miso.runscanner.processors.DefaultPacBio;
 import uk.ac.bbsrc.tgac.miso.runscanner.processors.Testing;
 
 /**
@@ -61,6 +73,8 @@ public abstract class RunProcessor {
     }
   }
 
+  private static final Logger log = LoggerFactory.getLogger(RunProcessor.class);
+
   /**
    * Find the builder that matches the requested parameters.
    * 
@@ -83,6 +97,23 @@ public abstract class RunProcessor {
   }
 
   /**
+   * Compile a list of XPath expressions
+   */
+  public static XPathExpression[] compileXPath(String... expression) {
+    XPathFactory xpathFactory = XPathFactory.newInstance();
+    XPath xpath = xpathFactory.newXPath();
+    XPathExpression[] expr = new XPathExpression[expression.length];
+    try {
+      for (int i = 0; i < expression.length; i++) {
+        expr[i] = xpath.compile(expression[i]);
+      }
+      return expr;
+    } catch (XPathExpressionException e) {
+      throw new IllegalArgumentException("Failed to compile XPath expression: " + expression, e);
+    }
+  }
+
+  /**
    * Creates a JSON mapper that is configured to handle the dates in {@link NotificationDto}.
    */
   public static ObjectMapper createObjectMapper() {
@@ -91,6 +122,15 @@ public abstract class RunProcessor {
         .setDateFormat(new ISO8601DateFormat());
 
     return mapper;
+  }
+
+  public static Optional<Document> parseXml(File file) {
+    try {
+      return Optional.of(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file));
+    } catch (SAXException | ParserConfigurationException | IOException e) {
+      log.error("Failed to parse XML", e);
+      return Optional.empty();
+    }
   }
 
   /**

@@ -1,8 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.webapp.service;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
@@ -36,11 +38,16 @@ public class RunScannerClient {
   private static final LatencyHistogram acquireTime = new LatencyHistogram("miso_runscanner_client_acquire_time",
       "Time to acquire the lock to put save runs (in seconds).");
 
+  private static final Gauge badRunCount = Gauge.build()
+      .name("miso_runscanner_client_bad_runs").help("The number of runs that failed to save.").register();
+
   private static final Logger log = LoggerFactory.getLogger(RunScannerClient.class);
+
   private static final Counter saveCount = Counter.build().name("miso_runscanner_client_run_count").help("The number of runs processed.")
       .register();
   private static final Counter saveFailures = Counter.build()
       .name("miso_runscanner_client_save_errors").help("The number of times a run failed to be saved.").register();
+
   private static final Counter saveNew = Counter.build()
       .name("miso_runscanner_client_save_new").help("The number of times a new run was found.").register();
 
@@ -58,8 +65,9 @@ public class RunScannerClient {
 
   private static final LatencyHistogram serverReadTime = new LatencyHistogram("miso_runscanner_client_read_time",
       "Time to download updates from a server in seconds.", "url");
-
   private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
+  private final Set<String> badRuns = new HashSet<>();
 
   private final Semaphore lock = new Semaphore(1);
   @Autowired
@@ -82,12 +90,15 @@ public class RunScannerClient {
       for (NotificationDto dto : results) {
         try (AutoCloseable timer = saveTime.start()) {
           (runService.processNotification(Dtos.to(dto, user), dto.getLaneCount(), dto.getContainerSerialNumber(), dto.getSequencerName(),
-              dto, dto::getLaneContents) ? saveNew : saveUpdate).inc();
+              dto, dto) ? saveNew : saveUpdate).inc();
           saveCount.inc();
+          badRuns.remove(dto.getRunAlias());
         } catch (Exception e) {
           log.error("Failed to save run: " + dto.getRunAlias(), e);
           saveFailures.inc();
+          badRuns.add(dto.getRunAlias());
         }
+        badRunCount.set(badRuns.size());
       }
       lock.release();
     } catch (IOException e) {

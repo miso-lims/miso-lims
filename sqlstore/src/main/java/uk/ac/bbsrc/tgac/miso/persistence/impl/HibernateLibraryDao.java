@@ -203,15 +203,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public List<Library> listAllWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.setMaxResults(((Long) limit).intValue());
-    @SuppressWarnings("unchecked")
-    List<Library> records = criteria.list();
-    return records;
-  }
-
-  @Override
   public Boxable getByPositionId(long positionId) {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.add(Restrictions.eq("boxPositionId", positionId));

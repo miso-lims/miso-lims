@@ -23,11 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -310,7 +309,7 @@ public class RunControllerHelperService {
 
         RunQC newQc = new RunQCImpl();
         newQc.setQcCreator(json.getString("qcCreator"));
-        newQc.setQcDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("qcDate")));
+        newQc.setQcDate(parseDate(json.getString("qcDate")));
         newQc.setQcType(runService.getRunQcType(json.getLong("qcType")));
         newQc.setInformation(json.getString("information"));
         newQc.setDoNotProcess(json.getBoolean("doNotProcess"));
@@ -324,7 +323,7 @@ public class RunControllerHelperService {
         for (RunQC qc : run.getRunQCs()) {
           sb.append("<tr>");
           sb.append("<td>" + qc.getQcCreator() + "</td>");
-          sb.append("<td>" + qc.getQcDate() + "</td>");
+          sb.append("<td>" + formatDate(qc.getQcDate()) + "</td>");
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
           sb.append("<td>");
 
@@ -570,7 +569,7 @@ public class RunControllerHelperService {
     try {
       b.append(
           "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
-      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + LimsUtils.getDateAsString(p.getCreationDate()) + ")</b><br/>");
+      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + LimsUtils.formatDate(p.getCreationDate()) + ")</b><br/>");
 
       Collection<PoolableElementView> ds = p.getPoolableElementViews();
       for (PoolableElementView d : ds) {
@@ -667,9 +666,9 @@ public class RunControllerHelperService {
         inner.add(TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getAlias()));
         inner.add((run.getHealth() != null ? run.getHealth().getKey() : ""));
         inner.add((run.getStartDate() != null
-            ? LimsUtils.getDateAsString(run.getStartDate()) : ""));
+            ? LimsUtils.formatDate(run.getStartDate()) : ""));
         inner.add((run.getCompletionDate() != null
-            ? LimsUtils.getDateAsString(run.getCompletionDate()) : ""));
+            ? LimsUtils.formatDate(run.getCompletionDate()) : ""));
         inner.add((run.getSequencerReference().getPlatform().getPlatformType() != null
             ? run.getSequencerReference().getPlatform().getPlatformType().getKey() : ""));
 

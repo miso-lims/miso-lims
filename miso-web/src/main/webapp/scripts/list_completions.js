@@ -46,10 +46,10 @@ ListTarget.completion = {
         ListUtils.idHyperlinkColumn("Name", "pool", "pool.id", function(
             completion) {
           return completion.pool.name;
-        }, 1),
+        }, 1, true),
         ListUtils.labelHyperlinkColumn("Alias", "pool", function(completion) {
           return completion.pool.id;
-        }, "pool.alias", 0), {
+        }, "pool.alias", 0, true), {
           "sTitle" : "Description",
           "mData" : "pool.description",
           "bSortable" : false,

@@ -27,7 +27,7 @@ ListTarget.box = {
     return "/miso/rest/box/dt" + (config.boxUse ? "/use/" + config.boxUse : "");
   },
   createBulkActions : function(config, projectId) {
-    return [];
+    return [ HotUtils.printAction('box'), ];
   },
   createStaticActions : function(config, projectId) {
     return [ {
@@ -39,10 +39,10 @@ ListTarget.box = {
   },
   createColumns : function(config, projectId) {
     return [
-        ListUtils
-            .idHyperlinkColumn("Name", "box", "id", Utils.array.getName, 1),
+        ListUtils.idHyperlinkColumn("Name", "box", "id", Utils.array.getName,
+            1, true),
         ListUtils.labelHyperlinkColumn("Alias", "box", Utils.array.getId,
-            "alias", 0),
+            "alias", 0, true),
         {
           "sTitle" : "Location",
           "mData" : "locationBarcode",

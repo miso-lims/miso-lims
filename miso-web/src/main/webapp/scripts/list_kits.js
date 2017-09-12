@@ -42,7 +42,7 @@ ListTarget.kit = {
   createColumns : function(config, projectId) {
     return [
         ListUtils.labelHyperlinkColumn("Name", "kitdescriptor",
-            Utils.array.getId, "name", 1), {
+            Utils.array.getId, "name", 1, true), {
           "sTitle" : "Version",
           "include" : true,
           "iSortPriority" : 0,

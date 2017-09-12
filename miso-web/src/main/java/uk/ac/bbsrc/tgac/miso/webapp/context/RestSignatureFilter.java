@@ -192,9 +192,9 @@ public class RestSignatureFilter extends OncePerRequestFilter {
   private void checkSignature(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     logger.debug("HEADERS: ");
-    Enumeration es = request.getHeaderNames();
+    Enumeration<String> es = request.getHeaderNames();
     while (es.hasMoreElements()) {
-      String key = (String) es.nextElement();
+      String key = es.nextElement();
       logger.info(key + " -> " + request.getHeader(key));
     }
     

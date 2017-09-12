@@ -149,6 +149,7 @@ Library.qc = {
       var column6 = jQuery('#libraryQcTable')[0].rows[1].insertCell(-1);
       column6.innerHTML = "<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/>Add</a>";
 
+      jQuery("#libraryQcDate").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
       Utils.ui.addMaxDatePicker("libraryQcDate", 0);
 
       Fluxion.doAjax(
@@ -233,188 +234,8 @@ Library.qc = {
   }
 };
 
-Library.dilution = {
-  insertLibraryDilutionRow: function (libraryId, libraryPrepKitId, autoGenerateIdBarcodes) {
-    if (!jQuery('#libraryDilutionTable').attr("dilutionInProgress")) {
-      jQuery('#libraryDilutionTable').attr("dilutionInProgress", "true");
-
-      jQuery('#libraryDilutionTable')[0].insertRow(1);
-      //dilutionId    Done By   Dilution Date Results
-      var column1 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-      column1.innerHTML = "<input id='name' name='name' type='hidden' value='Unsaved '/>Unsaved";
-      var column2 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-      column2.innerHTML = "<input id='libraryDilutionCreator' name='libraryDilutionCreator' type='hidden' value='" + jQuery('#currentUser')[0].innerHTML + "'/>" + jQuery('#currentUser')[0].innerHTML;
-      var column3 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='libraryDilutionDate' name='libraryDilutionDate' type='text'/>";
-      var column6 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-      column6.innerHTML = "<input id='libraryDilutionResults' name='libraryDilutionResults' type='text' onchange='Library.qc.changeLibraryQcUnits(this);'/>";
-      if (Constants.isDetailedSample) {
-        var column7 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-        column7.innerHTML = "<select id='libraryDilutionTargetedSequencing' name='libraryDilutionTargetedSequencing'/>"
-      }
-      var column8 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-      if (autoGenerateIdBarcodes) {
-        column8.innerHTML = "<i>Generated on save</i>";
-      } else {
-        column8.innerHTML = "<input id='libraryDilutionIdBarcode' name='libraryDilutionIdBarcode' type='text'/>";
-      }
-      var column9 = jQuery('#libraryDilutionTable')[0].rows[1].insertCell(-1);
-      column9.innerHTML = "<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution(" + autoGenerateIdBarcodes + ");'/>Add</a>";
-
-      Utils.ui.addMaxDatePicker("libraryDilutionDate", 0);
-      
-      if (Constants.isDetailedSample) {
-        Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'getTargetedSequencingTypes',
-          {
-            'url': ajaxurl,
-            'libraryPrepKitId': libraryPrepKitId
-          },
-          {
-            'doOnSuccess': function (json) {
-  	        	var selectElem = jQuery('#libraryDilutionTargetedSequencing');
-  	        	selectElem.append(new Option('NONE', 0));
-  	        	if (json.targetedSequencings.length > 0) {
-                json.targetedSequencings.sort(function(a, b) {
-                   return a.alias.localeCompare(b.alias);
-                });
-               jQuery.each(json.targetedSequencings, function(index, item) {
-               	 selectElem.append(new Option(item.alias, item.targetedSequencingId));
-               });
-  	        	}
-            }
-          }
-        );
-      }
-    } else {
-      alert("Cannot add another dilution when one is already in progress.");
-    }
-  },
-
-  addLibraryDilution: function (autoGenerateIdBarcodes) {
-    var f = Utils.mappifyForm("addDilutionForm");
-    var params = {
-      'libraryId': f.id,
-      'dilutionCreator': f.libraryDilutionCreator,
-      'dilutionDate': f.libraryDilutionDate,
-      'results': f.libraryDilutionResults,
-      'autoGenerateIdBarcodes': autoGenerateIdBarcodes,
-      'detailedSample': Constants.isDetailedSample,
-      'url': ajaxurl
-    };
- 	  if (Constants.isDetailedSample) {
-      jQuery('#libraryDilutionTargetedSequencing').attr('class', 'form-control');
-      jQuery('#libraryDilutionTargetedSequencing').attr('data-parsley-required', 'true');
-      jQuery('#libraryDilutionTargetedSequencing').attr('data-parsley-type', 'number');  
-  
-      jQuery('#addDilutionForm').parsley();
-      if (!jQuery('#addDilutionForm').parsley().validate()) {
-  	    return;
-      }
-      params['targetedSequencing'] = f.libraryDilutionTargetedSequencing;
-	  }
- 	  if (!autoGenerateIdBarcodes) {
- 	    params['idBarcode'] = f.libraryDilutionIdBarcode;
- 	  }
-
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'addLibraryDilution',
-      params,
-      {
-        'updateElement': 'libraryDilutionTable',
-        'doOnSuccess': function () {
-          jQuery('#libraryDilutionTable').removeAttr("dilutionInProgress");
-        }
-      }
-    );
-  },
-
-  changeLibraryDilutionRow: function (dilutionId, autoGenerateIdBarcodes, detailedSample) {
-    if (jQuery('#tarSeq' + dilutionId).length > 0) {
-      var targetedSequencingAlias = jQuery.trim(jQuery('#tarSeq' + dilutionId).text());
-    }
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'changeLibraryDilutionRow',
-      {
-        'dilutionId': dilutionId,
-        'autoGenerateIdBarcodes': autoGenerateIdBarcodes,
-        'detailedSample': detailedSample,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#results' + dilutionId).html(json.results);
-          jQuery('#edit' + dilutionId).html(json.edit);
-          if (detailedSample) {
-            jQuery('#tarSeq' + dilutionId).html(Library.dilution.makeTargetedSequencingsDropdown(json.targetedSequencings, dilutionId, targetedSequencingAlias));
-          }
-          if (!autoGenerateIdBarcodes) jQuery('#idBarcode' + dilutionId).html(json.idBarcode);
-        }
-      }
-    );
-  },
-
-  editLibraryDilution: function (dilutionId, autoGenerateIdBarcodes, detailedSample) {
-    var params = {
-        'dilutionId': dilutionId,
-        'result': jQuery('#' + dilutionId).val(),
-        'url': ajaxurl
-    };
-    if (detailedSample) params['targetedSequencing'] = jQuery('#targetedSequencing' + dilutionId).val();
-    if (!autoGenerateIdBarcodes) params['idBarcode'] = jQuery('#idBarcodeValue' + dilutionId).val();
-    
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'editLibraryDilution',
-      params,
-      {
-        'doOnSuccess': Utils.page.pageReload
-      }
-    );
-  },
-
-  deleteLibraryDilution: function (libraryDilutionId) {
-    if (confirm("Are you sure you really want to delete LDI" + libraryDilutionId + "? This operation is permanent!")) {
-      Fluxion.doAjax(
-        'libraryControllerHelperService',
-        'deleteLibraryDilution',
-        {
-          'libraryDilutionId': libraryDilutionId,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': window.location.reload(true)
-        }
-      );
-    }
-  },
-  
-  makeTargetedSequencingsDropdown: function (targetedSequencingsMap, dilutionId, currentAlias) {
-    var dropdown = ['<select id="targetedSequencing' + dilutionId + '">'];
-    dropdown.push('<option value="">NONE</option>');
-    dropdown.push(targetedSequencingsMap.map(function (tarseq) { return '<option value="' + tarseq.targetedSequencingId + '" ' + (currentAlias == tarseq.alias ? 'selected="selected"' : '') + '>' + tarseq.alias + '</option>'; }));
-    dropdown.push('</select>');
-    return dropdown.join('');
-  }
-};
-
 Library.barcode = {
   editLibraryBarcode: function(span, id) {
-    Fluxion.doAjax(
-      'loggedActionService',
-      'logAction',
-      {
-        'objectId': id,
-        'objectType': 'Library',
-        'action': 'editLibraryIdBarcode',
-        'url': ajaxurl
-      },
-      {}
-    );
-
     var v = span.find('a').text();
     if (v && v !== "") {
       span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");
@@ -458,118 +279,6 @@ Library.barcode = {
       },
       {
         'doOnSuccess': Utils.page.pageReload
-      }
-    );
-  },
-
-  printLibraryBarcodes: function () {
-    var libraries = [];
-    for (var i = 0; i < arguments.length; i++) {
-      libraries[i] = {'libraryId': arguments[i]};
-    }
-
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                  json.services +
-                  "</select></fieldset></form>");
-
-          jQuery('#printServiceSelectDialog').dialog({
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function () {
-                Fluxion.doAjax(
-                  'libraryControllerHelperService',
-                  'printLibraryBarcodes',
-                  {
-                    'printerId': jQuery('#serviceSelect').val(),
-                    'libraries': libraries,
-                    'url': ajaxurl
-                  },
-                  {
-                    'doOnSuccess': function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function () {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        },
-        'doOnError': function (json) {
-          alert(json.error);
-        }
-      }
-    );
-  },
-
-  printDilutionBarcode: function (dilutionId, platform) {
-    var dilutions = [];
-    dilutions[0] = {'dilutionId': dilutionId};
-
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Dilution',
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                  json.services +
-                  "</select></fieldset></form>");
-
-          jQuery('#printServiceSelectDialog').dialog({
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function () {
-                Fluxion.doAjax(
-                  'libraryControllerHelperService',
-                  'printLibraryDilutionBarcodes',
-                  {
-                    'printerId': jQuery('#serviceSelect').val(),
-                    'dilutions': dilutions,
-                    'platform': platform,
-                    'url': ajaxurl
-                  },
-                  {
-                    'doOnSuccess': function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function () {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        },
-        'doOnError': function (json) {
-          alert(json.error);
-        }
       }
     );
   },
@@ -684,7 +393,7 @@ Library.ui = {
     var family = Library.ui.getCurrentIndexFamily();
     var max = Library.ui.maxIndexPositionInFamily(family);
     if (Library.lastIndexPosition < max) {
-      Library.ui.createIndexSelect(max, null);
+      Library.ui.createIndexSelect(max, 0);
     } else if (Library.lastIndexPosition == 0) {
       var container = jQuery('#indicesDiv');
       if (container.children().length == 0) {
@@ -717,6 +426,7 @@ Library.ui = {
     var container = document.getElementById('indicesDiv');
     for (var position = Library.lastIndexPosition + 1; position <= newPosition; position++) {
       var widget = document.createElement("select");
+      widget.id = "index" + position;
       widget.name = "indices[" + (position - 1) + "]";
       if (position > 1) {
         var nullOption = document.createElement("option");
@@ -952,7 +662,7 @@ Library.ui = {
   },
 
   deleteLibraryNote: function (libraryId, noteId) {
-    if (confirm("Are you sure you want to delete this note?")) {
+    var deleteIt = function() {
       Fluxion.doAjax(
         'libraryControllerHelperService',
         'deleteLibraryNote',
@@ -966,6 +676,10 @@ Library.ui = {
         }
       );
     }
+    Utils.showConfirmDialog('Delete Note', 'Delete',
+      ["Are you sure you want to delete this note?"],
+      deleteIt
+    );
   },
 
   changeDesign: function(callback) {

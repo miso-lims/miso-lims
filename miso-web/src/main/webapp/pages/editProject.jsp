@@ -143,7 +143,6 @@
   });
 </script>
 
-<div id="printServiceSelectDialog" title="Select a Printer"></div>
 <div id="dialog"></div>
 
 <div id="projectoverviews">

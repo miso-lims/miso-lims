@@ -167,9 +167,9 @@ ListTarget.sample = {
   createColumns : function(config, projectId) {
     return [
         ListUtils.idHyperlinkColumn("Name", "sample", "id",
-            Utils.array.getName, 1),
+            Utils.array.getName, 1, true),
         ListUtils.labelHyperlinkColumn("Alias", "sample", Utils.array.getId,
-            "alias", 0),
+            "alias", 0, true),
         {
           "sTitle" : "Sample Class",
           "mData" : "sampleClassId",
