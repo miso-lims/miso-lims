@@ -3,6 +3,11 @@
  */
 HotTarget.sample = (function() {
   
+  // We assume we have a linear progression of information that must be
+  // collected as a sample progressed through the hierarchy.
+  var progression = [ 'Identity', 'Tissue', 'Tissue Processing', 'Stock',
+      'Aliquot' ];
+  
   var getSampleClasses = function(samples) {
     var classIds = Utils.array.deduplicateNumeric(samples.map(function(sample) {
       return sample.sampleClassId || -1;
@@ -65,10 +70,6 @@ HotTarget.sample = (function() {
       // (Detailed sample) Columns to show
       var show = {};
       
-      // We assume we have a linear progression of information that must be
-      // collected as a sample progressed through the hierarchy.
-      var progression = [ 'Identity', 'Tissue', 'Tissue Processing', 'Stock',
-          'Aliquot' ];
       // First, set all the groups of detailed columns we will show to off.
       for (var i = 0; i < progression.length; i++) {
         show[progression[i]] = false;
@@ -192,19 +193,27 @@ HotTarget.sample = (function() {
               }),
           HotUtils.makeColumnForEnum('Sample Type', true, true, 'sampleType',
               Constants.sampleTypes, null),
-          HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
-            validator : HotUtils.validator.requiredTextNoSpecialChars,
-            unpack : function(obj, flat, setCellMeta) {
-              flat.scientificName = obj.scientificName || config.defaultSciName;
-            }
-          }),
+          HotUtils
+              .makeColumnForText(
+                  'Sci. Name',
+                  true,
+                  'scientificName',
+                  {
+                    validator : HotUtils.validator.requiredTextNoSpecialChars,
+                    unpack : function(obj, flat, setCellMeta) {
+                      flat.scientificName = obj.scientificName || config.defaultSciName;
+                    }
+                  }),
           {
             header : 'Project',
             data : 'projectAlias',
             type : (config.hasProject ? 'text' : 'dropdown'),
             source : (function() {
               if ((!config.projects || config.projects.length == 0) && config.create && !config.propagate && !config.hasProject) {
-                /* projects list failed to generate when it should have, and we can't proceed. Notify the user. */
+                /*
+                 * projects list failed to generate when it should have, and we
+                 * can't proceed. Notify the user.
+                 */
                 var serverErrorMessages = document
                     .getElementById('serverErrors');
                 serverErrorMessages.innerHTML = '<p>Failed to generate list of projects. Please notify your MISO administrators.</p>';
@@ -217,7 +226,10 @@ HotTarget.sample = (function() {
               var projectLabels = (config.projects ? config.projects.sort(
                   Utils.sorting.standardSort(comparator)).map(function(item) {
                 return item[label];
-              }) : []); /* use empty array if projects are not provided (should only happen during propagate or edit) */
+              }) : []); /*
+                         * use empty array if projects are not provided (should
+                         * only happen during propagate or edit)
+                         */
               return projectLabels;
             })(),
             unpack : function(sam, flat, setCellMeta) {
@@ -286,7 +298,8 @@ HotTarget.sample = (function() {
             pack : function(sam, flat, errorHandler) {
               if (!getSelectedIdentity(flat)) {
                 sam.externalName = flat.externalName;
-              } // else externalName will come from an existing Identity via the Identity Alias column
+              } // else externalName will come from an existing Identity via the
+              // Identity Alias column
             }
           },
           {
@@ -303,15 +316,14 @@ HotTarget.sample = (function() {
                 setData) {
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
               var selectedProject = config.project || Utils.array
-                    .findFirstOrNull(
-                        function(project) {
-                          return project[label] == flat.projectAlias;
-                        }, config.projects);
+                  .findFirstOrNull(function(project) {
+                    return project[label] == flat.projectAlias;
+                  }, config.projects);
               if (selectedProject == null) {
-              	// the user needs to select a project
-              	setData("Delete external name, select a project, then re-enter external name.");
-              	return;
-              } 
+                // the user needs to select a project
+                setData("Delete external name, select a project, then re-enter external name.");
+                return;
+              }
               if (!Utils.validation.isEmpty(flat.externalName)) {
                 setData('(...searching...)');
                 getIdentities(HotUtils.counter);
@@ -335,7 +347,6 @@ HotTarget.sample = (function() {
                           // the original request
                           if (data.requestCounter == requestCounter) {
                             var potentialIdentities = [];
-                            
                             
                             if (selectedProject == null) {
                               // let the user know they need to select a project
@@ -361,8 +372,7 @@ HotTarget.sample = (function() {
                             
                             var indexOfMatchingIdentityInProject = -1;
                             for (i = 0; i < data.matchingIdentities.length; i++) {
-                              if (data.matchingIdentities[i].projectId == selectedProject.id 
-                                  && data.matchingIdentities[i].externalName == flat.externalName) {
+                              if (data.matchingIdentities[i].projectId == selectedProject.id && data.matchingIdentities[i].externalName == flat.externalName) {
                                 indexOfMatchingIdentityInProject = i;
                                 break;
                               }
@@ -393,11 +403,13 @@ HotTarget.sample = (function() {
               if (selectedIdentity) {
                 sam.parentAlias = selectedIdentity.alias;
                 sam.externalName = selectedIdentity.externalName;
-              } // else externalName is for a new Identity and will come from the External Name column
+              } // else externalName is for a new Identity and will come from
+              // the External Name column
             }
           },
-          HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;', show['Identity'], true,
-              'donorSex', Constants.donorSexes, 'Unknown'),
+          HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;',
+              show['Identity'], true, 'donorSex', Constants.donorSexes,
+              'Unknown'),
           
           // Detailed sample columns
           {
@@ -675,6 +687,83 @@ HotTarget.sample = (function() {
           }
         
         },
+        Constants.isDetailedSample
+            ? {
+              name : "Edit Parents",
+              action : function(samples) {
+                
+                // Construct a graph of the sample valid relationships and mark
+                // each node with what samples descend from that node
+                var graph = {};
+                var buildGraph = function(sampleId, sampleClass) {
+                  var node;
+                  if (graph[sampleClass.id]) {
+                    node = graph[sampleClass.id];
+                    var queue = [].concat(node.parents);
+                    while (queue.length > 0) {
+                      var parentNode = queue.pop();
+                      queue = queue.concat(parentNode.parents);
+                      parentNode.seen[sampleId] = true;
+                    }
+                  } else {
+                    node = {
+                      sampleClass : sampleClass,
+                      seen : {},
+                      parents : Constants.sampleValidRelationships
+                          .filter(
+                              function(relation) {
+                                return relation.childId == sampleClass.id && relation.parentId != sampleClass.id;
+                              }).map(
+                              function(relation) {
+                                return buildGraph(sampleId, Utils.array
+                                    .findFirstOrNull(function(sc) {
+                                      return sc.id == relation.parentId;
+                                    }, Constants.sampleClasses));
+                              })
+                    
+                    };
+                    graph[sampleClass.id] = node;
+                  }
+                  node.seen[sampleId] = true;
+                  return node;
+                }
+                samples.forEach(function(sample) {
+                  buildGraph(sample.id, Utils.array.findFirstOrNull(
+                      function(sc) {
+                        return sc.id == sample.sampleClassId;
+                      }, Constants.sampleClasses));
+                });
+                // Traverse the graph for any sample class that has been visited
+                // by every sample.
+                var allowedParents = Constants.sampleClasses.filter(
+                    function(sampleClass) {
+                      var node = graph[sampleClass.id];
+                      return node && samples.every(function(sample) {
+                        return node.seen[sample.id];
+                      });
+                    }).sort(Utils.sorting.sampleClassComparator);
+                
+                if (allowedParents.length == 0) {
+                  Utils.showOkDialog("Edit Parents",
+                      [ "No common parents to edit." ]);
+                  return;
+                }
+                Utils.showDialog("Edit Parents", "Edit", [ {
+                  label : 'Parent Class',
+                  type : 'select',
+                  values : allowedParents,
+                  property : 'sampleClass',
+                  getLabel : Utils.array.getAlias
+                } ], function(results) {
+                  window.location = "/miso/sample/bulk/editParents?" + jQuery
+                      .param({
+                        ids : samples.map(Utils.array.getId).join(','),
+                        sampleClassId : results.sampleClass.id
+                      });
+                });
+              }
+            
+            } : null,
         {
           name : "Propagate",
           action : function(samples) {
@@ -738,6 +827,8 @@ HotTarget.sample = (function() {
               (result.target || targets[0]).action(result.replicates);
             });
           }
-        }, HotUtils.printAction('sample'), ].concat(HotUtils.makeQcActions("Sample"))
+        }, HotUtils.printAction('sample'), ].filter(function(x) {
+      return x;
+    }).concat(HotUtils.makeQcActions("Sample"))
   };
 })();

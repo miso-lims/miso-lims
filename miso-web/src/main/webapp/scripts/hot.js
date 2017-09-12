@@ -92,6 +92,10 @@ var HotUtils = {
    */
   makeTable : function(target, create, data, config) {
     var hotContainer = document.getElementById('hotContainer');
+    if (data.length == 0) {
+      hotContainer.innerText = 'No items to show.';
+      return;
+    }
     // Get all the columns we intend to show and create a “flat” dummy object
     // for each row in the table.
     var columns = target.createColumns(config, create, data).filter(

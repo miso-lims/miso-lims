@@ -234,9 +234,7 @@ public class LimsUtils {
   public static <T extends DetailedSample> T getParent(Class<T> targetParentClass, DetailedSample start) {
     for (DetailedSample current = deproxify(start.getParent()); current != null; current = deproxify(current.getParent())) {
       if (targetParentClass.isInstance(current)) {
-        @SuppressWarnings("unchecked")
-        T result = (T) current;
-        return result;
+        return targetParentClass.cast(current);
       }
     }
     return null;
