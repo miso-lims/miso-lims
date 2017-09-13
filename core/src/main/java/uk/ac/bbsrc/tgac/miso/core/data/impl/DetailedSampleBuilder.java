@@ -959,4 +959,14 @@ public class DetailedSampleBuilder
   public void setStain(Stain stain) {
     this.stain = stain;
   }
+
+  @Override
+  public Date getBarcodeDate() {
+    return null;
+  }
+
+  @Override
+  public String getBarcodeExtraInfo() {
+    return getDescription();
+  }
 }

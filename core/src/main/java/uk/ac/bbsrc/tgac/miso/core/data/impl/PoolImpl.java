@@ -601,4 +601,14 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     return QcTarget.Pool;
   }
 
+  @Override
+  public Date getBarcodeDate() {
+    return getCreationDate();
+  }
+
+  @Override
+  public String getBarcodeExtraInfo() {
+    return getDescription();
+  }
+
 }

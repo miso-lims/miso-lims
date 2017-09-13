@@ -614,4 +614,15 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(qcPassed, other.qcPassed)
         .isEquals();
   }
+
+  @Override
+  public Date getBarcodeDate() {
+    return getCreationDate();
+  }
+
+  @Override
+  public String getBarcodeExtraInfo() {
+    return getDescription();
+  }
+
 }

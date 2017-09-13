@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -34,7 +35,7 @@ import java.util.TreeSet;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Barcodable extends Nameable {
+public interface Barcodable extends Nameable, Aliasable {
   /**
    * Returns the label text of this Barcodable object.
    * 
@@ -48,6 +49,16 @@ public interface Barcodable extends Nameable {
    * @return String identificationBarcode.
    */
   public String getIdentificationBarcode();
+
+  /**
+   * The date, if any, that should appear on the label.
+   */
+  public Date getBarcodeDate();
+
+  /**
+   * Supplemental description displayed on larger labels.
+   */
+  public String getBarcodeExtraInfo();
 
   /**
    * Sets the identificationBarcode of this Barcodable object.

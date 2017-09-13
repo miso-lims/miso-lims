@@ -179,4 +179,9 @@ public class BoxImpl extends AbstractBox {
     return changeLog;
   }
 
+  @Override
+  public String getBarcodeExtraInfo() {
+    return getDescription();
+  }
+
 }
