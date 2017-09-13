@@ -1314,6 +1314,7 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
+    dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
     return dto;
   }
 

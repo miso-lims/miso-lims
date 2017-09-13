@@ -48,6 +48,13 @@ ListTarget.partition = {
       
       response.items
           .forEach(function(item) {
+            var problems = [
+                item.pool.hasLowQualityLibraries ? "LOW QUALITY LIBRARIES"
+                    : null,
+                item.pool.duplicateIndices ? "DUPLICATE INDICES" : null ]
+                .filter(function(x) {
+                  return x;
+                });
             var div = document.createElement('DIV');
             div.setAttribute('class', 'pool-tile');
             
@@ -55,6 +62,13 @@ ListTarget.partition = {
             title.setAttribute('style', 'font-weight:bold');
             title.innerText = item.pool.name + " (" + item.pool.alias + ")";
             div.appendChild(title);
+            
+            problems.forEach(function(message) {
+              var errorP = document.createElement('P');
+              errorP.setAttribute('class', 'parsley-error');
+              errorP.innerText = "⚠ " + message;
+              div.appendChild(errorP);
+            });
             
             var dilutionP = document.createElement('P');
             item.pool.pooledElements
@@ -280,8 +294,17 @@ ListTarget.partition = {
             }
             var prettyName = data.name + " (" + data.alias + ")";
             if (type === 'display') {
-              return "<a href=\"/miso/pool/" + data.id + "\">" + prettyName + "</a>" + (data.duplicateIndices
-                  ? ' <span class="lowquality">DUPLICATE INDICES</span><img style="float:right; height:25px;" src="/styles/images/fail.png" />'
+              var problems = [
+                  data.hasLowQualityLibraries ? "LOW QUALITY LIBRARIES" : null,
+                  data.duplicateIndices ? "DUPLICATE INDICES" : null ]
+                  .filter(function(x) {
+                    return x;
+                  });
+              
+              return "<a href=\"/miso/pool/" + data.id + "\">" + prettyName + "</a>" + (problems.length > 0
+                  ? problems.map(function(message) {
+                    return ' <span class="lowquality">' + message + '</span>';
+                  }).join('') + '<img style="float:right; height:25px;" src="/styles/images/fail.png" />'
                   : "");
             } else {
               return prettyName;
