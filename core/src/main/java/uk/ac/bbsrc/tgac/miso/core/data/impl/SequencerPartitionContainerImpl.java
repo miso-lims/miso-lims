@@ -359,6 +359,21 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     return changeLog;
   }
 
+  @Override
+  public Date getBarcodeDate() {
+    return getCreationTime();
+  }
+
+  @Override
+  public String getBarcodeExtraInfo() {
+    return getPartitions().size() + " " + getPlatform().getPlatformType().getPartitionName();
+  }
+
+  @Override
+  public String getAlias() {
+    return "";
+  }
+
   private static final Comparator<Partition> partitionNumberComparator = new Comparator<Partition>() {
 
     @Override

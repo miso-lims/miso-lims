@@ -233,4 +233,9 @@ public abstract class AbstractBox implements Box {
     return getAlias();
   }
 
+  @Override
+  public Date getBarcodeDate() {
+    return getCreationTime();
+  }
+
 }

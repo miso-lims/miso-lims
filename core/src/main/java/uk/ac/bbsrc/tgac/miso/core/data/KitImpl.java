@@ -187,4 +187,19 @@ public class KitImpl implements Kit {
     sb.append(getKitDate());
     return sb.toString();
   }
+
+  @Override
+  public Date getBarcodeDate() {
+    return getKitDate();
+  }
+
+  @Override
+  public String getBarcodeExtraInfo() {
+    return getKitDescriptor().getName();
+  }
+
+  @Override
+  public String getAlias() {
+    return getLotNumber();
+  }
 }
