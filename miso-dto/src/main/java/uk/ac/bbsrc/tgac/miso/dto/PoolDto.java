@@ -29,6 +29,7 @@ public class PoolDto implements WritableUrls {
   private String volume;
   private String platformType;
   private int longestIndex;
+  private boolean hasLowQualityLibraries;
 
   public String getAlias() {
     return alias;
@@ -207,5 +208,13 @@ public class PoolDto implements WritableUrls {
 
   public void setLongestIndex(int longestIndex) {
     this.longestIndex = longestIndex;
+  }
+
+  public boolean getHasLowQualityLibraries() {
+    return hasLowQualityLibraries;
+  }
+
+  public void setHasLowQualityLibraries(boolean hasLowQualityLibraries) {
+    this.hasLowQualityLibraries = hasLowQualityLibraries;
   }
 }
