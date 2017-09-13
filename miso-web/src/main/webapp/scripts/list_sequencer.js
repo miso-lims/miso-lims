@@ -22,7 +22,7 @@
  */
 
 ListTarget.sequencer = {
-  name : "Sequencer",
+  name : "Sequencers",
   createUrl : function(config, projectId) {
     return "/miso/rest/sequencer/dt";
   },
