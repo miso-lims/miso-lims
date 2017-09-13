@@ -22,7 +22,7 @@
  */
 
 ListTarget.sample = {
-  name : "Sample",
+  name : "Samples",
   createUrl : function(config, projectId) {
     return "/miso/rest/tree/samples/dt" + (projectId ? '/project/' + projectId
         : '');

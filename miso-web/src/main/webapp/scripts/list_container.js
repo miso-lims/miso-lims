@@ -22,7 +22,7 @@
  */
 
 ListTarget.container = {
-  name : "Sequencing Container",
+  name : "Sequencing Containers",
   createUrl : function(config, projectId) {
     return "/miso/rest/container/dt" + (config.platformType
         ? "/platform/" + config.platformType : "");

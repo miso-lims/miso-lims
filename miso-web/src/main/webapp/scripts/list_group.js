@@ -22,7 +22,7 @@
  */
 
 ListTarget.group = {
-  name : "Group",
+  name : "Groups",
   createUrl : function(config, projectId) {
     throw "Static data only";
   },
