@@ -197,7 +197,6 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     Date now = new Date();
     pc.setSecurityProfile(profile);
     pc.setIdentificationBarcode(identificationBarcode);
-    pc.setLocationBarcode("location");
     Platform platform = new Platform();
     platform.setId(1L);
     pc.setPlatform(platform);

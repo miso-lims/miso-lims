@@ -1,0 +1,2 @@
+ALTER TABLE SequencerPartitionContainer DROP COLUMN locationBarcode;
+ALTER TABLE SequencerPartitionContainer DROP COLUMN validationBarcode;
