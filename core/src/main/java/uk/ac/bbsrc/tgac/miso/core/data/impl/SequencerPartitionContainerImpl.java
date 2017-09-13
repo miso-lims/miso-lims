@@ -84,7 +84,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
    * identificationBarcode is displayed as "serial number" to the user
    */
   private String identificationBarcode;
-  private String locationBarcode;
 
   @ManyToMany(targetEntity = Run.class, mappedBy = "containers")
   @BatchSize(size = 10)
@@ -97,8 +96,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @ManyToOne(targetEntity = Platform.class)
   @JoinColumn(name = "platform", nullable = false)
   private Platform platform;
-
-  private String validationBarcode;
 
   @OneToMany(targetEntity = SequencerPartitionContainerChangeLog.class, mappedBy = "sequencerPartitionContainer", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -210,16 +207,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   }
 
   @Override
-  public String getLocationBarcode() {
-    return locationBarcode;
-  }
-
-  @Override
-  public void setLocationBarcode(String locationBarcode) {
-    this.locationBarcode = locationBarcode;
-  }
-
-  @Override
   public String getLabelText() {
     return getIdentificationBarcode() + " (" + getPlatform().getNameAndModel() + ")";
   }
@@ -227,16 +214,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @Override
   public boolean isDeletable() {
     return getId() != SequencerPartitionContainerImpl.UNSAVED_ID;
-  }
-
-  @Override
-  public String getValidationBarcode() {
-    return validationBarcode;
-  }
-
-  @Override
-  public void setValidationBarcode(String validationBarcode) {
-    this.validationBarcode = validationBarcode;
   }
 
   /**
@@ -362,8 +339,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     sb.append(getId());
     sb.append(" : ");
     sb.append(getIdentificationBarcode());
-    sb.append(" : ");
-    sb.append(getLocationBarcode());
     return sb.toString();
   }
 

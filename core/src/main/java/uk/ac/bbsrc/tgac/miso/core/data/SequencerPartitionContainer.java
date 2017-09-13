@@ -40,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.1.6
  */
 public interface SequencerPartitionContainer
-    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer>, Barcodable, Locatable, ChangeLoggable, Serializable
+    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer>, Barcodable, ChangeLoggable, Serializable
 {
 
   public void setId(long id);
@@ -103,20 +103,6 @@ public interface SequencerPartitionContainer
    * @param platform Platform.
    */
   public void setPlatform(Platform platform);
-
-  /**
-   * If this container has been validated by an external piece of equipment, retrieve this barcode string
-   * 
-   * @return String validationBarcode
-   */
-  public String getValidationBarcode();
-
-  /**
-   * If this container has been validated by an external piece of equipment, set the barcode string
-   * 
-   * @param validationBarcode
-   */
-  public void setValidationBarcode(String validationBarcode);
 
   @Override
   public Collection<ChangeLog> getChangeLog();

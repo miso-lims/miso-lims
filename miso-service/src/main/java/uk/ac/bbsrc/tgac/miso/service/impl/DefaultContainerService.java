@@ -111,8 +111,6 @@ public class DefaultContainerService
   @Override
   public void applyChanges(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException {
     managed.setIdentificationBarcode(source.getIdentificationBarcode());
-    managed.setLocationBarcode(source.getLocationBarcode());
-    managed.setValidationBarcode(source.getValidationBarcode());
     managed.setPlatform(source.getPlatform());
 
     for (Partition sourcePartition : source.getPartitions()) {
