@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -142,6 +143,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 
 @Controller
 @RequestMapping("/sample")
@@ -748,6 +750,16 @@ public class EditSampleController {
   }
 
   /**
+   * Edit the parents of the selected samples at a particular level in the hierarchy.
+   * Sends Dtos objects which will then be used for editing in grid.
+   */
+  @RequestMapping(value = "/bulk/editParents", method = RequestMethod.GET)
+  public ModelAndView editBulkSampleParents(@RequestParam("ids") String sampleIds, @RequestParam("sampleClassId") Long sampleClassId,
+      ModelMap model) throws IOException {
+    return new BulkEditSampleParentsBackend(sampleClassService.get(sampleClassId)).edit(sampleIds, model);
+  }
+
+  /**
    * Used to create propagate new samples from existing samples (Detailed Sample only).
    * 
    * Sends Dtos objects which will then be used for editing in grid.
@@ -998,6 +1010,35 @@ public class EditSampleController {
       }
       config.put("defaultSciName", defaultSciName);
     }
-  };
+  }
 
+  private final class BulkEditSampleParentsBackend extends BulkTableBackend<SampleDto> {
+    private final SampleClass sampleClass;
+
+    public BulkEditSampleParentsBackend(SampleClass sampleClass) {
+      super("sample", SampleDto.class);
+      this.sampleClass = sampleClass;
+    }
+
+    public ModelAndView edit(String ids, ModelMap model) throws IOException {
+      List<SampleDto> dtos = sampleService.listByIdList(parseIds(ids)).stream().map(DetailedSample.class::cast).map(sample -> {
+        for (DetailedSample current = sample; current != null; current = LimsUtils.deproxify(current.getParent())) {
+          if (current.getSampleClass().getId().equals(sampleClass.getId())) {
+            return current;
+          }
+        }
+        return null;
+      }).filter(Objects::nonNull).distinct().map(Dtos::asDto).collect(Collectors.toList());
+      return prepare(model, false, "Edit Parent Samples", dtos);
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      config.putPOJO("targetSampleClass", Dtos.asDto(sampleClass));
+      config.putPOJO("sourceSampleClass", Dtos.asDto(sampleClass));
+      config.put("dnaseTreatable", sampleClass.getDNAseTreatable());
+      config.put("propagate", false);
+      config.put("edit", true);
+    }
+  }
 }
