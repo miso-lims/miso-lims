@@ -316,11 +316,13 @@ ListTarget.partition = {
           "sTitle" : "QC Status",
           "mData" : "qcType",
           "include" : config.runId,
+          "iSortPriority" : 0,
           "mRender" : ListUtils.render.textFromId(Constants.partitionQcTypes,
               'description', '(Unset)')
         }, {
           "sTitle" : "QC Notes",
           "mData" : "qcNotes",
+          "iSortPriority" : 0,
           "include" : config.runId
         } ];
   }
