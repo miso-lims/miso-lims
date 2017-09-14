@@ -65,11 +65,14 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ExperimentListConfiguration;
 import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
 
@@ -103,6 +106,10 @@ public class EditRunController {
   private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private ExperimentService experimentService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -247,6 +254,13 @@ public class EditRunController {
       partitionConfig.put("showContainer", true);
       partitionConfig.put("sequencingParametersId", run.getSequencingParameters() == null ? 0 : run.getSequencingParameters().getId());
       model.put("partitionConfig", mapper.writeValueAsString(partitionConfig));
+      model.put("experiments",
+          experimentService.listAllByRunId(run.getId()).stream().map(Dtos::asDto)
+              .collect(Collectors.toList()));
+      model.put("experimentConfiguration",
+          mapper.writeValueAsString(
+              new ExperimentListConfiguration(experimentService, libraryService, run.getSequencerReference().getPlatform(),
+                  run)));
 
       return new ModelAndView("/pages/editRun.jsp", model);
     } catch (IOException ex) {

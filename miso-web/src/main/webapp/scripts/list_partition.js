@@ -86,8 +86,8 @@ ListTarget.partition = {
           return order.remaining > 0;
         }).forEach(
             function(order) {
-              orderP.appendChild(document.createTextNode(order.parameters.name + ": " + order.remaining + " " + platformType.partitionName
-                  + " remaining"));
+              orderP.appendChild(document.createTextNode(order.parameters.name + ": " + order.remaining + " "
+                  + (order.remaining == 1 ? platformType.partitionName : platformType.pluralPartitionName) + " remaining"));
               orderP.appendChild(document.createElement('BR'));
             });
         div.appendChild(orderP);

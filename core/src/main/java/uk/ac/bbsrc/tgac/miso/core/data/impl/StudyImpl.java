@@ -70,7 +70,7 @@ public class StudyImpl implements Study {
   @JoinColumn(name = "project_projectId")
   private Project project = null;
 
-  @OneToMany(targetEntity = ExperimentImpl.class, mappedBy = "study")
+  @OneToMany(targetEntity = Experiment.class, mappedBy = "study")
   private Collection<Experiment> experiments = new HashSet<>();
 
   @Id

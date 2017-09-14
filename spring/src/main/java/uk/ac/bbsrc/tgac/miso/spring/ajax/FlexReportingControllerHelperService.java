@@ -51,6 +51,7 @@ import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -380,33 +381,15 @@ public class FlexReportingControllerHelperService {
               "<input class=\"runsinproject" + project.getProjectId() + "\" id=\"" + run.getName()
                   + "\" type=\"checkbox\" name=\"runIds\" value=\"" + run.getId() + "\" />");
           sb.append(run.getName() + " - " + run.getHealth().getKey() + " - " + run.getAlias());
-          Collection<SequencerPartitionContainer> spcs = containerService.listByRunId(run.getId());
-          if (spcs.size() > 0) {
-            sb.append("<ul>");
-            for (SequencerPartitionContainer spc : spcs) {
-
-              if (spc.getPartitions().size() > 0) {
-                for (Partition spp : spc.getPartitions()) {
-                  if (spp.getPool() != null) {
-                    if (spp.getPool().getExperiments().size() > 0) {
-                      for (Experiment experiment : spp.getPool().getExperiments()) {
-                        if (experiment.getStudy().getProject().equals(project)) {
-
-                          sb.append("<li>");
-                          sb.append("Lane " + spp.getPartitionNumber() + ": ");
-                          sb.append(" <b>" + spp.getPool().getName() + "</b> － " + spp.getPool().getAlias());
-                          sb.append("</li>");
-
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-
-            sb.append("</ul>");
-          }
+          sb.append("<ul>");
+          experimentService.listAllByRunId(run.getId()).stream().filter(experiment -> experiment.getStudy().getProject().equals(project))
+              .flatMap(experiment -> experiment.getRunPartitions().stream()).map(RunPartition::getPartition).forEach(parition -> {
+                sb.append("<li>");
+                sb.append("Lane " + parition.getPartitionNumber() + ": ");
+                sb.append(" <b>" + parition.getPool().getName() + "</b> － " + parition.getPool().getAlias());
+                sb.append("</li>");
+              });
+          sb.append("</ul>");
           sb.append("</li>");
         }
         sb.append("</ul>");
@@ -895,7 +878,8 @@ public class FlexReportingControllerHelperService {
         + run.getId() + "\"/>','" + run.getName() + "','" + run.getAlias() + "','"
         + (run.getHealth() != null ? run.getHealth().getKey() : "") + "','"
         + (run.getSequencerReference().getPlatform().getPlatformType() != null
-            ? run.getSequencerReference().getPlatform().getPlatformType().getKey() : "")
+            ? run.getSequencerReference().getPlatform().getPlatformType().getKey()
+            : "")
         + "']";
   }
 
@@ -920,7 +904,8 @@ public class FlexReportingControllerHelperService {
       for (Run run : runs) {
         if ((platform.equals("all") || platform.equals(run.getSequencerReference().getPlatform().getPlatformType().getKey()))
             && (status.equals("all") || (run.getHealth() != null
-                ? status.equals(run.getHealth().getKey()) : true))) {
+                ? status.equals(run.getHealth().getKey())
+                : true))) {
 
           if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
             if (run.getCompletionDate() != null) {
@@ -985,7 +970,8 @@ public class FlexReportingControllerHelperService {
 
             if (run.getHealth() != null) {
               int countQC = statusMap.containsKey(run.getHealth().getKey())
-                  ? statusMap.get(run.getHealth().getKey()) : 0;
+                  ? statusMap.get(run.getHealth().getKey())
+                  : 0;
               countQC++;
               statusMap.put(run.getHealth().getKey(), countQC);
             }
@@ -1049,7 +1035,8 @@ public class FlexReportingControllerHelperService {
                     Map<Long, Integer> projectMap = new HashMap<>();
                     for (PoolableElementView dilution : spp.getPool().getPoolableElementViews()) {
                       int count = projectMap.containsKey(dilution.getProjectId())
-                          ? projectMap.get(dilution.getProjectId()) : 0;
+                          ? projectMap.get(dilution.getProjectId())
+                          : 0;
                       count++;
                       projectMap.put(dilution.getProjectId(), count);
                     }
@@ -1059,10 +1046,10 @@ public class FlexReportingControllerHelperService {
                         jsonArray.add(
                             JsonSanitizer.sanitize(
                                 "[\"" + run.getName() + "\",\"" + (run.getAlias().replace("+", "-")) + "\",\""
-                                    + ( LimsUtils.formatDate(run.getStartDate()) + "\",\""
-                                   + pool.getName() + "\",\"" + spp.getPartitionNumber() + "\",\""
-                                    + dilution.getProjectName() + "\",\""
-                                    + projectMap.get(dilution.getProjectId()) + "\",\""
+                                    + (LimsUtils.formatDate(run.getStartDate()) + "\",\""
+                                        + pool.getName() + "\",\"" + spp.getPartitionNumber() + "\",\""
+                                        + dilution.getProjectName() + "\",\""
+                                        + projectMap.get(dilution.getProjectId()) + "\",\""
                                         + spp.getPool().getPoolableElementViews().size() + "\"]")));
                       }
                     }

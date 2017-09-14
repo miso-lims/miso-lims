@@ -87,15 +87,13 @@ public class LibraryControllerHelperService {
 
   public JSONObject addLibraryNote(HttpSession session, JSONObject json) {
     Long libraryId = json.getLong("libraryId");
-    String internalOnly = json.getString("internalOnly");
     String text = json.getString("text");
 
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Library library = libraryService.get(libraryId);
       Note note = new Note();
-      internalOnly = internalOnly.equals("on") ? "true" : "false";
-      note.setInternalOnly(Boolean.parseBoolean(internalOnly));
+      note.setInternalOnly(json.getString("internalOnly").equals("on"));
       note.setText(text);
       note.setOwner(user);
       libraryService.addNote(library, note);
@@ -118,21 +116,6 @@ public class LibraryControllerHelperService {
     } catch (IOException e) {
       log.error("delete library note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
-    }
-  }
-
-  public JSONObject deleteLibrary(HttpSession session, JSONObject json) {
-    if (json.has("libraryId")) {
-      Long libraryId = json.getLong("libraryId");
-      try {
-        libraryService.delete(libraryService.get(libraryId));
-        return JSONUtils.SimpleJSONResponse("Library deleted");
-      } catch (IOException e) {
-        log.error("cannot delete library", e);
-        return JSONUtils.SimpleJSONError("Cannot delete library: " + e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No library specified to delete.");
     }
   }
 

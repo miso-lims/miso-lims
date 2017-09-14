@@ -641,6 +641,7 @@ public class MisoServiceManager {
 
   private void updateLibraryServiceDependencies() {
     if (dilutionService != null) dilutionService.setLibraryService(libraryService);
+    if (experimentService != null) experimentService.setLibraryService(libraryService);
   }
 
   public HibernateLibraryQcDao getLibraryQcDao() {
@@ -767,7 +768,6 @@ public class MisoServiceManager {
 
   private void updatePoolServiceDependencies() {
     if (containerService != null) containerService.setPoolService(poolService);
-    if (experimentService != null) experimentService.setPoolService(poolService);
   }
 
   public HibernateExperimentDao getExperimentDao() {
@@ -1654,7 +1654,7 @@ public class MisoServiceManager {
     service.setKitService(kitService);
     service.setNamingScheme(getNamingScheme());
     service.setPlatformService(platformService);
-    service.setPoolService(poolService);
+    service.setLibraryService(libraryService);
     service.setSecurityStore(securityStore);
     service.setSecurityProfileStore(securityProfileDao);
     service.setStudyService(studyService);

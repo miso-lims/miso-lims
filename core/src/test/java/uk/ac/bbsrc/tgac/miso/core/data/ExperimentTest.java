@@ -14,17 +14,16 @@ import org.mockito.Mockito;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-public class AbstractExperimentTest {
-  private ExperimentImpl ae;
+public class ExperimentTest {
+  private Experiment ae;
 
   @Before
   public void setUp() throws Exception {
-    ae = new ExperimentImpl();
+    ae = new Experiment();
   }
 
   @Test

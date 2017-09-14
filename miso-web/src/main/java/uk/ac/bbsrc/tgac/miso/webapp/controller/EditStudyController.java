@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
@@ -101,79 +103,49 @@ public class EditStudyController {
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
-    return setupForm(StudyImpl.UNSAVED_ID, projectId, model);
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Study study = new StudyImpl(user);
+    Project project = requestManager.getProjectById(projectId);
+    study.setProject(project);
+
+    if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
+      SecurityProfile sp = new SecurityProfile(user);
+      LimsUtils.inheritUsersAndGroups(study, project.getSecurityProfile());
+      sp.setOwner(user);
+      study.setSecurityProfile(sp);
+    } else {
+      study.inheritPermissions(project);
+    }
+
+    if (!study.userCanWrite(user)) {
+      throw new SecurityException("Permission denied.");
+    }
+    return setupForm(study, user, "New Study", model);
   }
 
   @RequestMapping(value = "/{studyId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long studyId, ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Study study = studyService.get(studyId);
-      Project project;
-      if (study != null) {
-        if (!study.userCanRead(user)) {
-          throw new SecurityException("Permission denied.");
-        }
-        project = study.getProject();
-        model.put("formObj", study);
-        model.put("project", project);
-        model.put("study", study);
-        model.put("title", "Study " + studyId);
-      } else {
-        throw new SecurityException("No such Study");
-      }
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
-      return new ModelAndView("/pages/editStudy.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show Study", ex);
-      }
-      throw ex;
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Study study = studyService.get(studyId);
+    if (study == null) {
+      throw new SecurityException("No such Study");
     }
+    if (!study.userCanRead(user)) {
+      throw new SecurityException("Permission denied.");
+    }
+
+    return setupForm(study, user, "Study " + studyId, model);
   }
 
-  @RequestMapping(value = "/{studyId}/project/{projectId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long studyId, @PathVariable Long projectId, ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Study study = null;
-      if (studyId == StudyImpl.UNSAVED_ID) {
-        study = new StudyImpl(user);
-        model.put("title", "New Study");
-      } else {
-        study = studyService.get(studyId);
-        model.put("title", "Study " + studyId);
-      }
-
-      Project project = requestManager.getProjectById(projectId);
-      model.addAttribute("project", project);
-      study.setProject(project);
-      if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
-        SecurityProfile sp = new SecurityProfile(user);
-        LimsUtils.inheritUsersAndGroups(study, project.getSecurityProfile());
-        sp.setOwner(user);
-        study.setSecurityProfile(sp);
-      } else {
-        study.inheritPermissions(project);
-      }
-
-      if (!study.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-      model.put("formObj", study);
-      model.put("study", study);
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
-      return new ModelAndView("/pages/editStudy.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show Study", ex);
-      }
-      throw ex;
-    }
+  private ModelAndView setupForm(Study study, User user, String title, ModelMap model) throws IOException {
+    model.put("title", title);
+    model.put("formObj", study);
+    model.put("study", study);
+    model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
+    model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
+    model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
+    model.put("experiments", study.getExperiments().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    return new ModelAndView("/pages/editStudy.jsp", model);
   }
 
   @RequestMapping(method = RequestMethod.POST)

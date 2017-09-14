@@ -47,6 +47,8 @@
     Save
   </button>
 </h1>
+<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+</div>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
@@ -537,162 +539,16 @@
 </div>
 <br/>
 
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#studies_arrowclick'), 'studiesdiv');">
-  Studies
-  <div id="studies_arrowclick" class="toggleLeft"></div>
-</div>
-<div id="studiesdiv" style="display:none;">
-  <h1>Studies</h1>
-  <div style="clear:both">
-    <table id="study_table">
-    </table>
-  </div>
-</div>
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    ListUtils.createTable('study_table', ListTarget.study, ${project.id}, { "isAdmin" : ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')} });
-  });
-</script>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_arrowclick'), 'samplesdiv');">
-  Samples
-  <div id="samples_arrowclick" class="toggleLeft"></div>
-</div>
-<div id="samplesdiv" style="display:none;">
-
-  <div id="sampletabs">
-    <h1>Samples</h1>
-
-    <div style="clear:both">
-      <div id="deliveryformdiv" class="simplebox" style="display:none;">
-        <table class="in">
-          <tr>
-            <td>
-              <form method='post'
-                    id='deliveryform_upload_form'
-                    action='<c:url value="/miso/upload/project/sample-delivery-form"/>'
-                    enctype="multipart/form-data"
-                    target="deliveryform_target_upload"
-                    onsubmit="Utils.fileUpload.fileUploadProgress('deliveryform_upload_form', 'deliveryform_statusdiv', Project.ui.deliveryFormUploadSuccess);">
-                <input type="hidden" name="projectId" value="${project.id}"/>
-                <input type="file" name="file"/>
-                <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-                <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelSampleDeliveryFormUpload();">
-                  Cancel
-                </button>
-              </form>
-              <iframe id='deliveryform_target_upload' name='deliveryform_target_upload' src='' style='display: none'></iframe>
-              <div id="deliveryform_statusdiv"></div>
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <div id="inputformdiv" class="simplebox" style="display:none;">
-        <table class="in">
-          <tr>
-            <td>
-              <form method='post'
-                    id='inputform_upload_form'
-                    action='<c:url value="/miso/upload/project/bulk-input-form"/>'
-                    enctype="multipart/form-data"
-                    target="inputform_target_upload"
-                    onsubmit="Utils.fileUpload.fileUploadProgress('inputform_upload_form', 'inputform_statusdiv', Project.ui.bulkSampleInputFormUploadSuccess);">
-                <input type="hidden" name="projectId" value="${project.id}"/>
-                <input type="file" name="file"/>
-                <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-                <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelBulkSampleInputFormUpload();">
-                  Cancel
-                </button>
-              </form>
-              <iframe id='inputform_target_upload' name='inputform_target_upload' src='' style='display: none'></iframe>
-              <div id="inputform_statusdiv"></div>
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <table id="sample_table"></table>
-    </div>
-  </div>
-</div>
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-  ListUtils.createTable('sample_table', ListTarget.sample, ${project.id}, {});
-  });
-</script>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#libraries_arrowclick'), 'librariesdiv');">
-  Libraries
-  <div id="libraries_arrowclick" class="toggleLeft"></div>
-</div>
-
-<div id="librariesdiv" style="display:none;">
-  <h1>Libraries</h1>
-  <table class="display no-border" id="listingLibrariesTable">
-  </table>
-</div>
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    ListUtils.createTable('listingLibrariesTable', ListTarget.library, ${project.id}, {});
-  });
-</script>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#librarydils_arrowclick'), 'librarydilsdiv');">
-  Library Dilutions
-  <div id="librarydils_arrowclick" class="toggleLeft"></div>
-</div>
-<div id="librarydilsdiv" style="display:none;">
-  <a id="librarydil"></a>
-
-  <h1>Library Dilutions</h1>
-  <table class="display no-border" id="listingDilutionsTable">
-  </table>
-</div>
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    ListUtils.createTable('listingDilutionsTable', ListTarget.dilution, ${project.id}, {});
-  });
-</script>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_arrowclick'), 'poolsdiv');">
-  Pools
-  <div id="pools_arrowclick" class="toggleLeft"></div>
-</div>
-<div id="poolsdiv" style="display:none;">
-  <a id="pool"></a>
-
-  <h1>Pools</h1>
-  <table class="display no-border" id="listingPoolsTable">
-  </table>
-</div>
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    Pool.ui.createListingPoolsTable('listingPoolsTable', '${poolConcentrationUnits}', '/miso/rest/pool/dt/project/${project.id}');
-  });
-</script>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runsdiv');">
-  Runs
-  <div id="runs_arrowclick" class="toggleLeft"></div>
-</div>
-<div id="runsdiv" style="display:none;">
-  <h1>Runs</h1>
-
-  <table class="display no-border" id="listingRunsTable">
-  </table>
-</div>
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    ListUtils.createTable('listingRunsTable', ListTarget.run, ${project.id}, {});
-  });
-</script>
+  <miso:list-section-ajax id="project_studies" name="Studies" target="study" project="${project}" config="{ isAdmin : ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')} }"/>
+  <miso:list-section-ajax id="project_samples" name="Samples" target="sample" project="${project}" config="{}"/>
+  <miso:list-section-ajax id="project_libraries" name="Libraries" target="library" project="${project}" config="{}"/>
+  <miso:list-section-ajax id="project_dilutions" name="Dilutions" target="dilution" project="${project}" config="{}"/>
+  <miso:list-section-ajax id="project_pools" name="Pools" target="pool" project="${project}" config="{}"/>
+  <miso:list-section-ajax id="project_runs" name="Runs" target="run" project="${project}" config="{}"/>
 </c:when>
 </c:choose>
 
-<div id="addProjectOverviewDialog" title="Create new Overview"></div>
 <div id="addProjectOverviewNoteDialog" title="Create new Note"></div>
-<div id="getBulkSampleInputFormDialog" title="Get Bulk Sample Input Form"></div>
 
 <script type="text/javascript">
 jQuery(document).ready(function () {
@@ -716,21 +572,9 @@ jQuery(document).ready(function () {
     maxCount: ${maxLengths['description']},
     countDirection: 'down'
   });
-
-  <c:if test="${project.id != 0}">
-  Project.issues.getProjectIssues(${project.id});
-  </c:if>
 });
 
 </script>
-
-<c:if test="${not empty project.samples}">
-    <script type="text/javascript">
-      projectId_sample = ${project.id};
-      sampleQcTypesString = {${sampleQcTypesString}};
-    </script>
-</c:if>
-
 </div>
 </div>
 

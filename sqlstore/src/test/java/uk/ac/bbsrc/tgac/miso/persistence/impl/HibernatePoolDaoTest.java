@@ -26,7 +26,6 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -44,7 +43,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     assertEquals(expected.getIdentificationBarcode(), actual.getIdentificationBarcode());
     assertEquals(0, (expected.getCreationTime().getTime() - actual.getCreationTime().getTime()) / 84600000);
     assertEquals(expected.getSecurityProfile().getProfileId(), actual.getSecurityProfile().getProfileId());
-    assertEquals(expected.getExperiments().size(), actual.getExperiments().size());
     assertEquals(expected.getPlatformType(), actual.getPlatformType());
     assertEquals(expected.getReadyToRun(), actual.getReadyToRun());
     assertEquals(expected.getAlias(), actual.getAlias());
@@ -130,7 +128,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     testPool.setName("Test Pool xxx");
     testPool.setIdentificationBarcode("Foob");
     testPool.setCreationTime(new Date());
-    testPool.setExperiments(new ArrayList<Experiment>());
     testPool.setPlatformType(PlatformType.IONTORRENT);
     testPool.setReadyToRun(false);
     testPool.setAlias("Alias changed");

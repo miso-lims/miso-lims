@@ -154,7 +154,6 @@ public class EditSequencerPartitionContainerController {
         kitService.listKitDescriptorsByType(KitType.MULTIPLEXING).stream()
             .filter(descriptor -> descriptor.getPlatformType() == container.getPlatform().getPlatformType())
             .sorted(KitDescriptor::sortByName).collect(Collectors.toList()));
-
     return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
   }
 }

@@ -60,7 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
@@ -86,8 +85,6 @@ public class ProjectControllerHelperService {
   @Autowired
   private NamingScheme namingScheme;
   @Autowired
-  private LibraryService libraryService;
-  @Autowired
   private SampleService sampleService;
 
   public void setNamingScheme(NamingScheme namingScheme) {
@@ -108,10 +105,6 @@ public class ProjectControllerHelperService {
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
-  }
-
-  public void setLibraryService(LibraryService libraryService) {
-    this.libraryService = libraryService;
   }
 
   public void setSampleService(SampleService sampleService) {
@@ -159,7 +152,6 @@ public class ProjectControllerHelperService {
 
   public JSONObject addProjectOverviewNote(HttpSession session, JSONObject json) {
     final Long overviewId = json.getLong("overviewId");
-    String internalOnly = json.getString("internalOnly");
     final String text = json.getString("text");
 
     try {
@@ -169,9 +161,7 @@ public class ProjectControllerHelperService {
 
       final Note note = new Note();
 
-      internalOnly = internalOnly.equals("on") ? "true" : "false";
-
-      note.setInternalOnly(Boolean.parseBoolean(internalOnly));
+      note.setInternalOnly(json.getString("internalOnly").equals("on"));
       note.setText(text);
       note.setOwner(user);
       note.setCreationDate(new Date());

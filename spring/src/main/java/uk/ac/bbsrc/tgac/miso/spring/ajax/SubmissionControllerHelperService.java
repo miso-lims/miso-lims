@@ -72,7 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
-import uk.ac.bbsrc.tgac.miso.core.service.submission.FakeFilepathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGeneratorResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadJob;
@@ -80,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
@@ -109,6 +109,8 @@ public class SubmissionControllerHelperService {
   private LibraryDilutionService dilutionService;
   @Autowired
   private RunService runService;
+  @Autowired
+  private LibraryService libraryService;
 
   private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -443,6 +445,7 @@ public class SubmissionControllerHelperService {
         if (runs.size() > 0) {
           sb.append("<ul id='runList" + projectId + "'>");
           for (Run r : runs) {
+            Collection<Experiment> exps = experimentService.listAllByRunId(r.getId());
             sb.append("<li>");
             sb.append("<a href='/miso/run/" + r.getId() + "'><b>" + r.getName() + "</b> : " + r.getAlias() + "</a>");
             sb.append("<input type='hidden' id='RUN_" + r.getId() + "' name='RUN_" + r.getId() + "' value='" + r.getId() + "'/>");
@@ -462,7 +465,6 @@ public class SubmissionControllerHelperService {
                 // Checks whether the partition was involved in the project.
                 boolean partitionInvolved = false;
                 if (part.getPool() != null) {
-                  Collection<Experiment> exps = part.getPool().getExperiments();
                   List<String> involvedExperiments = new ArrayList<>();
                   for (Experiment e : exps) {
                     if (e.getStudy().getProject().getProjectId().equals(p.getProjectId())) {
@@ -497,10 +499,9 @@ public class SubmissionControllerHelperService {
                     FilePathGenerator fpg = filePathGeneratorResolverService
                         .getFilePathGenerator(r.getSequencerReference().getPlatform().getPlatformType());
                     if (fpg == null) {
-                      log.warn(
+                      throw new IllegalArgumentException(
                           "No file path generator found for '" + r.getSequencerReference().getPlatform().getPlatformType().getKey()
                               + "'. Falling back to fake path generator.");
-                      fpg = new FakeFilepathGenerator();
                     }
 
                     sb.append("<ul>");
@@ -523,14 +524,8 @@ public class SubmissionControllerHelperService {
                       sb.append(
                           ">" + partitionContainer.getId() + "_" + d.getLibraryName() + "_" + d.getDilutionName() + ": ");
                       sb.append("<ul>");
-                      try {
-                        for (File f : fpg.generateFilePath(part, d)) {
-                          sb.append("<li>" + f.getName() + "</li>");
-                        }
-                      } catch (SubmissionException e1) {
-                        log.error("Failed to generate path for data file in submission: ", e1);
-                        return JSONUtils.SimpleJSONError("Failed to populate project for submission");
-                      }
+                        fpg.generateFilePath(libraryService.get(d.getLibraryId()), part, exps.stream()).map(File::getName)
+                            .forEach(name -> sb.append("<li>" + name + "</li>"));
                       sb.append("</ul>");
 
                       sb.append("</li>");

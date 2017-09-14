@@ -304,9 +304,10 @@
   <br/>
 </c:if>
 
-  <c:if test="${container.id != 0}">
+  <c:if test="${run.id != 0}">
     <miso:list-section id="list_container" name="${run.platformType.containerName}" target="container" items="${runContainers}" alwaysShow="true" config="${partitionConfig}"/>
-    <miso:list-section id="list_parition" name="${run.platformType.partitionName}" target="partition" items="${runPartitions}" config="${partitionConfig}"/>
+    <miso:list-section id="list_parition" name="${run.platformType.pluralPartitionName}" target="partition" items="${runPartitions}" config="${partitionConfig}"/>
+    <miso:list-section id="list_experiment" name="Experiments" target="experiment" alwaysShow="true" items="${experiments}" config="${experimentConfiguration}"/>
   </c:if>
 </form:form>
 <miso:changelog item="${run}"/>

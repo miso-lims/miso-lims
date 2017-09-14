@@ -396,7 +396,16 @@ var Utils = Utils
           },
           'error': function(xhr, textStatus, errorThrown) {
             dialog.dialog("close");
-            Utils.showOkDialog(title, ['Error: ' + errorThrown]);
+            var lines = ['Error: ' + errorThrown];
+            try {
+              var responseObj = JSON.parse(xhr.responseText);
+              if (responseObj.detail) {
+                lines.push(responseObj.detail);
+              }
+            } catch (e) {
+              // If we got detail, great; if we didn't meh.
+            }
+            Utils.showOkDialog(title, lines);
           }
         });
       },

@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -25,13 +25,10 @@ package uk.ac.bbsrc.tgac.miso.tools.run.submission;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -42,8 +39,6 @@ import org.irods.jargon.core.query.GenQueryBuilderException;
 import org.irods.jargon.core.query.GenQueryOrderByField;
 import org.irods.jargon.core.query.IRODSGenQueryBuilder;
 import org.irods.jargon.core.query.IRODSGenQueryFromBuilder;
-import org.irods.jargon.core.query.IRODSQueryResultRow;
-import org.irods.jargon.core.query.IRODSQueryResultSet;
 import org.irods.jargon.core.query.JargonQueryException;
 import org.irods.jargon.core.query.QueryConditionOperators;
 import org.irods.jargon.core.query.RodsGenQueryEnum;
@@ -53,11 +48,9 @@ import org.slf4j.LoggerFactory;
 import net.sourceforge.fluxion.spi.ServiceProvider;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
 
 /**
@@ -95,85 +88,30 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
   }
 
   @Override
-  public Set<File> generateFilePath(Partition partition, PoolableElementView l) throws SubmissionException {
-    Pool pool = partition.getPool();
-    if (pool != null) {
-      if (pool.getExperiments() != null) {
-        List<String> filePaths = new ArrayList<>();
-        Set<File> fps = new HashSet<>();
-        try {
-          IRODSGenQueryBuilder builder = new IRODSGenQueryBuilder(true, null);
+  public Stream<File> generateFilePath(Library library, Partition partition, Stream<Experiment> experiments) {
+    return library.getLibraryDilutions().stream().flatMap(dilution -> {
+      try {
+        IRODSGenQueryBuilder builder = new IRODSGenQueryBuilder(true, null);
+        builder.addSelectAsGenQueryValue(RodsGenQueryEnum.COL_DATA_NAME)
+            .addConditionAsGenQueryField(RodsGenQueryEnum.COL_META_DATA_ATTR_NAME, QueryConditionOperators.EQUAL, "run_alias")
+            .addConditionAsGenQueryField(RodsGenQueryEnum.COL_META_DATA_ATTR_VALUE, QueryConditionOperators.EQUAL,
+                partition.getSequencerPartitionContainer().getLastRun().getAlias())
+            .addConditionAsGenQueryField(RodsGenQueryEnum.COL_DATA_NAME, QueryConditionOperators.LIKE, dilution.getName() + "%")
+            .addOrderByGenQueryField(RodsGenQueryEnum.COL_DATA_NAME, GenQueryOrderByField.OrderByType.ASC);
+        IRODSGenQueryFromBuilder irodsQuery = builder.exportIRODSQueryFromBuilder(1);
+        return queryExecutorAO.executeIRODSQuery(irodsQuery, 0).getResults().stream().map(row -> {
           try {
-            builder.addSelectAsGenQueryValue(RodsGenQueryEnum.COL_DATA_NAME)
-                .addConditionAsGenQueryField(RodsGenQueryEnum.COL_META_DATA_ATTR_NAME, QueryConditionOperators.EQUAL, "run_alias")
-                .addConditionAsGenQueryField(RodsGenQueryEnum.COL_META_DATA_ATTR_VALUE, QueryConditionOperators.EQUAL,
-                    partition.getSequencerPartitionContainer().getLastRun().getAlias())
-                .addConditionAsGenQueryField(RodsGenQueryEnum.COL_DATA_NAME, QueryConditionOperators.LIKE, l.getDilutionName() + "%")
-                .addOrderByGenQueryField(RodsGenQueryEnum.COL_DATA_NAME, GenQueryOrderByField.OrderByType.ASC);
-            IRODSGenQueryFromBuilder irodsQuery = builder.exportIRODSQueryFromBuilder(1);
-            collateResults(queryExecutorAO.executeIRODSQuery(irodsQuery, 0), filePaths);
-            log.info(String.join(" , ", filePaths));
-          } catch (GenQueryBuilderException e) {
-            log.error("error building query", e);
-            throw new JargonException("error building query", e);
-          } catch (JargonQueryException jqe) {
-            log.error("error executing query", jqe);
-            throw new JargonException("error executing query", jqe);
+            return row.getColumn(0);
+          } catch (JargonException e) {
+            log.error("error executing query", e);
+            return null;
           }
-        } catch (JargonException e) {
-          log.error("error executing query", e);
-        }
-
-        for (String fp : filePaths) {
-          fps.add(new File(fp));
-        }
-        return fps;
-      } else {
-        throw new SubmissionException("No experiments");
+        }).filter(Objects::nonNull);
+      } catch (GenQueryBuilderException | JargonQueryException | JargonException e) {
+        log.error("error executing query", e);
+        return Stream.<String> empty();
       }
-    } else {
-      throw new SubmissionException("Collection of experiments is empty");
-    }
-  }
-
-  private void collateResults(IRODSQueryResultSet resultSet, List<String> filePaths) throws JargonException, JargonQueryException {
-    for (IRODSQueryResultRow row : resultSet.getResults()) {
-      String col = row.getColumn(0);
-      filePaths.add(col);
-      log.info("Got: " + col);
-    }
-    if (resultSet.isHasMoreRecords()) {
-      collateResults(queryExecutorAO.getMoreResults(resultSet), filePaths);
-    }
-  }
-
-  @Override
-  public Set<File> generateFilePaths(Partition partition) throws SubmissionException {
-    Set<File> filePaths = new HashSet<>();
-    if ((partition.getSequencerPartitionContainer().getLastRun().getFilePath()) == null) {
-      throw new SubmissionException("No valid run filepath!");
-    }
-
-    Pool pool = partition.getPool();
-    if (pool == null) {
-      throw new SubmissionException("partition.getPool=null!");
-    } else {
-      Collection<Experiment> experiments = pool.getExperiments();
-      if (experiments.isEmpty()) {
-        throw new SubmissionException("Collection or experiments is empty");
-      } else {
-        Collection<PoolableElementView> libraryDilutions = pool.getPoolableElementViews();
-        if (libraryDilutions.isEmpty()) {
-          throw new SubmissionException("Collection of libraryDilutions is empty");
-        } else {
-          for (PoolableElementView l : libraryDilutions) {
-            Set<File> files = generateFilePath(partition, l);
-            filePaths.addAll(files);
-          }
-        }
-      }
-    }
-    return filePaths;
+    }).map(File::new);
   }
 
   @Override

@@ -105,6 +105,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
@@ -170,6 +171,8 @@ public class EditLibraryController {
   private PoolService poolService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private ExperimentService experimentService;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -595,6 +598,8 @@ public class EditLibraryController {
     ObjectNode config = mapper.createObjectNode();
     config.putPOJO("library", Dtos.asDto(library));
     model.put("libraryDilutionsConfig", mapper.writeValueAsString(config));
+    model.put("experiments", experimentService.listAllByLibraryId(library.getId()).stream().map(Dtos::asDto)
+        .collect(Collectors.toList()));
 
     populateDesigns(model,
         LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);

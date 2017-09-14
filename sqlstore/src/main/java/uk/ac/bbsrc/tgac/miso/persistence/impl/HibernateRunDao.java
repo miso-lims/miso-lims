@@ -166,10 +166,16 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public List<Run> listByPoolId(long poolId) throws IOException {
+    Criteria idCriteria = currentSession().createCriteria(Run.class);
+    idCriteria.createAlias("containers", "spc").createAlias("spc.partitions", "partition");
+    idCriteria.createAlias("partition.pool", "pool");
+    idCriteria.add(Restrictions.eq("pool.id", poolId));
+    idCriteria.setProjection(Projections.distinct(Projections.property("id")));
+    @SuppressWarnings("unchecked")
+    List<Long> ids = idCriteria.list();
+    if (ids.isEmpty()) return Collections.emptyList();
     Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.createAlias("containers", "spc").createAlias("spc.partitions", "partition");
-    criteria.createAlias("partition.pool", "pool");
-    criteria.add(Restrictions.eq("pool.id", poolId));
+    criteria.add(Restrictions.in("id", ids));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);

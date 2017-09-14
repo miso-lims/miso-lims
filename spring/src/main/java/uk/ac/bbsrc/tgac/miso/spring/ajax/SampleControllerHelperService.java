@@ -100,14 +100,12 @@ public class SampleControllerHelperService {
 
   public JSONObject addSampleNote(HttpSession session, JSONObject json) {
     Long sampleId = json.getLong("sampleId");
-    String internalOnly = json.getString("internalOnly");
     String text = json.getString("text");
 
     try {
       Sample sample = sampleService.get(sampleId);
       Note note = new Note();
-      internalOnly = internalOnly.equals("on") ? "true" : "false";
-      note.setInternalOnly(Boolean.parseBoolean(internalOnly));
+      note.setInternalOnly(json.getString("internalOnly").equals("on"));
       note.setText(text);
       sampleService.addNote(sample, note);
     } catch (IOException e) {

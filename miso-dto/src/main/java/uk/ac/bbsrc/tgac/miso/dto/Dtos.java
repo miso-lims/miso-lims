@@ -27,10 +27,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
+import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -81,6 +84,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -98,6 +102,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
@@ -1839,10 +1844,68 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setName(from.getName());
     dto.setPlatform(asDto(from.getPlatform()));
-    dto.setPool(asDto(from.getPool(), true));
-    dto.setRun(asDto(from.getRun()));
+    dto.setLibrary(asDto(from.getLibrary()));
+    dto.setPartitions(from.getRunPartitions().stream()
+        .map(entry -> new ExperimentDto.RunPartitionDto(asDto(entry.getRun()), asDto(entry.getPartition()))).collect(Collectors.toList()));
     dto.setStudy(asDto(from.getStudy()));
     dto.setTitle(from.getTitle());
     return dto;
+  }
+
+  public static KitConsumableDto asDto(Kit from) {
+    KitConsumableDto dto = new KitConsumableDto();
+    dto.setId(from.getId());
+    dto.setDate(formatDate(from.getKitDate()));
+    dto.setDescriptor(asDto(from.getKitDescriptor()));
+    dto.setLotNumber(from.getLotNumber());
+    return dto;
+  }
+
+  public static Kit to(KitConsumableDto dto) {
+    Kit to = new KitImpl();
+    if (dto.getId() != null) {
+      to.setId(dto.getId());
+    }
+    to.setKitDate(parseDate(dto.getDate()));
+    to.setKitDescriptor(to(dto.getDescriptor()));
+    to.setLotNumber(dto.getLotNumber());
+    return to;
+  }
+
+  public static Experiment to(ExperimentDto dto) {
+    Experiment to = new Experiment();
+    to.setId(dto.getId());
+    to.setAlias(dto.getAlias());
+    to.setDescription(dto.getDescription());
+    to.setLibrary(to(dto.getLibrary()));
+    to.setPlatform(to(dto.getPlatform()));
+    to.setRunPartitions(dto.getPartitions().stream().map(rpDto -> {
+      RunPartition rpTo = new RunPartition();
+      rpTo.setExperiment(to);
+      rpTo.setPartition(to(rpDto.getPartition()));
+      rpTo.setRun(to(rpDto.getRun()));
+      return rpTo;
+    }).collect(Collectors.toList()));
+    to.setStudy(to(dto.getStudy()));
+    to.setTitle(dto.getTitle());
+    return to;
+  }
+
+  public static Study to(StudyDto dto) {
+    Study to = new StudyImpl();
+    to.setId(dto.getId());
+    return to;
+  }
+
+  public static Run to(RunDto dto) {
+    Run to = PlatformType.get(dto.getPlatformType()).createRun(null);
+    to.setId(dto.getId());
+    return to;
+  }
+
+  public static Partition to(PartitionDto dto) {
+    Partition to = new PartitionImpl();
+    to.setId(dto.getId());
+    return to;
   }
 }

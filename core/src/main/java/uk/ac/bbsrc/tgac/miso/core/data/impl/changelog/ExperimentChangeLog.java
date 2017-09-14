@@ -13,7 +13,6 @@ import org.hibernate.annotations.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 
 @Entity
 @Table(appliesTo = "ExperimentChangeLog", indexes = {
@@ -26,7 +25,7 @@ public class ExperimentChangeLog extends AbstractChangeLog {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long experimentChangeLogId;
 
-  @ManyToOne(fetch = FetchType.LAZY, targetEntity = ExperimentImpl.class)
+  @ManyToOne(fetch = FetchType.LAZY, targetEntity = Experiment.class)
   @JoinColumn(name = "experimentId", nullable = false, updatable = false)
   private Experiment experiment;
 

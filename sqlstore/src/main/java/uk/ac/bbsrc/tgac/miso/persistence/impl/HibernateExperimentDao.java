@@ -24,6 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +42,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -60,7 +61,7 @@ public class HibernateExperimentDao implements ExperimentStore {
 
   @Override
   public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(ExperimentImpl.class).setProjection(Projections.rowCount()).uniqueResult();
+    long c = (Long) currentSession().createCriteria(Experiment.class).setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
   }
 
@@ -70,7 +71,7 @@ public class HibernateExperimentDao implements ExperimentStore {
 
   @Override
   public Experiment get(long experimentId) throws IOException {
-    return (Experiment) currentSession().get(ExperimentImpl.class, experimentId);
+    return (Experiment) currentSession().get(Experiment.class, experimentId);
   }
 
   @Override
@@ -89,7 +90,7 @@ public class HibernateExperimentDao implements ExperimentStore {
 
   @Override
   public List<Experiment> listAll() {
-    Criteria criteria = currentSession().createCriteria(ExperimentImpl.class);
+    Criteria criteria = currentSession().createCriteria(Experiment.class);
     @SuppressWarnings("unchecked")
     List<Experiment> results = criteria.list();
     return results;
@@ -97,7 +98,7 @@ public class HibernateExperimentDao implements ExperimentStore {
 
   @Override
   public List<Experiment> listAllWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(ExperimentImpl.class);
+    Criteria criteria = currentSession().createCriteria(Experiment.class);
     criteria.setMaxResults((int) limit);
     @SuppressWarnings("unchecked")
     List<Experiment> results = criteria.list();
@@ -107,7 +108,7 @@ public class HibernateExperimentDao implements ExperimentStore {
   @Override
   @CoverageIgnore
   public List<Experiment> listBySearch(String query) {
-    Criteria criteria = currentSession().createCriteria(ExperimentImpl.class);
+    Criteria criteria = currentSession().createCriteria(Experiment.class);
     criteria.add(DbUtils.searchRestrictions(query, "name", "alias", "description"));
     @SuppressWarnings("unchecked")
     List<Experiment> results = criteria.list();
@@ -116,7 +117,7 @@ public class HibernateExperimentDao implements ExperimentStore {
 
   @Override
   public List<Experiment> listByStudyId(long studyId) {
-    Criteria criteria = currentSession().createCriteria(ExperimentImpl.class);
+    Criteria criteria = currentSession().createCriteria(Experiment.class);
     criteria.createAlias("study", "study");
     criteria.add(Restrictions.eq("study.id", studyId));
     @SuppressWarnings("unchecked")
@@ -143,7 +144,7 @@ public class HibernateExperimentDao implements ExperimentStore {
   @Override
   public long save(Experiment experiment) throws IOException {
     long id;
-    if (experiment.getId() == ExperimentImpl.UNSAVED_ID) {
+    if (experiment.getId() == Experiment.UNSAVED_ID) {
       id = (Long) currentSession().save(experiment);
     } else {
       currentSession().update(experiment);
@@ -159,5 +160,32 @@ public class HibernateExperimentDao implements ExperimentStore {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  @Override
+  public Collection<Experiment> listByLibrary(long id) throws IOException {
+    Criteria criteria = currentSession().createCriteria(Experiment.class);
+    criteria.createAlias("library", "library");
+    criteria.add(Restrictions.eq("library.id", id));
+    @SuppressWarnings("unchecked")
+    List<Experiment> results = criteria.list();
+    return results;
+  }
+
+  @Override
+  public Collection<Experiment> listByRun(long runId) throws IOException {
+    Criteria idCriteria = currentSession().createCriteria(Experiment.class);
+    idCriteria.createCriteria("runPartitions").createAlias("run", "run").add(Restrictions.eq("run.id", runId));
+    idCriteria.setProjection(Projections.distinct(Projections.property("id")));
+    @SuppressWarnings("unchecked")
+    List<Long> ids = idCriteria.list();
+    if (ids.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Criteria criteria = currentSession().createCriteria(Experiment.class);
+    criteria.add(Restrictions.in("id", ids));
+    @SuppressWarnings("unchecked")
+    List<Experiment> results = criteria.list();
+    return results;
   }
 }

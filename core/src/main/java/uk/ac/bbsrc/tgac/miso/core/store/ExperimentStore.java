@@ -72,4 +72,8 @@ public interface ExperimentStore extends Store<Experiment>, Remover<Experiment> 
    * @throws IOException
    */
   public Map<String, Integer> getExperimentColumnSizes() throws IOException;
+
+  Collection<Experiment> listByLibrary(long id) throws IOException;
+
+  Collection<Experiment> listByRun(long runId) throws IOException;
 }
