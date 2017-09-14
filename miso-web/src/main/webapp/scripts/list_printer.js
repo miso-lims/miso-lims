@@ -22,95 +22,91 @@
  */
 
 ListTarget.printer = {
-  name : "Printers",
-  createUrl : function(config, projectId) {
+  name: "Printers",
+  createUrl: function(config, projectId) {
     return "/miso/rest/printer/dt";
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return [
         {
-          "name" : "Enable",
-          "include" : config.isInternal || config.isAdmin,
-          "action" : function(items) {
-            Utils.ajaxWithDialog('Enabling Printer', 'PUT',
-                '/miso/rest/printer/enable', items.map(Utils.array.getId), Utils.page.pageReload);
-            
+          "name": "Enable",
+          "include": config.isInternal || config.isAdmin,
+          "action": function(items) {
+            Utils.ajaxWithDialog('Enabling Printer', 'PUT', '/miso/rest/printer/enable', items.map(Utils.array.getId),
+                Utils.page.pageReload);
+
           }
         },
         {
-          "name" : "Disable",
-          "include" : config.isInternal || config.isAdmin,
-          "action" : function(items) {
-            Utils.ajaxWithDialog('Disabling Printer', 'PUT',
-                '/miso/rest/printer/disable', items.map(Utils.array.getId), Utils.page.pageReload);
-            
+          "name": "Disable",
+          "include": config.isInternal || config.isAdmin,
+          "action": function(items) {
+            Utils.ajaxWithDialog('Disabling Printer', 'PUT', '/miso/rest/printer/disable', items.map(Utils.array.getId),
+                Utils.page.pageReload);
+
           }
-        },
-        {
-          "name" : "Delete",
-          "include" : config.isAdmin,
-          "action" : function(items) {
-            Utils.ajaxWithDialog('Deleting Printer', 'DELETE',
-                '/miso/rest/printer', items.map(Utils.array.getId), Utils.page.pageReload);
+        }, {
+          "name": "Delete",
+          "include": config.isAdmin,
+          "action": function(items) {
+            Utils.ajaxWithDialog('Deleting Printer', 'DELETE', '/miso/rest/printer', items.map(Utils.array.getId), Utils.page.pageReload);
           }
-        } ].filter(function(action) {
+        }].filter(function(action) {
       return action.include;
     });
   },
-  createStaticActions : function(config, projectId) {
+  createStaticActions: function(config, projectId) {
     if (config.isAdmin) {
-      return [ {
-        "name" : "Add",
-        "handler" : function() {
-          Utils.showDialog('Add Printer', 'Next', [ {
-            type : "text",
-            label : "Name",
-            property : "name"
+      return [{
+        "name": "Add",
+        "handler": function() {
+          Utils.showDialog('Add Printer', 'Next', [{
+            type: "text",
+            label: "Name",
+            property: "name"
           }, {
-            type : "select",
-            label : "Driver",
-            property : "driver",
-            values : Constants.printerDrivers.map(Utils.array.getName)
+            type: "select",
+            label: "Driver",
+            property: "driver",
+            values: Constants.printerDrivers.map(Utils.array.getName)
           }, {
-            type : "select",
-            label : "Backend",
-            property : "backend",
-            values : Constants.printerBackends,
-            getLabel : function(backend) {
+            type: "select",
+            label: "Backend",
+            property: "backend",
+            values: Constants.printerBackends,
+            getLabel: function(backend) {
               return backend.name;
             }
-          } ], function(printer) {
+          }], function(printer) {
             if (!printer.name) {
               Utils.showOkDialog('Create Printer', ['A printer needs a name.']);
               return;
             }
             var save = function(printerConfig) {
-              
-              Utils.ajaxWithDialog('Saving Printer', 'POST',
-                  '/miso/rest/printer', {
-                    "id" : 0,
-                    "available" : true,
-                    "backend" : printer.backend.name,
-                    "configuration" : printerConfig,
-                    "driver" : printer.driver,
-                    "name" : printer.name,
-                  }, Utils.page.pageReload);
+
+              Utils.ajaxWithDialog('Saving Printer', 'POST', '/miso/rest/printer', {
+                "id": 0,
+                "available": true,
+                "backend": printer.backend.name,
+                "configuration": printerConfig,
+                "driver": printer.driver,
+                "name": printer.name,
+              }, Utils.page.pageReload);
             }
 
             if (printer.backend.configurationKeys.length == 0) {
               save({});
             } else {
-              Utils.showDialog('Add Printer', 'Save',
-                  printer.backend.configurationKeys.map(function(key) {
-                    return {
-                      type : "text",
-                      label : key,
-                      property : key
-                    };
-                  }), save);
+              Utils.showDialog('Add Printer', 'Save', printer.backend.configurationKeys.map(function(key) {
+                return {
+                  type: "text",
+                  label: key,
+                  property: key
+                };
+              }), save);
             }
           });
-          
+
         }
       }
 
@@ -119,28 +115,28 @@ ListTarget.printer = {
       return [];
     }
   },
-  createColumns : function(config, projectId) {
-    return [ {
-      "sTitle" : "Printer",
-      "include" : true,
-      "iSortPriority" : 1,
-      "mData" : "name"
+  createColumns: function(config, projectId) {
+    return [{
+      "sTitle": "Printer",
+      "include": true,
+      "iSortPriority": 1,
+      "mData": "name"
     }, {
-      "sTitle" : "Driver",
-      "include" : true,
-      "iSortPriority" : 0,
-      "mData" : "driver"
+      "sTitle": "Driver",
+      "include": true,
+      "iSortPriority": 0,
+      "mData": "driver"
     }, {
-      "sTitle" : "Backend",
-      "include" : true,
-      "iSortPriority" : 0,
-      "mData" : "backend"
+      "sTitle": "Backend",
+      "include": true,
+      "iSortPriority": 0,
+      "mData": "backend"
     }, {
-      "sTitle" : "Available",
-      "include" : true,
-      "iSortPriority" : 0,
-      "mData" : "available",
-      "mRender" : ListUtils.render.booleanChecks
-    } ];
+      "sTitle": "Available",
+      "include": true,
+      "iSortPriority": 0,
+      "mData": "available",
+      "mRender": ListUtils.render.booleanChecks
+    }];
   }
 };

@@ -22,47 +22,47 @@
  */
 
 ListTarget.lab = {
-  name : "Labs",
-  createUrl : function(config, projectId) {
+  name: "Labs",
+  createUrl: function(config, projectId) {
     throw "Must be provided statically";
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return config.isAdmin ? HotTarget.lab.bulkActions : [];
   },
-  createStaticActions : function(config, projectId) {
-    return config.isAdmin ? [ {
-      "name" : "Add",
-      "handler" : function() {
-        
-        Utils.showDialog('Create Labs', 'Create', [ {
-          property : 'quantity',
-          type : 'int',
-          label : 'Quantity',
-          value : 1
-        } ], function(result) {
+  createStaticActions: function(config, projectId) {
+    return config.isAdmin ? [{
+      "name": "Add",
+      "handler": function() {
+
+        Utils.showDialog('Create Labs', 'Create', [{
+          property: 'quantity',
+          type: 'int',
+          label: 'Quantity',
+          value: 1
+        }], function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Create Labs', ["That's a peculiar number of labs to create."]);
             return;
           }
           window.location = '/miso/lab/bulk/new?' + jQuery.param({
-            quantity : result.quantity,
+            quantity: result.quantity,
           });
         });
       }
-    } ] : [];
+    }] : [];
   },
-  createColumns : function(config, projectId) {
-    return [ {
-      "sTitle" : "Alias",
-      "mData" : "alias",
-      "include" : true,
-      "iSortPriority" : 0
+  createColumns: function(config, projectId) {
+    return [{
+      "sTitle": "Alias",
+      "mData": "alias",
+      "include": true,
+      "iSortPriority": 0
     }, {
-      "sTitle" : "Institute",
-      "mData" : "instituteId",
-      "include" : true,
-      "iSortPriority" : 0,
-      "mRender" : ListUtils.render.textFromId(config.institutes, 'alias')
+      "sTitle": "Institute",
+      "mData": "instituteId",
+      "include": true,
+      "iSortPriority": 0,
+      "mRender": ListUtils.render.textFromId(config.institutes, 'alias')
     }, ];
   }
 };

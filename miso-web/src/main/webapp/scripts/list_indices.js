@@ -22,39 +22,38 @@
  */
 
 ListTarget.index = {
-  name : "Indices",
-  createUrl : function(config, projectId) {
-    return "/miso/rest/index/dt" + (config.platformType
-        ? "/platform/" + config.platformType : "");
+  name: "Indices",
+  createUrl: function(config, projectId) {
+    return "/miso/rest/index/dt" + (config.platformType ? "/platform/" + config.platformType : "");
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return [];
   },
-  createStaticActions : function(config, projectId) {
+  createStaticActions: function(config, projectId) {
     return [];
   },
-  createColumns : function(config, projectId) {
-    return [ {
-      "sTitle" : "Platform",
-      "include" : !config.platformType,
-      "iSortPriority" : 3,
-      "mData" : "family.platformType",
-      "mRender" : ListUtils.render.platformType
+  createColumns: function(config, projectId) {
+    return [{
+      "sTitle": "Platform",
+      "include": !config.platformType,
+      "iSortPriority": 3,
+      "mData": "family.platformType",
+      "mRender": ListUtils.render.platformType
     }, {
-      "sTitle" : "Family",
-      "include" : true,
-      "iSortPriority" : 2,
-      "mData" : "family.name"
+      "sTitle": "Family",
+      "include": true,
+      "iSortPriority": 2,
+      "mData": "family.name"
     }, {
-      "sTitle" : "Name",
-      "include" : true,
-      "iSortPriority" : 1,
-      "mData" : "name"
+      "sTitle": "Name",
+      "include": true,
+      "iSortPriority": 1,
+      "mData": "name"
     }, {
-      "sTitle" : "Sequence",
-      "include" : true,
-      "iSortPriority" : 0,
-      "mData" : "sequence"
-    } ];
+      "sTitle": "Sequence",
+      "include": true,
+      "iSortPriority": 0,
+      "mData": "sequence"
+    }];
   }
 };

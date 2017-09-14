@@ -42,9 +42,9 @@ function validate_submission(form) {
 
   if (jQuery("input[type='text']").length > 0) {
     jQuery("input[type='text']").each(function() {
-      if (jQuery(this).val().indexOf("'")>-1 || jQuery(this).val().indexOf("\"")>-1) {
+      if (jQuery(this).val().indexOf("'") > -1 || jQuery(this).val().indexOf("\"") > -1) {
         ok = false;
-        error += "You cannot use single or double quotes in the "+jQuery(this).attr("id")+" field and it cannot end with a space.\n";
+        error += "You cannot use single or double quotes in the " + jQuery(this).attr("id") + " field and it cannot end with a space.\n";
       }
     });
   }

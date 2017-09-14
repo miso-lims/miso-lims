@@ -22,33 +22,30 @@
  */
 
 var Search = Search || {
-  dashboardSearch : function(inp, throbber) {
+  dashboardSearch: function(inp, throbber) {
     var t = jQuery(inp);
     var id = t.attr('id');
     jQuery('#' + id + 'result').html("<img src='/styles/images/ajax-loader.gif'/>");
-    Fluxion.doAjax(
-      'dashboard',
-      id,
-      {'str':t.val(), 'url':ajaxurl},
-      {
-        "doOnSuccess":
-          function(json) {
-            if (throbber) {
-              jQuery('#' + id + 'result').html("");
-            }
+    Fluxion.doAjax('dashboard', id, {
+      'str': t.val(),
+      'url': ajaxurl
+    }, {
+      "doOnSuccess": function(json) {
+        if (throbber) {
+          jQuery('#' + id + 'result').html("");
+        }
 
-            if (!Utils.validation.isNullCheck(json.html)) {
-              jQuery('#' + id + 'result').html(json.html);
-            }
-            else {
-              jQuery('#' + id + 'result').html("No matches");
-            }
-          }
-      });
+        if (!Utils.validation.isNullCheck(json.html)) {
+          jQuery('#' + id + 'result').html(json.html);
+        } else {
+          jQuery('#' + id + 'result').html("No matches");
+        }
+      }
+    });
     return true;
   },
 
-  loadAll : function() {
+  loadAll: function() {
     var self = this;
     self.dashboardSearch(jQuery('#searchProject'), true);
     self.dashboardSearch(jQuery('#searchRun'), true);
@@ -58,20 +55,19 @@ var Search = Search || {
     self.dashboardSearch(jQuery('#searchPool'), true);
   },
 
-  insertResult : function(id, v) {
+  insertResult: function(id, v) {
     var i = $(id);
     i.value = v;
     $(id + 'result').style.visibility = 'hidden';
   },
 
-  filterListOnAttribute : function(input, attr, list) {
+  filterListOnAttribute: function(input, attr, list) {
     var func = function(input, attr, list) {
       var filter = jQuery(input).val();
       if (filter) {
         jQuery('#' + list).find("li").not("[" + attr + "*=" + filter + "]").hide();
         jQuery('#' + list).find("li[" + attr + "*=" + filter + "]").show();
-      }
-      else {
+      } else {
         jQuery('#' + list).find("li").show();
       }
     };

@@ -24,18 +24,17 @@
 var Tasks = Tasks || {};
 
 Tasks.ui = {
-  populateRunningTasks : function() {
+  populateRunningTasks: function() {
     var self = this;
     jQuery('#runningDiv').prepend('<img id="runningThrobber" src="/styles/images/ajax-loader.gif"/>');
-    Fluxion.doAjax(
-            'taskControllerHelperService',
-            'populateRunningTasks',
-    {'url':ajaxurl},
-    {'doOnSuccess':self.processRunningTasks}
-    );
+    Fluxion.doAjax('taskControllerHelperService', 'populateRunningTasks', {
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': self.processRunningTasks
+    });
   },
 
-  processRunningTasks : function(json) {
+  processRunningTasks: function(json) {
     jQuery('#runningThrobber').remove();
 
     // clear table
@@ -44,32 +43,30 @@ Tasks.ui = {
     if (json.runningTasks.length > 0) {
       for (var i = 0; i < json.runningTasks.length; i++) {
         var task = json.runningTasks[i];
-        var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td>";
+        var rowtext = "<td>" + task.id + "</td><td>" + task.name + "</td><td>" + task.pipeline.name + "</td><td>" + task.statusMessage
+            + "</td><td>" + new Date(task.startDate) + "</td>";
         rowtext += "<td><table width='100%' border='0'><tr>";
         for (var j = 0; j < task.pipeline.processes.length; j++) {
-          rowtext += "<td id='"+task.id+"-"+task.pipeline.processes[j].name+"'>"+task.pipeline.processes[j].name+"</td>";
+          rowtext += "<td id='" + task.id + "-" + task.pipeline.processes[j].name + "'>" + task.pipeline.processes[j].name + "</td>";
         }
 
         rowtext += "</tr></table></td>";
-        jQuery('#runningTasks > tbody:last')
-          .append(jQuery('<tr>')
-            .append(rowtext)
-        );
+        jQuery('#runningTasks > tbody:last').append(jQuery('<tr>').append(rowtext));
 
         for (var j = 0; j < task.pipeline.processes.length; j++) {
           var process = task.pipeline.processes[j];
           for (var k = 0; k < processRuns.length; k++) {
             if (processRuns[k].processName === process.name) {
               if (processRuns[k].exitValue == 0) {
-                jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).addClass("ok");
-                jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).attr("title", "Finished: " + new Date(processRuns[k].end_time));
-              }
-              else if (processRuns[k].exitValue == -1) {
-                jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).addClass("running");
-                jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).attr("title", "Started: " + new Date(processRuns[k].start_time));
-              }
-              else if (processRuns[k].exitValue == 1 || processRuns[k].exitValue == 255) {
-                jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).addClass("error");
+                jQuery('#' + task.id + "-" + task.pipeline.processes[j].name).addClass("ok");
+                jQuery('#' + task.id + "-" + task.pipeline.processes[j].name).attr("title",
+                    "Finished: " + new Date(processRuns[k].end_time));
+              } else if (processRuns[k].exitValue == -1) {
+                jQuery('#' + task.id + "-" + task.pipeline.processes[j].name).addClass("running");
+                jQuery('#' + task.id + "-" + task.pipeline.processes[j].name).attr("title",
+                    "Started: " + new Date(processRuns[k].start_time));
+              } else if (processRuns[k].exitValue == 1 || processRuns[k].exitValue == 255) {
+                jQuery('#' + task.id + "-" + task.pipeline.processes[j].name).addClass("error");
               }
             }
           }
@@ -78,18 +75,17 @@ Tasks.ui = {
     }
   },
 
-  populatePendingTasks : function() {
+  populatePendingTasks: function() {
     var self = this;
     jQuery('#pendingDiv').prepend('<img id="pendingThrobber" src="/styles/images/ajax-loader.gif"/>');
-    Fluxion.doAjax(
-            'taskControllerHelperService',
-            'populatePendingTasks',
-    {'url':ajaxurl},
-    {'doOnSuccess':self.processPendingTasks}
-    );
+    Fluxion.doAjax('taskControllerHelperService', 'populatePendingTasks', {
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': self.processPendingTasks
+    });
   },
 
-  processPendingTasks : function(json) {
+  processPendingTasks: function(json) {
     jQuery('#pendingThrobber').remove();
     // clear table
     jQuery('#pendingTasks tbody').html("");
@@ -97,27 +93,24 @@ Tasks.ui = {
     if (json.pendingTasks.length > 0) {
       for (var i = 0; i < json.pendingTasks.length; i++) {
         var task = json.pendingTasks[i];
-        var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td>";
-        jQuery('#pendingTasks > tbody:last')
-          .append(jQuery('<tr>')
-            .append(rowtext)
-        );
+        var rowtext = "<td>" + task.id + "</td><td>" + task.name + "</td><td>" + task.pipeline.name + "</td><td>" + task.statusMessage
+            + "</td><td>" + new Date(task.startDate) + "</td>";
+        jQuery('#pendingTasks > tbody:last').append(jQuery('<tr>').append(rowtext));
       }
     }
   },
 
-  populateFailedTasks : function() {
+  populateFailedTasks: function() {
     var self = this;
     jQuery('#failedDiv').prepend('<img id="failedThrobber" src="/styles/images/ajax-loader.gif"/>');
-    Fluxion.doAjax(
-            'taskControllerHelperService',
-            'populateFailedTasks',
-    {'url':ajaxurl},
-    {'doOnSuccess':self.processFailedTasks}
-    );
+    Fluxion.doAjax('taskControllerHelperService', 'populateFailedTasks', {
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': self.processFailedTasks
+    });
   },
 
-  processFailedTasks : function(json) {
+  processFailedTasks: function(json) {
     jQuery('#failedThrobber').remove();
     // clear table
     jQuery('#failedTasks tbody').html("");
@@ -125,27 +118,24 @@ Tasks.ui = {
     if (json.failedTasks.length > 0) {
       for (var i = 0; i < json.failedTasks.length; i++) {
         var task = json.failedTasks[i];
-        var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td>";
-        jQuery('#failedTasks > tbody:last')
-          .append(jQuery('<tr>')
-            .append(rowtext)
-        );
+        var rowtext = "<td>" + task.id + "</td><td>" + task.name + "</td><td>" + task.pipeline.name + "</td><td>" + task.statusMessage
+            + "</td><td>" + new Date(task.startDate) + "</td>";
+        jQuery('#failedTasks > tbody:last').append(jQuery('<tr>').append(rowtext));
       }
     }
   },
 
-  populateCompletedTasks : function() {
+  populateCompletedTasks: function() {
     var self = this;
     jQuery('#completedDiv').prepend('<img id="completedThrobber" src="/styles/images/ajax-loader.gif"/>');
-    Fluxion.doAjax(
-            'taskControllerHelperService',
-            'populateCompletedTasks',
-    {'url':ajaxurl},
-    {'doOnSuccess':self.processCompletedTasks}
-    );
+    Fluxion.doAjax('taskControllerHelperService', 'populateCompletedTasks', {
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': self.processCompletedTasks
+    });
   },
 
-  processCompletedTasks : function(json) {
+  processCompletedTasks: function(json) {
     jQuery('#completedThrobber').remove();
     // clear table
     jQuery('#completedTasks tbody').html("");
@@ -153,36 +143,29 @@ Tasks.ui = {
     if (json.completedTasks.length > 0) {
       for (var i = 0; i < json.completedTasks.length; i++) {
         var task = json.completedTasks[i];
-        var rowtext = "<td>"+task.id+"</td><td>"
-        +task.name+"</td><td>"
-        +task.pipeline.name+"</td><td>"
-        +task.statusMessage+"</td><td>"
-        +new Date(task.startDate)+"</td><td>"
-        +new Date(task.completionDate)+"</td><td>"
-        +task.currentState+"</td>";
-        jQuery('#completedTasks > tbody:last')
-          .append(jQuery('<tr>')
-            .append(rowtext)
-        );
+        var rowtext = "<td>" + task.id + "</td><td>" + task.name + "</td><td>" + task.pipeline.name + "</td><td>" + task.statusMessage
+            + "</td><td>" + new Date(task.startDate) + "</td><td>" + new Date(task.completionDate) + "</td><td>" + task.currentState
+            + "</td>";
+        jQuery('#completedTasks > tbody:last').append(jQuery('<tr>').append(rowtext));
       }
     }
   },
 
-  selectPipeline : function(select, runId) {
+  selectPipeline: function(select, runId) {
     var self = this;
     var s = jQuery(select);
     if (!Utils.validation.isNullCheck(s.val())) {
-      Fluxion.doAjax(
-              'taskControllerHelperService',
-              'getPipeline',
-      {'url':ajaxurl, 'pipeline':s.val(), 'runId':runId},
-      {'doOnSuccess':self.processPipeline}
-      );
+      Fluxion.doAjax('taskControllerHelperService', 'getPipeline', {
+        'url': ajaxurl,
+        'pipeline': s.val(),
+        'runId': runId
+      }, {
+        'doOnSuccess': self.processPipeline
+      });
     }
   },
 
-
-  processPipeline : function(json) {
+  processPipeline: function(json) {
     if (json.pipeline) {
       var pipeline = json.pipeline;
       jQuery('#pipelineDetails').html("");
@@ -208,31 +191,24 @@ Tasks.ui = {
               if (parameter.optional) {
                 jQuery('#' + pipeline.name + '-reqParams > tbody:last').append(
                     jQuery('<tr>').append(
-                        "<td>" + parameter.name + "</td><td><input optional='true' type='checkbox' name='"
-                            + parameter.name + "'/>"));
+                        "<td>" + parameter.name + "</td><td><input optional='true' type='checkbox' name='" + parameter.name + "'/>"));
               } else {
                 jQuery('#' + pipeline.name + '-reqParams > tbody:last').append(
                     jQuery('<tr>').append(
-                        "<td>" + parameter.name + "</td><td><input required='true' type='checkbox' name='"
-                            + parameter.name + "'/>"));
+                        "<td>" + parameter.name + "</td><td><input required='true' type='checkbox' name='" + parameter.name + "'/>"));
               }
             } else {
               if (parameter.optional) {
                 jQuery('#' + pipeline.name + '-reqParams > tbody:last').append(
                     jQuery('<tr>').append(
-                        "<td>" + parameter.name + "</td><td><input optional='true' style='width:98%' type='text' id='"
-                            + parameter.name + "' name='" + parameter.name + "' value='" + parameter.default_text
-                            + "'/>"));
+                        "<td>" + parameter.name + "</td><td><input optional='true' style='width:98%' type='text' id='" + parameter.name
+                            + "' name='" + parameter.name + "' value='" + parameter.default_text + "'/>"));
               } else {
-                jQuery('#' + pipeline.name + '-reqParams > tbody:last')
-                    .append(
-                        jQuery('<tr>')
-                            .append(
-                                "<td>"
-                                    + parameter.name
-                                    + " <span style='color: red'>*</span></td><td><input style='width:98%' required='true' type='text' id='"
-                                    + parameter.name + "' name='" + parameter.name + "' value='"
-                                    + parameter.default_text + "'/>"));
+                jQuery('#' + pipeline.name + '-reqParams > tbody:last').append(
+                    jQuery('<tr>').append(
+                        "<td>" + parameter.name
+                            + " <span style='color: red'>*</span></td><td><input style='width:98%' required='true' type='text' id='"
+                            + parameter.name + "' name='" + parameter.name + "' value='" + parameter.default_text + "'/>"));
               }
             }
           }
@@ -244,11 +220,9 @@ Tasks.ui = {
         for (var k = 0; k < process.parameters.length; k++) {
           if (jQuery('input[name="' + process.parameters[k].name + '"]').length === 0) {
             jQuery('#' + pipeline.name + '-reqParams > tbody:last').append(
-                    "<tr><td>" + process.parameters[k].name + "</td>"
-                        + "<td><input style='width:98%' optional='true' type='text'" 
-                        + "id='"+ process.parameters[k].name + "'" 
-                        + "name='" + process.parameters[k].name + "'" 
-                        + "value='"+ process.parameters[k].default_text + "'/>");
+                "<tr><td>" + process.parameters[k].name + "</td>" + "<td><input style='width:98%' optional='true' type='text'" + "id='"
+                    + process.parameters[k].name + "'" + "name='" + process.parameters[k].name + "'" + "value='"
+                    + process.parameters[k].default_text + "'/>");
           }
         }
       }
@@ -268,7 +242,7 @@ Tasks.ui = {
 };
 
 Tasks.job = {
-  submitAnalysisTask : function() {
+  submitAnalysisTask: function() {
     var self = this;
     var okString = "Please fix the following issues:\n\n";
     var ok = true;
@@ -281,15 +255,13 @@ Tasks.job = {
         if (inp.attr("optional") && !inp.is(":checked")) {
           inp.attr("disabled", "disabled");
         }
-      }
-      else {
+      } else {
         if (inp.attr("required")) {
           if (Utils.validation.isNullCheck(inp.val())) {
             ok = false;
             okString += inp.attr("name") + " is a required parameter\n";
           }
-        }
-        else if (inp.attr("optional")) {
+        } else if (inp.attr("optional")) {
           if (Utils.validation.isNullCheck(inp.val())) {
             inp.attr("disabled", "disabled");
           }
@@ -298,22 +270,21 @@ Tasks.job = {
     });
 
     if (ok) {
-      Fluxion.doAjax(
-              'taskControllerHelperService',
-              'submitJob',
-      {'url':ajaxurl, 'submit':jQuery("#taskForm").serializeArray()},
-      {'doOnSuccess':self.processTaskSubmission,
-       'doOnError':function(json) {
-         jQuery('#pipelineDetails').find('input').each(function(e) {
-           if (jQuery(this).attr("disabled")) {
-             jQuery(this).removeAttr("disabled");
-           }
-         });
-         alert(json.error);
-       }
+      Fluxion.doAjax('taskControllerHelperService', 'submitJob', {
+        'url': ajaxurl,
+        'submit': jQuery("#taskForm").serializeArray()
+      }, {
+        'doOnSuccess': self.processTaskSubmission,
+        'doOnError': function(json) {
+          jQuery('#pipelineDetails').find('input').each(function(e) {
+            if (jQuery(this).attr("disabled")) {
+              jQuery(this).removeAttr("disabled");
+            }
+          });
+          alert(json.error);
+        }
       });
-    }
-    else {
+    } else {
       Utils.ui.reenableButton('submitTaskButton', "Submit Task");
 
       jQuery('#pipelineDetails').find('input').each(function(e) {
@@ -325,15 +296,14 @@ Tasks.job = {
     }
   },
 
-  processTaskSubmission : function(json) {
+  processTaskSubmission: function(json) {
     Utils.ui.reenableButton('submitTaskButton', "Submit Task");
 
     if (json.response) {
-      if (confirm(json.response+". Return to Analysis page?")) {
+      if (confirm(json.response + ". Return to Analysis page?")) {
         Utils.page.pageRedirect('/miso/analysis');
       }
-    }
-    else {
+    } else {
       Utils.page.pageRedirect('/miso/analysis');
     }
   }

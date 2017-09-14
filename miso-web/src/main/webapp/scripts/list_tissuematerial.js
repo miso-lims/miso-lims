@@ -22,41 +22,41 @@
  */
 
 ListTarget.tissuematerial = {
-  name : "Tissue Materials",
-  createUrl : function(config, projectId) {
+  name: "Tissue Materials",
+  createUrl: function(config, projectId) {
     throw "Must be provided statically";
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return config.isAdmin ? HotTarget.tissuematerial.bulkActions : [];
   },
-  createStaticActions : function(config, projectId) {
-    return config.isAdmin ? [ {
-      "name" : "Add",
-      "handler" : function() {
-        
-        Utils.showDialog('Create Tissue Materials', 'Create', [ {
-          property : 'quantity',
-          type : 'int',
-          label : 'Quantity',
-          value : 1
-        } ], function(result) {
+  createStaticActions: function(config, projectId) {
+    return config.isAdmin ? [{
+      "name": "Add",
+      "handler": function() {
+
+        Utils.showDialog('Create Tissue Materials', 'Create', [{
+          property: 'quantity',
+          type: 'int',
+          label: 'Quantity',
+          value: 1
+        }], function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Create Tissue Materials', ["That's a peculiar number of tissuematerials to create."]);
             return;
           }
           window.location = '/miso/tissuematerial/bulk/new?' + jQuery.param({
-            quantity : result.quantity,
+            quantity: result.quantity,
           });
         });
       }
-    } ] : [];
+    }] : [];
   },
-  createColumns : function(config, projectId) {
-    return [ {
-      "sTitle" : "Alias",
-      "mData" : "alias",
-      "include" : true,
-      "iSortPriority" : 0
+  createColumns: function(config, projectId) {
+    return [{
+      "sTitle": "Alias",
+      "mData": "alias",
+      "include": true,
+      "iSortPriority": 0
     }, ];
   }
 };

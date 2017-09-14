@@ -22,19 +22,14 @@
  */
 
 var Dashboard = Dashboard || {
-  showLatestReceivedtSamples: function () {
+  showLatestReceivedtSamples: function() {
     jQuery('#latestSamplesList').html("<img src='/styles/images/ajax-loader.gif'/>");
-    Fluxion.doAjax(
-      'dashboard',
-      'showLatestReceivedSamples',
-      {
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#latestSamplesList').html(json.html);
-        }
+    Fluxion.doAjax('dashboard', 'showLatestReceivedSamples', {
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': function(json) {
+        jQuery('#latestSamplesList').html(json.html);
       }
-    );
+    });
   }
 };

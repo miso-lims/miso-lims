@@ -22,56 +22,49 @@
  */
 
 ListTarget.box = {
-  name : "Boxes",
-  createUrl : function(config, projectId) {
+  name: "Boxes",
+  createUrl: function(config, projectId) {
     return "/miso/rest/box/dt" + (config.boxUse ? "/use/" + config.boxUse : "");
   },
-  createBulkActions : function(config, projectId) {
-    return [ HotUtils.printAction('box'), ];
+  createBulkActions: function(config, projectId) {
+    return [HotUtils.printAction('box'), ];
   },
-  createStaticActions : function(config, projectId) {
-    return [ {
-      "name" : "Add",
-      "handler" : function() {
+  createStaticActions: function(config, projectId) {
+    return [{
+      "name": "Add",
+      "handler": function() {
         window.location = '/miso/box/new';
       }
-    } ];
+    }];
   },
-  createColumns : function(config, projectId) {
-    return [
-        ListUtils.idHyperlinkColumn("Name", "box", "id", Utils.array.getName,
-            1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "box", Utils.array.getId,
-            "alias", 0, true),
-        {
-          "sTitle" : "Location",
-          "mData" : "locationBarcode",
-          "include" : true,
-          "iSortPriority" : 0
-        },
-        {
-          "sTitle" : "Items/Capacity",
-          "mData" : "tubeCount",
-          "include" : true,
-          "iSortPriority" : 0,
-          "bSortable" : false,
-          "mRender" : function(data, type, full) {
+  createColumns: function(config, projectId) {
+    return [ListUtils.idHyperlinkColumn("Name", "box", "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", "box", Utils.array.getId, "alias", 0, true), {
+          "sTitle": "Location",
+          "mData": "locationBarcode",
+          "include": true,
+          "iSortPriority": 0
+        }, {
+          "sTitle": "Items/Capacity",
+          "mData": "tubeCount",
+          "include": true,
+          "iSortPriority": 0,
+          "bSortable": false,
+          "mRender": function(data, type, full) {
             return full.tubeCount + "/" + (full.rows * full.cols);
           }
-        },
-        {
-          "sTitle" : "Size",
-          "mData" : "sizeId",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mRender" : ListUtils.render.textFromId(Constants.boxSizes,
-              'rowsByColumns')
         }, {
-          "sTitle" : "Use",
-          "mData" : "useId",
-          "include" : !config.boxUse,
-          "iSortPriority" : 0,
-          "mRender" : ListUtils.render.textFromId(Constants.boxUses, 'alias')
-        } ];
+          "sTitle": "Size",
+          "mData": "sizeId",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": ListUtils.render.textFromId(Constants.boxSizes, 'rowsByColumns')
+        }, {
+          "sTitle": "Use",
+          "mData": "useId",
+          "include": !config.boxUse,
+          "iSortPriority": 0,
+          "mRender": ListUtils.render.textFromId(Constants.boxUses, 'alias')
+        }];
   }
 };

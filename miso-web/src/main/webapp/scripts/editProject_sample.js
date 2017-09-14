@@ -21,7 +21,6 @@
  * *********************************************************************
  */
 
-
 /**
  * Created by bianx on 24/02/2014.
  */
@@ -29,31 +28,21 @@
 function bulkSampleQcTable(tableName) {
   var sTable = jQuery(tableName);
   if (!sTable.hasClass("display")) {
-    //destroy current table and recreate
+    // destroy current table and recreate
     sTable.dataTable().fnDestroy();
-    //bug fix to reset table width
+    // bug fix to reset table width
     sTable.removeAttr("style");
 
     sTable.addClass("display");
 
-    //remove edit and delete header and column
+    // remove edit and delete header and column
     jQuery(tableName + ' tr:first th:gt(5)').remove();
     jQuery(tableName + ' tr:first th:eq(4)').remove();
 
-    var headers = [
-      'rowsel',
-      'name',
-      'alias',
-      'description',
-      'sampleType',
-      'qcPassed',
-      'qcDate',
-      'qcType',
-      'results'
-    ];
+    var headers = ['rowsel', 'name', 'alias', 'description', 'sampleType', 'qcPassed', 'qcDate', 'qcType', 'results'];
 
-    sTable.find("tr").each(function () {
-      //remove rows where the sample QC has already passed
+    sTable.find("tr").each(function() {
+      // remove rows where the sample QC has already passed
       if (jQuery(this).find("td:eq(5)").html() == "true") {
         jQuery(this).remove();
       } else {
@@ -64,37 +53,50 @@ function bulkSampleQcTable(tableName) {
       }
     });
 
-//headers
-    jQuery(tableName + " tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\""+tableName+"\", this);'></span></th>");
-    jQuery(tableName + ' tr:first th:eq(5)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\""+tableName+"\", this);'></span>");
-    jQuery(tableName + " tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\""+tableName+"\", this);'></span></th>");
-    jQuery(tableName + " tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\""+tableName+"\", this);'></span></th>");
+    // headers
+    jQuery(tableName + " tr:first")
+        .prepend(
+            "<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\""
+                + tableName + "\", this);'></span></th>");
+    jQuery(tableName + ' tr:first th:eq(5)').html(
+        "QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\""
+            + tableName + "\", this);'></span>");
+    jQuery(tableName + " tr:first").append(
+        "<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\""
+            + tableName + "\", this);'></span></th>");
+    jQuery(tableName + " tr:first").append(
+        "<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\""
+            + tableName + "\", this);'></span></th>");
     jQuery(tableName + " tr:first").append("<th>Results</th>");
 
-//columns
+    // columns
     jQuery(tableName + " tr:gt(0)").prepend("<td class='rowSelect'></td>");
     jQuery(tableName + " tr:gt(0)").append("<td class='dateSelect'></td>");
     jQuery(tableName + " tr:gt(0)").append("<td class='typeSelect'></td>");
     jQuery(tableName + " tr:gt(0)").append("<td class='defaultEditable'></td>");
 
     var datatable = sTable.dataTable({
-      "aoColumnDefs": [
-        {
-          "bUseRendered": false,
-          "aTargets": [ 0 ]
-        }
-      ],
-      "aoColumns": [
-        {"bSortable": false},
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        null,
-        {"bSortable": false},
-        {"bSortable": false},
-        {"bSortable": false},
-        {"bSortable": false}
-      ],
+      "aoColumnDefs": [{
+        "bUseRendered": false,
+        "aTargets": [0]
+      }],
+      "aoColumns": [{
+        "bSortable": false
+      }, {
+        "sType": 'natural'
+      }, {
+        "sType": 'natural'
+      }, {
+        "sType": 'natural'
+      }, null, {
+        "bSortable": false
+      }, {
+        "bSortable": false
+      }, {
+        "bSortable": false
+      }, {
+        "bSortable": false
+      }],
       "bPaginate": false,
       "bInfo": false,
       "bJQueryUI": true,
@@ -104,13 +106,13 @@ function bulkSampleQcTable(tableName) {
       "sDom": '<<"toolbar">f>r<t>ip>'
     });
 
-    sTable.find("tr:gt(0)").each(function () {
+    sTable.find("tr:gt(0)").each(function() {
       for (var i = 0; i < this.cells.length; i++) {
         jQuery(this.cells[i]).attr("name", headers[i]);
       }
     });
 
-    jQuery(tableName + ' .rowSelect').click(function () {
+    jQuery(tableName + ' .rowSelect').click(function() {
       if (jQuery(this).parent().hasClass('row_selected')) {
         jQuery(this).parent().removeClass('row_selected');
       } else if (!jQuery(this).parent().hasClass('row_saved')) {
@@ -118,152 +120,140 @@ function bulkSampleQcTable(tableName) {
       }
     });
 
-    jQuery("div.toolbar").html("<input type='button' value='Save QCs' id=\"bulkSampleQcButton\" onclick=\"Project.ui.saveBulkSampleQc('"+tableName+"');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
-    jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+    jQuery("div.toolbar").html(
+        "<input type='button' value='Save QCs' id=\"bulkSampleQcButton\" onclick=\"Project.ui.saveBulkSampleQc('" + tableName
+            + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+    jQuery("div.toolbar").append(
+        "<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").removeClass("toolbar");
 
-    jQuery(tableName + ' .defaultEditable').editable(
-      function (value, settings) {
-        return value;
+    jQuery(tableName + ' .defaultEditable').editable(function(value, settings) {
+      return value;
+    }, {
+      callback: function(sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
       },
-      {
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        },
-        onblur: 'submit',
-        placeholder: '',
-        height: '14px'
-      }
-    );
+      submitdata: function(value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      },
+      onblur: 'submit',
+      placeholder: '',
+      height: '14px'
+    });
 
-    jQuery(".typeSelect").editable(
-      function (value, settings) {
-        return value;
+    jQuery(".typeSelect").editable(function(value, settings) {
+      return value;
+    }, {
+      data: sampleQcTypesString,
+      type: 'select',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      callback: function(sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
       },
-      {
-        data: sampleQcTypesString,
-        type: 'select',
-        onblur: 'submit',
-        placeholder: '',
-        style: 'inherit',
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        }
+      submitdata: function(value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
       }
-    );
+    });
 
-    jQuery(".dateSelect").editable(
-      function (value, settings) {
-        return value;
+    jQuery(".dateSelect").editable(function(value, settings) {
+      return value;
+    }, {
+      type: 'datepicker',
+      width: '100px',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      datepicker: {
+        dateFormat: Utils.ui.goodDateFormat,
+        showButtonPanel: true,
+        maxDate: 0
       },
-      {
-        type: 'datepicker',
-        width: '100px',
-        onblur: 'submit',
-        placeholder: '',
-        style: 'inherit',
-        datepicker: {
-          dateFormat: Utils.ui.goodDateFormat,
-          showButtonPanel: true,
-          maxDate: 0
-        },
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        }
+      callback: function(sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function(value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
       }
-    );
+    });
 
-    jQuery(".passedCheck").editable(
-      function (value, settings) {
-        return value;
+    jQuery(".passedCheck").editable(function(value, settings) {
+      return value;
+    }, {
+      // type : 'checkbox',
+      type: 'qcradio',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      callback: function(sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
       },
-      {
-        //type : 'checkbox',
-        type: 'qcradio',
-        onblur: 'submit',
-        placeholder: '',
-        style: 'inherit',
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        }
+      submitdata: function(value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
       }
-    );
+    });
   }
 }
 
 function generateSampleDeliveryForm(tableName, projectId) {
   var sTable = jQuery(tableName);
   if (!sTable.hasClass("display")) {
-    //destroy current table and recreate
+    // destroy current table and recreate
     sTable.dataTable().fnDestroy();
-    //bug fix to reset table width
+    // bug fix to reset table width
     sTable.removeAttr("style");
     sTable.addClass("display");
 
-    //remove edit header and column
+    // remove edit header and column
     jQuery(tableName + ' tr:first th:gt(4)').remove();
 
-    var headers = [
-      'rowsel',
-      'name',
-      'alias',
-      'description',
-      'sampleType',
-      'qcPassed'
-    ];
+    var headers = ['rowsel', 'name', 'alias', 'description', 'sampleType', 'qcPassed'];
 
-    sTable.find("tr").each(function () {
+    sTable.find("tr").each(function() {
       jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
       jQuery(this).find("td:gt(4)").remove();
     });
 
-    //headers
-    jQuery(tableName + " tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\""+tableName+"\", this);'></span></th>");
+    // headers
+    jQuery(tableName + " tr:first")
+        .prepend(
+            "<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\""
+                + tableName + "\", this);'></span></th>");
     jQuery(tableName + " tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
 
     sTable.dataTable({
-      "aoColumnDefs": [
-        {
-          "bUseRendered": false,
-          "aTargets": [ 0 ]
-        }
-      ],
-      "aoColumns": [
-        {"bSortable": false},
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        null,
-        { "sType": 'natural' }
-      ],
+      "aoColumnDefs": [{
+        "bUseRendered": false,
+        "aTargets": [0]
+      }],
+      "aoColumns": [{
+        "bSortable": false
+      }, {
+        "sType": 'natural'
+      }, {
+        "sType": 'natural'
+      }, {
+        "sType": 'natural'
+      }, null, {
+        "sType": 'natural'
+      }],
       "bPaginate": false,
       "bInfo": false,
       "bJQueryUI": true,
@@ -272,45 +262,50 @@ function generateSampleDeliveryForm(tableName, projectId) {
       "sDom": '<<"toolbar">f>r<t>ip>'
     });
 
-    sTable.find("tr:gt(0)").each(function () {
+    sTable.find("tr:gt(0)").each(function() {
       for (var i = 0; i < this.cells.length; i++) {
         jQuery(this.cells[i]).attr("name", headers[i]);
       }
     });
 
-    jQuery(tableName + ' .rowSelect').click(function () {
+    jQuery(tableName + ' .rowSelect').click(function() {
       if (jQuery(this).parent().hasClass('row_selected')) {
         jQuery(this).parent().removeClass('row_selected');
-      } else if (!jQuery(this).parent().hasClass('row_saved')){
+      } else if (!jQuery(this).parent().hasClass('row_saved')) {
         jQuery(this).parent().addClass('row_selected');
       }
     });
 
-    jQuery("div.toolbar").html("Plate: <input type='radio' name='plateinformationform' value='yes'/>Yes |<input type='radio' name='plateinformationform' value='no' checked='checked'/>No " + "<button type='button' onclick=\"Project.ui.processSampleDeliveryForm('"+tableName+"', " + projectId + ");\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
+    jQuery("div.toolbar")
+        .html(
+            "Plate: <input type='radio' name='plateinformationform' value='yes'/>Yes |<input type='radio' name='plateinformationform' value='no' checked='checked'/>No "
+                + "<button type='button' onclick=\"Project.ui.processSampleDeliveryForm('"
+                + tableName
+                + "', "
+                + projectId
+                + ");\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
   }
 }
 
 function getBulkSampleInputForm(projectId) {
-  jQuery('#getBulkSampleInputFormDialog')
-          .html("<form>" +
-                "<fieldset class='dialog'>" +
-                "<p>Select desired document format</p><br/>" +
-                "<label for='formTypeOds'>OpenOffice (ODS)</label>" +
-                "<input type='radio' name='formType' id='formTypeOds' class='text ui-widget-content ui-corner-all' value='ods'/>" +
-                "<label for='formTypeXlsx'>Excel (XLSX)</label>" +
-                "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
-                "</fieldset></form>");
+  jQuery('#getBulkSampleInputFormDialog').html(
+      "<form>" + "<fieldset class='dialog'>" + "<p>Select desired document format</p><br/>"
+          + "<label for='formTypeOds'>OpenOffice (ODS)</label>"
+          + "<input type='radio' name='formType' id='formTypeOds' class='text ui-widget-content ui-corner-all' value='ods'/>"
+          + "<label for='formTypeXlsx'>Excel (XLSX)</label>"
+          + "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>"
+          + "</fieldset></form>");
 
   jQuery('#getBulkSampleInputFormDialog').dialog({
     width: 400,
     modal: true,
     resizable: false,
     buttons: {
-      "Get Form": function () {
+      "Get Form": function() {
         Project.ui.downloadBulkSampleInputForm(projectId, jQuery('input[name=formType]:checked').val());
         jQuery(this).dialog('close');
       },
-      "Cancel": function () {
+      "Cancel": function() {
         jQuery(this).dialog('close');
       }
     }
