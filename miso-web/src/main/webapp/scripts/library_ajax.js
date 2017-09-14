@@ -44,19 +44,6 @@ window.Parsley.addValidator('libraryAlias', {
 });
 
 var Library = Library || {
-  deleteLibrary: function(libraryId) {
-    if (confirm("Are you sure you really want to delete LIB" + libraryId + "? This operation is permanent!")) {
-      Fluxion.doAjax('libraryControllerHelperService', 'deleteLibrary', {
-        'libraryId': libraryId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': function() {
-          window.location.href = '/miso/libraries';
-        }
-      });
-    }
-  },
-
   validateLibrary: function(skipAliasValidation) {
     Validate.cleanFields('#library-form');
     jQuery('#library-form').parsley().destroy();

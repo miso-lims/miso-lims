@@ -57,11 +57,6 @@ ListTarget.study = {
         "handler": function() {
           window.location = "/miso/study/new/" + projectId;
         }
-      }, {
-        "name": "Create Experiments",
-        "handler": function() {
-          window.location = "/miso/experimentwizard/new/" + projectId;
-        }
       }, ];
     } else {
       return [];

@@ -70,7 +70,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -92,7 +91,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleBuilder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -126,7 +124,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
-import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
@@ -166,8 +163,6 @@ public class EditSampleController {
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
-  private ExperimentService experimentService;
-  @Autowired
   private ChangeLogService changeLogService;
   @Autowired
   private PoolService poolService;
@@ -194,10 +189,6 @@ public class EditSampleController {
 
   public void setSampleValidRelationshipService(SampleValidRelationshipService sampleValidRelationshipService) {
     this.sampleValidRelationshipService = sampleValidRelationshipService;
-  }
-
-  public void setExperimentService(ExperimentService experimentService) {
-    this.experimentService = experimentService;
   }
 
   public void setChangeLogService(ChangeLogService changeLogService) {
@@ -303,7 +294,7 @@ public class EditSampleController {
     return Collections.emptyMap();
   }
 
-  public Collection<Project> populateProjects() throws IOException {
+  private Collection<Project> populateProjects() throws IOException {
     try {
       List<Project> ps = new ArrayList<>(requestManager.listAllProjects());
 
@@ -316,21 +307,6 @@ public class EditSampleController {
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list projects", ex);
-      }
-      throw ex;
-    }
-  }
-
-  public Experiment populateExperiment(@RequestParam(value = "experimentId", required = false) Long experimentId) throws IOException {
-    try {
-      if (experimentId != null) {
-        return experimentService.get(experimentId);
-      } else {
-        return new ExperimentImpl();
-      }
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to get parent experiment", ex);
       }
       throw ex;
     }

@@ -2,9 +2,12 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
@@ -22,11 +25,14 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
-import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -44,13 +50,17 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   @Autowired
   private PlatformService platformService;
   @Autowired
-  private PoolService poolService;
+  private LibraryService libraryService;
   @Autowired
   private SecurityStore securityStore;
   @Autowired
   private SecurityProfileStore securityProfileStore;
   @Autowired
   private StudyService studyService;
+  @Autowired
+  private ContainerService containerService;
+  @Autowired
+  private RunService runService;
 
   @Override
   public void delete(Experiment experiment) throws IOException {
@@ -101,12 +111,22 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
     try {
       authorizationManager.throwIfNotWritable(experiment);
       experiment.setLastModifier(authorizationManager.getCurrentUser());
-      if (experiment.getId() == ExperimentImpl.UNSAVED_ID) {
+      if (experiment.getRunPartitions() == null) {
+        experiment.setRunPartitions(Collections.emptyList());
+      } else {
+        experiment.setRunPartitions(experiment.getRunPartitions().stream().map(WhineyFunction.rethrow(from -> {
+          RunPartition to = new RunPartition();
+          to.setExperiment(experiment);
+          to.setPartition(containerService.getPartition(from.getPartition().getId()));
+          to.setRun(runService.get(from.getRun().getId()));
+          return to;
+        })).collect(
+            Collectors.toList()));
+      }
+      if (experiment.getId() == Experiment.UNSAVED_ID) {
         experiment.setName(DbUtils.generateTemporaryName());
         experiment.setPlatform(platformService.get(experiment.getPlatform().getId()));
-        if (experiment.getPool() != null) {
-          experiment.setPool(poolService.get(experiment.getPool().getId()));
-        }
+        experiment.setLibrary(libraryService.get(experiment.getLibrary().getId()));
         experiment.setStudy(studyService.get(experiment.getStudy().getId()));
         if (experiment.getSecurityProfile().getProfileId() == SecurityProfile.UNSAVED_ID) {
           securityProfileStore.save(experiment.getSecurityProfile());
@@ -135,11 +155,13 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
       original.setAlias(experiment.getAlias());
       original.setDescription(experiment.getDescription());
       original.setName(experiment.getName());
-      original.setPlatform(experiment.getPool() == null ? null : platformService.get(experiment.getPlatform().getId()));
-      original.setPool(poolService.get(experiment.getPool().getId()));
+      original.setPlatform(platformService.get(experiment.getPlatform().getId()));
+      original.setLibrary(libraryService.get(experiment.getLibrary().getId()));
       original.setStudy(studyService.get(experiment.getStudy().getId()));
       original.setSecurityProfile(securityStore.getSecurityProfileById(experiment.getSecurityProfile().getProfileId()));
       original.setTitle(experiment.getTitle());
+      original.setRunPartitions(experiment.getRunPartitions());// These have been already reloaded.
+      original.getRunPartitions().forEach(rp -> rp.setExperiment(original));
       Set<Kit> kits = new HashSet<>();
       for (Kit k : experiment.getKits()) {
         kits.add(kitService.getKitById(k.getId()));
@@ -173,10 +195,6 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
     this.platformService = platformService;
   }
 
-  public void setPoolService(PoolService poolService) {
-    this.poolService = poolService;
-  }
-
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
   }
@@ -187,6 +205,20 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
 
   public void setStudyService(StudyService studyService) {
     this.studyService = studyService;
+  }
+
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  @Override
+  public Collection<Experiment> listAllByLibraryId(long id) throws AuthorizationException, IOException {
+    return authorizationManager.filterUnreadable(experimentStore.listByLibrary(id));
+  }
+
+  @Override
+  public List<Experiment> listAllByRunId(long runId) throws IOException {
+    return authorizationManager.filterUnreadable(experimentStore.listByRun(runId));
   }
 
 }

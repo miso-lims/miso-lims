@@ -81,7 +81,7 @@ public class SubmissionImpl implements Submission {
   @MapKeyClass(LibraryDilution.class)
   private Map<LibraryDilution, Partition> dilutions;
 
-  @ManyToMany(targetEntity = ExperimentImpl.class)
+  @ManyToMany(targetEntity = Experiment.class)
   @JoinTable(name = "Submission_Experiment", joinColumns = {
       @JoinColumn(name = "submission_submissionId") }, inverseJoinColumns = {
           @JoinColumn(name = "experiments_experimentId") })

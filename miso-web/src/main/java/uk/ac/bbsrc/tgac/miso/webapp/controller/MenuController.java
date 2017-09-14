@@ -340,6 +340,7 @@ public class MenuController implements ServletContextAware {
       dto.put("libraryConcentrationUnits", platformType.getLibraryConcentrationUnits());
       dto.put("active", activePlatformTypes.contains(platformType));
       dto.put("partitionName", platformType.getPartitionName());
+      dto.put("pluralPartitionName", platformType.getPluralPartitionName());
     }
     ArrayNode sampleTypes = node.putArray("sampleTypes");
     for (String sampleType : sampleService.listSampleTypes()) {

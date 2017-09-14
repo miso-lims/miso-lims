@@ -84,7 +84,7 @@ ListTarget.container = {
                           platform.partitionSizes.map(function(size) {
 
                             return {
-                              name: size + " " + platformType.partitionName,
+                              name: size + " " + (size == 1 ? platformType.partitionName : platformType.pluralPartitionName),
                               handler: function() {
                                 window.location = "/miso/container/new/" + platform.id + "?count=" + size;
                               }

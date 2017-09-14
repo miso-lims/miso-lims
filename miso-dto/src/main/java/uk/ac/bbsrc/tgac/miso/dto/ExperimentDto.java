@@ -1,6 +1,37 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 public class ExperimentDto {
+  public static class RunPartitionDto {
+    private PartitionDto partition;
+    private RunDto run;
+
+    public RunPartitionDto() {
+    }
+
+    public RunPartitionDto(RunDto run, PartitionDto partition) {
+      this.partition = partition;
+      this.run = run;
+    }
+
+    public PartitionDto getPartition() {
+      return partition;
+    }
+
+    public RunDto getRun() {
+      return run;
+    }
+
+    public void setPartition(PartitionDto partition) {
+      this.partition = partition;
+    }
+
+    public void setRun(RunDto run) {
+      this.run = run;
+    }
+
+  }
   private String accession;
 
   private String alias;
@@ -9,13 +40,13 @@ public class ExperimentDto {
 
   private long id;
 
+  private LibraryDto library;
+
   private String name;
 
+  private List<RunPartitionDto> partitions;
+
   private PlatformDto platform;
-
-  private PoolDto pool;
-
-  private RunDto run;
 
   private StudyDto study;
 
@@ -37,20 +68,20 @@ public class ExperimentDto {
     return id;
   }
 
+  public LibraryDto getLibrary() {
+    return library;
+  }
+
   public String getName() {
     return name;
   }
 
+  public List<RunPartitionDto> getPartitions() {
+    return partitions;
+  }
+
   public PlatformDto getPlatform() {
     return platform;
-  }
-
-  public PoolDto getPool() {
-    return pool;
-  }
-
-  public RunDto getRun() {
-    return run;
   }
 
   public StudyDto getStudy() {
@@ -77,20 +108,20 @@ public class ExperimentDto {
     this.id = id;
   }
 
+  public void setLibrary(LibraryDto library) {
+    this.library = library;
+  }
+
   public void setName(String name) {
     this.name = name;
   }
 
+  public void setPartitions(List<RunPartitionDto> partitions) {
+    this.partitions = partitions;
+  }
+
   public void setPlatform(PlatformDto platform) {
     this.platform = platform;
-  }
-
-  public void setPool(PoolDto pool) {
-    this.pool = pool;
-  }
-
-  public void setRun(RunDto run) {
-    this.run = run;
   }
 
   public void setStudy(StudyDto study) {

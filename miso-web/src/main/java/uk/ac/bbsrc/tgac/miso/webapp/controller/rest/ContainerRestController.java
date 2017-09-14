@@ -24,7 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,12 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -86,70 +82,8 @@ public class ContainerRestController extends RestController {
   };
 
   @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String jsonRest(@PathVariable String containerBarcode) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    Collection<SequencerPartitionContainer> sequencerPartitionContainerCollection = containerService.listByBarcode(containerBarcode);
-    int i = 0;
-    for (SequencerPartitionContainer sequencerPartitionContainer : sequencerPartitionContainerCollection) {
-      i++;
-      sb.append("{");
-      sb.append("\"containerId\":\"" + sequencerPartitionContainer.getId() + "\",");
-      sb.append("\"identificationBarcode\":\"" + sequencerPartitionContainer.getIdentificationBarcode() + "\",");
-      if (sequencerPartitionContainer.getPlatform() != null) {
-        sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
-      }
-      sb.append("\"partitions\":[");
-      int ip = 0;
-      for (Partition partition : sequencerPartitionContainer.getPartitions()) {
-        ip++;
-        sb.append("{");
-        sb.append("\"partition\":\"" + partition.getId() + "\",");
-        sb.append("\"pool\":");
-        if (partition.getPool() != null) {
-          sb.append("{");
-          sb.append("\"poolName\":\"" + partition.getPool().getName() + "\",");
-          sb.append("\"poolDate\":\"" + partition.getPool().getCreationDate() + "\",");
-          // experiments
-          sb.append("\"experiments\":[");
-          int ie = 0;
-          ObjectMapper mapper = new ObjectMapper();
-          for (Experiment experiment : partition.getPool().getExperiments()) {
-            ie++;
-            sb.append(mapper.writeValueAsString(experiment));
-            if (ie < partition.getPool().getExperiments().size()) {
-              sb.append(",");
-            }
-          }
-          sb.append("],");
-
-          // dilutions
-          sb.append("\"poolableElements\":[");
-          int id = 0;
-          for (PoolableElementView poolable : partition.getPool().getPoolableElementViews()) {
-            id++;
-            sb.append(mapper.writeValueAsString(poolable));
-            if (id < partition.getPool().getPoolableElementViews().size()) {
-              sb.append(",");
-            }
-
-          }
-          sb.append("]");
-          sb.append("}");
-        } else {
-          sb.append("\"\"");
-        }
-        sb.append("}");
-        if (ip < sequencerPartitionContainer.getPartitions().size()) {
-          sb.append(",");
-        }
-      }
-      sb.append("]");
-      sb.append("}");
-      if (i < sequencerPartitionContainerCollection.size()) {
-        sb.append(",");
-      }
-    }
-    return "[" + sb.toString() + "]";
+  public @ResponseBody List<ContainerDto> jsonRest(@PathVariable String containerBarcode) throws IOException {
+    return containerService.listByBarcode(containerBarcode).stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
   @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")

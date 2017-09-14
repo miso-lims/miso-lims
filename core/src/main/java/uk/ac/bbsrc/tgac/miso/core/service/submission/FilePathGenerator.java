@@ -24,14 +24,14 @@
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
 import java.io.File;
-import java.util.Set;
+import java.util.stream.Stream;
 
 import net.sourceforge.fluxion.spi.Spi;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 
 /**
  * An interface that defines a TransferMethod object that can submit data files to a service defined by an endpoint
@@ -49,9 +49,7 @@ public interface FilePathGenerator {
    * @return Object response
    * @throws uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException
    */
-  public Set<File> generateFilePath(Partition partition, PoolableElementView dilution) throws SubmissionException;
-
-  public Set<File> generateFilePaths(Partition partition) throws SubmissionException;
+  public Stream<File> generateFilePath(Library library, Partition partition, Stream<Experiment> experiments);
 
   public String getName();
 

@@ -1,3 +1,17 @@
+Notes:
+
+  * This release changes the experiments to be easier and more SRA-compliant.
+	If you have multiplexed pools, migration of experiments may fail. In this
+    case, either remove the affected experiments if they are not part of an SRA
+    submission. If you have no SRA submissions, erase all experiments before migration:
+
+```
+DELETE FROM ExperimentChangeLog;
+DELETE FROM Experiment_Kit;
+DELETE FROM Experiment_Run;
+DELETE FROM Experiment;
+```
+
 # 0.2.90
 
 Changes:

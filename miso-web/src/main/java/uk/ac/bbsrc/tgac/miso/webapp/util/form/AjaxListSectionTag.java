@@ -18,19 +18,23 @@ package uk.ac.bbsrc.tgac.miso.webapp.util.form;
 
 import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+
 @SuppressWarnings("serial")
 public class AjaxListSectionTag extends RequestContextAwareTag {
   private String config;
 
   private String name;
 
+  private Long projectId;
+
   private String target;
 
   @Override
   protected int doStartTagInternal() throws Exception {
     pageContext.getOut().append(String.format(
-        "<br/><h1>%2$s</h1><table id='%1$s' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createTable('%1$s', ListTarget.%3$s, null, %4$s);});</script>",
-        getId(), name, target, config));
+        "<br/><h1>%2$s</h1><table id='%1$s' class='display no-border ui-widget-content'></table><script type='text/javascript'>jQuery(document).ready(function () { ListUtils.createTable('%1$s', ListTarget.%3$s, %4$s, %5$s);});</script>",
+        getId(), name, target, projectId == null ? "null" : projectId.toString(), config));
     return SKIP_BODY;
   }
 
@@ -52,6 +56,10 @@ public class AjaxListSectionTag extends RequestContextAwareTag {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public void setProject(Project project) {
+    projectId = project.getId();
   }
 
   public void setTarget(String target) {

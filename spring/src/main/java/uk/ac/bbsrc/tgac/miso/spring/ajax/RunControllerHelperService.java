@@ -61,16 +61,13 @@ public class RunControllerHelperService {
 
   public JSONObject addRunNote(HttpSession session, JSONObject json) {
     Long runId = json.getLong("runId");
-    String internalOnly = json.getString("internalOnly");
     String text = json.getString("text");
 
     try {
       Run run = runService.get(runId);
       Note note = new Note();
 
-      internalOnly = internalOnly.equals("on") ? "true" : "false";
-
-      note.setInternalOnly(Boolean.parseBoolean(internalOnly));
+      note.setInternalOnly(json.getString("internalOnly").equals("on"));
       note.setText(text);
       runService.addNote(run, note);
     } catch (IOException e) {

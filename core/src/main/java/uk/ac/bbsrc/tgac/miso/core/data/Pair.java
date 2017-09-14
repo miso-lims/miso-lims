@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.runscanner;
+package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Map.Entry;
 import java.util.function.Function;
