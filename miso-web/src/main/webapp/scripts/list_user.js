@@ -22,18 +22,18 @@
  */
 
 ListTarget.user = {
-  name : "Users",
-  createUrl : function(config, projectId) {
+  name: "Users",
+  createUrl: function(config, projectId) {
     throw "Static data only";
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return [];
   },
-  createStaticActions : function(config, projectId) {
+  createStaticActions: function(config, projectId) {
     if (config.isAdmin) {
-      return [ {
-        "name" : "Add",
-        "handler" : function() {
+      return [{
+        "name": "Add",
+        "handler": function() {
           window.location = "/miso/admin/user/new";
         }
       }
@@ -43,44 +43,39 @@ ListTarget.user = {
       return [];
     }
   },
-  createColumns : function(config, projectId) {
+  createColumns: function(config, projectId) {
     var permissionColumn = function(headerName, property, sortPriority) {
       return {
-        "sTitle" : headerName,
-        "mData" : property,
-        "include" : true,
-        "iSortPriority" : sortPriority,
-        "mRender" : function(data, type, full) {
+        "sTitle": headerName,
+        "mData": property,
+        "include": true,
+        "iSortPriority": sortPriority,
+        "mRender": function(data, type, full) {
           return data ? "✔" : "";
         }
       };
     }
 
-    return [
-        {
-          "sTitle" : "Login",
-          "mData" : "loginName",
-          "include" : true,
-          "iSortPriority" : 1,
-          "mRender" : function(data, type, full) {
-            if (config.isAdmin) {
-              return "<a href=\"/miso/admin/user/" + full.id + "\">" + data + "</a>";
-            } else if (config.isTech) {
-              return "<a href=\"/miso/tech/user/" + full.id + "\">" + data + "</a>";
-            } else {
-              return data;
-            }
-          }
-        }, {
-          "sTitle" : "Name",
-          "mData" : "fullName",
-          "include" : true,
-          "iSortPriority" : 0
-        }, permissionColumn("Active", "active", 0),
-        permissionColumn("Admin", "admin", 0),
-        permissionColumn("Internal", "internal", 0),
-        permissionColumn("External", "external", 0),
-        permissionColumn("Logged In", "loggedIn", 2)
-    ];
+    return [{
+      "sTitle": "Login",
+      "mData": "loginName",
+      "include": true,
+      "iSortPriority": 1,
+      "mRender": function(data, type, full) {
+        if (config.isAdmin) {
+          return "<a href=\"/miso/admin/user/" + full.id + "\">" + data + "</a>";
+        } else if (config.isTech) {
+          return "<a href=\"/miso/tech/user/" + full.id + "\">" + data + "</a>";
+        } else {
+          return data;
+        }
+      }
+    }, {
+      "sTitle": "Name",
+      "mData": "fullName",
+      "include": true,
+      "iSortPriority": 0
+    }, permissionColumn("Active", "active", 0), permissionColumn("Admin", "admin", 0), permissionColumn("Internal", "internal", 0),
+        permissionColumn("External", "external", 0), permissionColumn("Logged In", "loggedIn", 2)];
   }
 };

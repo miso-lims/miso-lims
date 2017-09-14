@@ -25,22 +25,17 @@
 window.Parsley.addValidator('libraryAlias', {
   validateString: function(value) {
     var deferred = new jQuery.Deferred();
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'validateLibraryAlias',
-      {
-        'alias': value,
-        'url': ajaxurl
+    Fluxion.doAjax('libraryControllerHelperService', 'validateLibraryAlias', {
+      'alias': value,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': function(json) {
+        deferred.resolve();
       },
-      {
-        'doOnSuccess': function(json) {
-          deferred.resolve();
-        },
-        'doOnError': function(json) {
-          deferred.reject(json.error);
-        }
+      'doOnError': function(json) {
+        deferred.reject(json.error);
       }
-    );
+    });
     return deferred.promise();
   },
   messages: {
@@ -49,25 +44,20 @@ window.Parsley.addValidator('libraryAlias', {
 });
 
 var Library = Library || {
-  deleteLibrary: function (libraryId) {
+  deleteLibrary: function(libraryId) {
     if (confirm("Are you sure you really want to delete LIB" + libraryId + "? This operation is permanent!")) {
-      Fluxion.doAjax(
-        'libraryControllerHelperService',
-        'deleteLibrary',
-        {
-          'libraryId': libraryId,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': function () {
-            window.location.href = '/miso/libraries';
-          }
+      Fluxion.doAjax('libraryControllerHelperService', 'deleteLibrary', {
+        'libraryId': libraryId,
+        'url': ajaxurl
+      }, {
+        'doOnSuccess': function() {
+          window.location.href = '/miso/libraries';
         }
-      );
+      });
     }
   },
-  
-  validateLibrary: function (skipAliasValidation) {
+
+  validateLibrary: function(skipAliasValidation) {
     Validate.cleanFields('#library-form');
     jQuery('#library-form').parsley().destroy();
 
@@ -86,7 +76,7 @@ var Library = Library || {
     jQuery('#description').attr('class', 'form-control');
     jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    
+
     // Library size validation
     jQuery('#dnaSize').attr('class', 'form-control');
     jQuery('#dnaSize').attr('data-parsley-maxlength', '10');
@@ -100,17 +90,17 @@ var Library = Library || {
     if (Constants.isDetailedSample) {
       var generatingAlias = Constants.automaticLibraryAlias == true && jQuery('#alias').val().length === 0;
       var selectedPlatform = jQuery('#platformTypes option:selected').text();
-      
+
       jQuery('#dnaSize').attr('data-parsley-required', generatingAlias && selectedPlatform === 'Illumina');
-      
+
       // Prep Kit validation
       jQuery('#libraryKit').attr('class', 'form-control');
       jQuery('#libraryKit').attr('data-parsley-required', 'true');
-      
+
       jQuery('#libraryDesignCodes').attr('class', 'form-control');
       jQuery('#libraryDesignCodes').attr('data-parsley-required', 'true');
       jQuery('#libraryDesignCodes').attr('data-parsley-min', 1);
-      
+
       // Concentration validation
       jQuery('#initialConcentration').attr('class', 'form-control');
       jQuery('#initialConcentration').attr('data-parsley-maxlength', '10');
@@ -120,12 +110,11 @@ var Library = Library || {
 
     jQuery('#library-form').parsley();
     jQuery('#library-form').parsley().validate();
-    
+
     Validate.updateWarningOrSubmit('#library-form');
   },
 
 };
-
 
 Library.ui = {
   updateConcentrationUnits: function() {
@@ -134,53 +123,69 @@ Library.ui = {
     var units = platformType == null ? 'nM' : platformType.libraryConcentrationUnits;
     jQuery('#concentrationUnits').text(units);
   },
-    
-  changePlatformType: function (originalLibraryTypeId, callback) {
+
+  changePlatformType: function(originalLibraryTypeId, callback) {
     var platformType = Library.ui.getSelectedPlatformType();
 
     var indexFamilySelect = jQuery('#indexFamily').empty()[0];
-    Constants.indexFamilies.filter(function(family) { return !family.platformType || family.platformType == platformType.name; }).sort(function(a, b) {
-      if (a.id == b.id) return 0;
-      if (a.id == 0) return -1;
-      if (b.id == 0) return 1;
+    Constants.indexFamilies.filter(function(family) {
+      return !family.platformType || family.platformType == platformType.name;
+    }).sort(function(a, b) {
+      if (a.id == b.id)
+        return 0;
+      if (a.id == 0)
+        return -1;
+      if (b.id == 0)
+        return 1;
       return a.name.localeCompare(b.name);
     }).map(function(family) {
       var option = document.createElement("option");
       option.value = family.id;
       option.text = family.name;
       return option;
-    }).forEach(function(o) { indexFamilySelect.appendChild(o); });
+    }).forEach(function(o) {
+      indexFamilySelect.appendChild(o);
+    });
 
     var libraryTypesSelect = jQuery('#libraryTypes').empty()[0];
-    Constants.libraryTypes.filter(function(type) { return type.platform == platformType.name && (!type.archived || type.id == originalLibraryTypeId); }).sort(function(a, b) {
+    Constants.libraryTypes.filter(function(type) {
+      return type.platform == platformType.name && (!type.archived || type.id == originalLibraryTypeId);
+    }).sort(function(a, b) {
       return a.alias.localeCompare(b.alias);
     }).map(function(type) {
       var option = document.createElement("option");
       option.value = type.id;
       option.text = type.alias;
       return option;
-    }).forEach(function(o) { libraryTypesSelect.appendChild(o); });
+    }).forEach(function(o) {
+      libraryTypesSelect.appendChild(o);
+    });
     Library.ui.updateIndices();
     Library.ui.updateConcentrationUnits();
     if (callback) {
       callback();
     }
   },
-  
+
   getSelectedPlatformType: function() {
     var platformTypeKey = jQuery('#platformTypes').val();
-    return Constants.platformTypes.filter(function(pt) { return pt.key == platformTypeKey; })[0];
+    return Constants.platformTypes.filter(function(pt) {
+      return pt.key == platformTypeKey;
+    })[0];
   },
 
-  updateIndices: function () {
+  updateIndices: function() {
     jQuery('#indicesDiv').empty();
     Library.lastIndexPosition = 0;
     Library.ui.createIndexNextBox();
   },
 
   createIndexBox: function(id) {
-    if (typeof id == 'undefined') return;
-    var selectedIndex = Library.ui.getCurrentIndexFamily().indices.filter(function(index) { return index.id == id; })[0];
+    if (typeof id == 'undefined')
+      return;
+    var selectedIndex = Library.ui.getCurrentIndexFamily().indices.filter(function(index) {
+      return index.id == id;
+    })[0];
     Library.ui.createIndexSelect(selectedIndex.position, id);
   },
 
@@ -189,7 +194,9 @@ Library.ui = {
   },
 
   maxIndexPositionInFamily: function(family) {
-    return Library.ui.maxOfArray(family.indices.map(function(index) { return index.position; }));
+    return Library.ui.maxOfArray(family.indices.map(function(index) {
+      return index.position;
+    }));
   },
 
   createIndexNextBox: function() {
@@ -204,22 +211,28 @@ Library.ui = {
       }
     }
     var container = document.getElementById('indicesDiv');
-    // If this index family requires fewer indices than previously selected, we need to null them out in the form input or Spring will create an array with a mix of new and old indices.
+    // If this index family requires fewer indices than previously selected, we need to null them out in the form input or Spring will
+    // create an array with a mix of new and old indices.
     var biggestMax = Library.ui.maxOfArray(Constants.indexFamilies.map(Library.ui.maxIndexPositionInFamily));
     for (var j = Library.lastIndexPosition; j < biggestMax; j++) {
-       var nullInput = document.createElement("input");
-       nullInput.type = "hidden";
-       nullInput.value = "";
-       nullInput.name = "indices[" + j + "]";
-       container.appendChild(nullInput);
+      var nullInput = document.createElement("input");
+      nullInput.type = "hidden";
+      nullInput.value = "";
+      nullInput.name = "indices[" + j + "]";
+      container.appendChild(nullInput);
     }
   },
 
   getCurrentIndexFamily: function() {
     var familyId = jQuery('#indexFamily').val();
-    var families = Constants.indexFamilies.filter(function(family) { return family.id == familyId; });
+    var families = Constants.indexFamilies.filter(function(family) {
+      return family.id == familyId;
+    });
     if (families.length == 0) {
-      return { id : 0, indices :  [] };
+      return {
+        id: 0,
+        indices: []
+      };
     } else {
       return families[0];
     }
@@ -237,7 +250,9 @@ Library.ui = {
         nullOption.text = "(None)";
         widget.appendChild(nullOption);
       }
-      var indices = Library.ui.getCurrentIndexFamily().indices.filter(function(index) { return index.position == position; });
+      var indices = Library.ui.getCurrentIndexFamily().indices.filter(function(index) {
+        return index.position == position;
+      });
       for (var i = 0; i < indices.length; i++) {
         var option = document.createElement("option");
         option.value = indices[i].id;
@@ -252,7 +267,7 @@ Library.ui = {
     Library.lastIndexPosition = newPosition;
   },
 
-  fillDownIndexFamilySelects: function (tableselector, th) {
+  fillDownIndexFamilySelects: function(tableselector, th) {
     DatatableUtils.collapseInputs(tableselector);
     var tableObj = jQuery(tableselector);
     var table = tableObj.dataTable();
@@ -274,59 +289,61 @@ Library.ui = {
         }
       }
 
-      tableObj.find("tr:gt(" + frId + ")").each(function () {
+      tableObj.find("tr:gt(" + frId + ")").each(function() {
         table.fnUpdate(tdtext, table.fnGetPosition(this), col);
       });
 
-      jQuery.get('../../library/indexPositionsJson', {indexFamily: tdtext}, {
-        success: function (json) {
-          tableObj.find("tr:gt(" + frId + ")").each(function () {
-            var c = this.cells[col + 1];
-            jQuery(c).html("");
-            for (var i = 0; i < json.numApplicableIndices; i++) {
-              jQuery(c).append("<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1) + "'>- <i>Select...</i></span>");
-              if (json.numApplicableIndices > 1 && i === 0) {
-                jQuery(c).append("|");
-              }
-            }
-
-            //bind editable to selects
-            jQuery("#cinput .indexSelectDiv").editable(function (value, settings) {
-              return value;
-            },
-            {
-              loadurl: '../../library/indicesForPosition',
-              loaddata: function (value, settings) {
-                var ret = {};
-                ret["position"] = jQuery(this).attr("position");
-                if (!Utils.validation.isNullCheck(tdtext)) {
-                  ret['indexFamily'] = tdtext;
-                } else {
-                  ret['indexFamily'] = '';
+      jQuery.get('../../library/indexPositionsJson', {
+        indexFamily: tdtext
+      }, {
+        success: function(json) {
+          tableObj.find("tr:gt(" + frId + ")").each(
+              function() {
+                var c = this.cells[col + 1];
+                jQuery(c).html("");
+                for (var i = 0; i < json.numApplicableIndices; i++) {
+                  jQuery(c).append(
+                      "<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1) + "'>- <i>Select...</i></span>");
+                  if (json.numApplicableIndices > 1 && i === 0) {
+                    jQuery(c).append("|");
+                  }
                 }
-                return ret;
-              },
-              type: 'select',
-              onblur: 'submit',
-              placeholder: '',
-              style: 'inherit',
-              submitdata: function (tvalue, tsettings) {
-                return {
-                  "row_id": this.parentNode.getAttribute('id'),
-                  "column": table.fnGetPosition(this)[2]
-                };
-              }
-            });
-          });
+
+                // bind editable to selects
+                jQuery("#cinput .indexSelectDiv").editable(function(value, settings) {
+                  return value;
+                }, {
+                  loadurl: '../../library/indicesForPosition',
+                  loaddata: function(value, settings) {
+                    var ret = {};
+                    ret["position"] = jQuery(this).attr("position");
+                    if (!Utils.validation.isNullCheck(tdtext)) {
+                      ret['indexFamily'] = tdtext;
+                    } else {
+                      ret['indexFamily'] = '';
+                    }
+                    return ret;
+                  },
+                  type: 'select',
+                  onblur: 'submit',
+                  placeholder: '',
+                  style: 'inherit',
+                  submitdata: function(tvalue, tsettings) {
+                    return {
+                      "row_id": this.parentNode.getAttribute('id'),
+                      "column": table.fnGetPosition(this)[2]
+                    };
+                  }
+                });
+              });
         }
       });
-    }
-    else {
+    } else {
       alert("Please select a row to use as the Fill Down template by clicking in the Select column for that row.");
     }
   },
 
-  fillDownIndexSelects: function (tableselector, th) {
+  fillDownIndexSelects: function(tableselector, th) {
     DatatableUtils.collapseInputs(tableselector);
     var tableObj = jQuery(tableselector);
     var table = tableObj.dataTable();
@@ -350,90 +367,91 @@ Library.ui = {
 
       var firstSelText = jQuery(aTrs[frId].cells[col - 1]).text();
 
-      tableObj.find("tr:gt(" + frId + ")").each(function () {
-        var ifam = this.cells[col - 1];
-        var ifamText = jQuery(ifam).text();
-        var cell = jQuery(this.cells[col]);
+      tableObj.find("tr:gt(" + frId + ")").each(
+          function() {
+            var ifam = this.cells[col - 1];
+            var ifamText = jQuery(ifam).text();
+            var cell = jQuery(this.cells[col]);
 
-        if (ifamText.trim()) {
-          //no select means empty or already filled
-          if (firstSelText.indexOf("Select") === 0) {
-            //same family, just copy the cell
-            if (firstSelText === ifamText) {
-              cell.html(tdtext);
-            } else {
-              jQuery.get('../../library/indexPositionsJson', {indexFamily: ifamText}, {
-                success: function (json) {
-                  cell.html("");
-                  for (var i = 0; i < json.numApplicableIndices; i++) {
-                    cell.append("<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1) + "'>- <i>Select...</i></span>");
-                    if (json.numApplicableIndices > 1 && i === 0) {
-                      cell.append("|");
+            if (ifamText.trim()) {
+              // no select means empty or already filled
+              if (firstSelText.indexOf("Select") === 0) {
+                // same family, just copy the cell
+                if (firstSelText === ifamText) {
+                  cell.html(tdtext);
+                } else {
+                  jQuery.get('../../library/indexPositionsJson', {
+                    indexFamily: ifamText
+                  }, {
+                    success: function(json) {
+                      cell.html("");
+                      for (var i = 0; i < json.numApplicableIndices; i++) {
+                        cell.append("<span class='indexSelectDiv' position='" + (i + 1) + "' id='indices" + (i + 1)
+                            + "'>- <i>Select...</i></span>");
+                        if (json.numApplicableIndices > 1 && i === 0) {
+                          cell.append("|");
+                        }
+                      }
                     }
-                  }
+                  });
                 }
-              });
-            }
-          }
-          else {
-            //just copy select
-            if (firstSelText === ifamText) {
-              cell.html(tdtext);
-            }
-          }
-        }
-
-        //bind editable to selects
-        jQuery("#cinput .indexSelectDiv").editable(function (value, settings) {
-          return value;
-        },
-        {
-          loadurl: '../../library/indicesForPosition',
-          loaddata: function (value, settings) {
-            var ret = {};
-            ret["position"] = jQuery(this).attr("position");
-            if (!Utils.validation.isNullCheck(ifamText)) {
-              ret['indexFamily'] = ifamText;
-            }
-            else {
-              ret['indexFamily'] = '';
+              } else {
+                // just copy select
+                if (firstSelText === ifamText) {
+                  cell.html(tdtext);
+                }
+              }
             }
 
-            return ret;
-          },
-          type: 'select',
-          onblur: 'submit',
-          placeholder: '',
-          style: 'inherit',
-          submitdata: function (tvalue, tsettings) {
-            return {
-              "row_id": this.parentNode.getAttribute('id'),
-              "column": table.fnGetPosition(this)[2]
-            };
-          }
-        });
-      });
+            // bind editable to selects
+            jQuery("#cinput .indexSelectDiv").editable(function(value, settings) {
+              return value;
+            }, {
+              loadurl: '../../library/indicesForPosition',
+              loaddata: function(value, settings) {
+                var ret = {};
+                ret["position"] = jQuery(this).attr("position");
+                if (!Utils.validation.isNullCheck(ifamText)) {
+                  ret['indexFamily'] = ifamText;
+                } else {
+                  ret['indexFamily'] = '';
+                }
+
+                return ret;
+              },
+              type: 'select',
+              onblur: 'submit',
+              placeholder: '',
+              style: 'inherit',
+              submitdata: function(tvalue, tsettings) {
+                return {
+                  "row_id": this.parentNode.getAttribute('id'),
+                  "column": table.fnGetPosition(this)[2]
+                };
+              }
+            });
+          });
     }
   },
 
-  showLibraryNoteDialog: function (libraryId) {
+  showLibraryNoteDialog: function(libraryId) {
     var self = this;
     jQuery('#addNoteDialog')
-      .html("<form>" +
-            "<fieldset class='dialog'>" +
-            "<label for='internalOnly'>Internal Only?</label>" +
-            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
-            "<br/>" +
-            "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />" +
-            "</fieldset></form>");
+        .html(
+            "<form>"
+                + "<fieldset class='dialog'>"
+                + "<label for='internalOnly'>Internal Only?</label>"
+                + "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />"
+                + "<br/>" + "<label for='notetext'>Text</label>"
+                + "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />"
+                + "</fieldset></form>");
 
     jQuery('#addNoteDialog').dialog({
       width: 400,
       modal: true,
       resizable: false,
       buttons: {
-        "Add Note": function () {
+        "Add Note": function() {
           if (jQuery('#notetext').val().length > 0) {
             self.addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
@@ -441,48 +459,35 @@ Library.ui = {
             jQuery('#notetext').focus();
           }
         },
-        "Cancel": function () {
+        "Cancel": function() {
           jQuery(this).dialog('close');
         }
       }
     });
   },
 
-  addLibraryNote: function (libraryId, internalOnly, text) {
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'addLibraryNote',
-      {
-        'libraryId': libraryId,
-        'internalOnly': internalOnly,
-        'text': text,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': Utils.page.pageReload
-      }
-    );
+  addLibraryNote: function(libraryId, internalOnly, text) {
+    Fluxion.doAjax('libraryControllerHelperService', 'addLibraryNote', {
+      'libraryId': libraryId,
+      'internalOnly': internalOnly,
+      'text': text,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': Utils.page.pageReload
+    });
   },
 
-  deleteLibraryNote: function (libraryId, noteId) {
+  deleteLibraryNote: function(libraryId, noteId) {
     var deleteIt = function() {
-      Fluxion.doAjax(
-        'libraryControllerHelperService',
-        'deleteLibraryNote',
-        {
-          'libraryId': libraryId,
-          'noteId': noteId,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': Utils.page.pageReload
-        }
-      );
+      Fluxion.doAjax('libraryControllerHelperService', 'deleteLibraryNote', {
+        'libraryId': libraryId,
+        'noteId': noteId,
+        'url': ajaxurl
+      }, {
+        'doOnSuccess': Utils.page.pageReload
+      });
     }
-    Utils.showConfirmDialog('Delete Note', 'Delete',
-      ["Are you sure you want to delete this note?"],
-      deleteIt
-    );
+    Utils.showConfirmDialog('Delete Note', 'Delete', ["Are you sure you want to delete this note?"], deleteIt);
   },
 
   changeDesign: function(callback) {
@@ -493,10 +498,15 @@ Library.ui = {
     if (designSelect == null || designSelect.value == -1) {
       selection.disabled = false;
       strategy.disabled = false;
-      if (code) { code.disabled = false; }
-      if (typeof callback == 'function') callback();
+      if (code) {
+        code.disabled = false;
+      }
+      if (typeof callback == 'function')
+        callback();
     } else {
-      var matchedDesigns = Constants.libraryDesigns.filter(function (rule) { return rule.id == designSelect.value; });
+      var matchedDesigns = Constants.libraryDesigns.filter(function(rule) {
+        return rule.id == designSelect.value;
+      });
       if (matchedDesigns.length == 1) {
         selection.value = matchedDesigns[0].selectionId;
         selection.disabled = true;

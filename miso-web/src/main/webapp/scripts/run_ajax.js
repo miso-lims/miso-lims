@@ -22,27 +22,22 @@
  */
 
 var Run = Run || {
-  deleteRun: function (runId, successfunc) {
+  deleteRun: function(runId, successfunc) {
     if (confirm("Are you sure you really want to delete RUN" + runId + "? This operation is permanent!")) {
-      Fluxion.doAjax(
-        'runControllerHelperService',
-        'deleteRun',
-        {
-          'runId': runId,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': function (json) {
-            successfunc();
-          }
+      Fluxion.doAjax('runControllerHelperService', 'deleteRun', {
+        'runId': runId,
+        'url': ajaxurl
+      }, {
+        'doOnSuccess': function(json) {
+          successfunc();
         }
-      );
+      });
     }
   },
-  
+
   // Validate methods can be found in parsley_form_validations.js
-  validateRun: function () {
-    Validate.cleanFields('#run-form');  
+  validateRun: function() {
+    Validate.cleanFields('#run-form');
     jQuery('#run-form').parsley().destroy();
 
     // Alias input field validation
@@ -55,7 +50,7 @@ var Run = Run || {
     jQuery('#description').attr('class', 'form-control');
     jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-    
+
     jQuery('#wellName').attr('class', 'form-control');
     jQuery('#wellName').attr('data-parsley-maxlength', '255');
     jQuery('#wellName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
@@ -85,23 +80,23 @@ var Run = Run || {
     jQuery('#cycles').attr('data-parsley-type', 'number');
 
     if (!document.getElementById('startDate').disabled) {
-       jQuery('#startDate').attr('class', 'form-control');
-       jQuery('#startDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-       jQuery('#startDate').attr('data-date-format', 'YYYY-MM-DD');
-       jQuery('#startDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
-       jQuery('#startDate').attr('required', 'true');
+      jQuery('#startDate').attr('class', 'form-control');
+      jQuery('#startDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+      jQuery('#startDate').attr('data-date-format', 'YYYY-MM-DD');
+      jQuery('#startDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+      jQuery('#startDate').attr('required', 'true');
     } else {
-       jQuery('#startDate').removeAttr('required');
+      jQuery('#startDate').removeAttr('required');
     }
 
     if (!document.getElementById('completionDate').disabled) {
-        jQuery('#completionDate').attr('class', 'form-control');
-        jQuery('#completionDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-        jQuery('#completionDate').attr('data-date-format', 'YYYY-MM-DD');
-        jQuery('#completionDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
-        jQuery('#completionDate').attr('required',  'true');
+      jQuery('#completionDate').attr('class', 'form-control');
+      jQuery('#completionDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+      jQuery('#completionDate').attr('data-date-format', 'YYYY-MM-DD');
+      jQuery('#completionDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+      jQuery('#completionDate').attr('required', 'true');
     } else {
-        jQuery('#completionDate').removeAttr('required');
+      jQuery('#completionDate').removeAttr('required');
     }
 
     // Radio button validation: ensure a platform is selected
@@ -110,7 +105,7 @@ var Run = Run || {
     jQuery('#platformType').attr('data-parsley-error-message', 'You must select a Platform.');
     jQuery('#platformTypes1').attr('data-parsley-errors-container', '#platformError');
     jQuery('#platformType').attr('data-parsley-class-handler', '#platformButtons');
-    
+
     // Sequencer select field validation
     jQuery('#sequencerReference').attr('class', 'form-control');
     jQuery('#sequencerReference').attr('required', 'true');
@@ -133,43 +128,43 @@ var Run = Run || {
     jQuery('#run-form').parsley().validate();
     jQuery('#run-form').submit();
   },
-  
-  checkForCompletionDate: function (showDialog) {
+
+  checkForCompletionDate: function(showDialog) {
     var statusVal = jQuery('input[name=health]:checked').val();
     if (Utils.validation.isNullCheck(statusVal)) {
-        return;
+      return;
     }
     var completionDate = document.getElementById("completionDate");
     if (!completionDate) {
-        return;
+      return;
     }
     var allowModification = (statusVal === "Failed" || statusVal === "Completed");
     if (allowModification && showDialog) {
-        alert("Please remember to enter a Completion Date!");
+      alert("Please remember to enter a Completion Date!");
     }
     completionDate.disabled = !allowModification;
   },
 };
 
 Run.ui = {
-  showRunNoteDialog: function (runId) {
+  showRunNoteDialog: function(runId) {
     var self = this;
     jQuery('#addRunNoteDialog')
-      .html("<form>" +
-            "<fieldset class='dialog'>" +
-            "<label for='internalOnly'>Internal Only?</label>" +
-            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
-            "<br/>" +
-            "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />" +
-            "</fieldset></form>");
+        .html(
+            "<form>"
+                + "<fieldset class='dialog'>"
+                + "<label for='internalOnly'>Internal Only?</label>"
+                + "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />"
+                + "<br/>" + "<label for='notetext'>Text</label>"
+                + "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />"
+                + "</fieldset></form>");
 
     jQuery('#addRunNoteDialog').dialog({
       width: 400,
       modal: true,
       resizable: false,
       buttons: {
-        "Add Note": function () {
+        "Add Note": function() {
           if (jQuery('#notetext').val().length > 0) {
             self.addRunNote(runId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
@@ -177,78 +172,57 @@ Run.ui = {
             jQuery('#notetext').focus();
           }
         },
-        "Cancel": function () {
+        "Cancel": function() {
           jQuery(this).dialog('close');
         }
       }
     });
   },
 
-  addRunNote: function (runId, internalOnly, text) {
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'addRunNote',
-      {
-        'runId': runId,
-        'internalOnly': internalOnly,
-        'text': text,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': Utils.page.pageReload
-      }
-    );
+  addRunNote: function(runId, internalOnly, text) {
+    Fluxion.doAjax('runControllerHelperService', 'addRunNote', {
+      'runId': runId,
+      'internalOnly': internalOnly,
+      'text': text,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': Utils.page.pageReload
+    });
   },
 
-  deleteRunNote: function (runId, noteId) {
+  deleteRunNote: function(runId, noteId) {
     if (confirm("Are you sure you want to delete this note?")) {
-      Fluxion.doAjax(
-        'runControllerHelperService',
-        'deleteRunNote',
-        {
-          'runId': runId,
-          'noteId': noteId,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': Utils.page.pageReload
-        }
-      );
+      Fluxion.doAjax('runControllerHelperService', 'deleteRunNote', {
+        'runId': runId,
+        'noteId': noteId,
+        'url': ajaxurl
+      }, {
+        'doOnSuccess': Utils.page.pageReload
+      });
     }
   },
 };
 
 Run.alert = {
-  watchRun: function (runId) {
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'watchRun',
-      {
-        'runId': runId,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function () {
-          Utils.page.pageReload();
-        }
+  watchRun: function(runId) {
+    Fluxion.doAjax('runControllerHelperService', 'watchRun', {
+      'runId': runId,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': function() {
+        Utils.page.pageReload();
       }
-    );
+    });
   },
 
-  unwatchRun: function (runId) {
-    Fluxion.doAjax(
-      'runControllerHelperService',
-      'unwatchRun',
-      {
-        'runId': runId,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function () {
-          Utils.page.pageReload();
-        }
+  unwatchRun: function(runId) {
+    Fluxion.doAjax('runControllerHelperService', 'unwatchRun', {
+      'runId': runId,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': function() {
+        Utils.page.pageReload();
       }
-    );
+    });
   }
 };
-

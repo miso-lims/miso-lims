@@ -31,7 +31,8 @@ function mopen(id) {
   mcancelclosetime();
 
   // close old layer
-  if (ddmenuitem) ddmenuitem.style.visibility = 'hidden';
+  if (ddmenuitem)
+    ddmenuitem.style.visibility = 'hidden';
 
   // get new layer and show it
   ddmenuitem = document.getElementById(id);
@@ -40,7 +41,8 @@ function mopen(id) {
 }
 // close showed layer
 function mclose() {
-  if (ddmenuitem) ddmenuitem.style.visibility = 'hidden';
+  if (ddmenuitem)
+    ddmenuitem.style.visibility = 'hidden';
 }
 
 // go close timer

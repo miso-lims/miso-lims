@@ -22,8 +22,8 @@
  */
 
 ListTarget.run = {
-  name : "Runs",
-  createUrl : function(config, projectId) {
+  name: "Runs",
+  createUrl: function(config, projectId) {
     if (projectId) {
       return "/miso/rest/run/dt/project/" + projectId;
     } else if (config.sequencer) {
@@ -34,90 +34,72 @@ ListTarget.run = {
       return "/miso/rest/run/dt";
     }
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return [];
   },
-  createStaticActions : function(config, projectId) {
+  createStaticActions: function(config, projectId) {
     if (!projectId && config.platformType) {
-      var platformKey = Utils.array.maybeGetProperty(Utils.array
-          .findFirstOrNull(Utils.array.namePredicate(config.platformType),
-              Constants.platformTypes), 'key');
-      return [ {
-        name : "Create " + platformKey + " Run",
-        handler : function() {
-          Utils
-              .ajaxWithDialog(
-                  'Getting Sequencer',
-                  'Get',
-                  '/miso/rest/sequencer',
-                  null,
-                  function(sequencers) {
-                    
-                    Utils
-                        .showWizardDialog(
-                            "Create " + platformKey + " Run",
-                            sequencers
-                                .filter(
-                                    function(sequencer) {
-                                      return sequencer.platform.platformType == config.platformType && !sequencer.dateDecommissioned;
-                                    })
-                                .sort(Utils.sorting.standardSort('name'))
-                                .map(
-                                    function(sequencer) {
-                                      return {
-                                        name : sequencer.name + " (" + sequencer.platform.instrumentModel + ")",
-                                        handler : function() {
-                                          window.location = '/miso/run/new/' + sequencer.id;
-                                        }
-                                      };
-                                      
-                                    }));
-                  });
+      var platformKey = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.namePredicate(config.platformType),
+          Constants.platformTypes), 'key');
+      return [{
+        name: "Create " + platformKey + " Run",
+        handler: function() {
+          Utils.ajaxWithDialog('Getting Sequencer', 'Get', '/miso/rest/sequencer', null, function(sequencers) {
+
+            Utils.showWizardDialog("Create " + platformKey + " Run", sequencers.filter(function(sequencer) {
+              return sequencer.platform.platformType == config.platformType && !sequencer.dateDecommissioned;
+            }).sort(Utils.sorting.standardSort('name')).map(function(sequencer) {
+              return {
+                name: sequencer.name + " (" + sequencer.platform.instrumentModel + ")",
+                handler: function() {
+                  window.location = '/miso/run/new/' + sequencer.id;
+                }
+              };
+
+            }));
+          });
         }
-      } ];
+      }];
     } else {
       return [];
     }
   },
-  createColumns : function(config, projectId) {
-    return [
-        ListUtils.idHyperlinkColumn("Name", "run", "id", Utils.array.getName,
-            1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "run", Utils.array.getId,
-            "alias", 0, true), {
-          "sTitle" : "Status",
-          "mData" : "status",
-          "mRender" : function(data, type, full) {
+  createColumns: function(config, projectId) {
+    return [ListUtils.idHyperlinkColumn("Name", "run", "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", "run", Utils.array.getId, "alias", 0, true), {
+          "sTitle": "Status",
+          "mData": "status",
+          "mRender": function(data, type, full) {
             return data || "";
           },
-          "include" : true,
-          "iSortPriority" : 0
+          "include": true,
+          "iSortPriority": 0
         }, {
-          "sTitle" : "Start Date",
-          "mData" : "startDate",
-          "mRender" : function(data, type, full) {
+          "sTitle": "Start Date",
+          "mData": "startDate",
+          "mRender": function(data, type, full) {
             return data || "";
           },
-          "include" : true,
-          "iSortPriority" : 2
+          "include": true,
+          "iSortPriority": 2
         }, {
-          "sTitle" : "End Date",
-          "mData" : "endDate",
-          "mRender" : function(data, type, full) {
+          "sTitle": "End Date",
+          "mData": "endDate",
+          "mRender": function(data, type, full) {
             return data || "";
           },
-          "include" : true,
-          "iSortPriority" : 0
+          "include": true,
+          "iSortPriority": 0
         }, {
-          "sTitle" : "Type",
-          "mData" : "platformType",
-          "include" : !config.platformType,
-          "iSortPriority" : 0
+          "sTitle": "Type",
+          "mData": "platformType",
+          "include": !config.platformType,
+          "iSortPriority": 0
         }, {
-          "sTitle" : "Last Modified",
-          "mData" : "lastModified",
-          "include" : Constants.isDetailedSample,
-          "iSortPriority" : 0
-        } ];
+          "sTitle": "Last Modified",
+          "mData": "lastModified",
+          "include": Constants.isDetailedSample,
+          "iSortPriority": 0
+        }];
   }
 };

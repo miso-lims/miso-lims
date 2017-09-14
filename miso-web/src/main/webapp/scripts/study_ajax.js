@@ -23,9 +23,9 @@
 
 var Study = Study || {
   // Validate methods can be found in parsley_form_validations.js
-  validateStudy: function () {
+  validateStudy: function() {
     Validate.cleanFields('#study-form');
-    
+
     jQuery('#study-form').parsley().destroy();
 
     // Alias input field validation
@@ -37,10 +37,10 @@ var Study = Study || {
     jQuery('#description').attr('class', 'form-control');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
     jQuery('#description').attr('data-parsley-maxlength', '255');
-    
+
     jQuery('#study-form').parsley();
     jQuery('#study-form').parsley().validate();
-    
+
     Validate.updateWarningOrSubmit('#study-form');
     return false;
   }

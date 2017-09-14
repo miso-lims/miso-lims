@@ -21,43 +21,26 @@
  * *********************************************************************
  */
 
-var Admin = Admin || {
-  clearCache : function() {
-    Utils.showConfirmDialog('Hibernate Cache', 'Clear',
-        [ 'Clear Hibernate cache?' ], function() {
-          Utils.ajaxWithDialog('Clearing Cache', 'POST',
-              '/miso/rest/admin/cache/clear', null, function(success) {
-                Utils.showOkDialog('Cache', [ success ? 'Cache cleared.'
-                    : 'Failed to clear cache.' ]);
-              });
+var Admin = Admin
+    || {
+      clearCache: function() {
+        Utils.showConfirmDialog('Hibernate Cache', 'Clear', ['Clear Hibernate cache?'], function() {
+          Utils.ajaxWithDialog('Clearing Cache', 'POST', '/miso/rest/admin/cache/clear', null, function(success) {
+            Utils.showOkDialog('Cache', [success ? 'Cache cleared.' : 'Failed to clear cache.']);
+          });
         });
-  },
-  regenBarcodes : function() {
-    Utils
-        .showConfirmDialog(
-            'Barcodes',
-            'Generate',
-            [ 'Generate missing barcodes?' ],
-            function() {
-              Utils
-                  .ajaxWithDialog(
-                      'Clearing Cache',
-                      'POST',
-                      '/miso/rest/admin/barcode/regen',
-                      null,
-                      function(results) {
-                        Utils
-                            .showOkDialog(
-                                'Cache',
-                                results
-                                    .filter(function(result) {
-                                      return result.count > 0;
-                                    })
-                                    .map(
-                                        function(result) {
-                                          return "Regenerated " + result.updated + " barcodes of " + result.blank + " " + result.target + ". " + result.total + " " + result.target + " processed.";
-                                        }));
-                      });
-            });
-  },
-};
+      },
+      regenBarcodes: function() {
+        Utils.showConfirmDialog('Barcodes', 'Generate', ['Generate missing barcodes?'], function() {
+          Utils.ajaxWithDialog('Clearing Cache', 'POST', '/miso/rest/admin/barcode/regen', null, function(results) {
+            Utils.showOkDialog('Cache', results.filter(function(result) {
+              return result.count > 0;
+            }).map(
+                function(result) {
+                  return "Regenerated " + result.updated + " barcodes of " + result.blank + " " + result.target + ". " + result.total + " "
+                      + result.target + " processed.";
+                }));
+          });
+        });
+      },
+    };

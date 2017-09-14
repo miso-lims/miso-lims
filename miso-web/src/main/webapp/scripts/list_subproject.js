@@ -22,64 +22,59 @@
  */
 
 ListTarget.subproject = {
-  name : "Subprojects",
-  createUrl : function(config, projectId) {
+  name: "Subprojects",
+  createUrl: function(config, projectId) {
     throw "Must be provided statically";
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return config.isAdmin ? HotTarget.subproject.bulkActions : [];
   },
-  createStaticActions : function(config, projectId) {
-    return config.isAdmin ? [ {
-      "name" : "Add",
-      "handler" : function() {
-        
-        Utils.showDialog('Create Subprojects', 'Create', [ {
-          property : 'quantity',
-          type : 'int',
-          label : 'Quantity',
-          value : 1
-        } ], function(result) {
+  createStaticActions: function(config, projectId) {
+    return config.isAdmin ? [{
+      "name": "Add",
+      "handler": function() {
+
+        Utils.showDialog('Create Subprojects', 'Create', [{
+          property: 'quantity',
+          type: 'int',
+          label: 'Quantity',
+          value: 1
+        }], function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Create Subprojects', ["That's a peculiar number of subprojects to create."]);
             return;
           }
           window.location = '/miso/subproject/bulk/new?' + jQuery.param({
-            quantity : result.quantity,
+            quantity: result.quantity,
           });
         });
       }
-    } ] : [];
+    }] : [];
   },
-  createColumns : function(config, projectId) {
-    return [
-        {
-          "sTitle" : "Alias",
-          "mData" : "alias",
-          "include" : true,
-          "iSortPriority" : 1
-        },
-        {
-          "sTitle" : "Project",
-          "mData" : "parentProjectId",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mRender" : ListUtils.render.textFromId(config.projects, 'alias')
-        },
-        {
-          "sTitle" : "Priority",
-          "mData" : "priority",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mRender" : ListUtils.render.booleanChecks
-        },
-        {
-          "sTitle" : "Reference Genome",
-          "mData" : "referenceGenomeId",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mRender" : ListUtils.render.textFromId(Constants.referenceGenomes,
-              'alias')
-        }, ];
+  createColumns: function(config, projectId) {
+    return [{
+      "sTitle": "Alias",
+      "mData": "alias",
+      "include": true,
+      "iSortPriority": 1
+    }, {
+      "sTitle": "Project",
+      "mData": "parentProjectId",
+      "include": true,
+      "iSortPriority": 0,
+      "mRender": ListUtils.render.textFromId(config.projects, 'alias')
+    }, {
+      "sTitle": "Priority",
+      "mData": "priority",
+      "include": true,
+      "iSortPriority": 0,
+      "mRender": ListUtils.render.booleanChecks
+    }, {
+      "sTitle": "Reference Genome",
+      "mData": "referenceGenomeId",
+      "include": true,
+      "iSortPriority": 0,
+      "mRender": ListUtils.render.textFromId(Constants.referenceGenomes, 'alias')
+    }, ];
   }
 };
