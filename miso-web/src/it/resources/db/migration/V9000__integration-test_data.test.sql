@@ -346,6 +346,16 @@ INSERT INTO SequencerReference (referenceId, name, platformId, ip) VALUES
   (1, 'T2000', 1, RAWTOHEX('127.0.0.1')),
   (2, 'TMS1', 2, RAWTOHEX('127.0.0.1')),
   (3, 'TPB1', 3, RAWTOHEX('127.0.0.1'));
+  
+INSERT INTO SequencerReference (referenceId, name, platformId, serialNumber, dateCommissioned, dateDecommissioned, upgradedSequencerReferenceId, ip) VALUES
+  (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, '127.0.0.1'),
+  (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL, '127.0.0.1'),
+  (102, 'OldHiSeq_102', 1, '102', '2017-01-01', '2017-02-01', 101, '127.0.0.1');
+
+INSERT INTO SequencerServiceRecord(recordId, sequencerReferenceId, title, details, servicedBy, referenceNumber, serviceDate, shutdownTime, restoredTime) VALUES
+  (150, 101, 'Test 150', 'details go here', 'technician1', '12345', '2017-09-05', '2017-09-01 10:00:00', '2017-09-05 10:00:00'),
+  (151, 101, 'Test 151', NULL, 'tech', NULL, '2017-09-12', NULL, NULL),
+  (152, 101, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00');
 
 DELETE FROM ProjectOverview;
 DELETE FROM Project;

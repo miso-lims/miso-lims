@@ -47,10 +47,8 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerServiceRecordDao;
 
 public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
 
@@ -92,7 +90,7 @@ public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
   }
   
   private SequencerServiceRecord makeServiceRecord(String title) {
-    SequencerServiceRecord rec = new SequencerServiceRecordImpl();
+    SequencerServiceRecord rec = new SequencerServiceRecord();
     rec.setTitle(title);
     rec.setSequencerReference(emptySR);
     rec.setServiceDate(new java.util.Date());
@@ -171,7 +169,7 @@ public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
   
   @Test
   public void testRemoveNotExisting() throws IOException {
-    assertFalse(dao.remove(new SequencerServiceRecordImpl()));
+    assertFalse(dao.remove(new SequencerServiceRecord()));
   }
   
   @Test

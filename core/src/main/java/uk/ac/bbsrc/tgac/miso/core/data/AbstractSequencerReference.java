@@ -230,4 +230,17 @@ public abstract class AbstractSequencerReference implements SequencerReference {
     this.runs = runs;
   }
 
+  @OneToMany(targetEntity = SequencerServiceRecord.class, mappedBy = "sequencerReference")
+  private Set<SequencerServiceRecord> serviceRecords = new HashSet<>();
+
+  @Override
+  public Set<SequencerServiceRecord> getServiceRecords() {
+    return serviceRecords;
+  }
+
+  @Override
+  public void setServiceRecords(Set<SequencerServiceRecord> serviceRecords) {
+    this.serviceRecords = serviceRecords;
+  }
+
 }

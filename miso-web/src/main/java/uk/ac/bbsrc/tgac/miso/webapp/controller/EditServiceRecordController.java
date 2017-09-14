@@ -45,12 +45,9 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerServiceRecordImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 
@@ -75,24 +72,18 @@ public class EditServiceRecordController {
       return key;
     }
   }
-  
-  @Autowired
-  private RequestManager requestManager;
+
   @Autowired
   private SequencerReferenceService sequencerReferenceService;
   @Autowired
   private FilesManager filesManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
   }
   
   public Map<Integer, String> populateServiceRecordFiles(SequencerServiceRecord record) throws IOException {
-    if (record.getId() != AbstractSequencerServiceRecord.UNSAVED_ID) {
+    if (record.getId() != SequencerServiceRecord.UNSAVED_ID) {
       Map<Integer, String> fileMap = new HashMap<>();
       for (String s : filesManager.getFileNames(SequencerServiceRecord.class, String.valueOf(record.getId()))) {
         fileMap.put(s.hashCode(), s);
@@ -113,6 +104,7 @@ public class EditServiceRecordController {
     if (sr != null) {
       model.put(ModelKeys.RECORD.getKey(), sr);
       model.put(ModelKeys.FILES.getKey(), populateServiceRecordFiles(sr));
+      model.put("title", "Service Record " + sr.getId());
     } else {
       throw new IOException("No such Service Record");
     }
@@ -125,9 +117,10 @@ public class EditServiceRecordController {
     if (sequencer == null) {
       throw new IOException("No such Sequencer.");
     }
-    SequencerServiceRecord record = new SequencerServiceRecordImpl();
+    SequencerServiceRecord record = new SequencerServiceRecord();
     record.setSequencerReference(sequencer);
     model.put(ModelKeys.RECORD.getKey(), record);
+    model.put("title", "New Service Record");
     return new ModelAndView("/pages/editServiceRecord.jsp", model);
   }
   
@@ -135,7 +128,7 @@ public class EditServiceRecordController {
   public String processSubmit(@ModelAttribute("serviceRecord") SequencerServiceRecord record, ModelMap model, SessionStatus session)
       throws IOException {
     Long recordId = null;
-    if (record.getId() == SequencerServiceRecordImpl.UNSAVED_ID) {
+    if (record.getId() == SequencerServiceRecord.UNSAVED_ID) {
       recordId = sequencerReferenceService.createServiceRecord(record);
     } else {
       sequencerReferenceService.updateServiceRecord(record);
