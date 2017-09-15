@@ -49,7 +49,7 @@ public class DefaultLabService implements LabService {
 
   @Override
   public Long create(Lab lab, Long instituteId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
+    authorizationManager.throwIfNotInternal();
     User user = authorizationManager.getCurrentUser();
     lab.setCreatedBy(user);
     lab.setUpdatedBy(user);

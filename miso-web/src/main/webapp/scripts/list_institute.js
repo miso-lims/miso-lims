@@ -30,7 +30,7 @@ ListTarget.institute = {
     return config.isAdmin ? HotTarget.institute.bulkActions : [];
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [{
+    return config.isInternal ? [{
       "name": "Add",
       "handler": function() {
 

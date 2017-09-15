@@ -30,7 +30,7 @@ ListTarget.lab = {
     return config.isAdmin ? HotTarget.lab.bulkActions : [];
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [{
+    return config.isInternal ? [{
       "name": "Add",
       "handler": function() {
 
