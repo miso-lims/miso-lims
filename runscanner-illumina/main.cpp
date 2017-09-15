@@ -203,12 +203,12 @@ void add_global_chart(
 }
 
 std::string format(const illumina::interop::model::summary::metric_stat &stat,
-                   const float scale = 1) {
+                   const float scale = 1, const int precision = 2) {
   if (std::isnan(stat.mean())) {
     return "N/A";
   }
   std::stringstream output;
-  output << std::setprecision(2) << stat.mean() / scale << " ± "
+  output << std::setprecision(precision) << stat.mean() / scale << " ± "
          << stat.stddev() / scale;
   return output.str();
 }
@@ -269,8 +269,8 @@ void add_lane_charts(
                     run_summary[0][lane].density().mean()) *
                        100 << " %";
     row["densityPct"] = density_pct.str();
-    row["density"] = format(run_summary[0][lane].density(), 1e3);
-    row["densityPf"] = format(run_summary[0][lane].density_pf(), 1e3);
+    row["density"] = format(run_summary[0][lane].density(), 1e3, 4);
+    row["densityPf"] = format(run_summary[0][lane].density_pf(), 1e3, 4);
     row["q30"] = format(run_summary[0][lane].percent_gt_q30());
     for (auto read = 0; read < run_summary.size(); read++) {
       row["errors" + std::to_string(read)] =
