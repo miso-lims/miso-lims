@@ -261,6 +261,7 @@ var RunGraph = (function() {
           },
           xAxis: {},
           yAxis: {
+            min: 1,
             title: {
               text: yLabel
             }
