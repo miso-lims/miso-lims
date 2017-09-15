@@ -424,11 +424,11 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     if (library.getSecurityProfile() != null && library.getSecurityProfile().getProfileId() != SecurityProfile.UNSAVED_ID) {
       library.setSecurityProfile(securityManager.getSecurityProfileById(library.getSecurityProfile().getProfileId()));
     }
+    if (library.getKitDescriptor() != null) {
+      library.setKitDescriptor(kitService.getKitDescriptorById(library.getKitDescriptor().getId()));
+    }
     if (isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;
-      if (lai.getKitDescriptor() != null) {
-        lai.setKitDescriptor(kitService.getKitDescriptorById(lai.getKitDescriptor().getId()));
-      }
       if (lai.getLibraryDesignCode() != null) {
         lai.setLibraryDesignCode(libraryDesignCodeService.get(lai.getLibraryDesignCode().getId()));
       }
@@ -500,6 +500,11 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     target.setQcPassed(source.getQcPassed());
 
     target.setIndices(source.getIndices());
+    if (source.getKitDescriptor() != null) {
+      target.setKitDescriptor(source.getKitDescriptor());
+    } else {
+      target.setKitDescriptor(null);
+    }
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
@@ -512,11 +517,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
         dTarget.setLibraryDesign(dSource.getLibraryDesign());
       } else {
         dTarget.setLibraryDesign(null);
-      }
-      if (dSource.getKitDescriptor() != null) {
-        dTarget.setKitDescriptor(dSource.getKitDescriptor());
-      } else {
-        dTarget.setKitDescriptor(null);
       }
     }
   }
