@@ -13,6 +13,8 @@ public class ContainerDto implements WritableUrls {
   private String lastSequencerName;
   private Long lastSequencerId;
   private String lastModified;
+  private KitDescriptorDto clusteringKit;
+  private KitDescriptorDto multiplexingKit;
 
   public Long getId() {
     return id;
@@ -90,5 +92,21 @@ public class ContainerDto implements WritableUrls {
 
   public void setLastSequencerId(Long lastSequencerId) {
     this.lastSequencerId = lastSequencerId;
+  }
+
+  public KitDescriptorDto getClusteringKit() {
+    return clusteringKit;
+  }
+
+  public void setClusteringKit(KitDescriptorDto clusteringKit) {
+    this.clusteringKit = clusteringKit;
+  }
+
+  public KitDescriptorDto getMultiplexingKit() {
+    return multiplexingKit;
+  }
+
+  public void setMultiplexingKit(KitDescriptorDto multiplexingKit) {
+    this.multiplexingKit = multiplexingKit;
   }
 }

@@ -1384,6 +1384,12 @@ public class Dtos {
     if (from.getLastModified() != null) {
       dto.setLastModified(formatDateTime(from.getLastModified()));
     }
+    if (from.getClusteringKit() != null) {
+      dto.setClusteringKit(asDto(from.getClusteringKit()));
+    }
+    if (from.getMultiplexingKit() != null) {
+      dto.setMultiplexingKit(asDto(from.getMultiplexingKit()));
+    }
     return dto;
   }
 

@@ -76,6 +76,14 @@
       <td>Sequencer Model:</td>
       <td>${container.platform.instrumentModel}</td>
     </tr>
+    <tr>
+      <td>Clustering Kit:</td>
+      <td><miso:select id="clusteringKit" path="clusteringKit" items="${clusteringKits}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="" /></td>
+    </tr>
+    <tr>
+      <td>Multiplexing Kit:</td>
+      <td><miso:select id="multiplexingKit" path="multiplexingKit" items="${multiplexingKits}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="" /></td>
+    </tr>
   </table>
 </form:form>
 
