@@ -24,6 +24,7 @@ public class ListItemsPageWithAuthorization extends ListItemsPage {
   protected final void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
     User user = securityManager.get().getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     config.put("isAdmin", user.isAdmin());
+    config.put("isInternal", user.isInternal());
     config.put("isTech", Arrays.asList(user.getRoles()).contains("ROLE_TECH"));
     writeConfigurationExtra(mapper, config);
   }

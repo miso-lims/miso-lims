@@ -41,7 +41,7 @@ public class DefaultSubprojectService implements SubprojectService {
 
   @Override
   public Long create(Subproject subproject, Long parentProjectId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
+    authorizationManager.throwIfNotInternal();
     User user = authorizationManager.getCurrentUser();
     Project parentProject = projectStore.get(parentProjectId);
     subproject.setCreatedBy(user);

@@ -37,7 +37,7 @@ public class DefaultSamplePurposeService implements SamplePurposeService {
 
   @Override
   public Long create(SamplePurpose samplePurpose) throws IOException {
-    authorizationManager.throwIfNonAdmin();
+    authorizationManager.throwIfNotInternal();
     User user = authorizationManager.getCurrentUser();
     samplePurpose.setCreatedBy(user);
     samplePurpose.setUpdatedBy(user);

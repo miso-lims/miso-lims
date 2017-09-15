@@ -30,7 +30,7 @@ ListTarget.samplepurpose = {
     return config.isAdmin ? HotTarget.samplepurpose.bulkActions : [];
   },
   createStaticActions: function(config, projectId) {
-    return config.isAdmin ? [{
+    return config.isInternal ? [{
       "name": "Add",
       "handler": function() {
 
