@@ -238,6 +238,7 @@ HotTarget.library = (function() {
             header: 'Platform',
             data: 'platformType',
             type: 'dropdown',
+            readOnly: !create,
             trimDropdown: false,
             source: Constants.platformTypes.filter(function(pt) {
               return pt.active || data.reduce(function(acc, lib) {
