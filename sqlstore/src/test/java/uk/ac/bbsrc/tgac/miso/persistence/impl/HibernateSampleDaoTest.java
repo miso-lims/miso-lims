@@ -326,16 +326,4 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     assertEquals(15L, detailed.getParent().getId());
   }
 
-  @Test
-  public void getNextSiblingNumberTest() throws Exception {
-    String partialAlias = "TEST_0001_TISSUE_";
-    DetailedSample s1 = (DetailedSample) dao.get(16L);
-    DetailedSample s2 = (DetailedSample) dao.get(17L);
-    assertTrue(s1.getAlias().startsWith(partialAlias));
-    assertEquals(new Integer(1), s1.getSiblingNumber());
-    assertTrue(s2.getAlias().startsWith(partialAlias));
-    assertEquals(new Integer(2), s2.getSiblingNumber());
-    assertEquals(3, dao.getNextSiblingNumber(partialAlias));
-  }
-
 }

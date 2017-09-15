@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -35,23 +33,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
-/**
- * This is the Hibernate DAO for Samples and serves as the bridge between Hibernate and the existing SqlStore persistence layers.
- *
- * The data from the Sample table is loaded via Hibernate, but Hibernate cannot follow the references to Libraries and such from a Sample.
- * Therefore, this implementation loads a Sample via Hibernate, then calls into the SqlStore persistence layer to gather the remaining data
- * that Hibernate cannot access. Similarly, it then follows any necessary links on save. All the SqlStore-populated fields are marked
- * “transient” in the Sample class.
- */
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, HibernatePaginatedBoxableSource<Sample> {
+public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableSource<Sample> {
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateSampleDao.class);
 
@@ -73,30 +62,6 @@ public class HibernateSampleDao implements SampleDao, SiblingNumberGenerator, Hi
   @Override
   public Long addSample(final Sample sample) throws IOException {
     return (Long) currentSession().save(sample);
-  }
-
-  @Override
-  public int getNextSiblingNumber(String partialAlias) throws IOException {
-    // Find highest existing siblingNumber matching this partialAlias
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(Restrictions.like("alias", partialAlias, MatchMode.START));
-    @SuppressWarnings("unchecked")
-    List<Sample> samples = criteria.list();
-    String regex = "^.{" + partialAlias.length() + "}(\\d*)$";
-    Pattern pattern = Pattern.compile(regex);
-    int next = 0;
-    for (Sample sample : samples) {
-      Matcher m = pattern.matcher(sample.getAlias());
-      if (!m.matches()) {
-        continue;
-      }
-      int siblingNumber = Integer.parseInt(m.group(1));
-      if (siblingNumber > next) {
-        next = siblingNumber;
-      }
-    }
-    next++;
-    return next;
   }
 
   @Override

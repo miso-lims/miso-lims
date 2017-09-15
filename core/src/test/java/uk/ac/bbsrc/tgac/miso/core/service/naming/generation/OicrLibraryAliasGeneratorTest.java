@@ -2,28 +2,36 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 
 public class OicrLibraryAliasGeneratorTest {
 
   private OicrLibraryAliasGenerator sut;
 
+  @Mock
+  private SiblingNumberGenerator siblingNumberGenerator;
+
   @Before
   public void setup() throws Exception {
+    MockitoAnnotations.initMocks(this);
     sut = new OicrLibraryAliasGenerator();
+    sut.setSiblingNumberGenerator(siblingNumberGenerator);
   }
 
   @Test
@@ -52,19 +60,16 @@ public class OicrLibraryAliasGeneratorTest {
   public void testGeneratePacBioLibraryAlias() throws Exception {
     DetailedLibrary library = new DetailedLibraryImpl();
     library.setPlatformType(PlatformType.PACBIO);
-
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    library.setCreationDate(df.parse("2017-09-13"));
     DetailedSample parent = new DetailedSampleImpl();
-    Project proj = new ProjectImpl();
-    proj.setShortName("PROJ");
-    parent.setProject(proj);
-    SampleTissue grandParent = new SampleTissueImpl();
-    grandParent.setTimesReceived(2);
-    parent.setParent(grandParent);
+    parent.setAlias("PROJ_1234_Pa_P_nn_1-1_D_8");
     library.setSample(parent);
 
-    library.setInitialConcentration(150D);
+    Mockito.when(siblingNumberGenerator.getNextSiblingNumber(Mockito.any(), Mockito.any())).thenReturn(2);
 
-    assertEquals("PROJ_2_150pM", sut.generate(library));
+
+    assertEquals("PROJ_1234_20170913_2", sut.generate(library));
   }
 
 }

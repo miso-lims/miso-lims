@@ -35,6 +35,7 @@ public class OicrNamingScheme extends AbstractNamingScheme {
    */
   public OicrNamingScheme() {
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(sampleAliasGenerator);
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(libraryAliasGenerator);
   }
 
   /**
@@ -45,6 +46,7 @@ public class OicrNamingScheme extends AbstractNamingScheme {
    */
   public void setSiblingNumberGenerator(SiblingNumberGenerator siblingNumberGenerator) {
     sampleAliasGenerator.setSiblingNumberGenerator(siblingNumberGenerator);
+    libraryAliasGenerator.setSiblingNumberGenerator(siblingNumberGenerator);
   }
 
   @Override

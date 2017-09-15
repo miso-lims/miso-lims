@@ -1,12 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.validation;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.OicrLibraryAliasValidator;
 
 public class OicrLibraryAliasValidatorTest {
 
@@ -40,6 +38,12 @@ public class OicrLibraryAliasValidatorTest {
   @Test
   public void test_alias_05() throws Exception {
     assertThat(sut.validate("MOUSE_1R45_Br_R_SE_1K_WG").isValid(), is(true));
+  }
+
+  @Test
+  public void testPacBioPattern() throws Exception {
+    assertTrue(sut.validate("PROJ_1234_20170913_1").isValid());
+    assertTrue(sut.validate("A123Z_0001_19991231_32").isValid());
   }
 
 }
