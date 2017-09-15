@@ -64,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -178,6 +179,10 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private LibraryBoxPosition boxPosition;
 
   private Integer dnaSize;
+
+  @ManyToOne
+  @JoinColumn(name = "kitDescriptorId")
+  private KitDescriptor kitDescriptor;
 
   @Override
   public EntityType getEntityType() {
@@ -570,6 +575,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public KitDescriptor getKitDescriptor() {
+    return kitDescriptor;
+  }
+
+  @Override
+  public void setKitDescriptor(KitDescriptor kitDescriptor) {
+    this.kitDescriptor = kitDescriptor;
+  }
+
+  @Override
   public int hashCode() {
     return new HashCodeBuilder(3, 33)
         .appendSuper(super.hashCode())
@@ -587,6 +602,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(paired)
         .append(platformType)
         .append(qcPassed)
+        .append(kitDescriptor)
         .toHashCode();
   }
 
@@ -612,6 +628,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(paired, other.paired)
         .append(platformType, other.platformType)
         .append(qcPassed, other.qcPassed)
+        .append(kitDescriptor, other.kitDescriptor)
         .isEquals();
   }
 

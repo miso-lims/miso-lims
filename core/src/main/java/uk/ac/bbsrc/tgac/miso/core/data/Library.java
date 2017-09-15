@@ -32,6 +32,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -337,5 +338,9 @@ public interface Library
    * @param creationTime
    */
   public void setCreationTime(Date creationTime);
+
+  KitDescriptor getKitDescriptor();
+
+  void setKitDescriptor(KitDescriptor prepKit);
 
 }

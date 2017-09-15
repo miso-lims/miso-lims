@@ -7,21 +7,12 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName(value = "Detailed")
 public class DetailedLibraryDto extends LibraryDto {
 
-  private Long kitDescriptorId;
   private Boolean archived;
   private Long libraryDesignId;
   private Long libraryDesignCodeId;
   private boolean nonStandardAlias;
   private Long preMigrationId;
   private String sampleBoxPositionLabel;
-
-  public Long getKitDescriptorId() {
-    return kitDescriptorId;
-  }
-
-  public void setKitDescriptorId(Long kitDescriptorId) {
-    this.kitDescriptorId = kitDescriptorId;
-  }
 
   public Boolean getArchived() {
     return archived;

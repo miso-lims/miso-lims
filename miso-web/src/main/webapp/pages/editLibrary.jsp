@@ -339,6 +339,13 @@
     <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.box.id}"/>'>${library.box.alias}, ${library.boxPosition}</a></c:if>
   </td>
 </tr>
+  <tr>
+    <td>Library Kit:*</td>
+    <td>
+      <miso:select id="libraryKit" path="kitDescriptor" items="${prepKits}" itemLabel="name"
+          itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+    </td>
+  </tr>
 </table>
 <script type="text/javascript">
     Library = Library || {};
@@ -362,13 +369,6 @@
 <br/>
 <h2>Details</h2>
 <table class="in">
-  <tr>
-    <td>Library Kit:*</td>
-    <td>
-      <miso:select id="libraryKit" path="kitDescriptor" items="${prepKits}" itemLabel="name"
-          itemValue="id" defaultLabel="SELECT" defaultValue=""/>
-    </td>
-  </tr>
   <c:if test="${not empty library.sample.groupId}">
     <tr>
       <td class="h">Group ID:</td>

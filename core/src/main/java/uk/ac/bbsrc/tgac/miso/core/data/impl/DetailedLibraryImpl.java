@@ -14,7 +14,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
 @Table(name = "DetailedLibrary")
@@ -22,10 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary {
 
   private static final long serialVersionUID = 1L;
-
-  @ManyToOne
-  @JoinColumn(name = "kitDescriptorId")
-  private KitDescriptor kitDescriptor;
 
   @Column(nullable = false)
   private Boolean archived = Boolean.FALSE;
@@ -42,16 +37,6 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
   private LibraryDesignCode libraryDesignCode;
 
   private Long preMigrationId;
-
-  @Override
-  public KitDescriptor getKitDescriptor() {
-    return kitDescriptor;
-  }
-
-  @Override
-  public void setKitDescriptor(KitDescriptor kitDescriptor) {
-    this.kitDescriptor = kitDescriptor;
-  }
 
   @Override
   public Boolean getArchived() {
@@ -109,7 +94,6 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
         .append(archived)
         .append(libraryDesign)
         .append(nonStandardAlias)
-        .append(kitDescriptor)
         .append(preMigrationId)
         .toHashCode();
   }
@@ -126,7 +110,6 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
         .append(libraryDesign, other.libraryDesign)
         .append(libraryDesignCode, other.libraryDesignCode)
         .append(nonStandardAlias, other.nonStandardAlias)
-        .append(kitDescriptor, other.kitDescriptor)
         .append(preMigrationId, other.preMigrationId)
         .isEquals();
   }

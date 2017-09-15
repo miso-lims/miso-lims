@@ -83,13 +83,11 @@ HotTarget.library = (function() {
       lib.paired = Constants.libraryTypes.reduce(function(acc, type) {
         return acc || type.id == lib.libraryTypeId && type.alias.indexOf('Pair') != -1;
       }, lib.paired);
-      if (Constants.isDetailedSample) {
         // if any members are null, fill them with empty objects otherwise
         // things go poorly
         if (!lib.kitDescriptorId) {
           lib.kitDescriptorId = '';
           lib.kitDescriptorName = '';
-        }
       }
     },
 
@@ -339,7 +337,7 @@ HotTarget.library = (function() {
             trimDropdown: false,
             validator: HotUtils.validator.requiredAutocomplete,
             source: [''],
-            include: Constants.isDetailedSample,
+            include: true,
             unpack: function(lib, flat, setCellMeta) {
               flat.kitDescriptorName = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
                   .idPredicate(lib.kitDescriptorId), Constants.kitDescriptors), 'name');
