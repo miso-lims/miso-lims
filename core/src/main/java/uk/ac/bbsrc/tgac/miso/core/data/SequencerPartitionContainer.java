@@ -30,6 +30,7 @@ import java.util.List;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -123,4 +124,12 @@ public interface SequencerPartitionContainer
   public Date getCreationTime();
 
   public void setCreationTime(Date creationTime);
+
+  void setClusteringKit(KitDescriptor clusteringKit);
+
+  KitDescriptor getClusteringKit();
+
+  KitDescriptor getMultiplexingKit();
+
+  void setMultiplexingKit(KitDescriptor multiplexingKit);
 }

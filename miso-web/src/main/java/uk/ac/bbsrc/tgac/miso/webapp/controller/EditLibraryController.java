@@ -328,12 +328,7 @@ public class EditLibraryController {
   @ModelAttribute("prepKits")
   public List<KitDescriptor> getPrepKits() throws IOException {
     List<KitDescriptor> list = new ArrayList<>(kitService.listKitDescriptorsByType(KitType.LIBRARY));
-    Collections.sort(list, new Comparator<KitDescriptor>() {
-      @Override
-      public int compare(KitDescriptor kd1, KitDescriptor kd2) {
-        return kd1.getName().compareTo(kd2.getName());
-      }
-    });
+    Collections.sort(list, KitDescriptor::sortByName);
     return list;
   }
 

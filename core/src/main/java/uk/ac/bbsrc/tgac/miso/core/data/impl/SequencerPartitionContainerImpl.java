@@ -56,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -120,6 +121,13 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @OrderBy("partitionNumber")
   private List<Partition> partitions = new ArrayList<>();
 
+  @ManyToOne
+  @JoinColumn(name = "clusteringKit")
+  private KitDescriptor clusteringKit;
+
+  @ManyToOne
+  @JoinColumn(name = "multiplexingKit")
+  private KitDescriptor multiplexingKit;
   /**
    * Construct a new SequencerPartitionContainer with a default empty SecurityProfile
    */
@@ -372,6 +380,26 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @Override
   public String getAlias() {
     return "";
+  }
+
+  @Override
+  public KitDescriptor getClusteringKit() {
+    return clusteringKit;
+  }
+
+  @Override
+  public void setClusteringKit(KitDescriptor clusteringKit) {
+    this.clusteringKit = clusteringKit;
+  }
+
+  @Override
+  public KitDescriptor getMultiplexingKit() {
+    return multiplexingKit;
+  }
+
+  @Override
+  public void setMultiplexingKit(KitDescriptor multiplexingKit) {
+    this.multiplexingKit = multiplexingKit;
   }
 
   private static final Comparator<Partition> partitionNumberComparator = new Comparator<Partition>() {
