@@ -39,7 +39,7 @@ public class DtosTest {
     assertNotNull(tissue.getTissueOrigin());
     assertEquals(4L, tissue.getTissueOrigin().getId());
     assertNotNull(tissue.getTissueType());
-    assertEquals(Long.valueOf(5L), tissue.getTissueType().getId());
+    assertEquals(5L, tissue.getTissueType().getId());
 
     assertNotNull(tissue.getParent());
     assertTrue(LimsUtils.isIdentitySample(tissue.getParent()));
@@ -78,7 +78,7 @@ public class DtosTest {
     assertNotNull(tissue.getTissueOrigin());
     assertEquals(4L, tissue.getTissueOrigin().getId());
     assertNotNull(tissue.getTissueType());
-    assertEquals(Long.valueOf(5L), tissue.getTissueType().getId());
+    assertEquals(5L, tissue.getTissueType().getId());
 
     assertNotNull(tissue.getParent());
     assertTrue(LimsUtils.isIdentitySample(tissue.getParent()));

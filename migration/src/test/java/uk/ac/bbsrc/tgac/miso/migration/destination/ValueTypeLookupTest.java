@@ -58,7 +58,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryQcDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
@@ -168,7 +167,6 @@ public class ValueTypeLookupTest {
     sqcs.add(makeQcType(VALID_LONG, VALID_STRING));
     Mockito.when(qcService.listQcTypes(Mockito.eq(QcTarget.Sample))).thenReturn(sqcs);
 
-    HibernateLibraryQcDao lqcDao = Mockito.mock(HibernateLibraryQcDao.class);
     List<QcType> lqcs = new ArrayList<>();
     lqcs.add(makeQcType(VALID_LONG, VALID_STRING));
     Mockito.when(qcService.listQcTypes(Mockito.eq(QcTarget.Library))).thenReturn(lqcs);
@@ -238,14 +236,14 @@ public class ValueTypeLookupTest {
   @Test
   public void testResolveTissueType() {
     assertNotNull(sut.resolve(makeTissueType(VALID_LONG, null)));
-    assertNotNull(sut.resolve(makeTissueType(null, VALID_STRING)));
+    assertNotNull(sut.resolve(makeTissueType(TissueTypeImpl.UNSAVED_ID, VALID_STRING)));
     assertNull(sut.resolve((TissueType) null));
-    assertNull(sut.resolve(makeTissueType(null, null)));
+    assertNull(sut.resolve(makeTissueType(TissueTypeImpl.UNSAVED_ID, null)));
     assertNull(sut.resolve(makeTissueType(INVALID_LONG, null)));
-    assertNull(sut.resolve(makeTissueType(null, INVALID_STRING)));
+    assertNull(sut.resolve(makeTissueType(TissueTypeImpl.UNSAVED_ID, INVALID_STRING)));
   }
 
-  private TissueType makeTissueType(Long id, String alias) {
+  private TissueType makeTissueType(long id, String alias) {
     TissueType tt = new TissueTypeImpl();
     tt.setId(id);
     tt.setAlias(alias);
