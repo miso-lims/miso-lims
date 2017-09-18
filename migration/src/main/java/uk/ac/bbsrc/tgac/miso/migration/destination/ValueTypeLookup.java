@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -424,7 +425,7 @@ public class ValueTypeLookup {
   @VisibleForTesting
   TissueType resolve(TissueType tissueType) {
     if (tissueType == null) return null;
-    if (tissueType.getId() != null) return tissueTypeById.get(tissueType.getId());
+    if (tissueType.getId() != TissueTypeImpl.UNSAVED_ID) return tissueTypeById.get(tissueType.getId());
     if (tissueType.getAlias() != null) return tissueTypeByAlias.get(tissueType.getAlias());
     return null;
   }

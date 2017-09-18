@@ -28,7 +28,7 @@ public class TissueTypeImpl implements TissueType {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long tissueTypeId = UNSAVED_ID;
+  private long tissueTypeId = UNSAVED_ID;
 
   @Column(unique = true, nullable = false)
   private String alias;
@@ -53,12 +53,12 @@ public class TissueTypeImpl implements TissueType {
   private Date lastUpdated;
 
   @Override
-  public Long getId() {
+  public long getId() {
     return tissueTypeId;
   }
 
   @Override
-  public void setId(Long tissueTypeId) {
+  public void setId(long tissueTypeId) {
     this.tissueTypeId = tissueTypeId;
   }
 
