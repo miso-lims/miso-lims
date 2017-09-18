@@ -255,6 +255,7 @@ public class MisoServiceManager {
     m.setDefaultPoolableElementViewService();
     m.setDefaultBoxService();
     m.setDefaultQualityControlService();
+    m.setDefaultQcTypeDao();
 
     // sigh
     m.setDefaultRequestManager();
@@ -1691,17 +1692,38 @@ public class MisoServiceManager {
     DefaultQualityControlService service = new DefaultQualityControlService();
     service.setAuthorizationManager(authorizationManager);
     service.setLibraryQcStore(libraryQcDao);
-    // Skip setParitionQcStore
     // Skip setPoolQcStore
     service.setSampleQcStore(sampleQcDao);
     service.setQcTypeStore(qcTypeDao);
+    setQualityControlService(service);
+  }
+
+  public void setQualityControlService(DefaultQualityControlService qualityControlService) {
+    this.qcService = qualityControlService;
     updateQualityServiceDependencies();
   }
 
   private void updateQualityServiceDependencies() {
+    // nothing depends on QualityControlService
   }
 
   public QualityControlService getQualityControlService() {
     return qcService;
   }
+
+  private void setDefaultQcTypeDao() {
+    HibernateQcTypeDao dao = new HibernateQcTypeDao();
+    dao.setSessionFactory(sessionFactory);
+    setQcTypeDao(dao);
+  }
+
+  public void setQcTypeDao(HibernateQcTypeDao qcTypeDao) {
+    this.qcTypeDao = qcTypeDao;
+    updateQcTypeDaoDependencies();
+  }
+
+  private void updateQcTypeDaoDependencies() {
+    if (qcService != null) qcService.setQcTypeStore(qcTypeDao);
+  }
+
 }
