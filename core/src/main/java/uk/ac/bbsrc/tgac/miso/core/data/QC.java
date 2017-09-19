@@ -41,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 @MappedSuperclass
-public abstract class QC implements Serializable {
+public abstract class QC implements Serializable, Comparable<QC> {
   private static final long serialVersionUID = 1L;
 
   public static final Long UNSAVED_ID = 0L;
@@ -103,5 +103,43 @@ public abstract class QC implements Serializable {
 
   public void setType(QcType type) {
     this.type = type;
+  }
+
+  @Override
+  public int compareTo(QC o) {
+    if (type != null && !type.equals(o.getType())) {
+      return type.compareTo(o.getType());
+    }
+    return date.compareTo(o.getDate());
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((date == null) ? 0 : date.hashCode());
+    result = prime * result + (int) (qcId ^ (qcId >>> 32));
+    result = prime * result + ((results == null) ? 0 : results.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    QC other = (QC) obj;
+    if (date == null) {
+      if (other.date != null) return false;
+    } else if (!date.equals(other.date)) return false;
+    if (qcId != other.qcId) return false;
+    if (results == null) {
+      if (other.results != null) return false;
+    } else if (!results.equals(other.results)) return false;
+    if (type == null) {
+      if (other.type != null) return false;
+    } else if (!type.equals(other.type)) return false;
+    return true;
   }
 }
