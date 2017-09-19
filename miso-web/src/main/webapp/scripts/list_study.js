@@ -22,45 +22,44 @@
  */
 
 ListTarget.study = {
-  name : "Studies",
-  createUrl : function(config, projectId) {
+  name: "Studies",
+  createUrl: function(config, projectId) {
     return "/miso/rest/study/dt" + (projectId ? "/project/" + projectId : "");
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     if (config.isAdmin) {
-      return [ {
-        "name" : "Delete",
-        "action" : function(ids) {
+      return [{
+        "name": "Delete",
+        "action": function(ids) {
           if (confirm("Are you sure you really want to delete? This operation is permanent!")) {
             var deleter = function(index) {
               if (index >= ids.length) {
                 Utils.page.pageReload();
                 return;
               }
-              Utils.ajaxWithDialog('Deleting study', 'DELETE',
-                  '/miso/rest/study/' + ids[index], function() {
-                    deleter(index + 1);
-                  });
+              Utils.ajaxWithDialog('Deleting study', 'DELETE', '/miso/rest/study/' + ids[index], function() {
+                deleter(index + 1);
+              });
             };
-            
+
             deleter(0);
           }
         }
-      } ];
+      }];
     } else {
       return [];
     }
   },
-  createStaticActions : function(config, projectId) {
+  createStaticActions: function(config, projectId) {
     if (projectId) {
-      return [ {
-        "name" : "Add",
-        "handler" : function() {
+      return [{
+        "name": "Add",
+        "handler": function() {
           window.location = "/miso/study/new/" + projectId;
         }
       }, {
-        "name" : "Create Experiments",
-        "handler" : function() {
+        "name": "Create Experiments",
+        "handler": function() {
           window.location = "/miso/experimentwizard/new/" + projectId;
         }
       }, ];
@@ -68,22 +67,19 @@ ListTarget.study = {
       return [];
     }
   },
-  createColumns : function(config, projectId) {
-    return [
-        ListUtils.idHyperlinkColumn("Name", "study", "id", Utils.array.getName,
-            1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "study", Utils.array.getId,
-            "alias", 0, true), {
-          "sTitle" : "Description",
-          "mData" : "description",
-          "include" : true,
-          "iSortPriority" : 0
+  createColumns: function(config, projectId) {
+    return [ListUtils.idHyperlinkColumn("Name", "study", "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", "study", Utils.array.getId, "alias", 0, true), {
+          "sTitle": "Description",
+          "mData": "description",
+          "include": true,
+          "iSortPriority": 0
         }, {
-          "sTitle" : "Type",
-          "mData" : "studyTypeId",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mRender" : ListUtils.render.textFromId(Constants.studyTypes, 'name')
-        } ];
+          "sTitle": "Type",
+          "mData": "studyTypeId",
+          "include": true,
+          "iSortPriority": 0,
+          "mRender": ListUtils.render.textFromId(Constants.studyTypes, 'name')
+        }];
   }
 };

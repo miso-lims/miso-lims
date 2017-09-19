@@ -22,117 +22,113 @@
  */
 
 ListTarget.completion = {
-  name : "Pool Orders",
-  createUrl : function(config, projectId) {
+  name: "Pool Orders",
+  createUrl: function(config, projectId) {
     if (config.poolId) {
       return '/miso/rest/pool/' + config.poolId + '/dt/completions';
     }
-    return '/miso/rest/poolorder/dt/completions' + (config.activeOnly
-        ? '/active' : '');
+    return '/miso/rest/poolorder/dt/completions' + (config.activeOnly ? '/active' : '');
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return [];
   },
-  createStaticActions : function(config, prodjectId) {
+  createStaticActions: function(config, prodjectId) {
     return [];
   },
-  createColumns : function(config, projectId) {
+  createColumns: function(config, projectId) {
     var nonZero = function(items) {
       return items.some(function(x) {
         return x != 0;
       });
     }
-    return [
-        ListUtils.idHyperlinkColumn("Name", "pool", "pool.id", function(
-            completion) {
-          return completion.pool.name;
-        }, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "pool", function(completion) {
-          return completion.pool.id;
-        }, "pool.alias", 0, true), {
-          "sTitle" : "Description",
-          "mData" : "pool.description",
-          "bSortable" : false,
-          "iSortPriority" : 0,
-          "include" : true
-        }, {
-          "sTitle" : "Platform",
-          "mData" : "parameters.platform.instrumentModel",
-          "bSortable" : false,
-          "iSortPriority" : 0,
-          "include" : true
-        }, {
-          "sTitle" : "Longest Index",
-          "mData" : "pool.longestIndex",
-          "bSortable" : false,
-          "iSortPriority" : 0,
-          "include" : !config.poolId
-        }, {
-          "sTitle" : "Sequencing Parameters",
-          "mData" : "parameters.name",
-          "iSortPriority" : 0,
-          "include" : true
-        
-        }, {
-          "sTitle" : "Completed",
-          "mData" : "completed",
-          "bSortable" : false,
-          "iSortPriority" : 0,
-          "include" : true,
-          "visibilityFilter" : nonZero
-        
-        }, {
-          "sTitle" : "Failed",
-          "mData" : "failed",
-          "bSortable" : false,
-          "iSortPriority" : 0,
-          "include" : true,
-          "visibilityFilter" : nonZero
-        }, {
-          "sTitle" : "Requested",
-          "mData" : "requested",
-          "bSortable" : false,
-          "iSortPriority" : 0,
-          "include" : true,
-          "visibilityFilter" : nonZero
-        }, {
-          "sTitle" : "Running",
-          "mData" : "running",
-          "bSortable" : false,
-          "iSortPriority" : 0,
-          "include" : true,
-          "visibilityFilter" : nonZero
-        }, {
-          "sTitle" : "Started",
-          "mData" : "started",
-          "bSortable" : false,
-          "iSortPriority" : 0,
-          "include" : true,
-          "visibilityFilter" : nonZero
-        }, {
-          "sTitle" : "Stopped",
-          "mData" : "stopped",
-          "bSortable" : false,
-          "iSortPriority" : 0,
-          "include" : true,
-          "visibilityFilter" : nonZero
-        }, {
-          "sTitle" : "Unknown",
-          "mData" : "unknown",
-          "bSortable" : false,
-          "iSortPriority" : 0,
-          "include" : true,
-          "visibilityFilter" : nonZero
-        }, {
-          "sTitle" : "Remaining",
-          "mData" : "remaining",
-          "iSortPriority" : 0,
-          "include" : true
-        }, {
-          "sTitle" : "Last Modified",
-          "mData" : "lastUpdated",
-          "iSortPriority" : 2,
-          "include" : true
-        } ];
+    return [ListUtils.idHyperlinkColumn("Name", "pool", "pool.id", function(completion) {
+      return completion.pool.name;
+    }, 1, true), ListUtils.labelHyperlinkColumn("Alias", "pool", function(completion) {
+      return completion.pool.id;
+    }, "pool.alias", 0, true), {
+      "sTitle": "Description",
+      "mData": "pool.description",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": true
+    }, {
+      "sTitle": "Platform",
+      "mData": "parameters.platform.instrumentModel",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": true
+    }, {
+      "sTitle": "Longest Index",
+      "mData": "pool.longestIndex",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": !config.poolId
+    }, {
+      "sTitle": "Sequencing Parameters",
+      "mData": "parameters.name",
+      "iSortPriority": 0,
+      "include": true
+
+    }, {
+      "sTitle": "Completed",
+      "mData": "completed",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": true,
+      "visibilityFilter": nonZero
+
+    }, {
+      "sTitle": "Failed",
+      "mData": "failed",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": true,
+      "visibilityFilter": nonZero
+    }, {
+      "sTitle": "Requested",
+      "mData": "requested",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": true,
+      "visibilityFilter": nonZero
+    }, {
+      "sTitle": "Running",
+      "mData": "running",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": true,
+      "visibilityFilter": nonZero
+    }, {
+      "sTitle": "Started",
+      "mData": "started",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": true,
+      "visibilityFilter": nonZero
+    }, {
+      "sTitle": "Stopped",
+      "mData": "stopped",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": true,
+      "visibilityFilter": nonZero
+    }, {
+      "sTitle": "Unknown",
+      "mData": "unknown",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": true,
+      "visibilityFilter": nonZero
+    }, {
+      "sTitle": "Remaining",
+      "mData": "remaining",
+      "iSortPriority": 0,
+      "include": true
+    }, {
+      "sTitle": "Last Modified",
+      "mData": "lastUpdated",
+      "iSortPriority": 2,
+      "include": true
+    }];
   }
 };

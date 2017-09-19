@@ -66,6 +66,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 @Table(name = "KitDescriptor")
 public class KitDescriptor implements Serializable, ChangeLoggable {
 
+  public static int sortByName(KitDescriptor a, KitDescriptor b) {
+    return a.getName().compareTo(b.getName());
+  }
   private static final long serialVersionUID = 1L;
 
   /** Field UNSAVED_ID */

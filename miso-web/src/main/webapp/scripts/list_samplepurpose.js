@@ -22,41 +22,41 @@
  */
 
 ListTarget.samplepurpose = {
-  name : "Sample Purposes",
-  createUrl : function(config, projectId) {
+  name: "Sample Purposes",
+  createUrl: function(config, projectId) {
     throw "Must be provided statically";
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return config.isAdmin ? HotTarget.samplepurpose.bulkActions : [];
   },
-  createStaticActions : function(config, projectId) {
-    return config.isAdmin ? [ {
-      "name" : "Add",
-      "handler" : function() {
-        
-        Utils.showDialog('Create Sample Purposes', 'Create', [ {
-          property : 'quantity',
-          type : 'int',
-          label : 'Quantity',
-          value : 1
-        } ], function(result) {
+  createStaticActions: function(config, projectId) {
+    return config.isInternal ? [{
+      "name": "Add",
+      "handler": function() {
+
+        Utils.showDialog('Create Sample Purposes', 'Create', [{
+          property: 'quantity',
+          type: 'int',
+          label: 'Quantity',
+          value: 1
+        }], function(result) {
           if (result.quantity < 1) {
             Utils.showOkDialog('Create Sample Purposes', ["That's a peculiar number of sample purposes to create."]);
             return;
           }
           window.location = '/miso/samplepurpose/bulk/new?' + jQuery.param({
-            quantity : result.quantity,
+            quantity: result.quantity,
           });
         });
       }
-    } ] : [];
+    }] : [];
   },
-  createColumns : function(config, projectId) {
-    return [ {
-      "sTitle" : "Alias",
-      "mData" : "alias",
-      "include" : true,
-      "iSortPriority" : 0
+  createColumns: function(config, projectId) {
+    return [{
+      "sTitle": "Alias",
+      "mData": "alias",
+      "include": true,
+      "iSortPriority": 0
     }, ];
   }
 };

@@ -22,48 +22,46 @@
  */
 
 ListTarget.group = {
-  name : "Group",
-  createUrl : function(config, projectId) {
+  name: "Groups",
+  createUrl: function(config, projectId) {
     throw "Static data only";
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return [];
   },
-  createStaticActions : function(config, projectId) {
+  createStaticActions: function(config, projectId) {
     if (config.isAdmin || config.isTech) {
-      return [ {
-        "name" : "Add",
-        "handler" : function() {
-          window.location = config.isTech ? "/miso/tech/group/new"
-              : "/miso/admin/group/new";
+      return [{
+        "name": "Add",
+        "handler": function() {
+          window.location = config.isTech ? "/miso/tech/group/new" : "/miso/admin/group/new";
         }
-      } ];
+      }];
     } else {
       return [];
     }
   },
-  createColumns : function(config, projectId) {
-    return [
-        {
-          "sTitle" : "Name",
-          "mData" : "name",
-          "include" : true,
-          "iSortPriority" : 1,
-          "bSortDirection" : true,
-          "mRender" : function(data, type, full) {
-            if (config.isAdmin) {
-              return "<a href=\"/miso/admin/group/" + full.id + "\">" + data + "</a>";
-            } else if (config.isTech) {
-              return "<a href=\"/miso/tech/group/" + full.id + "\">" + data + "</a>";
-            } else {
-              return data;
-            }
-          }
-        }, {
-          "sTitle" : "Description",
-          "mData" : "description",
-          "include" : true,
-          "iSortPriority" : 0
-        } ];
+  createColumns: function(config, projectId) {
+    return [{
+      "sTitle": "Name",
+      "mData": "name",
+      "include": true,
+      "iSortPriority": 1,
+      "bSortDirection": true,
+      "mRender": function(data, type, full) {
+        if (config.isAdmin) {
+          return "<a href=\"/miso/admin/group/" + full.id + "\">" + data + "</a>";
+        } else if (config.isTech) {
+          return "<a href=\"/miso/tech/group/" + full.id + "\">" + data + "</a>";
+        } else {
+          return data;
+        }
+      }
+    }, {
+      "sTitle": "Description",
+      "mData": "description",
+      "include": true,
+      "iSortPriority": 0
+    }];
   }
 };

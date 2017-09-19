@@ -44,7 +44,7 @@
         </sec:authorize>
         Sequencer
         <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <button onclick="return Sequencer.validateSequencerReference();" class="fg-button ui-state-default ui-corner-all">Save</button>
+          <button id="save" onclick="return Sequencer.validateSequencerReference();" class="fg-button ui-state-default ui-corner-all">Save</button>
         </sec:authorize>
       </h1>
       <div class="breadcrumbs">
@@ -75,16 +75,16 @@
       <table class="in">
         <tr>
           <td class="h">Sequencer ID:</td>
-          <td>
+          <td><span id="instrumentId">
             <c:choose>
               <c:when test="${sequencerReference.id != 0}">${sequencerReference.id}</c:when>
               <c:otherwise><i>Unsaved</i></c:otherwise>
             </c:choose>
-          </td>
+          </span></td>
         </tr>
         <tr>
           <td class="h">Platform:</td>
-          <td>${sequencerReference.platform.nameAndModel}</td>
+          <td><span id="platform">${sequencerReference.platform.nameAndModel}</span></td>
         </tr>
         <tr>
           <td class="h">Serial Number:</td>
@@ -93,7 +93,7 @@
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <form:input path="serialNumber" id="serialNumber" name="serialNumber" class="validateable"/><span id="serialNumberCounter" class="counter"></span>
               </c:when>
-              <c:otherwise>${sequencerReference.serialNumber}</c:otherwise>
+              <c:otherwise><span id="serialNumber">${sequencerReference.serialNumber}</span></c:otherwise>
             </c:choose>
           </td>
         </tr>
@@ -104,7 +104,7 @@
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <form:input path="name" id="name" name="name" class="validateable"/><span id="nameCounter" class="counter"></span>
               </c:when>
-              <c:otherwise>${sequencerReference.name}</c:otherwise>
+              <c:otherwise><span id="name">${sequencerReference.name}</span></c:otherwise>
             </c:choose>
           </td>
         </tr>
@@ -116,7 +116,7 @@
                 <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}" class="validateable"/>
                 <input type="hidden" value="on" name="_ipAddress"/>
               </c:when>
-              <c:otherwise>${trimmedIpAddress}</c:otherwise>
+              <c:otherwise><span id="ipAddress">${trimmedIpAddress}</span></c:otherwise>
             </c:choose>
           </td>
         </tr>
@@ -138,9 +138,9 @@
                   Utils.ui.addDatePicker("datecommissionedpicker");
                 </script>
               </c:when>
-              <c:otherwise>
+              <c:otherwise><span id="dateCommissioned">
                 <fmt:formatDate value="${sequencerReference.dateCommissioned}" pattern="yyyy-MM-dd"/>
-              </c:otherwise>
+              </span></c:otherwise>
             </c:choose>
           </td>
         </tr>
@@ -149,16 +149,18 @@
           <td>
             <c:choose>
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <input type="radio" name="status" value="production" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned == null}">checked</c:if>/> Production
-                <input type="radio" name="status" value="retired" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">checked</c:if>/> Retired
-                <input type="radio" name="status" value="upgraded" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference != null}">checked</c:if>/> Upgraded
+                <label><input type="radio" name="status" value="production" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned == null}">checked</c:if>/> Production</label>
+                <label><input type="radio" name="status" value="retired" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">checked</c:if>/> Retired</label>
+                <label><input type="radio" name="status" value="upgraded" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference != null}">checked</c:if>/> Upgraded</label>
               </c:when>
               <c:otherwise>
+                <span name="status">
                 <c:choose>
                   <c:when test="${sequencerReference.dateDecommissioned == null}">Production</c:when>
                   <c:when test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">Retired</c:when>
                   <c:otherwise>Upgraded</c:otherwise>
                 </c:choose>
+                </span>
               </c:otherwise>
             </c:choose>
           </td>
@@ -231,25 +233,10 @@
       <div id="records_arrowclick" class="toggleLeft"></div>
     </div>
     <h1>Service Records</h1>
+    <span onclick="Sequencer.ui.addServiceRecord(${sequencerReference.dateDecommissioned != null}, ${sequencerReference.id})" 
+          class="sddm fg-button ui-state-default ui-corner-all" id="addServiceRecord">Add Service Record</span>
+
     <div id="recordsdiv" style="display:none;">
-      <ul class="sddm">
-        <li>
-          <a onmouseover="mopen('recordmenu')" onmouseout="mclosetime()">
-            Options
-            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-          </a>
-          <div id="recordmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-            <c:choose>
-              <c:when test="${sequencerReference.dateDecommissioned == null}">
-                <a href='<c:url value="/miso/sequencer/servicerecord/new/${sequencerReference.id}"/> '>Add new Service Record</a>
-              </c:when>
-              <c:otherwise>
-                <a class="disabled" onclick="alert('Cannot add Service Records to a retired Sequencer')">Add new Service Record</a>
-              </c:otherwise>
-            </c:choose>
-          </div>
-        </li>
-      </ul>
       <div style="clear:both">
         <table class="list" id="records_table">
           <thead>

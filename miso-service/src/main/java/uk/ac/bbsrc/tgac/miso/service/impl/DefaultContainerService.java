@@ -16,10 +16,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
@@ -40,6 +43,8 @@ public class DefaultContainerService
   private PoolService poolService;
   @Autowired
   private SecurityProfileStore securityProfileDao;
+  @Autowired
+  private KitService kitService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -111,9 +116,9 @@ public class DefaultContainerService
   @Override
   public void applyChanges(SequencerPartitionContainer source, SequencerPartitionContainer managed) throws IOException {
     managed.setIdentificationBarcode(source.getIdentificationBarcode());
-    managed.setLocationBarcode(source.getLocationBarcode());
-    managed.setValidationBarcode(source.getValidationBarcode());
     managed.setPlatform(source.getPlatform());
+    managed.setClusteringKit(source.getClusteringKit());
+    managed.setMultiplexingKit(source.getMultiplexingKit());
 
     for (Partition sourcePartition : source.getPartitions()) {
       for (Partition managedPartition : managed.getPartitions()) {
@@ -150,6 +155,20 @@ public class DefaultContainerService
    */
   private void loadChildEntities(SequencerPartitionContainer container) throws IOException {
     container.setPlatform(platformService.get(container.getPlatform().getId()));
+    if (container.getClusteringKit() != null) {
+      KitDescriptor descriptor = kitService.getKitDescriptorById(container.getClusteringKit().getId());
+      if (descriptor.getKitType() != KitType.CLUSTERING) {
+        throw new IllegalArgumentException(descriptor.getName() + " is not a clustering kit.");
+      }
+      container.setClusteringKit(descriptor);
+    }
+    if (container.getMultiplexingKit() != null) {
+      KitDescriptor descriptor = kitService.getKitDescriptorById(container.getMultiplexingKit().getId());
+      if (descriptor.getKitType() != KitType.MULTIPLEXING) {
+        throw new IllegalArgumentException(descriptor.getName() + " is not a multiplexing kit.");
+      }
+      container.setMultiplexingKit(descriptor);
+    }
   }
 
   /**

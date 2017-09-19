@@ -23,60 +23,53 @@
 
 ListTarget.qc = function(qcTarget) {
   return {
-    name : qcTarget + " QCs",
-    createUrl : function(config, projectId) {
+    name: qcTarget + " QCs",
+    createUrl: function(config, projectId) {
       throw "QCs can only be generated statically";
     },
-    createBulkActions : function(config, projectId) {
+    createBulkActions: function(config, projectId) {
       return HotTarget.qc(qcTarget).bulkActions;
     },
-    createStaticActions : function(config, projectId) {
-      return config.entityId
-          ? [ {
-            name : 'Add QCs',
-            handler : function() {
-              Utils
-                  .showDialog(
-                      'Add QCs',
-                      'Add',
-                      [ {
-                        property : 'copies',
-                        type : 'int',
-                        label : 'QCs per ' + qcTarget,
-                        value : 1
-                      }, ],
-                      function(result) {
-                        window.location = window.location.origin + '/miso/qc/bulk/addFrom/' + qcTarget + '?' + jQuery
-                            .param({
-                              entityIds : config.entityId,
-                              copies : result.copies
-                            });
-                      });
-            }
-          } ] : [];
+    createStaticActions: function(config, projectId) {
+      return config.entityId ? [{
+        name: 'Add QCs',
+        handler: function() {
+          Utils.showDialog('Add QCs', 'Add', [{
+            property: 'copies',
+            type: 'int',
+            label: 'QCs per ' + qcTarget,
+            value: 1
+          }, ], function(result) {
+            window.location = window.location.origin + '/miso/qc/bulk/addFrom/' + qcTarget + '?' + jQuery.param({
+              entityIds: config.entityId,
+              copies: result.copies
+            });
+          });
+        }
+      }] : [];
     },
-    createColumns : function(config, projectId) {
-      return [ {
-        "sTitle" : "Method",
-        "mData" : "type.name",
-        "include" : true,
-        "iSortPriority" : 0
+    createColumns: function(config, projectId) {
+      return [{
+        "sTitle": "Method",
+        "mData": "type.name",
+        "include": true,
+        "iSortPriority": 0
       }, {
-        "sTitle" : "Creator",
-        "mData" : "creator",
-        "include" : true,
-        "iSortPriority" : 0
+        "sTitle": "Creator",
+        "mData": "creator",
+        "include": true,
+        "iSortPriority": 0
       }, {
-        "sTitle" : "Date",
-        "mData" : "date",
-        "include" : true,
-        "iSortPriority" : 1
+        "sTitle": "Date",
+        "mData": "date",
+        "include": true,
+        "iSortPriority": 1
       }, {
-        "sTitle" : "Results",
-        "mData" : "results",
-        "include" : true,
-        "iSortPriority" : 0,
-        "mRender" : function(data, type, full) {
+        "sTitle": "Results",
+        "mData": "results",
+        "include": true,
+        "iSortPriority": 0,
+        "mRender": function(data, type, full) {
           return data + " " + full.type.units;
         }
       }, ];

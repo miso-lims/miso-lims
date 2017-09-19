@@ -249,21 +249,21 @@ VALUES (1,'WGS','Whole genome shotgun'),
 (14,'CTS','Concatenated Tag Sequencing');
 
 DELETE FROM `Library`;
-INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `securityProfile_profileId`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`)
-VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
-(2,'LIB2','Inherited from TEST_0001',NULL,1,2,'LIB2::TEST_0001_Bn_R_PE_300_WG','LIBRARY_INBOX_A02',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(3,'LIB3','Inherited from TEST_0002',NULL,1,3,'LIB3::TEST_0002_Bn_P_PE_300_WG','LIBRARY_INBOX_A03',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
-(4,'LIB4','Inherited from TEST_0002',NULL,1,4,'LIB4::TEST_0002_Bn_R_PE_300_WG','LIBRARY_INBOX_A04',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55'),
-(5,'LIB5','Inherited from TEST_0003',NULL,1,5,'LIB5::TEST_0003_Bn_P_PE_300_WG','LIBRARY_INBOX_A05',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57'),
-(6,'LIB6','Inherited from TEST_0003',NULL,1,6,'LIB6::TEST_0003_Bn_R_PE_300_WG','LIBRARY_INBOX_A06',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59'),
-(7,'LIB7','Inherited from TEST_0004',NULL,1,7,'LIB7::TEST_0004_Bn_P_PE_300_WG','LIBRARY_INBOX_A07',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01'),
-(8,'LIB8','Inherited from TEST_0004',NULL,1,8,'LIB8::TEST_0004_Bn_R_PE_300_WG','LIBRARY_INBOX_A08',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03'),
-(9,'LIB9','Inherited from TEST_0005',NULL,1,9,'LIB9::TEST_0005_Bn_P_PE_300_WG','LIBRARY_INBOX_A09',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05'),
-(10,'LIB10','Inherited from TEST_0005',NULL,1,10,'LIB10::TEST_0005_Bn_R_PE_300_WG','LIBRARY_INBOX_A10',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07'),
-(11,'LIB11','Inherited from TEST_0006',NULL,1,11,'LIB11::TEST_0006_Bn_P_PE_300_WG','LIBRARY_INBOX_B01',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09'),
-(12,'LIB12','Inherited from TEST_0006',NULL,1,12,'LIB12::TEST_0006_Bn_R_PE_300_WG','LIBRARY_INBOX_B02',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11'),
-(13,'LIB13','Inherited from TEST_0007',NULL,1,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13'),
-(14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15');
+INSERT INTO `Library`(`libraryId`, `name`, `description`, `accession`, `securityProfile_profileId`, `sample_sampleId`, `identificationBarcode`, `locationBarcode`, `libraryType`, `concentration`, `creationDate`, `platformType`, `alias`, `paired`, `librarySelectionType`, `libraryStrategyType`, `qcPassed`, `lastModifier`, `lastModified`, `creator`, `created`, `kitDescriptorId`)
+VALUES (1,'LIB1','Inherited from TEST_0001',NULL,1,1,'LIB1::TEST_0001_Bn_P_PE_300_WG','LIBRARY_INBOX_A01',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49', 1),
+(2,'LIB2','Inherited from TEST_0001',NULL,1,2,'LIB2::TEST_0001_Bn_R_PE_300_WG','LIBRARY_INBOX_A02',3,0,'2015-08-27','ILLUMINA','TEST_0001_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51', NULL),
+(3,'LIB3','Inherited from TEST_0002',NULL,1,3,'LIB3::TEST_0002_Bn_P_PE_300_WG','LIBRARY_INBOX_A03',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53', NULL),
+(4,'LIB4','Inherited from TEST_0002',NULL,1,4,'LIB4::TEST_0002_Bn_R_PE_300_WG','LIBRARY_INBOX_A04',3,0,'2015-08-27','ILLUMINA','TEST_0002_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:55',1,'2016-07-07 13:30:55', NULL),
+(5,'LIB5','Inherited from TEST_0003',NULL,1,5,'LIB5::TEST_0003_Bn_P_PE_300_WG','LIBRARY_INBOX_A05',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:57',1,'2016-07-07 13:30:57', NULL),
+(6,'LIB6','Inherited from TEST_0003',NULL,1,6,'LIB6::TEST_0003_Bn_R_PE_300_WG','LIBRARY_INBOX_A06',3,0,'2015-08-27','ILLUMINA','TEST_0003_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:30:59',1,'2016-07-07 13:30:59', NULL),
+(7,'LIB7','Inherited from TEST_0004',NULL,1,7,'LIB7::TEST_0004_Bn_P_PE_300_WG','LIBRARY_INBOX_A07',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:01',1,'2016-07-07 13:31:01', NULL),
+(8,'LIB8','Inherited from TEST_0004',NULL,1,8,'LIB8::TEST_0004_Bn_R_PE_300_WG','LIBRARY_INBOX_A08',3,0,'2015-08-27','ILLUMINA','TEST_0004_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:03',1,'2016-07-07 13:31:03', NULL),
+(9,'LIB9','Inherited from TEST_0005',NULL,1,9,'LIB9::TEST_0005_Bn_P_PE_300_WG','LIBRARY_INBOX_A09',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:05',1,'2016-07-07 13:31:05', NULL),
+(10,'LIB10','Inherited from TEST_0005',NULL,1,10,'LIB10::TEST_0005_Bn_R_PE_300_WG','LIBRARY_INBOX_A10',3,0,'2015-08-27','ILLUMINA','TEST_0005_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:07',1,'2016-07-07 13:31:07', NULL),
+(11,'LIB11','Inherited from TEST_0006',NULL,1,11,'LIB11::TEST_0006_Bn_P_PE_300_WG','LIBRARY_INBOX_B01',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:09',1,'2016-07-07 13:31:09', NULL),
+(12,'LIB12','Inherited from TEST_0006',NULL,1,12,'LIB12::TEST_0006_Bn_R_PE_300_WG','LIBRARY_INBOX_B02',3,0,'2015-08-27','ILLUMINA','TEST_0006_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11', NULL),
+(13,'LIB13','Inherited from TEST_0007',NULL,1,13,'LIB13::TEST_0007_Bn_P_PE_300_WG','LIBRARY_INBOX_B03',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_P_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13', NULL),
+(14,'LIB14','Inherited from TEST_0007',NULL,1,14,'LIB14::TEST_0007_Bn_R_PE_300_WG','LIBRARY_INBOX_B04',3,0,'2015-08-27','ILLUMINA','TEST_0007_Bn_R_PE_300_WG',1,1,1,'true',1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15', NULL);
 
 DELETE FROM LibraryChangeLog;
 INSERT INTO `LibraryChangeLog`(`libraryId`, `columnsChanged`, `userId`, `message`, `changeTime`)
@@ -468,17 +468,17 @@ INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`)
 VALUES (1,1,1);
 
 DELETE FROM `SequencerPartitionContainer`;
-INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `locationBarcode`, `platform`, `validationBarcode`, `lastModifier`, `lastModified`, `creator`, `created`) 
-VALUES (1,12,'C0JHTACXX','',16,'',1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
-(2,13,'D0VJ9ACXX','',16,'',1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
-(3,14,'C075RACXX','',16,'',1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
-(4,15,'C0KY7ACXX','',16,'',1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53');
+INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `platform`, `lastModifier`, `lastModified`, `creator`, `created`) 
+VALUES (1,12,'C0JHTACXX',16,1,'2016-07-07 13:30:47',1,'2016-07-07 13:30:47'),
+(2,13,'D0VJ9ACXX',16,1,'2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
+(3,14,'C075RACXX',16,1,'2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
+(4,15,'C0KY7ACXX',16,1,'2016-07-07 13:30:53',1,'2016-07-07 13:30:53');
 
 INSERT INTO `SequencerPartitionContainerChangeLog`(`containerId`, `columnsChanged`, `userId`, `message`, `changeTime`)
-VALUES (1, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
-(2, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:49'),
-(3, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:51'),
-(4, 'validationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:53');
+VALUES (1, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:47'),
+(2, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:49'),
+(3, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:51'),
+(4, 'identificationBarcode', 1, 'NULL -> real', '2016-07-07 13:30:53');
 
 DELETE FROM `SequencerPartitionContainer_Partition`;
 INSERT INTO `SequencerPartitionContainer_Partition`(`container_containerId`, `partitions_partitionId`) 
@@ -613,5 +613,5 @@ INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `c
 VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
 
 DELETE FROM `DetailedLibrary`;
-INSERT INTO `DetailedLibrary`(`libraryId`, `kitDescriptorId`, `libraryDesignCodeId`)
-VALUES (1,1,1);
+INSERT INTO `DetailedLibrary`(`libraryId`, `libraryDesignCodeId`)
+VALUES (1,1);

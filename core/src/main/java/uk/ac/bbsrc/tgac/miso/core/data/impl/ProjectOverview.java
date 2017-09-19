@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -62,7 +63,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Watchable;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data
@@ -382,7 +382,7 @@ public class ProjectOverview implements Watchable, Nameable, Serializable {
     sb.append(" : ");
     if (getSampleGroup() != null && !getSampleGroup().isEmpty()) {
       sb.append(" [ ");
-      sb.append(LimsUtils.join(getSampleGroup(), ","));
+      sb.append(getSampleGroup().stream().map(Object::toString).collect(Collectors.joining(",")));
       sb.append(" ] ");
     }
     return sb.toString();

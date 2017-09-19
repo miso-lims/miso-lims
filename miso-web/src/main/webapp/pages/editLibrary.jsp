@@ -339,6 +339,13 @@
     <c:if test="${!empty library.boxPosition}"><a href='<c:url value="/miso/box/${library.box.id}"/>'>${library.box.alias}, ${library.boxPosition}</a></c:if>
   </td>
 </tr>
+  <tr>
+    <td>Library Kit:*</td>
+    <td>
+      <miso:select id="libraryKit" path="kitDescriptor" items="${prepKits}" itemLabel="name"
+          itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+    </td>
+  </tr>
 </table>
 <script type="text/javascript">
     Library = Library || {};
@@ -368,13 +375,6 @@
     <td><a href="http://lims.res.oicr.on.ca/gsle/GA/templateDetails?template_id=${library.preMigrationId}">${library.preMigrationId}</a>
   </tr>
   </c:if>
-  <tr>
-    <td>Library Kit:*</td>
-    <td>
-      <miso:select id="libraryKit" path="kitDescriptor" items="${prepKits}" itemLabel="name"
-          itemValue="id" defaultLabel="SELECT" defaultValue=""/>
-    </td>
-  </tr>
   <c:if test="${not empty library.sample.groupId}">
     <tr>
       <td class="h">Group ID:</td>

@@ -443,4 +443,14 @@ public class LibraryDilution
     discarded = emptied;
   }
 
+  @Override
+  public Date getBarcodeDate() {
+    return getCreationDate();
+  }
+
+  @Override
+  public String getBarcodeExtraInfo() {
+    return library.getName();
+  }
+
 }

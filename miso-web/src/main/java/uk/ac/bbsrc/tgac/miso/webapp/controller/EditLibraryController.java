@@ -290,28 +290,6 @@ public class EditLibraryController {
     return types;
   }
 
-  @ModelAttribute("platformTypesString")
-  public String platformTypesString() throws IOException {
-    List<String> names = new ArrayList<>();
-    List<String> pn = populatePlatformTypes();
-    for (String name : pn) {
-      names.add("\"" + name + "\"" + ":" + "\"" + name + "\"");
-    }
-    if (!pn.isEmpty()) {
-      names.add("\"selected\":" + "\"" + pn.get(0) + "\"");
-    }
-    return LimsUtils.join(names, ",");
-  }
-
-  @ModelAttribute("libraryTypesString")
-  public String libraryTypesString() throws IOException {
-    List<String> types = new ArrayList<>();
-    for (LibraryType t : populateLibraryTypes()) {
-      types.add("\"" + t.getDescription() + "\"" + ":" + "\"" + t.getDescription() + "\"");
-    }
-    return LimsUtils.join(types, ",");
-  }
-
   @ModelAttribute("librarySelectionTypes")
   public Collection<LibrarySelectionType> populateLibrarySelectionTypes() throws IOException {
     List<LibrarySelectionType> types = new ArrayList<>(libraryService.listLibrarySelectionTypes());
@@ -319,29 +297,11 @@ public class EditLibraryController {
     return types;
   }
 
-  @ModelAttribute("librarySelectionTypesString")
-  public String librarySelectionTypesString() throws IOException {
-    List<String> types = new ArrayList<>();
-    for (LibrarySelectionType t : populateLibrarySelectionTypes()) {
-      types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
-    }
-    return LimsUtils.join(types, ",");
-  }
-
   @ModelAttribute("libraryStrategyTypes")
   public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
     List<LibraryStrategyType> types = new ArrayList<>(libraryService.listLibraryStrategyTypes());
     Collections.sort(types);
     return types;
-  }
-
-  @ModelAttribute("libraryStrategyTypesString")
-  public String libraryStrategyTypesString() throws IOException {
-    List<String> types = new ArrayList<>();
-    for (LibraryStrategyType t : populateLibraryStrategyTypes()) {
-      types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
-    }
-    return LimsUtils.join(types, ",");
   }
 
   public void populateAvailableIndexFamilies(Library library, ModelMap model) throws IOException {
@@ -368,12 +328,7 @@ public class EditLibraryController {
   @ModelAttribute("prepKits")
   public List<KitDescriptor> getPrepKits() throws IOException {
     List<KitDescriptor> list = new ArrayList<>(kitService.listKitDescriptorsByType(KitType.LIBRARY));
-    Collections.sort(list, new Comparator<KitDescriptor>() {
-      @Override
-      public int compare(KitDescriptor kd1, KitDescriptor kd2) {
-        return kd1.getName().compareTo(kd2.getName());
-      }
-    });
+    Collections.sort(list, KitDescriptor::sortByName);
     return list;
   }
 

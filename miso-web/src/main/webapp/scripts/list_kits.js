@@ -22,56 +22,53 @@
  */
 
 ListTarget.kit = {
-  name : "Kits",
-  createUrl : function(config, projectId) {
-    return "/miso/rest/kitdescriptor/dt" + (config.kitType
-        ? "/type/" + config.kitType : "");
+  name: "Kits",
+  createUrl: function(config, projectId) {
+    return "/miso/rest/kitdescriptor/dt" + (config.kitType ? "/type/" + config.kitType : "");
   },
-  createBulkActions : function(config, projectId) {
-    
+  createBulkActions: function(config, projectId) {
+
     return [];
   },
-  createStaticActions : function(config, projectId) {
-    return [ {
-      "name" : "Add",
-      "handler" : function() {
+  createStaticActions: function(config, projectId) {
+    return [{
+      "name": "Add",
+      "handler": function() {
         window.location = '/miso/kitdescriptor/new';
       }
-    } ];
+    }];
   },
-  createColumns : function(config, projectId) {
-    return [
-        ListUtils.labelHyperlinkColumn("Name", "kitdescriptor",
-            Utils.array.getId, "name", 1, true), {
-          "sTitle" : "Version",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mData" : "version"
-        }, {
-          "sTitle" : "Manufacturer",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mData" : "manufacturer"
-        }, {
-          "sTitle" : "Part Number",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mData" : "partNumber"
-        }, {
-          "sTitle" : "Type",
-          "include" : !config.kitType,
-          "iSortPriority" : 0,
-          "mData" : "kitType"
-        }, {
-          "sTitle" : "Stock Level",
-          "include" : true,
-          "iSortPriority" : 0,
-          "mData" : "stockLevel"
-        }, {
-          "sTitle" : "Platform",
-          "include" : !config.platformType,
-          "iSortPriority" : 0,
-          "mData" : "platformType"
-        } ];
+  createColumns: function(config, projectId) {
+    return [ListUtils.labelHyperlinkColumn("Name", "kitdescriptor", Utils.array.getId, "name", 1, true), {
+      "sTitle": "Version",
+      "include": true,
+      "iSortPriority": 0,
+      "mData": "version"
+    }, {
+      "sTitle": "Manufacturer",
+      "include": true,
+      "iSortPriority": 0,
+      "mData": "manufacturer"
+    }, {
+      "sTitle": "Part Number",
+      "include": true,
+      "iSortPriority": 0,
+      "mData": "partNumber"
+    }, {
+      "sTitle": "Type",
+      "include": !config.kitType,
+      "iSortPriority": 0,
+      "mData": "kitType"
+    }, {
+      "sTitle": "Stock Level",
+      "include": true,
+      "iSortPriority": 0,
+      "mData": "stockLevel"
+    }, {
+      "sTitle": "Platform",
+      "include": !config.platformType,
+      "iSortPriority": 0,
+      "mData": "platformType"
+    }];
   }
 };

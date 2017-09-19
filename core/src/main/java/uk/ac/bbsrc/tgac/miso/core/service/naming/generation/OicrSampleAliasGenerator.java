@@ -12,6 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -89,7 +90,7 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
       if (siblingNumberGenerator == null) {
         throw new IllegalStateException("No SiblingNumberGenerator configured");
       }
-      sample.setSiblingNumber(siblingNumberGenerator.getNextSiblingNumber(partialAlias));
+      sample.setSiblingNumber(siblingNumberGenerator.getNextSiblingNumber(SampleImpl.class, partialAlias));
     }
     String siblingNum = sample.getSiblingNumber().toString();
     // Sibling number is only padded for Tissue Processing

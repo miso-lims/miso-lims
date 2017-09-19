@@ -22,7 +22,7 @@
  */
 
 var Pool = Pool || {
-  validatePool: function () {
+  validatePool: function() {
     Validate.cleanFields('#pool-form');
     jQuery('#pool-form').parsley().destroy();
 
@@ -69,172 +69,127 @@ var Pool = Pool || {
 };
 
 Pool.ui = {
-  selectElementsByBarcodes : function(codes) {
+  selectElementsByBarcodes: function(codes) {
     if (codes === "") {
       alert("Please input at least one barcode...");
     } else {
-      Fluxion.doAjax(
-        'poolControllerHelperService',
-        'selectElementsByBarcodeList',
-        {
-          'barcodes':codes,
-          'url':ajaxurl
-        },
-        {
-          'updateElement':'importlist'
-        }
-      );
+      Fluxion.doAjax('poolControllerHelperService', 'selectElementsByBarcodeList', {
+        'barcodes': codes,
+        'url': ajaxurl
+      }, {
+        'updateElement': 'importlist'
+      });
     }
   },
 
-  dilutionFileUploadProgress : function() {
+  dilutionFileUploadProgress: function() {
     var self = this;
-    Fluxion.doAjaxUpload(
-      'ajax_upload_form',
-      'fileUploadProgressBean',
-      'checkUploadStatus',
-      {
-        'url':ajaxurl
-      },
-      {
-        'statusElement':'statusdiv',
-        'progressElement':'trash',
-        'doOnSuccess':self.dilutionFileUploadSuccessFunc
-      },
-      {'':''}
-    );
+    Fluxion.doAjaxUpload('ajax_upload_form', 'fileUploadProgressBean', 'checkUploadStatus', {
+      'url': ajaxurl
+    }, {
+      'statusElement': 'statusdiv',
+      'progressElement': 'trash',
+      'doOnSuccess': self.dilutionFileUploadSuccessFunc
+    }, {
+      '': ''
+    });
   },
 
-  dilutionFileUploadSuccessFunc : function() {
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'selectDilutionsByBarcodeFile',
-      {
-        'url':ajaxurl
-      },
-      {
-        'updateElement':'dilimportfile'
-      }
-    );
+  dilutionFileUploadSuccessFunc: function() {
+    Fluxion.doAjax('poolControllerHelperService', 'selectDilutionsByBarcodeFile', {
+      'url': ajaxurl
+    }, {
+      'updateElement': 'dilimportfile'
+    });
   },
 
   /** Deprecated */
-  libraryDilutionFileUploadProgress : function() {
+  libraryDilutionFileUploadProgress: function() {
     var self = this;
-    Fluxion.doAjaxUpload(
-      'ajax_upload_form',
-      'fileUploadProgressBean',
-      'checkUploadStatus',
-      {
-        'url':ajaxurl
-      },
-      {
-        'statusElement':'statusdiv',
-        'progressElement':'trash',
-        'doOnSuccess':self.libraryDilutionFileUploadSuccessFunc
-      },
-      {'':''}
-    );
+    Fluxion.doAjaxUpload('ajax_upload_form', 'fileUploadProgressBean', 'checkUploadStatus', {
+      'url': ajaxurl
+    }, {
+      'statusElement': 'statusdiv',
+      'progressElement': 'trash',
+      'doOnSuccess': self.libraryDilutionFileUploadSuccessFunc
+    }, {
+      '': ''
+    });
   },
 
   /** Deprecated */
-  libraryDilutionFileUploadSuccessFunc : function() {
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'selectLibraryDilutionsByBarcodeFile',
-      {
-        'url':ajaxurl
-      },
-      {
-        'updateElement':'dilimportfile'
-      }
-    );
+  libraryDilutionFileUploadSuccessFunc: function() {
+    Fluxion.doAjax('poolControllerHelperService', 'selectLibraryDilutionsByBarcodeFile', {
+      'url': ajaxurl
+    }, {
+      'updateElement': 'dilimportfile'
+    });
   },
 
   /** Deprecated */
-  ls454EmPcrDilutionFileUploadProgress : function() {
+  ls454EmPcrDilutionFileUploadProgress: function() {
     var self = this;
-    Fluxion.doAjaxUpload(
-      'ajax_upload_form',
-      'fileUploadProgressBean',
-      'checkUploadStatus',
-      {
-        'url':ajaxurl
-      },
-      {
-        'statusElement':'statusdiv',
-        'progressElement':'trash',
-        'doOnSuccess':self.ls454EmPcrDilutionFileUploadSuccessFunc
-      },
-      {'':''}
-    );
+    Fluxion.doAjaxUpload('ajax_upload_form', 'fileUploadProgressBean', 'checkUploadStatus', {
+      'url': ajaxurl
+    }, {
+      'statusElement': 'statusdiv',
+      'progressElement': 'trash',
+      'doOnSuccess': self.ls454EmPcrDilutionFileUploadSuccessFunc
+    }, {
+      '': ''
+    });
   },
 
   /** Deprecated */
-  ls454EmPcrDilutionFileUploadSuccessFunc : function() {
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'select454EmPCRDilutionsByBarcodeFile',
-      {
-        'url':ajaxurl
-      },
-      {
-        'updateElement':'dilimportfile'
-      }
-    );
+  ls454EmPcrDilutionFileUploadSuccessFunc: function() {
+    Fluxion.doAjax('poolControllerHelperService', 'select454EmPCRDilutionsByBarcodeFile', {
+      'url': ajaxurl
+    }, {
+      'updateElement': 'dilimportfile'
+    });
   },
 
   /** Deprecated */
-  solidEmPcrDilutionFileUploadProgress : function() {
+  solidEmPcrDilutionFileUploadProgress: function() {
     var self = this;
-    Fluxion.doAjaxUpload(
-      'ajax_upload_form',
-      'fileUploadProgressBean',
-      'checkUploadStatus',
-      {
-        'url':ajaxurl
-      },
-      {
-        'statusElement':'statusdiv',
-        'progressElement':'trash',
-        'doOnSuccess':self.solidEmPcrDilutionFileUploadSuccessFunc
-      },
-      {'':''}
-    );
+    Fluxion.doAjaxUpload('ajax_upload_form', 'fileUploadProgressBean', 'checkUploadStatus', {
+      'url': ajaxurl
+    }, {
+      'statusElement': 'statusdiv',
+      'progressElement': 'trash',
+      'doOnSuccess': self.solidEmPcrDilutionFileUploadSuccessFunc
+    }, {
+      '': ''
+    });
   },
 
   /** Deprecated */
-  solidEmPcrDilutionFileUploadSuccessFunc : function() {
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'selectSolidEmPCRDilutionsByBarcodeFile',
-      {
-        'url':ajaxurl
-      },
-      {
-        'updateElement':'dilimportfile'
-      }
-    );
+  solidEmPcrDilutionFileUploadSuccessFunc: function() {
+    Fluxion.doAjax('poolControllerHelperService', 'selectSolidEmPCRDilutionsByBarcodeFile', {
+      'url': ajaxurl
+    }, {
+      'updateElement': 'dilimportfile'
+    });
   },
 
-  showPoolNoteDialog: function (poolId) {
+  showPoolNoteDialog: function(poolId) {
     var self = this;
     jQuery('#addNoteDialog')
-      .html("<form>" +
-        "<fieldset class='dialog'>" +
-        "<label for='internalOnly'>Internal Only?</label>" +
-        "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
-        "<br/>" +
-        "<label for='notetext'>Text</label>" +
-        "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />" +
-        "</fieldset></form>");
+        .html(
+            "<form>"
+                + "<fieldset class='dialog'>"
+                + "<label for='internalOnly'>Internal Only?</label>"
+                + "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />"
+                + "<br/>" + "<label for='notetext'>Text</label>"
+                + "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />"
+                + "</fieldset></form>");
 
     jQuery('#addNoteDialog').dialog({
       width: 400,
       modal: true,
       resizable: false,
       buttons: {
-        "Add Note": function () {
+        "Add Note": function() {
           if (jQuery('#notetext').val().length > 0) {
             self.addPoolNote(poolId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
@@ -242,80 +197,63 @@ Pool.ui = {
             jQuery('#notetext').focus();
           }
         },
-        "Cancel": function () {
+        "Cancel": function() {
           jQuery(this).dialog('close');
         }
       }
     });
   },
 
-  addPoolNote: function (poolId, internalOnly, text) {
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'addPoolNote',
-      {
-        'poolId': poolId,
-        'internalOnly': internalOnly,
-        'text': text,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': Utils.page.pageReload
-      }
-    );
+  addPoolNote: function(poolId, internalOnly, text) {
+    Fluxion.doAjax('poolControllerHelperService', 'addPoolNote', {
+      'poolId': poolId,
+      'internalOnly': internalOnly,
+      'text': text,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': Utils.page.pageReload
+    });
   },
 
-  deletePoolNote: function (poolId, noteId) {
+  deletePoolNote: function(poolId, noteId) {
     var deleteIt = function() {
-      Fluxion.doAjax(
-        'poolControllerHelperService',
-        'deletePoolNote',
-        {
-          'poolId': poolId,
-          'noteId': noteId,
-          'url': ajaxurl
-        },
-        {
-          'doOnSuccess': Utils.page.pageReload
-        }
-      );
+      Fluxion.doAjax('poolControllerHelperService', 'deletePoolNote', {
+        'poolId': poolId,
+        'noteId': noteId,
+        'url': ajaxurl
+      }, {
+        'doOnSuccess': Utils.page.pageReload
+      });
     }
-    Utils.showConfirmDialog('Delete Note', 'Delete',
-      ["Are you sure you want to delete this note?"],
-      deleteIt
-    );
+    Utils.showConfirmDialog('Delete Note', 'Delete', ["Are you sure you want to delete this note?"], deleteIt);
   }
 };
 
 Pool.search = {
-  poolSearchExperiments : function(input, platform) {
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'poolSearchExperiments',
-      {
-        'str':jQuery(input).val(),
-        'platform':platform,
-        'id':input.id,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          jQuery('#exptresult').css('visibility', 'visible');
-          jQuery('#exptresult').html(json.html);
-          jQuery(input).blur(function() {
-            jQuery('#exptresult :first-child').hide();
-          });
-        }
+  poolSearchExperiments: function(input, platform) {
+    Fluxion.doAjax('poolControllerHelperService', 'poolSearchExperiments', {
+      'str': jQuery(input).val(),
+      'platform': platform,
+      'id': input.id,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': function(json) {
+        jQuery('#exptresult').css('visibility', 'visible');
+        jQuery('#exptresult').html(json.html);
+        jQuery(input).blur(function() {
+          jQuery('#exptresult :first-child').hide();
+        });
       }
-    );
+    });
   },
 
-  poolSearchSelectExperiment : function(experimentId, experimentName) {
+  poolSearchSelectExperiment: function(experimentId, experimentName) {
     if (jQuery("#experiments" + experimentId).length > 0) {
       alert("Experiment " + experimentName + " is already associated with this pool.");
     } else {
       var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
-      div += "<span class='float-left'><input type='hidden' id='experiment" + experimentId + "' value='" + experimentId + "' name='experiments'/>";
+      div += "<span class='float-left'><input type='hidden' id='experiment" + experimentId + "' value='" + experimentId
+          + "' name='experiments'/>";
       div += "<b>Experiment: " + experimentName + "</b></span>";
       div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
       jQuery('#exptlist').append(div);
@@ -323,23 +261,17 @@ Pool.search = {
     jQuery('#exptresult').css('visibility', 'hidden');
   },
 
-  poolSearchLibraryDilution : function(input, platform) {
-    Fluxion.doAjax(
-      'poolControllerHelperService',
-      'poolSearchLibraryDilution',
-      {
-        'str':jQuery(input).val(),
-        'platform':platform,
-        'id':input.id,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          jQuery('#searchDilutionResult').css('visibility', 'visible');
-          jQuery('#searchDilutionResult').html(json.html);
-        }
+  poolSearchLibraryDilution: function(input, platform) {
+    Fluxion.doAjax('poolControllerHelperService', 'poolSearchLibraryDilution', {
+      'str': jQuery(input).val(),
+      'platform': platform,
+      'id': input.id,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': function(json) {
+        jQuery('#searchDilutionResult').css('visibility', 'visible');
+        jQuery('#searchDilutionResult').html(json.html);
       }
-    );
+    });
   }
 };
-

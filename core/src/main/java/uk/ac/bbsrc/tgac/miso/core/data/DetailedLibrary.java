@@ -1,12 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-
 public interface DetailedLibrary extends Library {
-
-  KitDescriptor getKitDescriptor();
-
-  void setKitDescriptor(KitDescriptor prepKit);
 
   Boolean getArchived();
 
@@ -27,6 +21,7 @@ public interface DetailedLibrary extends Library {
   /**
    * @return the old LIMS' ID for this library prior to being migrated to MISO
    */
+  @Override
   Long getPreMigrationId();
 
   void setPreMigrationId(Long preMigrationId);

@@ -760,6 +760,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     assertBoxPropertiesMatch(from, to);
     // Because we're already inside the session at this point, the original object must be evicted
     // to allow changes to be observed and changeLogged in the Service/RequestManager layer
+    to = deproxify(to);
     sessionFactory.getCurrentSession().evict(to);
     for (Entry<String, BoxableView> entry : from.getBoxables().entrySet()) {
       if (entry.getValue() != null) {

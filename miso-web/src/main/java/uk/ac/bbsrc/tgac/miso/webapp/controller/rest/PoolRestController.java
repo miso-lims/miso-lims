@@ -57,7 +57,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
@@ -277,7 +276,7 @@ public class PoolRestController extends RestController {
     for (String name : types) {
       names.add("\"" + name + "\"");
     }
-    return "[" + LimsUtils.join(names, ",") + "]";
+    return "[" + String.join(",", names) + "]";
   }
 
   @RequestMapping(value = "/picker/search")

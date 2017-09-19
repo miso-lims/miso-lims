@@ -78,14 +78,31 @@ public class MisoWebUtils {
     return checks;
   }
 
+  /**
+   * Similar to checkDirectory, but for single files.
+   * 
+   * @param path of type File
+   * @return boolean true if the file exists, false if not
+   * @throws IOException when the file doesn't exist
+   */
+  private static boolean checkFile(File path) throws IOException {
+    boolean storageOk = path.exists();
+    if (!storageOk) {
+      StringBuilder sb = new StringBuilder("The file [" + path.toString() + "] doesn't exist.");
+      throw new IOException(sb.toString());
+    } else {
+      log.info("File (" + path + ") OK.");
+    }
+    return storageOk;
+  }
   public static Map<String, String> checkCorePropertiesFiles(String baseStoragePath) {
     Map<String, String> checks = new HashMap<>();
     if (baseStoragePath.endsWith("/")) {
       try {
-        LimsUtils.checkFile(new File(baseStoragePath, "issuetracker.properties"));
-        LimsUtils.checkFile(new File(baseStoragePath, "mail.properties"));
-        LimsUtils.checkFile(new File(baseStoragePath, "security.properties"));
-        LimsUtils.checkFile(new File(baseStoragePath, "submission.properties"));
+        checkFile(new File(baseStoragePath, "issuetracker.properties"));
+        checkFile(new File(baseStoragePath, "mail.properties"));
+        checkFile(new File(baseStoragePath, "security.properties"));
+        checkFile(new File(baseStoragePath, "submission.properties"));
         checks.put("ok", "All core properties files OK");
       } catch (IOException e) {
         log.error("core properties files check", e);

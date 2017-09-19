@@ -47,7 +47,7 @@
           <c:otherwise>Create</c:otherwise>
         </c:choose>
         Service Record
-        <button onclick="return ServiceRecord.validateServiceRecord();" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button id="save" onclick="return ServiceRecord.validateServiceRecord();" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
       <div class="breadcrumbs">
         <ul>
@@ -80,16 +80,16 @@
       <table class="in">
         <tr>
           <td class="h">Service Record ID:</td>
-          <td>
+          <td><span id="serviceRecordId">
             <c:choose>
               <c:when test="${serviceRecord.id != 0}">${serviceRecord.id}</c:when>
               <c:otherwise><i>Unsaved</i></c:otherwise>
             </c:choose>
-          </td>
+          </span></td>
         </tr>
         <tr>
           <td class="h">Sequencer:</td>
-          <td><a href='<c:url value="/miso/sequencer/${serviceRecord.sequencerReference.id}"/>'>${serviceRecord.sequencerReference.name}</a></td>
+          <td><a href='<c:url value="/miso/sequencer/${serviceRecord.sequencerReference.id}"/>' id="sequencerName">${serviceRecord.sequencerReference.name}</a></td>
         </tr>
         <tr>
           <td class="h">Title:*</td>
@@ -127,7 +127,7 @@
         <tr>
           <td class="h">Instrument Shutdown Time:</td>
           <td>
-            <form:input path="shutdownTime" id="shutdownTime" placeholder="YYYY-MM-DD HH:mm:ss"/>
+            <form:input path="shutdownTime" id="shutdownTime" placeholder="YYYY-MM-DD HH:mm"/>
             <script type="text/javascript">
               Utils.ui.addDateTimePicker("shutdownTime");
             </script>
@@ -136,7 +136,7 @@
         <tr>
           <td class="h">Instrument Restored Time:</td>
           <td>
-            <form:input path="restoredTime" id="restoredTime" placeholder="YYYY-MM-DD HH:mm:ss"/>
+            <form:input path="restoredTime" id="restoredTime" placeholder="YYYY-MM-DD HH:mm"/>
             <script type="text/javascript">
               Utils.ui.addDateTimePicker("restoredTime");
             </script>

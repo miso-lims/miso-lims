@@ -898,9 +898,6 @@ public class Dtos {
 
   private static DetailedLibraryDto asDetailedLibraryDto(DetailedLibrary from) {
     DetailedLibraryDto dto = new DetailedLibraryDto();
-    if (from.getKitDescriptor() != null) {
-      dto.setKitDescriptorId(from.getKitDescriptor().getId());
-    }
     if (from.getLibraryDesign() != null) {
       dto.setLibraryDesignId(from.getLibraryDesign().getId());
     }
@@ -917,11 +914,6 @@ public class Dtos {
   public static DetailedLibrary toDetailedLibrary(DetailedLibraryDto from) {
     if (from == null) return null;
     DetailedLibrary to = new DetailedLibraryImpl();
-    if (from.getKitDescriptorId() != null) {
-      KitDescriptor kitDescriptor = new KitDescriptor();
-      kitDescriptor.setId(from.getKitDescriptorId());
-      to.setKitDescriptor(kitDescriptor);
-    }
     if (from.getLibraryDesignId() != null) {
       LibraryDesign design = new LibraryDesign();
       design.setId(from.getLibraryDesignId());
@@ -1035,6 +1027,9 @@ public class Dtos {
       dto.setPlatformType(from.getPlatformType().getKey());
     }
     dto.setLastModified(formatDateTime(from.getLastModified()));
+    if (from.getKitDescriptor() != null) {
+      dto.setKitDescriptorId(from.getKitDescriptor().getId());
+    }
     if (!from.getIndices().isEmpty()) {
       dto.setIndexFamilyName(from.getIndices().get(0).getFamily().getName());
       for (Index index : from.getIndices()) {
@@ -1130,6 +1125,11 @@ public class Dtos {
       to.setVolume(Double.valueOf(from.getVolume()));
     }
     to.setDnaSize(from.getDnaSize());
+    if (from.getKitDescriptorId() != null) {
+      KitDescriptor kitDescriptor = new KitDescriptor();
+      kitDescriptor.setId(from.getKitDescriptorId());
+      to.setKitDescriptor(kitDescriptor);
+    }
     to.setLocationBarcode(from.getLocationBarcode());
     to.setCreationDate(parseDate(from.getCreationDate()));
 
@@ -1314,6 +1314,7 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
+    dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
     return dto;
   }
 
@@ -1382,6 +1383,12 @@ public class Dtos {
     }
     if (from.getLastModified() != null) {
       dto.setLastModified(formatDateTime(from.getLastModified()));
+    }
+    if (from.getClusteringKit() != null) {
+      dto.setClusteringKit(asDto(from.getClusteringKit()));
+    }
+    if (from.getMultiplexingKit() != null) {
+      dto.setMultiplexingKit(asDto(from.getMultiplexingKit()));
     }
     return dto;
   }

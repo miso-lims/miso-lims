@@ -30,6 +30,7 @@ import java.util.List;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -40,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.1.6
  */
 public interface SequencerPartitionContainer
-    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer>, Barcodable, Locatable, ChangeLoggable, Serializable
+    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer>, Barcodable, ChangeLoggable, Serializable
 {
 
   public void setId(long id);
@@ -104,20 +105,6 @@ public interface SequencerPartitionContainer
    */
   public void setPlatform(Platform platform);
 
-  /**
-   * If this container has been validated by an external piece of equipment, retrieve this barcode string
-   * 
-   * @return String validationBarcode
-   */
-  public String getValidationBarcode();
-
-  /**
-   * If this container has been validated by an external piece of equipment, set the barcode string
-   * 
-   * @param validationBarcode
-   */
-  public void setValidationBarcode(String validationBarcode);
-
   @Override
   public Collection<ChangeLog> getChangeLog();
 
@@ -137,4 +124,12 @@ public interface SequencerPartitionContainer
   public Date getCreationTime();
 
   public void setCreationTime(Date creationTime);
+
+  void setClusteringKit(KitDescriptor clusteringKit);
+
+  KitDescriptor getClusteringKit();
+
+  KitDescriptor getMultiplexingKit();
+
+  void setMultiplexingKit(KitDescriptor multiplexingKit);
 }

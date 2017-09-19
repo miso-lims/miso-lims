@@ -266,7 +266,13 @@ public class DefaultPacBio extends RunProcessor {
       builder.addParameter("instrument", dto.getSequencerName());
       builder.addParameter("run", dto.getRunAlias());
       builder.addParameter("from", dto.getStartDate().truncatedTo(ChronoUnit.DAYS).format(URL_DATE_FORMAT));
-      builder.addParameter("to", dto.getStartDate().plusDays(1).truncatedTo(ChronoUnit.DAYS).format(URL_DATE_FORMAT));
+      if (dto.getHealthType().isDone()) {
+        builder.addParameter("to", dto.getCompletionDate().plusDays(1).truncatedTo(ChronoUnit.DAYS).format(URL_DATE_FORMAT));
+      } else {
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime maxRunTime = dto.getStartDate().plusDays(7);
+        builder.addParameter("to", (today.isBefore(maxRunTime) ? today : maxRunTime).truncatedTo(ChronoUnit.DAYS).format(URL_DATE_FORMAT));
+      }
       dashboardMetric.put("href", builder.build().toASCIIString());
     } catch (URISyntaxException e) {
       throw new IOException(e);

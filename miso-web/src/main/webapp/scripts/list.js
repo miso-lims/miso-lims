@@ -30,9 +30,8 @@ ListUtils = (function() {
         return d.id != item.id;
       }) ? 1 : 0);
     }, 0);
-    state.element.innerText = (state.selected.length
-        ? (' ' + state.selected.length + ' selected') : '') + (hidden
-        ? ' (' + hidden + ' on other pages)' : '');
+    state.element.innerText = (state.selected.length ? (' ' + state.selected.length + ' selected') : '')
+        + (hidden ? ' (' + hidden + ' on other pages)' : '');
   };
   var initTable = function(elementId, target, projectId, config, optionModifier) {
     var staticActions = target.createStaticActions(config, projectId);
@@ -41,40 +40,38 @@ ListUtils = (function() {
       return x.include;
     });
     ListState[elementId] = {
-      selected : [],
-      data : [],
-      lastId : -1,
-      element : document.createElement('SPAN')
+      selected: [],
+      data: [],
+      lastId: -1,
+      element: document.createElement('SPAN')
     };
     if (bulkActions.length > 0) {
-      columns
-          .unshift({
-            "sTitle" : "",
-            "mData" : "id",
-            "include" : true,
-            "bSortable" : false,
-            "mRender" : function(data, type, full) {
-              var checked = ListState[elementId].selected.some(function(obj) {
-                return obj.id == data;
-              }) ? " checked=\"checked\"" : "";
-              
-              return "<input type=\"checkbox\" id=\"" + elementId + "_toggle" + data + "\" onclick=\"ListUtils._checkEventHandler(this.checked, event, " + data + ", '" + elementId + "')\"" + checked + ">";
-            }
-          });
+      columns.unshift({
+        "sTitle": "",
+        "mData": "id",
+        "include": true,
+        "bSortable": false,
+        "mRender": function(data, type, full) {
+          var checked = ListState[elementId].selected.some(function(obj) {
+            return obj.id == data;
+          }) ? " checked=\"checked\"" : "";
+
+          return "<input type=\"checkbox\" id=\"" + elementId + "_toggle" + data
+              + "\" onclick=\"ListUtils._checkEventHandler(this.checked, event, " + data + ", '" + elementId + "')\"" + checked + ">";
+        }
+      });
       if (staticActions.length > 0) {
         staticActions.push(null);
       }
       staticActions.push({
-        "name" : "☑",
-        "title" : "Select all",
-        "handler" : function() {
+        "name": "☑",
+        "title": "Select all",
+        "handler": function() {
           var state = ListState[elementId];
           state.lastId = -1;
-          state.selected = Utils.array.deduplicateById(state.selected
-              .concat(state.data));
+          state.selected = Utils.array.deduplicateById(state.selected.concat(state.data));
           state.data.forEach(function(item) {
-            var element = document
-                .getElementById(elementId + "_toggle" + item.id);
+            var element = document.getElementById(elementId + "_toggle" + item.id);
             if (element) {
               element.checked = true;
             }
@@ -83,15 +80,14 @@ ListUtils = (function() {
         }
       });
       staticActions.push({
-        "name" : "☐",
-        "title" : "Deselect all",
-        "handler" : function() {
+        "name": "☐",
+        "title": "Deselect all",
+        "handler": function() {
           var state = ListState[elementId];
           state.lastId = -1;
           state.selected = [];
           state.data.forEach(function(item) {
-            var element = document
-                .getElementById(elementId + "_toggle" + item.id);
+            var element = document.getElementById(elementId + "_toggle" + item.id);
             if (element) {
               element.checked = false;
             }
@@ -103,19 +99,18 @@ ListUtils = (function() {
     var errorMessage = document.createElement('DIV');
     var jqTable = jQuery('#' + elementId).html('');
     var options = Utils.setSortFromPriority({
-      'aoColumns' : columns,
-      'bJQueryUI' : true,
-      'bAutoWidth' : false,
-      'iDisplayLength' : 25,
-      'iDisplayStart' : 0,
-      'sDom' : '<"H"lf>r<"datatable-scroll"t><"F"ip>',
-      'sPaginationType' : 'full_numbers',
-      'bStateSave' : true,
-      'bProcessing' : true,
-      'fnDrawCallback' : function(oSettings) {
+      'aoColumns': columns,
+      'bJQueryUI': true,
+      'bAutoWidth': false,
+      'iDisplayLength': 25,
+      'iDisplayStart': 0,
+      'sDom': '<"H"lf>r<"datatable-scroll"t><"F"ip>',
+      'sPaginationType': 'full_numbers',
+      'bStateSave': true,
+      'bProcessing': true,
+      'fnDrawCallback': function(oSettings) {
         jqTable.removeClass('disabled');
-        jQuery('#' + elementId + '_paginate').find('.fg-button').removeClass(
-            'fg-button');
+        jQuery('#' + elementId + '_paginate').find('.fg-button').removeClass('fg-button');
       }
     });
     optionModifier(options, jqTable, errorMessage, columns);
@@ -132,19 +127,16 @@ ListUtils = (function() {
     tableNode.parentNode.insertBefore(errorMessage, tableNode);
     if (bulkActions.length > 0 || staticActions.length > 0) {
       var toolbar = document.createElement('DIV');
-      toolbar
-          .setAttribute(
-              'class',
-              'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix paging_full_numbers');
+      toolbar.setAttribute('class', 'fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix paging_full_numbers');
       tableNode.parentNode.insertBefore(toolbar, tableNode);
       if (staticActions.length > 0 && bulkActions.length > 0) {
         staticActions.push(null);
       }
-      
+
       staticActions.concat(bulkActions.map(function(bulkAction) {
         return bulkAction ? {
-          name : bulkAction.name,
-          handler : function() {
+          name: bulkAction.name,
+          handler: function() {
             if (ListState[elementId].selected.length == 0) {
               Utils.showOkDialog(bulkAction.name, ['Nothing selected.']);
               return;
@@ -176,9 +168,8 @@ ListUtils = (function() {
     }
   }
   return {
-    createTable : function(elementId, target, projectId, config) {
-      initTable(elementId, target, projectId, config, function(options,
-          jqTable, errorMessage, columns) {
+    createTable: function(elementId, target, projectId, config) {
+      initTable(elementId, target, projectId, config, function(options, jqTable, errorMessage, columns) {
         options.bServerSide = true;
         options.sAjaxSource = target.createUrl(config, projectId);
         options.fnServerData = function(sSource, aoData, fnCallback) {
@@ -186,11 +177,11 @@ ListUtils = (function() {
           var filterbox = jQuery('#' + elementId + '_filter :input');
           filterbox.prop('disabled', true);
           jQuery.ajax({
-            'dataType' : 'json',
-            'type' : 'GET',
-            'url' : sSource,
-            'data' : aoData,
-            'success' : function(data, textStatus, xhr) {
+            'dataType': 'json',
+            'type': 'GET',
+            'url': sSource,
+            'data': aoData,
+            'success': function(data, textStatus, xhr) {
               errorMessage.innerText = data.sError;
               errorMessage.style.visibility = data.sError ? "visible" : "hidden";
               ListState[elementId].data = data.aaData;
@@ -198,25 +189,24 @@ ListUtils = (function() {
                 if (!column.visibilityFilter) {
                   return;
                 }
-                jqTable.fnSetColumnVis(index, column
-                    .visibilityFilter(data.aaData.map(function(d) {
-                      return d[column.mData];
-                    })), false);
+                jqTable.fnSetColumnVis(index, column.visibilityFilter(data.aaData.map(function(d) {
+                  return d[column.mData];
+                })), false);
               });
               updateSelectedLabel(ListState[elementId]);
               fnCallback(data, textStatus, xhr);
               filterbox.prop('disabled', false);
             },
-            'error' : function(xhr, statusText, errorThrown) {
+            'error': function(xhr, statusText, errorThrown) {
               errorMessage.style.visibility = "visible";
               errorMessage.innerText = errorThrown;
               ListState[elementId].data = [];
               updateSelectedLabel(ListState[elementId]);
               fnCallback({
-                iTotalRecords : 0,
-                iTotalDisplayRecords : 0,
-                sEcho : aoData.sEcho,
-                aaData : []
+                iTotalRecords: 0,
+                iTotalDisplayRecords: 0,
+                sEcho: aoData.sEcho,
+                aaData: []
               });
               filterbox.prop('disabled', false);
             }
@@ -224,15 +214,14 @@ ListUtils = (function() {
         };
       });
     },
-    createStaticTable : function(elementId, target, config, data) {
-      initTable(elementId, target, null, config, function(options, jqTable,
-          errorMessage, columns) {
+    createStaticTable: function(elementId, target, config, data) {
+      initTable(elementId, target, null, config, function(options, jqTable, errorMessage, columns) {
         options.aaData = data;
         ListState[elementId].data = data;
         errorMessage.style.visibility = "hidden";
       });
     },
-    _checkEventHandler : function(isChecked, ev, data, elementId) {
+    _checkEventHandler: function(isChecked, ev, data, elementId) {
       var state = ListState[elementId];
       if (!ev.shiftKey) {
         if (isChecked) {
@@ -240,10 +229,9 @@ ListUtils = (function() {
           if (!state.selected.some(function(obj) {
             return obj.id == data;
           })) {
-            Array.prototype.push.apply(state.selected, state.data
-                .filter(function(obj) {
-                  return obj.id == data;
-                }));
+            Array.prototype.push.apply(state.selected, state.data.filter(function(obj) {
+              return obj.id == data;
+            }));
           }
         } else {
           var index = state.selected.findIndex(function(obj) {
@@ -257,38 +245,31 @@ ListUtils = (function() {
         var selectedIndex = state.data.findIndex(function(obj) {
           return obj.id == data;
         });
-        var shiftIndex = state.lastId == -1 ? 0 : state.data
-            .findIndex(function(obj) {
-              return obj.id == state.lastId;
-            });
+        var shiftIndex = state.lastId == -1 ? 0 : state.data.findIndex(function(obj) {
+          return obj.id == state.lastId;
+        });
         if (selectedIndex == -1 || shiftIndex == -1) {
           return;
         }
-        var newlySelected = state.data.slice(Math
-            .min(selectedIndex, shiftIndex), Math
-            .max(selectedIndex, shiftIndex) + 1);
-        newlySelected
-            .forEach(function(obj) {
-              var element = document
-                  .getElementById(elementId + "_toggle" + obj.id);
-              if (element) {
-                element.checked = true;
-              }
-            });
-        state.selected = Utils.array.deduplicateById(state.selected
-            .concat(newlySelected));
+        var newlySelected = state.data.slice(Math.min(selectedIndex, shiftIndex), Math.max(selectedIndex, shiftIndex) + 1);
+        newlySelected.forEach(function(obj) {
+          var element = document.getElementById(elementId + "_toggle" + obj.id);
+          if (element) {
+            element.checked = true;
+          }
+        });
+        state.selected = Utils.array.deduplicateById(state.selected.concat(newlySelected));
       }
       updateSelectedLabel(state);
     },
-    idHyperlinkColumn : function(headerName, urlFragment, id, getLabel,
-        priority, include) {
+    idHyperlinkColumn: function(headerName, urlFragment, id, getLabel, priority, include) {
       return {
-        "sTitle" : headerName,
-        "mData" : id,
-        "include" : include,
-        "iSortPriority" : priority,
-        "bSortable" : priority >= 0,
-        "mRender" : function(data, type, full) {
+        "sTitle": headerName,
+        "mData": id,
+        "include": include,
+        "iSortPriority": priority,
+        "bSortable": priority >= 0,
+        "mRender": function(data, type, full) {
           if (type === 'display') {
             return data ? "<a href=\"/miso/" + urlFragment + "/" + data + "\">" + getLabel(full) + "</a>" : "";
           } else if (type === 'filter') {
@@ -298,16 +279,15 @@ ListUtils = (function() {
         }
       };
     },
-    labelHyperlinkColumn : function(headerName, urlFragment, getId, label,
-        priority, include) {
+    labelHyperlinkColumn: function(headerName, urlFragment, getId, label, priority, include) {
       return {
-        "sTitle" : headerName,
-        "mData" : label,
-        "include" : include,
-        "iSortPriority" : priority,
-        "bSortDirection" : true,
-        "bSortable" : priority >= 0,
-        "mRender" : function(data, type, full) {
+        "sTitle": headerName,
+        "mData": label,
+        "include": include,
+        "iSortPriority": priority,
+        "bSortDirection": true,
+        "bSortable": priority >= 0,
+        "mRender": function(data, type, full) {
           if (type === 'display') {
             return data ? "<a href=\"/miso/" + urlFragment + "/" + getId(full) + "\">" + data + "</a>" : "";
           }
@@ -315,25 +295,25 @@ ListUtils = (function() {
         }
       };
     },
-    render : {
-      archived : function(data, type, full) {
+    render: {
+      archived: function(data, type, full) {
         return data ? "🗄" : "";
       },
-      booleanChecks : function(data, type, full) {
+      booleanChecks: function(data, type, full) {
         if (typeof data == 'boolean') {
           return data ? "✔" : "✘";
         } else {
           return "?";
         }
       },
-      platformType : function(data, type, full) {
-        return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(
-            Utils.array.namePredicate(data), Constants.platformTypes), 'key') || 'Unknown';
+      platformType: function(data, type, full) {
+        return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.namePredicate(data), Constants.platformTypes), 'key')
+            || 'Unknown';
       },
-      textFromId : function(list, property, unknown) {
+      textFromId: function(list, property, unknown) {
         return function(data, type, full) {
-          return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(
-              Utils.array.idPredicate(data), list), property) || unknown || "Unknown";
+          return Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(data), list), property) || unknown
+              || "Unknown";
         };
       },
     }

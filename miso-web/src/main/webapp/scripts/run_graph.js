@@ -32,15 +32,15 @@ var RunGraph = (function() {
       // Output a graph definition
       var node = document.createElement('P');
       return {
-        dom : node,
-        span : false, // Indicator of whether the graph spans the entire width
+        dom: node,
+        span: false, // Indicator of whether the graph spans the entire width
         // of the row.
-        render : function() {
+        render: function() {
           // Callback to render the graph after the DOM node is inserted.
           node.innerText = 'Look at me. I am gorgeous.';
         }
       };
-      
+
     });
   };
   var errorMessage = function(metrics, width) {
@@ -51,8 +51,8 @@ var RunGraph = (function() {
       node.setAttribute('class', 'parsley-error');
       node.innerText = metric.message;
       return {
-        dom : node,
-        render : function() {
+        dom: node,
+        render: function() {
         }
       };
     });
@@ -66,36 +66,36 @@ var RunGraph = (function() {
       link.href = metric.href;
       link.target = "_blank";
       return {
-        dom : link,
-        span : false,
-        render : function() {
+        dom: link,
+        span: false,
+        render: function() {
         }
       };
     });
   };
-  
+
   var chart = function(metrics, width) {
     return metrics.filter(function(metric) {
       return metric.type == 'chart';
     }).map(function(metric) {
       var node = document.createElement('TABLE');
       return {
-        dom : node,
-        span : false,
-        render : function() {
+        dom: node,
+        span: false,
+        render: function() {
           jQuery(node).dataTable({
-            'bJQueryUI' : true,
-            'bAutoWidth' : false,
-            'aoColumns' : [ {
-              "sTitle" : "Name",
-              "mData" : "name",
+            'bJQueryUI': true,
+            'bAutoWidth': false,
+            'aoColumns': [{
+              "sTitle": "Name",
+              "mData": "name",
             }, {
-              "sTitle" : "Value",
-              "mData" : "value",
+              "sTitle": "Value",
+              "mData": "value",
             }, ],
-            'aaData' : metric.values,
-            'sDom' : 't',
-            'fnDrawCallback' : function() {
+            'aaData': metric.values,
+            'sDom': 't',
+            'fnDrawCallback': function() {
               jQuery(node).find("thead").remove();
             }
           });
@@ -106,32 +106,30 @@ var RunGraph = (function() {
   var summaryTable = function(metrics, width, renamePartitions) {
     return metrics.filter(function(metric) {
       return metric.type == 'table';
-    }).map(
-        function(metric) {
-          var node = document.createElement('TABLE');
-          return {
-            dom : node,
-            span : true,
-            render : function() {
-              var dt = jQuery(node).dataTable({
-                'bJQueryUI' : true,
-                'aoColumns' : metric.columns.map(function(column) {
-                  return {
-                    "sTitle" : column.name,
-                    "mData" : column.property,
-                    "mRender" : function(data) {
-                      return renamePartitions(data, false);
-                    }
-                  };
-                }),
-                'sDom' : '<"datatable-scroll"t><"F"ip>',
-                'aaData' : metric.rows
-              });
-              dt.parents("div.dataTables_wrapper").css("width",
-                  (width * 2) + "px");
-            }
-          };
-        });
+    }).map(function(metric) {
+      var node = document.createElement('TABLE');
+      return {
+        dom: node,
+        span: true,
+        render: function() {
+          var dt = jQuery(node).dataTable({
+            'bJQueryUI': true,
+            'aoColumns': metric.columns.map(function(column) {
+              return {
+                "sTitle": column.name,
+                "mData": column.property,
+                "mRender": function(data) {
+                  return renamePartitions(data, false);
+                }
+              };
+            }),
+            'sDom': '<"datatable-scroll"t><"F"ip>',
+            'aaData': metric.rows
+          });
+          dt.parents("div.dataTables_wrapper").css("width", (width * 2) + "px");
+        }
+      };
+    });
   };
   var lineGraph = function(typeName, title, yLabel) {
     return function(metrics, width, renamePartitions) {
@@ -144,42 +142,42 @@ var RunGraph = (function() {
         });
         var node = document.createElement('DIV');
         return {
-          dom : node,
-          span : false,
-          render : function() {
+          dom: node,
+          span: false,
+          render: function() {
             new Highcharts.Chart({
-              chart : {
-                type : 'line',
-                renderTo : node,
-                zoomType : 'x',
-                spacingRight : 20,
-                width : width
+              chart: {
+                type: 'line',
+                renderTo: node,
+                zoomType: 'x',
+                spacingRight: 20,
+                width: width
               },
-              title : {
-                text : title
+              title: {
+                text: title
               },
-              xAxis : {},
-              yAxis : {
-                title : {
-                  text : yLabel
+              xAxis: {},
+              yAxis: {
+                title: {
+                  text: yLabel
                 }
               },
-              plotOptions : {
-                line : {
-                  lineWidth : 1,
-                  marker : {
-                    enabled : false
+              plotOptions: {
+                line: {
+                  lineWidth: 1,
+                  marker: {
+                    enabled: false
                   },
-                  shadow : false
+                  shadow: false
                 },
-                series : {
-                  animation : false,
-                  tooltip : {
-                    valueDecimals : 2
+                series: {
+                  animation: false,
+                  tooltip: {
+                    valueDecimals: 2
                   }
                 }
               },
-              series : metric.series
+              series: metric.series
             });
           }
         };
@@ -196,94 +194,95 @@ var RunGraph = (function() {
         });
         var node = document.createElement('DIV');
         return {
-          dom : node,
-          span : false,
-          render : function() {
+          dom: node,
+          span: false,
+          render: function() {
             new Highcharts.Chart({
-              chart : {
-                type : 'bar',
-                renderTo : node,
-                zoomType : 'x',
-                spacingRight : 20,
-                width : width
+              chart: {
+                type: 'bar',
+                renderTo: node,
+                zoomType: 'x',
+                spacingRight: 20,
+                width: width
               },
-              title : {
-                text : title
+              title: {
+                text: title
               },
-              xAxis : {
-                categories : metric.categories,
-                title : {
-                  text : null
+              xAxis: {
+                categories: metric.categories,
+                title: {
+                  text: null
                 }
               },
-              yAxis : {
-                title : {
-                  text : yLabel
+              yAxis: {
+                title: {
+                  text: yLabel
                 }
               },
-              plotOptions : {
-                line : {
-                  lineWidth : 1,
-                  marker : {
-                    enabled : false
+              plotOptions: {
+                line: {
+                  lineWidth: 1,
+                  marker: {
+                    enabled: false
                   },
-                  shadow : false
+                  shadow: false
                 },
-                series : {
-                  animation : false,
-                  tooltip : {
-                    valueDecimals : 2
+                series: {
+                  animation: false,
+                  tooltip: {
+                    valueDecimals: 2
                   }
                 }
               },
-              series : metric.series
+              series: metric.series
             });
           }
         };
       });
     };
   };
-  
+
   var boxPlot = function(metric, title, yLabel, width) {
     var node = document.createElement('DIV');
     return {
-      dom : node,
-      span : false,
-      render : function() {
+      dom: node,
+      span: false,
+      render: function() {
         new Highcharts.Chart({
-          chart : {
-            type : 'boxplot',
-            renderTo : node,
-            zoomType : 'x',
-            spacingRight : 20,
-            width : width
+          chart: {
+            type: 'boxplot',
+            renderTo: node,
+            zoomType: 'x',
+            spacingRight: 20,
+            width: width
           },
-          title : {
-            text : title
+          title: {
+            text: title
           },
-          xAxis : {},
-          yAxis : {
-            title : {
-              text : yLabel
+          xAxis: {},
+          yAxis: {
+            min: 1,
+            title: {
+              text: yLabel
             }
           },
-          plotOptions : {
-            boxplot : {
-              medianColor : 'red'
+          plotOptions: {
+            boxplot: {
+              medianColor: 'red'
             },
-            series : {
-              animation : false,
-              tooltip : {
-                valueDecimals : 2
+            series: {
+              animation: false,
+              tooltip: {
+                valueDecimals: 2
               }
             }
           },
-          series : metric.series
+          series: metric.series
         });
       }
     };
   };
-  
+
   var illuminaPerCyclePlot = function(typeName, title, yLabel) {
     return function(metrics, width, renamePartitions) {
       return metrics.filter(function(metric) {
@@ -291,7 +290,7 @@ var RunGraph = (function() {
       }).map(function(metric) {
         metric.series.forEach(function(series) {
           series.tooltip = {
-            headerFormat : '<em>Cycle {point.key}</em><br/>'
+            headerFormat: '<em>Cycle {point.key}</em><br/>'
           };
           series.visible = !/{\d+}/.test(series.name);
           series.name = renamePartitions(series.name, true);
@@ -300,7 +299,7 @@ var RunGraph = (function() {
       });
     };
   };
-  
+
   var illuminaPerLanePlot = function(typeName, title, yLabel) {
     return function(metrics, width, renamePartitions) {
       return metrics.filter(function(metric) {
@@ -313,28 +312,21 @@ var RunGraph = (function() {
       });
     };
   };
-  
+
   return {
     // This is a list of standard metric processors for metrics produced by run
     // scanner. Additional processors maybe added in separate files and appended
     // to this list.
-    metricProcessors : [
-        example,
-        externalLink,
-        errorMessage,
-        chart,
-        summaryTable,
+    metricProcessors: [example, externalLink, errorMessage, chart, summaryTable,
         illuminaPerCyclePlot('illumina-q30-by-cycle', '> Q30', '% Bases >Q30'),
-        lineGraph('illumina-called-intensity-by-cycle', 'Called Intensity',
-            'Average Intensity per Cycle'),
+        lineGraph('illumina-called-intensity-by-cycle', 'Called Intensity', 'Average Intensity per Cycle'),
         lineGraph('illumina-base-percent-by-cycle', 'Base %', 'Percentage'),
-        illuminaPerLanePlot('illumina-cluster-density-by-lane',
-            'Cluster Density', 'Density (K/mm²)'),
-        barGraph('illumina-yield-by-read', 'Yields', 'Yield (gb)') ],
+        illuminaPerLanePlot('illumina-cluster-density-by-lane', 'Cluster Density', 'Density (K/mm²)'),
+        barGraph('illumina-yield-by-read', 'Yields', 'Yield (gb)')],
     // Takes a list of metrics and renders them to #metricsdiv
-    renderMetrics : function(metrics, partitionNames) {
+    renderMetrics: function(metrics, partitionNames) {
       var container = document.getElementById('metricsdiv');
-      
+
       var renderAll = function() {
         while (container.hasChildNodes()) {
           container.removeChild(container.lastChild);
@@ -344,21 +336,18 @@ var RunGraph = (function() {
         var width = forceSpan ? realWidth : Math.round(realWidth * 0.49);
         // Start with graphs we know how to make (see the example for a
         // template). Then filter them as appropriate for the data we have.
-        var graphs = RunGraph.metricProcessors.map(
-            function(graph) {
-              return graph(metrics, width, function(str, includePrefix) {
-                return ("" + str).replace(/{(\d+)}/, function(match,
-                    partitionNumber) {
-                  var index = parseInt(partitionNumber) - 1;
-                  if (partitionNames[index]) {
-                    return (includePrefix ? "Lane " + partitionNumber + ": "
-                        : "") + partitionNames[index];
-                  } else {
-                    return includePrefix ? ("Lane " + partitionNumber) : "N/A";
-                  }
-                });
-              });
-            }).reduce(function(a, b) {
+        var graphs = RunGraph.metricProcessors.map(function(graph) {
+          return graph(metrics, width, function(str, includePrefix) {
+            return ("" + str).replace(/{(\d+)}/, function(match, partitionNumber) {
+              var index = parseInt(partitionNumber) - 1;
+              if (partitionNames[index]) {
+                return (includePrefix ? "Lane " + partitionNumber + ": " : "") + partitionNames[index];
+              } else {
+                return includePrefix ? ("Lane " + partitionNumber) : "N/A";
+              }
+            });
+          });
+        }).reduce(function(a, b) {
           return a.concat(b);
         });
         if (graphs.length == 0) {
@@ -391,7 +380,7 @@ var RunGraph = (function() {
           graph.render();
         });
       };
-      
+
       var timer_id;
       jQuery(window).resize(function() {
         clearTimeout(timer_id);

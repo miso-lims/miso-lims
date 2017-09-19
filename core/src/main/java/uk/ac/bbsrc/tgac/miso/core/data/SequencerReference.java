@@ -157,4 +157,8 @@ public interface SequencerReference extends Nameable, Deletable, Serializable {
 
   void setRuns(Set<Run> runs);
 
+  Set<SequencerServiceRecord> getServiceRecords();
+
+  void setServiceRecords(Set<SequencerServiceRecord> serviceRecords);
+
 }

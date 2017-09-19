@@ -22,68 +22,62 @@
  */
 
 ListTarget.pool = {
-  name : "Pools",
-  createUrl : function(config, projectId) {
+  name: "Pools",
+  createUrl: function(config, projectId) {
     if (projectId) {
       return "/miso/rest/pool/dt/project/" + projectId;
     } else {
       return "/miso/rest/pool/dt/platform/" + config.platformType;
     }
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return HotTarget.pool.bulkActions;
   },
-  createStaticActions : function(config, prodjectId) {
-    return [ {
-      name : "Add",
-      handler : function() {
+  createStaticActions: function(config, prodjectId) {
+    return [{
+      name: "Add",
+      handler: function() {
         window.location = "/miso/pool/new";
       }
-    } ];
+    }];
   },
-  createColumns : function(config, projectId) {
+  createColumns: function(config, projectId) {
     return [
-        ListUtils.idHyperlinkColumn("Name", "pool", "id", Utils.array.getName,
-            1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "pool", Utils.array.getId,
-            "alias", 0, true),
+        ListUtils.idHyperlinkColumn("Name", "pool", "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", "pool", Utils.array.getId, "alias", 0, true),
         {
-          "sTitle" : "Description",
-          "mData" : "description",
-          "mRender" : function(data, type, full) {
-            return (data ? data : "") + (full.duplicateIndices ? " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDICES)</strong></span>" : "");
+          "sTitle": "Description",
+          "mData": "description",
+          "mRender": function(data, type, full) {
+            return (data ? data : "")
+                + (full.duplicateIndices ? " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDICES)</strong></span>" : "");
           },
-          "include" : true,
-          "iSortPriority" : 0
-        },
-        {
-          "sTitle" : "Date Created",
-          "mData" : "creationDate",
-          "include" : true,
-          "iSortPriority" : 0
-        },
-        {
-          "sTitle" : "Conc. (" + Constants.poolConcentrationUnits + ")",
-          "mData" : "concentration",
-          "include" : true,
-          "iSortPriority" : 0
-        },
-        {
-          "sTitle" : "Location",
-          "mData" : "locationLabel",
-          "bSortable" : false,
-          "mRender" : function(data, type, full) {
-            return full.boxId
-                ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>"
-                : data;
-          },
-          "include" : true,
-          "iSortPriority" : 0
+          "include": true,
+          "iSortPriority": 0
         }, {
-          "sTitle" : "Last Modified",
-          "mData" : "lastModified",
-          "include" : Constants.isDetailedSample,
-          "iSortPriority" : 2
-        } ];
+          "sTitle": "Date Created",
+          "mData": "creationDate",
+          "include": true,
+          "iSortPriority": 0
+        }, {
+          "sTitle": "Conc. (" + Constants.poolConcentrationUnits + ")",
+          "mData": "concentration",
+          "include": true,
+          "iSortPriority": 0
+        }, {
+          "sTitle": "Location",
+          "mData": "locationLabel",
+          "bSortable": false,
+          "mRender": function(data, type, full) {
+            return full.boxId ? "<a href='/miso/box/" + full.boxId + "'>" + data + "</a>" : data;
+          },
+          "include": true,
+          "iSortPriority": 0
+        }, {
+          "sTitle": "Last Modified",
+          "mData": "lastModified",
+          "include": Constants.isDetailedSample,
+          "iSortPriority": 2
+        }];
   }
 };

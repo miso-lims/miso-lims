@@ -469,4 +469,15 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   public QcTarget getQcTarget() {
     return QcTarget.Sample;
   }
+
+  @Override
+  public Date getBarcodeDate() {
+    return getReceivedDate() == null ? getCreationTime() : getReceivedDate();
+  }
+
+  @Override
+  public String getBarcodeExtraInfo() {
+    return getDescription();
+  }
+
 }

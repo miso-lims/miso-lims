@@ -50,9 +50,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
@@ -64,6 +67,8 @@ public class EditSequencerPartitionContainerController {
 
   @Autowired
   private ContainerService containerService;
+  @Autowired
+  private KitService kitService;
   @Autowired
   private PlatformService platformService;
   @Autowired
@@ -141,6 +146,15 @@ public class EditSequencerPartitionContainerController {
     model.put("container", container);
     model.put("containerPartitions", container.getPartitions().stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("clusteringKits",
+        kitService.listKitDescriptorsByType(KitType.CLUSTERING).stream()
+            .filter(descriptor -> descriptor.getPlatformType() == container.getPlatform().getPlatformType())
+            .sorted(KitDescriptor::sortByName).collect(Collectors.toList()));
+    model.put("multiplexingKits",
+        kitService.listKitDescriptorsByType(KitType.MULTIPLEXING).stream()
+            .filter(descriptor -> descriptor.getPlatformType() == container.getPlatform().getPlatformType())
+            .sorted(KitDescriptor::sortByName).collect(Collectors.toList()));
+
     return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
   }
 }

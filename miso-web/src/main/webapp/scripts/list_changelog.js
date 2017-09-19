@@ -22,34 +22,32 @@
  */
 
 ListTarget.changelog = {
-  name : "Changes",
-  createUrl : function(config, projectId) {
+  name: "Changes",
+  createUrl: function(config, projectId) {
     throw "Static data only";
   },
-  createBulkActions : function(config, projectId) {
+  createBulkActions: function(config, projectId) {
     return [];
   },
-  createStaticActions : function(config, projectId) {
+  createStaticActions: function(config, projectId) {
     return [];
   },
-  createColumns : function(config, projectId) {
-    return [
-        {
-          "sTitle" : "Name",
-          "mData" : "userName",
-          "include" : true,
-          "iSortPriority" : 0
-        },
-        {
-          "sTitle" : "Summary",
-          "mData" : "summary",
-          "include" : true,
-          "iSortPriority" : 0
-        }, {
-          "sTitle" : "Time",
-          "mData" : "time",
-          "include" : true,
-          "iSortPriority" : 1
-        } ];
+  createColumns: function(config, projectId) {
+    return [{
+      "sTitle": "Name",
+      "mData": "userName",
+      "include": true,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Summary",
+      "mData": "summary",
+      "include": true,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Time",
+      "mData": "time",
+      "include": true,
+      "iSortPriority": 1
+    }];
   }
 };

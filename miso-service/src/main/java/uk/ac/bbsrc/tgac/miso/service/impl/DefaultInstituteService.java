@@ -37,7 +37,7 @@ public class DefaultInstituteService implements InstituteService {
 
   @Override
   public Long create(Institute institute) throws IOException {
-    authorizationManager.throwIfNonAdmin();
+    authorizationManager.throwIfNotInternal();
     User user = authorizationManager.getCurrentUser();
     institute.setCreatedBy(user);
     institute.setUpdatedBy(user);

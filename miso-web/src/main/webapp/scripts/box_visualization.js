@@ -20,8 +20,6 @@
  *
  */
 
-
-
 /*
  * A BoxPosition represents a single position (cell) in the Box visualization (table).
  * It is responsible for handling the functionality of a cell. This includes changing the title and image
@@ -29,13 +27,13 @@
  */
 var BoxPosition = function(opts) {
   var self = {};
-  
+
   isMultiSelectClick = function(event) {
     // multi-select is accessible by pressing the Command key (metaKey) on Mac,
     // or the Control key (ctrlKey) on Windows or Linux
     return navigator.platform.indexOf('Mac') != -1 ? event.metaKey : event.ctrlKey;
   };
-  
+
   self.title = opts.title || '';
   self.parentVisual = opts.parentVisual;
   self.row = opts.row;
@@ -48,7 +46,7 @@ var BoxPosition = function(opts) {
   self.setTitle = function() {
     self.cell.prop('title', Box.utils.getPositionString(self.row, self.col) + ': ' + self.title);
   };
-  
+
   self.setImage = opts.setImage || function(imgurl) {
     self.element.prop('src', imgurl);
   };
@@ -84,23 +82,27 @@ var BoxPosition = function(opts) {
 
   self.setTitle();
   self.unselect();
-  self.element.click({'row': self.row, 'col': self.col}, self.click);
+  self.element.click({
+    'row': self.row,
+    'col': self.col
+  }, self.click);
   self.cell.append(self.element);
-  
+
   return self;
 };
 
-
 var BoxVisual = function() {
   var self = {};
-  
+
   self.selectedItems = [];
 
   self.clearSelection = function() {
-    self.selectedItems.forEach(function(item) { item.unselect() });
+    self.selectedItems.forEach(function(item) {
+      item.unselect()
+    });
     self.selectedItems = [];
   };
-  
+
   self.select = function(item, skipCallback) {
     item.select();
     self.selectedItems.push(item);
@@ -108,15 +110,17 @@ var BoxVisual = function() {
       self.onSelectionChanged(self.selectedItems);
     }
   };
-  
+
   self.unselect = function(item, skipCallback) {
     item.unselect();
-    self.selectedItems = self.selectedItems.filter(function(selectedItem) {return selectedItem !== item});
+    self.selectedItems = self.selectedItems.filter(function(selectedItem) {
+      return selectedItem !== item
+    });
     if (!skipCallback) {
       self.onSelectionChanged(self.selectedItems);
     }
   };
-  
+
   self.clear = function() {
     jQuery(self.div).empty();
   };
@@ -125,11 +129,11 @@ var BoxVisual = function() {
     self.data = opts.data;
     self.size = opts.size;
     self.div = opts.div;
-    self.table = self.div+'Visualization';
-    self.position = new Array(self.size.rows+1);
+    self.table = self.div + 'Visualization';
+    self.position = new Array(self.size.rows + 1);
 
     for (var i = 1; i <= self.size.rows; i++) {
-      self.position[i] = new Array(self.size.cols+1);
+      self.position[i] = new Array(self.size.cols + 1);
     }
 
     self.clear();
@@ -146,13 +150,17 @@ var BoxVisual = function() {
     tRow.append(emptyCornerCell);
 
     var makeColSelectEventData = function(col) {
-      return {'col': col};
+      return {
+        'col': col
+      };
     };
 
     var makeRowSelectEventData = function(row) {
-      return {'row': row};
+      return {
+        'row': row
+      };
     };
-    
+
     for (var col = 1; col <= self.size.cols; col++) {
       var thCell = jQuery('<th>').text(col);
       thCell.addClass('boxVisColHeader');
@@ -163,7 +171,7 @@ var BoxVisual = function() {
 
     for (var row = 1; row <= self.size.rows; row++) {
       tRow = jQuery('<tr>');
-      tRow.attr('id', self.div.substring(1)+'Row'+row);
+      tRow.attr('id', self.div.substring(1) + 'Row' + row);
       var tCell = jQuery('<td>');
       tCell.addClass('boxVisRowHeader');
       tCell.text(Box.utils.getRowLetter(row));
@@ -172,7 +180,7 @@ var BoxVisual = function() {
 
       for (col = 1; col <= self.size.cols; col++) {
         tCell = jQuery('<td>');
-        tCell.addClass('Col'+col + ' boxVisCell');
+        tCell.addClass('Col' + col + ' boxVisCell');
         self.position[row][col] = self.getBoxPosition(row, col, tCell);
         tRow.append(self.position[row][col].cell);
       }
@@ -181,7 +189,7 @@ var BoxVisual = function() {
     jQuery(self.table).append(tBody);
     jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
   };
-  
+
   var toggleGroupSelection = function(event, items) {
     if (!isMultiSelectClick(event)) {
       self.clearSelection();
@@ -200,7 +208,7 @@ var BoxVisual = function() {
     }
     self.onSelectionChanged(self.selectedItems);
   };
-  
+
   self.selectRow = function(event) {
     var row = event.data.row;
     var items = [];
@@ -209,7 +217,7 @@ var BoxVisual = function() {
     }
     toggleGroupSelection(event, items);
   };
-  
+
   self.selectCol = function(event) {
     var col = event.data.col;
     var items = [];
@@ -227,12 +235,12 @@ var BoxVisual = function() {
     opts.parentVisual = self;
     return new BoxPosition(opts);
   };
-  
-  self.onSelectionChanged = function(items) {};
-  
+
+  self.onSelectionChanged = function(items) {
+  };
+
   return self;
 };
-
 
 var Box = Box || {};
 
@@ -249,7 +257,7 @@ Box.DialogVisual = function(scan) {
       width: Box.dialogWidth,
       modal: true,
       resizable: false,
-      position: [jQuery(window).width()/2 - Box.dialogWidth/2, 50],
+      position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
       buttons: {}
     });
     self.create({
@@ -275,7 +283,9 @@ Box.DialogVisual = function(scan) {
         unselectedImg: '/styles/images/tube_error.png'
       };
     }
-    boxables = self.data.filter(function(item) { return item.coordinates == pos; });
+    boxables = self.data.filter(function(item) {
+      return item.coordinates == pos;
+    });
     if (boxables.length > 0) {
       return {
         title: boxables[0].alias,
@@ -290,18 +300,20 @@ Box.DialogVisual = function(scan) {
       };
     }
   };
-  
+
   return self;
 };
 
 Box.Visual = function() {
   var self = new BoxVisual();
 
-  //@Override
+  // @Override
   self.getBoxPositionOpts = function(row, col) {
     var pos = Box.utils.getPositionString(row, col);
     var boxables;
-    boxables = self.data.filter(function(item) { return item.coordinates == pos; });
+    boxables = self.data.filter(function(item) {
+      return item.coordinates == pos;
+    });
     if (boxables.length > 0) {
       return {
         title: boxables[0].alias,
@@ -316,18 +328,20 @@ Box.Visual = function() {
       };
     }
   };
-  
+
   self.onSelectionChanged = function(items) {
     var positions = items.map(function(item) {
       return Box.utils.getPositionString(item.row, item.col);
     });
     Box.ui.filterTableByBoxPositions(positions);
-    
+
     var boxables = null;
     if (positions.length === 1) {
-      boxables = self.data.filter(function(item) { return item.coordinates === positions[0] });
+      boxables = self.data.filter(function(item) {
+        return item.coordinates === positions[0]
+      });
     }
-    
+
     if (boxables && boxables.length > 0) {
       // filled position selected
       jQuery('#selectedPosition').text(positions[0]);
@@ -353,10 +367,9 @@ Box.Visual = function() {
       jQuery('#currentLocation, #currentLocationText, #warningMessages').html('');
     }
   };
-  
+
   return self;
 };
-
 
 Box.ScanDialog = function() {
   var self = new BoxVisual();
@@ -365,34 +378,41 @@ Box.ScanDialog = function() {
     self.size = opts.size;
     self.data = opts.data;
 
-    self.getNewPosition = function () {
+    self.getNewPosition = function() {
       // Ignore all the magic numbers
-      var h = Box.boxJSON.rows*30 - 100;
-      var w = Box.dialogWidth-400;
-      return [Math.floor(Math.random() * h)+100, Math.floor(Math.random() * w)+100];
+      var h = Box.boxJSON.rows * 30 - 100;
+      var w = Box.dialogWidth - 400;
+      return [Math.floor(Math.random() * h) + 100, Math.floor(Math.random() * w) + 100];
     };
 
-    self.animateMag = function () {
+    self.animateMag = function() {
       var newpos = self.getNewPosition();
       var oldpos = jQuery('#magnify').offset();
       var speed = self.getSpeed([oldpos.top, oldpos.left], newpos);
-      jQuery('#magnify').animate({ top: newpos[0], left: newpos[1] }, speed, function() {
+      jQuery('#magnify').animate({
+        top: newpos[0],
+        left: newpos[1]
+      }, speed, function() {
         self.animateMag();
       });
     };
 
-    self.getSpeed = function (prev, next) {
+    self.getSpeed = function(prev, next) {
       var x = Math.abs(prev[1] - next[1]);
       var y = Math.abs(prev[0] - next[0]);
       var greatest = x > y ? x : y;
       var speedModifier = 0.1;
-      return Math.ceil(greatest/speedModifier);
+      return Math.ceil(greatest / speedModifier);
     };
 
-    jQuery('#dialogInfoAbove').html('<h1>Place box on scanner</h1><br>'+
-      '<img id="magnify" src="/styles/images/magnifying_glass.png" style="position:absolute;"></img>');
+    jQuery('#dialogInfoAbove').html(
+        '<h1>Place box on scanner</h1><br>'
+            + '<img id="magnify" src="/styles/images/magnifying_glass.png" style="position:absolute;"></img>');
     jQuery('#dialogInfoBelow').html('<p>Please place the box on the scanner. The box will be scanned automatically.</p>');
-    jQuery('#magnify').offset({'top': self.getNewPosition()[0], 'left': self.getNewPosition()[1]});
+    jQuery('#magnify').offset({
+      'top': self.getNewPosition()[0],
+      'left': self.getNewPosition()[1]
+    });
     self.animateMag();
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
@@ -401,7 +421,7 @@ Box.ScanDialog = function() {
       height: Box.dialogHeight,
       modal: true,
       resizable: false,
-      position: [jQuery(window).width()/2 - Box.dialogWidth/2, 50],
+      position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
       buttons: {}
     });
 
@@ -431,8 +451,7 @@ Box.ScanDialog = function() {
 
   self.error = function(message) {
     jQuery('#dialogInfoBelow').html('');
-    jQuery('#dialogInfoAbove').html('<h1 class="warning">Error: Scanner did not detect a box</h1>'+
-                                    '<p>'+message+'</p><br>');
+    jQuery('#dialogInfoAbove').html('<h1 class="warning">Error: Scanner did not detect a box</h1>' + '<p>' + message + '</p><br>');
     jQuery('#dialogVisual').html('');
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
@@ -440,9 +459,9 @@ Box.ScanDialog = function() {
       width: Box.dialogWidth,
       modal: true,
       height: "auto",
-      position: [jQuery(window).width()/2 - Box.dialogWidth/2, 50],
+      position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
       buttons: {
-        "Retry": function () {
+        "Retry": function() {
           Box.initScan();
         },
         "Cancel": function() {
@@ -464,23 +483,26 @@ Box.ScanDiff = function() {
 
     var diffs = results.diffs.map(function(d) {
       switch (d.action) {
-        case 'added':
-          return '<li style="color:green;"><b>+</b> ' + d.modified.name + ' added to the box at position ' + d.coordinates + '</li>';
-        case 'removed':
-          return '<li style="color:red;"><b>-</b> ' + d.original.name + ' removed from ' + d.coordinates + '</li>';
-        case 'changed':
-          return '<li style="color:orange;"><b>!</b> ' + d.original.name + ' replaced by ' + d.modified.name + ' at ' + d.coordinates + '</li>';
-        default:
-          return '<li><b>?</b> Unknown change at ' + (d.coordinates || 'unknown position') + '</li>';
+      case 'added':
+        return '<li style="color:green;"><b>+</b> ' + d.modified.name + ' added to the box at position ' + d.coordinates + '</li>';
+      case 'removed':
+        return '<li style="color:red;"><b>-</b> ' + d.original.name + ' removed from ' + d.coordinates + '</li>';
+      case 'changed':
+        return '<li style="color:orange;"><b>!</b> ' + d.original.name + ' replaced by ' + d.modified.name + ' at ' + d.coordinates
+            + '</li>';
+      default:
+        return '<li><b>?</b> Unknown change at ' + (d.coordinates || 'unknown position') + '</li>';
       }
     });
 
-    var message = (results.errors.length == 0 ? "<h1>Scan Success! </h1>" : '<h1 class="warning">Scan Failed!</h1>') +
-        results.errors.map(function(err) { return "<p>Position " + err.coordinates + ": " + err.message + "</p>"; }).join("") +
-        (diffs.length == 0 ? "" : "<p>Box has changed. See below.</p>");
+    var message = (results.errors.length == 0 ? "<h1>Scan Success! </h1>" : '<h1 class="warning">Scan Failed!</h1>')
+        + results.errors.map(function(err) {
+          return "<p>Position " + err.coordinates + ": " + err.message + "</p>";
+        }).join("") + (diffs.length == 0 ? "" : "<p>Box has changed. See below.</p>");
 
     jQuery('#dialogInfoAbove').html(message);
-    jQuery('#dialogInfoBelow').html("<ul style=\"list-style-type: none;overflow:hidden; overflow-y:scroll;height:125px;\">" + diffs.join("") + '</ul>');
+    jQuery('#dialogInfoBelow').html(
+        "<ul style=\"list-style-type: none;overflow:hidden; overflow-y:scroll;height:125px;\">" + diffs.join("") + '</ul>');
 
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
@@ -520,15 +542,22 @@ Box.ScanDiff = function() {
     var pos = Box.utils.getPositionString(row, col);
     var sel, unsel, title;
 
-    var boxables = self.results.items.filter(function(item) { return item.coordinates == pos; });
-    var diffs = self.results.diffs.filter(function(item) { return item.coordinates == pos; });
-    var errors = self.results.errors.filter(function(item) { return item.coordinates == pos; });
+    var boxables = self.results.items.filter(function(item) {
+      return item.coordinates == pos;
+    });
+    var diffs = self.results.diffs.filter(function(item) {
+      return item.coordinates == pos;
+    });
+    var errors = self.results.errors.filter(function(item) {
+      return item.coordinates == pos;
+    });
     if (errors.length > 0) {
       title = errors[0].message;
       sel = '/styles/images/tube_error.png';
       unsel = '/styles/images/tube_error.png';
     } else if (diffs.length > 0) {
-      title = (diffs[0].modified ? diffs[0].modified.alias : 'Empty') + " (Previously " + (diffs[0].original ? diffs[0].original.alias : 'Empty') + ")";
+      title = (diffs[0].modified ? diffs[0].modified.alias : 'Empty') + " (Previously "
+          + (diffs[0].original ? diffs[0].original.alias : 'Empty') + ")";
       sel = diffs[0].modified ? '/styles/images/tube_full_selected_changed.png' : '/styles/images/tube_empty_selected_changed.png';
       unsel = diffs[0].modified ? '/styles/images/tube_full_changed.png' : '/styles/images/tube_empty_changed.png';
     } else if (boxables.length > 0) {
@@ -556,8 +585,8 @@ Box.PrepareScannerDialog = function() {
   self.show = function() {
     jQuery('#dialogInfoAbove').html('<h1>Preparing scanner</h1>');
     jQuery('#dialogVisual').html('');
-    jQuery('#dialogInfoBelow').html('<p>Please remove box from scanner until prompted.</p>' +
-                                     '<img class="center" src="/styles/images/ajax-loader.gif"/>');   
+    jQuery('#dialogInfoBelow').html(
+        '<p>Please remove box from scanner until prompted.</p>' + '<img class="center" src="/styles/images/ajax-loader.gif"/>');
     jQuery('#dialogDialog').dialog({
       autoOpen: false,
       title: 'Scan',
@@ -565,7 +594,7 @@ Box.PrepareScannerDialog = function() {
       height: "auto",
       modal: true,
       resizable: false,
-      position: [jQuery(window).width()/2 - Box.dialogWidth/2, 50],
+      position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
       buttons: {}
     });
     jQuery('#dialogDialog').dialog('open');
@@ -575,8 +604,7 @@ Box.PrepareScannerDialog = function() {
   self.error = function() {
     jQuery('#dialogInfoAbove').html('<h1 class="warning">Error: could not find the scanner</h1>');
     jQuery('#dialogVisual').html('');
-    jQuery('#dialogInfoBelow').html('<p>Please ensure that the scanner software is running, ' +
-                                    'and remove the box before retrying.</p>');
+    jQuery('#dialogInfoBelow').html('<p>Please ensure that the scanner software is running, ' + 'and remove the box before retrying.</p>');
     jQuery('#dialogDialog').dialog({
       autoOpen: true,
       title: 'Scan',
@@ -584,12 +612,14 @@ Box.PrepareScannerDialog = function() {
       height: "auto",
       modal: true,
       resizable: false,
-      position: [jQuery(window).width()/2 - Box.dialogWidth/2, 50],
+      position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
       buttons: {
         "Retry": function() {
           Box.initScan();
         },
-        "Cancel": function(){ jQuery('#dialogDialog').dialog('close'); }
+        "Cancel": function() {
+          jQuery('#dialogDialog').dialog('close');
+        }
       }
     });
     jQuery('#dialogDialog').dialog('open');
@@ -599,7 +629,7 @@ Box.PrepareScannerDialog = function() {
 
 Box.utils = {
   getRowLetter: function(row) {
-    return String.fromCharCode('A'.charCodeAt(0)-1+row);
+    return String.fromCharCode('A'.charCodeAt(0) - 1 + row);
   },
 
   getPositionString: function(row, col) {
@@ -612,13 +642,13 @@ Box.utils = {
   },
 
   hyperlinkify: function(path, text) {
-    return "<a href=\""+path+"\">"+text+"</a>";
+    return "<a href=\"" + path + "\">" + text + "</a>";
   },
 
   hyperlinkifyBoxable: function(name, id, text) {
     var path = "/miso/";
-    var prefix = name.substring(0,3);
-    if (prefix == "SAM" || prefix == "LIB" || prefix.substring(1,3) == "PO") {
+    var prefix = name.substring(0, 3);
+    if (prefix == "SAM" || prefix == "LIB" || prefix.substring(1, 3) == "PO") {
       if (prefix == "SAM") {
         path += "sample/";
       } else if (prefix == "LIB") {
@@ -643,8 +673,9 @@ Box.utils = {
 
   // Return the position of a boxable item given its id in a box else return null
   findItemPos: function(name, boxables) {
-    var matches = boxables.filter(function(item) { return item.name == name; });
+    var matches = boxables.filter(function(item) {
+      return item.name == name;
+    });
     return matches.length == 1 ? mathces[0] : null;
   }
 };
-

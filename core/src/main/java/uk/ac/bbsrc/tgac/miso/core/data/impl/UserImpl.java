@@ -281,7 +281,7 @@ public class UserImpl implements User, Serializable {
     sb.append(":").append(isAdmin());
     sb.append(":").append(isInternal());
     sb.append(":").append(isExternal());
-    sb.append("[").append(LimsUtils.join(getRoles(), ",")).append("]");
+    sb.append("[").append(String.join(",", getRoles())).append("]");
     return sb.toString();
   }
 
