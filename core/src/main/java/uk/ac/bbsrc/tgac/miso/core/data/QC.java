@@ -41,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 @MappedSuperclass
-public abstract class QC implements Serializable {
+public abstract class QC implements Serializable, Comparable<QC> {
   private static final long serialVersionUID = 1L;
 
   public static final Long UNSAVED_ID = 0L;
@@ -103,5 +103,13 @@ public abstract class QC implements Serializable {
 
   public void setType(QcType type) {
     this.type = type;
+  }
+
+  @Override
+  public int compareTo(QC o) {
+    if (type != null && !type.equals(o.getType())) {
+      return type.compareTo(o.getType());
+    }
+    return date.compareTo(o.getDate());
   }
 }
