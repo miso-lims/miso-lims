@@ -1,3 +1,19 @@
+# 0.2.89
+
+Changes:
+
+ * Prevent users from changing a library's platform type through bulk edit after creation
+ * Revised OICR PacBio library naming scheme
+ * Added Kit Descriptor to Library (non-detailed)
+ * Added clustering and multiplexing kits to containers
+ * Add support for Zebra printer labels
+ * Minor changes to Illumina cluster density chart and graph
+ * Allow internal users to create institute defaults
+ * Fixed sorting of partition list
+ * Removed Location Barcode and Validation Barcode attributes from containers
+ * Indicate low quality libraries in pool picker
+ * Fixed PacBio dashboard link
+
 # 0.2.88
 
 Changes:
