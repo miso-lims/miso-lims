@@ -53,7 +53,7 @@ ListTarget.container = {
           }
           Utils.showDialog('Add ' + platformType.containerName, 'Add', [{
             type: "text",
-            label: "Identification Barcode",
+            label: "Serial Number",
             property: "barcode"
           }, ], function(results) {
             Utils.ajaxWithDialog('Adding ' + platformType.containerName, 'POST', '/miso/rest/run/' + config.runId + '/add?'
