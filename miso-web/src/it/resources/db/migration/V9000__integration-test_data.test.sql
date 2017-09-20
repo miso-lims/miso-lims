@@ -1,6 +1,8 @@
 -- fixes LibraryDesign changes that were marked "NoTest" in V0130
-ALTER TABLE LibraryDesign DROP CONSTRAINT `uk_libraryDesign_name`;
-ALTER TABLE LibraryDesign ADD CONSTRAINT `uk_libraryDesign_name_sampleClass` UNIQUE (`name`, `sampleClassId`);
+--ALTER TABLE LibraryDesign DROP FOREIGN KEY `uk_libraryDesign_name`;
+--ALTER TABLE LibraryDesign ADD CONSTRAINT `uk_libraryDesign_name_sampleClass` UNIQUE (`name`, `sampleClassId`);
+-- fixes BeforeInsertPool trigger created in V0004
+DROP TRIGGER IF EXISTS BeforeInsertPool;
 
 INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
 VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
@@ -82,7 +84,7 @@ INSERT INTO TissueOrigin(tissueOriginId, alias, description, createdBy, creation
 
 DELETE FROM TissueType;
 INSERT INTO TissueType(tissueTypeId, alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'R','Reference or non-tumour, non-diseased tissue sample. Typically used as a donor-specific comparison to a diseased tissue, usually a cancer',1,'2016-09-26 15:55:43',1,'2016-09-26 15:55:43',),
+(1, 'R','Reference or non-tumour, non-diseased tissue sample. Typically used as a donor-specific comparison to a diseased tissue, usually a cancer',1,'2016-09-26 15:55:43',1,'2016-09-26 15:55:43'),
 (2, 'P','Primary tumour',1,'2016-09-26 15:55:43',1,'2016-09-26 15:55:43'),
 (3, 'M','Metastatic tumour',1,'2016-09-26 15:55:43',1,'2016-09-26 15:55:43'),
 (4, 'X','Xenograft derived from some tumour. Note: may not necessarily be a mouse xenograft',1,'2016-09-26 15:55:43',1,'2016-09-26 15:55:43'),
@@ -343,9 +345,9 @@ INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
 
 DELETE FROM SequencerReference;
 INSERT INTO SequencerReference (referenceId, name, platformId, ip) VALUES
-  (1, 'T2000', 1, RAWTOHEX('127.0.0.1')),
-  (2, 'TMS1', 2, RAWTOHEX('127.0.0.1')),
-  (3, 'TPB1', 3, RAWTOHEX('127.0.0.1'));
+  (1, 'T2000', 1, '127.0.0.1'),
+  (2, 'TMS1', 2, '127.0.0.1'),
+  (3, 'TPB1', 3, '127.0.0.1');
   
 INSERT INTO SequencerReference (referenceId, name, platformId, serialNumber, dateCommissioned, dateDecommissioned, upgradedSequencerReferenceId, ip) VALUES
   (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, '127.0.0.1'),
@@ -429,21 +431,21 @@ INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_pro
   (304, 300, 'SAM304', 'DILT_0001_nn_n_1-1_D_1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
   (305, 300, 'SAM305', 'DILT_0001_nn_n_1-1_D_2', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00');
 
-INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, concentration) VALUES
-(1, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL),
-(2, 23, 1, NULL, '7357', 'TEST', 1, NULL, NULL),
-(3, 24, 2, 1, '7357', 'TEST', 1, NULL, NULL),
-(4, 8, 2, 1, '7357', 'TEST', 1, NULL, NULL),
-(5, 10, 3, 1, '7357', 'TEST', 1, NULL, NULL),
-(6, 11, 5, 1, '7357', 'TEST', 1, NULL, NULL),
-(7, 13, 2, 1, '7357', 'TEST', 1, NULL, NULL),
-(8, 15, 6, 1, '7357', 'TEST', 1, NULL, NULL),
-(9, 17, 7, 1, '7357', 'TEST', 1, NULL, NULL),
-(10, 14, 7, 2, '7357', 'TEST', 1, NULL, NULL),
-(11, 21, 10, 2, '7357', 'TEST', 1, NULL, NULL),
-(12, 18, 9, 1, '7357', 'TEST', 1, NULL, NULL),
-(13, 19, 9, 1, '7357', 'TEST', 1, NULL, NULL),
-(14, 20, 9, 1, '7357', 'TEST', 1, NULL, NULL);
+INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, concentration, archived) VALUES
+(1, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, 0),
+(2, 23, 1, NULL, '7357', 'TEST', 1, NULL, NULL, 0),
+(3, 24, 2, 1, '7357', 'TEST', 1, NULL, NULL, 0),
+(4, 8, 2, 1, '7357', 'TEST', 1, NULL, NULL, 0),
+(5, 10, 3, 1, '7357', 'TEST', 1, NULL, NULL, 0),
+(6, 11, 5, 1, '7357', 'TEST', 1, NULL, NULL, 0),
+(7, 13, 2, 1, '7357', 'TEST', 1, NULL, NULL, 0),
+(8, 15, 6, 1, '7357', 'TEST', 1, NULL, NULL, 0),
+(9, 17, 7, 1, '7357', 'TEST', 1, NULL, NULL, 0),
+(10, 14, 7, 2, '7357', 'TEST', 1, NULL, NULL, 0),
+(11, 21, 10, 2, '7357', 'TEST', 1, NULL, NULL, 0),
+(12, 18, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
+(13, 19, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
+(14, 20, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0);
 
 INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId, archived) VALUES
   (100001, 1, NULL, 1, 0),  -- Identity
@@ -494,9 +496,9 @@ INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, secondaryIde
   (110002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (120002, 2, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (200002, 3, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
-  (202, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL),
-  (302, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL),
-  (502, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL);;
+  (202, 1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  (302, 1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  (502, 1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL);;
 
 INSERT INTO SampleTissueProcessing(sampleId) VALUES
 (3),(4),(5);
