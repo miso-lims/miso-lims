@@ -1298,6 +1298,7 @@ public class Dtos {
     dto.setPlatformType(from.getPlatformType().name());
     dto.setLongestIndex(from.getLongestIndex());
     dto.setLastModified(formatDateTime(from.getLastModified()));
+    dto.setDilutionCount(from.getPoolableElementViews().size());
     if (includeContents) {
       Set<DilutionDto> pooledElements = new HashSet<>();
       for (PoolableElementView ld : from.getPoolableElementViews()) {

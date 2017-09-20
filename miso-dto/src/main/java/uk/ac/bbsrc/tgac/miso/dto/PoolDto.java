@@ -30,6 +30,7 @@ public class PoolDto implements WritableUrls {
   private String platformType;
   private int longestIndex;
   private boolean hasLowQualityLibraries;
+  private int dilutionCount;
 
   public String getAlias() {
     return alias;
@@ -216,5 +217,13 @@ public class PoolDto implements WritableUrls {
 
   public void setHasLowQualityLibraries(boolean hasLowQualityLibraries) {
     this.hasLowQualityLibraries = hasLowQualityLibraries;
+  }
+
+  public int getDilutionCount() {
+    return dilutionCount;
+  }
+
+  public void setDilutionCount(int dilutionCount) {
+    this.dilutionCount = dilutionCount;
   }
 }
