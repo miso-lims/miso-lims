@@ -105,20 +105,17 @@ ListTarget.dilution = {
       "include": true,
       "iSortPriority": 0
     }, {
-      "sTitle": "Creator",
-      "mData": "dilutionUserName",
-      "include": true,
-      "iSortPriority": 0
-    }, {
-      "sTitle": "Creation Date",
-      "mData": "creationDate",
-      "include": true,
-      "iSortPriority": 0
-    }, {
       "sTitle": "Platform",
       "mData": "library.platformType",
       "include": true,
       "iSortPriority": 0
+    }, {
+      "sTitle": "Targeted Sequencing",
+      "mData": "targetedSequencingId",
+      "include": Constants.isDetailedSample,
+      "mRender": ListUtils.render.textFromId(Constants.targetedSequencings, 'alias', '(None)'),
+      "iSortPriority": 0,
+      "bSortable": false
     }, {
       "sTitle": "Concentration",
       "mData": "concentration",
@@ -130,12 +127,15 @@ ListTarget.dilution = {
       "include": true,
       "iSortPriority": 0
     }, {
-      "sTitle": "Targeted Sequencing",
-      "mData": "targetedSequencingId",
-      "include": Constants.isDetailedSample,
-      "mRender": ListUtils.render.textFromId(Constants.targetedSequencings, 'alias', '(None)'),
-      "iSortPriority": 0,
-      "bSortable": false
+      "sTitle": "Creator",
+      "mData": "dilutionUserName",
+      "include": true,
+      "iSortPriority": 0
+    }, {
+      "sTitle": "Creation Date",
+      "mData": "creationDate",
+      "include": true,
+      "iSortPriority": 0
     }];
   }
 };
