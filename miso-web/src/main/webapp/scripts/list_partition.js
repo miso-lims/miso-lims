@@ -236,12 +236,9 @@ ListTarget.partition = {
   },
   createColumns: function(config, projectId) {
     return [
-        {
-          "sTitle": "Container",
-          "mData": "containerName",
-          "include": config.showContainer,
-          "iSortPriority": 0
-        },
+        ListUtils.labelHyperlinkColumn("Container", "container", function(partition) {
+          return partition.containerId;
+        }, "containerName", 0, config.showContainer),
         {
           "sTitle": "Number",
           "mData": "partitionNumber",
