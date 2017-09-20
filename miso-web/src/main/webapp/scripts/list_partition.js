@@ -279,6 +279,23 @@ ListTarget.partition = {
 
           }
         }, {
+          "sTitle": "Dilutions",
+          "mData": "pool",
+          "include": true,
+          "iSortPriority": 0,
+          "bSortable": false,
+          "mRender": function(data, type, full) {
+            if (data) {
+              return data.dilutionCount;
+            } else {
+              if (type === 'display') {
+                return "(None)";
+              } else {
+                return "";
+              }
+            }
+          }
+        }, {
           "sTitle": "QC Status",
           "mData": "qcType",
           "include": config.runId,
