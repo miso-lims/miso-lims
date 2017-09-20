@@ -1815,6 +1815,7 @@ public class Dtos {
   public static PartitionDto asDto(Partition from) {
     PartitionDto dto = new PartitionDto();
     dto.setId(from.getId());
+    dto.setContainerId(from.getSequencerPartitionContainer().getId());
     dto.setContainerName(from.getSequencerPartitionContainer().getIdentificationBarcode());
     dto.setPartitionNumber(from.getPartitionNumber());
     dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), false));
