@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -760,7 +761,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     assertBoxPropertiesMatch(from, to);
     // Because we're already inside the session at this point, the original object must be evicted
     // to allow changes to be observed and changeLogged in the Service/RequestManager layer
-    to = deproxify(to);
+    Hibernate.initialize(to.getBoxables());
     sessionFactory.getCurrentSession().evict(to);
     for (Entry<String, BoxableView> entry : from.getBoxables().entrySet()) {
       if (entry.getValue() != null) {
