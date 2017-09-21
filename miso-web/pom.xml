@@ -37,16 +37,15 @@
   <properties>
     <skipITs>true</skipITs>
     <cargoInitGoal>start</cargoInitGoal>
+    <mysql.db>lims</mysql.db>
+    <mysql.user>tgaclims</mysql.user>
+    <mysql.pw>tgaclims</mysql.pw>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
   <dependencies>
     <dependency>
       <groupId>aopalliance</groupId>
       <artifactId>aopalliance</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.lowagie</groupId>
@@ -75,6 +74,24 @@
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>docker-maven-plugin</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-jdk14</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-nop</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.prometheus</groupId>
@@ -277,6 +294,11 @@
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
     </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <finalName>ROOT</finalName>
@@ -318,6 +340,51 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
+      <plugin>
+      	<groupId>io.fabric8</groupId>
+      	<artifactId>docker-maven-plugin</artifactId>
+        <version>0.21.0</version>
+      	<configuration>
+      	<removeVolumes>true</removeVolumes>
+      	  <images>
+      	    <image>
+      	      <name>mysql:5.7</name>
+      	      <alias>mysql</alias>
+      	      <run>
+      	        <env>
+      	          <MYSQL_ROOT_PASSWORD>abc123</MYSQL_ROOT_PASSWORD>
+      	          <MYSQL_USER>${mysql.user}</MYSQL_USER>
+      	          <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
+      	          <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
+      	        </env>
+      	        <ports>
+      	          <port>${mysql.port}:3306</port>
+      	        </ports>
+      	        <wait>
+      	          <time>8000</time>
+      	        </wait>
+      	      </run>
+      	    </image>
+      	  </images>
+      	</configuration>
+      	<executions>
+      	  <execution>
+      	    <id>start</id>
+      	    <phase>pre-integration-test</phase>
+      	    <goals>
+      	      <goal>start</goal>
+      	    </goals>
+      	  </execution>
+      	  <execution>
+      	    <id>stop</id>
+      	    <phase>post-integration-test</phase>
+      	    <goals>
+      	      <goal>stop</goal>
+      	    </goals>
+      	  </execution>
+      	</executions>
+      </plugin>
+      
     </plugins>
   </build>
   <profiles>
@@ -444,7 +511,7 @@
 	              </resources>
 	            </configuration>
 	          </execution>
-	          <!-- Reserve ports for Tomcat and H2 -->
+	          <!-- Reserve ports for Tomcat -->
 	          <execution>
 	            <id>reserve-network-port</id>
                 <phase>pre-integration-test</phase>
@@ -455,7 +522,6 @@
 	              <portNames>
 	                <portName>miso.it.tomcat.servlet.port</portName>
                     <portName>miso.it.tomcat.ajp.port</portName>
-                    <portName>miso.it.h2.port</portName>
 	              </portNames>
 	            </configuration>
 	          </execution>
@@ -486,7 +552,7 @@
 	        </executions>
 	      </plugin>
 	      <plugin>
-	        <!-- translate Flyway migrations to work in H2 -->
+	        <!-- translate Flyway migrations -->
 	        <groupId>org.codehaus.gmaven</groupId>
 	        <artifactId>groovy-maven-plugin</artifactId>
 	        <executions>
@@ -499,35 +565,6 @@
 	            <configuration>
 	              <source>${project.basedir}/src/it/resources/db/scripts/schema_translator.groovy</source>
 	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
-	      <plugin>
-	        <!-- create H2 in-memory DB, accessible via TCP -->
-	        <groupId>net.xeric.maven</groupId>
-	        <artifactId>h2-maven-plugin</artifactId>
-	        <configuration>
-	          <args>
-	            <arg>-tcp</arg>
-	            <arg>-tcpAllowOthers</arg>
-	            <arg>-tcpPort</arg>
-	            <arg>${miso.it.h2.port}</arg>
-	          </args>
-	        </configuration>
-	        <executions>
-	          <execution>
-	            <id>start-h2-tcp</id>
-	            <phase>pre-integration-test</phase>
-	            <goals>
-	              <goal>h2-start</goal>
-	            </goals>
-	          </execution>
-	          <execution>
-	            <id>stop-h2-tcp</id>
-	            <phase>post-integration-test</phase>
-	            <goals>
-	              <goal>h2-stop</goal>
-	            </goals>
 	          </execution>
 	        </executions>
 	      </plugin>
@@ -546,7 +583,9 @@
 	          </execution>
 	        </executions>
 	        <configuration>
-	          <url>jdbc:h2:tcp://localhost:${miso.it.h2.port}/mem:miso-it;mode=mysql;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS "public";</url>
+	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	          <user>${mysql.user}</user>
+	          <password>${mysql.pw}</password>
 	          <locations>
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
                 <location>classpath:db/migration</location>
@@ -588,8 +627,8 @@
 	            </systemProperties>
 	            <dependencies>
 	              <dependency>
-	                <groupId>com.h2database</groupId>
-	                <artifactId>h2</artifactId>
+	                <groupId>mysql</groupId>
+      				<artifactId>mysql-connector-java</artifactId>
 	              </dependency>
 	            </dependencies>
 	          </container>
@@ -610,8 +649,10 @@
 	              <datasource>
 	                <jndiName>jdbc/MISODB</jndiName>
 	                <connectionType>javax.sql.Datasource</connectionType>
-	                <driverClass>org.h2.Driver</driverClass>
-	                <url>jdbc:h2:tcp://localhost:${miso.it.h2.port}/mem:miso-it;mode=mysql;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS "public";</url>
+	                <driverClass>com.mysql.jdbc.Driver</driverClass>
+	                <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	                <username>${mysql.user}</username>
+	                <password>${mysql.pw}</password>
 	              </datasource>
 	            </datasources>
 	          </configuration>
@@ -633,7 +674,9 @@
               <systemPropertyVariables>
                 <!-- Make URLs available for tests -->
                 <miso.it.baseUrl>http://localhost:${miso.it.tomcat.servlet.port}/</miso.it.baseUrl>
-                <miso.it.h2.url>jdbc:h2:tcp://localhost:${miso.it.h2.port}/mem:miso-it;mode=mysql;DB_CLOSE_DELAY=-1;</miso.it.h2.url>
+                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</miso.it.mysql.url>
+                <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
+                <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
               <skipTests>${skipITs}</skipTests>
             </configuration>
