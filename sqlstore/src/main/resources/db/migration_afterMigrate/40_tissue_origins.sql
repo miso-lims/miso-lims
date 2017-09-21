@@ -25,4 +25,7 @@ CALL addTissueOrigin('Bi', 'Biliary');
 CALL addTissueOrigin('En', 'Endometrial');
 CALL addTissueOrigin('Cr', 'Colorectal');
 CALL addTissueOrigin('Sr', 'Serosa');
+CALL addTissueOrigin('Ax', 'Axillary');
+CALL addTissueOrigin('Ba', 'Back');
+CALL addTissueOrigin('Pu', 'Pleura');
 -- EndNoTest
