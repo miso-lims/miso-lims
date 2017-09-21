@@ -54,6 +54,7 @@ ListTarget.partition = {
         div.setAttribute('class', 'pool-tile');
 
         var title = document.createElement('DIV');
+        title.setAttribute('class', 'pool-name');
         title.setAttribute('style', 'font-weight:bold');
         title.innerText = item.pool.name + " (" + item.pool.alias + ")";
         div.appendChild(title);
@@ -116,12 +117,20 @@ ListTarget.partition = {
         title: 'Select Pool',
         modal: true,
         buttons: {
-          "Back": function() {
-            dialog.dialog("close");
-            backHandler();
+          "Back": {
+            id: 'back',
+            text: 'Back',
+            click: function() {
+              dialog.dialog("close");
+              backHandler();
+            },
           },
-          "Cancel": function() {
-            dialog.dialog("close");
+          "Cancel": {
+            id: 'cancel',
+            text: 'Cancel',
+            click: function() {
+              dialog.dialog("close");
+            }
           }
         }
       });
@@ -238,7 +247,7 @@ ListTarget.partition = {
     return [
         ListUtils.labelHyperlinkColumn("Container", "container", function(partition) {
           return partition.containerId;
-        }, "containerName", 0, config.showContainer),
+        }, "containerName", 2, config.showContainer),
         {
           "sTitle": "Number",
           "mData": "partitionNumber",
@@ -299,7 +308,7 @@ ListTarget.partition = {
           "iSortPriority": 0,
           "mRender": ListUtils.render.textFromId(Constants.partitionQcTypes, 'description', '(Unset)')
         }, {
-          "sTitle": "QC Notes",
+          "sTitle": "QC Note",
           "mData": "qcNotes",
           "iSortPriority": 0,
           "include": config.runId

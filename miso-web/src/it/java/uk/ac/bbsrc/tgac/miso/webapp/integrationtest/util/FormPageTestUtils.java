@@ -20,7 +20,7 @@ public class FormPageTestUtils {
     fields.forEach((key, val) -> {
       String fieldValue = page.getField(key);
       if (val == null) {
-        assertTrue(String.format(formatString, key.toString()) + " expected null", isStringEmptyOrNull(fieldValue));
+        assertTrue(String.format(formatString, key.toString()) + " expected null, is " + fieldValue, isStringEmptyOrNull(fieldValue));
       } else {
         assertEquals(String.format(formatString, key.toString()), val, page.getField(key));
       }

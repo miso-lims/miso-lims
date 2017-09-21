@@ -303,27 +303,39 @@ var Utils = Utils
         });
 
         var buttons = {};
-        buttons[okButton] = function() {
-          var badFields = fields.filter(function(field) {
-            return field.required && !output[field.property];
-          }).map(function(field) {
-            return field.label;
-          });
-          if (badFields.length) {
-            alert("You must fill out the following fields: " + badFields.join(", "));
-            return;
+        buttons[okButton] = {
+          id: "ok",
+          text: okButton,
+          click: function() {
+            var badFields = fields.filter(function(field) {
+              return field.required && !output[field.property];
+            }).map(function(field) {
+              return field.label;
+            });
+            if (badFields.length) {
+              alert("You must fill out the following fields: " + badFields.join(", "));
+              return;
+            }
+            dialog.dialog("close");
+            callback(output);
           }
-          dialog.dialog("close");
-          callback(output);
         };
         if (backHandler) {
-          buttons["Back"] = function() {
-            dialog.dialog("close");
-            backHandler();
+          buttons["Back"] = {
+            id: "back",
+            text: "Back",
+            click: function() {
+              dialog.dialog("close");
+              backHandler();
+            }
           };
         }
-        buttons["Cancel"] = function() {
-          dialog.dialog("close");
+        buttons["Cancel"] = {
+          id: "cancel",
+          text: "Cancel",
+          click: function() {
+            dialog.dialog("close");
+          }
         };
         var dialog = jQuery('#dialog').dialog({
           autoOpen: true,
@@ -361,8 +373,12 @@ var Utils = Utils
           title: title,
           modal: true,
           buttons: {
-            "Cancel": function() {
-              dialog.dialog("close");
+            "Cancel": {
+              id: 'cancel',
+              text: 'Cancel',
+              click: function() {
+                dialog.dialog("close");
+              }
             }
           }
         });

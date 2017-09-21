@@ -45,12 +45,12 @@
     <c:when test="${run.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Run
-  <button type="button" onclick="return Run.validateRun();" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button type="button" id="save" onclick="return Run.validateRun();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
   <c:if test="${run.id != 0 && miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
-    <a href="<c:url value='/miso/rest/run/${run.id}/samplesheet'/>" class="ui-button ui-state-default">Sample Sheet (1.8)</button>
-    <a href="<c:url value='/miso/rest/run/${run.id}/oldsamplesheet'/>" class="ui-button ui-state-default">Sample Sheet (1.7)</button>
+    <a href="<c:url value='/miso/rest/run/${run.id}/samplesheet'/>" class="ui-button ui-state-default">Sample Sheet (1.8)</a>
+    <a href="<c:url value='/miso/rest/run/${run.id}/oldsamplesheet'/>" class="ui-button ui-state-default">Sample Sheet (1.7)</a>
     <span></span>
   </c:if>
   <c:choose>
@@ -79,18 +79,27 @@
 <table class="in">
   <tr>
     <td class="h">Run ID:</td>
-    <td>
+    <td><span id="runId">
       <c:choose>
         <c:when test="${run.id != 0}">
           <input type='hidden' id='runId' name='runId' value='${run.id}'/>${run.id}
         </c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
-    </td>
+    </span></td>
+  </tr>
+  <tr>
+    <td class="h">Name:</td>
+    <td><span id="name">
+      <c:choose>
+      <c:when test="${run.id != 0}">${run.name}</c:when>
+      <c:otherwise><i>Unsaved</i></c:otherwise>
+      </c:choose>
+    </span></td>
   </tr>
   <tr>
     <td class="h">Alias:*</td>
-    <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span>
+    <td><form:input id="alias" path="alias" class="validateable"/><span id="aliascounter" class="counter"></span>
     </td>
   </tr>
   <c:if test="${not empty run.accession}">
@@ -102,11 +111,11 @@
   </c:if>
   <tr>
     <td>Platform:</td>
-    <td>${run.sequencerReference.platform.platformType.key}</td>
+    <td><span id="platform">${run.sequencerReference.platform.platformType.key}</span></td>
   </tr>
   <tr>
     <td>Sequencer:</td>
-    <td>${run.sequencerReference.name} - ${run.sequencerReference.platform.instrumentModel}</td>
+    <td><span id="sequencer">${run.sequencerReference.name} - ${run.sequencerReference.platform.instrumentModel}</span></td>
   </tr>
   <tr>
     <td>Sequencing Parameters:</td>
@@ -126,10 +135,10 @@
     <td>
       <c:choose>
         <c:when test="${run.health.key ne 'Unknown'}">
-           <form:input path="description" disabled="disabled" class="validateable"/>
+           <form:input id="description" path="description" disabled="disabled" class="validateable"/>
         </c:when>
 
-        <c:otherwise><form:input path="description" class="validateable"/></c:otherwise>
+        <c:otherwise><form:input id="description" path="description" class="validateable"/></c:otherwise>
       </c:choose>
       <span id="descriptioncounter" class="counter"></span>
     </td>
@@ -138,33 +147,33 @@
     <td>Run Path:*</td>
     <td>
       <c:choose>
-        <c:when test="${empty run.filePath or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}"><form:input path="filePath"/></c:when>
-        <c:otherwise>${run.filePath}</c:otherwise>
+        <c:when test="${empty run.filePath or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}"><form:input id="filePath" path="filePath"/></c:when>
+        <c:otherwise><span id="filePath">${run.filePath}</span></c:otherwise>
       </c:choose>
     </td>
   </tr>
   <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
     <tr>
       <td>Number of Cycles:</td>
-      <td><form:input path="numCycles" class="validateable"/></td>
+      <td><form:input id="numCycles" path="numCycles" class="validateable"/></td>
     </tr>
     <tr>
       <td>Called Cycles:</td>
-      <td><form:input path="callCycle" class="validateable"/></td>
+      <td><form:input id="callCycle" path="callCycle" class="validateable"/></td>
     </tr>
     <tr>
       <td>Imaged Cycles:</td>
-      <td><form:input path="imgCycle" class="validateable"/></td>
+      <td><form:input id="imgCycle" path="imgCycle" class="validateable"/></td>
     </tr>
     <tr>
       <td>Scored Cycles:</td>
-      <td><form:input path="scoreCycle" class="validateable"/></td>
+      <td><form:input id="scoreCycle" path="scoreCycle" class="validateable"/></td>
     </tr>
   </c:if>
   <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.LS454Run')}">
     <tr>
       <td>Cycles:</td>
-      <td><form:input path="cycles" class="validateable"/></td>
+      <td><form:input id="cycles" path="cycles" class="validateable"/></td>
     </tr>
 
   </c:if>
@@ -174,7 +183,7 @@
     <td>
       <c:choose>
          <c:when test="${run.health.key ne 'Unknown'}"><form:checkbox
-           value="${run.pairedEnd}" path="pairedEnd" disabled="disabled"/></c:when>
+           value="${run.pairedEnd}" path="pairedEnd" id="pairedEnd" disabled="disabled"/></c:when>
         <c:otherwise><form:checkbox value="${run.pairedEnd}" path="pairedEnd" id="pairedEnd"/></c:otherwise>
       </c:choose>
     </td>
@@ -198,7 +207,7 @@
         <tr>
           <c:choose>
           <c:when test="${run.id == 0 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <td><form:input path="startDate"/></td>
+              <td><form:input path="startDate" id="startDate" /></td>
           
               <script type="text/javascript">
               Utils.ui.addDatePicker("startDate");
@@ -212,7 +221,7 @@
           </c:choose>
           <c:choose>
           <c:when test="${(run.health.isDone() and empty run.completionDate) or run.id == 0 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <td><form:input path="completionDate"/></td>
+              <td><form:input path="completionDate" id="completionDate" /></td>
           
               <script type="text/javascript">
               Utils.ui.addDatePicker("completionDate");
@@ -305,9 +314,15 @@
 </c:if>
 
   <c:if test="${run.id != 0}">
-    <miso:list-section id="list_container" name="${run.platformType.containerName}" target="container" items="${runContainers}" alwaysShow="true" config="${partitionConfig}"/>
-    <miso:list-section id="list_parition" name="${run.platformType.pluralPartitionName}" target="partition" items="${runPartitions}" config="${partitionConfig}"/>
-    <miso:list-section id="list_experiment" name="Experiments" target="experiment" alwaysShow="true" items="${experiments}" config="${experimentConfiguration}"/>
+    <div id="containers">
+      <miso:list-section id="list_container" name="${run.platformType.containerName}" target="container" items="${runContainers}" alwaysShow="true" config="${partitionConfig}"/>
+    </div>
+    <div id="partitions">
+      <miso:list-section id="list_partition" name="${run.platformType.pluralPartitionName}" target="partition" items="${runPartitions}" config="${partitionConfig}"/>
+    </div>
+    <div id="experiments">
+      <miso:list-section id="list_experiment" name="Experiments" target="experiment" alwaysShow="true" items="${experiments}" config="${experimentConfiguration}"/>
+    </div>
   </c:if>
 </form:form>
 <miso:changelog item="${run}"/>

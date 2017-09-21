@@ -8,6 +8,8 @@ import org.openqa.selenium.WebElement;
 
 import com.google.common.collect.Lists;
 
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
+
 public class DataTable {
 
   private static final By columnHeadingsSelector = By.tagName("th");
@@ -75,6 +77,14 @@ public class DataTable {
   public String getTextAtCell(String columnHeading, int rowNum) {
     WebElement cell = getCell(columnHeading, rowNum);
     return cell.getText();
+  }
+
+  public void checkBoxForRow(int rowNum) {
+    List<WebElement> checkbox = getCell(Columns.SORT, rowNum).findElements(By.tagName("input"));
+    if (checkbox.isEmpty()) {
+      throw new IllegalArgumentException("Row " + rowNum + " does not have a checkbox to click.");
+    }
+    checkbox.get(0).click();
   }
 
   private WebElement getCell(String columnHeading, int rowNum) {

@@ -526,7 +526,7 @@
                       <port>${mysql.port}:3306</port>
                     </ports>
                     <wait>
-                      <time>8000</time>
+                      <time>10000</time>
                     </wait>
                   </run>
                 </image>
