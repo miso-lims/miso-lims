@@ -467,7 +467,7 @@
       <dependency>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.21.0</version>
+        <version>0.22.1</version>
       </dependency>
       <dependency>
         <groupId>io.github.bonigarcia</groupId>
@@ -934,11 +934,6 @@
           <groupId>com.samaxes.maven</groupId>
           <artifactId>minify-maven-plugin</artifactId>
           <version>1.7.4</version>
-        </plugin>
-        <plugin>
-          <groupId>net.xeric.maven</groupId>
-          <artifactId>h2-maven-plugin</artifactId>
-          <version>1.5</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

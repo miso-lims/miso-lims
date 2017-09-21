@@ -1,6 +1,3 @@
--- fixes LibraryDesign changes that were marked "NoTest" in V0130
---ALTER TABLE LibraryDesign DROP FOREIGN KEY `uk_libraryDesign_name`;
---ALTER TABLE LibraryDesign ADD CONSTRAINT `uk_libraryDesign_name_sampleClass` UNIQUE (`name`, `sampleClassId`);
 -- fixes BeforeInsertPool trigger created in V0004
 DROP TRIGGER IF EXISTS BeforeInsertPool;
 
