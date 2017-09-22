@@ -102,6 +102,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     this.sessionFactory = MisoTargetUtils.makeSessionFactory(dsProxy);
     JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
     this.serviceManager = MisoServiceManager.buildWithDefaults(jdbcTemplate, sessionFactory, properties.getRequiredString(OPT_MISO_USER));
+    this.serviceManager.getSampleService().setUniqueExternalNameWithinProjectRequired(false);
     this.valueTypeLookup = readInTransaction(new TransactionWork<ValueTypeLookup>() {
       @Override
       public ValueTypeLookup doWork() throws IOException {

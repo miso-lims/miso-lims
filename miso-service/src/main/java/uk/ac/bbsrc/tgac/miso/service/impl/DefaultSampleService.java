@@ -231,7 +231,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
         validateHierarchy(detailed);
       } else {
         sample.inheritPermissions(sample.getProject());
-        if (isExternalNameDuplicatedInProject(sample)) {
+        if (isUniqueExternalNameWithinProjectRequired() && isExternalNameDuplicatedInProject(sample)) {
           throw new IllegalArgumentException("Sample with external name '" + ((SampleIdentity) sample).getExternalName()
               + "' already exists in project " + sample.getProject().getShortName());
         }
