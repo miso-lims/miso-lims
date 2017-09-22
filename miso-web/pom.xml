@@ -340,51 +340,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
-      <plugin>
-      	<groupId>io.fabric8</groupId>
-      	<artifactId>docker-maven-plugin</artifactId>
-        <version>0.21.0</version>
-      	<configuration>
-      	<removeVolumes>true</removeVolumes>
-      	  <images>
-      	    <image>
-      	      <name>mysql:5.7</name>
-      	      <alias>mysql</alias>
-      	      <run>
-      	        <env>
-      	          <MYSQL_ROOT_PASSWORD>abc123</MYSQL_ROOT_PASSWORD>
-      	          <MYSQL_USER>${mysql.user}</MYSQL_USER>
-      	          <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
-      	          <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
-      	        </env>
-      	        <ports>
-      	          <port>${mysql.port}:3306</port>
-      	        </ports>
-      	        <wait>
-      	          <time>8000</time>
-      	        </wait>
-      	      </run>
-      	    </image>
-      	  </images>
-      	</configuration>
-      	<executions>
-      	  <execution>
-      	    <id>start</id>
-      	    <phase>pre-integration-test</phase>
-      	    <goals>
-      	      <goal>start</goal>
-      	    </goals>
-      	  </execution>
-      	  <execution>
-      	    <id>stop</id>
-      	    <phase>post-integration-test</phase>
-      	    <goals>
-      	      <goal>stop</goal>
-      	    </goals>
-      	  </execution>
-      	</executions>
-      </plugin>
-      
     </plugins>
   </build>
   <profiles>
@@ -568,6 +523,50 @@
 	          </execution>
 	        </executions>
 	      </plugin>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.21.0</version>
+            <configuration>
+            <removeVolumes>true</removeVolumes>
+              <images>
+                <image>
+                  <name>mysql:5.7</name>
+                  <alias>mysql</alias>
+                  <run>
+                    <env>
+                      <MYSQL_ROOT_PASSWORD>abc123</MYSQL_ROOT_PASSWORD>
+                      <MYSQL_USER>${mysql.user}</MYSQL_USER>
+                      <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
+                      <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
+                    </env>
+                    <ports>
+                      <port>${mysql.port}:3306</port>
+                    </ports>
+                    <wait>
+                      <time>8000</time>
+                    </wait>
+                  </run>
+                </image>
+              </images>
+            </configuration>
+            <executions>
+              <execution>
+                <id>start</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
 	      <plugin>
 	        <!-- populate DB -->
 	        <groupId>org.flywaydb</groupId>
