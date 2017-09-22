@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -244,14 +245,15 @@ public class SampleController extends RestController {
       throw new RestException("Must give search terms to look up identities", Status.BAD_REQUEST);
     }
     Integer requestCounter = (Integer) json.get("requestCounter");
-    Set<SampleDto> matchingIdentities = new HashSet<>();
+    Set<Sample> uniqueIdentities = new HashSet<>();
     String searchTerms = json.getString("identitiesSearches");
     for (String term : SampleIdentityImpl.getSetFromString(searchTerms.replaceAll(";", ","))) {
       Collection<SampleIdentity> matches = sampleService.getIdentitiesByExternalNameOrAlias(term);
       for (SampleIdentity identity : matches) {
-        matchingIdentities.add(Dtos.asDto(identity));
+        uniqueIdentities.add(identity);
       }
     }
+    Set<SampleDto> matchingIdentities = uniqueIdentities.stream().map(Dtos::asDto).collect(Collectors.toSet());
     JSONObject allIdentities = new JSONObject();
     allIdentities.put("requestCounter", requestCounter);
     allIdentities.put("matchingIdentities", matchingIdentities);
