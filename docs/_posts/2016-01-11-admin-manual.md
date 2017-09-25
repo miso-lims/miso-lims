@@ -15,12 +15,9 @@ deploying a fork of the code base with customisations.
 For each service, which may be put on the same machine, the following tools are
 required:
 
-All:
-
-* JDK 8
-
 Application Server:
 
+* JDK 8
 * Tomcat 8
 
 Database Server:
@@ -28,9 +25,12 @@ Database Server:
 * MySQL 5.7
 * Flyway
 
-Notification Server:
+Run Scanner:
 
-* Nothing extra
+* JDK 8
+* Tomcat 8
+* C++ build environment
+* jsoncpp
 
 Development Machine(s):
 
@@ -312,34 +312,63 @@ Java package. To create a new naming scheme option, create a new class in this p
 Extending the functionality to validate and/or generate additional fields is possible, but will
 require modifications at the Service layer as well.
 
-# Setting Up the Notification Server
-The notification server is a Java daemon that scans the paths containing
+# Setting Up the Run Scanner
+The run scanner is a webservice  that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
-without it, sequencer runs must be added manually. Configuration for
-`systemd`-based Linux systems is provided here.
+without it, sequencer runs must be added manually.
 
-Create the default configuration:
+Create a file called `ROOT.xml` in the following directory
+`$CATALINA_HOME/conf/Catalina/localhost`, creating the directory if necessary,
+and populate it with the following information:
 
-    mkdir /srv/notification-server
-    cp $MISO_SRC/notification-server/service/notification.properties /srv/notification-server
-    cp $MISO_SRC/notification-server/service/miso-notification.service /etc/systemd/system
+    <Context>
+       <Parameter name="runscanner.configFile" value="/etc/runscanner.json" override="false"/>
+    </Context>
 
-Edit `notification.properties`:
+In `/etc/runscanner.json`, or another path of your choosing, put JSON data describing your instruments. You will need one record for each instrument:
 
-1. Uncomment necessary `<service>.dataPaths` line and add comma-separated paths to instrument directories to scan.
-1. Replace `localhost:8080` with URL to MISO web server.
+    {
+      "path": "/some/directory/where/sequencer/writes",
+      "platformType": "ILLUMINA",
+      "name": "default",
+      "timeZone": "America/Toronto",
+      "parameters": {}
+    }
 
-After building and deploying the JAR, start the notification server:
+The JSON file then contains a list of instruments:
 
-    sudo systemctl daemon-reload
-    sudo systemctl enable miso-notification.service
-    sudo systemctl start miso-notification.service
+    [
+      {
+        "path": "/srv/sequencer/hiseq2500_1",
+        "platformType": "ILLUMINA",
+        "name": "default",
+        "timeZone": "America/Toronto",
+        "parameters": {}
+      },
+      {
+        "path": "/srv/sequencer/hiseq2500_2",
+        "platformType": "ILLUMINA",
+        "name": "default",
+        "timeZone": "America/Toronto",
+        "parameters": {}
+      }
+    ]
 
-The service should start up. You can inspect `stdout` in
-`/srv/notification-server/notification/notification.log` file, and `stderr` by
-`sudo journalctl -f -u miso-notification`.
+The name/platform-type combination decide what scanner is used to interpret the sequencer's results. A list of supported scanners can be found on the status page or the debugging interface below.
 
-# Building the Applicaton
+The parameters are set based on the processor. Currently, PACBIO/default requires `address` to be set to the URL of the PacBio machine.
+
+If you intend to scan Illumina runs, you will have to build `runscanner-illumina` and install it. See `runscanner-illumina/README.md` for instructions.
+
+Start Tomcat on this machine.
+
+Edit `miso.properties` and set `miso.runscanner.urls` to the URL of the Run Scanner instance and restart MISO.
+
+It is possible to set up multiple run scanners managing different sequencers and add all the URLs to `miso.properties`.
+
+You can view the run scanner's state from the main page.
+
+# Building the Application
 Building the application is done by:
 
     mvn clean package -P external
@@ -393,4 +422,5 @@ Once satisfied, push the image to Docker Hub. Note that only members of the [mis
     docker login
     docker push "misolims/miso-lims:${version}"
     
-
+# Monitoring
+The main MISO application and Run Scanner can be monitored using [Prometheus](http://prometheus.io/).
