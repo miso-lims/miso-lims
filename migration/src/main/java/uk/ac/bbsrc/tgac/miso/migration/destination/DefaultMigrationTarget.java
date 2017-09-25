@@ -486,17 +486,23 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private void fixDilutionChangeLog(LibraryDilution ldi, Collection<ChangeLog> ghostChangeLog) throws IOException {
     Library lib = ldi.getLibrary();
     Collection<ChangeLog> changes = lib.getChangeLog();
+    Collection<ChangeLog> fixedChanges = Lists.newArrayList();
     if (ghostChangeLog != null) {
       changes.addAll(ghostChangeLog);
     }
     String gsleTag = "GSLE" + ldi.getPreMigrationId();
     String misoTag = ldi.getName() != null ? ldi.getName() : "LDI" + ldi.getId();
     for (ChangeLog change : changes) {
+      if (("Library dilution " + misoTag + " created.").equals(change.getSummary())) {
+        // omit dilution created changelog created by DB trigger
+        continue;
+      }
       if (change.getSummary().matches("^" + gsleTag + ".*")) {
         change.setSummary(change.getSummary().replaceFirst(gsleTag, misoTag));
       }
+      fixedChanges.add(change);
     }
-    saveLibraryChangeLog(lib, changes);
+    saveLibraryChangeLog(lib, fixedChanges);
   }
 
   /**
