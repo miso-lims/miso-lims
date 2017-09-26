@@ -43,8 +43,19 @@
   <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
   
   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-    <property name="driverClassName" value="org.h2.Driver"/>
-    <property name="url" value="${miso.it.h2.url}"/>
+    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+    <property name="url" value="${miso.it.mysql.url}" />
+    <property name="username" value="${miso.it.mysql.user}" />
+    <property name="password" value="${miso.it.mysql.pw}" />
+  </bean>
+  
+  <bean name="interfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+  
+  <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+    <property name="sessionFactory" ref="sessionFactory"/>
+    <property name="dataSource" ref="dataSource"/>
   </bean>
 
 </beans>

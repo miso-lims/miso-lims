@@ -60,6 +60,12 @@ ListTarget.pool = {
           "include": true,
           "iSortPriority": 0
         }, {
+          "sTitle": "Dilutions",
+          "mData": "dilutionCount",
+          "include": true,
+          "iSortPriority": 0,
+          "bSortable": false,
+        }, {
           "sTitle": "Conc. (" + Constants.poolConcentrationUnits + ")",
           "mData": "concentration",
           "include": true,

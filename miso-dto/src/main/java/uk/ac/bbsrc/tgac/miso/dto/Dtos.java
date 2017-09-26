@@ -1298,6 +1298,7 @@ public class Dtos {
     dto.setPlatformType(from.getPlatformType().name());
     dto.setLongestIndex(from.getLongestIndex());
     dto.setLastModified(formatDateTime(from.getLastModified()));
+    dto.setDilutionCount(from.getPoolableElementViews().size());
     if (includeContents) {
       Set<DilutionDto> pooledElements = new HashSet<>();
       for (PoolableElementView ld : from.getPoolableElementViews()) {
@@ -1815,6 +1816,7 @@ public class Dtos {
   public static PartitionDto asDto(Partition from) {
     PartitionDto dto = new PartitionDto();
     dto.setId(from.getId());
+    dto.setContainerId(from.getSequencerPartitionContainer().getId());
     dto.setContainerName(from.getSequencerPartitionContainer().getIdentificationBarcode());
     dto.setPartitionNumber(from.getPartitionNumber());
     dto.setPool(from.getPool() == null ? null : asDto(from.getPool(), false));

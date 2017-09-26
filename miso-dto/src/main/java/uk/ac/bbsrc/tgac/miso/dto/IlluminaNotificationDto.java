@@ -52,6 +52,12 @@ public class IlluminaNotificationDto extends NotificationDto {
     return imgCycle;
   }
 
+  /**
+   * Get the lengths of the index reads in this run
+   * 
+   * This is the number of nucleotides in the index reads of this run. A single-index 6bp run would be encoded as [6], while a dual-index
+   * 8bp run would be [8,8]. If no index was done, this would be an empty list.
+   */
   public List<Integer> getIndexLengths() {
     return indexLengths;
   }
@@ -69,7 +75,6 @@ public class IlluminaNotificationDto extends NotificationDto {
   public PlatformType getPlatformType() {
     return PlatformType.ILLUMINA;
   }
-
 
   public Map<Integer, String> getPoolNames() {
     return poolNames;
@@ -139,7 +144,8 @@ public class IlluminaNotificationDto extends NotificationDto {
   @Override
   public String toString() {
     return "IlluminaNotificationDto [callCycle=" + callCycle + ", chemistry=" + chemistry + ", imgCycle=" + imgCycle + ", indexLengths="
-        + indexLengths + ", numCycles=" + numCycles + ", poolNames=" + poolNames + ", readLength=" + readLength + ", scoreCycle=" + scoreCycle
+        + indexLengths + ", numCycles=" + numCycles + ", poolNames=" + poolNames + ", readLength=" + readLength + ", scoreCycle="
+        + scoreCycle
         + ", getRunAlias()=" + getRunAlias() + ", getSequencerName()=" + getSequencerName() + ", getContainerSerialNumber()="
         + getContainerSerialNumber() + ", getLaneCount()=" + getLaneCount() + ", getHealthType()=" + getHealthType()
         + ", getSequencerFolderPath()=" + getSequencerFolderPath() + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()="

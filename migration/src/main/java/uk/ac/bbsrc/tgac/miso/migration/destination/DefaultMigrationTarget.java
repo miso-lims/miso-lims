@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -101,6 +102,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     this.sessionFactory = MisoTargetUtils.makeSessionFactory(dsProxy);
     JdbcTemplate jdbcTemplate = new JdbcTemplate(datasource);
     this.serviceManager = MisoServiceManager.buildWithDefaults(jdbcTemplate, sessionFactory, properties.getRequiredString(OPT_MISO_USER));
+    this.serviceManager.getSampleService().setUniqueExternalNameWithinProjectRequired(false);
     this.valueTypeLookup = readInTransaction(new TransactionWork<ValueTypeLookup>() {
       @Override
       public ValueTypeLookup doWork() throws IOException {
@@ -484,17 +486,23 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private void fixDilutionChangeLog(LibraryDilution ldi, Collection<ChangeLog> ghostChangeLog) throws IOException {
     Library lib = ldi.getLibrary();
     Collection<ChangeLog> changes = lib.getChangeLog();
+    Collection<ChangeLog> fixedChanges = Lists.newArrayList();
     if (ghostChangeLog != null) {
       changes.addAll(ghostChangeLog);
     }
     String gsleTag = "GSLE" + ldi.getPreMigrationId();
     String misoTag = ldi.getName() != null ? ldi.getName() : "LDI" + ldi.getId();
     for (ChangeLog change : changes) {
+      if (("Library dilution " + misoTag + " created.").equals(change.getSummary())) {
+        // omit dilution created changelog created by DB trigger
+        continue;
+      }
       if (change.getSummary().matches("^" + gsleTag + ".*")) {
         change.setSummary(change.getSummary().replaceFirst(gsleTag, misoTag));
       }
+      fixedChanges.add(change);
     }
-    saveLibraryChangeLog(lib, changes);
+    saveLibraryChangeLog(lib, fixedChanges);
   }
 
   /**
@@ -760,7 +768,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     assertBoxPropertiesMatch(from, to);
     // Because we're already inside the session at this point, the original object must be evicted
     // to allow changes to be observed and changeLogged in the Service/RequestManager layer
-    to = deproxify(to);
+    Hibernate.initialize(to.getBoxables());
     sessionFactory.getCurrentSession().evict(to);
     for (Entry<String, BoxableView> entry : from.getBoxables().entrySet()) {
       if (entry.getValue() != null) {

@@ -236,12 +236,9 @@ ListTarget.partition = {
   },
   createColumns: function(config, projectId) {
     return [
-        {
-          "sTitle": "Container",
-          "mData": "containerName",
-          "include": config.showContainer,
-          "iSortPriority": 0
-        },
+        ListUtils.labelHyperlinkColumn("Container", "container", function(partition) {
+          return partition.containerId;
+        }, "containerName", 0, config.showContainer),
         {
           "sTitle": "Number",
           "mData": "partitionNumber",
@@ -277,6 +274,23 @@ ListTarget.partition = {
               return prettyName;
             }
 
+          }
+        }, {
+          "sTitle": "Dilutions",
+          "mData": "pool",
+          "include": true,
+          "iSortPriority": 0,
+          "bSortable": false,
+          "mRender": function(data, type, full) {
+            if (data) {
+              return data.dilutionCount;
+            } else {
+              if (type === 'display') {
+                return "(None)";
+              } else {
+                return "";
+              }
+            }
           }
         }, {
           "sTitle": "QC Status",

@@ -71,6 +71,14 @@ ListTarget.poolelement = {
           return dilution.library.parentSampleId;
         }, "library.parentSampleAlias", 0, true),
         {
+          "sTitle": "Targeted Sequencing",
+          "mData": "targetedSequencingId",
+          "include": Constants.isDetailedSample,
+          "mRender": ListUtils.render.textFromId(Constants.targetedSequencings, 'alias', '(None)'),
+          "iSortPriority": 0,
+          "bSortable": false
+        },
+        {
           'sTitle': 'Indices',
           'mData': 'indexIds',
           'include': true,

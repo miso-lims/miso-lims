@@ -1,12 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 public class PartitionDto {
+  private Long containerId;
   private String containerName;
   private Long id;
   private int partitionNumber;
   private PoolDto pool;
   private String qcNotes;
   private long qcType;
+
+  public Long getContainerId() {
+    return containerId;
+  }
 
   public String getContainerName() {
     return containerName;
@@ -30,6 +35,10 @@ public class PartitionDto {
 
   public long getQcType() {
     return qcType;
+  }
+
+  public void setContainerId(Long containerId) {
+    this.containerId = containerId;
   }
 
   public void setContainerName(String containerName) {
