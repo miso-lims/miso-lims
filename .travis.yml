@@ -7,23 +7,17 @@ env: >
       MAVEN_SETTINGS="${TRAVIS_BUILD_DIR}/gsi-config"
       MAVEN_OPTS="-Xms1g -Xmx2g" 
 
+services:
+  - docker
+
 git:
   depth: 3
-
-addons:
-    sonarcloud:
-        organization: "miso-lims"
-        token:
-            secure: "CuaZUL0SJiRQR3Z+zvSTKAJc+/SOC+2g5a9gG08NYYSkwN8Ujwoyd9e14DLuyFaY2xZppQb5OIcQWQH+lmZqZbycRuAlBsTy1iIooUFB9v80g5eW8RDaJu3609Y7emSV7sZ3wuTJx3sTDeITAbkhRz0FQ2FyyoFMgD1jI+lxPXA="
-        github_token:
-            secure: "PsRH/x31KHGk/l0QlwMLDj437bKnWxJF45o2AiYZofVQZRVXzhhhpVxMqMl3QZ25K8wq5Qr7F2a2MYdMHtUpl0RBL5TWMDTmP9T1hyjA8IuqYx8Lq2ZklOvB4HJa/HgZEGVRWDyl4XE3giVDsYxPNogFTD1ieE6rs3XC0KkhQWY="
-        branches:
-            - develop
 
 before_install:
     - git clone https://github.com/oicr-gsi/gsi-config.git "${MAVEN_SETTINGS}"
     - cp "${MAVEN_SETTINGS}/settings.xml" "${HOME}/.m2/settings.xml"
     - 'echo pr slug ${TRAVIS_PULL_REQUEST_SLUG} && echo repo slug ${TRAVIS_REPO_SLUG}'
+    - docker build -t gims-miso .
 
 before_script:
   - export MAVEN_OPTS='-Xms1g -Xmx2g' CXX=g++-5
@@ -47,9 +41,17 @@ cache:
 
 notifications:
   email: false
-  slack:
-    rooms:
-      secure: Op3cFjj8lw8y5I+Bh4Hq0yt4G9Rx2GNOuwo6onjHGRrlODIPvFE0GCD+aEWmB76qcH/Lq/9NRf86Ik2tWnQbBRrwkH7bcJjmK05DvRFP3gvqIMiReHKugdYcthMnI+ep2PX+tiUMt3OwLAT9F2tpmOjEm2oG6DRsJ45oN/iUpVo=
-    on_success: change
-    on_failure: always
+
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_HOST;
+    docker tag gims-miso:latest $DOCKER_HOST/gims-miso:latest
+    docker push $DOCKER_HOST/gims-miso:latest;
+    fi
+  - if [ "$TRAVIS_BRANCH" == "develop" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_HOST;
+    docker tag gims-miso:develop $DOCKER_HOST/gims-miso:develop
+    docker push $DOCKER_HOST/gims-miso:develop;
+    fi
 
