@@ -465,11 +465,6 @@
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.fabric8</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>0.22.1</version>
-      </dependency>
-      <dependency>
         <groupId>io.github.bonigarcia</groupId>
         <artifactId>webdrivermanager</artifactId>
         <version>1.7.0</version>
@@ -934,6 +929,11 @@
           <groupId>com.samaxes.maven</groupId>
           <artifactId>minify-maven-plugin</artifactId>
           <version>1.7.4</version>
+        </plugin>
+        <plugin>
+          <groupId>io.fabric8</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
+          <version>0.22.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
