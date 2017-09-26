@@ -301,7 +301,7 @@ public class MisoServiceManager {
   }
 
   // TODO: Add naming scheme config instead of hard-coding
-  private NamingScheme getNamingScheme() {
+  public NamingScheme getNamingScheme() {
     if (namingScheme == null) {
       namingScheme = new OicrNamingScheme();
     }
