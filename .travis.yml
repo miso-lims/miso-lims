@@ -17,7 +17,7 @@ before_install:
     - git clone https://github.com/oicr-gsi/gsi-config.git "${MAVEN_SETTINGS}"
     - cp "${MAVEN_SETTINGS}/settings.xml" "${HOME}/.m2/settings.xml"
     - 'echo pr slug ${TRAVIS_PULL_REQUEST_SLUG} && echo repo slug ${TRAVIS_REPO_SLUG}'
-    - docker build -t gims-miso .
+    - sudo docker build -t gims-miso .
 
 before_script:
   - export MAVEN_OPTS='-Xms1g -Xmx2g' CXX=g++-5
@@ -45,13 +45,13 @@ notifications:
 
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" https://$DOCKER_HOST;
-    docker tag gims-miso:latest $DOCKER_HOST/$DOCKER_TAG:latest
-    docker push $DOCKER_HOST/$DOCKER_TAG:latest;
+    sudo docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" https://$DOCKER_HOST;
+    sudo docker tag gims-miso:latest $DOCKER_HOST/$DOCKER_TAG:latest
+    sudo docker push $DOCKER_HOST/$DOCKER_TAG:latest;
     fi
   - if [ "$TRAVIS_BRANCH" == "develop" ]; then
-    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" https://$DOCKER_HOST;
-    docker tag gims-miso:develop $DOCKER_HOST/$DOCKER_TAG:develop
-    docker push $DOCKER_HOST/$DOCKER_TAG:develop;
+    sudo docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" https://$DOCKER_HOST;
+    sudo docker tag gims-miso:develop $DOCKER_HOST/$DOCKER_TAG:develop
+    sudo docker push $DOCKER_HOST/$DOCKER_TAG:develop;
     fi
 
