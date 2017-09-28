@@ -22,13 +22,9 @@
   --%>
 
 <%@ include file="../header.jsp" %>
-<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-
 <script src="<c:url value='/scripts/jquery/datatables/js/TableTools.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/dataTables.tableTools.css'/>" rel="stylesheet" type="text/css">
-
 <script src="<c:url value='/scripts/jquery/datatables/js/ZeroClipboard.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/runCalendar.js'/>" type="text/javascript"></script>

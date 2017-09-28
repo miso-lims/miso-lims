@@ -309,7 +309,6 @@
                 <jsSourceInclude>*.js</jsSourceInclude>
               </jsSourceIncludes>
               <jsSourceExcludes>
-                <jsSourceExclude>natural_sort.js</jsSourceExclude>
                 <jsSourceExclude>xregexp-all-min.js</jsSourceExclude>
                 <jsSourceExclude>runCalendar.js</jsSourceExclude>
               </jsSourceExcludes>
