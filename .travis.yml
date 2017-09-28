@@ -6,6 +6,7 @@ sudo: required
 env: > 
       MAVEN_SETTINGS="${TRAVIS_BUILD_DIR}/gsi-config"
       MAVEN_OPTS="-Xms1g -Xmx2g" 
+      DOCKER_OPTS="-H unix:///var/run/docker.sock
 
 services:
   - docker
@@ -17,7 +18,8 @@ before_install:
     - git clone https://github.com/oicr-gsi/gsi-config.git "${MAVEN_SETTINGS}"
     - cp "${MAVEN_SETTINGS}/settings.xml" "${HOME}/.m2/settings.xml"
     - 'echo pr slug ${TRAVIS_PULL_REQUEST_SLUG} && echo repo slug ${TRAVIS_REPO_SLUG}'
-    - sudo docker version
+    - echo "ENV GIT_SHA ${TRAVIS_COMMIT}" >> Dockerfile
+    - sudo docker --version
     - sudo docker build -t $DOCKER_TAG .
 
 before_script:
