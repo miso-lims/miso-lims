@@ -46,12 +46,12 @@ notifications:
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" https://$DOCKER_HOST;
-    docker tag gims-miso:latest $DOCKER_HOST/gims-miso:latest
-    docker push $DOCKER_HOST/gims-miso:latest;
+    docker tag gims-miso:latest $DOCKER_HOST/$DOCKER_TAG:latest
+    docker push $DOCKER_HOST/$DOCKER_TAG:latest;
     fi
   - if [ "$TRAVIS_BRANCH" == "develop" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" https://$DOCKER_HOST;
-    docker tag gims-miso:develop $DOCKER_HOST/gims-miso:develop
-    docker push $DOCKER_HOST/gims-miso:develop;
+    docker tag gims-miso:develop $DOCKER_HOST/$DOCKER_TAG:develop
+    docker push $DOCKER_HOST/$DOCKER_TAG:develop;
     fi
 
