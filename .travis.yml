@@ -6,7 +6,6 @@ sudo: required
 env: > 
       MAVEN_SETTINGS="${TRAVIS_BUILD_DIR}/gsi-config"
       MAVEN_OPTS="-Xms1g -Xmx2g" 
-      DOCKER_OPTS="-H unix:///var/run/docker.sock"
 
 services:
   - docker
@@ -18,9 +17,6 @@ before_install:
     - git clone https://github.com/oicr-gsi/gsi-config.git "${MAVEN_SETTINGS}"
     - cp "${MAVEN_SETTINGS}/settings.xml" "${HOME}/.m2/settings.xml"
     - 'echo pr slug ${TRAVIS_PULL_REQUEST_SLUG} && echo repo slug ${TRAVIS_REPO_SLUG}'
-    - echo "ENV GIT_SHA ${TRAVIS_COMMIT}" >> Dockerfile
-    - sudo docker --version
-    - sudo docker build -t $DOCKER_TAG .
 
 before_script:
   - export MAVEN_OPTS='-Xms1g -Xmx2g' CXX=g++-5
@@ -28,6 +24,7 @@ before_script:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update
   - sudo apt-get install -y pkg-config cmake libjsoncpp-dev autoconf libtool build-essential gcc-5 g++-5
+  
 script:
   - pushd runscanner-illumina && ./build-illumina-interop && autoreconf -i && ./configure && make && popd
   - PATH=$PATH:$(pwd)/runscanner-illumina mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false -DskipIllumina=false install
@@ -36,6 +33,11 @@ script:
      else 
         echo "[WARN] SonarCloud cannot run on pull requests from forks." ; 
      fi'
+
+after_script:
+    - echo "ENV GIT_SHA ${TRAVIS_COMMIT}" >> Dockerfile
+    - sudo docker version
+    - sudo docker build -t $DOCKER_TAG .
 
 cache:
   directories:
