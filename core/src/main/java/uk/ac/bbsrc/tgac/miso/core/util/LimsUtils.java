@@ -31,8 +31,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -308,7 +308,7 @@ public class LimsUtils {
     }
   }
 
-  public static void appendSet(StringBuilder target, Set<String> items, String prefix) {
+  public static void appendSet(StringBuilder target, Collection<String> items, String prefix) {
     if (items.isEmpty()) return;
     target.append(" ");
     target.append(prefix);
