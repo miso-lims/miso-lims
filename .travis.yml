@@ -47,12 +47,12 @@ notifications:
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     sudo docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" https://$DOCKER_HOST;
-    sudo docker tag $DOCKER_TAG:latest $DOCKER_HOST/$DOCKER_TAG:latest
+    sudo docker tag $DOCKER_TAG:latest $DOCKER_HOST/$DOCKER_TAG:latest;
     sudo docker push $DOCKER_HOST/$DOCKER_TAG:latest;
     fi
   - if [ "$TRAVIS_BRANCH" == "develop" ]; then
     sudo docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" https://$DOCKER_HOST;
-    sudo docker tag $DOCKER_TAG:develop $DOCKER_HOST/$DOCKER_TAG:develop
+    sudo docker tag $DOCKER_TAG:develop $DOCKER_HOST/$DOCKER_TAG:develop;
     sudo docker push $DOCKER_HOST/$DOCKER_TAG:develop;
     fi
 
