@@ -33,6 +33,7 @@ script:
   #    else 
   #       echo "[WARN] SonarCloud cannot run on pull requests from forks." ; 
   #    fi'
+  - cd miso
   - mvn clean package -P external
 
 after_script:
