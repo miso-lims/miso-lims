@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2017. Earlham Institute, Norwich, UK, and
+  ~ the Ontario Institute for Cancer Research, Ontario, Canada. 
+  ~ MISO project contacts: Robert Davey @ EI (formerly TGAC), 
+  ~ Morgan Taschuk @ OICR 
+  ~
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses />.
+  ~
+  ~ **********************************************************************
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>miso</artifactId>
+    <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+    <version>0.2.91-SNAPSHOT</version>
+  </parent>
+  <groupId>miso-external-web</groupId>
+  <artifactId>miso-external-web</artifactId>
+  <packaging>war</packaging>
+  <name>miso-external-web</name>
+  <dependencies>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>javax.servlet.jsp-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.json-lib</groupId>
+      <artifactId>json-lib</artifactId>
+      <classifier>jdk15</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.tgac.fluxion.ajax</groupId>
+      <artifactId>fluxion-ajax-3</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <finalName>miso-external</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-fluxion-ajax-js</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>uk.ac.tgac.fluxion.ajax</groupId>
+                  <artifactId>fluxion-ajax-js</artifactId>
+                  <version>1.0</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                </artifactItem>
+              </artifactItems>
+              <excludes>META-INF</excludes>
+              <outputDirectory>target/miso-external/scripts/fluxion-ajax/</outputDirectory>
+              <overWriteReleases>true</overWriteReleases>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

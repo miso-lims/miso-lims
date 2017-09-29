@@ -1,20 +1,30 @@
-FROM misolims/miso-base:0.4
+FROM    tomcat
+LABEL   maintainer="Justin Payne <justin.payne@fda.hhs.gov"
 
-ARG     version
+EXPOSE  80
 
-COPY    miso-web/target/ROOT.war /var/lib/tomcat8/webapps/
+VOLUME  /storage/miso
+
+ENV     SECURITY_METHOD ad
 
 RUN     apt-get -y update && apt-get -y install --no-install-recommends     \
-            unzip xmlstarlet                                                &&\
-        unzip -xjo /var/lib/tomcat8/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d /home/lib &&\
-        chmod 0444 /var/lib/tomcat8/webapps/ROOT.war 		&&\
-	    chown tomcat8 /var/lib/tomcat8/webapps/ROOT.war 	&&\
-	    chgrp tomcat8 /var/lib/tomcat8/webapps/ROOT.war		&&\
-	    rm -rf /var/lib/tomcat8/webapps/ROOT &&\
-        cd /home/ && bash /root/miso-ansible/files/miso-install.sh $version   &&\
+            unzip xmlstarlet maven default-jdk                                                              &&\
         apt-get purge --auto-remove -q -y                                   \
-            unzip xmlstarlet                                                &&\
-        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+            unzip xmlstarlet                                                                                &&\
+        echo "JAVA_OPTS=/"$JAVA_OPTS -Dsecurity.method=${SECURITY_METHOD} -Xmx768M/"" \
+            >> $CATALINA_HOME/bin/setenv.sh                                                                 &&\
+        cd $CATALINA_HOME/lib                                                                               &&\
+        curl -kO https://repos.tgac.ac.uk/miso/common/mysql-connector-java-5.1.10.jar                       &&\
+        curl -kO https://repos.tgac.ac.uk/miso/common/jndi-file-factory-1.0.jar                             &&\
+        rm -rf $CATALINA_HOME/webapps/ROOT 
 
-CMD	["/root/miso-ansible/misoStart.sh"]
+
+COPY    miso /src
+
+RUN     cd /src && mvn clean package -P external
+
+
+COPY    miso/miso-web/target/ROOT.war $CATALINA_HOME/webapps/
+COPY    tomcat_conf/ $CATALINA_HOME/conf/Catalina/localhost/
+COPY    cfsan-miso-properties/ /storage/miso/
 
