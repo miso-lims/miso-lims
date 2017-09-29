@@ -57,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
@@ -259,15 +260,13 @@ public class DefaultMigrationTarget implements MigrationTarget {
         // New subproject
         createSubproject(detailed.getSubproject(), detailed.getProject());
       }
+
       if (sample.getAlias() != null) {
-        // Check for duplicate alias
-        List<Sample> dupes = serviceManager.getSampleService().getByAlias(sample.getAlias());
-        if (!dupes.isEmpty()) {
-          for (Sample dupe : dupes) {
-            ((DetailedSample) dupe).setNonStandardAlias(true);
-            serviceManager.getSampleService().update(dupe);
-          }
-          detailed.setNonStandardAlias(true);
+        allowDuplicateAliases(detailed);
+      } else if (detailed.isSynthetic()) {
+        if (mergeIfAppropriate(detailed)) {
+          log.debug("Merged ghost sample with existing: " + sample.getAlias());
+          return;
         }
       }
       if (isIdentitySample(detailed)) updateSampleNumberPerProject(detailed);
@@ -283,6 +282,70 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     if (sample.getAlias() == null) throw new IllegalStateException("Sample saved with null alias");
     log.debug("Saved sample " + sample.getAlias());
+  }
+
+  private void allowDuplicateAliases(DetailedSample sample) throws IOException {
+    // Check for duplicate alias
+    List<Sample> dupes = serviceManager.getSampleService().getByAlias(sample.getAlias());
+    if (!dupes.isEmpty()) {
+      for (Sample dupe : dupes) {
+        ((DetailedSample) dupe).setNonStandardAlias(true);
+        serviceManager.getSampleService().update(dupe);
+      }
+      sample.setNonStandardAlias(true);
+    }
+  }
+
+  /**
+   * Merge an incoming ghost sample with existing ghost sample if appropriate. If it is merged, its ID will be set to match the
+   * existing sample
+   * 
+   * @param sample incoming sample
+   * @return true if the incoming sample was merged with an existing sample (its ID will be set as well)
+   * @throws IOException
+   * @see #areMergeable
+   */
+  private boolean mergeIfAppropriate(DetailedSample sample) throws IOException {
+    try {
+      sample.setAlias(serviceManager.getNamingScheme().generateSampleAlias(sample));
+    } catch (MisoNamingException e) {
+      throw new IOException("Sample alias generation failed", e);
+    }
+    List<Sample> dupes = serviceManager.getSampleService().getByAlias(sample.getAlias());
+    if (dupes.size() == 1) {
+      DetailedSample dupe = (DetailedSample) dupes.get(0);
+      if (areMergeable(dupe, sample)) {
+        sample.setId(dupe.getId());
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Check whether an incoming sample should be merged with an existing sample. Conditions:
+   * <ul>
+   * <li>both ghost samples (synthetic)</li>
+   * <li>same parent sample</li>
+   * <li>same SampleClass</li>
+   * <li>same groupId</li>
+   * </ul>
+   * 
+   * @param s1
+   * @param s2
+   * @return true if the samples should be merged; false otherwise
+   */
+  private boolean areMergeable(DetailedSample s1, DetailedSample s2) {
+    if (!s1.isSynthetic() || !s2.isSynthetic()) return false;
+    if (s1.getParent() == null || s2.getParent() == null) return false;
+    if (s1.getParent().getId() != s2.getParent().getId()) return false;
+    if (!s1.getSampleClass().getAlias().equals(s2.getSampleClass().getAlias())) return false;
+    if (s1.getGroupId() == null) {
+      if (s2.getGroupId() != null) return false;
+    } else {
+      if (!s1.getGroupId().equals(s2.getGroupId())) return false;
+    }
+    return true;
   }
 
   private void updateSampleNumberPerProject(DetailedSample sample) throws IOException {
@@ -486,17 +549,23 @@ public class DefaultMigrationTarget implements MigrationTarget {
   private void fixDilutionChangeLog(LibraryDilution ldi, Collection<ChangeLog> ghostChangeLog) throws IOException {
     Library lib = ldi.getLibrary();
     Collection<ChangeLog> changes = lib.getChangeLog();
+    Collection<ChangeLog> fixedChanges = Lists.newArrayList();
     if (ghostChangeLog != null) {
       changes.addAll(ghostChangeLog);
     }
     String gsleTag = "GSLE" + ldi.getPreMigrationId();
     String misoTag = ldi.getName() != null ? ldi.getName() : "LDI" + ldi.getId();
     for (ChangeLog change : changes) {
+      if (("Library dilution " + misoTag + " created.").equals(change.getSummary())) {
+        // omit dilution created changelog created by DB trigger
+        continue;
+      }
       if (change.getSummary().matches("^" + gsleTag + ".*")) {
         change.setSummary(change.getSummary().replaceFirst(gsleTag, misoTag));
       }
+      fixedChanges.add(change);
     }
-    saveLibraryChangeLog(lib, changes);
+    saveLibraryChangeLog(lib, fixedChanges);
   }
 
   /**

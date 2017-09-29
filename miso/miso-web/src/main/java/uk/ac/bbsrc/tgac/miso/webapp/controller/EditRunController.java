@@ -82,9 +82,7 @@ public class EditRunController {
   /**
    * Get a stream of source of metrics
    * 
-   * Normally, metrics collected by run scanner are stored in the MISO database, but it is possible to provide
-   * 
-   * @return
+   * Normally, metrics collected by run scanner are stored in the MISO database, but it is possible to provide others here.
    */
   public Stream<RunMetricsSource> getSources() {
     return Stream.of(Run::getMetrics);

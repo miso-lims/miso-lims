@@ -1,3 +1,17 @@
+# 0.2.90
+
+Changes:
+
+ * Elaborate documentation for notification and Illumina runscanner
+ * fix addQC procedure
+ * fix migration of dilution changelogs when library was migrated separately
+ * eliminate duplicates in Identity lookup
+ * Make container a hyperlink in partition list on run page
+ * Add dilution counts to pools
+ * Change label in add container dialog
+ * Reorder dilution table columns
+ * Add targeted sequencing to edit pool page
+
 # 0.2.89
 
 Changes:
