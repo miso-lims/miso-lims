@@ -3,14 +3,12 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -18,7 +16,6 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -1075,7 +1072,7 @@ public class SampleBulkCreateIT extends AbstractBulkSampleIT {
   }
 
   // TODO: fix and re-enable (Sometimes selects project PRO1 instead of PRO2 - may be interference from other tests)
-  @Ignore
+  // @Ignore
   @Test
   public void testCreateOneIdentityNoProject() throws Exception {
     // Goal: ensure one identity can be saved
