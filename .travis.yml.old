@@ -19,21 +19,20 @@ before_install:
     - 'echo pr slug ${TRAVIS_PULL_REQUEST_SLUG} && echo repo slug ${TRAVIS_REPO_SLUG}'
 
 before_script:
-  # - export MAVEN_OPTS='-Xms1g -Xmx2g' CXX=g++-5
-  # - sudo apt-add-repository -y ppa:likemartinma/devel
-  # - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  # - sudo apt-get update
-  # - sudo apt-get install -y pkg-config cmake libjsoncpp-dev autoconf libtool build-essential gcc-5 g++-5
+  - export MAVEN_OPTS='-Xms1g -Xmx2g' CXX=g++-5
+  - sudo apt-add-repository -y ppa:likemartinma/devel
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update
+  - sudo apt-get install -y pkg-config cmake libjsoncpp-dev autoconf libtool build-essential gcc-5 g++-5
   
 script:
-  # - pushd runscanner-illumina && ./build-illumina-interop && autoreconf -i && ./configure && make && popd
-  # - PATH=$PATH:$(pwd)/runscanner-illumina mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false -DskipIllumina=false install
-  # - 'if [[ ${TRAVIS_PULL_REQUEST_SLUG} == ${TRAVIS_REPO_SLUG} ]] ; then 
-  #       mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar ;
-  #    else 
-  #       echo "[WARN] SonarCloud cannot run on pull requests from forks." ; 
-  #    fi'
-  - mvn clean package -P external
+  - pushd runscanner-illumina && ./build-illumina-interop && autoreconf -i && ./configure && make && popd
+  - PATH=$PATH:$(pwd)/runscanner-illumina mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false -DskipIllumina=false install
+  - 'if [[ ${TRAVIS_PULL_REQUEST_SLUG} == ${TRAVIS_REPO_SLUG} ]] ; then 
+        mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar ;
+     else 
+        echo "[WARN] SonarCloud cannot run on pull requests from forks." ; 
+     fi'
 
 after_script:
     - echo "ENV GIT_SHA ${TRAVIS_COMMIT}" >> Dockerfile
@@ -60,3 +59,4 @@ after_success:
     sudo docker tag $DOCKER_TAG:develop $DOCKER_HOST/$DOCKER_TAG:develop;
     sudo docker push $DOCKER_HOST/$DOCKER_TAG:develop;
     fi
+
