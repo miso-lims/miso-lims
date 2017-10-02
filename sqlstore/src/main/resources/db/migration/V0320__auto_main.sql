@@ -45,11 +45,11 @@ CREATE TABLE `PoolQC2` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO LibraryQC2(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`)
-	SELECT qcId, library_libraryId, (SELECT userId FROM `User` WHERE fullName = qcCreator), qcDate, qcMethod, results FROM LibraryQC;
+	SELECT qcId, library_libraryId, (SELECT userId FROM `User` WHERE fullName = qcCreator OR loginName = qcCreator), qcDate, qcMethod, results FROM LibraryQC;
 INSERT INTO SampleQC2(`qcId`, `sample_sampleId`, `creator`, `date`, `type`, `results`)
-	SELECT qcId, sample_sampleId, (SELECT userId FROM `User` WHERE fullName = qcCreator), qcDate, qcMethod, results FROM SampleQC;
+	SELECT qcId, sample_sampleId, (SELECT userId FROM `User` WHERE fullName = qcCreator OR loginName = qcCreator), qcDate, qcMethod, results FROM SampleQC;
 INSERT INTO PoolQC2(`qcId`, `pool_poolId`, `creator`, `date`, `type`, `results`)
-	SELECT qcId, pool_poolId, (SELECT userId FROM `User` WHERE fullName = qcCreator), qcDate, qcMethod, results FROM PoolQC;
+	SELECT qcId, pool_poolId, (SELECT userId FROM `User` WHERE fullName = qcCreator OR loginName = qcCreator), qcDate, qcMethod, results FROM PoolQC;
 
 DROP TABLE LibraryQC;
 DROP TABLE SampleQC;
