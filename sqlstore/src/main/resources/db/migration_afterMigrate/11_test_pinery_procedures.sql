@@ -1,4 +1,5 @@
 -- test Pinery stored procedures
+-- StartNoTest
 CALL queryAllModels();
 CALL queryModelById(1);
 CALL queryAllInstruments();
@@ -24,3 +25,4 @@ CALL queryAllSampleTypes();
 CALL queryAllSampleProjects();
 CALL queryAllSampleChangeLogs();
 CALL querySampleChangeLogById(1);
+-- EndNoTest
