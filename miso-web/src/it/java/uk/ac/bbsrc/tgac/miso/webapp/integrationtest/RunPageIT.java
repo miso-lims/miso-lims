@@ -436,7 +436,7 @@ public class RunPageIT extends AbstractIT {
     });
     // assert that pools with readyToRun = false are not returned
     assertFalse(poolIds.contains(120001L));
-    assertFalse(poolIds.contains(200001L));
+    assertFalse(poolIds.contains(5105L));
   }
 
   @Ignore
