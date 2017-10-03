@@ -23,7 +23,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 
 public class HibernatePoolQcDaoTest extends AbstractDAOTest {
   
@@ -69,7 +68,7 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
   
   
   @Test
-  public void testSaveNew() throws IOException, MalformedPoolException {
+  public void testSaveNew() throws IOException {
     long autoIncrementId = nextAutoIncrementId;
     PoolQC qc = new PoolQC();
     Pool pool = new PoolImpl();
@@ -91,7 +90,7 @@ public class HibernatePoolQcDaoTest extends AbstractDAOTest {
   }
   
   @Test
-  public void testSaveUpdate() throws IOException, MalformedPoolException {
+  public void testSaveUpdate() throws IOException {
     PoolQC qc = (PoolQC) dao.get(1L);
     assertNotNull(qc);
     User mockUser = new UserImpl();

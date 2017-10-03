@@ -249,7 +249,7 @@ public class LimsUtils {
 
   /**
    * universal temporary name prefix. TODO: these same methods are in sqlstore DbUtils;
-   * use those when refactoring away the RequestManager.
+   * use those when refactoring away the ProjectService.
    */
   static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
 

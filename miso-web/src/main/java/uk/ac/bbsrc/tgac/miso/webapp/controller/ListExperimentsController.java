@@ -32,21 +32,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
-import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 @Controller
-public class ListContainerController {
+public class ListExperimentsController {
   @Autowired
-  private SequencerReferenceService sequencerService;
-
+  private ExperimentService experimentService;
   @ModelAttribute("title")
   public String title() {
-    return "Containers";
+    return "Experiments";
   }
 
-  @RequestMapping("/containers")
-  public ModelAndView listContainers(ModelMap model) throws IOException {
-    return TabbedListItemsPage.createForPlatformType("container", sequencerService).list(model);
+  @RequestMapping("/experiments")
+  public ModelAndView listExperiments(ModelMap model) throws IOException {
+    return new ListItemsPage("experiment").list(model, experimentService.listAll().stream().map(Dtos::asDto));
   }
 }

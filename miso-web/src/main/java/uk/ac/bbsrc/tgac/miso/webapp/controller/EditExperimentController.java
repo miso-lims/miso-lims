@@ -51,7 +51,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
@@ -76,7 +75,7 @@ public class EditExperimentController {
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("experiment") Experiment experiment, ModelMap model, SessionStatus session)
-      throws IOException, MalformedExperimentException {
+      throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!experiment.userCanWrite(user)) {

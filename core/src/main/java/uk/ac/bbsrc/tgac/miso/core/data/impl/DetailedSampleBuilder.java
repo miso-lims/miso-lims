@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class DetailedSampleBuilder
@@ -721,7 +720,7 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public void addLibrary(Library library) throws MalformedLibraryException {
+  public void addLibrary(Library library) {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 

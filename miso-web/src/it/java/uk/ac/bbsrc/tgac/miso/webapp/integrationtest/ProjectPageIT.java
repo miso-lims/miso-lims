@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.stream.Collectors;
+
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
@@ -116,7 +118,7 @@ public class ProjectPageIT extends AbstractIT {
     // goal: ensure all tables are present on the page and have no errors
     ProjectPage page = getProjectPage(1L);
     
-    assertTrue("unexpected errors on project tables: " + page.getVisibleErrors().stream().map(error -> error.getText()).toString(),
+    assertTrue("unexpected errors on project tables: " + page.getVisibleErrors().stream().map(error -> error.getText()).collect(Collectors.joining(", ")),
         page.getVisibleErrors().isEmpty());
     
     Set<String> tableIds = Sets.newHashSet(TableIds.STUDIES, TableIds.SAMPLES, TableIds.LIBRARIES, TableIds.DILUTIONS, TableIds.POOLS,

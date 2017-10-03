@@ -103,8 +103,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -126,6 +124,7 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -153,7 +152,7 @@ public class EditSampleController {
   private SecurityManager securityManager;
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -175,8 +174,8 @@ public class EditSampleController {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {
@@ -268,7 +267,7 @@ public class EditSampleController {
     if (p != null && p.getId() == projectId) {
       if (p.getSamples().isEmpty()) {
         // if p was lazy loaded then it doesn't have samples.
-        p = requestManager.getProjectById(p.getId());
+        p = projectService.getProjectById(p.getId());
       }
       if (!p.getSamples().isEmpty()) {
         Map<String, Sample> ret = new HashMap<>();
@@ -296,7 +295,7 @@ public class EditSampleController {
 
   private Collection<Project> populateProjects() throws IOException {
     try {
-      List<Project> ps = new ArrayList<>(requestManager.listAllProjects());
+      List<Project> ps = new ArrayList<>(projectService.listAllProjects());
 
       if (isDetailedSampleEnabled()) {
         Collections.sort(ps, (a, b) -> a.getShortName().compareTo(b.getShortName()));
@@ -613,7 +612,7 @@ public class EditSampleController {
         model.put("title", "New Sample");
 
         if (projectId != null) {
-          Project project = requestManager.getProjectById(projectId);
+          Project project = projectService.getProjectById(projectId);
           if (project == null) throw new SecurityException("No such project.");
           model.addAttribute("project", project);
           sample.setProject(project);
@@ -630,7 +629,7 @@ public class EditSampleController {
           model.put("accessibleProjects", populateProjects());
         }
         List<ProjectDto> projects = new ArrayList<>();
-        for (Project p : requestManager.listAllProjects()) {
+        for (Project p : projectService.listAllProjects()) {
           projects.add(Dtos.asDto(p));
         }
         model.put("projectsDtos", mapper.valueToTree(projects));
@@ -644,7 +643,7 @@ public class EditSampleController {
         model.put("title", "Sample " + sampleId);
 
         if (projectId != null) {
-          Project project = requestManager.getProjectById(projectId);
+          Project project = projectService.getProjectById(projectId);
           if (project == null) throw new SecurityException("No such project.");
           model.addAttribute("project", project);
           sample.setProject(project);
@@ -795,7 +794,7 @@ public class EditSampleController {
     if (projectId == null) {
       project = null;
     } else {
-      project = requestManager.getProjectById(projectId);
+      project = projectService.getProjectById(projectId);
       template.setProjectId(projectId);
     }
 
@@ -804,7 +803,7 @@ public class EditSampleController {
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session)
-      throws IOException, MalformedSampleException {
+      throws IOException {
     if (sample instanceof DetailedSampleBuilder) {
       DetailedSampleBuilder builder = (DetailedSampleBuilder) sample;
       builder.setSampleClass(sampleClassService.get(builder.getSampleClass().getId()));
@@ -968,7 +967,7 @@ public class EditSampleController {
       config.put("create", true);
       config.put("hasProject", project != null);
       if (project == null) {
-        requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
+        projectService.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
       } else {
         config.putPOJO("project", Dtos.asDto(project));
       }

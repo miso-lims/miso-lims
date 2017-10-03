@@ -37,8 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
@@ -54,12 +54,12 @@ public class MisoFormsService {
   private static final Logger log = LoggerFactory.getLogger(MisoFormsService.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Autowired
   private SampleService sampleService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setSampleService(SampleService sampleService) {

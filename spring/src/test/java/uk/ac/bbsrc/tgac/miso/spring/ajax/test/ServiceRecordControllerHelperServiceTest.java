@@ -22,7 +22,7 @@ import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.ServiceRecordControllerHelperService;
 
@@ -31,7 +31,7 @@ public class ServiceRecordControllerHelperServiceTest {
   @Mock
   private SecurityManager securityManager;
   @Mock
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Mock
   private SequencerReferenceService sequencerReferenceService;
   @Mock

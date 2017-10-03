@@ -50,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.StudyChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -138,7 +137,7 @@ public class StudyImpl implements Study {
   }
 
   @Override
-  public void addExperiment(Experiment e) throws MalformedExperimentException {
+  public void addExperiment(Experiment e) {
     // propagate security profiles down the hierarchy
     e.setSecurityProfile(this.securityProfile);
 

@@ -46,11 +46,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 
 /**
@@ -67,14 +67,14 @@ public class ProjectRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(ProjectRestController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Autowired
   private LibraryService libraryService;
   @Autowired
   private SampleGroupService sampleGroupService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setLibraryService(LibraryService libraryService) {
@@ -83,7 +83,7 @@ public class ProjectRestController extends RestController {
 
   @RequestMapping(value = "/alias/{projectAlias}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody ProjectDto getProjectByAlias(@PathVariable String projectAlias) throws IOException {
-    Project project = requestManager.getProjectByAlias(projectAlias);
+    Project project = projectService.getProjectByAlias(projectAlias);
     if (project == null) {
       throw new RestException("No project found with alias: " + projectAlias, Status.NOT_FOUND);
     }
@@ -92,7 +92,7 @@ public class ProjectRestController extends RestController {
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody ProjectDto getProjectById(@PathVariable Long projectId) throws IOException {
-    Project project = requestManager.getProjectById(projectId);
+    Project project = projectService.getProjectById(projectId);
     if (project == null) {
       throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
     }
@@ -107,7 +107,7 @@ public class ProjectRestController extends RestController {
 
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody List<ProjectDto> listAllProjects() throws IOException {
-    Collection<Project> lp = requestManager.listAllProjects();
+    Collection<Project> lp = projectService.listAllProjects();
     return Dtos.asProjectDtos(lp);
   }
 

@@ -65,12 +65,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
@@ -88,7 +88,7 @@ public class FlexReportingControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(FlexReportingControllerHelperService.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Autowired
   private ContainerService containerService;
   @Autowired
@@ -152,7 +152,7 @@ public class FlexReportingControllerHelperService {
       JSONObject jsonObject = new JSONObject();
       StringBuilder a = new StringBuilder();
       JSONArray jsonArray = new JSONArray();
-      Collection<Project> projects = requestManager.listAllProjects();
+      Collection<Project> projects = projectService.listAllProjects();
       for (Project project : projects) {
         jsonArray.add(projectRowBuilder(project));
       }
@@ -179,9 +179,9 @@ public class FlexReportingControllerHelperService {
 
       Collection<Project> projects = null;
       if (!isStringEmptyOrNull(searchStr)) {
-        projects = requestManager.listAllProjectsBySearch(searchStr);
+        projects = projectService.listAllProjectsBySearch(searchStr);
       } else {
-        projects = requestManager.listAllProjects();
+        projects = projectService.listAllProjects();
       }
 
       for (Project project : projects) {
@@ -231,7 +231,7 @@ public class FlexReportingControllerHelperService {
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("name").equals("projectIds")) {
-          Project p = requestManager.getProjectById(j.getLong("value"));
+          Project p = projectService.getProjectById(j.getLong("value"));
           if (p != null) {
             projects.add(p);
 
@@ -331,9 +331,9 @@ public class FlexReportingControllerHelperService {
 
       Collection<Project> projects = null;
       if (!isStringEmptyOrNull(searchStr)) {
-        projects = requestManager.listAllProjectsBySearch(searchStr);
+        projects = projectService.listAllProjectsBySearch(searchStr);
       } else {
-        projects = requestManager.listAllProjects();
+        projects = projectService.listAllProjects();
       }
 
       for (Project project : projects) {
@@ -413,7 +413,7 @@ public class FlexReportingControllerHelperService {
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("name").equals("projectId")) {
-          p = requestManager.getProjectById(j.getLong("value"));
+          p = projectService.getProjectById(j.getLong("value"));
         }
         if (j.getString("name").equals("runIds")) {
           Run r = runService.get(j.getLong("value"));
@@ -1070,7 +1070,7 @@ public class FlexReportingControllerHelperService {
 
   public JSONObject d3graphRest(Long projectId) throws IOException {
     try {
-      Project p = requestManager.getProjectById(projectId);
+      Project p = projectService.getProjectById(projectId);
       JSONObject projectJSON = new JSONObject();
       projectJSON.put("name", p.getName());
       projectJSON.put("description", p.getAlias());
@@ -1182,8 +1182,8 @@ public class FlexReportingControllerHelperService {
     }
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
 }

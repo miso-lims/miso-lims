@@ -21,7 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 
 /**
  * @author Chris Salt
@@ -49,10 +48,9 @@ public class HibernateLibraryQcDaoTest extends AbstractDAOTest {
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO#save(uk.ac.bbsrc.tgac.miso.core.data.LibraryQC)}.
    * 
    * @throws IOException
-   * @throws MalformedLibraryException
    */
   @Test
-  public void testSave() throws IOException, MalformedLibraryException {
+  public void testSave() throws IOException {
     LibraryQC qc = new LibraryQC();
     Library library = new LibraryImpl();
     library.setId(3L);

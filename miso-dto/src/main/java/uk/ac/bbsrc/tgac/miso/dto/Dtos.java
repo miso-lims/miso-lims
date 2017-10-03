@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
+import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -1907,5 +1908,20 @@ public class Dtos {
     Partition to = new PartitionImpl();
     to.setId(dto.getId());
     return to;
+  }
+
+  public static SubmissionDto asDto(Submission from) {
+    SubmissionDto dto = new SubmissionDto();
+    dto.setId(from.getId());
+    dto.setAccession(from.getAccession());
+    dto.setAlias(from.getAlias());
+    dto.setCompleted(from.isCompleted());
+    dto.setCreationDate(formatDate(from.getCreationDate()));
+    dto.setDescription(from.getDescription());
+    dto.setName(from.getName());
+    dto.setSubmittedDate(formatDate(from.getSubmissionDate()));
+    dto.setTitle(from.getTitle());
+    dto.setVerified(from.isVerified());
+    return dto;
   }
 }

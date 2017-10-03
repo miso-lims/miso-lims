@@ -44,9 +44,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
@@ -63,7 +63,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 public class ProjectTreeControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(ProjectTreeControllerHelperService.class);
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -75,8 +75,8 @@ public class ProjectTreeControllerHelperService {
   @Autowired
   private StudyService studyService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setExperimentService(ExperimentService experimentService) {
@@ -100,7 +100,7 @@ public class ProjectTreeControllerHelperService {
    */
   public JSONObject listProjectTree(HttpSession session, JSONObject json) {
     try {
-      Collection<Project> projects = requestManager.listAllProjects();
+      Collection<Project> projects = projectService.listAllProjects();
 
       JSONObject miso = new JSONObject();
       JSONArray projectsArray = new JSONArray();

@@ -89,7 +89,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -753,7 +752,7 @@ public class EditLibraryController {
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("library") Library library, ModelMap model, SessionStatus session)
-      throws IOException, MalformedLibraryException {
+      throws IOException {
     try {
       if (library.getId() == AbstractLibrary.UNSAVED_ID) {
         libraryService.create(library);
@@ -773,7 +772,7 @@ public class EditLibraryController {
   }
 
   @RequestMapping(value = "/bulk/create", method = RequestMethod.POST)
-  public String processBulkSubmit(@RequestBody JSONArray librariesDtos) throws IOException, MalformedLibraryException {
+  public String processBulkSubmit(@RequestBody JSONArray librariesDtos) throws IOException {
     try {
       if (librariesDtos != null && librariesDtos.size() > 0) {
         List<Long> savedLibraryIds = new ArrayList<>();

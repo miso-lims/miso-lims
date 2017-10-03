@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -18,15 +18,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 
 public class TabbedListItemsPage {
 
-  public static TabbedListItemsPage createForPlatformType(String targetType, RequestManager requestManager)
+  public static TabbedListItemsPage createForPlatformType(String targetType, SequencerReferenceService sequencerService)
       throws IOException {
-    return TabbedListItemsPage.createWithJson(targetType, "platformType", getPlatformTypes(requestManager), PlatformType::getKey,
+    return TabbedListItemsPage.createWithJson(targetType, "platformType", getPlatformTypes(sequencerService), PlatformType::getKey,
         PlatformType::name);
   }
+
   public static <T> TabbedListItemsPage createWithJson(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
       Function<T, Object> getValue) {
     ObjectMapper mapper = new ObjectMapper();
@@ -40,8 +42,10 @@ public class TabbedListItemsPage {
 
   }
 
-  private static Stream<PlatformType> getPlatformTypes(RequestManager requestManager) throws IOException {
-    Collection<PlatformType> platforms = requestManager.listActivePlatformTypes();
+  private static Stream<PlatformType> getPlatformTypes(SequencerReferenceService sequencerService) throws IOException {
+    Set<PlatformType> platforms = sequencerService.list(0, 0, true, "id", PaginationFilter.archived(false)).stream()
+        .map(sr -> sr.getPlatform().getPlatformType()).collect(Collectors.toSet());
+
     if (platforms.size() > 0) {
       return platforms.stream();
     } else {
