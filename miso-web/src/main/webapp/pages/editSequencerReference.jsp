@@ -31,9 +31,6 @@
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-
 <div id="maincontent">
   <div id="contentcolumn">
     <form:form id="sequencer_reference_form" data-parsley-validate="" action="/miso/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">

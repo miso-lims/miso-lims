@@ -595,11 +595,17 @@ var HotUtils = {
 
   makeCellNSAlias: function(setCellMeta) {
     setCellMeta('renderer', function(instance, td, row, col, prop, value, cellProperties) {
-      Handsontable.renderers.TextRenderer.apply(this, arguments);
+      Handsontable.TextRenderer.apply(this, arguments);
       td.classList.add('nonStandardAlias');
       return td;
     });
     jQuery('#nonStandardAliasNote').show();
+  },
+  
+  multipleOptionsRenderer: function(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.AutocompleteRenderer.apply(this, arguments);
+    td.classList.add('multipleOptions');
+    return td;
   },
 
   makeColumnForConstantsList: function(headerName, include, flatProperty, modelProperty, id, name, items, required, baseobj, sortFunc) {
