@@ -80,7 +80,7 @@ CREATE TABLE PlatformSizes (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO PlatformSizes(platform_platformId, partitionSize)
-  SELECT DISTINCT platform, COUNT(*) AS c FROM SequencerPartitionContainer JOIN SequencerPartitionContainer_Partition ON containerId = container_containerId GROUP BY containerId
+  SELECT platform, c FROM (SELECT DISTINCT platform, COUNT(*) AS c FROM SequencerPartitionContainer JOIN SequencerPartitionContainer_Partition ON containerId = container_containerId GROUP BY containerId) as p where platform > 0
   UNION SELECT platformId, 1 FROM Platform WHERE name = 'ILLUMINA' AND instrumentModel LIKE '%MiSeq%'
   UNION SELECT platformId, 2 FROM Platform WHERE name = 'ILLUMINA' AND instrumentModel LIKE '%HiSeq%'
   UNION SELECT platformId, 8 FROM Platform WHERE name = 'ILLUMINA' AND instrumentModel LIKE '%HiSeq%'
