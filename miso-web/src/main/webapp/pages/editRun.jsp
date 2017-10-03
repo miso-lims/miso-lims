@@ -109,7 +109,7 @@
     <td>${run.sequencerReference.name} - ${run.sequencerReference.platform.instrumentModel}</td>
   </tr>
   <tr>
-    <td>Sequencing Parameters:</td>
+    <td>Sequencing Parameters:*</td>
     <td><miso:select id="sequencingParameters" path="sequencingParameters" items="${sequencingParameters}" itemLabel="name" itemValue="id" defaultLabel="SELECT" defaultValue="" /></td>
   </tr>
   <tr>

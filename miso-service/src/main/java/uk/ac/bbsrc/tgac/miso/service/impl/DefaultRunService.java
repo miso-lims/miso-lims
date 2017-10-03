@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -46,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -67,6 +67,26 @@ import uk.ac.bbsrc.tgac.miso.service.security.AuthorizedPaginatedDataSource;
 @Transactional(rollbackFor = Exception.class)
 @Service
 public class DefaultRunService implements RunService, AuthorizedPaginatedDataSource<Run> {
+  
+  private static class NotIn implements Predicate<SequencerPartitionContainer> {
+
+    private final Collection<SequencerPartitionContainer> containers;
+
+    public NotIn(Collection<SequencerPartitionContainer> containers) {
+      this.containers = containers;
+    }
+
+    @Override
+    public boolean test(SequencerPartitionContainer t) {
+      for (SequencerPartitionContainer c : containers) {
+        if (c.getLabelText().equals(t.getLabelText())) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+  
   private static final Logger log = LoggerFactory.getLogger(DefaultRunService.class);
 
   @Autowired
@@ -224,7 +244,9 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     run.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(run.getSecurityProfile())));
     run.setName(generateTemporaryName());
 
-    return save(run).getId();
+    Run saved = save(run);
+    makeContainerChangesChangeLog(saved, Collections.emptyList(), saved.getSequencerPartitionContainers());
+    return saved.getId();
   }
 
   @Override
@@ -319,7 +341,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setCompletionDate(source.getCompletionDate());
     target.setMetrics(source.getMetrics());
 
-    makeContainerChangesChangeLog(target, source.getSequencerPartitionContainers());
+    makeContainerChangesChangeLog(target, target.getSequencerPartitionContainers(), source.getSequencerPartitionContainers());
     target.setSequencerPartitionContainers(source.getSequencerPartitionContainers());
 
     target.setSequencingParameters(source.getSequencingParameters());
@@ -374,27 +396,58 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     }
   }
 
-  private void makeContainerChangesChangeLog(Run managedRun, List<SequencerPartitionContainer> updatedContainers) throws IOException {
-    Set<String> originalContainersString = Barcodable.extractLabels(managedRun.getSequencerPartitionContainers());
-    Set<String> updatedContainersString = Barcodable.extractLabels(updatedContainers);
-    Set<String> added = new TreeSet<>(updatedContainersString);
-    added.removeAll(originalContainersString);
-    Set<String> removed = new TreeSet<>(originalContainersString);
-    removed.removeAll(updatedContainersString);
+  /**
+   * If any containers were added or removed from the run, generates and saves a single Run changelog entry and one Container changelog
+   * entry for each Container affected. May be called before or after managedRun is updated, as the original and updated container list
+   * are both provided separately
+   * 
+   * @param managedRun Run to add changelog entry to
+   * @param originalContainers Containers attached to the Run before change
+   * @param updatedContainers Containers attached to the Run after change
+   * @throws IOException
+   */
+  private void makeContainerChangesChangeLog(Run managedRun, List<SequencerPartitionContainer> originalContainers,
+      List<SequencerPartitionContainer> updatedContainers) throws IOException {
+    List<SequencerPartitionContainer> added = updatedContainers.stream()
+        .filter(new NotIn(originalContainers))
+        .collect(Collectors.toList());
+    List<SequencerPartitionContainer> removed = originalContainers.stream()
+        .filter(new NotIn(updatedContainers))
+        .collect(Collectors.toList());
     if (!added.isEmpty() || !removed.isEmpty()) {
+      Set<String> addedLabels = Barcodable.extractLabels(added);
+      Set<String> removedLabels = Barcodable.extractLabels(removed);
       StringBuilder message = new StringBuilder();
       message.append("Containers");
-      LimsUtils.appendSet(message, added, "added");
-      LimsUtils.appendSet(message, removed, "removed");
+      LimsUtils.appendSet(message, addedLabels, "added");
+      LimsUtils.appendSet(message, removedLabels, "removed");
 
       RunChangeLog changeLog = new RunChangeLog();
       changeLog.setRun(managedRun);
       changeLog.setColumnsChanged("containers");
       changeLog.setSummary(message.toString());
       changeLog.setTime(new Date());
-      changeLog.setUser(managedRun.getLastModifier());
+      changeLog.setUser(authorizationManager.getCurrentUser());
       changeLogService.create(changeLog);
+      for (SequencerPartitionContainer add : added) {
+        String addMessage = "Added to run " + managedRun.getAlias();
+        saveContainerRunChangeLog(add, addMessage);
+      }
+      for (SequencerPartitionContainer remove : removed) {
+        String removeMessage = "Removed from run " + managedRun.getAlias();
+        saveContainerRunChangeLog(remove, removeMessage);
+      }
     }
+  }
+
+  private void saveContainerRunChangeLog(SequencerPartitionContainer container, String message) throws IOException {
+    SequencerPartitionContainerChangeLog changeLog = new SequencerPartitionContainerChangeLog();
+    changeLog.setSequencerPartitionContainer(container);
+    changeLog.setColumnsChanged("run");
+    changeLog.setSummary(message);
+    changeLog.setTime(new Date());
+    changeLog.setUser(authorizationManager.getCurrentUser());
+    changeLogService.create(changeLog);
   }
 
   @Override
