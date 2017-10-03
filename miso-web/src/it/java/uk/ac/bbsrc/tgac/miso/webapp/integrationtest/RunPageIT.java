@@ -7,6 +7,7 @@ import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtil
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -20,7 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.Columns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.Field;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.LaneQC;
@@ -181,7 +182,7 @@ public class RunPageIT extends AbstractIT {
 
     RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5002L);
     RunPage page2 = page.addContainer("EXISTING", "Illumina", false);
-    assertNotNull(page2);
+    assertTrue(page2.getTable("list_container").doesColumnContain(Columns.SERIAL_NUMBER, "EXISTING"));
 
     Run addedRun = (Run) getSession().get(Run.class, 5002L);
     assertEquals(1, addedRun.getSequencerPartitionContainers().size());
@@ -196,7 +197,8 @@ public class RunPageIT extends AbstractIT {
     assertEquals("REMOVABLE", run.getSequencerPartitionContainers().get(0).getIdentificationBarcode());
 
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5003L);
-    page1.removeContainer(0);
+    RunPage page2 = page1.removeContainer(0);
+    assertFalse(page2.getTable("list_container").doesColumnContain(Columns.SERIAL_NUMBER, "REMOVABLE"));
 
     Run strippedRun = (Run) getSession().get(Run.class, 5003L);
     assertTrue(strippedRun.getSequencerPartitionContainers().isEmpty());
@@ -205,14 +207,19 @@ public class RunPageIT extends AbstractIT {
   @Test
   public void testAssignPoolToTwoLanes() throws Exception {
     // goal: assign a pool to two empty lanes of a run
+    final String poolAlias = "RUN_POOL_ADD";
     Run initial = (Run) getSession().get(Run.class, 5004L);
     assertEquals(1, initial.getSequencerPartitionContainers().size());
     initial.getSequencerPartitionContainers().get(0).getPartitions()
       .forEach(partition -> assertNull(partition.getPool()));
     
-    RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5004L);
-    RunPage page2 = page.assignPools(Arrays.asList(0, 1), PoolSearch.SEARCH, "RUN_POOL_ADD");
-    assertNotNull(page2);
+    RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5004L);
+    List<String> page1Pools = page1.getTable("list_partition").getColumnValues(Columns.POOL);
+    assertEquals(0, page1Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
+
+    RunPage page2 = page1.assignPools(Arrays.asList(0, 1), PoolSearch.SEARCH, poolAlias);
+    List<String> columnValues = page2.getTable("list_partition").getColumnValues(Columns.POOL);
+    assertEquals(2, columnValues.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
 
     Run run = (Run) getSession().get(Run.class, 5004L);
     assertEquals(1, run.getSequencerPartitionContainers().size());
@@ -223,14 +230,18 @@ public class RunPageIT extends AbstractIT {
   @Test
   public void testRemovePoolsFromLanes() throws Exception {
     // goal: remove pools from two lane of a run
+    final String poolAlias = "RUN_POOL_REMOVE";
     Run initial = (Run) getSession().get(Run.class, 5005L);
     assertEquals(1, initial.getSequencerPartitionContainers().size());
     initial.getSequencerPartitionContainers().get(0).getPartitions()
         .forEach(partition -> assertNotNull(partition.getPool()));
 
-    RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5005L);
-    RunPage page2 = page.assignPools(Arrays.asList(0, 1), PoolSearch.NO_POOL, null);
-    assertNotNull(page2);
+    RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5005L);
+    List<String> page1Pools = page1.getTable("list_partition").getColumnValues(Columns.POOL);
+    assertEquals(2, page1Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
+    RunPage page2 = page1.assignPools(Arrays.asList(0, 1), PoolSearch.NO_POOL, null);
+    List<String> page2Pools = page2.getTable("list_partition").getColumnValues(Columns.POOL);
+    assertEquals(0, page2Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
 
     Run run = (Run) getSession().get(Run.class, 5005L);
     assertEquals(1, run.getSequencerPartitionContainers().size());
@@ -241,24 +252,30 @@ public class RunPageIT extends AbstractIT {
   @Test
   public void testReplacePoolInLane() throws Exception {
     // goal: assign a pool to one full lane of a run
+    final String firstPool = "IPO5006";
+    final String secondPool = "IPO5007";
     Run initial = (Run) getSession().get(Run.class, 5006L);
     assertEquals(1, initial.getSequencerPartitionContainers().size());
     initial.getSequencerPartitionContainers().get(0).getPartitions()
         .forEach(partition -> {
           assertNotNull(partition.getPool());
-          assertEquals("IPO5006", partition.getPool().getName());
+          assertEquals(firstPool, partition.getPool().getName());
         });
 
-    RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5006L);
-    RunPage page2 = page.assignPools(Arrays.asList(0), PoolSearch.SEARCH, "IPO5007");
-    assertNotNull(page2);
+    RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5006L);
+    List<String> page1Pools = page1.getTable("list_partition").getColumnValues(Columns.POOL);
+    assertEquals(1, page1Pools.stream().filter(val -> val.contains(firstPool)).collect(Collectors.toList()).size());
+
+    RunPage page2 = page1.assignPools(Arrays.asList(0), PoolSearch.SEARCH, secondPool);
+    List<String> page2Pools = page2.getTable("list_partition").getColumnValues(Columns.POOL);
+    assertEquals(1, page2Pools.stream().filter(val -> val.contains(secondPool)).collect(Collectors.toList()).size());
 
     Run run = (Run) getSession().get(Run.class, 5006L);
     assertEquals(1, run.getSequencerPartitionContainers().size());
     run.getSequencerPartitionContainers().get(0).getPartitions()
         .forEach(partition -> {
           assertNotNull(partition.getPool());
-          assertEquals("IPO5007", partition.getPool().getName());
+          assertEquals(secondPool, partition.getPool().getName());
         });
   }
 

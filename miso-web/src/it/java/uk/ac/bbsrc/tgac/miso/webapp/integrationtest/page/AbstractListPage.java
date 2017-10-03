@@ -66,6 +66,11 @@ public interface AbstractListPage {
     public static final String VOLUME = "Volume";
     public static final String MATRIX_BARCODE = "Matrix Barcode";
     public static final String DILUTIONS = "Dilutions";
+    public static final String CONTAINER = "Container";
+    public static final String NUMBER = "Number";
+    public static final String POOL = "Pool";
+    public static final String QC_STATUS = "QC Status";
+    public static final String QC_NOTE = "QC Note";
   }
 
   public static class ListTarget {

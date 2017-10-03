@@ -105,6 +105,10 @@ public class RunPage extends FormPage<RunPage.Field> {
     return new RunPage(getDriver());
   }
 
+  public DataTable getTable(String tableId) {
+    return new DataTable(getDriver().findElement(By.id(tableId)));
+  }
+
   public RunPage addContainer(String serialNumber, String platformType, boolean isRunFull) {
     WebElement html = getHtmlElement();
     containersSection.findElement(By.linkText("Add " + PlatformType.get(platformType).getContainerName())).click();

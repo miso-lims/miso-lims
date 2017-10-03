@@ -289,19 +289,11 @@ public abstract class AbstractPage extends AbstractElement {
 
   protected void clickOk() {
     WebElement okButton = getDriver().findElement(By.id("ok"));
-    if (okButton != null) {
-      okButton.click();
-    } else {
-      throw new IllegalArgumentException("Ok button is not available to click");
-    }
+    okButton.click();
   }
 
   protected void clickCancel() {
     WebElement cancelButton = getDriver().findElement(By.id("cancel"));
-    if (cancelButton != null) {
-      cancelButton.click();
-    } else {
-      throw new IllegalArgumentException("Cancel button is not available to click");
-    }
+    cancelButton.click();
   }
 }
