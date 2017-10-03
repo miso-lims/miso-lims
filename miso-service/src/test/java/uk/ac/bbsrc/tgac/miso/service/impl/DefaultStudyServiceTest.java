@@ -47,10 +47,6 @@ public class DefaultStudyServiceTest {
     MockitoAnnotations.initMocks(this);
   }
 
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveStudy(uk.ac.bbsrc.tgac.miso.core.data.Study)}
-   * .
-   */
   @Test
   public void testSaveStudy() throws IOException {
     StudyType st = new StudyType();
@@ -78,9 +74,6 @@ public class DefaultStudyServiceTest {
     assertNotEquals(s.getName(), db.getName());
   }
 
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getStudyById(long)} .
-   */
   @Test
   public void testGetStudyByIdThrows() throws IOException {
     Study db = new StudyImpl();

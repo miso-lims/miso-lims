@@ -51,10 +51,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
 @Controller
@@ -67,13 +67,13 @@ public class EditStudyController {
   private SecurityManager securityManager;
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
 
   @Autowired
   private StudyService studyService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -82,7 +82,7 @@ public class EditStudyController {
 
   public Project populateProject(@PathVariable Long projectId) throws IOException {
     try {
-      return requestManager.getProjectById(projectId);
+      return projectService.getProjectById(projectId);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to get parent project", ex);
@@ -105,7 +105,7 @@ public class EditStudyController {
   public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Study study = new StudyImpl(user);
-    Project project = requestManager.getProjectById(projectId);
+    Project project = projectService.getProjectById(projectId);
     study.setProject(project);
 
     if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {

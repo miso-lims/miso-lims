@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrNamingScheme;
@@ -72,6 +71,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPlatformService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolOrderService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultPoolableElementViewService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultProjectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultQualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultRunService;
@@ -166,7 +166,7 @@ public class MisoServiceManager {
   private HibernateReferenceGenomeDao referenceGenomeDao;
   private HibernateQcTypeDao qcTypeDao;
 
-  private MisoRequestManager requestManager;
+  private DefaultProjectService projectService;
 
   /**
    * Constructs a new MisoServiceManager with no services initialized
@@ -256,9 +256,7 @@ public class MisoServiceManager {
     m.setDefaultBoxService();
     m.setDefaultQualityControlService();
     m.setDefaultQcTypeDao();
-
-    // sigh
-    m.setDefaultRequestManager();
+    m.setDefaultProjectService();
 
     User migrationUser = m.getUserByLoginNameInTransaction(m.getSecurityStore(), username);
     if (migrationUser == null) throw new IllegalArgumentException("User '" + username + "' not found");
@@ -341,30 +339,24 @@ public class MisoServiceManager {
     if (boxService != null) boxService.setAuthorizationManager(authorizationManager);
   }
 
-  public MisoRequestManager getRequestManager() {
-    return requestManager;
+  public DefaultProjectService getProjectService() {
+    return projectService;
   }
 
-  public void setRequestManager(MisoRequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(DefaultProjectService projectService) {
+    this.projectService = projectService;
   }
 
-  public void setDefaultRequestManager() {
-    MisoRequestManager rm = new MisoRequestManager();
+  public void setDefaultProjectService() {
+    DefaultProjectService projectService = new DefaultProjectService();
     // Set stores for entities which need names generated before creation and can't be saved via services.
-    rm.setPlatformStore(platformDao);
-    rm.setProjectStore(projectDao);
-    rm.setPoolStore(poolDao);
-    rm.setRunStore(runDao);
-    rm.setNamingScheme(getNamingScheme());
-    rm.setSecurityStore(securityStore);
-    rm.setSecurityProfileStore(securityProfileDao);
-    rm.setAutoGenerateIdBarcodes(autoGenerateIdBarcodes);
-    rm.setSecurityStore(securityStore);
-    rm.setSecurityManager(securityManager);
-    rm.setChangeLogStore(changeLogDao);
-    rm.setSequencerPartitionContainerStore(sequencerPartitionContainerDao);
-    setRequestManager(rm);
+    projectService.setAuthorizationManager(authorizationManager);
+    projectService.setProjectStore(projectDao);
+    projectService.setNamingScheme(getNamingScheme());
+    projectService.setSecurityProfileStore(securityProfileDao);
+    projectService.setReferenceGenomeDao(referenceGenomeDao);
+    projectService.setSecurityManager(securityManager);
+    setProjectService(projectService);
   }
 
   public HibernateSecurityDao getSecurityStore() {
@@ -386,7 +378,6 @@ public class MisoServiceManager {
   private void updateSecurityStoreDependencies() {
     if (securityManager != null) securityManager.setSecurityStore(securityStore);
     if (poolDao != null) poolDao.setSecurityStore(securityStore);
-    if (requestManager != null) requestManager.setSecurityStore(securityStore);
     if (projectDao != null) projectDao.setSecurityStore(securityStore);
     if (runDao != null) runDao.setSecurityStore(securityStore);
     if (experimentService != null) experimentService.setSecurityStore(securityStore);
@@ -408,7 +399,7 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityProfileDaoDependencies() {
-    if (requestManager != null) requestManager.setSecurityProfileStore(securityProfileDao);
+    if (projectService != null) projectService.setSecurityProfileStore(securityProfileDao);
     if (runService != null) runService.setSecurityProfileStore(securityProfileDao);
     if (containerService != null) containerService.setSecurityProfileDao(securityProfileDao);
     if (experimentService != null) experimentService.setSecurityProfileStore(securityProfileDao);
@@ -431,7 +422,7 @@ public class MisoServiceManager {
   }
 
   private void updateSecurityManagerDependencies() {
-    if (requestManager != null) requestManager.setSecurityManager(securityManager);
+    if (projectService != null) projectService.setSecurityManager(securityManager);
     if (libraryService != null) libraryService.setSecurityManager(securityManager);
     if (runService != null) runService.setSecurityManager(securityManager);
   }
@@ -455,7 +446,7 @@ public class MisoServiceManager {
 
   private void updateProjectDaoDependencies() {
     if (sampleNumberPerProjectService != null) sampleNumberPerProjectService.setProjectStore(projectDao);
-    if (requestManager != null) requestManager.setProjectStore(projectDao);
+    if (projectService != null) projectService.setProjectStore(projectDao);
     if (sampleService != null) sampleService.setProjectStore(projectDao);
     if (studyService != null) studyService.setProjectStore(projectDao);
   }
@@ -570,7 +561,6 @@ public class MisoServiceManager {
   }
 
   private void updateChangeLogDaoDependencies() {
-    if (requestManager != null) requestManager.setChangeLogStore(changeLogDao);
     if (changeLogService != null) changeLogService.setChangeLogDao(changeLogDao);
   }
 
@@ -743,7 +733,6 @@ public class MisoServiceManager {
   }
 
   private void updatePoolDaoDependencies() {
-    if (requestManager != null) requestManager.setPoolStore(poolDao);
     if (poolService != null) poolService.setPoolStore(poolDao);
   }
 
@@ -827,7 +816,6 @@ public class MisoServiceManager {
   }
 
   private void updatePlatformDaoDependencies() {
-    if (requestManager != null) requestManager.setPlatformStore(platformDao);
     if (platformService != null) platformService.setPlatformDao(platformDao);
   }
 
@@ -869,7 +857,6 @@ public class MisoServiceManager {
   }
 
   private void updateRunDaoDependencies() {
-    if (requestManager != null) requestManager.setRunStore(runDao);
     if (runService != null) runService.setRunDao(runDao);
   }
 
@@ -889,7 +876,6 @@ public class MisoServiceManager {
   }
 
   private void updateSequencerPartitionContainerDaoDependencies() {
-    if (requestManager != null) requestManager.setSequencerPartitionContainerStore(getSequencerPartitionContainerDao());
     if (containerService != null) containerService.setContainerDao(sequencerPartitionContainerDao);
   }
 
@@ -911,7 +897,6 @@ public class MisoServiceManager {
 
   private void updateSequencerReferenceDaoDependencies() {
     if (sequencerReferenceService != null) sequencerReferenceService.setSequencerReferenceDao(sequencerReferenceDao);
-    if (requestManager != null) requestManager.setSequencerReferenceStore(sequencerReferenceDao);
   }
 
   public HibernateBoxDao getBoxDao() {
@@ -1231,7 +1216,7 @@ public class MisoServiceManager {
 
   private void updateReferenceGenomeDaoDependencies() {
     if (referenceGenomeService != null) referenceGenomeService.setReferenceGenomeDao(referenceGenomeDao);
-    if (requestManager != null) requestManager.setReferenceGenomeStore(referenceGenomeDao);
+    if (projectService != null) projectService.setReferenceGenomeStore(referenceGenomeDao);
   }
 
   public HibernateSampleValidRelationshipDao getSampleValidRelationshipDao() {

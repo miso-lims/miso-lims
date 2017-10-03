@@ -47,10 +47,10 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
 /**
@@ -68,7 +68,7 @@ public class SampleControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -226,11 +226,11 @@ public class SampleControllerHelperService {
         Long sampleId = json.getLong("sampleId");
         Long overviewId = json.getLong("overviewId");
         try {
-          ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+          ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
           Sample s = sampleService.get(sampleId);
           if (overview.getSamples().contains(s)) {
             if (overview.getSamples().remove(s)) {
-              requestManager.saveProjectOverview(overview);
+              projectService.saveProjectOverview(overview);
 
               return JSONUtils.SimpleJSONResponse("Sample removed from group");
             } else {
@@ -255,8 +255,8 @@ public class SampleControllerHelperService {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setSampleNamingScheme(NamingScheme namingScheme) {

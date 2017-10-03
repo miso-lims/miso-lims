@@ -69,13 +69,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
@@ -90,7 +90,7 @@ public class EditProjectController {
   private SecurityManager securityManager;
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
 
   @Autowired
   private FilesManager filesManager;
@@ -114,8 +114,8 @@ public class EditProjectController {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setFilesManager(FilesManager filesManager) {
@@ -150,7 +150,7 @@ public class EditProjectController {
 
   public Map<Integer, String> populateProjectFiles(Long projectId) throws IOException {
     if (projectId != AbstractProject.UNSAVED_ID) {
-      Project p = requestManager.getProjectById(projectId);
+      Project p = projectService.getProjectById(projectId);
       if (p != null) {
         Map<Integer, String> fileMap = new HashMap<>();
         for (String s : filesManager.getFileNames(Project.class, projectId.toString())) {
@@ -164,7 +164,7 @@ public class EditProjectController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getProjectColumnSizes();
+    return projectService.getProjectColumnSizes();
   }
 
   @ModelAttribute("poolConcentrationUnits")
@@ -265,7 +265,7 @@ public class EditProjectController {
         project = new ProjectImpl(user);
         model.put("title", "New Project");
       } else {
-        project = requestManager.getProjectById(projectId);
+        project = projectService.getProjectById(projectId);
         model.put("title", "Project " + projectId);
       }
 
@@ -310,9 +310,9 @@ public class EditProjectController {
       if (!project.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
-      requestManager.saveProject(project);
+      projectService.saveProject(project);
       for (ProjectOverview overview : project.getOverviews()) {
-        requestManager.saveProjectOverview(overview);
+        projectService.saveProjectOverview(overview);
       }
       session.setComplete();
       model.clear();

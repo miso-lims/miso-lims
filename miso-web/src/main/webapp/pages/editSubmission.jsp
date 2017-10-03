@@ -20,37 +20,29 @@
   ~
   ~ **********************************************************************
   --%>
-
-<%--
-  Created by IntelliJ IDEA.
-  User: davey
-  Date: 15-Feb-2010
-  Time: 15:08:42
-
---%>
 <%@ include file="../header.jsp" %>
 
-<script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.jstree.js'/>"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form action="/miso/submission" method="POST" commandName="submission" autocomplete="off"
-           onsubmit="return validate_submission(this);">
+<form:form id="submission-form" data-parsley-validate="" action="/miso/submission" method="POST" modelAttribute="submission" autocomplete="off">
   <sessionConversation:insertSessionConversationId attributeName="submission"/>
   <h1>
     <c:choose>
       <c:when test="${submission.id != 0}">Edit</c:when>
       <c:otherwise>Create</c:otherwise>
     </c:choose> Submission
-    <c:if test="${submission.id != 0}">
-      <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all"
-             onclick="Submission.saveSubmission(${submission.id},jQuery(form))"/>
-    </c:if>
-    <c:if test="${submission.id == 0}">
-      <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all"
-             onclick="Submission.saveSubmission(-1,jQuery(form))"/>
-    </c:if>
+    <button type="button" onclick="return Submission.validateSubmission();" class="fg-button ui-state-default ui-corner-all">Save</button>
   </h1>
+<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+  <c:if test="${submission.id != 0}">
+    <a href="#" onclick="Submission.download(${submission.id})" class="ui-button ui-state-default">Download</a>
+    <span></span>
+  </c:if>
+</div>
 
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
     <div id="note_arrowclick" class="toggleLeft"></div>
@@ -80,17 +72,14 @@
     <tr>
       <td class="h">Title:</td>
       <td><form:input path="title"/><span id="titlecounter" class="counter"></span></td>
-        <%--<td><a href="void(0);" onclick="popup('help/submissionTitle.html');">Help</a></td>--%>
     </tr>
     <tr>
       <td class="h">Alias:</td>
       <td><form:input path="alias"/><span id="aliascounter" class="counter"></span></td>
-        <%--<td><a href="void(0);" onclick="popup('help/submissionAlias.html');">Help</a></td>--%>
     </tr>
     <tr>
       <td class="h">Description:</td>
       <td><form:input path="description"/><span id="descriptioncounter" class="counter"></span></td>
-        <%--<td><a href="void(0);" onclick="popup('help/submissionDescription.html');">Help</a></td>--%>
     </tr>
     <c:if test="${not empty submission.accession}">
       <tr>
@@ -98,104 +87,12 @@
         <td><a href="http://www.ebi.ac.uk/ena/data/view/${submission.accession}"
                target="_blank">${submission.accession}</a>
         </td>
-          <%--<td><a href="void(0);" onclick="popup('help/submissionAccession.html');">Help</a></td>--%>
       </tr>
     </c:if>
-    <tr>
-      <td>Action:</td>
-      <td>
-        <form:radiobuttons id="submissionActionType" path="submissionActionType"/>
-      </td>
-    </tr>
   </table>
 
-  <c:if test="${submission.id != 0}">
-    <span style="float:right">
-      <a href="javascript:void(0);" onclick="Submission.ui.previewSubmissionMetadata(${submission.id});"> Preview Submission Metadata</a>
-    </span><br/>
-    <span style="float:right">
-      <a href="javascript:void(0);" onclick="Submission.ui.downloadSubmissionMetadata(${submission.id});">Download Submission Metadata</a>
-    </span><br/>
-    <span style="float:right">
-      <a href="javascript:void(0);" onclick="Submission.validateSubmissionMetadata(${submission.id});">Validate Submission Metadata</a>
-    </span><br/>
-    <span style="float:right">
-      <a href="javascript:void(0);" onclick="Submission.submitSubmissionMetadata(${submission.id});">Submit Submission Metadata</a>
-    </span><br/>
-    <%-- <span style="float:right"><a href="javascript:void(0);" onclick="Submission.submitSequenceData(${submission.id});">Submit Sequence Data</a></span> --%>
-    <div id="submissionreport"></div>
-
-    <c:if test="${not empty prettyMetadata}">
-      <h3>Submission Metadata</h3>
-      ${prettyMetadata}
-      <br/>
-    </c:if>
-    <%--
-    <c:if test="${not empty studyxmls}">
-        <c:forEach items="${studyxmls}" var="xml">
-            <h3>${xml.key}</h3>
-            <pre class="note">
-                ${xml.value}
-            </pre>
-        </c:forEach>
-    </c:if>
-    <c:if test="${not empty samplexmls}">
-        <c:forEach items="${samplexmls}" var="xml">
-            <h3>${xml.key}</h3>
-            <pre class="note">
-                ${xml.value}
-            </pre>
-        </c:forEach>
-    </c:if>
-    <c:if test="${not empty experimentxmls}">
-        <c:forEach items="${experimentxmls}" var="xml">
-            <h3>${xml.key}</h3>
-            <pre class="note">
-                ${xml.value}
-            </pre>
-        </c:forEach>
-    </c:if>
-    <c:if test="${not empty runxmls}">
-        <c:forEach items="${runxmls}" var="xml">
-            <h3>${xml.key}</h3>
-            <pre class="note">
-                ${xml.value}
-            </pre>
-        </c:forEach>
-    </c:if>
-    --%>
-  </c:if>
-
-  <h2>Submittable Elements</h2>
-
-  <div id="submissionTree">
-    <ul>
-        <%--
-         <c:choose>
-                     <c:when test="${not empty submission.submissionId}">${submission.submissionId}</c:when>
-                     <c:otherwise><i>Unsaved</i></c:otherwise>
-                 </c:choose>
-                 --%>
-      <c:forEach items="${projects}" var="project">
-        <li id="project${project.id}" class="jstree-closed">
-          <c:if test="${submission.id != 0}">
-            <p style="cursor: pointer" id="projectTitle${project.id}"
-               onclick="Submission.ui.populateSubmissionProject(${project.id},${submission.id});">
-              <strong>${project.name}</strong> : ${project.description}</p>
-          </c:if>
-          <c:if test="${submission.id == 0}">
-            <p style="cursor: pointer" id="projectTitle${project.id}"
-               onclick="Submission.ui.populateSubmissionProject(${project.id});"><strong>${project.name}</strong>
-              : ${project.description}</p>
-          </c:if>
-          <ul id="projectSubmission${project.id}"></ul>
-        </li>
-      </c:forEach>
-    </ul>
-  </div>
-  <input type="hidden" value="on" name="_submissionElements">
 </form:form>
-<br/>
+    <miso:list-section id="list_experiments" name="Experiments" target="experiment" items="${experiments}" config="{ inSubmission: true }"/>
 </div>
 </div>
 
@@ -221,10 +118,6 @@
       maxCount: ${maxLengths['description']},
       countDirection: 'down'
     });
-
-    <c:if test="${submission.id != 0}">
-    Submission.ui.openSubmissionProjectNodes(${submission.id});
-    </c:if>
   });
 </script>
 

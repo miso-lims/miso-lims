@@ -27,7 +27,17 @@ ListTarget.experiment = {
     throw "Experiments must be provided statically";
   },
   createBulkActions: function(config, projectId) {
-    return [];
+    if (config.inSubmission) {
+      return [];
+    }
+    return [{
+      name: "Create Submission",
+      action: function(experiments) {
+        window.location = window.location.origin + '/miso/submission/new?' + jQuery.param({
+          experimentIds: experiments.map(Utils.array.getId).join(',')
+        });
+      }
+    }];
   },
   createStaticActions: function(config, projectId) {
     var actions = [];

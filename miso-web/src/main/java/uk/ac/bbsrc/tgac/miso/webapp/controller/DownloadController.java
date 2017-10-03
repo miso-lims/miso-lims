@@ -52,9 +52,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -73,7 +73,7 @@ public class DownloadController {
   private SecurityManager securityManager;
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
 
   @Autowired
   private FilesManager filesManager;
@@ -88,8 +88,8 @@ public class DownloadController {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setFilesManager(FilesManager filesManager) {
@@ -103,7 +103,7 @@ public class DownloadController {
   @RequestMapping(value = "/project/{id}/{hashcode}", method = RequestMethod.GET)
   protected void downloadProjectFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Project project = requestManager.getProjectById(id);
+    Project project = projectService.getProjectById(id);
     if (project.userCanRead(user)) {
       lookupAndRetrieveFile(Project.class, id.toString(), hashcode, response);
     } else {

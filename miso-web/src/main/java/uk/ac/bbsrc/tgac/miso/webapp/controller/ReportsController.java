@@ -65,7 +65,7 @@ import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.itext.ITextProjectDecorator;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @RequestMapping("/reports")
@@ -78,10 +78,10 @@ public class ReportsController {
   private static final String XLS = "xls";
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   @Autowired
@@ -105,7 +105,7 @@ public class ReportsController {
     String format = PDF;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Project project = projectId == AbstractProject.UNSAVED_ID ? null : requestManager.getProjectById(projectId);
+      Project project = projectId == AbstractProject.UNSAVED_ID ? null : projectService.getProjectById(projectId);
       if (project != null) {
         if (!project.userCanRead(user)) {
           throw new SecurityException("Permission denied.");

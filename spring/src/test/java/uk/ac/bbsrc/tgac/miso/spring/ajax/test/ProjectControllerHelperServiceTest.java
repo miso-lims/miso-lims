@@ -25,7 +25,7 @@ import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectControllerHelperService;
 
 public class ProjectControllerHelperServiceTest {
@@ -36,7 +36,7 @@ public class ProjectControllerHelperServiceTest {
   @Mock
   private SecurityManager securityManager;
   @Mock
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Mock
   private User user;
   @Mock
@@ -56,7 +56,7 @@ public class ProjectControllerHelperServiceTest {
     final String fileName = "file_name";
     final long id = 1L;
     when(project.userCanWrite(any(User.class))).thenReturn(true);
-    when(requestManager.getProjectById(anyLong())).thenReturn(project);
+    when(projectService.getProjectById(anyLong())).thenReturn(project);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");
     final SecurityContextImpl context = new SecurityContextImpl();
@@ -80,7 +80,7 @@ public class ProjectControllerHelperServiceTest {
     final String fileName = "file_name";
     final long id = 1L;
     when(project.userCanWrite(any(User.class))).thenReturn(false);
-    when(requestManager.getProjectById(anyLong())).thenReturn(project);
+    when(projectService.getProjectById(anyLong())).thenReturn(project);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Johnny Badhat");
     final SecurityContextImpl context = new SecurityContextImpl();
@@ -118,7 +118,7 @@ public class ProjectControllerHelperServiceTest {
     final String fileName = "file_name";
     final long id = 1L;
     when(project.userCanWrite(any(User.class))).thenReturn(true);
-    when(requestManager.getProjectById(anyLong())).thenReturn(project);
+    when(projectService.getProjectById(anyLong())).thenReturn(project);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");
     final SecurityContextImpl context = new SecurityContextImpl();

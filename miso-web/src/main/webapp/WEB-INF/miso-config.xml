@@ -35,18 +35,8 @@
   <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
   </bean>
-
-  <bean id="requestManager" class="uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager">
-    <constructor-arg index="0">
-      <bean class="org.springframework.security.core.context.SecurityContextHolder" factory-method="getContextHolderStrategy" />
-    </constructor-arg>
-    <constructor-arg index="1" ref="securityManager" />
-    <property name="backingManager" ref="backingRequestManager" />
-  </bean>
   
   <bean id="authorizationManager" class="uk.ac.bbsrc.tgac.miso.service.security.DefaultAuthorizationManager" />
-
-  <bean id="backingRequestManager" class="uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager" />
 
   <bean id="misoFormsService" name="misoFormsService" class="uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService" />
 
@@ -61,22 +51,11 @@
     <property name="fileStorageDirectory" value="${miso.fileStorageDirectory}" />
   </bean>
 
-  <bean id="submissionManager" class="uk.ac.bbsrc.tgac.miso.core.manager.ERASubmissionManager">
-    <property name="centreName" value="${submission.centreName}" />
-    <property name="accountName" value="${submission.accountName}" />
-    <property name="dropBox" value="${submission.dropBox}" />
-    <property name="authKey" value="${submission.authKey}" />
-    <property name="submissionEndPoint" value="${submission.submissionEndPoint}" />
-    <property name="submissionStoragePath" value="${miso.submissionStorageDirectory}" />
-  </bean>
-
   <bean name="issueTrackerManager" class="uk.ac.bbsrc.tgac.miso.core.manager.DummyIssueTrackerManager" />
 
   <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
 
   <!-- further naming scheme config happens in MisoAppListener -->
   <bean id="namingScheme" name="namingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DelegatingNamingScheme"/>
-
-  <bean id="filePathGeneratorResolverService" name="filePathGeneratorResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.submission.MisoFilePathGeneratorResolverService" />
 
 </beans>

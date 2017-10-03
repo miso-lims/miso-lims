@@ -58,7 +58,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -66,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
@@ -85,7 +85,7 @@ public class DashboardHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -187,9 +187,9 @@ public class DashboardHelperService {
       List<Project> projects;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        projects = new ArrayList<>(requestManager.listAllProjectsBySearch(searchStr));
+        projects = new ArrayList<>(projectService.listAllProjectsBySearch(searchStr));
       } else {
-        projects = new ArrayList<>(requestManager.listAllProjectsWithLimit(50));
+        projects = new ArrayList<>(projectService.listAllProjectsWithLimit(50));
       }
 
       if (projects.size() > 0) {
@@ -445,8 +445,8 @@ public class DashboardHelperService {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setLibraryService(LibraryService libraryService) {

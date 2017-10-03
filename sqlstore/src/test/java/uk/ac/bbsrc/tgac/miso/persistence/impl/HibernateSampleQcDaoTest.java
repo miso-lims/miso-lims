@@ -42,7 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 
 public class HibernateSampleQcDaoTest extends AbstractDAOTest {
@@ -78,7 +77,7 @@ public class HibernateSampleQcDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testSaveEdit() throws IOException, MalformedSampleException {
+  public void testSaveEdit() throws IOException {
     SampleQC sampleQC = dao.get(1L);
     sampleQC.setResults(5.0);
 
@@ -88,7 +87,7 @@ public class HibernateSampleQcDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testSaveNew() throws IOException, MalformedSampleException {
+  public void testSaveNew() throws IOException {
     SampleQC newSampleQC = new SampleQC();
     newSampleQC.setSample(new SampleImpl());
     newSampleQC.getSample().setId(1L);

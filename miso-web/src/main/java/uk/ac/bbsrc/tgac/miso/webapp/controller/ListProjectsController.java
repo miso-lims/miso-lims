@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 @Controller
@@ -43,10 +43,10 @@ public class ListProjectsController {
   }
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
 
   @RequestMapping("/projects")
   public ModelAndView listProjects(ModelMap model) throws Exception {
-    return new ListItemsPage("project").list(model, requestManager.listAllProjects().stream().map(Dtos::asDto));
+    return new ListItemsPage("project").list(model, projectService.listAllProjects().stream().map(Dtos::asDto));
   }
 }

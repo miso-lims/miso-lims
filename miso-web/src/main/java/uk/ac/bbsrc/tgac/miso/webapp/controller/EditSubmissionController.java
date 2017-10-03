@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -24,11 +24,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.Date;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.QueryParam;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,21 +44,11 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
-import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.service.StudyService;
-import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.service.SubmissionService;
 
 @Controller
 @RequestMapping("/submission")
@@ -65,112 +56,33 @@ import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 public class EditSubmissionController {
   protected static final Logger log = LoggerFactory.getLogger(EditSubmissionController.class);
 
-  @Autowired
-  private RequestManager requestManager;
-  @Autowired
-  private RunService runService;
-  @Autowired
-  private SampleService sampleService;
-  @Autowired
-  private StudyService studyService;
+  private static final Pattern COMMA = Pattern.compile(",");
 
   @Autowired
-  private SubmissionManager submissionManager;
+  private SubmissionService submissionService;
 
   @Autowired
   private ExperimentService experimentService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setRunService(RunService runService) {
-    this.runService = runService;
-  }
-
-  public void setSampleService(SampleService sampleService) {
-    this.sampleService = sampleService;
-  }
-
-  public void setSubmissionManager(SubmissionManager submissionManager) {
-    this.submissionManager = submissionManager;
-  }
-
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getSubmissionColumnSizes();
-  }
-
-  @ModelAttribute("projects")
-  public Collection<Project> populateProjects() throws IOException {
-    List<Project> projects = new ArrayList<>(requestManager.listAllProjects());
-    Collections.sort(projects);
-    return projects;
-  }
-
-  @ModelAttribute("studies")
-  public Collection<Study> populateStudies() throws IOException {
-    return studyService.list(0, 0, true, "id");
-  }
-
-  @ModelAttribute("samples")
-  public Collection<Sample> populateSamples() throws IOException {
-    return sampleService.list();
-  }
-
-  @ModelAttribute("runs")
-  public Collection<Run> populateRuns() throws IOException {
-    return runService.list();
-  }
-
-  @ModelAttribute("experiments")
-  public Collection<Experiment> populateExperiments() throws IOException {
-    return experimentService.listAll();
+    return submissionService.getColumnSizes();
   }
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
-  public ModelAndView newSubmission(ModelMap model) throws IOException {
-    return setupForm(Submission.UNSAVED_ID, model);
-  }
-
-  @RequestMapping(value = "/{submissionId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long submissionId, ModelMap model) throws IOException {
-    try {
-      Submission submission = null;
-      if (submissionId == Submission.UNSAVED_ID) {
-        submission = new SubmissionImpl();
-        model.put("title", "New Submission");
-      } else {
-        submission = requestManager.getSubmissionById(submissionId);
-        model.put("title", "Submission " + submissionId);
-        model.put("prettyMetadata", submissionManager.prettifySubmissionMetadata(submission));
-      }
-
-      if (submission == null) {
-        throw new SecurityException("No such Submission");
-      }
-
-      model.put("formObj", submission);
-      model.put("submission", submission);
-      return new ModelAndView("/pages/editSubmission.jsp", model);
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show submission", ex);
-      }
-      throw ex;
-    } catch (SubmissionException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show submission", e);
-      }
-      throw new IOException(e);
-    }
+  public ModelAndView newSubmission(@QueryParam("experimentIds") String experimentIds, ModelMap model) throws IOException {
+    Submission submission = new Submission();
+    submission.setExperiments(COMMA.splitAsStream(experimentIds).map(Long::parseLong).map(WhineyFunction.rethrow(experimentService::get))
+        .collect(Collectors.toSet()));
+    submission.setCreationDate(new Date());
+    return setupForm(submission, "New Submission", model);
   }
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("submission") Submission submission, ModelMap model, SessionStatus session)
-      throws IOException, MalformedRunException {
+      throws IOException {
     try {
-      requestManager.saveSubmission(submission);
+      submissionService.save(submission);
       session.setComplete();
       model.clear();
       return "redirect:/miso/submission/" + submission.getId();
@@ -180,5 +92,19 @@ public class EditSubmissionController {
       }
       throw ex;
     }
+  }
+
+  @RequestMapping(value = "/{submissionId}", method = RequestMethod.GET)
+  public ModelAndView setupForm(@PathVariable Long submissionId, ModelMap model) throws IOException {
+    Submission submission = submissionService.get(submissionId);
+    return setupForm(submission, "Submission " + submissionId, model);
+  }
+
+  private ModelAndView setupForm(Submission submission, String title, ModelMap model) {
+    model.put("title", title);
+    model.put("formObj", submission);
+    model.put("submission", submission);
+    model.put("experiments", submission.getExperiments().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    return new ModelAndView("/pages/editSubmission.jsp", model);
   }
 }

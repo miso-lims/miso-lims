@@ -12,9 +12,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SubprojectDto;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 
 @Controller
@@ -22,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
 public class SubprojectDefaultsController extends AbstractInstituteDefaultsController<Subproject, SubprojectDto> {
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Autowired
   private SubprojectService service;
 
@@ -66,7 +66,7 @@ public class SubprojectDefaultsController extends AbstractInstituteDefaultsContr
   @Override
   protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
     ArrayNode projects = config.putArray("projects");
-    requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(projects::addPOJO);
+    projectService.listAllProjects().stream().map(Dtos::asDto).forEach(projects::addPOJO);
   }
 
 }

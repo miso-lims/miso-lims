@@ -59,12 +59,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
@@ -77,7 +77,7 @@ public class UploadController {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  public RequestManager requestManager;
+  public ProjectService projectService;
   @Autowired
   public FilesManager filesManager;
   @Autowired
@@ -103,8 +103,8 @@ public class UploadController {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setFilesManager(FilesManager filesManager) {
@@ -148,7 +148,7 @@ public class UploadController {
     String projectId = request.getParameter("projectId");
     if (projectId == null) {
       throw new IOException("Cannot upload file - projectId parameter missing or null");
-    } else if (requestManager.getProjectById(Long.valueOf(projectId)) == null) {
+    } else if (projectService.getProjectById(Long.valueOf(projectId)) == null) {
       throw new IOException("Cannot upload file - service record does not exist");
     }
 
@@ -162,7 +162,7 @@ public class UploadController {
     String projectId = request.getParameter("projectId");
     if (projectId == null) {
       throw new IOException("Cannot upload file - projectId parameter missing or null");
-    } else if (requestManager.getProjectById(Long.valueOf(projectId)) == null) {
+    } else if (projectService.getProjectById(Long.valueOf(projectId)) == null) {
       throw new IOException("Cannot upload file - project does not exist");
     }
 
@@ -188,7 +188,7 @@ public class UploadController {
     String projectId = request.getParameter("projectId");
     if (projectId == null) {
       throw new IOException("Cannot upload file - projectId parameter missing or null");
-    } else if (requestManager.getProjectById(Long.valueOf(projectId)) == null) {
+    } else if (projectService.getProjectById(Long.valueOf(projectId)) == null) {
       throw new IOException("Cannot upload file - project does not exist");
     }
 

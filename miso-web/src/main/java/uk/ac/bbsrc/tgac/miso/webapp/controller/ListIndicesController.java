@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
 public class ListIndicesController {
 
   @Autowired
-  private RequestManager requestManager;
+  private SequencerReferenceService sequencerService;
 
   @ModelAttribute("title")
   public String title() {
@@ -30,6 +30,6 @@ public class ListIndicesController {
 
   @RequestMapping("/indices")
   public ModelAndView listIndices(ModelMap model) throws IOException {
-    return TabbedListItemsPage.createForPlatformType("index", requestManager).list(model);
+    return TabbedListItemsPage.createForPlatformType("index", sequencerService).list(model);
   }
 }

@@ -2,6 +2,7 @@ package com.eaglegenomics.simlims.core.manager;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
+
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 
 /**
  * Copyright (C) 2009 The Genome Analysis Center, Norwich, UK.
@@ -42,6 +44,11 @@ public abstract class AbstractSecurityManager implements SecurityManager {
   }
 
   @Override
+  public Map<String, Integer> getGroupColumnSizes() throws IOException {
+      return securityStore.getGroupColumnSizes();
+  }
+
+  @Override
   public SecurityProfile getSecurityProfileById(Long profileId) throws IOException {
     return securityStore.getSecurityProfileById(profileId);
   }
@@ -59,6 +66,11 @@ public abstract class AbstractSecurityManager implements SecurityManager {
   @Override
   public User getUserByLoginName(String username) throws IOException {
     return securityStore.getUserByLoginName(username);
+  }
+
+  @Override
+  public Map<String, Integer> getUserColumnSizes() throws IOException {
+      return securityStore.getUserColumnSizes();
   }
 
   @Override
@@ -128,4 +140,5 @@ public abstract class AbstractSecurityManager implements SecurityManager {
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
   }
+
 }

@@ -78,10 +78,6 @@ public class DefaultExperimentServiceTest {
     experiment.getStudy().setId(5L);
   }
 
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   */
   @Test
   public void testSaveExperiment() throws IOException {
     final long expectedReturn = 1L;
@@ -103,10 +99,6 @@ public class DefaultExperimentServiceTest {
     verify(experimentStore, times(2)).save(experiment);
   }
 
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   */
   @Test
   public void testSaveExperimentThrows() throws IOException {
     doThrow(new IOException()).when(authorizationManager).throwIfNotWritable(any(Experiment.class));
@@ -117,9 +109,6 @@ public class DefaultExperimentServiceTest {
     verify(experimentStore, never()).save(experiment);
   }
 
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#get(long)} .
-   */
   @Test
   public void testGetExperimentById() throws IOException {
     long inputId = 1L;
@@ -137,9 +126,6 @@ public class DefaultExperimentServiceTest {
     verify(experimentStore).get(inputId);
   }
 
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#get(long)} .
-   */
   @Test
   public void testGetExperimentByIdThrows() throws IOException {
     long inputId = 1L;

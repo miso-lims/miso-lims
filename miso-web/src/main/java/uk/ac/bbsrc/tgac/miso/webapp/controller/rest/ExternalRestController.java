@@ -48,9 +48,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
@@ -68,7 +68,7 @@ public class ExternalRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(ExternalRestController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Autowired
   private ContainerService containerService;
   @Autowired
@@ -76,8 +76,8 @@ public class ExternalRestController extends RestController {
   @Autowired
   private SampleService sampleService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setContainerService(ContainerService containerService) {
@@ -95,7 +95,7 @@ public class ExternalRestController extends RestController {
   @RequestMapping(value = "projects", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String jsonRest() throws IOException {
     StringBuilder sb = new StringBuilder();
-    Collection<Project> lp = requestManager.listAllProjects();
+    Collection<Project> lp = projectService.listAllProjects();
     int pi = 0;
     for (Project p : lp) {
       pi++;
@@ -110,7 +110,7 @@ public class ExternalRestController extends RestController {
   public String jsonRestProjectList(Long projectId) throws IOException {
     StringBuilder sb = new StringBuilder();
 
-    Project p = requestManager.getProjectById(projectId);
+    Project p = projectService.getProjectById(projectId);
     sb.append("'id':'" + projectId + "'");
     sb.append(",");
     sb.append("'name':'" + p.getName() + "'");
@@ -124,7 +124,7 @@ public class ExternalRestController extends RestController {
   public @ResponseBody String jsonRestProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     StringBuilder sb = new StringBuilder();
 
-    Project p = requestManager.getProjectById(projectId);
+    Project p = projectService.getProjectById(projectId);
     if (p == null) {
       throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
     }

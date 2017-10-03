@@ -200,7 +200,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
           project.getStudies().add(study);
         }
 
-        project.setId(serviceManager.getRequestManager().saveProject(project));
+        project.setId(serviceManager.getProjectService().saveProject(project));
 
         for (Study study : project.getStudies()) {
           study.setProject(project);
@@ -833,7 +833,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Merging box " + from.getAlias() + " with existing box");
     assertBoxPropertiesMatch(from, to);
     // Because we're already inside the session at this point, the original object must be evicted
-    // to allow changes to be observed and changeLogged in the Service/RequestManager layer
+    // to allow changes to be observed and changeLogged in the Service layer
     Hibernate.initialize(to.getBoxables());
     sessionFactory.getCurrentSession().evict(to);
     for (Entry<String, BoxableView> entry : from.getBoxables().entrySet()) {
