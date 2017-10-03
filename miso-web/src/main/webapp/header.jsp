@@ -136,13 +136,13 @@
       <li><a href="<c:url value="/miso/projects"/>"><span>My Projects</span></a></li>
     </sec:authorize>
 
-    <sec:authorize access="hasRole('ROLE_INTERNAL')">
-      <li><a href="<c:url value="/miso/analysis"/>"><span>Analysis</span></a></li>
-    </sec:authorize>
+    <%--<sec:authorize access="hasRole('ROLE_INTERNAL')">--%>
+      <%--<li><a href="<c:url value="/miso/analysis"/>"><span>Analysis</span></a></li>--%>
+    <%--</sec:authorize>--%>
 
-    <sec:authorize access="hasRole('ROLE_INTERNAL')">
-      <li><a href="<c:url value="/miso/flexreports"/>"><span>Reports</span></a></li>
-    </sec:authorize>
+    <%--<sec:authorize access="hasRole('ROLE_INTERNAL')">--%>
+      <%--<li><a href="<c:url value="/miso/flexreports"/>"><span>Reports</span></a></li>--%>
+    <%--</sec:authorize>--%>
 
     <sec:authorize access="isAuthenticated()">
       <li>
