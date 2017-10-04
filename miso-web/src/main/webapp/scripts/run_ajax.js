@@ -139,9 +139,6 @@ var Run = Run || {
       return;
     }
     var allowModification = (statusVal === "Failed" || statusVal === "Completed");
-    if (allowModification && showDialog) {
-      alert("Please remember to enter a Completion Date!");
-    }
     completionDate.disabled = !allowModification;
   },
 };
