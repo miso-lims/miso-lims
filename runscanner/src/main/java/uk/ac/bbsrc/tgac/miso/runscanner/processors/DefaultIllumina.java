@@ -4,13 +4,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.TimeZone;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.xml.xpath.XPathConstants;
@@ -44,6 +48,11 @@ public final class DefaultIllumina extends RunProcessor {
 
   private static final XPathExpression RUN_COMPLETION_STATUS_EXPRESSION = compileXPath("//CompletionStatus")[0];
 
+  private static final Pattern COMMA = Pattern.compile(",");
+
+  private static final Predicate<String> BCL_FILENAME = Pattern.compile("^s_[0-9]*_[0-9]*\\.bcl(\\.gz)?").asPredicate();
+  private static final Predicate<String> BCL_BGZF_FILENAME = Pattern.compile("^[0-9]*\\.bcl\\.bgzf").asPredicate();
+
   public static DefaultIllumina create(Builder builder, ObjectNode parameters) {
     return new DefaultIllumina(builder);
   }
@@ -72,7 +81,43 @@ public final class DefaultIllumina extends RunProcessor {
     return Arrays.stream(root.listFiles(f -> f.isDirectory() && !f.getName().equals("Instrument")));
   }
 
-  private static final Pattern COMMA = Pattern.compile(",");
+  private boolean isLaneComplete(Path laneDir, IlluminaNotificationDto dto) {
+    // For MiSeq and HiSeq, check for a complete set of BCL files per each cycle
+    long completeCycleDataCount = IntStream.rangeClosed(1, dto.getNumCycles())//
+        .mapToObj(cycle -> String.format("C%d.1", cycle))//
+        .map(laneDir::resolve)//
+        .filter(Files::exists)//
+        .filter(cycleDir -> {
+          try (Stream<Path> cycleWalk = Files.walk(cycleDir, 1)) {
+
+            long bclCount = cycleWalk//
+                .map(file -> file.getFileName().toString())//
+                .filter(BCL_FILENAME)//
+                .count();
+            return bclCount == dto.getBclCount();
+          } catch (IOException e) {
+            log.error("Failed to walk lane directory: " + laneDir.toString(), e);
+            return false;
+          }
+        }).count();
+    if (completeCycleDataCount == dto.getNumCycles()) {
+      return true;
+    }
+    // For NextSeq, check for a file per cycle
+    try (Stream<Path> laneWalk = Files.walk(laneDir, 1)) {
+      // First, examine the control files to determine all the BCL files we intend to find for each cycle.
+      long bgzfCount = laneWalk//
+          .map(file -> file.getFileName().toString())//
+          .filter(BCL_BGZF_FILENAME)//
+          .count();
+      if (bgzfCount == dto.getNumCycles()) {
+        return true;
+      }
+    } catch (IOException e) {
+      log.error("Failed to walk lane directory: " + laneDir.toString(), e);
+    }
+    return false;
+  }
 
   @Override
   public NotificationDto process(File runDirectory, TimeZone tz) throws IOException {
@@ -128,6 +173,20 @@ public final class DefaultIllumina extends RunProcessor {
         .orElse(false);
     if (failed) {
       dto.setHealthType(HealthType.Failed);
+    }
+
+    // Check that all the data files have copied. Sometimes, the interop files are copied off the instrument first, but the data isn't and
+    // we don't want to mark the run as complete yet.
+    if (dto.getHealthType() == HealthType.Completed) {
+      Path baseCallDirectory = Paths.get(dto.getSequencerFolderPath(), "Data", "Intensities", "BaseCalls");
+      // Check that each lane directory is complete
+      boolean dataCopied = IntStream.rangeClosed(1, dto.getLaneCount())//
+          .mapToObj(lane -> String.format("L%03d", lane))//
+          .map(baseCallDirectory::resolve)//
+          .allMatch(laneDir -> isLaneComplete(laneDir, dto));
+      if (!dataCopied) {
+        dto.setHealthType(HealthType.Running);
+      }
     }
 
     Optional.of(new File(runDirectory, "RunCompletionStatus.xml")).filter(File::canRead).flatMap(RunProcessor::parseXml)

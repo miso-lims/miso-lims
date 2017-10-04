@@ -1,4 +1,5 @@
 {
+  "bclCount": 28,
   "callCycle": 242,
   "chemistry": "UNKNOWN",
   "class": "uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto",
@@ -11,7 +12,7 @@
     31
   ],
   "containerSerialNumber": "000000000-A2WDF",
-  "healthType": "Completed",
+  "healthType": "Running",
   "imgCycle": 242,
   "indexLengths": [
   ],

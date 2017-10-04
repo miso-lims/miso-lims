@@ -430,6 +430,11 @@ int main(int argc, const char **argv) {
   illumina::interop::logic::summary::summarize_run_metrics(run, run_summary,
                                                            true);
 
+  result["bclCount"] =
+      (Json::Value::Int)(run.run_info().flowcell().tiles_per_lane() *
+                         run.run_info().flowcell().swath_count() *
+                         run.run_info().flowcell().surface_count());
+
   result["imgCycle"] = (Json::Value::Int)run_summary.cycle_state()
                            .extracted_cycle_range()
                            .last_cycle();

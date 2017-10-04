@@ -18,6 +18,7 @@ public class IlluminaNotificationDto extends NotificationDto {
   private Map<Integer, String> poolNames;
   private int readLength;
   private int scoreCycle;
+  private int bclCount;
 
   @Override
   public boolean equals(Object obj) {
@@ -25,6 +26,7 @@ public class IlluminaNotificationDto extends NotificationDto {
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
     IlluminaNotificationDto other = (IlluminaNotificationDto) obj;
+    if (bclCount != other.bclCount) return false;
     if (callCycle != other.callCycle) return false;
     if (chemistry != other.chemistry) return false;
     if (imgCycle != other.imgCycle) return false;
@@ -38,6 +40,10 @@ public class IlluminaNotificationDto extends NotificationDto {
     if (readLength != other.readLength) return false;
     if (scoreCycle != other.scoreCycle) return false;
     return true;
+  }
+
+  public int getBclCount() {
+    return bclCount;
   }
 
   public int getCallCycle() {
@@ -92,6 +98,7 @@ public class IlluminaNotificationDto extends NotificationDto {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
+    result = prime * result + bclCount;
     result = prime * result + callCycle;
     result = prime * result + ((chemistry == null) ? 0 : chemistry.hashCode());
     result = prime * result + imgCycle;
@@ -101,6 +108,10 @@ public class IlluminaNotificationDto extends NotificationDto {
     result = prime * result + readLength;
     result = prime * result + scoreCycle;
     return result;
+  }
+
+  public void setBclCount(int bclCount) {
+    this.bclCount = bclCount;
   }
 
   public void setCallCycle(int callCycle) {
@@ -145,11 +156,10 @@ public class IlluminaNotificationDto extends NotificationDto {
   public String toString() {
     return "IlluminaNotificationDto [callCycle=" + callCycle + ", chemistry=" + chemistry + ", imgCycle=" + imgCycle + ", indexLengths="
         + indexLengths + ", numCycles=" + numCycles + ", poolNames=" + poolNames + ", readLength=" + readLength + ", scoreCycle="
-        + scoreCycle
-        + ", getRunAlias()=" + getRunAlias() + ", getSequencerName()=" + getSequencerName() + ", getContainerSerialNumber()="
-        + getContainerSerialNumber() + ", getLaneCount()=" + getLaneCount() + ", getHealthType()=" + getHealthType()
-        + ", getSequencerFolderPath()=" + getSequencerFolderPath() + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()="
-        + getSoftware() + ", getStartDate()=" + getStartDate() + ", getCompletionDate()=" + getCompletionDate() + "]";
+        + scoreCycle + ", bclCount=" + bclCount + ", getRunAlias()=" + getRunAlias() + ", getSequencerName()=" + getSequencerName()
+        + ", getContainerSerialNumber()=" + getContainerSerialNumber() + ", getLaneCount()=" + getLaneCount() + ", getHealthType()="
+        + getHealthType() + ", getSequencerFolderPath()=" + getSequencerFolderPath() + ", isPairedEndRun()=" + isPairedEndRun()
+        + ", getSoftware()=" + getSoftware() + ", getStartDate()=" + getStartDate() + ", getCompletionDate()=" + getCompletionDate() + "]";
   }
 
 }
