@@ -8,7 +8,8 @@ public interface AbstractListPage {
 
   public static class Columns {
     public static final String SORT = "";
-    public static final String NAME = "Name";
+    public static final String AUTOGEN_NAME = "Name";
+    public static final String NON_AUTOGEN_NAME = "Name";
     public static final String ALIAS = "Alias";
     public static final String SAMPLE_CLASS = "Sample Class";
     public static final String SAMPLE_TYPE = "Type";
