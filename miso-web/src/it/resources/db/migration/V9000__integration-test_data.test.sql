@@ -663,7 +663,8 @@ INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarc
 (5101, 4, 4, 'IPO5101', 'POOL_SEARCH_1', 'ipobar5101', 'swimming', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5102, 4, 4, 'IPO5102', 'POOL_SEARCH_2', 'ipobar5102', 'cats', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5103, 4, 4, 'IPO5103', 'POOL_WITH_ORDERS', 'ipobar5103', 'sergeant', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5104, 4, 4, 'IPO5104', 'POOL_WITH_COMPLETED_ORDERS', 'ipobar5104', 'mission accomplished', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL);
+(5104, 4, 4, 'IPO5104', 'POOL_WITH_COMPLETED_ORDERS', 'ipobar5104', 'mission accomplished', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(5105, 4, 4, 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 2, 'ILLUMINA', 0, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1),
