@@ -2,7 +2,6 @@
 
 ALTER TABLE SampleTissue CHANGE COLUMN externalInstituteIdentifier secondaryIdentifier VARCHAR(255) DEFAULT NULL;
 
-
 -- qcs
 
 CREATE TABLE `LibraryQC2` (
@@ -45,11 +44,11 @@ CREATE TABLE `PoolQC2` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO LibraryQC2(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`)
-	SELECT qcId, library_libraryId, (SELECT userId FROM `User` WHERE fullName = qcCreator), qcDate, qcMethod, results FROM LibraryQC;
+	SELECT qcId, library_libraryId, IFNULL((SELECT userId FROM `User` WHERE fullName = qcCreator OR loginName = qcCreator),1), qcDate, qcMethod, results FROM LibraryQC;
 INSERT INTO SampleQC2(`qcId`, `sample_sampleId`, `creator`, `date`, `type`, `results`)
-	SELECT qcId, sample_sampleId, (SELECT userId FROM `User` WHERE fullName = qcCreator), qcDate, qcMethod, results FROM SampleQC;
+	SELECT qcId, sample_sampleId, IFNULL((SELECT userId FROM `User` WHERE fullName = qcCreator OR loginName = qcCreator),1), qcDate, qcMethod, results FROM SampleQC;
 INSERT INTO PoolQC2(`qcId`, `pool_poolId`, `creator`, `date`, `type`, `results`)
-	SELECT qcId, pool_poolId, (SELECT userId FROM `User` WHERE fullName = qcCreator), qcDate, qcMethod, results FROM PoolQC;
+	SELECT qcId, pool_poolId, IFNULL((SELECT userId FROM `User` WHERE fullName = qcCreator OR loginName = qcCreator),1), qcDate, qcMethod, results FROM PoolQC;
 
 DROP TABLE LibraryQC;
 DROP TABLE SampleQC;
@@ -81,7 +80,7 @@ CREATE TABLE PlatformSizes (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO PlatformSizes(platform_platformId, partitionSize)
-  SELECT DISTINCT platform, COUNT(*) AS c FROM SequencerPartitionContainer JOIN SequencerPartitionContainer_Partition ON containerId = container_containerId GROUP BY containerId
+  SELECT platform, c FROM (SELECT DISTINCT platform, COUNT(*) AS c FROM SequencerPartitionContainer JOIN SequencerPartitionContainer_Partition ON containerId = container_containerId GROUP BY containerId) as p where platform > 0
   UNION SELECT platformId, 1 FROM Platform WHERE name = 'ILLUMINA' AND instrumentModel LIKE '%MiSeq%'
   UNION SELECT platformId, 2 FROM Platform WHERE name = 'ILLUMINA' AND instrumentModel LIKE '%HiSeq%'
   UNION SELECT platformId, 8 FROM Platform WHERE name = 'ILLUMINA' AND instrumentModel LIKE '%HiSeq%'
