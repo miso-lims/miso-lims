@@ -57,7 +57,7 @@ ListTarget.user = {
     }
 
     return [{
-      "sTitle": "Login",
+      "sTitle": "Login Name",
       "mData": "loginName",
       "include": true,
       "iSortPriority": 1,
@@ -71,7 +71,7 @@ ListTarget.user = {
         }
       }
     }, {
-      "sTitle": "Name",
+      "sTitle": "Use Name",
       "mData": "fullName",
       "include": true,
       "iSortPriority": 0

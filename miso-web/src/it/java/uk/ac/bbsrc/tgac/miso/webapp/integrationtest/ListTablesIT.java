@@ -26,38 +26,36 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class ListTablesIT extends AbstractIT {
 
-  private static final Set<String> samplesColumns = Sets.newHashSet(Columns.SORT, Columns.AUTOGEN_NAME, Columns.ALIAS, Columns.SAMPLE_CLASS,
+  private static final Set<String> samplesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.SAMPLE_CLASS,
       Columns.SAMPLE_TYPE, Columns.QC_PASSED, Columns.LOCATION, Columns.LAST_MODIFIED);
-  private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.AUTOGEN_NAME, Columns.ALIAS,
+  private static final Set<String> librariesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.SAMPLE_NAME,
       Columns.SAMPLE_ALIAS, Columns.QC_PASSED, Columns.INDICES, Columns.LOCATION, Columns.LAST_MODIFIED);
-  private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.AUTOGEN_NAME, Columns.LIBRARY_NAME,
+  private static final Set<String> dilutionsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.LIBRARY_NAME,
       Columns.LIBRARY_ALIAS, Columns.MATRIX_BARCODE, Columns.PLATFORM, Columns.TARGETED_SEQUENCING, Columns.DIL_CONCENTRATION,
       Columns.VOLUME, Columns.CREATOR, Columns.CREATION_DATE);
-  private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.AUTOGEN_NAME, Columns.ALIAS,
+  private static final Set<String> poolsColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS,
       Columns.DESCRIPTION, Columns.DATE_CREATED, Columns.DILUTIONS, Columns.POOL_CONCENTRATION, Columns.LOCATION,
       Columns.LAST_MODIFIED);
-  private static final Set<String> ordersColumns = Sets.newHashSet(Columns.AUTOGEN_NAME, Columns.ALIAS, Columns.DESCRIPTION,
+  private static final Set<String> ordersColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.PLATFORM, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.REMAINING, Columns.LAST_MODIFIED);
   private static final Set<String> containersColumns = Sets.newHashSet(Columns.SORT, Columns.SERIAL_NUMBER, Columns.LAST_RUN_NAME,
       Columns.LAST_RUN_ALIAS, Columns.LAST_SEQUENCER, Columns.LAST_MODIFIED);
-  private static final Set<String> runsColumns = Sets.newHashSet(Columns.AUTOGEN_NAME, Columns.ALIAS, Columns.STATUS,
+  private static final Set<String> runsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.STATUS,
       Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED);
-  private static final Set<String> boxesColumns = Sets.newHashSet(Columns.SORT, Columns.AUTOGEN_NAME, Columns.ALIAS, Columns.LOCATION,
+  private static final Set<String> boxesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.LOCATION,
       Columns.ITEMS_CAPACITY, Columns.SIZE);
-  private static final Set<String> sequencersColumns = Sets.newHashSet(Columns.NON_AUTOGEN_NAME, Columns.PLATFORM, Columns.MODEL,
-      Columns.COMMISSIONED,
-      Columns.DECOMMISSIONED, Columns.SERIAL_NUMBER);
-  private static final Set<String> kitsColumns = Sets.newHashSet(Columns.NON_AUTOGEN_NAME, Columns.VERSION, Columns.MANUFACTURER,
+  private static final Set<String> sequencersColumns = Sets.newHashSet(Columns.INSTRUMENT_NAME, Columns.PLATFORM, Columns.MODEL,
+      Columns.COMMISSIONED, Columns.DECOMMISSIONED, Columns.SERIAL_NUMBER);
+  private static final Set<String> kitsColumns = Sets.newHashSet(Columns.KIT_NAME, Columns.VERSION, Columns.MANUFACTURER,
       Columns.PART_NUMBER, Columns.STOCK_LEVEL, Columns.PLATFORM);
-  private static final Set<String> indicesColumns = Sets.newHashSet(Columns.FAMILY, Columns.NON_AUTOGEN_NAME, Columns.SEQUENCE);
-  private static final Set<String> studiesColumns = Sets.newHashSet(Columns.SORT, Columns.AUTOGEN_NAME, Columns.ALIAS, Columns.DESCRIPTION,
+  private static final Set<String> indicesColumns = Sets.newHashSet(Columns.FAMILY, Columns.INDEX_NAME, Columns.SEQUENCE);
+  private static final Set<String> studiesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.TYPE);
   private static final Set<String> printersColumns = Sets.newHashSet(Columns.SORT, Columns.PRINTER, Columns.DRIVER, Columns.BACKEND,
       Columns.AVAILABLE);
-  private static final Set<String> projectsColumns = Sets.newHashSet(Columns.AUTOGEN_NAME, Columns.ALIAS, Columns.SHORT_NAME,
-      Columns.DESCRIPTION,
-      Columns.PROGRESS);
+  private static final Set<String> projectsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.SHORT_NAME,
+      Columns.DESCRIPTION, Columns.PROGRESS);
 
   private static final Set<String> poolsTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
   private static final Set<String> ordersTabs = Sets.newHashSet(Tabs.ACTIVE, Tabs.ALL);
@@ -402,7 +400,7 @@ public class ListTablesIT extends AbstractIT {
     case Columns.QC_PASSED:
       return qcPassedComparator;
     case Columns.LIBRARY_NAME:
-    case Columns.AUTOGEN_NAME:
+    case Columns.NAME:
     case Columns.SAMPLE_NAME:
       return nameNumericComparator;
     default:

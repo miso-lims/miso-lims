@@ -45,7 +45,7 @@ ListTarget.index = {
       "iSortPriority": 2,
       "mData": "family.name"
     }, {
-      "sTitle": "Name",
+      "sTitle": "Index Name",
       "include": true,
       "iSortPriority": 1,
       "mData": "name"
