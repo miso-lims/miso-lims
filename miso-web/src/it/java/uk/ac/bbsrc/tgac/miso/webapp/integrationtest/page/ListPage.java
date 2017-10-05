@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
