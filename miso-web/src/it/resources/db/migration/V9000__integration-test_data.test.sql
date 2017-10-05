@@ -350,14 +350,14 @@ DELETE FROM SequencerReference;
 INSERT INTO SequencerReference (referenceId, name, platformId, ip) VALUES
   (1, 'T2000', 1, '127.0.0.1'),
   (2, 'TMS1', 2, '127.0.0.1'),
-  (3, 'TPB1', 3, '127.0.0.1');
+  (3, 'TPB2', 3, '127.0.0.1');
   
 INSERT INTO SequencerReference (referenceId, name, platformId, serialNumber, dateCommissioned, dateDecommissioned, upgradedSequencerReferenceId, ip) VALUES
   (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, '127.0.0.1'),
   (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL, '127.0.0.1'),
   (102, 'OldHiSeq_102', 1, '102', '2017-01-01', '2017-02-01', 101, '127.0.0.1'),
-  (5001, 'PacBio_SR', 3, '5001', '2017-09-21', NULL, NULL, '127.0.0.1'),
-  (5002, 'HiSeq_SR', 1, '5002', '2017-02-01', NULL, NULL, '127.0.0.1');
+  (5001, 'PacBio_SR_5001', 3, '5001', '2017-09-21', NULL, NULL, '127.0.0.1'),
+  (5002, 'HiSeq_SR_5002', 1, '5002', '2017-02-01', NULL, NULL, '127.0.0.1');
 
 INSERT INTO SequencerServiceRecord(recordId, sequencerReferenceId, title, details, servicedBy, referenceNumber, serviceDate, shutdownTime, restoredTime) VALUES
   (150, 101, 'Test 150', 'details go here', 'technician1', '12345', '2017-09-05', '2017-09-01 10:00:00', '2017-09-05 10:00:00'),

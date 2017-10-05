@@ -44,7 +44,7 @@ public class RunPageIT extends AbstractIT {
     fields.put(Field.NAME, "Unsaved");
     fields.put(Field.ALIAS, null);
     fields.put(Field.PLATFORM, "PacBio");
-    fields.put(Field.SEQUENCER, "PacBio_SR - PacBio RS II");
+    fields.put(Field.SEQUENCER, "PacBio_SR_5001 - PacBio RS II");
     fields.put(Field.SEQ_PARAMS, "SELECT");
     fields.put(Field.DESCRIPTION, null);
     fields.put(Field.FILE_PATH, null);
@@ -87,7 +87,7 @@ public class RunPageIT extends AbstractIT {
     fields.put(Field.NAME, "Unsaved");
     fields.put(Field.ALIAS, null);
     fields.put(Field.PLATFORM, "Illumina");
-    fields.put(Field.SEQUENCER, "HiSeq_SR - Illumina HiSeq 2500");
+    fields.put(Field.SEQUENCER, "HiSeq_SR_5002 - Illumina HiSeq 2500");
     fields.put(Field.SEQ_PARAMS, "SELECT");
     fields.put(Field.DESCRIPTION, null);
     fields.put(Field.FILE_PATH, null);
@@ -131,7 +131,7 @@ public class RunPageIT extends AbstractIT {
     fields.put(Field.NAME, "RUN5001");
     fields.put(Field.ALIAS, "Change_Values_Run");
     fields.put(Field.PLATFORM, "Illumina");
-    fields.put(Field.SEQUENCER, "HiSeq_SR - Illumina HiSeq 2500");
+    fields.put(Field.SEQUENCER, "HiSeq_SR_5002 - Illumina HiSeq 2500");
     fields.put(Field.SEQ_PARAMS, "Rapid Run 2x151");
     fields.put(Field.DESCRIPTION, "description");
     fields.put(Field.FILE_PATH, "/filePath");

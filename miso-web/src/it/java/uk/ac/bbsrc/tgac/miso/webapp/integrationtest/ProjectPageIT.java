@@ -116,10 +116,10 @@ public class ProjectPageIT extends AbstractIT {
     // goal: ensure all tables are present on the page and have no errors
     ProjectPage page = getProjectPage(1L);
     
-    assertTrue(page.getVisibleErrors().isEmpty());
+    assertTrue("no visible errors", page.getVisibleErrors().isEmpty());
     
     Set<String> tableIds = Sets.newHashSet(TableIds.STUDIES, TableIds.SAMPLES, TableIds.LIBRARIES, TableIds.DILUTIONS, TableIds.POOLS,
         TableIds.RUNS);
-    tableIds.forEach(id -> assertNotNull(page.getTable(id)));
+    tableIds.forEach(id -> assertNotNull("table " + id + " should exist on page", page.getTable(id)));
   }
 }
