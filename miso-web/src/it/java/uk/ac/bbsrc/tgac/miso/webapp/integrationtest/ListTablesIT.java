@@ -389,7 +389,7 @@ public class ListTablesIT extends AbstractIT {
   private int compareFirstTwoNonMatchingValues(DataTable table, String heading) {
     String row1Val = table.getTextAtCell(heading, 0);
     String row2Val = table.getTextAtCell(heading, 1);
-    for (int rowNum = 2; row1Val.equals(row2Val) || rowNum < table.countRows(); rowNum++) {
+    for (int rowNum = 2; row1Val.equals(row2Val) && rowNum < table.countRows(); rowNum++) {
       row1Val = row2Val;
       row2Val = table.getTextAtCell(heading, rowNum);
     }
