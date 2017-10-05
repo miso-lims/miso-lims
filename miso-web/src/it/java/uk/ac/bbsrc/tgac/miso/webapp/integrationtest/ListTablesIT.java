@@ -378,7 +378,9 @@ public class ListTablesIT extends AbstractIT {
 
         // compare results (if either is 0, value of the other can be anything though)
         if (sort1 != 0) {
-          assertTrue(heading + " column second sort order should differ from first", sort2 == 0 || sort1 > 0 != sort2 > 0);
+          assertTrue(
+              heading + " column second sort order should differ from first",
+              sort2 == 0 || sort1 > 0 != sort2 > 0);
         }
       }
     }
@@ -387,7 +389,7 @@ public class ListTablesIT extends AbstractIT {
   private int compareFirstTwoNonMatchingValues(DataTable table, String heading) {
     String row1Val = table.getTextAtCell(heading, 0);
     String row2Val = table.getTextAtCell(heading, 1);
-    for (int rowNum = 2; row1Val.equals(row2Val) && rowNum < table.countRows(); rowNum++) {
+    for (int rowNum = 2; row1Val.equals(row2Val) || rowNum < table.countRows(); rowNum++) {
       row1Val = row2Val;
       row2Val = table.getTextAtCell(heading, rowNum);
     }
@@ -398,12 +400,15 @@ public class ListTablesIT extends AbstractIT {
   private static Comparator<String> getComparator(String column) {
     switch (column) {
     case Columns.QC_PASSED:
+      System.out.println("*********QC Comparator");
       return qcPassedComparator;
     case Columns.LIBRARY_NAME:
     case Columns.NAME:
     case Columns.SAMPLE_NAME:
+      System.out.println("*********Numeric Comparator");
       return nameNumericComparator;
     default:
+      System.out.println("*********Standard Comparator");
       return standardComparator;
     }
   }
