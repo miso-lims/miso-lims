@@ -6,14 +6,18 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Sets;
+
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.Fields;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.TableIds;
 
 public class ProjectPageIT extends AbstractIT {
 
@@ -105,5 +109,18 @@ public class ProjectPageIT extends AbstractIT {
     page.setDescription(originalDescription);
     page.clickSave();
     assertEquals(originalDescription, page.getDescription());
+  }
+
+  @Test
+  public void testConfirmTablesAllVisibleWithoutErrors() throws Exception {
+    // goal: ensure all tables are present on the page and have no errors
+    ProjectPage page = getProjectPage(1L);
+    
+    assertTrue("unexpected errors on project tables: " + page.getVisibleErrors().stream().map(error -> error.getText()).toString(),
+        page.getVisibleErrors().isEmpty());
+    
+    Set<String> tableIds = Sets.newHashSet(TableIds.STUDIES, TableIds.SAMPLES, TableIds.LIBRARIES, TableIds.DILUTIONS, TableIds.POOLS,
+        TableIds.RUNS);
+    tableIds.forEach(id -> assertNotNull("table " + id + " should exist on page", page.getTable(id)));
   }
 }

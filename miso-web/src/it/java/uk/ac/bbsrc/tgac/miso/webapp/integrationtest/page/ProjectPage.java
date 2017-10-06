@@ -3,11 +3,15 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class ProjectPage extends HeaderFooterPage {
 
@@ -24,6 +28,15 @@ public class ProjectPage extends HeaderFooterPage {
     private Fields() {
       throw new IllegalStateException("Util class not intended for instantiation");
     }
+  }
+
+  public static class TableIds {
+    public static final String STUDIES = "project_studies";
+    public static final String SAMPLES = "project_samples";
+    public static final String LIBRARIES = "project_libraries";
+    public static final String DILUTIONS = "project_dilutions";
+    public static final String POOLS = "project_pools";
+    public static final String RUNS = "project_runs";
   }
 
   @FindBy(id = "projectId")
@@ -44,6 +57,9 @@ public class ProjectPage extends HeaderFooterPage {
   private WebElement referenceGenomeLabel;
   @FindBy(id = "save")
   private WebElement saveButton;
+
+  @FindBy(className = "parsley-error")
+  List<WebElement> errors;
 
   public ProjectPage(WebDriver driver) {
     super(driver);
@@ -117,5 +133,13 @@ public class ProjectPage extends HeaderFooterPage {
     saveButton.click();
     waitForPageRefresh(html);
     return new ProjectPage(getDriver());
+  }
+
+  public List<WebElement> getVisibleErrors() {
+    return errors.stream().filter(error -> error.isDisplayed()).collect(Collectors.toList());
+  }
+
+  public DataTable getTable(String tableId) {
+    return new DataTable(getDriver().findElement(By.id(tableId)));
   }
 }

@@ -287,4 +287,13 @@ public abstract class AbstractPage extends AbstractElement {
     return getDriver().findElement(By.tagName("html"));
   }
 
+  protected void clickOk() {
+    WebElement okButton = getDriver().findElement(By.id("ok"));
+    okButton.click();
+  }
+
+  protected void clickCancel() {
+    WebElement cancelButton = getDriver().findElement(By.id("cancel"));
+    cancelButton.click();
+  }
 }

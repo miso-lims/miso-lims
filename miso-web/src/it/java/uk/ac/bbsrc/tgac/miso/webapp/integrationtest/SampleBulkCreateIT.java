@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;

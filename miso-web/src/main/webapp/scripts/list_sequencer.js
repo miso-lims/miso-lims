@@ -38,7 +38,7 @@ ListTarget.sequencer = {
           Utils.showDialog("Add Sequencer", "Add", [{
             property: "name",
             type: "text",
-            label: "Name",
+            label: "Instrument Name",
             required: true
           }, {
             property: "platform",
@@ -64,7 +64,7 @@ ListTarget.sequencer = {
           }, {
             property: "dateCommissioned",
             type: "date",
-            label: "Date Comissioned",
+            label: "Date Commissioned",
             required: false
           }], function(seq) {
             seq.id = 0;
@@ -79,7 +79,7 @@ ListTarget.sequencer = {
     }
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.labelHyperlinkColumn("Name", "sequencer", Utils.array.getId, "name", 1, true), {
+    return [ListUtils.labelHyperlinkColumn("Instrument Name", "sequencer", Utils.array.getId, "name", 1, true), {
       "sTitle": "Platform",
       "mData": "platform.platformType",
       "include": true,
