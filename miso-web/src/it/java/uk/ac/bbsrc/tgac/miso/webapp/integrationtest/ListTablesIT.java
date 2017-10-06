@@ -97,7 +97,7 @@ public class ListTablesIT extends AbstractIT {
     sortOnTab = Collections.unmodifiableMap(preferredTab);
   }
 
-  private static final Comparator<String> standardComparator = (s1, s2) -> s1.compareTo(s2);
+  private static final Comparator<String> standardComparator = (s1, s2) -> s1.toUpperCase().compareTo(s2.toUpperCase());
 
   /**
    * Comparator for QC Passed columns, which render the boolean values as symbols.
