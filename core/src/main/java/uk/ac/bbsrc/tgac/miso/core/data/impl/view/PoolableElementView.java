@@ -99,6 +99,14 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private Long targetedSequencingId;
 
+  private String boxAlias;
+
+  private String boxName;
+
+  private String boxIdentificationBarcode;
+
+  private String boxLocationBarcode;
+
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
 
@@ -117,6 +125,12 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
     v.setDilutionVolume(dilution.getVolume());
     v.setLastModified(dilution.getLastModified());
     v.setPreMigrationId(dilution.getPreMigrationId());
+    if (dilution.getBox() != null) {
+      v.setBoxName(dilution.getBox().getName());
+      v.setBoxAlias(dilution.getBox().getAlias());
+      v.setBoxIdentificationBarcode(dilution.getBox().getIdentificationBarcode());
+      v.setBoxLocationBarcode(dilution.getBox().getLocationBarcode());
+    }
     
     Library lib = dilution.getLibrary();
     if (lib != null) {
@@ -434,6 +448,38 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setDilutionVolume(Double dilutionVolume) {
     this.dilutionVolume = dilutionVolume;
+  }
+
+  public String getBoxAlias() {
+    return boxAlias;
+  }
+
+  public void setBoxAlias(String boxAlias) {
+    this.boxAlias = boxAlias;
+  }
+
+  public String getBoxName() {
+    return boxName;
+  }
+
+  public void setBoxName(String boxName) {
+    this.boxName = boxName;
+  }
+
+  public String getBoxIdentificationBarcode() {
+    return boxIdentificationBarcode;
+  }
+
+  public void setBoxIdentificationBarcode(String boxIdentificationBarcode) {
+    this.boxIdentificationBarcode = boxIdentificationBarcode;
+  }
+
+  public String getBoxLocationBarcode() {
+    return boxLocationBarcode;
+  }
+
+  public void setBoxLocationBarcode(String boxLocationBarcode) {
+    this.boxLocationBarcode = boxLocationBarcode;
   }
 
 }

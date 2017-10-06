@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import java.util.stream.Collectors;
 
 import org.joda.time.format.DateTimeFormat;
@@ -19,7 +18,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.Fields;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.TableIds;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.ProjectTable;
 
 public class ProjectPageIT extends AbstractIT {
 
@@ -118,11 +117,13 @@ public class ProjectPageIT extends AbstractIT {
     // goal: ensure all tables are present on the page and have no errors
     ProjectPage page = getProjectPage(1L);
     
-    assertTrue("unexpected errors on project tables: " + page.getVisibleErrors().stream().map(error -> error.getText()).collect(Collectors.joining(", ")),
+    assertTrue(
+        "unexpected errors on project tables: "
+            + page.getVisibleErrors().stream().map(error -> error.getText()).collect(Collectors.joining(";")),
         page.getVisibleErrors().isEmpty());
     
-    Set<String> tableIds = Sets.newHashSet(TableIds.STUDIES, TableIds.SAMPLES, TableIds.LIBRARIES, TableIds.DILUTIONS, TableIds.POOLS,
-        TableIds.RUNS);
+    Set<String> tableIds = Sets.newHashSet(ProjectTable.STUDIES, ProjectTable.SAMPLES, ProjectTable.LIBRARIES, ProjectTable.DILUTIONS, ProjectTable.POOLS,
+        ProjectTable.RUNS);
     tableIds.forEach(id -> assertNotNull("table " + id + " should exist on page", page.getTable(id)));
   }
 }

@@ -176,7 +176,7 @@ public class HibernateSequencerPartitionContainerDao
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
     case CREATE:
-      return "creationDate";
+      return "creationTime";
     case UPDATE:
       return "lastModified";
     default:

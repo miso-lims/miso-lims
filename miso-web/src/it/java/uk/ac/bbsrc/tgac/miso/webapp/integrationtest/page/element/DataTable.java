@@ -1,36 +1,51 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
 
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 
-public class DataTable {
+public class DataTable extends AbstractElement {
 
+  private static final By tableSelector = By.tagName("table");
+  private static final By searchBarSelector = By.xpath(".//div[@class='dataTables_filter']/descendant::label/descendant::input");
   private static final By columnHeadingsSelector = By.tagName("th");
   private static final By rowSelector = By.cssSelector("tbody > tr");
   private static final By cellSelector = By.tagName("td");
   private static final By emptyTableSelector = By.className("dataTables_empty");
   private static final By sortableColumnSelector = By.xpath(".//div/span[contains(@class, 'ui-icon-carat')]");
   private static final By selectedSortableColumnSelector = By.xpath(".//div/span[contains(@class, 'ui-icon-triangle')]");
+  private static final By processingSelector = By.className("dataTables_processing");
 
   private final WebElement table;
   private final List<WebElement> columnHeaders;
   private final List<String> columnHeadings;
+  private final WebElement searchBar;
+  private final WebElement processing;
 
-  public DataTable(WebElement listTable) {
-    this.table = listTable;
-    this.columnHeaders = listTable.findElements(columnHeadingsSelector).stream()
+  public DataTable(WebDriver driver, String tableWrapperId) {
+    super(driver);
+    PageFactory.initElements(driver, this);
+    WebElement tableWrapper = getDriver().findElement(By.id(tableWrapperId));
+    this.table = tableWrapper.findElement(tableSelector);
+    this.columnHeaders = tableWrapper.findElements(columnHeadingsSelector).stream()
         .collect(Collectors.toList());
     this.columnHeadings = columnHeaders.stream()
         .map(element -> element.getText().trim())
         .collect(Collectors.toList());
+    this.searchBar = tableWrapper.findElement(searchBarSelector);
+    this.processing = tableWrapper.findElement(processingSelector);
   }
 
   public List<WebElement> getColumnHeaders() {
@@ -54,8 +69,17 @@ public class DataTable {
         .collect(Collectors.toList());
   }
 
+  public void sortByColumn(String columnHeading) {
+    clickToSort(columnHeading);
+    waitWithTimeout().until(invisibilityOf(processing));
+  }
+
   public String getId() {
     return table.getAttribute("id");
+  }
+
+  public WebElement getProcessing() {
+    return processing;
   }
 
   public int countRows() {
@@ -124,4 +148,13 @@ public class DataTable {
   public boolean doesColumnContain(String columnHeading, String target) {
     return getColumnValues(columnHeading).contains(target);
   }
+
+  public void searchFor(String searchTerm) {
+    waitUntil(elementToBeClickable(searchBar));
+    searchBar.clear();
+    searchBar.sendKeys(searchTerm);
+    searchBar.sendKeys(Keys.ENTER);
+    waitUntil(elementToBeClickable(searchBar));
+  }
+
 }

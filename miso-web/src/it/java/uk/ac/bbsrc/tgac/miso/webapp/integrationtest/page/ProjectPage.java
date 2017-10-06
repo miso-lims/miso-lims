@@ -5,7 +5,6 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -30,13 +29,13 @@ public class ProjectPage extends HeaderFooterPage {
     }
   }
 
-  public static class TableIds {
-    public static final String STUDIES = "project_studies";
-    public static final String SAMPLES = "project_samples";
-    public static final String LIBRARIES = "project_libraries";
-    public static final String DILUTIONS = "project_dilutions";
-    public static final String POOLS = "project_pools";
-    public static final String RUNS = "project_runs";
+  public static class ProjectTable {
+    public static final String STUDIES = "project_studies_wrapper";
+    public static final String SAMPLES = "project_samples_wrapper";
+    public static final String LIBRARIES = "project_libraries_wrapper";
+    public static final String DILUTIONS = "project_dilutions_wrapper";
+    public static final String POOLS = "project_pools_wrapper";
+    public static final String RUNS = "project_runs_wrapper";
   }
 
   @FindBy(id = "projectId")
@@ -139,7 +138,7 @@ public class ProjectPage extends HeaderFooterPage {
     return errors.stream().filter(error -> error.isDisplayed()).collect(Collectors.toList());
   }
 
-  public DataTable getTable(String tableId) {
-    return new DataTable(getDriver().findElement(By.id(tableId)));
+  public DataTable getTable(String tableWrapperId) {
+    return new DataTable(getDriver(), tableWrapperId);
   }
 }
