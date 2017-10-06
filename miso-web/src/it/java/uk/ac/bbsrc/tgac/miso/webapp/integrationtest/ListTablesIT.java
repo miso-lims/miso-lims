@@ -259,7 +259,6 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListSequencersColumnSort() throws Exception {
-    System.out.println("******** Test List Sequencers **********");
     testColumnsSort(ListTarget.SEQUENCERS);
   }
 
@@ -394,7 +393,6 @@ public class ListTablesIT extends AbstractIT {
       row1Val = row2Val;
       row2Val = table.getTextAtCell(heading, rowNum);
     }
-    System.out.println("** row 1: " + row1Val + " and row 2: " + row2Val + "**");
     Comparator<String> columnComparator = getComparator(heading);
     return columnComparator.compare(row1Val, row2Val);
   }
@@ -402,15 +400,12 @@ public class ListTablesIT extends AbstractIT {
   private static Comparator<String> getComparator(String column) {
     switch (column) {
     case Columns.QC_PASSED:
-      System.out.println("*********QC Comparator");
       return qcPassedComparator;
     case Columns.LIBRARY_NAME:
     case Columns.NAME:
     case Columns.SAMPLE_NAME:
-      System.out.println("*********Numeric Comparator");
       return nameNumericComparator;
     default:
-      System.out.println("*********Standard Comparator");
       return standardComparator;
     }
   }
