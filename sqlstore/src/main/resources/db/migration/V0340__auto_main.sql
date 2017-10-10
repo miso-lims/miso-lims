@@ -1,3 +1,11 @@
+-- seq_params_paired_not_null
+
+ALTER TABLE SequencingParameters CHANGE COLUMN paired paired TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE SequencingParameters CHANGE COLUMN readLength readLength INT(11) NOT NULL DEFAULT 0;
+
+
+-- experiment_refactor
+
 DELETE FROM Experiment_Run WHERE Experiment_Run.experiment_experimentId IN (SELECT experimentId  FROM Experiment WHERE alias LIKE 'EXP_AUTOGEN%' AND NOT EXISTS(SELECT * FROM Experiment_Kit WHERE Experiment_Kit.experiments_experimentId = Experiment.experimentId) AND NOT EXISTS(SELECT * FROM Submission_Experiment WHERE Submission_Experiment.experiments_experimentId = Experiment.experimentId));
 
 DELETE FROM ExperimentChangeLog WHERE experimentId IN (SELECT experimentId  FROM Experiment WHERE alias LIKE 'EXP_AUTOGEN%' AND NOT EXISTS(SELECT * FROM Experiment_Kit WHERE Experiment_Kit.experiments_experimentId = Experiment.experimentId) AND NOT EXISTS(SELECT * FROM Submission_Experiment WHERE Submission_Experiment.experiments_experimentId = Experiment.experimentId));
@@ -31,3 +39,12 @@ INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partiti
 ALTER TABLE Experiment DROP FOREIGN KEY fk_experiment_pool_poolId;
 ALTER TABLE Experiment DROP pool_poolId;
 DROP TABLE Experiment_Run;
+
+
+-- drop_submission
+
+DROP TABLE Submission_Sample;
+DROP TABLE Submission_Partition_Dilution;
+DROP TABLE Submission_Study;
+
+
