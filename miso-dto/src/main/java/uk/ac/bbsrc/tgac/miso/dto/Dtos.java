@@ -408,7 +408,8 @@ public class Dtos {
    * <ol>
    * <li>parent ID is provided. This implies that the parent exists, so no other parent information will be required</li>
    * <li>identity information and parentTissueSampleClassId are provided. This implies that a tissue parent should be created, and that the
-   * identity may or may not yet exist. If the sampleClassId is an aliquot, a stockClassId must be provided.</li>
+   * identity may or may not yet exist. If the sampleClassId is an aliquot, a stockClassId must be provided. ParentAliquotClassId may be
+   * provided to indicate a second aliquot level in the hierarchy</li>
    * <li>identity information is provided, but no parentTissueSampleClassId. You must be creating a tissue in this case.</li>
    * </ol>
    * 
@@ -437,11 +438,20 @@ public class Dtos {
         parent = tissue;
       }
       if (childDto instanceof SampleStockDto && childDto.getClass() != SampleStockDto.class) {
+        SampleAliquotDto aliquotDto = (SampleAliquotDto) childDto;
         DetailedSample stock = toStockSample((SampleStockDto) childDto);
         stock.setSampleClass(new SampleClassImpl());
-        stock.getSampleClass().setId(((SampleAliquotDto) childDto).getStockClassId());
+        stock.getSampleClass().setId(aliquotDto.getStockClassId());
         stock.setParent(parent);
         parent = stock;
+
+        if (aliquotDto.getParentAliquotClassId() != null) {
+          DetailedSample parentAliquot = toAliquotSample(aliquotDto);
+          parentAliquot.setSampleClass(new SampleClassImpl());
+          parentAliquot.getSampleClass().setId(aliquotDto.getParentAliquotClassId());
+          parentAliquot.setParent(parent);
+          parent = parentAliquot;
+        }
       }
     }
     return parent;

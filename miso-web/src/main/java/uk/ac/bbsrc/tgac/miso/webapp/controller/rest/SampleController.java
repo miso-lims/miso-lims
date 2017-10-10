@@ -177,7 +177,7 @@ public class SampleController extends RestController {
   }
 
   /**
-   * Converts the DTO to a Sample, complete with parents. Parent SampleClasses are inferred where necessary and possible
+   * Converts the DTO to a Sample, complete with parents. Parent SampleClasses are inferred where necessary
    * 
    * @param sampleDto
    * @return
@@ -185,28 +185,31 @@ public class SampleController extends RestController {
   public Sample buildHierarchy(SampleDto sampleDto) {
     if (sampleDto instanceof SampleAliquotDto) {
       SampleAliquotDto dto = (SampleAliquotDto) sampleDto;
-      dto.setStockClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
-          SampleStock.CATEGORY_NAME));
+      dto.setParentAliquotClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
+          SampleAliquot.CATEGORY_NAME, true));
+      Long topAliquotClassId = dto.getParentAliquotClassId() == null ? dto.getSampleClassId() : dto.getParentAliquotClassId();
+      dto.setStockClassId(inferIntermediateSampleClassId(dto, topAliquotClassId, SampleAliquot.CATEGORY_NAME, SampleStock.CATEGORY_NAME,
+          false));
       // infer grandparent tissue class
       dto.setParentTissueSampleClassId(inferIntermediateSampleClassId(dto, dto.getStockClassId(),
-          SampleStock.CATEGORY_NAME, SampleTissue.CATEGORY_NAME));
+          SampleStock.CATEGORY_NAME, SampleTissue.CATEGORY_NAME, false));
     } else if (sampleDto instanceof SampleStockDto) {
       DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
       dto.setParentTissueSampleClassId(
           inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleStock.CATEGORY_NAME,
-              SampleTissue.CATEGORY_NAME));
+              SampleTissue.CATEGORY_NAME, false));
     } else if (sampleDto instanceof SampleTissueProcessingDto) {
       DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
       dto.setParentTissueSampleClassId(
           inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleTissueProcessing.CATEGORY_NAME,
-              SampleTissue.CATEGORY_NAME));
+              SampleTissue.CATEGORY_NAME, false));
 
     }
     return Dtos.to(sampleDto);
   }
 
   private Long inferIntermediateSampleClassId(DetailedSampleDto dto, Long childClassId,
-      String childClassCategory, String parentCategory) {
+      String childClassCategory, String parentCategory, boolean nullOk) {
     if (dto.getParentId() != null) {
       return null;
     }
@@ -215,6 +218,10 @@ public class SampleController extends RestController {
     }
     // infer parent class
     SampleClass parentClass = sampleClassService.inferParentFromChild(childClassId, childClassCategory, parentCategory);
+    if (parentClass == null && !nullOk) {
+      throw new IllegalStateException(String.format("%s class with id %d has no %s parents", childClassCategory, childClassId,
+          parentCategory));
+    }
     return parentClass.getId();
   }
 

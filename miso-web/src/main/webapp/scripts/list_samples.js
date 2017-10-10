@@ -76,9 +76,7 @@ ListTarget.sample = {
             property: 'sampleClass',
             type: 'select',
             label: 'Sample Class',
-            values: Constants.sampleClasses.filter(function(sampleClass) {
-              return sampleClass.canCreateNew;
-            }).sort(Utils.sorting.sampleClassComparator),
+            values: Constants.sampleClasses.sort(Utils.sorting.sampleClassComparator),
             getLabel: Utils.array.getAlias
           });
         }

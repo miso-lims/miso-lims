@@ -47,8 +47,10 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -124,6 +126,9 @@ public class LibraryRestController extends RestController {
       Library library = Dtos.to(libraryDto);
       if (libraryDto.getSample() != null) {
         Sample sample = sampleController.buildHierarchy(libraryDto.getSample());
+        if (LimsUtils.isDetailedSample(sample)) {
+          ((DetailedSample) sample).setSynthetic(true);
+        }
         library.setSample(sample);
       }
       id = libraryService.create(library);

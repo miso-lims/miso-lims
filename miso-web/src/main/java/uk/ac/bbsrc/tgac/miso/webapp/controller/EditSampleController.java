@@ -83,7 +83,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -336,18 +335,10 @@ public class EditSampleController {
   };
 
   private void populateSampleClasses(ModelMap model) throws IOException {
-    List<SampleClass> sampleClasses = new ArrayList<>();
-    List<SampleClass> tissueClasses = new ArrayList<>();
-    Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
-    // Can only create Tissues, Stocks, and Aliquots from this page, so remove other classes
-    for (SampleClass sc : sampleClassService.getAll()) {
-      if (SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory())) {
-        tissueClasses.add(sc);
-      }
-      if (sc.hasPathToIdentity(relationships)) {
-        sampleClasses.add(sc);
-      }
-    }
+    List<SampleClass> sampleClasses = new ArrayList<>(sampleClassService.getAll());
+    List<SampleClass> tissueClasses = sampleClasses.stream()
+        .filter(sc -> SampleTissue.CATEGORY_NAME.equals(sc.getSampleCategory()))
+        .collect(Collectors.toList());
     Collections.sort(sampleClasses, SAMPLECLASS_CATEGORY_ALIAS);
     Collections.sort(tissueClasses, SAMPLECLASS_CATEGORY_ALIAS);
     model.put("sampleClasses", sampleClasses);
@@ -813,6 +804,10 @@ public class EditSampleController {
       if (builder.getParent() == null && builder.getSampleClass().getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
         builder.setStockClass(sampleClassService.inferParentFromChild(builder.getSampleClass().getId(), SampleAliquot.CATEGORY_NAME,
             SampleStock.CATEGORY_NAME));
+        if (builder.getStockClass() == null) {
+          throw new IllegalStateException(String.format("%s class with id %d has no %s parents", SampleAliquot.CATEGORY_NAME,
+              builder.getSampleClass().getId(), SampleStock.CATEGORY_NAME));
+        }
       }
       sample = builder.build();
     }

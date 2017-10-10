@@ -1,6 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,6 +24,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 
 @Entity
 @Table(name = "SampleClass", uniqueConstraints = @UniqueConstraint(columnNames = { "alias", "sampleCategory" }))
@@ -147,6 +152,26 @@ public class SampleClassImpl implements SampleClass {
   @Override
   public void setDNAseTreatable(Boolean treatable) {
     dnaseTreatable = treatable;
+  }
+
+  @Override
+  public boolean hasPathToDnaseTreatable(Collection<SampleValidRelationship> relationships) {
+    return hasPathToDnaseTreatable(this, new HashSet<>(), relationships);
+  }
+
+  private static boolean hasPathToDnaseTreatable(SampleClass from, Set<Long> checked, Collection<SampleValidRelationship> relationships) {
+    if (from.getDNAseTreatable()) {
+      return true;
+    }
+    // stop at tissue level, or if circling into a class hierarchy that has already been checked
+    if (from.getSampleCategory().equals(SampleTissue.CATEGORY_NAME) || !checked.add(from.getId())) {
+      return false;
+    }
+    return relationships.stream()
+        .filter(relationship -> !relationship.getArchived()
+            && relationship.getChild().getId().equals(from.getId())
+            && !checked.contains(relationship.getParent().getId()))
+        .anyMatch(relationship -> hasPathToDnaseTreatable(relationship.getParent(), checked, relationships));
   }
 
   @Override

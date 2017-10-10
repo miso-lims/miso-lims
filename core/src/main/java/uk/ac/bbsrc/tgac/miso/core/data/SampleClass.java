@@ -58,27 +58,6 @@ public interface SampleClass extends Serializable {
 
   void setDNAseTreatable(Boolean treatable);
 
-  default boolean hasPathToIdentity(Collection<SampleValidRelationship> relationships) {
-    if (getSampleCategory().equals(SampleIdentity.CATEGORY_NAME)) {
-      return true;
-    }
-    return relationships.stream()
-        .filter(relationship -> !relationship.getArchived() && relationship.getChild().getId() == getId()
-            && !relationship.getParent().getSampleCategory().equals(getSampleCategory()))
-        .anyMatch(relationship -> relationship.getParent().hasPathToIdentity(relationships));
-  }
-
-  default boolean hasPathToDnaseTreatable(Collection<SampleValidRelationship> relationships) {
-    if (getDNAseTreatable()) {
-      return true;
-    }
-    if (getSampleCategory().equals(SampleTissue.CATEGORY_NAME)) {
-      return false;
-    }
-    return relationships.stream()
-        .filter(relationship -> !relationship.getArchived() && relationship.getChild().getId() == getId()
-            && !relationship.getParent().getSampleCategory().equals(getSampleCategory()))
-        .anyMatch(relationship -> relationship.getParent().hasPathToDnaseTreatable(relationships));
-  }
+  boolean hasPathToDnaseTreatable(Collection<SampleValidRelationship> relationships);
 
 }
