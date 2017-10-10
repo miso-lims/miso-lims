@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
@@ -90,6 +91,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -103,6 +105,8 @@ import uk.ac.bbsrc.tgac.miso.dto.DilutionDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
@@ -112,8 +116,11 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkMergeTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
@@ -172,6 +179,12 @@ public class EditLibraryController {
   private LibraryDilutionService dilutionService;
   @Autowired
   private ExperimentService experimentService;
+  @Autowired
+  private SampleClassService sampleClassService;
+  @Autowired
+  private RequestManager requestManager;
+  @Autowired
+  private SampleValidRelationshipService sampleValidRelationshipService;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -219,6 +232,8 @@ public class EditLibraryController {
   private Boolean showDescription;
   @Value("${miso.display.library.bulk.volume}")
   private Boolean showVolume;
+  @Value("${miso.defaults.sample.bulk.scientificname:}")
+  private String defaultSciName;
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
@@ -359,6 +374,12 @@ public class EditLibraryController {
           to.setId(Long.valueOf(text));
           setValue(to);
         }
+      }
+    });
+    binder.registerCustomEditor(Long.class, new PropertyEditorSupport() {
+      @Override
+      public void setAsText(String text) throws IllegalArgumentException {
+        setValue(isStringEmptyOrNull(text) ? null : Long.valueOf(text));
       }
     });
   }
@@ -700,6 +721,85 @@ public class EditLibraryController {
   @RequestMapping(value = "/bulk/edit", method = RequestMethod.GET)
   public ModelAndView editBulkLibraries(@RequestParam("ids") String libraryIds, ModelMap model) throws IOException {
     return libraryBulkEditBackend.edit(libraryIds, model);
+  }
+
+  @RequestMapping(value = "/bulk/receive", method = RequestMethod.GET)
+  public ModelAndView receiveBulkLibraries(@RequestParam("quantity") Integer quantity,
+      @RequestParam(value = "sampleClassId", required = false) Long aliquotClassId,
+      @RequestParam(value = "projectId", required = false) Long projectId,
+      ModelMap model) throws IOException {
+
+    LibraryDto libDto = null;
+    Project project = null;
+    if (projectId != null) {
+      project = requestManager.getProjectById(projectId);
+      if (project == null) {
+        throw new IllegalArgumentException("Invalid Project ID");
+      }
+    }
+
+    SampleClass aliquotClass = null;
+    if (isDetailedSampleEnabled()) {
+      if (aliquotClassId == null) {
+        throw new IllegalArgumentException("Sample Class ID is required for Detailed Sample");
+      }
+      aliquotClass = sampleClassService.get(aliquotClassId);
+      if (aliquotClass == null) {
+        throw new IllegalArgumentException("Invalid Sample Class ID");
+      }
+      DetailedLibraryDto detailedDto = new DetailedLibraryDto();
+      libDto = detailedDto;
+      SampleAliquotDto samDto = new SampleAliquotDto();
+      detailedDto.setSample(samDto);
+      samDto.setSampleClassId(aliquotClassId);
+      detailedDto.setParentSampleClassId(aliquotClassId);
+    } else {
+      libDto = new LibraryDto();
+      libDto.setSample(new SampleDto());
+    }
+
+    return new BulkReceiveLibraryBackend(libDto, quantity, project, aliquotClass, defaultSciName).create(model);
+  }
+
+  private final class BulkReceiveLibraryBackend extends BulkCreateTableBackend<LibraryDto> {
+
+    private final Project project;
+    private final SampleClass aliquotClass;
+    private final String defaultSciName;
+    private final boolean isDnaseTreatable;
+
+    public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName)
+        throws IOException {
+      super("libraryReceipt", LibraryDto.class, "Libraries", dto, quantity);
+      if (isDetailedSampleEnabled() && aliquotClass == null) {
+        throw new IllegalArgumentException("Aliquot Class cannot be null");
+      }
+      this.project = project;
+      this.aliquotClass = aliquotClass;
+      this.defaultSciName = defaultSciName;
+      this.isDnaseTreatable = isDetailedSampleEnabled() && aliquotClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll());
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      config.putPOJO("targetSampleClass", Dtos.asDto(aliquotClass));
+      config.put("dnaseTreatable", isDnaseTreatable);
+      config.put("create", true);
+      config.put("hasProject", project != null);
+      if (project == null) {
+        requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
+      } else {
+        config.putPOJO("project", Dtos.asDto(project));
+      }
+      config.put("defaultSciName", defaultSciName);
+      config.put("showDescription", showDescription);
+      config.put("showVolume", showVolume);
+      config.put("showLibraryAlias", showLibraryAlias);
+      config.put("sortableLocation", false);
+      config.put("propagate", false);
+      config.put("isLibraryReceipt", true);
+    }
+
   }
 
   private final BulkPropagateTableBackend<Library, DilutionDto> dilutionBulkPropagateBackend = new BulkPropagateTableBackend<Library, DilutionDto>(

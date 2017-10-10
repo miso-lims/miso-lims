@@ -48,6 +48,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -82,6 +83,8 @@ public class LibraryRestController extends RestController {
 
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private SampleController sampleController;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -119,6 +122,10 @@ public class LibraryRestController extends RestController {
     Long id = null;
     try {
       Library library = Dtos.to(libraryDto);
+      if (libraryDto.getSample() != null) {
+        Sample sample = sampleController.buildHierarchy(libraryDto.getSample());
+        library.setSample(sample);
+      }
       id = libraryService.create(library);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating library. ", e);

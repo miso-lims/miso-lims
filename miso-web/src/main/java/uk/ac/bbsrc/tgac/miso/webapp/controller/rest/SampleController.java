@@ -158,26 +158,7 @@ public class SampleController extends RestController {
     }
     Long id = null;
     try {
-      if (sampleDto instanceof SampleAliquotDto) {
-        SampleAliquotDto dto = (SampleAliquotDto) sampleDto;
-        dto.setStockClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
-            SampleStock.CATEGORY_NAME));
-        // infer grandparent tissue class
-        dto.setParentTissueSampleClassId(inferIntermediateSampleClassId(dto, dto.getStockClassId(),
-            SampleStock.CATEGORY_NAME, SampleTissue.CATEGORY_NAME));
-      } else if (sampleDto instanceof SampleStockDto) {
-        DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
-        dto.setParentTissueSampleClassId(
-            inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleStock.CATEGORY_NAME,
-                SampleTissue.CATEGORY_NAME));
-      } else if (sampleDto instanceof SampleTissueProcessingDto) {
-        DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
-        dto.setParentTissueSampleClassId(
-            inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleTissueProcessing.CATEGORY_NAME,
-                SampleTissue.CATEGORY_NAME));
-
-      }
-      Sample sample = Dtos.to(sampleDto);
+      Sample sample = buildHierarchy(sampleDto);
       id = sampleService.create(sample);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating sample. ", e);
@@ -193,6 +174,35 @@ public class SampleController extends RestController {
     created.setUrl(uriComponents.toUri().toString());
     response.setHeader("Location", uriComponents.toUri().toString());
     return created;
+  }
+
+  /**
+   * Converts the DTO to a Sample, complete with parents. Parent SampleClasses are inferred where necessary and possible
+   * 
+   * @param sampleDto
+   * @return
+   */
+  public Sample buildHierarchy(SampleDto sampleDto) {
+    if (sampleDto instanceof SampleAliquotDto) {
+      SampleAliquotDto dto = (SampleAliquotDto) sampleDto;
+      dto.setStockClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
+          SampleStock.CATEGORY_NAME));
+      // infer grandparent tissue class
+      dto.setParentTissueSampleClassId(inferIntermediateSampleClassId(dto, dto.getStockClassId(),
+          SampleStock.CATEGORY_NAME, SampleTissue.CATEGORY_NAME));
+    } else if (sampleDto instanceof SampleStockDto) {
+      DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
+      dto.setParentTissueSampleClassId(
+          inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleStock.CATEGORY_NAME,
+              SampleTissue.CATEGORY_NAME));
+    } else if (sampleDto instanceof SampleTissueProcessingDto) {
+      DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
+      dto.setParentTissueSampleClassId(
+          inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleTissueProcessing.CATEGORY_NAME,
+              SampleTissue.CATEGORY_NAME));
+
+    }
+    return Dtos.to(sampleDto);
   }
 
   private Long inferIntermediateSampleClassId(DetailedSampleDto dto, Long childClassId,

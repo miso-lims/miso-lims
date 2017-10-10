@@ -48,6 +48,7 @@ public class LibraryDto implements WritableUrls {
   private List<QcDto> qcs;
   private Integer dnaSize;
   private Long kitDescriptorId;
+  private SampleDto sample;
 
   public String getAlias() {
     return alias;
@@ -312,6 +313,14 @@ public class LibraryDto implements WritableUrls {
 
   public void setKitDescriptorId(Long kitDescriptorId) {
     this.kitDescriptorId = kitDescriptorId;
+  }
+
+  public SampleDto getSample() {
+    return sample;
+  }
+
+  public void setSample(SampleDto sample) {
+    this.sample = sample;
   }
 
   @Override
