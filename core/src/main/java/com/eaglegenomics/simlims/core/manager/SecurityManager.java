@@ -2,6 +2,7 @@ package com.eaglegenomics.simlims.core.manager;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.SecurityProfile;
@@ -53,4 +54,9 @@ public interface SecurityManager {
   public boolean isPasswordMutable();
 
   public boolean canCreateNewUser();
+
+  public Map<String, Integer> getUserColumnSizes() throws IOException;
+
+  public Map<String, Integer> getGroupColumnSizes() throws IOException;
+
 }

@@ -57,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationData;
 import uk.ac.bbsrc.tgac.miso.migration.MigrationProperties;
@@ -199,7 +200,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
           project.getStudies().add(study);
         }
 
-        project.setId(serviceManager.getRequestManager().saveProject(project));
+        project.setId(serviceManager.getProjectService().saveProject(project));
 
         for (Study study : project.getStudies()) {
           study.setProject(project);
@@ -232,17 +233,20 @@ public class DefaultMigrationTarget implements MigrationTarget {
     if (isDetailedSample(sample)) {
       DetailedSample detailed = (DetailedSample) sample;
       if (hasUnsavedParent(detailed)) {
-        if (detailed.getParent().getSampleClass() == null && detailed.getParent().getPreMigrationId() != null) {
-          Long preMigrationId = detailed.getParent().getPreMigrationId();
+        if (detailed.getParent().getPreMigrationId() != null) {
           // find previously-migrated parent
-          detailed
-              .setParent((DetailedSample) serviceManager.getSampleDao().getByPreMigrationId(detailed.getParent().getPreMigrationId()));
-          if (detailed.getParent() == null) {
-            throw new IOException("No Sample found with pre-migration ID " + preMigrationId);
+          Long preMigrationId = detailed.getParent().getPreMigrationId();
+          DetailedSample parent = (DetailedSample) serviceManager.getSampleDao().getByPreMigrationId(preMigrationId);
+          if (parent != null) {
+            detailed.setParent(parent);
           }
-        } else {
+        }
+        if (hasUnsavedParent(detailed)) {
           // save parent first to generate ID
           saveSample(((DetailedSample) sample).getParent());
+        }
+        if (detailed.getParent() == null) {
+          throw new IOException("Failed to find or save parent for sample " + sample.getAlias());
         }
       }
     }
@@ -259,15 +263,13 @@ public class DefaultMigrationTarget implements MigrationTarget {
         // New subproject
         createSubproject(detailed.getSubproject(), detailed.getProject());
       }
+
       if (sample.getAlias() != null) {
-        // Check for duplicate alias
-        List<Sample> dupes = serviceManager.getSampleService().getByAlias(sample.getAlias());
-        if (!dupes.isEmpty()) {
-          for (Sample dupe : dupes) {
-            ((DetailedSample) dupe).setNonStandardAlias(true);
-            serviceManager.getSampleService().update(dupe);
-          }
-          detailed.setNonStandardAlias(true);
+        allowDuplicateAliases(detailed);
+      } else if (detailed.isSynthetic()) {
+        if (mergeIfAppropriate(detailed)) {
+          log.debug("Merged ghost sample with existing: " + sample.getAlias());
+          return;
         }
       }
       if (isIdentitySample(detailed)) updateSampleNumberPerProject(detailed);
@@ -283,6 +285,70 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     if (sample.getAlias() == null) throw new IllegalStateException("Sample saved with null alias");
     log.debug("Saved sample " + sample.getAlias());
+  }
+
+  private void allowDuplicateAliases(DetailedSample sample) throws IOException {
+    // Check for duplicate alias
+    List<Sample> dupes = serviceManager.getSampleService().getByAlias(sample.getAlias());
+    if (!dupes.isEmpty()) {
+      for (Sample dupe : dupes) {
+        ((DetailedSample) dupe).setNonStandardAlias(true);
+        serviceManager.getSampleService().update(dupe);
+      }
+      sample.setNonStandardAlias(true);
+    }
+  }
+
+  /**
+   * Merge an incoming ghost sample with existing ghost sample if appropriate. If it is merged, its ID will be set to match the
+   * existing sample
+   * 
+   * @param sample incoming sample
+   * @return true if the incoming sample was merged with an existing sample (its ID will be set as well)
+   * @throws IOException
+   * @see #areMergeable
+   */
+  private boolean mergeIfAppropriate(DetailedSample sample) throws IOException {
+    try {
+      sample.setAlias(serviceManager.getNamingScheme().generateSampleAlias(sample));
+    } catch (MisoNamingException e) {
+      throw new IOException("Sample alias generation failed", e);
+    }
+    List<Sample> dupes = serviceManager.getSampleService().getByAlias(sample.getAlias());
+    if (dupes.size() == 1) {
+      DetailedSample dupe = (DetailedSample) dupes.get(0);
+      if (areMergeable(dupe, sample)) {
+        sample.setId(dupe.getId());
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Check whether an incoming sample should be merged with an existing sample. Conditions:
+   * <ul>
+   * <li>both ghost samples (synthetic)</li>
+   * <li>same parent sample</li>
+   * <li>same SampleClass</li>
+   * <li>same groupId</li>
+   * </ul>
+   * 
+   * @param s1
+   * @param s2
+   * @return true if the samples should be merged; false otherwise
+   */
+  private boolean areMergeable(DetailedSample s1, DetailedSample s2) {
+    if (!s1.isSynthetic() || !s2.isSynthetic()) return false;
+    if (s1.getParent() == null || s2.getParent() == null) return false;
+    if (s1.getParent().getId() != s2.getParent().getId()) return false;
+    if (!s1.getSampleClass().getAlias().equals(s2.getSampleClass().getAlias())) return false;
+    if (s1.getGroupId() == null) {
+      if (s2.getGroupId() != null) return false;
+    } else {
+      if (!s1.getGroupId().equals(s2.getGroupId())) return false;
+    }
+    return true;
   }
 
   private void updateSampleNumberPerProject(DetailedSample sample) throws IOException {
@@ -767,7 +833,7 @@ public class DefaultMigrationTarget implements MigrationTarget {
     log.debug("Merging box " + from.getAlias() + " with existing box");
     assertBoxPropertiesMatch(from, to);
     // Because we're already inside the session at this point, the original object must be evicted
-    // to allow changes to be observed and changeLogged in the Service/RequestManager layer
+    // to allow changes to be observed and changeLogged in the Service layer
     Hibernate.initialize(to.getBoxables());
     sessionFactory.getCurrentSession().evict(to);
     for (Entry<String, BoxableView> entry : from.getBoxables().entrySet()) {

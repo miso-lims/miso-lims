@@ -80,7 +80,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingParametersDao;
@@ -94,6 +93,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
@@ -110,7 +110,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   protected static final Logger log = LoggerFactory.getLogger(LimsBindingInitializer.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
 
   @Autowired
   private SecurityManager securityManager;
@@ -310,14 +310,14 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
 
   /**
-   * Sets the requestManager of this LimsBindingInitializer object.
+   * Sets the projectService of this LimsBindingInitializer object.
    * 
-   * @param requestManager
-   *          requestManager.
+   * @param projectService
+   *          projectService.
    */
-  public void setRequestManager(RequestManager requestManager) {
-    assert (requestManager != null);
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    assert (projectService != null);
+    this.projectService = projectService;
   }
 
   /**
@@ -374,7 +374,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     new BindingConverterByPrefixedId<Project>(Project.class, Project.PREFIX) {
       @Override
       public Project resolveById(long id) throws Exception {
-        return requestManager.getProjectById(id);
+        return projectService.getProjectById(id);
       }
     }.register(binder);
 

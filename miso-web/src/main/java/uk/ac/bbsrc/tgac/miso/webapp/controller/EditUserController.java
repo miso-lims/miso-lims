@@ -53,7 +53,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
 
@@ -68,13 +67,6 @@ public class EditUserController {
   @Autowired
   private PasswordCodecService passwordCodecService;
 
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -85,7 +77,7 @@ public class EditUserController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getUserColumnSizes();
+    return securityManager.getUserColumnSizes();
   }
 
   @ModelAttribute("groups")

@@ -49,16 +49,6 @@
         </div>
       </sec:authorize>
 
-      <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_SUBMITTER')">
-        <div class="portlet">
-          <div class="portlet-header">Submissions</div>
-          <div class="portlet-content">
-            <a href="<c:url value='/miso/submission/new'/>">Prepare new Submission</a><br/>
-            <a href="<c:url value='/miso/submissions'/>">List Submissions</a>
-          </div>
-        </div>
-      </sec:authorize>
-
       <div class="portlet">
         <div class="portlet-header">Reporting</div>
         <div class="portlet-content">

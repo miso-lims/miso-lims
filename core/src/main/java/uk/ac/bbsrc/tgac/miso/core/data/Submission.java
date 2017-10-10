@@ -25,72 +25,151 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
-/**
- * Created by IntelliJ IDEA. User: davey Date: 10-Feb-2010 Time: 09:43:30
- */
-public interface Submission extends Nameable, Comparable<Submission>, Serializable {
+@Entity
+@Table(name = "Submission")
+public class Submission implements Nameable, Comparable<Submission>, Serializable
+{
 
   public static final Long UNSAVED_ID = 0L;
 
-  public void setId(long id);
+  private static final long serialVersionUID = 1L;
 
-  public void setName(String name);
+  private String accession;
+  private String alias;
+  private boolean completed;
 
-  public String getAlias();
+  @Temporal(TemporalType.DATE)
+  private Date creationDate;
 
-  public void setAlias(String alias);
+  private String description;
 
-  public String getAccession();
+  @ManyToMany(targetEntity = Experiment.class)
+  @JoinTable(name = "Submission_Experiment", joinColumns = {
+      @JoinColumn(name = "submission_submissionId") }, inverseJoinColumns = {
+          @JoinColumn(name = "experiments_experimentId") })
+  private Set<Experiment> experiments = new HashSet<>();
 
-  public void setAccession(String accession);
+  private String name;
 
-  public String getDescription();
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long submissionId = UNSAVED_ID;
 
-  public void setDescription(String description);
+  @Temporal(TemporalType.DATE)
+  private Date submittedDate;
 
-  public String getTitle();
+  private String title;
+  private boolean verified;
 
-  public void setTitle(String title);
+  @Override
+  public int compareTo(Submission t) {
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
+    return 0;
+  }
 
-  public Date getCreationDate();
+  public String getAccession() {
+    return accession;
+  }
 
-  public void setCreationDate(Date creationDate);
+  public String getAlias() {
+    return alias;
+  }
 
-  public Date getSubmissionDate();
+  public Date getCreationDate() {
+    return creationDate;
+  }
 
-  public void setSubmissionDate(Date submissionDate);
+  public String getDescription() {
+    return description;
+  }
 
-  public boolean isVerified();
+  public Set<Experiment> getExperiments() {
+    return experiments;
+  }
 
-  public void setVerified(boolean verified);
+  @Override
+  public long getId() {
+    return submissionId;
+  }
 
-  public boolean isCompleted();
+  @Override
+  public String getName() {
+    return name;
+  }
 
-  public void setCompleted(boolean completed);
+  public Date getSubmissionDate() {
+    return submittedDate;
+  }
 
-  public SubmissionActionType getSubmissionActionType();
+  public String getTitle() {
+    return title;
+  }
 
-  public void setSubmissionActionType(SubmissionActionType submissionActionType);
+  public boolean isCompleted() {
+    return completed;
+  }
 
-  Set<Sample> getSamples();
+  public boolean isVerified() {
+    return verified;
+  }
 
-  void setSamples(Set<Sample> samples);
+  public void setAccession(String accession) {
+    this.accession = accession;
+  }
 
-  Set<Study> getStudies();
+  public void setAlias(String alias) {
+    this.alias = alias;
+  }
 
-  void setStudies(Set<Study> studies);
+  public void setCompleted(boolean completed) {
+    this.completed = completed;
+  }
 
-  Set<Experiment> getExperiments();
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
+  }
 
-  void setExperiments(Set<Experiment> experiments);
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-  Map<LibraryDilution, Partition> getDilutions();
 
-  void setDilutions(Map<LibraryDilution, Partition> dilutions);
+  public void setExperiments(Set<Experiment> experiments) {
+    this.experiments = experiments;
+  }
+
+  public void setId(long id) {
+    this.submissionId = id;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setSubmissionDate(Date submissionDate) {
+    this.submittedDate = submissionDate;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public void setVerified(boolean verified) {
+    this.verified = verified;
+  }
 }

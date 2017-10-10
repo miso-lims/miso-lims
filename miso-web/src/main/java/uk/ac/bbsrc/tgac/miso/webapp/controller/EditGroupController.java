@@ -47,8 +47,6 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
 @Controller
 @SessionAttributes("user")
 public class EditGroupController {
@@ -56,13 +54,6 @@ public class EditGroupController {
 
   @Autowired
   private SecurityManager securityManager;
-  
-  @Autowired
-  private RequestManager requestManager;
-  
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -84,7 +75,7 @@ public class EditGroupController {
   
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return requestManager.getGroupColumnSizes();
+    return securityManager.getGroupColumnSizes();
   }
 
   @RequestMapping(value = "/admin/group/new", method = RequestMethod.GET)

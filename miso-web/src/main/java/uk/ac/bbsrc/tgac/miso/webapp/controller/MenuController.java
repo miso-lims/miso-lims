@@ -66,6 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
@@ -322,6 +323,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "boxUses", boxService.listUses(), Function.identity());
     createArray(mapper, baseUri, node, "studyTypes", studyService.listTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
+    createArray(mapper, baseUri, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
 
     Collection<IndexFamily> indexFamilies = indexService.getIndexFamilies();
     indexFamilies.add(IndexFamily.NULL);
@@ -340,6 +342,7 @@ public class MenuController implements ServletContextAware {
       dto.put("libraryConcentrationUnits", platformType.getLibraryConcentrationUnits());
       dto.put("active", activePlatformTypes.contains(platformType));
       dto.put("partitionName", platformType.getPartitionName());
+      dto.put("pluralPartitionName", platformType.getPluralPartitionName());
     }
     ArrayNode sampleTypes = node.putArray("sampleTypes");
     for (String sampleType : sampleService.listSampleTypes()) {

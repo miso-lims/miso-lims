@@ -1,3 +1,29 @@
+# 0.2.91
+
+Changes:
+
+ * Improved submission creation
+ * Wait for all Illumina files to be written before marking Run completed
+ * Added Pinery queries as stored procedures
+ * Visually indicate when multiple Identity options are available in the Create Samples table
+ * Improved Run/Container/Pool changelogs
+ * Hid Analysis and Reports tabs
+ * Re-worked experiment design
+
+Notes:
+
+  * This release changes the experiments to be easier and more SRA-compliant. If you have
+    multiplexed pools, migration of experiments may fail. In this case, remove the affected
+    experiments if they are not part of an SRA submission. If you have no SRA submissions,
+    erase all experiments before migration:
+
+```
+DELETE FROM ExperimentChangeLog;
+DELETE FROM Experiment_Kit;
+DELETE FROM Experiment_Run;
+DELETE FROM Experiment;
+```
+
 # 0.2.90
 
 Changes:

@@ -40,7 +40,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -66,7 +65,7 @@ public class HibernateSubmissionDao implements SubmissionStore {
 
   @Override
   public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(SubmissionImpl.class).setProjection(Projections.rowCount()).uniqueResult();
+    long c = (Long) currentSession().createCriteria(Submission.class).setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
   }
 
@@ -76,7 +75,7 @@ public class HibernateSubmissionDao implements SubmissionStore {
 
   @Override
   public Submission get(long id) throws IOException {
-    return (Submission) currentSession().get(SubmissionImpl.class, id);
+    return (Submission) currentSession().get(Submission.class, id);
   }
 
   public JdbcTemplate getJdbcTemplate() {
@@ -94,7 +93,7 @@ public class HibernateSubmissionDao implements SubmissionStore {
 
   @Override
   public Collection<Submission> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(SubmissionImpl.class);
+    Criteria criteria = currentSession().createCriteria(Submission.class);
     @SuppressWarnings("unchecked")
     List<Submission> results = criteria.list();
     return results;
@@ -102,7 +101,7 @@ public class HibernateSubmissionDao implements SubmissionStore {
 
   @Override
   public long save(Submission submission) throws IOException {
-    if (submission.getId() == SubmissionImpl.UNSAVED_ID) {
+    if (submission.getId() == Submission.UNSAVED_ID) {
       return (Long) currentSession().save(submission);
     } else {
       currentSession().update(submission);

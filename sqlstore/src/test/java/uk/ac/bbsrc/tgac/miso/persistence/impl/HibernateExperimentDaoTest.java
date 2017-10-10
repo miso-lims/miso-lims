@@ -26,7 +26,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -70,7 +69,7 @@ public class HibernateExperimentDaoTest extends AbstractDAOTest {
    */
   @Test
   public void testSave() throws IOException, MisoNamingException {
-    Experiment experiment = new ExperimentImpl();
+    Experiment experiment = new Experiment();
     experiment.setName("TEMPORARY_XXX");
     experiment.setPlatform(new Platform());
     experiment.setStudy(new StudyImpl());
@@ -129,7 +128,7 @@ public class HibernateExperimentDaoTest extends AbstractDAOTest {
   @Test
   public void testListByStudyId() {
     List<Experiment> experiments = dao.listByStudyId(1L);
-    assertEquals(32, experiments.size());
+    assertEquals(25, experiments.size());
   }
 
   /**
@@ -156,5 +155,25 @@ public class HibernateExperimentDaoTest extends AbstractDAOTest {
     Experiment experiment = dao.get(1L);
     dao.remove(experiment);
     assertEquals(31, dao.listAll().size());
+  }
+
+  @Test
+  public void testlistByLibraryExists() throws IOException {
+    assertEquals(4, dao.listByLibrary(10).size());
+  }
+
+  @Test
+  public void testlistByLibraryMissing() throws IOException {
+    assertEquals(0, dao.listByLibrary(1000).size());
+  }
+
+  @Test
+  public void testlistByRunExists() throws IOException {
+    assertEquals(2, dao.listByRun(1).size());
+  }
+
+  @Test
+  public void testlistByRunMissing() throws IOException {
+    assertEquals(0, dao.listByRun(2).size());
   }
 }

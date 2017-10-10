@@ -89,7 +89,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -105,6 +104,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignService;
@@ -170,6 +170,8 @@ public class EditLibraryController {
   private PoolService poolService;
   @Autowired
   private LibraryDilutionService dilutionService;
+  @Autowired
+  private ExperimentService experimentService;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -595,6 +597,8 @@ public class EditLibraryController {
     ObjectNode config = mapper.createObjectNode();
     config.putPOJO("library", Dtos.asDto(library));
     model.put("libraryDilutionsConfig", mapper.writeValueAsString(config));
+    model.put("experiments", experimentService.listAllByLibraryId(library.getId()).stream().map(Dtos::asDto)
+        .collect(Collectors.toList()));
 
     populateDesigns(model,
         LimsUtils.isDetailedSample(library.getSample()) ? ((DetailedSample) library.getSample()).getSampleClass() : null);
@@ -748,7 +752,7 @@ public class EditLibraryController {
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("library") Library library, ModelMap model, SessionStatus session)
-      throws IOException, MalformedLibraryException {
+      throws IOException {
     try {
       if (library.getId() == AbstractLibrary.UNSAVED_ID) {
         libraryService.create(library);
@@ -768,7 +772,7 @@ public class EditLibraryController {
   }
 
   @RequestMapping(value = "/bulk/create", method = RequestMethod.POST)
-  public String processBulkSubmit(@RequestBody JSONArray librariesDtos) throws IOException, MalformedLibraryException {
+  public String processBulkSubmit(@RequestBody JSONArray librariesDtos) throws IOException {
     try {
       if (librariesDtos != null && librariesDtos.size() > 0) {
         List<Long> savedLibraryIds = new ArrayList<>();

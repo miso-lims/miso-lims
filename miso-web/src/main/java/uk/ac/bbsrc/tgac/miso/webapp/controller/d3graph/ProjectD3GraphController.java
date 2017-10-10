@@ -47,9 +47,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
@@ -66,7 +66,7 @@ public class ProjectD3GraphController {
   protected static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
@@ -82,7 +82,7 @@ public class ProjectD3GraphController {
   public @ResponseBody JSONObject d3graphRest(@PathVariable Long projectId) throws IOException {
 
     try {
-      Project p = requestManager.getProjectById(projectId);
+      Project p = projectService.getProjectById(projectId);
       JSONObject projectJSON = new JSONObject();
       projectJSON.put("name", p.getName());
       projectJSON.put("show", "PROJECT");
@@ -201,7 +201,7 @@ public class ProjectD3GraphController {
   @RequestMapping(method = RequestMethod.GET)
   public @ResponseBody JSONObject graphd3Rest() throws IOException {
     try {
-      Collection<Project> projects = requestManager.listAllProjects();
+      Collection<Project> projects = projectService.listAllProjects();
 
       JSONObject miso = new JSONObject();
       JSONArray projectsArray = new JSONArray();

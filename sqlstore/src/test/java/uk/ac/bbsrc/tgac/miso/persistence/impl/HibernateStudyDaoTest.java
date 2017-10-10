@@ -29,7 +29,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 
 public class HibernateStudyDaoTest extends AbstractDAOTest {
 
@@ -70,7 +69,7 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
   @Test
   public void testListAll() {
     List<Study> studies = dao.listAll();
-    assertEquals(4, studies.size());
+    assertEquals(6, studies.size());
   }
 
   @Test
@@ -82,7 +81,7 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
   @Test
   public void testListAllWithBiggerLimit() throws IOException {
     List<Study> studies = dao.listAllWithLimit(50L);
-    assertEquals(4, studies.size());
+    assertEquals(6, studies.size());
   }
 
   @Test
@@ -93,19 +92,19 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
 
   @Test
   public void testStudyCount() throws IOException {
-    assertEquals(4, dao.count());
+    assertEquals(6, dao.count());
   }
 
   @Test
   public void testListBySearchOICR() {
     List<Study> runs = dao.listBySearch("OICR");
-    assertEquals(2, runs.size());
+    assertEquals(3, runs.size());
   }
 
   @Test
   public void testListBySearchStu() {
     List<Study> runs = dao.listBySearch("STU");
-    assertEquals(4, runs.size());
+    assertEquals(6, runs.size());
   }
 
   @Test
@@ -159,10 +158,10 @@ public class HibernateStudyDaoTest extends AbstractDAOTest {
   @Test
   public void testRemove() throws Exception {
     int count = dao.count();
-    Study study = dao.get(2);
+    Study study = dao.get(6);
 
     assertTrue(dao.remove(study));
-    assertNull(dao.get(2));
+    assertNull(dao.get(6));
     assertEquals(count - 1, dao.count());
   }
 

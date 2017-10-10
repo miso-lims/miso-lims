@@ -45,7 +45,7 @@ public class SequencingParameters implements Serializable
   private Date lastUpdated;
   @Column(nullable = false)
   private String name;
-
+  @Column(nullable = false)
   private boolean paired;
 
   @Id
@@ -55,7 +55,7 @@ public class SequencingParameters implements Serializable
   @ManyToOne(targetEntity = Platform.class)
   @JoinColumn(name = "platformId")
   private Platform platform;
-
+  @Column(nullable = false)
   private int readLength;
 
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)

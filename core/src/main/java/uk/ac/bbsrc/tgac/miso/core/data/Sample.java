@@ -31,7 +31,6 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -176,10 +175,8 @@ public interface Sample
    * 
    * @param library
    *          of type Library
-   * @throws MalformedLibraryException
-   *           when the Library added is not valid
    */
-  public void addLibrary(Library library) throws MalformedLibraryException;
+  public void addLibrary(Library library);
 
   /**
    * Returns the libraries prepared from this Sample object.

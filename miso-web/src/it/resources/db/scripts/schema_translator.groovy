@@ -33,10 +33,8 @@ for (File file : productionSchemaDir.listFiles()) {
     Path srcPath = file.toPath()
     Path dstPath = Paths.get(testSchemaDir + file.getName().replaceFirst('\\.sql$', '.test.sql'))
     String text = new String(Files.readAllBytes(srcPath))
-    
-    String translated = text
      
-    Files.write(dstPath, translated.getBytes(), StandardOpenOption.CREATE)
+    Files.write(dstPath, text.getBytes(), StandardOpenOption.CREATE)
     println("Wrote translated schema file: " + dstPath.toAbsolutePath().toString())
   }
 }

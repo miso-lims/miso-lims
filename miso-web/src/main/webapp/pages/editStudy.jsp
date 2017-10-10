@@ -124,12 +124,12 @@
         <td><miso:select id="studyType" path="studyType" items="${studyTypes}" itemLabel="name" itemValue="id" /></td>
       </tr>
       <c:choose>
-        <c:when test="${!empty project and study.securityProfile.profileId eq project.securityProfile.profileId}">
+        <c:when test="${study.securityProfile.profileId eq study.project.securityProfile.profileId}">
           <tr>
             <td>Permissions</td>
             <td><i>Inherited from project </i><a
-                href='<c:url value="/miso/project/${project.id}"/>'>${project.name}</a>
-              <input type="hidden" value="${project.securityProfile.profileId}"
+                href='<c:url value="/miso/project/${project.id}"/>'>${study.project.name}</a>
+              <input type="hidden" value="${study.project.securityProfile.profileId}"
                      name="securityProfile" id="securityProfile"/>
             </td>
           </tr>
@@ -148,70 +148,11 @@
           Validate.attachParsley('#study-form');
         });
       </script>
-
-      <c:choose>
-        <c:when test="${study.id != 0}">
-          <h1>
-            <span id="totalCount">
-            </span>
-          </h1>
-          <ul class="sddm">
-            <li>
-              <a onmouseover="mopen('expmenu')" onmouseout="mclosetime()">Options
-                <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-              </a>
-
-              <div id="expmenu"
-                   onmouseover="mcancelclosetime()"
-                   onmouseout="mclosetime()">
-                <a href='<c:url value="/miso/experiment/new/${study.id}"/>' class="add">Add new
-                  Experiment</a>
-              </div>
-            </li>
-          </ul>
-          <div style="clear:both">
-            <table class="list" id="table">
-              <thead>
-              <tr>
-                <th>Experiment Name</th>
-                <th>Experiment Alias</th>
-                <th>Description</th>
-                <th>Platform</th>
-              </tr>
-              </thead>
-              <tbody>
-              <c:forEach items="${study.experiments}" var="experiment">
-                <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                  <td><b><a href='<c:url value="/miso/experiment/${experiment.id}"/>'>${experiment.name}</a></b></td>
-                  <td><a href='<c:url value="/miso/experiment/${experiment.id}"/>'>${experiment.alias}</a></td>
-                  <td>${experiment.description}</td>
-                  <td>${experiment.platform.platformType.key}
-                    - ${experiment.platform.instrumentModel}</td>
-                </tr>
-              </c:forEach>
-              </tbody>
-            </table>
-          </div>
-          <script type="text/javascript">
-            jQuery(document).ready(function () {
-              jQuery("#table").tablesorter({
-                headers: {
-                  4: {
-                    sorter: false
-                  }
-                }
-              });
-            });
-            jQuery(document).ready(function () {
-              writeTotalNo();
-            });
-            function writeTotalNo() {
-              jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Experiments");
-            }
-          </script>
-        </c:when>
-      </c:choose>
     </form:form>
+
+    <c:if test="${study.id != 0}">
+        <miso:list-section id="list_experiments" alwaysShow="true" name="Experiments" target="experiment" items="${experiments}" config="{ studyId : ${study.id} }"/>
+    </c:if>
     <miso:changelog item="${study}"/>
   </div>
 </div>

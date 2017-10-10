@@ -25,9 +25,6 @@
 <link href="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.css'/>" rel="stylesheet" type="text/css" />
 <script src="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/handsontable/dist/moment/moment.js'/>" type="text/javascript"></script>
-
-<script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
-
 <script src="<c:url value='/scripts/handsontable/dist/handsontable.full.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/handsontable_renderers.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" media="screen" href="<c:url value='/scripts/handsontable/dist/handsontable.full.css'/>">

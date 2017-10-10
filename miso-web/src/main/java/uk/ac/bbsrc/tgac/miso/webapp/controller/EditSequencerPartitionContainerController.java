@@ -52,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
@@ -78,7 +77,7 @@ public class EditSequencerPartitionContainerController {
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer container, ModelMap model, SessionStatus session)
-      throws IOException, MalformedRunException {
+      throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!container.userCanWrite(user)) {
@@ -154,7 +153,6 @@ public class EditSequencerPartitionContainerController {
         kitService.listKitDescriptorsByType(KitType.MULTIPLEXING).stream()
             .filter(descriptor -> descriptor.getPlatformType() == container.getPlatform().getPlatformType())
             .sorted(KitDescriptor::sortByName).collect(Collectors.toList()));
-
     return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
   }
 }

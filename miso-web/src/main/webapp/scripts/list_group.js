@@ -43,7 +43,7 @@ ListTarget.group = {
   },
   createColumns: function(config, projectId) {
     return [{
-      "sTitle": "Name",
+      "sTitle": "Group Name",
       "mData": "name",
       "include": true,
       "iSortPriority": 1,

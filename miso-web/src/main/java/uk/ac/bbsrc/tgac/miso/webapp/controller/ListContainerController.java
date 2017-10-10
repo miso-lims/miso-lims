@@ -32,20 +32,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
 public class ListContainerController {
   @Autowired
-  private RequestManager requestManager;
+  private SequencerReferenceService sequencerService;
 
   @ModelAttribute("title")
   public String title() {
     return "Containers";
   }
+
   @RequestMapping("/containers")
   public ModelAndView listContainers(ModelMap model) throws IOException {
-    return TabbedListItemsPage.createForPlatformType("container", requestManager).list(model);
+    return TabbedListItemsPage.createForPlatformType("container", sequencerService).list(model);
   }
 }

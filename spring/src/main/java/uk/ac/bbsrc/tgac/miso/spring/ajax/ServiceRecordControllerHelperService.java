@@ -19,7 +19,6 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 
 @Ajaxified
@@ -31,16 +30,10 @@ public class ServiceRecordControllerHelperService {
   @Autowired
   private SequencerReferenceService sequencerReferenceService;
   @Autowired
-  private RequestManager requestManager;
-  @Autowired
   private MisoFilesManager misoFileManager;
   
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
   }
   
   public void setMisoFileManager(MisoFilesManager misoFileManager) {

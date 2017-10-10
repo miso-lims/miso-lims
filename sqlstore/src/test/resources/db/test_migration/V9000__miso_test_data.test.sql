@@ -160,7 +160,9 @@ INSERT INTO `Study`(`studyId`, `name`, `description`, `accession`, `securityProf
 VALUES (1,'STU1','Test study1',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study1',1),
 (2,'STU2','Test study2',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study2',1),
 (3,'STU3','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study3',1),
-(4,'STU4','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study4',1);
+(4,'STU4','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study4',1),
+(5,'STU5','OICR',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study5',1),
+(6,'STU6','delete me',NULL,1,1,(SELECT typeId FROM StudyType WHERE name = 'Other'),'Test Study6',1);
 
 DELETE FROM `Experiment`;
 
@@ -381,7 +383,7 @@ VALUES (1,2),
 (1,1),
 (2,3);
 
-INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `securityProfile_profileId`, `study_studyId`, `alias`, `platform_platformId`,`lastModifier`, `pool_poolId`) 
+INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `securityProfile_profileId`, `study_studyId`, `alias`, `platform_platformId`,`lastModifier`, `library_libraryId`) 
 VALUES
 (1,'EXP1','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_1',16,1, 1),
 (2,'EXP2','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_2',16,1, 2),
@@ -408,13 +410,13 @@ VALUES
 (23,'EXP23','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_23',16,1, 8),
 (24,'EXP24','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_24',16,1, 8),
 (25,'EXP25','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_25',16,1, 10),
-(26,'EXP26','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_26',16,1, 10),
-(27,'EXP27','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_27',16,1, 10),
-(28,'EXP28','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_28',16,1, 10),
-(29,'EXP29','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_29',16,1, 9),
-(30,'EXP30','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_30',16,1, 9),
-(31,'EXP31','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_31',16,1, 9),
-(32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_32',16,1, 9);
+(26,'EXP26','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,2,'EXP_AUTOGEN_STU1_Other_26',16,1, 10),
+(27,'EXP27','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,3,'EXP_AUTOGEN_STU1_Other_27',16,1, 10),
+(28,'EXP28','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,4,'EXP_AUTOGEN_STU1_Other_28',16,1, 10),
+(29,'EXP29','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,2,'EXP_AUTOGEN_STU1_Other_29',16,1, 9),
+(30,'EXP30','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,3,'EXP_AUTOGEN_STU1_Other_30',16,1, 9),
+(31,'EXP31','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,4,'EXP_AUTOGEN_STU1_Other_31',16,1, 9),
+(32,'EXP32','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,5,'EXP_AUTOGEN_STU1_Other_32',16,1, 9);
 
 DELETE FROM `PoolQC`;
 INSERT INTO `PoolQC`(`qcId`, `pool_poolId`, `creator`, `date`, `type`, `results`)
@@ -491,6 +493,11 @@ VALUES (1,1),(2,2),(3,3),(4,4);
 
 INSERT INTO Run_Partition_QC(runId, partitionId, partitionQcTypeId, notes) VALUES (1, 1, 1, 'it is written');
 
+INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId)
+VALUES
+(1, 1, 1),
+(2, 1, 1);
+
 DELETE FROM `BoxSize`;
 INSERT INTO `BoxSize` (`boxSizeId`, `rows`, `columns`, `scannable`)
 VALUES
@@ -527,11 +534,6 @@ VALUES
 (1, '2012-04-20', '2012-04-20', 0, 'test description 1', 'name 1', 'title 1', 'accession 1', 'alias 1', 0),
 (2, '2012-04-20', '2012-04-20', 1, 'test description 2', 'name 2', 'title 2', 'accession 2', 'alias 2', 1),
 (3, '2012-04-20', '2012-04-20', 0, 'test description 3', 'name 3', 'title 3', 'accession 3', 'alias 3', 0);
-
-DELETE FROM Submission_Partition_Dilution;
-INSERT INTO Submission_Partition_Dilution(submission_submissionId, partition_partitionId, dilution_dilutionId) 
-VALUES
-(3, 1, 1);
 
 DELETE FROM Submission_Experiment;
 INSERT INTO `Submission_Experiment` (`submission_submissionId`, `experiments_experimentId`)

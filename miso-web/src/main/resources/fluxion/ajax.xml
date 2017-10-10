@@ -45,17 +45,11 @@
   <bean id="poolControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolControllerHelperService">
     </bean>
 
-  <bean id="printerControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PrinterControllerHelperService">
-    </bean>
-
   <bean id="projectControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectControllerHelperService">
     <property name="issueTrackerManager" ref="issueTrackerManager" />
   </bean>
 
   <bean id="sampleControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.SampleControllerHelperService">
-  </bean>
-
-  <bean id="submissionControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.SubmissionControllerHelperService">
   </bean>
 
   <bean id="runControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.RunControllerHelperService">
@@ -67,28 +61,13 @@
   <bean id="libraryControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.LibraryControllerHelperService">
   </bean>
 
-  <bean id="projectPreview" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectPreview">
-  </bean>
-
   <bean id="dashboard" class="uk.ac.bbsrc.tgac.miso.spring.ajax.DashboardHelperService">
   </bean>
-
-  <bean id="poolSearchService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolSearchService">
-    </bean>
-
-  <bean id="experimentSearchService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentSearchService">
-    </bean>
 
   <bean id="flexReportingControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.FlexReportingControllerHelperService">
   </bean>
 
   <bean id="projectsTreeControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectTreeControllerHelperService">
-  </bean>
-
-  <bean id="experimentControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentControllerHelperService">
-  </bean>
-
-  <bean id="experimentWizardControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentWizardControllerHelperService">
   </bean>
 
   <bean id="taskControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.TaskControllerHelperService">

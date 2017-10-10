@@ -128,12 +128,9 @@ public class DefaultContainerService
         if (sourcePartition.getId() == managedPartition.getId()) {
           Pool sourcePool = sourcePartition.getPool();
           Pool managedPool = managedPartition.getPool();
-          if (sourcePool == null && managedPool == null) continue;
-          if (sourcePool == null && managedPool != null) {
+          if (sourcePool == null) {
             managedPartition.setPool(null);
-          } else if (sourcePool != null && managedPool == null) {
-            managedPartition.setPool(poolService.get(sourcePool.getId()));
-          } else if (sourcePool.getId() != managedPool.getId()) {
+          } else if (managedPool == null || sourcePool.getId() != managedPool.getId()) {
             managedPartition.setPool(poolService.get(sourcePool.getId()));
           }
           break;

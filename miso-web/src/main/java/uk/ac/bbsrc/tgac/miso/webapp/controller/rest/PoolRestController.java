@@ -26,8 +26,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,11 +50,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -66,8 +65,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
-import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
-import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderCompletionService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
@@ -121,9 +119,7 @@ public class PoolRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
   @Autowired
-  private LibraryDilutionService dilutionService;
-  @Autowired
-  private PlatformService platformService;
+  private ExperimentService experimentService;
   @Autowired
   private PoolService poolService;
   @Autowired
@@ -132,14 +128,6 @@ public class PoolRestController extends RestController {
   private PoolableElementViewService poolableElementViewService;
   @Autowired
   private PoolOrderCompletionService poolOrderCompletionService;
-
-  public void setDilutionService(LibraryDilutionService dilutionService) {
-    this.dilutionService = dilutionService;
-  }
-
-  public void setPlatformService(PlatformService platformService) {
-    this.platformService = platformService;
-  }
 
   @RequestMapping(value = "{poolId}", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody PoolDto getPoolById(@PathVariable Long poolId) throws IOException {
@@ -183,9 +171,31 @@ public class PoolRestController extends RestController {
   @ResponseStatus(code = HttpStatus.OK)
   public void assignPool(@PathVariable Long poolId, @RequestBody List<Long> partitionIds) throws IOException {
     Pool pool = poolId == 0 ? null : poolService.get(poolId);
+
+    // Determine if this pool transition is allowed for this experiment. If removing a pool, it strictly isn't. If the new pool contains the
+    // same library as the experiment, it's fine.
+    Predicate<Experiment> isTransitionValid = pool == null ? experiment -> false
+        : experiment -> pool.getPoolableElementViews().stream().map(PoolableElementView::getLibraryId)
+            .anyMatch(id -> id == experiment.getLibrary().getId());
+
     partitionIds.stream()//
         .map(WhineyFunction.rethrow(containerService::getPartition))//
-        .peek(partition -> {
+        .peek(WhineyConsumer.rethrow(partition -> {
+          for (Run run : partition.getSequencerPartitionContainer().getRuns()) {
+            // Check that we aren't going to hose any existing experiments through this reassignment
+            boolean relatedExperimentsOkay = experimentService.listAllByRunId(run.getId()).stream()//
+                .flatMap(experiment -> experiment.getRunPartitions().stream())//
+                .filter(rp -> rp.getRun().getId() == run.getId() && rp.getPartition().getId() == partition.getId())//
+                .map(RunPartition::getExperiment)//
+                .allMatch(isTransitionValid);
+            if (!relatedExperimentsOkay) {
+              throw new RestException(
+                  String.format("%s %d is used in an experiment.",
+                      partition.getSequencerPartitionContainer().getPlatform().getPlatformType().getPartitionName(),
+                      partition.getPartitionNumber()),
+                  Status.BAD_REQUEST);
+            }
+          }
           if (pool != null && partition.getSequencerPartitionContainer().getPlatform().getPlatformType() != pool.getPlatformType()) {
             throw new RestException(
                 String.format("%s %d in %s is not compatible with pool %s.",
@@ -194,7 +204,7 @@ public class PoolRestController extends RestController {
                 Status.BAD_REQUEST);
           }
           partition.setPool(pool);
-        })//
+        }))//
         .forEach(WhineyConsumer.rethrow(containerService::update));
     if (pool != null) {
       pool.setReadyToRun(false);
@@ -241,42 +251,6 @@ public class PoolRestController extends RestController {
       poolDto.writeUrls(uriBuilder);
     }
     return poolDtos;
-  }
-
-  @RequestMapping(value = "/wizard/librarydilutions", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody JSONObject ldRest() throws IOException {
-    Collection<LibraryDilution> lds = dilutionService.list();
-
-    List<String> types = new ArrayList<>(platformService.listDistinctPlatformTypeNames());
-    Collections.sort(types);
-
-    JSONArray platformTypeArray = new JSONArray();
-    for (String type : types) {
-      platformTypeArray.add(type);
-    }
-
-    JSONObject ldJSON = new JSONObject();
-    JSONArray tableArray = new JSONArray();
-    for (LibraryDilution ld : lds) {
-      JSONArray rowArray = new JSONArray();
-      rowArray.add("");
-      rowArray.add(ld.getName());
-      rowArray.add("");
-      tableArray.add(rowArray);
-    }
-
-    ldJSON.put("aaData", tableArray);
-    return ldJSON;
-  }
-
-  @RequestMapping(value = "/wizard/platformtypes", method = RequestMethod.GET, produces = "application/json")
-  public @ResponseBody String platformTypesRest() throws IOException {
-    List<String> names = new ArrayList<>();
-    List<String> types = new ArrayList<>(platformService.listDistinctPlatformTypeNames());
-    for (String name : types) {
-      names.add("\"" + name + "\"");
-    }
-    return "[" + String.join(",", names) + "]";
   }
 
   @RequestMapping(value = "/picker/search")

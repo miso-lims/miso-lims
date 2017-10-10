@@ -30,7 +30,6 @@
 --%>
 <%@ include file="../header.jsp" %>
 <script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
@@ -469,6 +468,7 @@
   <miso:list-section id="list_dilution" name="Dilutions" target="dilution" items="${libraryDilutions}" config="${libraryDilutionsConfig}"/>
   <miso:list-section id="list_pool" name="Pools" target="pool" items="${libraryPools}"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${libraryRuns}"/>
+  <miso:list-section id="list_experiment" name="Experiments" target="experiment" items="${experiments}" config="{ libraryId: ${library.id} }"/>
   <miso:changelog item="${library}"/>
 </c:if>
 </div>

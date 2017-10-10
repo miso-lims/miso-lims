@@ -346,9 +346,11 @@ HotTarget.sample = (function() {
                         }
                         requestCounter++;
                         flat.potentialIdentities = potentialIdentities;
-                        setOptions({
-                          'source': identitiesSources
-                        });
+                        var cellOptions = {
+                          'source': identitiesSources,
+                          'renderer': (identitiesSources.length > 1 ? HotUtils.multipleOptionsRenderer : Handsontable.AutocompleteRenderer)
+                        };
+                        setOptions(cellOptions);
                       }
                     }).fail(function(response, textStatus, serverStatus) {
                   HotUtils.showServerErrors(response, serverStatus);

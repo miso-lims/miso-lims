@@ -1911,6 +1911,10 @@ button.disabled {
   background-color: #F5E5DA !important;
 }
 
+.handsontable td.multipleOptions {
+  background-color: #F0F0FF;
+}
+
 .datatable-scroll {
     overflow-x: auto;
     overflow-y: visible;

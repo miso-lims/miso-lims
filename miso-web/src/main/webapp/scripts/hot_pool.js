@@ -101,7 +101,7 @@ HotTarget.pool = {
               getLabel: Utils.array.getName
             }, {
               type: "int",
-              label: platformType.partitionName + " Count",
+              label: platformType.pluralPartitionName,
               property: "count",
               value: 1
             }], function(results) {

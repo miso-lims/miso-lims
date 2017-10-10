@@ -40,9 +40,6 @@
 <script src="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/handsontable/dist/moment/moment.js'/>" type="text/javascript"></script>
 
-<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
-
 <script src="<c:url value='/scripts/handsontable/dist/handsontable.full.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/handsontable_renderers.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" media="screen" href="/scripts/handsontable/dist/handsontable.full.css">

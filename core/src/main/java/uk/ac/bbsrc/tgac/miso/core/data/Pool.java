@@ -35,7 +35,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -95,28 +94,6 @@ public interface Pool
    * Returns the elements of this Pool object.
    */
   public Set<PoolableElementView> getPoolableElementViews();
-
-  /**
-   * Registers an Experiment to this Pool
-   * 
-   * @param experiment of type Experiment
-   * @throws MalformedExperimentException when
-   */
-  public void addExperiment(Experiment experiment) throws MalformedExperimentException;
-
-  /**
-   * Sets the experiments related to this Pool object.
-   * 
-   * @param experiments experiments.
-   */
-  public void setExperiments(Collection<Experiment> experiments);
-
-  /**
-   * Returns the experiments related to this Pool object.
-   * 
-   * @return Experiment experiment.
-   */
-  public Collection<Experiment> getExperiments();
 
   /**
    * Returns the concentration of this Pool object.

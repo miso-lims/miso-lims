@@ -39,11 +39,13 @@ public interface AbstractListPage {
     public static final String END_DATE = "End Date";
     public static final String ITEMS_CAPACITY = "Items/Capacity";
     public static final String SIZE = "Size";
+    public static final String KIT_NAME = "Kit Name";
     public static final String VERSION = "Version";
     public static final String MANUFACTURER = "Manufacturer";
     public static final String PART_NUMBER = "Part Number";
     public static final String STOCK_LEVEL = "Stock Level";
     public static final String FAMILY = "Family";
+    public static final String INDEX_NAME = "Index Name";
     public static final String SEQUENCE = "Sequence";
     public static final String COMPLETED = "Completed";
     public static final String REQUESTED = "Requested";
@@ -60,12 +62,26 @@ public interface AbstractListPage {
     public static final String AVAILABLE = "Available";
     public static final String SHORT_NAME = "Short Name";
     public static final String PROGRESS = "Progress";
+    public static final String INSTRUMENT_NAME = "Instrument Name";
     public static final String MODEL = "Model";
     public static final String COMMISSIONED = "Commissioned";
     public static final String DECOMMISSIONED = "Decommissioned";
     public static final String VOLUME = "Volume";
     public static final String MATRIX_BARCODE = "Matrix Barcode";
     public static final String DILUTIONS = "Dilutions";
+    public static final String CONTAINER = "Container";
+    public static final String NUMBER = "Number";
+    public static final String POOL = "Pool";
+    public static final String QC_STATUS = "QC Status";
+    public static final String QC_NOTE = "QC Note";
+    public static final String LOGIN_NAME = "Login Name";
+    public static final String USER_NAME = "User Name";
+    public static final String ACTIVE = "Active";
+    public static final String ADMIN = "Admin";
+    public static final String INTERNAL = "Internal";
+    public static final String EXTERNAL = "External";
+    public static final String LOGGED_IN = "Logged In";
+    public static final String GROUP_NAME = "Group Name";
   }
 
   public static class ListTarget {

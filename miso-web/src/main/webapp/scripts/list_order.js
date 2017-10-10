@@ -35,7 +35,7 @@ ListTarget.order = {
       action: function(orders) {
         Utils.showDialog('Re-order', 'Update', [{
           type: "int",
-          label: "Extra " + platformType.partitionName + " Count",
+          label: "Extra " + platformType.pluralPartitionName,
           property: "count",
           value: 1
         }], function(results) {
@@ -92,7 +92,7 @@ ListTarget.order = {
                 getLabel: Utils.array.getName
               }, {
                 type: "int",
-                label: platformType.partitionName + " Count",
+                label: platformType.pluralPartitionName,
                 property: "count",
                 value: 1
               }], function(results) {
@@ -125,7 +125,7 @@ ListTarget.order = {
       "iSortPriority": 0,
       "mRender": ListUtils.render.textFromId(Constants.sequencingParameters, 'name')
     }, {
-      "sTitle": platformType.partitionName + " Count",
+      "sTitle": platformType.pluralPartitionName,
       "mData": "partitions",
       "include": true,
       "iSortPriority": 1

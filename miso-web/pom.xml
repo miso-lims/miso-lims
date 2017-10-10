@@ -309,7 +309,6 @@
                 <jsSourceInclude>*.js</jsSourceInclude>
               </jsSourceIncludes>
               <jsSourceExcludes>
-                <jsSourceExclude>natural_sort.js</jsSourceExclude>
                 <jsSourceExclude>xregexp-all-min.js</jsSourceExclude>
                 <jsSourceExclude>runCalendar.js</jsSourceExclude>
               </jsSourceExcludes>
@@ -526,7 +525,7 @@
                       <port>${mysql.port}:3306</port>
                     </ports>
                     <wait>
-                      <time>8000</time>
+                      <time>10000</time>
                     </wait>
                   </run>
                 </image>

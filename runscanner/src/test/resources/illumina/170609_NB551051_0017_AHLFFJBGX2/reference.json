@@ -1,4 +1,5 @@
 {
+  "bclCount": 216,
   "callCycle": 158,
   "chemistry": "NS_HIGH",
   "class": "uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto",

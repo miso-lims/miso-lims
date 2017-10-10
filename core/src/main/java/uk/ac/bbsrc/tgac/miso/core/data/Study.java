@@ -28,7 +28,6 @@ import java.util.Collection;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -133,10 +132,8 @@ public interface Study extends SecurableByProfile, Comparable<Study>, Deletable,
    * 
    * @param e
    *          of type Experiment
-   * @throws MalformedExperimentException
-   *           when the Experiment being registered is not valid
    */
-  public void addExperiment(Experiment e) throws MalformedExperimentException;
+  public void addExperiment(Experiment e);
 
   /**
    * Returns the registered Experiments of this Study object.

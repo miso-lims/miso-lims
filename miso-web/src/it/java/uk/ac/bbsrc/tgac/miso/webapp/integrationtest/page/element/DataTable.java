@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,6 +8,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.google.common.collect.Lists;
+
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
 
 public class DataTable {
 
@@ -17,12 +20,12 @@ public class DataTable {
   private static final By sortableColumnSelector = By.xpath(".//div/span[contains(@class, 'ui-icon-carat')]");
   private static final By selectedSortableColumnSelector = By.xpath(".//div/span[contains(@class, 'ui-icon-triangle')]");
 
-  private final WebElement listTable;
+  private final WebElement table;
   private final List<WebElement> columnHeaders;
   private final List<String> columnHeadings;
 
   public DataTable(WebElement listTable) {
-    this.listTable = listTable;
+    this.table = listTable;
     this.columnHeaders = listTable.findElements(columnHeadingsSelector).stream()
         .collect(Collectors.toList());
     this.columnHeadings = columnHeaders.stream()
@@ -52,11 +55,11 @@ public class DataTable {
   }
 
   public String getId() {
-    return listTable.getAttribute("id");
+    return table.getAttribute("id");
   }
 
   public int countRows() {
-    return listTable.findElements(rowSelector).size();
+    return table.findElements(rowSelector).size();
   }
 
   public void clickToSort(String columnHeading) {
@@ -77,12 +80,20 @@ public class DataTable {
     return cell.getText();
   }
 
+  public void checkBoxForRow(int rowNum) {
+    List<WebElement> checkbox = getCell(Columns.SORT, rowNum).findElements(By.tagName("input"));
+    if (checkbox.isEmpty()) {
+      throw new IllegalArgumentException("Row " + rowNum + " does not have a checkbox to click.");
+    }
+    checkbox.get(0).click();
+  }
+
   private WebElement getCell(String columnHeading, int rowNum) {
     int colNum = columnHeadings.indexOf(columnHeading);
     if (colNum == -1) {
       throw new IllegalArgumentException("Column " + columnHeading + " doesn't exist");
     }
-    List<WebElement> rows = listTable.findElements(rowSelector);
+    List<WebElement> rows = table.findElements(rowSelector);
     if (rowNum >= rows.size()) {
       throw new IllegalArgumentException("Requested row " + rowNum + " which is larger than the available " + rows.size());
     }
@@ -92,6 +103,25 @@ public class DataTable {
   }
 
   public boolean isTableEmpty() {
-    return listTable.findElements(emptyTableSelector).size() == 1;
+    return table.findElements(emptyTableSelector).size() == 1;
+  }
+
+  public List<String> getColumnValues(String columnHeading) {
+    int colNum = columnHeadings.indexOf(columnHeading);
+    if (table.findElements(rowSelector).isEmpty()) {
+      return new ArrayList<>();
+    }
+    return table.findElements(rowSelector).stream()
+        .map(row -> {
+          if (row == null) return null;
+          List<WebElement> cells = row.findElements(cellSelector);
+          if (cells.size() < 2) return null; // empty table has one cell saying "No data available in table"
+          return cells.get(colNum).getText();
+        })
+        .collect(Collectors.toList());
+  }
+
+  public boolean doesColumnContain(String columnHeading, String target) {
+    return getColumnValues(columnHeading).contains(target);
   }
 }

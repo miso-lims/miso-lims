@@ -31,10 +31,7 @@
 <%@ include file="../header.jsp" %>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>"
-      type="text/css">
-<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>" type="text/css">
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -229,56 +226,7 @@
 <!-- notes end -->
 
 <c:if test="${pool.id != 0}">
-<miso:qcs id="list_qcs" item="${pool}"/>
-</c:if>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#experiments_arrowclick'), 'experiments');">
-  Experiments
-  <div id="experiments_arrowclick" class="toggleLeftDown"></div>
-</div>
-<div id="experiments" style="display:none;">
-<h1>Experiments</h1>
-
-<div class="note">
-  <h2>Selected experiment(s):</h2>
-
-  <div id="exptlist" class="elementList ui-corner-all">
-    <c:if test="${not empty pool.experiments}">
-      <c:forEach items="${pool.experiments}" var="exp">
-        <div onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'"
-             class="dashboard">
-          <span class='float-left'>
-          <input type="hidden" id="experiments${exp.id}" value="${exp.id}" name="experiments"/>
-          <b>Experiment:</b> <a href="<c:url value="/miso/experiment/${exp.id}"/>">${exp.alias} (${exp.name})</a><br/>
-          <b>Description:</b> ${exp.description}<br/>
-          <b>Project:</b> <a
-              href="<c:url value="/miso/project/${exp.study.project.id}"/>">${exp.study.project.alias}
-            (${exp.study.project.name})</a><br/>
-          </span>
-          <span onclick='Utils.ui.confirmRemove(jQuery(this).parent());'
-                class='float-right ui-icon ui-icon-circle-close'></span>
-        </div>
-      </c:forEach>
-    </c:if>
-    <input type="hidden" value="on" name="_experiments"/>
-  </div>
-</div>
-<h2 class="hrule">Select experiments:</h2>
-<table class="in">
-  <tr>
-    <td style="vertical-align:top;width:30%">
-      <label for="selectExpts"><b>Search experiments:</b></label><br/>
-      <input type="text" id='selectExpts' name="selectExpts" value=""
-             onKeyup="Utils.timer.timedFunc(Pool.search.poolSearchExperiments(this, 'ILLUMINA'),200);"/>
-
-      <div id='exptresult'></div>
-    </td>
-  </tr>
-</table>
-</div>
-<br/>
-
-<c:if test="${pool.id != 0}">
+  <miso:qcs id="list_qcs" item="${pool}"/>
   <miso:list-section id="list_order" name="Requested Orders" target="order" alwaysShow="true" items="${orders}" config="{ poolId: ${pool.id}, platformType: '${pool.platformType.name()}' }"/>
   <miso:list-section-ajax id="list_completion" name="Order Status" target="completion" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${runs}"/>

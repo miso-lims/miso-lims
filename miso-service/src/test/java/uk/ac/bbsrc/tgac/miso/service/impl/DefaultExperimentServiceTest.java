@@ -22,8 +22,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -32,8 +31,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
-import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
@@ -42,14 +41,14 @@ public class DefaultExperimentServiceTest {
   @Rule
   public final ExpectedException thrown = ExpectedException.none();
 
-  private final Experiment experiment = new ExperimentImpl();
+  private final Experiment experiment = new Experiment();
 
   @Mock
   private ExperimentStore experimentStore;
   @Mock
   private PlatformService platformService;
   @Mock
-  private PoolService poolService;
+  private LibraryService libraryService;
   @Mock
   private StudyService studyService;
   @Mock
@@ -71,18 +70,14 @@ public class DefaultExperimentServiceTest {
     Mockito.when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
     experiment.setPlatform(new Platform());
     experiment.getPlatform().setId(2L);
-    experiment.setPool(new PoolImpl());
-    experiment.getPool().setId(3L);
+    experiment.setLibrary(new LibraryImpl());
+    experiment.getLibrary().setId(3L);
     experiment.setSecurityProfile(new SecurityProfile());
     experiment.getSecurityProfile().setProfileId(4L);
     experiment.setStudy(new StudyImpl());
     experiment.getStudy().setId(5L);
   }
 
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   */
   @Test
   public void testSaveExperiment() throws IOException {
     final long expectedReturn = 1L;
@@ -96,7 +91,7 @@ public class DefaultExperimentServiceTest {
 
     when(experimentStore.save(experiment)).thenReturn(expectedReturn);
     when(platformService.get(experiment.getPlatform().getId())).thenReturn(experiment.getPlatform());
-    when(poolService.get(experiment.getPool().getId())).thenReturn(experiment.getPool());
+    when(libraryService.get(experiment.getLibrary().getId())).thenReturn(experiment.getLibrary());
     when(studyService.get(experiment.getStudy().getId())).thenReturn(experiment.getStudy());
     when(securityProfileStore.get(experiment.getSecurityProfile().getProfileId())).thenReturn(experiment.getSecurityProfile());
 
@@ -104,10 +99,6 @@ public class DefaultExperimentServiceTest {
     verify(experimentStore, times(2)).save(experiment);
   }
 
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   */
   @Test
   public void testSaveExperimentThrows() throws IOException {
     doThrow(new IOException()).when(authorizationManager).throwIfNotWritable(any(Experiment.class));
@@ -118,9 +109,6 @@ public class DefaultExperimentServiceTest {
     verify(experimentStore, never()).save(experiment);
   }
 
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#get(long)} .
-   */
   @Test
   public void testGetExperimentById() throws IOException {
     long inputId = 1L;
@@ -138,9 +126,6 @@ public class DefaultExperimentServiceTest {
     verify(experimentStore).get(inputId);
   }
 
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#get(long)} .
-   */
   @Test
   public void testGetExperimentByIdThrows() throws IOException {
     long inputId = 1L;

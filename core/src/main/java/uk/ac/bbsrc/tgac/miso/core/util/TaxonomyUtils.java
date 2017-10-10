@@ -27,8 +27,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -67,8 +72,11 @@ public class TaxonomyUtils {
         String out = parseEntity(response.getEntity());
         log.info(out);
         try {
-          Document d = SubmissionUtils.emptyDocument();
-          SubmissionUtils.transform(new UnicodeReader(out), d);
+          DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+          Document d = docBuilder.newDocument();
+
+          TransformerFactory.newInstance().newTransformer().transform(new StreamSource(new UnicodeReader(out)), new DOMResult(d));
+
           NodeList nl = d.getElementsByTagName("Id");
           for (int i = 0; i < nl.getLength(); i++) {
             Element e = (Element) nl.item(i);

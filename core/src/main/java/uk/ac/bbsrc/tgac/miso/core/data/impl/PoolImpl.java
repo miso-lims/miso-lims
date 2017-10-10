@@ -57,8 +57,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
@@ -68,7 +66,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
@@ -77,7 +74,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -93,7 +89,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   public static final String CONCENTRATION_UNITS = "nM";
   private static final int DESCRIPTION_LENGTH = 255;
   private static final int ID_BARCODE_LENGTH = 255;
-  private static final Logger log = LoggerFactory.getLogger(PoolImpl.class);
   private static final int NAME_LENGTH = 255;
   public static final String PREFIX = "IPO";
   private static final long serialVersionUID = 1L;
@@ -110,9 +105,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Column(length = DESCRIPTION_LENGTH)
   private String description;
-
-  @OneToMany(targetEntity = ExperimentImpl.class, mappedBy = "pool")
-  private Collection<Experiment> experiments = new HashSet<>();
 
   @Column(length = ID_BARCODE_LENGTH)
   private String identificationBarcode;
@@ -197,14 +189,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public void addExperiment(Experiment experiment) throws MalformedExperimentException {
-    if (experiment != null) {
-      experiments.add(experiment);
-      experiment.setPool(this);
-    }
-  }
-
-  @Override
   public void addNote(Note note) {
     this.notes.add(note);
   }
@@ -234,7 +218,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     if (!(obj instanceof Pool)) return false;
     Pool other = (Pool) obj;
     return new EqualsBuilder().appendSuper(super.equals(obj)).append(description, other.getDescription())
-        .append(pooledElementViews, other.getPoolableElementViews()).append(experiments, other.getExperiments())
+        .append(pooledElementViews, other.getPoolableElementViews())
         .append(concentration, other.getConcentration())
         .append(identificationBarcode, other.getIdentificationBarcode()).append(readyToRun, other.getReadyToRun())
         .append(qcPassed, other.getQcPassed())
@@ -269,11 +253,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public String getDescription() {
     return description;
-  }
-
-  @Override
-  public Collection<Experiment> getExperiments() {
-    return experiments;
   }
 
   @Override
@@ -395,7 +374,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(pooledElementViews).append(experiments)
+    return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(pooledElementViews)
         .append(concentration).append(identificationBarcode).append(readyToRun).append(qcPassed).toHashCode();
   }
 
@@ -431,18 +410,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  @Override
-  public void setExperiments(Collection<Experiment> experiments) {
-    this.experiments = experiments;
-    if (experiments != null) {
-      for (Experiment e : experiments) {
-        if (e != null && e.getPool() == null) {
-          e.setPool(this);
-        }
-      }
-    }
   }
 
   @Override

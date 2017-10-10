@@ -56,11 +56,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
@@ -78,15 +77,13 @@ public class ProjectControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
   @Autowired
   private IssueTrackerManager issueTrackerManager;
   @Autowired
   private MisoFilesManager misoFileManager;
   @Autowired
   private NamingScheme namingScheme;
-  @Autowired
-  private LibraryService libraryService;
   @Autowired
   private SampleService sampleService;
 
@@ -98,8 +95,8 @@ public class ProjectControllerHelperService {
     this.securityManager = securityManager;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setIssueTrackerManager(IssueTrackerManager issueTrackerManager) {
@@ -108,10 +105,6 @@ public class ProjectControllerHelperService {
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
-  }
-
-  public void setLibraryService(LibraryService libraryService) {
-    this.libraryService = libraryService;
   }
 
   public void setSampleService(SampleService sampleService) {
@@ -140,15 +133,15 @@ public class ProjectControllerHelperService {
     final Integer numProposedSamples = json.getInt("numProposedSamples");
 
     try {
-      final Project project = requestManager.getProjectById(projectId);
+      final Project project = projectService.getProjectById(projectId);
       final ProjectOverview overview = new ProjectOverview();
       overview.setNumProposedSamples(numProposedSamples);
       overview.setPrincipalInvestigator(principalInvestigator);
       overview.setProject(project);
       overview.setLocked(false);
       project.getOverviews().add(overview);
-      requestManager.saveProjectOverview(overview);
-      requestManager.saveProject(project);
+      projectService.saveProjectOverview(overview);
+      projectService.saveProject(project);
     } catch (final IOException e) {
       log.error("add project overview", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -159,25 +152,22 @@ public class ProjectControllerHelperService {
 
   public JSONObject addProjectOverviewNote(HttpSession session, JSONObject json) {
     final Long overviewId = json.getLong("overviewId");
-    String internalOnly = json.getString("internalOnly");
     final String text = json.getString("text");
 
     try {
       final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
       final Project project = overview.getProject();
 
       final Note note = new Note();
 
-      internalOnly = internalOnly.equals("on") ? "true" : "false";
-
-      note.setInternalOnly(Boolean.parseBoolean(internalOnly));
+      note.setInternalOnly(json.getString("internalOnly").equals("on"));
       note.setText(text);
       note.setOwner(user);
       note.setCreationDate(new Date());
       overview.getNotes().add(note);
-      requestManager.saveProjectOverviewNote(overview, note);
-      requestManager.saveProject(project);
+      projectService.saveProjectOverviewNote(overview, note);
+      projectService.saveProject(project);
     } catch (final IOException e) {
       log.error("add project overview note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -191,8 +181,8 @@ public class ProjectControllerHelperService {
     final Long noteId = json.getLong("noteId");
 
     try {
-      final ProjectOverview po = requestManager.getProjectOverviewById(overviewId);
-      requestManager.deleteProjectOverviewNote(po, noteId);
+      final ProjectOverview po = projectService.getProjectOverviewById(overviewId);
+      projectService.deleteProjectOverviewNote(po, noteId);
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
       log.error("delete project overview", e);
@@ -205,7 +195,7 @@ public class ProjectControllerHelperService {
     final Integer hashcode = json.getInt("hashcode");
     try {
       final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final Project project = requestManager.getProjectById(id);
+      final Project project = projectService.getProjectById(id);
 
       if (project.userCanWrite(user)) {
         String filename = null;
@@ -231,10 +221,10 @@ public class ProjectControllerHelperService {
   public JSONObject unlockProjectOverview(HttpSession session, JSONObject json) {
     final Long overviewId = json.getLong("overviewId");
     try {
-      final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
       overview.setLocked(false);
-      requestManager.saveProjectOverview(overview);
-      requestManager.saveProject(overview.getProject());
+      projectService.saveProjectOverview(overview);
+      projectService.saveProject(overview.getProject());
     } catch (final IOException e) {
       log.error("unlock project overview", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -245,10 +235,10 @@ public class ProjectControllerHelperService {
   public JSONObject lockProjectOverview(HttpSession session, JSONObject json) {
     final Long overviewId = json.getLong("overviewId");
     try {
-      final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
       overview.setLocked(true);
-      requestManager.saveProjectOverview(overview);
-      requestManager.saveProject(overview.getProject());
+      projectService.saveProjectOverview(overview);
+      projectService.saveProject(overview.getProject());
     } catch (final IOException e) {
       log.error("lock project overview", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
@@ -289,7 +279,7 @@ public class ProjectControllerHelperService {
     if (issueTrackerManager != null) {
       final Long projectId = json.getLong("projectId");
       try {
-        final Project project = requestManager.getProjectById(projectId);
+        final Project project = projectService.getProjectById(projectId);
         final JSONObject j = new JSONObject();
         if (project != null) {
           final List<JSONObject> issueList = new ArrayList<>();
@@ -349,7 +339,7 @@ public class ProjectControllerHelperService {
       try {
         final File f = misoFileManager.getNewFile(Project.class, projectId.toString(),
             "BulkInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
-        FormUtils.createSampleInputSpreadsheet(requestManager.getProjectById(projectId).getSamples(), f);
+        FormUtils.createSampleInputSpreadsheet(projectService.getProjectById(projectId).getSamples(), f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       } catch (final Exception e) {
         e.printStackTrace();
@@ -434,8 +424,8 @@ public class ProjectControllerHelperService {
     final Long overviewId = json.getLong("overviewId");
     try {
       final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
-      requestManager.addProjectWatcher(overview.getProject(), user);
+      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
+      projectService.addProjectWatcher(overview.getProject(), user);
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
       log.error("watch overview", e);
@@ -447,8 +437,8 @@ public class ProjectControllerHelperService {
     final Long overviewId = json.getLong("overviewId");
     try {
       final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
-      requestManager.removeProjectWatcher(overview.getProject(), user);
+      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
+      projectService.removeProjectWatcher(overview.getProject(), user);
       if (!overview.getProject().getSecurityProfile().getOwner().equals(user)) {
         return JSONUtils.SimpleJSONResponse("OK");
       } else {
@@ -465,7 +455,7 @@ public class ProjectControllerHelperService {
     final StringBuilder sb = new StringBuilder();
     final JSONObject j = new JSONObject();
     try {
-      final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
       sb.append("<ul class='bullets' style='margin-left: -30px;'>");
       for (final User theUser : overview.getWatchers()) {
         sb.append("<li>");
@@ -502,7 +492,7 @@ public class ProjectControllerHelperService {
   public JSONObject addSampleGroup(HttpSession session, JSONObject json) {
     final Long overviewId = json.getLong("overviewId");
     try {
-      final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
 
       final Set<Sample> samples = new HashSet<>();
       if (json.has("samples")) {
@@ -518,8 +508,8 @@ public class ProjectControllerHelperService {
 
       overview.setSampleGroup(samples);
 
-      requestManager.saveProjectOverview(overview);
-      requestManager.saveProject(overview.getProject());
+      projectService.saveProjectOverview(overview);
+      projectService.saveProject(overview.getProject());
 
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
@@ -531,7 +521,7 @@ public class ProjectControllerHelperService {
   public JSONObject addSamplesToGroup(HttpSession session, JSONObject json) {
     final Long overviewId = json.getLong("overviewId");
     try {
-      final ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+      final ProjectOverview overview = projectService.getProjectOverviewById(overviewId);
       if (json.has("samples")) {
         final JSONArray a = JSONArray.fromObject(json.get("samples"));
         for (final JSONObject j : (Iterable<JSONObject>) a) {
@@ -548,8 +538,8 @@ public class ProjectControllerHelperService {
         }
       }
 
-      requestManager.saveProjectOverview(overview);
-      requestManager.saveProject(overview.getProject());
+      projectService.saveProjectOverview(overview);
+      projectService.saveProject(overview.getProject());
 
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {

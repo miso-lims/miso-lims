@@ -49,9 +49,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
@@ -62,7 +62,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 public class ExternalSectionControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(DashboardHelperService.class);
   @Autowired
-  private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
+  private uk.ac.bbsrc.tgac.miso.service.ProjectService projectService;
   @Autowired
   private ContainerService containerService;
   @Autowired
@@ -70,8 +70,8 @@ public class ExternalSectionControllerHelperService {
   @Autowired
   private SampleService sampleService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
   public void setContainerService(ContainerService containerService) {
@@ -89,7 +89,7 @@ public class ExternalSectionControllerHelperService {
   public JSONObject listProjects(HttpSession session, JSONObject json) {
     try {
       StringBuilder b = new StringBuilder();
-      Collection<Project> projectCollection = requestManager.listAllProjects();
+      Collection<Project> projectCollection = projectService.listAllProjects();
 
       for (Project p : projectCollection) {
         if (p.getSecurityProfile() == null) {
@@ -123,7 +123,7 @@ public class ExternalSectionControllerHelperService {
       Long projectId = json.getLong("projectId");
       StringBuilder projectSb = new StringBuilder();
       StringBuilder sampleQcSb = new StringBuilder();
-      Project project = requestManager.getProjectById(projectId);
+      Project project = projectService.getProjectById(projectId);
       projectSb.append("<div class='report'>");
       projectSb.append("<b>Project Name: </b> " + project.getName());
       projectSb.append("<br/><br/>");
