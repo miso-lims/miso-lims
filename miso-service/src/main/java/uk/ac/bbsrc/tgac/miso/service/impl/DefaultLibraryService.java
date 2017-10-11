@@ -510,6 +510,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     } else {
       target.setKitDescriptor(null);
     }
+    target.setReceivedDate(source.getReceivedDate());
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
@@ -523,6 +524,8 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
       } else {
         dTarget.setLibraryDesign(null);
       }
+      dTarget.setGroupId(dSource.getGroupId());
+      dTarget.setGroupDescription(dSource.getGroupDescription());
     }
   }
 

@@ -192,6 +192,28 @@ HotTarget.library = (function() {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
           {
+            header: 'Date of receipt',
+            data: 'receivedDate',
+            type: 'date',
+            dateFormat: 'YYYY-MM-DD',
+            datePickerConfig: {
+              firstDay: 0,
+              numberOfMonths: 1
+            },
+            allowEmpty: true,
+            include: config.isLibraryReceipt || !create,
+            unpack: function(lib, flat, setCellMeta) {
+              flat.receivedDate = lib.receivedDate || null;
+            },
+            pack: function(lib, flat, errorHandler) {
+              lib.receivedDate = flat.receivedDate;
+            }
+          },
+          HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample, 'groupId', {
+            validator: HotUtils.validator.optionalTextAlphanumeric
+          }),
+          HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample, 'groupDescription', {}),
+          {
             header: 'Design',
             data: 'libraryDesignAlias',
             type: 'dropdown',

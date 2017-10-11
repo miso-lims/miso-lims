@@ -222,7 +222,7 @@ public class SampleController extends RestController {
       throw new IllegalStateException(String.format("%s class with id %d has no %s parents", childClassCategory, childClassId,
           parentCategory));
     }
-    return parentClass.getId();
+    return parentClass == null ? null : parentClass.getId();
   }
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })

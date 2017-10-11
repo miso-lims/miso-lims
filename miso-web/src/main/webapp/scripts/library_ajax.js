@@ -64,6 +64,12 @@ var Library = Library || {
     jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
+    // Date of Receipt validation: ensure date is of correct form
+    jQuery('#receiveddatepicker').attr('class', 'form-control');
+    jQuery('#receiveddatepicker').attr('data-date-format', 'YYYY-MM-DD');
+    jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+
     // Library size validation
     jQuery('#dnaSize').attr('class', 'form-control');
     jQuery('#dnaSize').attr('data-parsley-maxlength', '10');
@@ -77,6 +83,16 @@ var Library = Library || {
     if (Constants.isDetailedSample) {
       var generatingAlias = Constants.automaticLibraryAlias == true && jQuery('#alias').val().length === 0;
       var selectedPlatform = jQuery('#platformTypes option:selected').text();
+
+      // Group ID validation
+      jQuery('#groupId').attr('class', 'form-control');
+      jQuery('#groupId').attr('data-parsley-type', 'alphanum');
+      jQuery('#groupId').attr('data-parsley-maxlength', '10');
+
+      // Group Description validation
+      jQuery('#groupDescription').attr('class', 'form-control');
+      jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
+      jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
       jQuery('#dnaSize').attr('data-parsley-required', generatingAlias && selectedPlatform === 'Illumina');
 
