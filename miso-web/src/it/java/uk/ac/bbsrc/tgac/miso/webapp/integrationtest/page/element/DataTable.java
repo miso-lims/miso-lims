@@ -20,6 +20,7 @@ public class DataTable extends AbstractElement {
 
   private static final By tableSelector = By.tagName("table");
   private static final By searchBarSelector = By.xpath(".//div[@class='dataTables_filter']/descendant::label/descendant::input");
+  private static final By searchBarDivSelector = By.xpath(".//div[@class='dataTables_filter']");
   private static final By columnHeadingsSelector = By.tagName("th");
   private static final By rowSelector = By.cssSelector("tbody > tr");
   private static final By cellSelector = By.tagName("td");
@@ -32,6 +33,7 @@ public class DataTable extends AbstractElement {
   private final List<WebElement> columnHeaders;
   private final List<String> columnHeadings;
   private final WebElement searchBar;
+  private final WebElement searchBarDiv;
   private final WebElement processing;
 
   public DataTable(WebDriver driver, String tableWrapperId) {
@@ -45,6 +47,7 @@ public class DataTable extends AbstractElement {
         .map(element -> element.getText().trim())
         .collect(Collectors.toList());
     this.searchBar = tableWrapper.findElement(searchBarSelector);
+    this.searchBarDiv = tableWrapper.findElement(searchBarDivSelector);
     this.processing = tableWrapper.findElement(processingSelector);
   }
 
@@ -155,6 +158,10 @@ public class DataTable extends AbstractElement {
     searchBar.sendKeys(searchTerm);
     searchBar.sendKeys(Keys.ENTER);
     waitUntil(elementToBeClickable(searchBar));
+  }
+
+  public String getSearchDivId() {
+    return searchBarDiv.getAttribute("id");
   }
 
 }

@@ -538,7 +538,8 @@ public class ListTablesIT extends AbstractIT {
     DataTable table = page.getTable(tableWrapperId);
     table.searchFor(searchTarget);
     assertTrue(
-        "error searching project page '" + tableWrapperId + "' table for '" + searchTarget + "': "
+        "error searching project page '" + tableWrapperId + "' table with search bar '" + table.getSearchDivId() + "' for '" + searchTarget
+            + " (" + page.getVisibleErrors().size() + "): "
             + page.getVisibleErrors().stream().map(error -> error.getText()).collect(Collectors.joining(";")),
         page.getVisibleErrors().isEmpty());
   }
