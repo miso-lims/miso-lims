@@ -131,7 +131,7 @@
                 <option value="${proj.id}" <c:if test="${proj.id == sample.project.id}">selected="selected"</c:if>>
                   <c:choose>
                     <c:when test="${detailedSample}">${proj.shortName} (${proj.name})</c:when>
-                    <c:otherwise>{proj.name}: ${proj.alias}</c:otherwise>
+                    <c:otherwise>${proj.name}: ${proj.alias}</c:otherwise>
                   </c:choose>
                 </option>
               </c:forEach>

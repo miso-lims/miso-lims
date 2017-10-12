@@ -22,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.Columns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
@@ -36,35 +36,35 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertTrue("Server errors", result.getServerErrors().isEmpty());
     assertTrue("Save errors", result.getSaveErrors().isEmpty());
 
-    assertTrue("Sample name generation", table.getText(Columns.NAME, 0).contains("SAM"));
-    assertTrue("Sample alias generation", !isStringEmptyOrNull(table.getText(Columns.ALIAS, 0)));
+    assertTrue("Sample name generation", table.getText(SamColumns.NAME, 0).contains("SAM"));
+    assertTrue("Sample alias generation", !isStringEmptyOrNull(table.getText(SamColumns.ALIAS, 0)));
   }
 
   protected void assertPlainSampleAttributes(Map<String, String> hotAttributes, Sample fromDb, boolean newlyCreated) {
     if (newlyCreated) {
-      assertEquals("confirm project", hotAttributes.get(Columns.PROJECT), fromDb.getProject().getShortName());
+      assertEquals("confirm project", hotAttributes.get(SamColumns.PROJECT), fromDb.getProject().getShortName());
     }
-    assertEquals("confirm alias", hotAttributes.get(Columns.ALIAS), fromDb.getAlias());
-    assertEquals("confirm description", hotAttributes.get(Columns.DESCRIPTION),
+    assertEquals("confirm alias", hotAttributes.get(SamColumns.ALIAS), fromDb.getAlias());
+    assertEquals("confirm description", hotAttributes.get(SamColumns.DESCRIPTION),
         (fromDb.getDescription() == null ? "" : fromDb.getDescription()));
-    assertEquals("confirm matrix barcode", hotAttributes.get(Columns.ID_BARCODE),
+    assertEquals("confirm matrix barcode", hotAttributes.get(SamColumns.ID_BARCODE),
         (fromDb.getIdentificationBarcode() == null ? "" : fromDb.getIdentificationBarcode()));
-    assertEquals("confirm sample type", hotAttributes.get(Columns.SAMPLE_TYPE), fromDb.getSampleType());
-    assertEquals("confirm scientific name", hotAttributes.get(Columns.SCIENTIFIC_NAME), fromDb.getScientificName());
+    assertEquals("confirm sample type", hotAttributes.get(SamColumns.SAMPLE_TYPE), fromDb.getSampleType());
+    assertEquals("confirm scientific name", hotAttributes.get(SamColumns.SCIENTIFIC_NAME), fromDb.getScientificName());
     if (!LimsUtils.isIdentitySample(fromDb)) {
-      assertEquals("confirm received date", hotAttributes.get(Columns.RECEIVE_DATE),
+      assertEquals("confirm received date", hotAttributes.get(SamColumns.RECEIVE_DATE),
           (fromDb.getReceivedDate() == null ? "" : LimsUtils.formatDate(fromDb.getReceivedDate())));
     }
   }
 
   protected void assertDetailedSampleAttributes(Map<String, String> hotAttributes, DetailedSample fromDb) {
-    assertEquals("confirm QC status", hotAttributes.get(Columns.QC_STATUS),
+    assertEquals("confirm QC status", hotAttributes.get(SamColumns.QC_STATUS),
         (fromDb.getDetailedQcStatus() == null ? "Not Ready" : fromDb.getDetailedQcStatus().getDescription()));
     if (!fromDb.getSampleClass().getSampleCategory().equals(SampleIdentity.CATEGORY_NAME)) {
       assertNotNull("parent is not null", fromDb.getParent());
     }
-    assertEquals("confirm group ID", hotAttributes.get(Columns.GROUP_ID), (fromDb.getGroupId() == null ? "" : fromDb.getGroupId()));
-    assertEquals("confirm group description", hotAttributes.get(Columns.GROUP_DESCRIPTION),
+    assertEquals("confirm group ID", hotAttributes.get(SamColumns.GROUP_ID), (fromDb.getGroupId() == null ? "" : fromDb.getGroupId()));
+    assertEquals("confirm group description", hotAttributes.get(SamColumns.GROUP_DESCRIPTION),
         (fromDb.getGroupDescription() == null ? "" : fromDb.getGroupDescription()));
   }
 
@@ -73,58 +73,58 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertIdentityAttributes(Map<String, String> hotAttributes, SampleIdentity fromDb) {
-    assertEquals("confirm external name", hotAttributes.get(Columns.EXTERNAL_NAME), fromDb.getExternalName());
-    assertEquals("confirm donor sex", (hotAttributes.get(Columns.DONOR_SEX) == null ? "Unknown" : hotAttributes.get(Columns.DONOR_SEX)),
+    assertEquals("confirm external name", hotAttributes.get(SamColumns.EXTERNAL_NAME), fromDb.getExternalName());
+    assertEquals("confirm donor sex", (hotAttributes.get(SamColumns.DONOR_SEX) == null ? "Unknown" : hotAttributes.get(SamColumns.DONOR_SEX)),
         fromDb.getDonorSex().getLabel());
   }
 
   protected void assertTissueAttributes(Map<String, String> hotAttributes, SampleTissue fromDb) {
-    assertEquals("confirm tissue material", hotAttributes.get(Columns.TISSUE_MATERIAL),
+    assertEquals("confirm tissue material", hotAttributes.get(SamColumns.TISSUE_MATERIAL),
         (fromDb.getTissueMaterial() == null ? "(None)" : fromDb.getTissueMaterial().getAlias()));
-    assertEquals("confirm region", hotAttributes.get(Columns.REGION), (fromDb.getRegion() == null ? "" : fromDb.getRegion()));
-    assertEquals("confirm secondary id", hotAttributes.get(Columns.SECONDARY_ID),
+    assertEquals("confirm region", hotAttributes.get(SamColumns.REGION), (fromDb.getRegion() == null ? "" : fromDb.getRegion()));
+    assertEquals("confirm secondary id", hotAttributes.get(SamColumns.SECONDARY_ID),
         (fromDb.getSecondaryIdentifier() == null ? "" : fromDb.getSecondaryIdentifier()));
-    assertEquals("confirm lab", hotAttributes.get(Columns.LAB), (fromDb.getLab() == null ? "(None)" : fromDb.getLab().getItemLabel()));
-    assertEquals("confirm tissue origin", hotAttributes.get(Columns.TISSUE_ORIGIN), fromDb.getTissueOrigin().getItemLabel());
-    assertEquals("confirm tissue type", hotAttributes.get(Columns.TISSUE_TYPE), fromDb.getTissueType().getItemLabel());
-    assertEquals("confirm passage number", hotAttributes.get(Columns.PASSAGE_NUMBER),
+    assertEquals("confirm lab", hotAttributes.get(SamColumns.LAB), (fromDb.getLab() == null ? "(None)" : fromDb.getLab().getItemLabel()));
+    assertEquals("confirm tissue origin", hotAttributes.get(SamColumns.TISSUE_ORIGIN), fromDb.getTissueOrigin().getItemLabel());
+    assertEquals("confirm tissue type", hotAttributes.get(SamColumns.TISSUE_TYPE), fromDb.getTissueType().getItemLabel());
+    assertEquals("confirm passage number", hotAttributes.get(SamColumns.PASSAGE_NUMBER),
         (fromDb.getPassageNumber() == null ? "" : fromDb.getPassageNumber().toString()));
-    assertEquals("confirm times received", hotAttributes.get(Columns.TIMES_RECEIVED),
+    assertEquals("confirm times received", hotAttributes.get(SamColumns.TIMES_RECEIVED),
         fromDb.getTimesReceived().toString());
-    assertEquals("confirm tube number", hotAttributes.get(Columns.TUBE_NUMBER), fromDb.getTubeNumber().toString());
+    assertEquals("confirm tube number", hotAttributes.get(SamColumns.TUBE_NUMBER), fromDb.getTubeNumber().toString());
   }
 
   protected void assertSlideAttributes(Map<String, String> hotAttributes, SampleSlide fromDb) {
-    assertEquals("confirm slides", hotAttributes.get(Columns.SLIDES), fromDb.getSlides().toString());
-    assertEquals("confirm discards", hotAttributes.get(Columns.DISCARDS),
+    assertEquals("confirm slides", hotAttributes.get(SamColumns.SLIDES), fromDb.getSlides().toString());
+    assertEquals("confirm discards", hotAttributes.get(SamColumns.DISCARDS),
         (fromDb.getDiscards() == null ? "" : fromDb.getDiscards().toString()));
-    assertEquals("confirm thickness", hotAttributes.get(Columns.THICKNESS),
+    assertEquals("confirm thickness", hotAttributes.get(SamColumns.THICKNESS),
         (fromDb.getThickness() == null ? "" : fromDb.getThickness().toString()));
-    assertEquals("confirm stain", hotAttributes.get(Columns.STAIN), (fromDb.getStain() == null ? "(None)" : fromDb.getStain().getName()));
+    assertEquals("confirm stain", hotAttributes.get(SamColumns.STAIN), (fromDb.getStain() == null ? "(None)" : fromDb.getStain().getName()));
   }
 
   protected void assertLcmTubeAttributes(Map<String, String> hotAttributes, SampleLCMTube fromDb) {
-    assertEquals("confirm slides consumed", hotAttributes.get(Columns.SLIDES_CONSUMED), fromDb.getSlidesConsumed().toString());
+    assertEquals("confirm slides consumed", hotAttributes.get(SamColumns.SLIDES_CONSUMED), fromDb.getSlidesConsumed().toString());
   }
 
   protected void assertAnalyteAttributes(Map<String, String> hotAttributes, DetailedSample fromDb) {
-    assertEquals("confirm volume", hotAttributes.get(Columns.VOLUME).toString(),
+    assertEquals("confirm volume", hotAttributes.get(SamColumns.VOLUME).toString(),
         (fromDb.getVolume() == null ? "" : fromDb.getVolume().toString()));
-    assertEquals("confirm concentration", hotAttributes.get(Columns.CONCENTRATION).toString(),
+    assertEquals("confirm concentration", hotAttributes.get(SamColumns.CONCENTRATION).toString(),
         (fromDb.getConcentration() == null ? "" : fromDb.getConcentration().toString()));
   }
 
   protected void assertStockAttributes(Map<String, String> hotAttributes, SampleStock fromDb) {
-    assertEquals("confirm STR Status", hotAttributes.get(Columns.STR_STATUS), fromDb.getStrStatus().getLabel());
+    assertEquals("confirm STR Status", hotAttributes.get(SamColumns.STR_STATUS), fromDb.getStrStatus().getLabel());
   }
 
   protected void assertRnaStockSampleAttributes(Map<String, String> hotAttributes, SampleStock fromDb) {
-    assertEquals("confirm DNAse Treated", Boolean.valueOf(hotAttributes.get(Columns.DNASE_TREATED)),
+    assertEquals("confirm DNAse Treated", Boolean.valueOf(hotAttributes.get(SamColumns.DNASE_TREATED)),
         Boolean.valueOf(fromDb.getDNAseTreated()));
   }
 
   protected void assertAliquotAttributes(Map<String, String> hotAttributes, SampleAliquot fromDb) {
-    assertEquals("confirm purpose", hotAttributes.get(Columns.PURPOSE), fromDb.getSamplePurpose().getAlias());
+    assertEquals("confirm purpose", hotAttributes.get(SamColumns.PURPOSE), fromDb.getSamplePurpose().getAlias());
   }
 
   protected void assertAllForIdentity(Map<String, String> identity, Long sampleId, boolean newlyCreated) {
@@ -223,7 +223,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected Long getIdForRow(HandsOnTable table, Integer row) {
-    String newId = table.getText(Columns.NAME, row).substring(3, table.getText(Columns.NAME, 0).length());
+    String newId = table.getText(SamColumns.NAME, row).substring(3, table.getText(SamColumns.NAME, 0).length());
     return Long.valueOf(newId);
   }
 }

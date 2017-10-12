@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkLibraryPage extends HeaderFooterPage {
 
-  public static class Columns {
+  public static class LibColumns {
     public static final String NAME = "Library Name";
     public static final String ALIAS = "Library Alias";
     public static final String SAMPLE_ALIAS = "Sample Alias";
@@ -41,7 +41,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String VOLUME = "Vol. (µl)";
     public static final String CONCENTRATION = "Conc.";
 
-    private Columns() {
+    private LibColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");
     }
   };

@@ -83,12 +83,6 @@ HotTarget.library = (function() {
       lib.paired = Constants.libraryTypes.reduce(function(acc, type) {
         return acc || type.id == lib.libraryTypeId && type.alias.indexOf('Pair') != -1;
       }, lib.paired);
-      // if any members are null, fill them with empty objects otherwise
-      // things go poorly
-      if (!lib.kitDescriptorId) {
-        lib.kitDescriptorId = '';
-        lib.kitDescriptorName = '';
-      }
     },
 
     createColumns: function(config, create, data) {
@@ -378,7 +372,8 @@ HotTarget.library = (function() {
                 }).map(Utils.array.getName).sort()
               });
             }
-          }, HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
+          }, 
+          HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
           HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume, 'volume', false),
           HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), ];

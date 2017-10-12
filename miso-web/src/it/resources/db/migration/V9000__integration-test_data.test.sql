@@ -124,20 +124,6 @@ INSERT INTO SamplePurpose (samplePurposeId, alias, createdBy, creationDate, upda
 (10, 'WGA',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
 (11, 'Ion Torrent',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
 
-DELETE FROM SamplePurpose;
-INSERT INTO SamplePurpose (samplePurposeId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-(1, 'CNV',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(2, 'Extra',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(3, 'Library',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(4, 'Methylation',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(5, 'PacBio',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(6, 'Research',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(7, 'Sequenom',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(8, 'Stock',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(9, 'Validation',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(10, 'WGA',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
-(11, 'Ion Torrent',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
-
 DELETE FROM DetailedQcStatus;
 INSERT INTO `DetailedQcStatus` (DetailedQcStatusId, status, description, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1,TRUE,  'Ready',                  0,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44'),

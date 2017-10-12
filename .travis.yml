@@ -34,6 +34,7 @@ before_script:
 script:
   - pushd runscanner-illumina && ./build-illumina-interop && autoreconf -i && ./configure && make && popd
   - PATH=$PATH:$(pwd)/runscanner-illumina mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false -DskipIllumina=false install
+  - mvn clean -P external-plain -Dmaven.javadoc.skip=true -DrunPlainITs verify
   - 'if [[ ${TRAVIS_PULL_REQUEST_SLUG} == ${TRAVIS_REPO_SLUG} ]] ; then 
         mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar ;
      else 

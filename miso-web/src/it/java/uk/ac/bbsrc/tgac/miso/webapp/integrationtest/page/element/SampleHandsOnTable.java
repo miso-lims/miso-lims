@@ -5,7 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.MoreExpectedCond
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.Columns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 
 public class SampleHandsOnTable extends HandsOnTable {
 
@@ -16,7 +16,7 @@ public class SampleHandsOnTable extends HandsOnTable {
   }
 
   public void waitForIdentityLookup(int rowNum) {
-    WebElement lookupField = getCell(Columns.IDENTITY_ALIAS, rowNum);
+    WebElement lookupField = getCell(SamColumns.IDENTITY_ALIAS, rowNum);
     waitUntil(textDoesNotContain(lookupField, LOOKUP_TEXT));
   }
 

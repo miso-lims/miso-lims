@@ -15,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTa
 
 public class BulkSamplePage extends HeaderFooterPage {
 
-  public static class Columns {
+  public static class SamColumns {
     public static final String NAME = "Sample Name";
     public static final String ALIAS = "Sample Alias";
     public static final String DESCRIPTION = "Description";
@@ -51,13 +51,14 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String DNASE_TREATED = "DNAse";
     public static final String QC_NOTE = "QC Note";
     public static final String PURPOSE = "Purpose";
+    public static final String QC_PASSED = "QC Passed?";
 
-    private Columns() {
+    private SamColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");
     }
   };
 
-  private static final String CREATE_URL_FORMAT = "%smiso/sample/bulk/new?quantity=%d&projectId=%s&sampleClassId=%d";
+  private static final String CREATE_URL_FORMAT = "%smiso/sample/bulk/new?quantity=%d&projectId=%s&sampleClassId=%s";
   private static final String EDIT_URL_FORMAT = "%smiso/sample/bulk/edit?ids=%s";
 
   private final SampleHandsOnTable table;
@@ -70,8 +71,8 @@ public class BulkSamplePage extends HeaderFooterPage {
   }
 
   public static BulkSamplePage getForCreate(WebDriver driver, String baseUrl, Integer quantity, Long projectId, Long sampleClassId) {
-    String project = projectId == null ? "" : projectId.toString();
-    String url = String.format(CREATE_URL_FORMAT, baseUrl, quantity, project, sampleClassId);
+    String url = String.format(CREATE_URL_FORMAT, baseUrl, quantity, (projectId == null ? "" : projectId.toString()),
+        (sampleClassId == null ? "" : sampleClassId.toString()));
     driver.get(url);
     return new BulkSamplePage(driver);
   }
