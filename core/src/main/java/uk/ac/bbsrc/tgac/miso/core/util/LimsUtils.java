@@ -31,10 +31,13 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
@@ -375,5 +378,10 @@ public class LimsUtils {
       }
 
     };
+  }
+
+  @SafeVarargs
+  public static Set<String> concatSets(Set<String>... sets) {
+    return Arrays.stream(sets).flatMap(Collection::stream).collect(Collectors.toSet());
   }
 }

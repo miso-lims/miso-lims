@@ -1,22 +1,21 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class ListPage extends HeaderFooterPage implements AbstractListPage {
 
-  @FindBy(id = "listingTable")
-  private WebElement listingTable;
+  @FindBy(className = "dataTables_wrapper")
+  private WebElement tableWrapper;
   @FindBy(className = "parsley-error")
   private WebElement errors;
-  @FindBy(id = "listingTable_processing")
-  private WebElement processing;
 
   private WebElement addButton = null;
 
@@ -25,8 +24,8 @@ public class ListPage extends HeaderFooterPage implements AbstractListPage {
   public ListPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    waitWithTimeout().until(ExpectedConditions.visibilityOf(listingTable));
-    table = new DataTable(listingTable);
+    waitWithTimeout().until(visibilityOf(tableWrapper));
+    table = new DataTable(driver, tableWrapper.getAttribute("id"));
     if (!driver.findElements(By.linkText("Add")).isEmpty()) {
       addButton = driver.findElement(By.linkText("Add"));
     }
@@ -46,12 +45,6 @@ public class ListPage extends HeaderFooterPage implements AbstractListPage {
   @Override
   public WebElement getErrors() {
     return errors;
-  }
-
-  @Override
-  public void sortByColumn(String columnHeading) {
-    table.clickToSort(columnHeading);
-    waitWithTimeout().until(ExpectedConditions.invisibilityOf(processing));
   }
 
   public void clickAddButton(boolean expectAddDialog) {

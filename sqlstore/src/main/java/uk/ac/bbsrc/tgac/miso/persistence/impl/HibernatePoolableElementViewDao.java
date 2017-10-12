@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolableElementViewDao;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -150,13 +151,18 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
 
   @Override
   public String propertyForUserName(Criteria item, boolean creator) {
-    return creator ? "creatorName" : "lastModifier";
+    return creator ? "creatorName" : "lastModifierName";
   }
 
   @Override
   public void restrictPaginationByIndex(Criteria criteria, String index, Consumer<String> errorHandler) {
     criteria.createAlias("indices", "indices");
     HibernateLibraryDao.restrictPaginationByIndices(criteria, index);
+  }
+
+  @Override
+  public void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.searchRestrictions(name, "boxAlias", "boxName", "boxIdentificationBarcode", "boxLocationBarcode"));
   }
 
   @Override
