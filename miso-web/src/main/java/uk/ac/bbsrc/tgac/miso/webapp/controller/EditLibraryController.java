@@ -91,7 +91,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -116,6 +115,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
@@ -182,9 +182,9 @@ public class EditLibraryController {
   @Autowired
   private SampleClassService sampleClassService;
   @Autowired
-  private RequestManager requestManager;
-  @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
+  @Autowired
+  private ProjectService projectService;
 
   public NamingScheme getNamingScheme() {
     return namingScheme;
@@ -732,7 +732,7 @@ public class EditLibraryController {
     LibraryDto libDto = null;
     Project project = null;
     if (projectId != null) {
-      project = requestManager.getProjectById(projectId);
+      project = projectService.getProjectById(projectId);
       if (project == null) {
         throw new IllegalArgumentException("Invalid Project ID");
       }
@@ -787,7 +787,7 @@ public class EditLibraryController {
       config.put("create", true);
       config.put("hasProject", project != null);
       if (project == null) {
-        requestManager.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
+        projectService.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
       } else {
         config.putPOJO("project", Dtos.asDto(project));
       }
