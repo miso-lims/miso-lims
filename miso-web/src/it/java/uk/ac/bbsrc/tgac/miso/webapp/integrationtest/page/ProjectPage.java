@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class ProjectPage extends HeaderFooterPage {
@@ -135,7 +136,8 @@ public class ProjectPage extends HeaderFooterPage {
   }
 
   public List<WebElement> getVisibleErrors() {
-    return errors.stream().filter(error -> error.isDisplayed()).collect(Collectors.toList());
+    return errors.stream().filter(error -> error.isDisplayed() && !LimsUtils.isStringEmptyOrNull(error.getText()))
+        .collect(Collectors.toList());
   }
 
   public DataTable getTable(String tableWrapperId) {
