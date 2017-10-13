@@ -40,7 +40,13 @@ The JSON file then contains a list of instruments:
 
 The name/platform-type combination decide what scanner is used to interpret the sequencer's results. A list of supported scanners can be found on the status page or the debugging interface below.
 
-The parameters are set based on the processor. Currently, PACBIO/default requires `address` to be set to the URL of the PacBio machine.
+The parameters are set based on the processor.
+
+- PACBIO/default requires `address` to be set to the URL of the PacBio machine.
+- ILLUMINA/default optionally allows `checkOutput`. If true, the scanner will
+  try to look for BCL files to verify a run is complete if no logs are present.
+  If false, it will assume the run is complete if ambiguous. The default is true.
+  This can be very slow on certain network file systems.
 
 ## Debugging
 For troublesome runs, you can see the output for a particular run directory using:

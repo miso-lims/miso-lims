@@ -430,6 +430,7 @@ int main(int argc, const char **argv) {
   illumina::interop::logic::summary::summarize_run_metrics(run, run_summary,
                                                            true);
 
+  result["numReads"] = (Json::Value::Int)run.run_info().reads().size();
   result["bclCount"] =
       (Json::Value::Int)(run.run_info().flowcell().tiles_per_lane() *
                          run.run_info().flowcell().swath_count() *
