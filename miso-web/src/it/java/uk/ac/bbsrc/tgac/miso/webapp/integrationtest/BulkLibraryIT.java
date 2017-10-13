@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
-import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.assertColumnValues;
+import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -657,27 +657,27 @@ public class BulkLibraryIT extends AbstractIT {
     return Long.valueOf(table.getText(LibColumns.NAME, 0).substring(3, table.getText(LibColumns.NAME, 0).length()));
   }
 
-  private void assertPlainLibraryAttributes(Map<String, String> attributes, Library library) {
-    testLibraryAttribute(LibColumns.NAME, attributes, library, Library::getName);
-    testLibraryAttribute(LibColumns.ALIAS, attributes, library, Library::getAlias);
-    testLibraryAttribute(LibColumns.DESCRIPTION, attributes, library, Library::getDescription);
-    testLibraryAttribute(LibColumns.PLATFORM, attributes, library, lib -> lib.getPlatformType().getKey());
-    testLibraryAttribute(LibColumns.ID_BARCODE, attributes, library, Library::getIdentificationBarcode);
-    testLibraryAttribute(LibColumns.LIBRARY_TYPE, attributes, library, lib -> lib.getLibraryType().getDescription());
-    testLibraryAttribute(LibColumns.INDEX_FAMILY, attributes, library, lib -> {
+  public void assertPlainLibraryAttributes(Map<String, String> attributes, Library library) {
+    assertEntityAttribute(LibColumns.NAME, attributes, library, Library::getName);
+    assertEntityAttribute(LibColumns.ALIAS, attributes, library, Library::getAlias);
+    assertEntityAttribute(LibColumns.DESCRIPTION, attributes, library, Library::getDescription);
+    assertEntityAttribute(LibColumns.PLATFORM, attributes, library, lib -> lib.getPlatformType().getKey());
+    assertEntityAttribute(LibColumns.ID_BARCODE, attributes, library, Library::getIdentificationBarcode);
+    assertEntityAttribute(LibColumns.LIBRARY_TYPE, attributes, library, lib -> lib.getLibraryType().getDescription());
+    assertEntityAttribute(LibColumns.INDEX_FAMILY, attributes, library, lib -> {
       if (lib.getIndices() == null || lib.getIndices().isEmpty()) {
         return null;
       }
       return lib.getIndices().get(0).getFamily().getName();
     });
-    testLibraryAttribute(LibColumns.INDEX_1, attributes, library, indexGetter(1));
-    testLibraryAttribute(LibColumns.INDEX_2, attributes, library, indexGetter(2));
-    testLibraryAttribute(LibColumns.QC_PASSED, attributes, library, lib -> getQcPassedString(lib.getQcPassed()));
-    testLibraryAttribute(LibColumns.SIZE, attributes, library, lib -> {
+    assertEntityAttribute(LibColumns.INDEX_1, attributes, library, indexGetter(1));
+    assertEntityAttribute(LibColumns.INDEX_2, attributes, library, indexGetter(2));
+    assertEntityAttribute(LibColumns.QC_PASSED, attributes, library, lib -> getQcPassedString(lib.getQcPassed()));
+    assertEntityAttribute(LibColumns.SIZE, attributes, library, lib -> {
       return lib.getDnaSize() == null ? null : lib.getDnaSize().toString();
     });
-    testLibraryAttribute(LibColumns.VOLUME, attributes, library, lib -> lib.getVolume().toString());
-    testLibraryAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> lib.getInitialConcentration().toString());
+    assertEntityAttribute(LibColumns.VOLUME, attributes, library, lib -> lib.getVolume().toString());
+    assertEntityAttribute(LibColumns.CONCENTRATION, attributes, library, lib -> lib.getInitialConcentration().toString());
     testLibraryAttribute(LibColumns.RECEIVE_DATE, attributes, library, lib -> {
       return lib.getReceivedDate() == null ? null : LimsUtils.formatDate(lib.getReceivedDate());
     });
@@ -686,13 +686,13 @@ public class BulkLibraryIT extends AbstractIT {
   private void assertDetailedLibraryAttributes(Map<String, String> attributes, DetailedLibrary library) {
     assertPlainLibraryAttributes(attributes, library);
 
-    testLibraryAttribute(LibColumns.DESIGN, attributes, library, lib -> {
+    assertEntityAttribute(LibColumns.DESIGN, attributes, library, lib -> {
       return lib.getLibraryDesign() == null ? null : lib.getLibraryDesign().getName();
     });
-    testLibraryAttribute(LibColumns.KIT_DESCRIPTOR, attributes, library, lib -> lib.getKitDescriptor().getName());
-    testLibraryAttribute(LibColumns.CODE, attributes, library, lib -> lib.getLibraryDesignCode().getCode());
-    testLibraryAttribute(LibColumns.SELECTION, attributes, library, lib -> lib.getLibrarySelectionType().getName());
-    testLibraryAttribute(LibColumns.STRATEGY, attributes, library, lib -> lib.getLibraryStrategyType().getName());
+    assertEntityAttribute(LibColumns.KIT_DESCRIPTOR, attributes, library, lib -> lib.getKitDescriptor().getName());
+    assertEntityAttribute(LibColumns.CODE, attributes, library, lib -> lib.getLibraryDesignCode().getCode());
+    assertEntityAttribute(LibColumns.SELECTION, attributes, library, lib -> lib.getLibrarySelectionType().getName());
+    assertEntityAttribute(LibColumns.STRATEGY, attributes, library, lib -> lib.getLibraryStrategyType().getName());
   }
 
   private void assertParentSampleAttributes(Map<String, String> attributes, DetailedLibrary library) {
@@ -740,42 +740,6 @@ public class BulkLibraryIT extends AbstractIT {
       }
       return lib.getIndices().stream().filter(index -> index.getPosition() == position).findFirst().get().getLabel();
     };
-  }
-
-  private String getQcPassedString(Boolean qcPassed) {
-    if (qcPassed == null) {
-      return "Unknown";
-    } else if (qcPassed) {
-      return "True";
-    } else {
-      return "False";
-    }
-  }
-
-  private <T> void testLibraryAttribute(String column, Map<String, String> attributes, T object, Function<T, String> getter) {
-    if (attributes.containsKey(column)) {
-      String objectAttribute = getter.apply(object);
-      String tableAttribute = cleanNullValues(column, attributes.get(column));
-      if (tableAttribute == null) {
-        assertTrue(String.format("persisted attribute expected empty '%s'", column), isStringEmptyOrNull(objectAttribute));
-      } else {
-        assertEquals(String.format("persisted attribute '%s'", column), tableAttribute, objectAttribute);
-      }
-    }
-  }
-
-  private String cleanNullValues(String key, String value) {
-    switch (key) {
-    case LibColumns.INDEX_FAMILY:
-      return NO_INDEX_FAMILY.equals(value) ? null : value;
-    case LibColumns.INDEX_1:
-    case LibColumns.INDEX_2:
-      return NO_INDEX.equals(value) ? null : value;
-    case LibColumns.DESIGN:
-      return NO_DESIGN.equals(value) ? null : value;
-    default:
-      return value == null || value.isEmpty() ? null : value;
-    }
   }
 
   private void saveAndAssertSuccess(HandsOnTable table) {
