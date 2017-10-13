@@ -78,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -761,6 +762,8 @@ public class EditSampleController {
       case SampleTissueProcessing.CATEGORY_NAME:
         if (SampleSlide.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
           detailedTemplate = new SampleSlideDto();
+        } else if (SampleLCMTube.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+          detailedTemplate = new SampleLCMTubeDto();
         } else {
           detailedTemplate = new SampleTissueProcessingDto();
         }

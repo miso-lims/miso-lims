@@ -69,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleLCMTubeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
@@ -185,6 +186,7 @@ public class SampleController extends RestController {
   public Sample buildHierarchy(SampleDto sampleDto) {
     if (sampleDto instanceof SampleAliquotDto) {
       SampleAliquotDto dto = (SampleAliquotDto) sampleDto;
+      // Some hierarchies have two Aliquot levels
       dto.setParentAliquotClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleAliquot.CATEGORY_NAME,
           SampleAliquot.CATEGORY_NAME, true));
       Long topAliquotClassId = dto.getParentAliquotClassId() == null ? dto.getSampleClassId() : dto.getParentAliquotClassId();
@@ -200,10 +202,19 @@ public class SampleController extends RestController {
               SampleTissue.CATEGORY_NAME, false));
     } else if (sampleDto instanceof SampleTissueProcessingDto) {
       DetailedSampleDto dto = (DetailedSampleDto) sampleDto;
+      Long topProcessingClassId = dto.getSampleClassId();
+      if (sampleDto instanceof SampleLCMTubeDto) {
+        SampleLCMTubeDto lcmDto = (SampleLCMTubeDto) dto;
+        // Some hierarchies have two Tissue Processing levels
+        lcmDto.setParentSlideClassId(inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleTissueProcessing.CATEGORY_NAME,
+            SampleTissueProcessing.CATEGORY_NAME, true));
+        if (lcmDto.getParentSlideClassId() != null) {
+          topProcessingClassId = lcmDto.getParentSlideClassId();
+        }
+      }
       dto.setParentTissueSampleClassId(
-          inferIntermediateSampleClassId(dto, dto.getSampleClassId(), SampleTissueProcessing.CATEGORY_NAME,
+          inferIntermediateSampleClassId(dto, topProcessingClassId, SampleTissueProcessing.CATEGORY_NAME,
               SampleTissue.CATEGORY_NAME, false));
-
     }
     return Dtos.to(sampleDto);
   }

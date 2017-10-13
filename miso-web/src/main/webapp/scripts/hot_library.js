@@ -200,7 +200,7 @@ HotTarget.library = (function() {
               firstDay: 0,
               numberOfMonths: 1
             },
-            allowEmpty: true,
+            allowEmpty: !config.isLibraryReceipt,
             include: config.isLibraryReceipt || !create,
             unpack: function(lib, flat, setCellMeta) {
               flat.receivedDate = lib.receivedDate || null;

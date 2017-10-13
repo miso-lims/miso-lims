@@ -436,6 +436,18 @@ public class Dtos {
         tissue.getSampleClass().setId(childDto.getParentTissueSampleClassId());
         tissue.setParent(parent);
         parent = tissue;
+
+        if (childDto instanceof SampleLCMTubeDto) {
+          SampleLCMTubeDto lcm = (SampleLCMTubeDto) childDto;
+          if (lcm.getParentSlideClassId() != null) {
+            SampleSlide slide = new SampleSlideImpl();
+            slide.setSampleClass(new SampleClassImpl());
+            slide.getSampleClass().setId(lcm.getParentSlideClassId());
+            slide.setSlides(0);
+            slide.setParent(parent);
+            parent = slide;
+          }
+        }
       }
       if (childDto instanceof SampleStockDto && childDto.getClass() != SampleStockDto.class) {
         SampleAliquotDto aliquotDto = (SampleAliquotDto) childDto;
