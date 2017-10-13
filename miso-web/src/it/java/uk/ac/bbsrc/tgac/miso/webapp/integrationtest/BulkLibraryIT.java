@@ -35,10 +35,14 @@ public class BulkLibraryIT extends AbstractIT {
 
   private static final Logger log = LoggerFactory.getLogger(BulkLibraryIT.class);
 
-  private static final Set<String> commonColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.SAMPLE_ALIAS, Columns.ID_BARCODE,
-      Columns.SAMPLE_LOCATION, Columns.DESCRIPTION, Columns.GROUP_ID, Columns.GROUP_DESC, Columns.DESIGN, Columns.CODE, Columns.PLATFORM,
-      Columns.LIBRARY_TYPE, Columns.SELECTION, Columns.STRATEGY, Columns.INDEX_FAMILY, Columns.INDEX_1, Columns.INDEX_2,
-      Columns.KIT_DESCRIPTOR, Columns.QC_PASSED, Columns.SIZE, Columns.VOLUME, Columns.CONCENTRATION);
+  private static final Set<String> commonColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.ID_BARCODE,
+      Columns.DESCRIPTION, Columns.GROUP_ID, Columns.GROUP_DESC, Columns.DESIGN, Columns.CODE, Columns.PLATFORM, Columns.LIBRARY_TYPE,
+      Columns.SELECTION, Columns.STRATEGY, Columns.INDEX_FAMILY, Columns.INDEX_1, Columns.INDEX_2, Columns.KIT_DESCRIPTOR,
+      Columns.QC_PASSED, Columns.SIZE, Columns.VOLUME, Columns.CONCENTRATION);
+
+  private static final Set<String> editColumns = Sets.newHashSet(Columns.RECEIVE_DATE, Columns.SAMPLE_ALIAS, Columns.SAMPLE_LOCATION);
+
+  private static final Set<String> propagateColumns = Sets.newHashSet(Columns.SAMPLE_ALIAS, Columns.SAMPLE_LOCATION);
 
   private static final Set<String> receiptColumns = Sets.newHashSet(BulkSamplePage.Columns.SAMPLE_TYPE,
       BulkSamplePage.Columns.SCIENTIFIC_NAME, BulkSamplePage.Columns.PROJECT, BulkSamplePage.Columns.EXTERNAL_NAME,
@@ -62,11 +66,13 @@ public class BulkLibraryIT extends AbstractIT {
     BulkLibraryPage page = BulkLibraryPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(100001L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(commonColumns.size() + 1, headings.size());
+    assertEquals(commonColumns.size() + editColumns.size(), headings.size());
     for (String col : commonColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
-    assertTrue("Check for column: '" + Columns.RECEIVE_DATE + "'", headings.contains(Columns.RECEIVE_DATE));
+    for (String col : editColumns) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
     assertEquals(1, table.getRowCount());
   }
 
@@ -76,8 +82,11 @@ public class BulkLibraryIT extends AbstractIT {
     BulkLibraryPage page = BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Sets.newHashSet(100004L), 4);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(commonColumns.size(), headings.size());
+    assertEquals(commonColumns.size() + propagateColumns.size(), headings.size());
     for (String col : commonColumns) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+    for (String col : propagateColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(4, table.getRowCount());
@@ -100,9 +109,8 @@ public class BulkLibraryIT extends AbstractIT {
     for (String col : receiptColumns) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
-    assertEquals(4, table.getRowCount());
+    assertEquals(2, table.getRowCount());
 
-    assertEquals("LIBT_0001_Ly_P_1-1_D1", table.getText(Columns.SAMPLE_ALIAS, 0));
     assertEquals("Unknown", table.getText(Columns.QC_PASSED, 0));
 
     // test extra field for RNA subtypes
