@@ -12,7 +12,7 @@ import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor.Builder;
 
 public class IlluminaProcessorTest extends AbstractProcessorTest {
-  private final DefaultIllumina instance = new DefaultIllumina(new Builder(PlatformType.ILLUMINA, "unittest", null));
+  private final DefaultIllumina instance = new DefaultIllumina(new Builder(PlatformType.ILLUMINA, "unittest", null), true);
 
   public IlluminaProcessorTest() {
     super(IlluminaNotificationDto.class);

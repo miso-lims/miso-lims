@@ -12,12 +12,13 @@
     49
   ],
   "containerSerialNumber": "C59Y4ACXX",
-  "healthType": "Running",
+  "healthType": "Completed",
   "imgCycle": 202,
   "indexLengths": [
   ],
   "laneCount": 8,
   "numCycles": 202,
+  "numReads": 2,
   "pairedEndRun": true,
   "poolNames": {},
   "readLength": 101,
