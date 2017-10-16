@@ -933,9 +933,6 @@ public class Dtos {
     dto.setPreMigrationId(from.getPreMigrationId());
     dto.setArchived(from.getArchived());
     dto.setNonStandardAlias(from.hasNonStandardAlias());
-    if (from.getSample().getBox() != null) {
-      dto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
-    }
     if (from.getGroupId() != null) {
       dto.setGroupId(from.getGroupId());
     }
@@ -1098,6 +1095,9 @@ public class Dtos {
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
+    if (from.getSample().getBox() != null) {
+      dto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
+    }
     if (from.getReceivedDate() != null) {
       dto.setReceivedDate(formatDate(from.getReceivedDate()));
     }

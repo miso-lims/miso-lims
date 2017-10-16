@@ -122,7 +122,7 @@ var HotUtils = {
       data: flatObjects,
       maxRows: data.length,
       renderAllRows: true,
-      columnSorting: Constants.isDetailedSample,
+      columnSorting: true,
       cells: function(row, col, prop) {
         var cellProperties = {};
 

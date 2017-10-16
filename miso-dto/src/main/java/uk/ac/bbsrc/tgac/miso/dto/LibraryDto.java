@@ -50,6 +50,7 @@ public class LibraryDto implements WritableUrls {
   private Long kitDescriptorId;
   private SampleDto sample;
   private String receivedDate;
+  private String sampleBoxPositionLabel;
 
   public String getAlias() {
     return alias;
@@ -330,6 +331,14 @@ public class LibraryDto implements WritableUrls {
 
   public void setReceivedDate(String receivedDate) {
     this.receivedDate = receivedDate;
+  }
+
+  public String getSampleBoxPositionLabel() {
+    return sampleBoxPositionLabel;
+  }
+
+  public void setSampleBoxPositionLabel(String boxPositionLabel) {
+    this.sampleBoxPositionLabel = boxPositionLabel;
   }
 
   @Override

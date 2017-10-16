@@ -12,7 +12,6 @@ public class DetailedLibraryDto extends LibraryDto {
   private Long libraryDesignCodeId;
   private boolean nonStandardAlias;
   private Long preMigrationId;
-  private String sampleBoxPositionLabel;
   private String groupId;
   private String groupDescription;
 
@@ -54,14 +53,6 @@ public class DetailedLibraryDto extends LibraryDto {
 
   public void setPreMigrationId(Long preMigrationId) {
     this.preMigrationId = preMigrationId;
-  }
-
-  public String getSampleBoxPositionLabel() {
-    return sampleBoxPositionLabel;
-  }
-
-  public void setSampleBoxPositionLabel(String boxPositionLabel) {
-    this.sampleBoxPositionLabel = boxPositionLabel;
   }
 
   public String getGroupId() {
