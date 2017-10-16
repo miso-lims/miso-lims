@@ -45,6 +45,7 @@ cache:
   directories:
     - "$HOME/.sonar/cache"
     - "$HOME/.m2"
+  timeout: 300
 
 notifications:
   email: false
