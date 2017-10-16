@@ -2,11 +2,11 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.assertEntityAttribute;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -189,17 +189,37 @@ public class BulkDilutionIT extends AbstractIT {
   }
 
   private void assertDilutionAttributes(Map<String, String> attributes, LibraryDilution dilution) {
-    assertEntityAttribute(DilColumns.NAME, attributes, dilution, LibraryDilution::getName);
-    assertEntityAttribute(DilColumns.ID_BARCODE, attributes, dilution, LibraryDilution::getIdentificationBarcode);
-    assertEntityAttribute(DilColumns.LIBRARY_ALIAS, attributes, dilution, dil -> dil.getLibrary().getAlias());
-    assertEntityAttribute(DilColumns.CONCENTRATION, attributes, dilution, dil -> dil.getConcentration().toString());
-    assertEntityAttribute(DilColumns.VOLUME, attributes, dilution, dil -> dil.getVolume().toString());
-    assertEntityAttribute(DilColumns.CREATION_DATE, attributes, dilution, dil -> dil.getCreationDate().toString());
-    assertEntityAttribute(DilColumns.TARGETED_SEQUENCING, attributes, dilution, dil -> {
+    testDilutionAttribute(DilColumns.NAME, attributes, dilution, LibraryDilution::getName);
+    testDilutionAttribute(DilColumns.ID_BARCODE, attributes, dilution, LibraryDilution::getIdentificationBarcode);
+    testDilutionAttribute(DilColumns.LIBRARY_ALIAS, attributes, dilution, dil -> dil.getLibrary().getAlias());
+    testDilutionAttribute(DilColumns.CONCENTRATION, attributes, dilution, dil -> dil.getConcentration().toString());
+    testDilutionAttribute(DilColumns.VOLUME, attributes, dilution, dil -> dil.getVolume().toString());
+    testDilutionAttribute(DilColumns.CREATION_DATE, attributes, dilution, dil -> dil.getCreationDate().toString());
+    testDilutionAttribute(DilColumns.TARGETED_SEQUENCING, attributes, dilution, dil -> {
       if (dil.getTargetedSequencing() == null) {
         return null;
       }
       return dil.getTargetedSequencing().getAlias();
     });
+  }
+
+  private <T> void testDilutionAttribute(String column, Map<String, String> attributes, T object, Function<T, String> getter) {
+    if (attributes.containsKey(column)) {
+      String objectAttribute = getter.apply(object);
+      String tableAttribute = cleanNullValues(column, attributes.get(column));
+      if (tableAttribute == null) {
+        assertTrue(String.format("persisted attribute expected empty '%s'", column), isStringEmptyOrNull(objectAttribute));
+      } else {
+        assertEquals(String.format("persisted attribute '%s'", column), tableAttribute, objectAttribute);
+      }
+    }
+  }
+
+  private String cleanNullValues(String key, String value) {
+    if (DilColumns.TARGETED_SEQUENCING.equals(key)) {
+      return NO_TAR_SEQ.equals(value) ? null : value;
+    } else {
+      return value == null || value.isEmpty() ? null : value;
+    }
   }
 }

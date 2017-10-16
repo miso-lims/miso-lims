@@ -46,7 +46,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
       assertEntityAttribute(SamColumns.PROJECT, attributes, sample, s -> s.getProject().getShortName());
     }
     assertEntityAttribute(SamColumns.ALIAS, attributes, sample, Sample::getAlias);
-    assertEntityAttribute(SamColumns.DESCRIPTION, attributes, sample, s -> s.getDescription() == null ? null : s.getDescription());
+    assertEntityAttribute(SamColumns.DESCRIPTION, attributes, sample, s -> s.getDescription() == null ? "" : s.getDescription());
     assertEntityAttribute(SamColumns.ID_BARCODE, attributes, sample,
         s -> s.getIdentificationBarcode() == null ? null : s.getIdentificationBarcode());
     assertEntityAttribute(SamColumns.SAMPLE_TYPE, attributes, sample, Sample::getSampleType);
