@@ -706,8 +706,10 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
         return true;
       }
     } else {
-      if (!target.didSomeoneElseChangeColumn("health", user) && target.getHealth() != source.getHealth()) {
+      if (!target.didSomeoneElseChangeColumn("health", user) || (target.getHealth().isDone() && !source.getHealth().isDone())) {
         // A human user has never change the health of this run, so we will.
+        // Alternatively, a human set the status to not-done but runscanner has indicated that the run is now done, so we will update with
+        // this.
         target.setHealth(source.getHealth());
         target.setCompletionDate(source.getHealth().isDone() ? source.getCompletionDate() : null);
         return true;
