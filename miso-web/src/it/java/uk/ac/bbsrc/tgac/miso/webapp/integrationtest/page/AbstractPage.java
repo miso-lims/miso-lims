@@ -296,4 +296,16 @@ public abstract class AbstractPage extends AbstractElement {
     WebElement cancelButton = getDriver().findElement(By.id("cancel"));
     cancelButton.click();
   }
+
+  public String getCurrentUrl() {
+    return getDriver().getCurrentUrl();
+  }
+
+  public String clickLinkButtonAndGetUrl(String linkText) {
+    WebElement button = getDriver().findElement(By.linkText(linkText));
+    WebElement html = getHtmlElement();
+    button.click();
+    waitForPageRefresh(html);
+    return getCurrentUrl();
+  }
 }

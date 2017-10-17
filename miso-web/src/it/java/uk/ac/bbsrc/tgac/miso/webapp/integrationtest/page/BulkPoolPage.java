@@ -53,14 +53,14 @@ public class BulkPoolPage extends HeaderFooterPage {
   }
 
   public static BulkPoolPage getForPoolSeparately(WebDriver driver, String baseUrl, Collection<Long> dilutionIds) {
-    String ids = Joiner.on(',').join(dilutionIds);
+    String ids = Joiner.on("%2C").join(dilutionIds);
     String url = baseUrl + "miso/library/dilution/bulk/propagate?ids=" + ids;
     driver.get(url);
     return new BulkPoolPage(driver);
   }
 
   public static BulkPoolPage getForPoolTogether(WebDriver driver, String baseUrl, Collection<Long> dilutionIds) {
-    String ids = Joiner.on(',').join(dilutionIds);
+    String ids = Joiner.on("%2C").join(dilutionIds);
     String url = baseUrl + "miso/library/dilution/bulk/merge?ids=" + ids;
     driver.get(url);
     return new BulkPoolPage(driver);

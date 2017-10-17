@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,8 +17,11 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage.Columns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkPoolIT extends AbstractIT {
@@ -40,6 +44,49 @@ public class BulkPoolIT extends AbstractIT {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
+  }
+
+  @Test
+  public void testSelectForPoolTogether() {
+    // goal: confirm that using the List Dilutions page to select dilutions for pooling together
+    // directs the page to the correct link with the correct dilutions
+    ListPage listDilutions = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.DILUTIONS);
+    DataTable dilutions = listDilutions.getTable();
+    dilutions.searchFor("LDI70"); // should get LDI701 and LDI702
+    assertEquals(2, dilutions.countRows());
+
+    dilutions.checkBoxForRow(0);
+    dilutions.checkBoxForRow(1);
+    String newUrl = listDilutions.clickLinkButtonAndGetUrl("Pool together");
+
+    assertTrue(newUrl.contains("miso/library/dilution/bulk/merge"));
+    String idString = newUrl.split("=")[1];
+    List<String> ids = Arrays.asList(idString.split("%2C"));
+    assertEquals(2, ids.size());
+    assertTrue(ids.contains("701"));
+    assertTrue(ids.contains("702"));
+  }
+
+  @Test
+  public void testSelectForPoolSeparately() {
+    // goal: confirm that using the List Dilutions page to select dilutions for pooling separately
+    // directs the page to the correct link with the correct dilutions
+    ListPage listDilutions = ListPage.getListPage(getDriver(), getBaseUrl(), ListTarget.DILUTIONS);
+    DataTable dilutions = listDilutions.getTable();
+    dilutions.searchFor("LDI70"); // should get LDI701 and LDI702
+    assertEquals(2, dilutions.countRows());
+
+    dilutions.checkBoxForRow(0);
+    dilutions.checkBoxForRow(1);
+    String newUrl = listDilutions.clickLinkButtonAndGetUrl("Pool separately");
+
+
+    assertTrue(newUrl.contains("miso/library/dilution/bulk/propagate"));
+    String idString = newUrl.split("=")[1];
+    List<String> ids = Arrays.asList(idString.split("%2C"));
+    assertEquals(2, ids.size());
+    assertTrue(ids.contains("701"));
+    assertTrue(ids.contains("702"));
   }
 
   @Test

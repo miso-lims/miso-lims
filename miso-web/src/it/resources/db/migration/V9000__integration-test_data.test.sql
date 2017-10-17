@@ -643,7 +643,9 @@ INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId,
 (200001, 'LDI200001', 4, 200001, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
 (200002, 'LDI200002', 3, 200002, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
 (504, 'LDI504', 5.9, 504, 'TIB_Dil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00'),
-(505, 'LDI505', 3.3, 504, 'TIB_replaceDil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00');
+(505, 'LDI505', 3.3, 504, 'TIB_replaceDil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00'),
+(701, 'LDI701', 2.2, 504, 'test_pooling_1', '2017-10-16', 'admin', 1, 1, '2017-10-16 15:59:00'),
+(702, 'LDI702', 2.2, 504, 'test_pooling_2', '2017-10-16', 'admin', 1, 1, '2017-10-16 15:59:00');
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, ready, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 2, 'ILLUMINA', 1, 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
@@ -665,7 +667,9 @@ INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarc
 (5102, 4, 4, 'IPO5102', 'POOL_SEARCH_2', 'ipobar5102', 'cats', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5103, 4, 4, 'IPO5103', 'POOL_WITH_ORDERS', 'ipobar5103', 'sergeant', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5104, 4, 4, 'IPO5104', 'POOL_WITH_COMPLETED_ORDERS', 'ipobar5104', 'mission accomplished', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5105, 4, 4, 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 2, 'ILLUMINA', 0, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL);
+(5105, 4, 4, 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 2, 'ILLUMINA', 0, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(701, 4, 4, 'IPO701', 'TEST_POOLING_DILUTIONS', 'ipobar701', 'test pool', '2017-10-17', 2, 'ILLUMINA', 1, 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
+(702, 4, 4, 'IPO702', 'TEST_REMOVING_DILUTIONS', 'ipobar702', 'test pool', '2017-10-17', 2, 'ILLUMINA', 1, 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1),
@@ -680,7 +684,8 @@ INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (200003, 200001),
 (200003, 200002),
 (200004, 200001),
-(501, 504);
+(501, 504),
+(702, 702);
 
 INSERT INTO PoolOrder (poolOrderId, poolId, partitions, parametersId, createdBy, updatedBy, creationDate, lastUpdated) VALUES
 (1, 5103, 2, 4, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),

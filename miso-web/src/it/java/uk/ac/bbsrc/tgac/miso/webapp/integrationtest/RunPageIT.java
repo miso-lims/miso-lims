@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.Field;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.LaneQC;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.PoolSearch;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.TableWrapperId;;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.RunTableWrapperId;;
 
 public class RunPageIT extends AbstractIT {
 
@@ -183,7 +183,7 @@ public class RunPageIT extends AbstractIT {
 
     RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5002L);
     RunPage page2 = page.addContainer("EXISTING", "Illumina", false);
-    assertTrue(page2.getTable(TableWrapperId.CONTAINER).doesColumnContain(Columns.SERIAL_NUMBER, "EXISTING"));
+    assertTrue(page2.getTable(RunTableWrapperId.CONTAINER).doesColumnContain(Columns.SERIAL_NUMBER, "EXISTING"));
 
     Run addedRun = (Run) getSession().get(Run.class, 5002L);
     assertEquals(1, addedRun.getSequencerPartitionContainers().size());
@@ -199,7 +199,7 @@ public class RunPageIT extends AbstractIT {
 
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5003L);
     RunPage page2 = page1.removeContainer(0);
-    assertFalse(page2.getTable(TableWrapperId.CONTAINER).doesColumnContain(Columns.SERIAL_NUMBER, "REMOVABLE"));
+    assertFalse(page2.getTable(RunTableWrapperId.CONTAINER).doesColumnContain(Columns.SERIAL_NUMBER, "REMOVABLE"));
 
     Run strippedRun = (Run) getSession().get(Run.class, 5003L);
     assertTrue(strippedRun.getSequencerPartitionContainers().isEmpty());
@@ -215,11 +215,11 @@ public class RunPageIT extends AbstractIT {
       .forEach(partition -> assertNull(partition.getPool()));
     
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5004L);
-    List<String> page1Pools = page1.getTable(TableWrapperId.PARTITION).getColumnValues(Columns.POOL);
+    List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(0, page1Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
 
     RunPage page2 = page1.assignPools(Arrays.asList(0, 1), PoolSearch.SEARCH, poolAlias);
-    List<String> columnValues = page2.getTable(TableWrapperId.PARTITION).getColumnValues(Columns.POOL);
+    List<String> columnValues = page2.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(2, columnValues.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
 
     Run run = (Run) getSession().get(Run.class, 5004L);
@@ -238,10 +238,10 @@ public class RunPageIT extends AbstractIT {
         .forEach(partition -> assertNotNull(partition.getPool()));
 
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5005L);
-    List<String> page1Pools = page1.getTable(TableWrapperId.PARTITION).getColumnValues(Columns.POOL);
+    List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(2, page1Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
     RunPage page2 = page1.assignPools(Arrays.asList(0, 1), PoolSearch.NO_POOL, null);
-    List<String> page2Pools = page2.getTable(TableWrapperId.PARTITION).getColumnValues(Columns.POOL);
+    List<String> page2Pools = page2.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(0, page2Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
 
     Run run = (Run) getSession().get(Run.class, 5005L);
@@ -264,11 +264,11 @@ public class RunPageIT extends AbstractIT {
         });
 
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5006L);
-    List<String> page1Pools = page1.getTable(TableWrapperId.PARTITION).getColumnValues(Columns.POOL);
+    List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(1, page1Pools.stream().filter(val -> val.contains(firstPool)).collect(Collectors.toList()).size());
 
     RunPage page2 = page1.assignPools(Arrays.asList(0), PoolSearch.SEARCH, secondPool);
-    List<String> page2Pools = page2.getTable(TableWrapperId.PARTITION).getColumnValues(Columns.POOL);
+    List<String> page2Pools = page2.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(1, page2Pools.stream().filter(val -> val.contains(secondPool)).collect(Collectors.toList()).size());
 
     Run run = (Run) getSession().get(Run.class, 5006L);
