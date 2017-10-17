@@ -1,3 +1,10 @@
+# 0.2.92
+
+Changes:
+
+ * Can now receive Libraries (all flavours) and all SampleClasses (detailed flavour only)
+ * override user-set 'not done' run status if run scanner sees run is 'done'
+
 # 0.2.91
 
 Changes:
