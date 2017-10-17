@@ -4,10 +4,12 @@ jdk:
   - oraclejdk8
 sudo: required
 env:  
-MAVEN_SETTINGS="${TRAVIS_BUILD_DIR}/gsi-config"
-MAVEN_OPTS="-Xms1g -Xmx2g" 
-- PLAIN=true
-- PLAIN=false
+  global:
+    - MAVEN_SETTINGS="${TRAVIS_BUILD_DIR}/gsi-config"
+    - MAVEN_OPTS="-Xms1g -Xmx2g" 
+  matrix: 
+    - PLAIN=true
+    - PLAIN=false
 
 git:
   depth: 3
