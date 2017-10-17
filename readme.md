@@ -44,6 +44,12 @@ To use it:
 Navigate to [http://localhost:8090](http://localhost:8090) to login to miso with
 the credentials **admin/admin**.
 
+There is a [tutorial available](https://oicr-gsi.github.io/miso-docs-oicr/plain-index)
+for introducing new users to MISO's functionality. Some of the resources (MISO URL,
+ways of contacting the MISO administrators) are specific to Ontario Institute for 
+Cancer Research, but this can be changed by forking and configuring the
+[tutorial repository](https://github.com/oicr-gsi/miso-docs-oicr).
+
 ### Virtual Box
 
 An older version of MISO is available in our our virtual machine image with
@@ -74,8 +80,8 @@ own fork of the MISO codebase with your configuration changes. For each
 release, you will need to merge the main changes into your local repository and
 then deploy a new version.
 
-For deployment, you will need a mySQL database server, a server to scan the
-sequencer output directories (the notification server), and a Tomcat
+For deployment, you will need a MySQL database server, a server to scan the
+sequencer output directories (the run scanner), and a Tomcat
 application server. These can be on the same machine. It is advisable to
 have a separate build environment.
 
