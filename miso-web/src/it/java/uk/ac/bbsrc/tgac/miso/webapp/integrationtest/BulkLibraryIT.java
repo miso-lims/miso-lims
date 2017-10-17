@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage.LibColumns;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 
@@ -44,12 +44,12 @@ public class BulkLibraryIT extends AbstractIT {
 
   private static final Set<String> propagateColumns = Sets.newHashSet(LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION);
 
-  private static final Set<String> receiptColumns = Sets.newHashSet(BulkSamplePage.Columns.SAMPLE_TYPE,
-      BulkSamplePage.Columns.SCIENTIFIC_NAME, BulkSamplePage.Columns.PROJECT, BulkSamplePage.Columns.EXTERNAL_NAME,
-      BulkSamplePage.Columns.IDENTITY_ALIAS, BulkSamplePage.Columns.DONOR_SEX, BulkSamplePage.Columns.SAMPLE_CLASS,
-      BulkSamplePage.Columns.TISSUE_ORIGIN, BulkSamplePage.Columns.TISSUE_TYPE, BulkSamplePage.Columns.PASSAGE_NUMBER,
-      BulkSamplePage.Columns.TIMES_RECEIVED, BulkSamplePage.Columns.TUBE_NUMBER, BulkSamplePage.Columns.TISSUE_MATERIAL,
-      BulkSamplePage.Columns.REGION, Columns.RECEIVE_DATE);
+  private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE,
+      SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME,
+      SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.SAMPLE_CLASS,
+      SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER,
+      SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL,
+      SamColumns.REGION, LibColumns.RECEIVE_DATE);
 
   private static final String NO_INDEX_FAMILY = "No indices";
   private static final String NO_INDEX = "No index";
@@ -111,14 +111,14 @@ public class BulkLibraryIT extends AbstractIT {
     }
     assertEquals(2, table.getRowCount());
 
-    assertEquals("Unknown", table.getText(Columns.QC_PASSED, 0));
+    assertEquals("Unknown", table.getText(LibColumns.QC_PASSED, 0));
 
     // test extra field for RNA subtypes
     BulkLibraryPage page2 = BulkLibraryPage.getForReceive(getDriver(), getBaseUrl(), 2, null, 19);
     HandsOnTable table2 = page2.getTable();
     List<String> headings2 = table2.getColumnHeadings();
     assertEquals(commonColumns.size() + receiptColumns.size() + 1, headings2.size());
-    assertTrue("Check for column: '" + BulkSamplePage.Columns.DNASE_TREATED + "'", headings2.contains(BulkSamplePage.Columns.DNASE_TREATED));
+    assertTrue("Check for column: '" + SamColumns.DNASE_TREATED + "'", headings2.contains(SamColumns.DNASE_TREATED));
   }
 
   @Test
@@ -503,15 +503,15 @@ public class BulkLibraryIT extends AbstractIT {
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
-    attrs.put(BulkSamplePage.Columns.SAMPLE_TYPE, "GENOMIC");
-    attrs.put(BulkSamplePage.Columns.SCIENTIFIC_NAME, "Homo sapiens");
-    attrs.put(BulkSamplePage.Columns.PROJECT, "LIBT");
-    attrs.put(BulkSamplePage.Columns.EXTERNAL_NAME, "lkjh");
-    attrs.put(BulkSamplePage.Columns.DONOR_SEX, "Unknown");
-    attrs.put(BulkSamplePage.Columns.TISSUE_ORIGIN, "Bn (Brain)");
-    attrs.put(BulkSamplePage.Columns.TISSUE_TYPE, "P (Primary tumour)");
-    attrs.put(BulkSamplePage.Columns.TIMES_RECEIVED, "3");
-    attrs.put(BulkSamplePage.Columns.TUBE_NUMBER, "4");
+    attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
+    attrs.put(SamColumns.SCIENTIFIC_NAME, "Homo sapiens");
+    attrs.put(SamColumns.PROJECT, "LIBT");
+    attrs.put(SamColumns.EXTERNAL_NAME, "lkjh");
+    attrs.put(SamColumns.DONOR_SEX, "Unknown");
+    attrs.put(SamColumns.TISSUE_ORIGIN, "Bn (Brain)");
+    attrs.put(SamColumns.TISSUE_TYPE, "P (Primary tumour)");
+    attrs.put(SamColumns.TIMES_RECEIVED, "3");
+    attrs.put(SamColumns.TUBE_NUMBER, "4");
     attrs.put(LibColumns.ID_BARCODE, "LIBT_RCV1");
     attrs.put(LibColumns.DESCRIPTION, "LIBT receive test");
     attrs.put(LibColumns.RECEIVE_DATE, "2017-10-12");
@@ -696,18 +696,18 @@ public class BulkLibraryIT extends AbstractIT {
   }
 
   private void assertParentSampleAttributes(Map<String, String> attributes, DetailedLibrary library) {
-    testLibraryAttribute(BulkSamplePage.Columns.SAMPLE_TYPE, attributes, library, lib -> lib.getSample().getSampleType());
-    testLibraryAttribute(BulkSamplePage.Columns.SCIENTIFIC_NAME, attributes, library, lib -> lib.getSample().getScientificName());
-    testLibraryAttribute(BulkSamplePage.Columns.PROJECT, attributes, library, lib -> lib.getSample().getProject().getShortName());
-    testLibraryAttribute(BulkSamplePage.Columns.EXTERNAL_NAME, attributes, library, lib -> identityGetter.apply(lib).getExternalName());
-    testLibraryAttribute(BulkSamplePage.Columns.DONOR_SEX, attributes, library, lib -> identityGetter.apply(lib).getDonorSex().getLabel());
-    testLibraryAttribute(BulkSamplePage.Columns.TISSUE_ORIGIN, attributes, library,
+    testLibraryAttribute(SamColumns.SAMPLE_TYPE, attributes, library, lib -> lib.getSample().getSampleType());
+    testLibraryAttribute(SamColumns.SCIENTIFIC_NAME, attributes, library, lib -> lib.getSample().getScientificName());
+    testLibraryAttribute(SamColumns.PROJECT, attributes, library, lib -> lib.getSample().getProject().getShortName());
+    testLibraryAttribute(SamColumns.EXTERNAL_NAME, attributes, library, lib -> identityGetter.apply(lib).getExternalName());
+    testLibraryAttribute(SamColumns.DONOR_SEX, attributes, library, lib -> identityGetter.apply(lib).getDonorSex().getLabel());
+    testLibraryAttribute(SamColumns.TISSUE_ORIGIN, attributes, library,
         lib -> tissueGetter.apply(lib).getTissueOrigin().getItemLabel());
-    testLibraryAttribute(BulkSamplePage.Columns.TISSUE_TYPE, attributes, library,
+    testLibraryAttribute(SamColumns.TISSUE_TYPE, attributes, library,
         lib -> tissueGetter.apply(lib).getTissueType().getItemLabel());
-    testLibraryAttribute(BulkSamplePage.Columns.TIMES_RECEIVED, attributes, library,
+    testLibraryAttribute(SamColumns.TIMES_RECEIVED, attributes, library,
         lib -> tissueGetter.apply(lib).getTimesReceived().toString());
-    testLibraryAttribute(BulkSamplePage.Columns.TUBE_NUMBER, attributes, library,
+    testLibraryAttribute(SamColumns.TUBE_NUMBER, attributes, library,
         lib -> tissueGetter.apply(lib).getTubeNumber().toString());
   }
 
