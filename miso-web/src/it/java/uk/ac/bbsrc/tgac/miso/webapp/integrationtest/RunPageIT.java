@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.Field;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.LaneQC;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.PoolSearch;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.RunTableWrapperId;;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.RunTableWrapperId;
 
 public class RunPageIT extends AbstractIT {
 
