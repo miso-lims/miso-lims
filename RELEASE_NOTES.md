@@ -1,9 +1,19 @@
+# 0.2.93
+
+Changes:
+
+ * rename library receipt migration
+
 # 0.2.92
 
 Changes:
 
  * Can now receive Libraries (all flavours) and all SampleClasses (detailed flavour only)
  * override user-set 'not done' run status if run scanner sees run is 'done'
+
+Bad:
+
+ * Misnamed migration will cause issues when migrating database. Use v0.2.93 instead.
 
 # 0.2.91
 
