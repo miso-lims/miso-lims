@@ -5,7 +5,8 @@ DROP PROCEDURE IF EXISTS querySampleById//
 CREATE PROCEDURE querySampleById(
   iSampleId BIGINT(20)
 ) BEGIN
-  PREPARE stmt FROM 'SELECT s.alias NAME
+  PREPARE stmt FROM 'SELECT * FROM (
+    SELECT s.alias NAME
       , s.description description
       , s.NAME id
       , parent.NAME parentId
