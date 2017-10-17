@@ -48,7 +48,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     assertEntityAttribute(SamColumns.ALIAS, attributes, sample, Sample::getAlias);
     assertEntityAttribute(SamColumns.DESCRIPTION, attributes, sample, s -> s.getDescription() == null ? "" : s.getDescription());
     assertEntityAttribute(SamColumns.ID_BARCODE, attributes, sample,
-        s -> s.getIdentificationBarcode() == null ? null : s.getIdentificationBarcode());
+        s -> s.getIdentificationBarcode() == null ? "" : s.getIdentificationBarcode());
     assertEntityAttribute(SamColumns.SAMPLE_TYPE, attributes, sample, Sample::getSampleType);
     assertEntityAttribute(SamColumns.SCIENTIFIC_NAME, attributes, sample, Sample::getScientificName);
     if (!LimsUtils.isIdentitySample(sample)) {
@@ -63,8 +63,9 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     if (!sample.getSampleClass().getSampleCategory().equals(SampleIdentity.CATEGORY_NAME)) {
       assertNotNull("parent is not null", sample.getParent());
     }
-    assertEntityAttribute(SamColumns.GROUP_ID, attributes, sample, DetailedSample::getGroupId);
-    assertEntityAttribute(SamColumns.GROUP_DESCRIPTION, attributes, sample, DetailedSample::getGroupDescription);
+    assertEntityAttribute(SamColumns.GROUP_ID, attributes, sample, s -> s.getGroupId() == null ? "" : s.getGroupId());
+    assertEntityAttribute(SamColumns.GROUP_DESCRIPTION, attributes, sample,
+        s -> s.getGroupDescription() == null ? "" : s.getGroupDescription());
   }
 
   protected void assertSampleClass(String sampleClass, DetailedSample sample) {
@@ -79,8 +80,9 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   protected void assertTissueAttributes(Map<String, String> attributes, SampleTissue sample) {
     assertEntityAttribute(SamColumns.TISSUE_MATERIAL, attributes, sample,
         s -> s.getTissueMaterial() == null ? "(None)" : s.getTissueMaterial().getAlias());
-    assertEntityAttribute(SamColumns.REGION, attributes, sample, SampleTissue::getRegion);
-    assertEntityAttribute(SamColumns.SECONDARY_ID, attributes, sample, SampleTissue::getSecondaryIdentifier);
+    assertEntityAttribute(SamColumns.REGION, attributes, sample, s -> s.getRegion() == null ? "" : s.getRegion());
+    assertEntityAttribute(SamColumns.SECONDARY_ID, attributes, sample,
+        s -> s.getSecondaryIdentifier() == null ? "" : s.getSecondaryIdentifier());
     assertEntityAttribute(SamColumns.LAB, attributes, sample, s -> s.getLab() == null ? "(None)" : s.getLab().getItemLabel());
     assertEntityAttribute(SamColumns.TISSUE_ORIGIN, attributes, sample, s -> s.getTissueOrigin().getItemLabel());
     assertEntityAttribute(SamColumns.TISSUE_TYPE, attributes, sample, s -> s.getTissueType().getItemLabel());
@@ -92,10 +94,10 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
 
   protected void assertSlideAttributes(Map<String, String> attributes, SampleSlide sample) {
     assertEntityAttribute(SamColumns.SLIDES, attributes, sample, s -> s.getSlides().toString());
-    assertEntityAttribute(SamColumns.DISCARDS, attributes, sample, s -> s.getDiscards() == null ? null : s.getDiscards().toString());
+    assertEntityAttribute(SamColumns.DISCARDS, attributes, sample, s -> s.getDiscards() == null ? "" : s.getDiscards().toString());
     assertEntityAttribute(SamColumns.THICKNESS, attributes, sample,
-        s -> s.getThickness() == null ? null : sample.getThickness().toString());
-    assertEntityAttribute(SamColumns.STAIN, attributes, sample, s -> s.getStain() == null ? null : s.getStain().getName());
+        s -> s.getThickness() == null ? "" : sample.getThickness().toString());
+    assertEntityAttribute(SamColumns.STAIN, attributes, sample, s -> s.getStain() == null ? "(None)" : s.getStain().getName());
   }
 
   protected void assertLcmTubeAttributes(Map<String, String> attributes, SampleLCMTube sample) {
@@ -103,9 +105,9 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAnalyteAttributes(Map<String, String> attributes, DetailedSample sample) {
-    assertEntityAttribute(SamColumns.VOLUME, attributes, sample, s -> s.getVolume() == null ? null : s.getVolume().toString());
+    assertEntityAttribute(SamColumns.VOLUME, attributes, sample, s -> s.getVolume() == null ? "" : s.getVolume().toString());
     assertEntityAttribute(SamColumns.CONCENTRATION, attributes, sample,
-        s -> s.getConcentration() == null ? null : s.getConcentration().toString());
+        s -> s.getConcentration() == null ? "" : s.getConcentration().toString());
   }
 
   protected void assertStockAttributes(Map<String, String> attributes, SampleStock sample) {
