@@ -37,7 +37,7 @@ before_script:
   - sudo apt-get install -y pkg-config cmake libjsoncpp-dev autoconf libtool build-essential gcc-5 g++-5
 script:
   
-  - 'if [[PLAIN]] ; then
+  - 'if ($PLAIN) ; then
         mvn -P external clean verify -DrunPlainITs;
      else
         pushd runscanner-illumina && ./build-illumina-interop && autoreconf -i && ./configure && make && popd;
