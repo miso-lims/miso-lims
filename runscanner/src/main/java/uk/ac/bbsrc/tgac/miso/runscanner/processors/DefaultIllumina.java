@@ -30,11 +30,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.IlluminaNotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
+
+import io.prometheus.client.Counter;
 
 /**
  * Scan an Illumina sequener's output using the Illumina Interop C++ library.
@@ -42,6 +45,12 @@ import uk.ac.bbsrc.tgac.miso.runscanner.RunProcessor;
  * This should work for all sequencer execept the Genome Analyzer and Genome Analyzer II.
  */
 public final class DefaultIllumina extends RunProcessor {
+  private static final LatencyHistogram directory_scan_time = new LatencyHistogram("runscanner_illumina_file_completness_time",
+      "The time to scan all the output files in a sequencer's directory to tell if it's finished.");
+
+  private static final Counter completness_method_success = Counter.build("runscanner_illumina_completness_check",
+      "The number of times a method was used to determine a run's completeness after sequencing").labelNames("method").register();
+
   private static final Pattern FAILED_MESSAGE = Pattern.compile("Application\\sexited\\sbefore\\scompletion");
 
   private static final Logger log = LoggerFactory.getLogger(DefaultIllumina.class);
@@ -51,10 +60,12 @@ public final class DefaultIllumina extends RunProcessor {
   private static final Pattern COMMA = Pattern.compile(",");
 
   private static final Predicate<String> BCL_FILENAME = Pattern.compile("^s_[0-9]*_[0-9]*\\.bcl(\\.gz)?").asPredicate();
+
   private static final Predicate<String> BCL_BGZF_FILENAME = Pattern.compile("^[0-9]*\\.bcl\\.bgzf").asPredicate();
 
   public static DefaultIllumina create(Builder builder, ObjectNode parameters) {
-    return new DefaultIllumina(builder);
+    return new DefaultIllumina(builder,
+        parameters.hasNonNull("checkOutput") ? parameters.get("checkOutput").asBoolean() : true);
   }
 
   private static Optional<HealthType> getHealth(Document document) {
@@ -64,7 +75,7 @@ public final class DefaultIllumina extends RunProcessor {
       case "CompletedAsPlanned":
         return Optional.of(HealthType.Completed);
       default:
-        log.debug("New Illumina completion status found: " + status);
+        log.debug("New Illumina completion status found: %s", status);
       }
     } catch (XPathExpressionException e) {
       log.error("Failed to evaluate completion status", e);
@@ -72,8 +83,11 @@ public final class DefaultIllumina extends RunProcessor {
     return Optional.empty();
   }
 
-  public DefaultIllumina(Builder builder) {
+  private final boolean checkOutput;
+
+  public DefaultIllumina(Builder builder, boolean checkOutput) {
     super(builder);
+    this.checkOutput = checkOutput;
   }
 
   @Override
@@ -83,11 +97,11 @@ public final class DefaultIllumina extends RunProcessor {
 
   private boolean isLaneComplete(Path laneDir, IlluminaNotificationDto dto) {
     // For MiSeq and HiSeq, check for a complete set of BCL files per each cycle
-    long completeCycleDataCount = IntStream.rangeClosed(1, dto.getNumCycles())//
+    boolean completeCycleData = IntStream.rangeClosed(1, dto.getNumCycles())//
         .mapToObj(cycle -> String.format("C%d.1", cycle))//
         .map(laneDir::resolve)//
         .filter(Files::exists)//
-        .filter(cycleDir -> {
+        .allMatch(cycleDir -> {
           try (Stream<Path> cycleWalk = Files.walk(cycleDir, 1)) {
 
             long bclCount = cycleWalk//
@@ -99,8 +113,8 @@ public final class DefaultIllumina extends RunProcessor {
             log.error("Failed to walk lane directory: " + laneDir.toString(), e);
             return false;
           }
-        }).count();
-    if (completeCycleDataCount == dto.getNumCycles()) {
+        });
+    if (completeCycleData) {
       return true;
     }
     // For NextSeq, check for a file per cycle
@@ -175,22 +189,53 @@ public final class DefaultIllumina extends RunProcessor {
       dto.setHealthType(HealthType.Failed);
     }
 
-    // Check that all the data files have copied. Sometimes, the interop files are copied off the instrument first, but the data isn't and
-    // we don't want to mark the run as complete yet.
+    // This run claims to be complete, but is it really?
     if (dto.getHealthType() == HealthType.Completed) {
-      Path baseCallDirectory = Paths.get(dto.getSequencerFolderPath(), "Data", "Intensities", "BaseCalls");
-      // Check that each lane directory is complete
-      boolean dataCopied = IntStream.rangeClosed(1, dto.getLaneCount())//
-          .mapToObj(lane -> String.format("L%03d", lane))//
-          .map(baseCallDirectory::resolve)//
-          .allMatch(laneDir -> isLaneComplete(laneDir, dto));
-      if (!dataCopied) {
-        dto.setHealthType(HealthType.Running);
-      }
-    }
+      // Maybe a NextSeq wrote a completion status, that we take as authoritative even though it's totally undocumented behaviour.
+      Optional<HealthType> updatedHealth = Optional.of(new File(runDirectory, "RunCompletionStatus.xml"))//
+          .filter(File::canRead)//
+          .flatMap(RunProcessor::parseXml)//
+          .flatMap(DefaultIllumina::getHealth);
 
-    Optional.of(new File(runDirectory, "RunCompletionStatus.xml")).filter(File::canRead).flatMap(RunProcessor::parseXml)
-        .flatMap(DefaultIllumina::getHealth).ifPresent(dto::setHealthType);
+      if (updatedHealth.isPresent()) {
+        completness_method_success.labels("xml").inc();
+      }
+
+      if (!updatedHealth.isPresent() && dto.getNumReads() > 0) {
+        // Well, that didn't work. Maybe there are netcopy files.
+        long netCopyFiles = IntStream.rangeClosed(1, dto.getNumReads())//
+            .mapToObj(read -> String.format("Basecalling_Netcopy_complete_Read%d.txt", read))//
+            .map(fileName -> new File(runDirectory, fileName))//
+            .filter(File::exists)//
+            .count();
+        if (netCopyFiles == 0) {
+          // This might mean incomplete or it might mean the sequencer never wrote the files
+        } else {
+          // If we see some net copy files, then it's still running; if they're all here, assume it's done.
+          updatedHealth = Optional.of(netCopyFiles < dto.getNumReads() ? HealthType.Running : HealthType.Completed);
+          completness_method_success.labels("netcopy").inc();
+        }
+      }
+
+      // Check that all the data files have copied. This is a really expensive check, so we let the user disable it.
+      if (!updatedHealth.isPresent() && checkOutput) {
+        try (AutoCloseable latency = directory_scan_time.start()) {
+          Path baseCallDirectory = Paths.get(dto.getSequencerFolderPath(), "Data", "Intensities", "BaseCalls");
+          // Check that each lane directory is complete
+          boolean dataCopied = IntStream.rangeClosed(1, dto.getLaneCount())//
+              .mapToObj(lane -> String.format("L%03d", lane))//
+              .map(baseCallDirectory::resolve)//
+              .allMatch(laneDir -> isLaneComplete(laneDir, dto));
+          if (!dataCopied) {
+            updatedHealth = Optional.of(HealthType.Running);
+            completness_method_success.labels("dirscan").inc();
+          }
+        } catch (Exception e) {
+          throw new IOException(e);
+        }
+      }
+      updatedHealth.ifPresent(dto::setHealthType);
+    }
 
     return dto;
   }

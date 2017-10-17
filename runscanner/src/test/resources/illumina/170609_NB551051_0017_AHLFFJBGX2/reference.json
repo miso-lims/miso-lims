@@ -19,6 +19,7 @@
   ],
   "laneCount": 4,
   "numCycles": 158,
+  "numReads": 3,
   "pairedEndRun": true,
   "poolNames": {},
   "readLength": 75,

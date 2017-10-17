@@ -103,7 +103,5 @@ public interface AbstractListPage {
 
   public WebElement getErrors();
 
-  public void sortByColumn(String columnHeading);
-
   public DataTable getTable();
 }

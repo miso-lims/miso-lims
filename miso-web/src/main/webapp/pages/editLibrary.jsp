@@ -184,6 +184,15 @@
   </tr>
 </c:if>
 <tr>
+  <td>Date of receipt:</td>
+  <td>
+    <form:input path="receivedDate" id="receiveddatepicker" placeholder="YYYY-MM-DD"/>
+    <script type="text/javascript">
+      Utils.ui.addDatePicker("receiveddatepicker");
+    </script>
+  </td>
+</tr>
+<tr>
   <td class="h">Creation date:</td>
   <td id="creationDate"><fmt:formatDate pattern="yyyy-MM-dd" type="date" value="${library.creationDate}"/></td>
 </tr>
@@ -374,16 +383,18 @@
     <td><a href="http://lims.res.oicr.on.ca/gsle/GA/templateDetails?template_id=${library.preMigrationId}">${library.preMigrationId}</a>
   </tr>
   </c:if>
-  <c:if test="${not empty library.sample.groupId}">
-    <tr>
-      <td class="h">Group ID:</td>
-      <td>${library.sample.groupId}</td>
-    </tr>
-    <tr>
-      <td class="h">Group Description:</td>
-      <td>${library.sample.groupDescription}</td>
-    </tr>
-  </c:if>
+  <tr>
+    <td class="h">Group ID:</td>
+    <td>
+      <form:input id="groupId" path="groupId"/>
+    </td>
+  </tr>
+  <tr>
+    <td class="h">Group Description:</td>
+    <td>
+      <form:input id="groupDescription" path="groupDescription"/>
+    </td>
+  </tr>
   <tr>
     <td class="h"><label for="initialConcentration">Initial Concentration (<span id="concentrationUnits"></span>):</label></td>
     <td><form:input id="initialConcentration" path="initialConcentration"/></td>

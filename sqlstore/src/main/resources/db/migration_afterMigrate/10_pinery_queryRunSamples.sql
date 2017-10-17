@@ -4,9 +4,10 @@ DELIMITER //
 DROP PROCEDURE IF EXISTS queryAllRunSamples//
 CREATE PROCEDURE queryAllRunSamples() BEGIN
   PREPARE stmt FROM 'SELECT part.partitionId
-    , l.name libraryId
+    , ld.name dilutionId 
     , bc1.sequence barcode
-    , bc2.sequence barcode_two, tr.alias targeted_sequencing
+    , bc2.sequence barcode_two
+    , tr.alias targeted_sequencing
     FROM _Partition part
     JOIN Pool pool ON pool.poolId = part.pool_poolId
     JOIN Pool_Dilution ele ON ele.pool_poolId = pool.poolId

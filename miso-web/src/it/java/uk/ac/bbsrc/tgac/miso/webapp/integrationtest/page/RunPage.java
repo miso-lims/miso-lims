@@ -73,6 +73,13 @@ public class RunPage extends FormPage<RunPage.Field> {
     public static final String FAIL_SEQOPS = "→ Failed: SeqOps QC";
   } // end LaneQC class
 
+  public static class TableWrapperId {
+    public static final String PARTITION = "list_partition_wrapper";
+    public static final String CONTAINER = "list_container_wrapper";
+    public static final String EXPERIMENT = "list_experiment_wrapper";
+    public static final String CHANGELOG = "changelog_wrapper";
+  } // end TableWrapperId class
+
   @FindBy(id = "save")
   private WebElement saveButton;
   @FindBy(id = "containers")
@@ -105,8 +112,8 @@ public class RunPage extends FormPage<RunPage.Field> {
     return new RunPage(getDriver());
   }
 
-  public DataTable getTable(String tableId) {
-    return new DataTable(getDriver().findElement(By.id(tableId)));
+  public DataTable getTable(String tableWrapperId) {
+    return new DataTable(getDriver(), tableWrapperId);
   }
 
   public RunPage addContainer(String serialNumber, String platformType, boolean isRunFull) {
@@ -132,7 +139,7 @@ public class RunPage extends FormPage<RunPage.Field> {
 
   public RunPage removeContainer(int rowNum) {
     WebElement html = getHtmlElement();
-    DataTable containersTable = new DataTable(containersSection.findElement(By.id("list_container")));
+    DataTable containersTable = new DataTable(getDriver(), TableWrapperId.CONTAINER);
     containersTable.checkBoxForRow(rowNum);
     containersSection.findElement(By.linkText("Remove")).click();
     waitForPageRefresh(html);
@@ -140,7 +147,7 @@ public class RunPage extends FormPage<RunPage.Field> {
   }
 
   public void searchForPools(boolean assignFirstPool, List<Integer> partitions, String option, String searchText) {
-    checkBoxesAndSelectOption(partitions, "Assign Pool", option);
+    checkLaneBoxesAndSelectOption(partitions, "Assign Pool", option);
     switch (option) {
     case PoolSearch.NO_POOL:
       break;
@@ -173,7 +180,7 @@ public class RunPage extends FormPage<RunPage.Field> {
 
   public RunPage setPartitionQC(List<Integer> partitions, String option, String noteText) {
     WebElement html = getHtmlElement();
-    checkBoxesAndSelectOption(partitions, "Set QC", option);
+    checkLaneBoxesAndSelectOption(partitions, "Set QC", option);
     switch (option) {
     case LaneQC.OK:
     case LaneQC.OK_COLLAB:
@@ -194,12 +201,12 @@ public class RunPage extends FormPage<RunPage.Field> {
   }
 
   public String getLaneInfo(String columnHeading, int rowNum) {
-    DataTable partitionsTable = new DataTable(partitionsSection.findElement(By.id("list_partition")));
+    DataTable partitionsTable = new DataTable(getDriver(), TableWrapperId.PARTITION);
     return partitionsTable.getTextAtCell(columnHeading, rowNum);
   }
 
-  private void checkBoxesAndSelectOption(List<Integer> partitions, String titleText, String option) {
-    DataTable partitionsTable = new DataTable(partitionsSection.findElement(By.id("list_partition")));
+  private void checkLaneBoxesAndSelectOption(List<Integer> partitions, String titleText, String option) {
+    DataTable partitionsTable = new DataTable(getDriver(), TableWrapperId.PARTITION);
     partitions.forEach(partition -> partitionsTable.checkBoxForRow(partition));
     partitionsSection.findElement(By.linkText(titleText)).click();
     waitUntil(visibilityOf(dialog));

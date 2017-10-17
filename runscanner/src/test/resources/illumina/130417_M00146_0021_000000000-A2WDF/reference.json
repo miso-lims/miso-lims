@@ -12,12 +12,13 @@
     31
   ],
   "containerSerialNumber": "000000000-A2WDF",
-  "healthType": "Running",
+  "healthType": "Completed",
   "imgCycle": 242,
   "indexLengths": [
   ],
   "laneCount": 1,
   "numCycles": 242,
+  "numReads": 2,
   "pairedEndRun": true,
   "poolNames": {
     "1": "Unique_Sample_ID"

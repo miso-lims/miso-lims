@@ -10,15 +10,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class IlluminaNotificationDto extends NotificationDto {
 
+  private int bclCount;
   private int callCycle;
   private IlluminaChemistry chemistry;
   private int imgCycle;
   private List<Integer> indexLengths;
   private int numCycles;
+  private int numReads;
   private Map<Integer, String> poolNames;
   private int readLength;
   private int scoreCycle;
-  private int bclCount;
 
   @Override
   public boolean equals(Object obj) {
@@ -34,6 +35,7 @@ public class IlluminaNotificationDto extends NotificationDto {
       if (other.indexLengths != null) return false;
     } else if (!indexLengths.equals(other.indexLengths)) return false;
     if (numCycles != other.numCycles) return false;
+    if (numReads != other.numReads) return false;
     if (poolNames == null) {
       if (other.poolNames != null) return false;
     } else if (!poolNames.equals(other.poolNames)) return false;
@@ -77,6 +79,10 @@ public class IlluminaNotificationDto extends NotificationDto {
     return numCycles;
   }
 
+  public int getNumReads() {
+    return numReads;
+  }
+
   @Override
   public PlatformType getPlatformType() {
     return PlatformType.ILLUMINA;
@@ -104,6 +110,7 @@ public class IlluminaNotificationDto extends NotificationDto {
     result = prime * result + imgCycle;
     result = prime * result + ((indexLengths == null) ? 0 : indexLengths.hashCode());
     result = prime * result + numCycles;
+    result = prime * result + numReads;
     result = prime * result + ((poolNames == null) ? 0 : poolNames.hashCode());
     result = prime * result + readLength;
     result = prime * result + scoreCycle;
@@ -132,6 +139,10 @@ public class IlluminaNotificationDto extends NotificationDto {
 
   public void setNumCycles(int numCycles) {
     this.numCycles = numCycles;
+  }
+
+  public void setNumReads(int numReads) {
+    this.numReads = numReads;
   }
 
   public void setPoolNames(Map<Integer, String> poolNames) {

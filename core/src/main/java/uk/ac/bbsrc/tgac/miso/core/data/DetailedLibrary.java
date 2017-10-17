@@ -30,4 +30,12 @@ public interface DetailedLibrary extends Library {
 
   void setLibraryDesignCode(LibraryDesignCode libraryDesignCode);
 
+  String getGroupId();
+
+  void setGroupId(String groupId);
+
+  String getGroupDescription();
+
+  void setGroupDescription(String groupDescription);
+
 }

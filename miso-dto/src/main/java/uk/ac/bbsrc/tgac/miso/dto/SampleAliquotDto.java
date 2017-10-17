@@ -18,6 +18,7 @@ public class SampleAliquotDto extends SampleStockDto {
   private String samplePurposeUrl;
   @JsonIgnore
   private Long stockClassId;
+  private Long parentAliquotClassId;
 
   public Long getSamplePurposeId() {
     return samplePurposeId;
@@ -41,6 +42,14 @@ public class SampleAliquotDto extends SampleStockDto {
 
   public void setStockClassId(Long stockClassId) {
     this.stockClassId = stockClassId;
+  }
+
+  public Long getParentAliquotClassId() {
+    return parentAliquotClassId;
+  }
+
+  public void setParentAliquotClassId(Long parentAliquotClassId) {
+    this.parentAliquotClassId = parentAliquotClassId;
   }
 
   @Override

@@ -51,7 +51,7 @@ public interface Sample
     QualityControllable<SampleQC> {
 
   /** Field UNSAVED_ID */
-  public static final Long UNSAVED_ID = 0L;
+  public static final long UNSAVED_ID = 0L;
   /** Field PREFIX */
   public static final String PREFIX = "SAM";
   public void setId(long id);

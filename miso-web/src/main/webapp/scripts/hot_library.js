@@ -83,11 +83,11 @@ HotTarget.library = (function() {
       lib.paired = Constants.libraryTypes.reduce(function(acc, type) {
         return acc || type.id == lib.libraryTypeId && type.alias.indexOf('Pair') != -1;
       }, lib.paired);
-        // if any members are null, fill them with empty objects otherwise
-        // things go poorly
-        if (!lib.kitDescriptorId) {
-          lib.kitDescriptorId = '';
-          lib.kitDescriptorName = '';
+      // if any members are null, fill them with empty objects otherwise
+      // things go poorly
+      if (!lib.kitDescriptorId) {
+        lib.kitDescriptorId = '';
+        lib.kitDescriptorName = '';
       }
     },
 
@@ -155,7 +155,7 @@ HotTarget.library = (function() {
             header: 'Sample Alias',
             data: 'parentSampleAlias',
             readOnly: true,
-            include: true,
+            include: !config.isLibraryReceipt,
             unpack: function(lib, flat, setCellMeta) {
               flat.parentSampleAlias = lib.parentSampleAlias;
             },
@@ -167,7 +167,7 @@ HotTarget.library = (function() {
             data: 'sampleBoxPositionLabel',
             type: 'text',
             readOnly: true,
-            include: config.sortableLocation,
+            include: config.sortableLocation && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               flat.sampleBoxPositionLabel = sam.sampleBoxPositionLabel;
             },
@@ -191,6 +191,28 @@ HotTarget.library = (function() {
           HotUtils.makeColumnForText('Description', config.showDescription, 'description', {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
+          {
+            header: 'Date of receipt',
+            data: 'receivedDate',
+            type: 'date',
+            dateFormat: 'YYYY-MM-DD',
+            datePickerConfig: {
+              firstDay: 0,
+              numberOfMonths: 1
+            },
+            allowEmpty: !config.isLibraryReceipt,
+            include: config.isLibraryReceipt || !create,
+            unpack: function(lib, flat, setCellMeta) {
+              flat.receivedDate = lib.receivedDate || null;
+            },
+            pack: function(lib, flat, errorHandler) {
+              lib.receivedDate = flat.receivedDate;
+            }
+          },
+          HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample, 'groupId', {
+            validator: HotUtils.validator.optionalTextAlphanumeric
+          }),
+          HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample, 'groupDescription', {}),
           {
             header: 'Design',
             data: 'libraryDesignAlias',

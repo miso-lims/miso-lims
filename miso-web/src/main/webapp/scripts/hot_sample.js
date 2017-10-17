@@ -100,7 +100,7 @@ HotTarget.sample = (function() {
             header: 'Sample Name',
             data: 'name',
             readOnly: true,
-            include: true,
+            include: !config.isLibraryReceipt,
             unpackAfterSave: true,
             unpack: function(sam, flat, setCellMeta) {
               flat.name = sam.name || null;
@@ -151,9 +151,9 @@ HotTarget.sample = (function() {
             pack: function(sam, flat, errorHandler) {
               sam.alias = flat.alias;
             },
-            include: true
+            include: !config.isLibraryReceipt
           },
-          HotUtils.makeColumnForText('Description', true, 'description', {
+          HotUtils.makeColumnForText('Description', !config.isLibraryReceipt, 'description', {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
           {
@@ -166,7 +166,7 @@ HotTarget.sample = (function() {
               numberOfMonths: 1
             },
             allowEmpty: true,
-            include: !Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity',
+            include: (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity') && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
               flat.receivedDate = sam.receivedDate || null;
             },
@@ -174,7 +174,7 @@ HotTarget.sample = (function() {
               sam.receivedDate = flat.receivedDate;
             }
           },
-          HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes, 'identificationBarcode', {
+          HotUtils.makeColumnForText('Matrix Barcode', !Constants.automaticBarcodes && !config.isLibraryReceipt, 'identificationBarcode', {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
           HotUtils.makeColumnForEnum('Sample Type', true, true, 'sampleType', Constants.sampleTypes, null),
@@ -231,9 +231,10 @@ HotTarget.sample = (function() {
 
           // Detailed Sample
           // parent columns
-          HotUtils.makeColumnForText('Parent Alias', (Constants.isDetailedSample && config.propagate), 'parentAlias', {
-            readOnly: true
-          }),
+          HotUtils.makeColumnForText('Parent Alias', (Constants.isDetailedSample && config.propagate && !config.isLibraryReceipt),
+              'parentAlias', {
+                readOnly: true
+              }),
           {
             header: 'Parent Sample Class',
             data: 'parentTissueSampleClassAlias',
@@ -249,7 +250,7 @@ HotTarget.sample = (function() {
                 return item.alias == flat.parentTissueSampleClassAlias;
               }, Constants.sampleClasses), 'id');
             },
-            include: Constants.isDetailedSample && config.propagate
+            include: Constants.isDetailedSample && config.propagate && !config.isLibraryReceipt
           },
 
           // Identity columns
@@ -389,10 +390,10 @@ HotTarget.sample = (function() {
             },
             include: Constants.isDetailedSample
           },
-          HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample, 'groupId', {
+          HotUtils.makeColumnForText('Group ID', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupId', {
             validator: HotUtils.validator.optionalTextAlphanumeric
           }),
-          HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample, 'groupDescription', {}),
+          HotUtils.makeColumnForText('Group Desc.', Constants.isDetailedSample && !config.isLibraryReceipt, 'groupDescription', {}),
 
           // Tissue columns
           HotUtils.makeColumnForConstantsList('Tissue Origin', show['Tissue'], 'tissueOriginAlias', 'tissueOriginId', 'id', 'label',
@@ -402,8 +403,9 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForInt('Passage #', show['Tissue'], 'passageNumber', null),
           HotUtils.makeColumnForInt('Times Received', show['Tissue'], 'timesReceived', HotUtils.validator.requiredNumber),
           HotUtils.makeColumnForInt('Tube Number', show['Tissue'], 'tubeNumber', HotUtils.validator.requiredNumber),
-          HotUtils.makeColumnForConstantsList('Lab', show['Tissue'], 'labComposite', 'labId', 'id', 'label', Constants.labs, false),
-          HotUtils.makeColumnForText('Secondary ID', show['Tissue'], 'secondaryIdentifier', {
+          HotUtils.makeColumnForConstantsList('Lab', show['Tissue'] && !config.isLibraryReceipt, 'labComposite', 'labId', 'id', 'label',
+              Constants.labs, false),
+          HotUtils.makeColumnForText('Secondary ID', show['Tissue'] && !config.isLibraryReceipt, 'secondaryIdentifier', {
             validator: HotUtils.validator.optionalTextNoSpecialChars
           }),
           HotUtils.makeColumnForConstantsList('Material', show['Tissue'], 'tissueMaterialAlias', 'tissueMaterialId', 'id', 'alias',
@@ -454,7 +456,8 @@ HotTarget.sample = (function() {
               'slidesConsumed', HotUtils.validator.requiredNumber),
 
           // Stock columns
-          HotUtils.makeColumnForEnum('STR Status', show['Stock'], true, 'strStatus', Constants.strStatuses, null),
+          HotUtils.makeColumnForEnum('STR Status', show['Stock'] && !config.isLibraryReceipt, true, 'strStatus', Constants.strStatuses,
+              null),
           {
             header: 'DNAse',
             data: 'dnaseTreated',
@@ -470,8 +473,9 @@ HotTarget.sample = (function() {
             },
             include: Constants.isDetailedSample && config.dnaseTreatable
           },
-          HotUtils.makeColumnForFloat('Vol. (&#181;l)', (show['Stock'] || show['Aliquot']), 'volume'),
-          HotUtils.makeColumnForFloat('Conc. (ng/&#181;l)', (show['Stock'] || show['Aliquot']), 'concentration'),
+          HotUtils.makeColumnForFloat('Vol. (&#181;l)', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'volume'),
+          HotUtils.makeColumnForFloat('Conc. (ng/&#181;l)', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt),
+              'concentration'),
 
           // QC status columns for detailed and non-detailed samples
           {
@@ -496,7 +500,7 @@ HotTarget.sample = (function() {
               else
                 sam.qcPassed = null;
             },
-            include: !Constants.isDetailedSample
+            include: !Constants.isDetailedSample && !config.isLibraryReceipt
           },
           {
             header: 'QC Status',
@@ -539,9 +543,9 @@ HotTarget.sample = (function() {
                     .descriptionPredicate(flat.detailedQcStatusDescription), Constants.detailedQcStatuses), 'id');
               }
             },
-            include: Constants.isDetailedSample
+            include: Constants.isDetailedSample && !config.isLibraryReceipt
           },
-          HotUtils.makeColumnForText('QC Note', Constants.isDetailedSample, 'detailedQcStatusNote', {
+          HotUtils.makeColumnForText('QC Note', Constants.isDetailedSample && !config.isLibraryReceipt, 'detailedQcStatusNote', {
             readOnly: true,
             depends: 'detailedQcStatusDescription',
             update: function(sam, flat, value, setReadOnly, setOptions, setData) {
@@ -563,8 +567,8 @@ HotTarget.sample = (function() {
           }),
 
           // Aliquot columns
-          HotUtils.makeColumnForConstantsList('Purpose', show['Aliquot'], 'samplePurposeAlias', 'samplePurposeId', 'id', 'alias',
-              Constants.samplePurposes, true)];
+          HotUtils.makeColumnForConstantsList('Purpose', show['Aliquot'] && !config.isLibraryReceipt, 'samplePurposeAlias',
+              'samplePurposeId', 'id', 'alias', Constants.samplePurposes, true)];
     },
 
     bulkActions: [

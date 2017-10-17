@@ -110,7 +110,7 @@ var HotUtils = {
     var anyInvalidCells = false;
     var table = new Handsontable(hotContainer, {
       debug: true,
-      fixedColumnsLeft: 1,
+      fixedColumnsLeft: target.fixedColumns === undefined ? 1 : target.fixedColumns,
       manualColumnResize: true,
       rowHeaders: false,
       colHeaders: columns.map(function(c) {
@@ -601,7 +601,7 @@ var HotUtils = {
     });
     jQuery('#nonStandardAliasNote').show();
   },
-  
+
   multipleOptionsRenderer: function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.AutocompleteRenderer.apply(this, arguments);
     td.classList.add('multipleOptions');

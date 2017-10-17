@@ -36,12 +36,10 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
     public static final String SEQUENCING = "Sequencing";
   }
 
-  @FindBy(className = "dataTable")
-  private List<WebElement> tablesElements;
+  @FindBy(className = "dataTables_wrapper")
+  private List<WebElement> tableWrapperElements;
   @FindBy(className = "parsley-error")
   private WebElement errors;
-  @FindBy(className = "dataTables_processing")
-  private List<WebElement> processingList;
   
   private final List<WebElement> tabs;
 
@@ -50,15 +48,14 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
   @FindBy(className = "ui-tabs-active")
   private WebElement selectedTab;
   private DataTable selectedTable;
-  private WebElement selectedProcessing;
 
   public ListTabbedPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
     tabs = driver.findElements(By.xpath("//li[@role='tab']"));
     waitWithTimeout().until(ExpectedConditions.visibilityOf(selectedTab));
-    tablesElements.forEach(table -> {
-      tables.add(new DataTable(table));
+    tableWrapperElements.forEach(wrapper -> {
+      tables.add(new DataTable(driver, wrapper.getAttribute("id")));
     });
     setSelectedTable(getTabNumber());
   }
@@ -83,18 +80,11 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
     selectedTable = tables.stream()
         .filter(table -> tableId.equals(table.getId())).findAny().orElse(null);
     if (selectedTable == null) throw new IllegalArgumentException("Cannot find table with id " + tableId);
-    setSelectedProcessing(tabNumber);
   }
 
   @Override
   public WebElement getErrors() {
     return errors;
-  }
-
-  @Override
-  public void sortByColumn(String columnHeading) {
-    selectedTable.clickToSort(columnHeading);
-    waitWithTimeout().until(ExpectedConditions.invisibilityOf(selectedProcessing));
   }
 
   public void clickTab(String tabHeading) {
@@ -105,16 +95,7 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
 
     setSelectedTable(getTabNumber());
     selectedTab.click();
-    waitWithTimeout().until(ExpectedConditions.invisibilityOf(selectedProcessing));
-  }
-
-  private void setSelectedProcessing(String tabNumber) {
-    String selectedProcessingId = "list" + getTabNumber() + "_processing";
-    
-    selectedProcessing = processingList.stream()
-        .filter(proc -> selectedProcessingId.equals(proc.getAttribute("id")))
-        .findAny().orElse(null);
-    if (selectedProcessing == null) throw new IllegalArgumentException("Cannot find processing with ID " + selectedProcessingId);
+    waitWithTimeout().until(ExpectedConditions.invisibilityOf(getTable().getProcessing()));
   }
 
   public Set<String> getTabHeadings() {

@@ -180,6 +180,9 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinColumn(name = "kitDescriptorId")
   private KitDescriptor kitDescriptor;
 
+  @Temporal(TemporalType.DATE)
+  private Date receivedDate;
+
   @Override
   public EntityType getEntityType() {
     return EntityType.LIBRARY;
@@ -581,6 +584,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public Date getReceivedDate() {
+    return receivedDate;
+  }
+
+  @Override
+  public void setReceivedDate(Date receivedDate) {
+    this.receivedDate = receivedDate;
+  }
+
+  @Override
   public int hashCode() {
     return new HashCodeBuilder(3, 33)
         .appendSuper(super.hashCode())
@@ -599,6 +612,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(platformType)
         .append(qcPassed)
         .append(kitDescriptor)
+        .append(receivedDate)
         .toHashCode();
   }
 
@@ -625,6 +639,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
         .append(platformType, other.platformType)
         .append(qcPassed, other.qcPassed)
         .append(kitDescriptor, other.kitDescriptor)
+        .append(receivedDate, other.receivedDate)
         .isEquals();
   }
 

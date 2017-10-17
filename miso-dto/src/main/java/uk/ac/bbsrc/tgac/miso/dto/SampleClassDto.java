@@ -19,7 +19,6 @@ public class SampleClassDto implements WritableUrls {
   private String updatedByUrl;
   private String lastUpdated;
   private Boolean dnaseTreatable;
-  private boolean canCreateNew;
 
   public Long getId() {
     return id;
@@ -115,14 +114,6 @@ public class SampleClassDto implements WritableUrls {
 
   public void setDNAseTreatable(Boolean dnaseTreatable) {
     this.dnaseTreatable = dnaseTreatable;
-  }
-
-  public boolean getCanCreateNew() {
-    return canCreateNew;
-  }
-
-  public void setCanCreateNew(boolean canCreateNew) {
-    this.canCreateNew = canCreateNew;
   }
 
   @Override
