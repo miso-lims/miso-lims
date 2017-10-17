@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -37,6 +39,8 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
   private LibraryDesignCode libraryDesignCode;
 
   private Long preMigrationId;
+  private String groupId;
+  private String groupDescription;
 
   @Override
   public Boolean getArchived() {
@@ -86,6 +90,26 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
   @Override
   public void setPreMigrationId(Long preMigrationId) {
     this.preMigrationId = preMigrationId;
+  }
+
+  @Override
+  public String getGroupId() {
+    return groupId;
+  }
+
+  @Override
+  public void setGroupId(String groupId) {
+    this.groupId = nullifyStringIfBlank(groupId);
+  }
+
+  @Override
+  public String getGroupDescription() {
+    return groupDescription;
+  }
+
+  @Override
+  public void setGroupDescription(String groupDescription) {
+    this.groupDescription = nullifyStringIfBlank(groupDescription);
   }
 
   @Override

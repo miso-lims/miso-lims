@@ -342,4 +342,8 @@ public interface Library
 
   void setKitDescriptor(KitDescriptor prepKit);
 
+  public Date getReceivedDate();
+
+  public void setReceivedDate(Date date);
+
 }

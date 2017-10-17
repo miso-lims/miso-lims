@@ -10,6 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 public class SampleLCMTubeDto extends SampleTissueProcessingDto {
 
   private Integer slidesConsumed;
+  private Long parentSlideClassId;
 
   public Integer getSlidesConsumed() {
     return slidesConsumed;
@@ -17,6 +18,14 @@ public class SampleLCMTubeDto extends SampleTissueProcessingDto {
 
   public void setSlidesConsumed(Integer slidesConsumed) {
     this.slidesConsumed = slidesConsumed;
+  }
+
+  public Long getParentSlideClassId() {
+    return parentSlideClassId;
+  }
+
+  public void setParentSlideClassId(Long parentSlideClassId) {
+    this.parentSlideClassId = parentSlideClassId;
   }
 
 }

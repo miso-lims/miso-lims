@@ -23,6 +23,9 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String SAMPLE_LOCATION = "Sample Location";
     public static final String DESCRIPTION = "Description";
+    public static final String RECEIVE_DATE = "Date of receipt";
+    public static final String GROUP_ID = "Group ID";
+    public static final String GROUP_DESC = "Group Desc.";
     public static final String DESIGN = "Design";
     public static final String CODE = "Code";
     public static final String PLATFORM = "Platform";
@@ -56,7 +59,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
   public BulkLibraryPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    waitWithTimeout().until(or(titleContains("Create Libraries from Samples "), titleContains("Edit Libraries ")));
+    waitWithTimeout().until(or(titleContains("Create Libraries "), titleContains("Edit Libraries ")));
     table = new HandsOnTable(driver);
   }
 
@@ -70,6 +73,14 @@ public class BulkLibraryPage extends HeaderFooterPage {
   public static BulkLibraryPage getForPropagate(WebDriver driver, String baseUrl, Collection<Long> sampleIds, int replicates) {
     String ids = Joiner.on(',').join(sampleIds);
     String url = baseUrl + "miso/library/bulk/propagate?ids=" + ids + "&replicates=" + replicates;
+    driver.get(url);
+    return new BulkLibraryPage(driver);
+  }
+
+  public static BulkLibraryPage getForReceive(WebDriver driver, String baseUrl, int quantity, Integer projectId, int aliquotClassId) {
+    String url = baseUrl + "miso/library/bulk/receive?quantity=" + quantity
+        + "&projectId=" + (projectId == null ? "" : projectId)
+        + "&sampleClassId=" + aliquotClassId;
     driver.get(url);
     return new BulkLibraryPage(driver);
   }

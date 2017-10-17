@@ -13,6 +13,8 @@ public class DetailedLibraryDto extends LibraryDto {
   private boolean nonStandardAlias;
   private Long preMigrationId;
   private String sampleBoxPositionLabel;
+  private String groupId;
+  private String groupDescription;
 
   public Boolean getArchived() {
     return archived;
@@ -60,6 +62,22 @@ public class DetailedLibraryDto extends LibraryDto {
 
   public void setSampleBoxPositionLabel(String boxPositionLabel) {
     this.sampleBoxPositionLabel = boxPositionLabel;
+  }
+
+  public String getGroupId() {
+    return groupId;
+  }
+
+  public void setGroupId(String groupId) {
+    this.groupId = groupId;
+  }
+
+  public String getGroupDescription() {
+    return groupDescription;
+  }
+
+  public void setGroupDescription(String groupDescription) {
+    this.groupDescription = groupDescription;
   }
 
 }

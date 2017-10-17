@@ -430,36 +430,20 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
           }
         }
       }
-    } else if (isTissueSample(tempParent)) {
-      return createParentTissue((SampleTissue) tempParent, sample);
-    } else if (isStockSample(tempParent)) {
-      return createParentStock((SampleStock) tempParent, sample);
+    } else {
+      return createGhostParent((DetailedSample) tempParent, sample);
     }
-    throw new IllegalArgumentException("Could not resolve parent sample");
   }
 
-  private SampleTissue createParentTissue(SampleTissue tissue, DetailedSample child) throws IOException {
-    log.debug("Creating a new Tissue to use as a parent.");
-    tissue.setProject(child.getProject());
-    tissue.setSampleType(child.getSampleType());
-    tissue.setScientificName(child.getScientificName());
-    tissue.setVolume(0D);
-    tissue.setSynthetic(true);
-    if (child.getIdentityId() != null) tissue.setIdentityId(child.getIdentityId());
-    create(tissue);
-    return tissue;
-  }
-
-  private SampleStock createParentStock(SampleStock stock, DetailedSample child) throws IOException {
-    log.debug("Creating a new Stock to use as a parent.");
-    stock.setProject(child.getProject());
-    stock.setSampleType(child.getSampleType());
-    stock.setScientificName(child.getScientificName());
-    stock.setVolume(0D);
-    stock.setSynthetic(true);
-    if (child.getIdentityId() != null) stock.setIdentityId(child.getIdentityId());
-    create(stock);
-    return stock;
+  private DetailedSample createGhostParent(DetailedSample parent, DetailedSample child) throws IOException {
+    parent.setProject(child.getProject());
+    parent.setSampleType(child.getSampleType());
+    parent.setScientificName(child.getScientificName());
+    parent.setVolume(0D);
+    parent.setSynthetic(true);
+    if (child.getIdentityId() != null) parent.setIdentityId(child.getIdentityId());
+    create(parent);
+    return parent;
   }
 
   private SampleIdentity createParentIdentity(DetailedSample sample) throws IOException, MisoNamingException, SQLException {

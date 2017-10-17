@@ -74,11 +74,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private static final long serialVersionUID = 1L;
 
   protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
-  public static final long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long sampleId = AbstractSample.UNSAVED_ID;
+  private long sampleId = Sample.UNSAVED_ID;
 
   @ManyToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "project_projectId")

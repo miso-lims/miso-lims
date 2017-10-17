@@ -408,7 +408,8 @@ public class Dtos {
    * <ol>
    * <li>parent ID is provided. This implies that the parent exists, so no other parent information will be required</li>
    * <li>identity information and parentTissueSampleClassId are provided. This implies that a tissue parent should be created, and that the
-   * identity may or may not yet exist. If the sampleClassId is an aliquot, a stockClassId must be provided.</li>
+   * identity may or may not yet exist. If the sampleClassId is an aliquot, a stockClassId must be provided. ParentAliquotClassId may be
+   * provided to indicate a second aliquot level in the hierarchy</li>
    * <li>identity information is provided, but no parentTissueSampleClassId. You must be creating a tissue in this case.</li>
    * </ol>
    * 
@@ -435,13 +436,34 @@ public class Dtos {
         tissue.getSampleClass().setId(childDto.getParentTissueSampleClassId());
         tissue.setParent(parent);
         parent = tissue;
+
+        if (childDto instanceof SampleLCMTubeDto) {
+          SampleLCMTubeDto lcm = (SampleLCMTubeDto) childDto;
+          if (lcm.getParentSlideClassId() != null) {
+            SampleSlide slide = new SampleSlideImpl();
+            slide.setSampleClass(new SampleClassImpl());
+            slide.getSampleClass().setId(lcm.getParentSlideClassId());
+            slide.setSlides(0);
+            slide.setParent(parent);
+            parent = slide;
+          }
+        }
       }
       if (childDto instanceof SampleStockDto && childDto.getClass() != SampleStockDto.class) {
+        SampleAliquotDto aliquotDto = (SampleAliquotDto) childDto;
         DetailedSample stock = toStockSample((SampleStockDto) childDto);
         stock.setSampleClass(new SampleClassImpl());
-        stock.getSampleClass().setId(((SampleAliquotDto) childDto).getStockClassId());
+        stock.getSampleClass().setId(aliquotDto.getStockClassId());
         stock.setParent(parent);
         parent = stock;
+
+        if (aliquotDto.getParentAliquotClassId() != null) {
+          DetailedSample parentAliquot = toAliquotSample(aliquotDto);
+          parentAliquot.setSampleClass(new SampleClassImpl());
+          parentAliquot.getSampleClass().setId(aliquotDto.getParentAliquotClassId());
+          parentAliquot.setParent(parent);
+          parent = parentAliquot;
+        }
       }
     }
     return parent;
@@ -914,6 +936,12 @@ public class Dtos {
     if (from.getSample().getBox() != null) {
       dto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
     }
+    if (from.getGroupId() != null) {
+      dto.setGroupId(from.getGroupId());
+    }
+    if (from.getGroupDescription() != null) {
+      dto.setGroupDescription(from.getGroupDescription());
+    }
     return dto;
   }
 
@@ -931,6 +959,12 @@ public class Dtos {
 
     if (from.getArchived() != null) to.setArchived(from.getArchived());
     to.setNonStandardAlias(from.getNonStandardAlias());
+    if (from.getGroupId() != null) {
+      to.setGroupId(from.getGroupId());
+    }
+    if (from.getGroupDescription() != null) {
+      to.setGroupDescription(from.getGroupDescription());
+    }
     return to;
   }
 
@@ -1064,6 +1098,9 @@ public class Dtos {
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
+    if (from.getReceivedDate() != null) {
+      dto.setReceivedDate(formatDate(from.getReceivedDate()));
+    }
     return dto;
   }
 
@@ -1138,7 +1175,9 @@ public class Dtos {
     }
     to.setLocationBarcode(from.getLocationBarcode());
     to.setCreationDate(parseDate(from.getCreationDate()));
-
+    if (from.getReceivedDate() != null) {
+      to.setReceivedDate(parseDate(from.getReceivedDate()));
+    }
     return to;
   }
 

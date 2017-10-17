@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,10 +83,8 @@ public class SampleClassController extends RestController {
   @RequestMapping(value = "/sampleclasses", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<SampleClassDto> getSampleClasses(UriComponentsBuilder uriBuilder, HttpServletResponse response) throws IOException {
-    Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
     return sampleClassService.getAll().stream().map(sc -> {
       SampleClassDto dto = Dtos.asDto(sc);
-      dto.setCanCreateNew(sc.hasPathToIdentity(relationships));
       dto.writeUrls(uriBuilder);
       return dto;
     }).collect(Collectors.toSet());

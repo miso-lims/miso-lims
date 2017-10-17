@@ -107,8 +107,7 @@ public class DefaultSampleClassService implements SampleClassService {
         .map(SampleValidRelationship::getParent).collect(Collectors.toList());
     switch (parentClasses.size()) {
     case 0:
-      throw new IllegalStateException(
-          String.format("%s class %s (%d) has no %s parents", childCategory, childClass.getAlias(), childClassId, parentCategory));
+      return null;
     case 1:
       return parentClasses.get(0);
     default:

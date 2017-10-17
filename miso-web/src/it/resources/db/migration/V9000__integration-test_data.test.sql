@@ -382,6 +382,9 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 1, 'ACTIVE', 1, '2017-08-16 14:50:00'),
   (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 1, 'ACTIVE', 1, '2017-08-15 13:45:00');
 
+INSERT INTO SampleNumberPerProject(projectId, highestSampleNumber, padding, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(100001, 1, 4, 1, '2017-10-11 15:33:00', 1, '2017-10-11 15:33:00');
+
 INSERT INTO Study (studyId, name, securityProfile_profileId, project_projectId, alias, lastModifier, studyTypeId) VALUES
 (1, 'STU1', 1, 1, 'Study One', 1, 1),
 (400, 'STU400', 1, 400, 'UI Test Study', 1, 1);

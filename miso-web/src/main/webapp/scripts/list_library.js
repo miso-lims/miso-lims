@@ -29,8 +29,43 @@ ListTarget.library = {
   createBulkActions: function(config, projectId) {
     return HotTarget.library.bulkActions;
   },
-  createStaticActions: function(config, prodjectId) {
-    return [];
+  createStaticActions: function(config, projectId) {
+    return [{
+      name: "Receive",
+      include: true,
+      handler: function() {
+        var fields = [{
+          property: 'quantity',
+          type: 'int',
+          label: 'Quantity',
+          value: 1
+        }];
+
+        if (Constants.isDetailedSample) {
+          fields.unshift({
+            property: 'sampleClass',
+            type: 'select',
+            label: 'Aliquot Class',
+            values: Constants.sampleClasses.filter(function(sampleClass) {
+              return sampleClass.sampleCategory === 'Aliquot';
+            }).sort(Utils.sorting.sampleClassComparator),
+            getLabel: Utils.array.getAlias
+          });
+        }
+
+        Utils.showDialog('Receive Libraries', 'Receive', fields, function(result) {
+          if (result.quantity < 1) {
+            Utils.showOkDialog('Receive Libraries', ["That's a peculiar number of libraries to receive."]);
+            return;
+          }
+          window.location = '/miso/library/bulk/receive?' + jQuery.param({
+            quantity: result.quantity,
+            projectId: projectId,
+            sampleClassId: Constants.isDetailedSample ? result.sampleClass.id : null
+          });
+        });
+      }
+    }];
   },
   createColumns: function(config, projectId) {
     return [ListUtils.idHyperlinkColumn("Name", "library", "id", Utils.array.getName, 1, true),

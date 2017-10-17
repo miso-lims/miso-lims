@@ -73,7 +73,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PlatformDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.dto.WritableUrls;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
@@ -300,11 +299,7 @@ public class MenuController implements ServletContextAware {
       return dto;
     });
     createArray(mapper, baseUri, node, "kitDescriptors", kitService.listKitDescriptors(), Dtos::asDto);
-    createArray(mapper, baseUri, node, "sampleClasses", sampleClassService.getAll(), model -> {
-      SampleClassDto dto = Dtos.asDto(model);
-      dto.setCanCreateNew(model.hasPathToIdentity(relationships));
-      return dto;
-    });
+    createArray(mapper, baseUri, node, "sampleClasses", sampleClassService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleValidRelationships", relationships, Dtos::asDto);
     createArray(mapper, baseUri, node, "detailedQcStatuses", detailedQcStatusService.getAll(), Dtos::asDto);
     createArray(mapper, baseUri, node, "sampleGroups", sampleGroupService.getAll(), Dtos::asDto);
