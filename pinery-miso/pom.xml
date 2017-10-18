@@ -1,0 +1,72 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+    <artifactId>miso</artifactId>
+    <version>0.2.97-oicr-SNAPSHOT</version>
+  </parent>
+  <artifactId>pinery-miso</artifactId>
+  <name>pinery-miso</name>
+  <packaging>war</packaging>
+  
+  <properties>
+    <pinery.version>2.0.0</pinery.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <!-- Overlay -->
+      <groupId>ca.on.oicr</groupId>
+      <artifactId>pinery-ws</artifactId>
+      <version>${pinery.version}</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>ca.on.oicr</groupId>
+      <artifactId>pinery-api</artifactId>
+      <version>${pinery.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ca.on.oicr</groupId>
+      <artifactId>pinery-lims</artifactId>
+      <version>${pinery.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+  </dependencies>
+
+</project>
