@@ -38,6 +38,7 @@ FOR EACH ROW
   BEGIN
     DECLARE log_message varchar(500) CHARACTER SET utf8;
     DECLARE last_modifier bigint(20);
+    DECLARE last_modified TIMESTAMP;
     DECLARE old_pool_name, new_pool_name, new_container_serial varchar(255) CHARACTER SET utf8;
     
     SET old_pool_name = COALESCE((SELECT name FROM Pool WHERE poolId = OLD.pool_poolId), 'n/a');
@@ -55,6 +56,9 @@ FOR EACH ROW
     SELECT spc.lastModifier INTO last_modifier FROM SequencerPartitionContainer spc
       JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
       WHERE spcp.partitions_partitionId = OLD.partitionId;
+    SELECT spc.lastModified INTO last_modified FROM SequencerPartitionContainer spc
+      JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
+      WHERE spcp.partitions_partitionId = OLD.partitionId; 
     
     IF log_message IS NOT NULL AND log_message <> '' THEN
       INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message, changeTime) VALUES (
@@ -63,9 +67,7 @@ FOR EACH ROW
          'pool',
          last_modifier,
          log_message,
-         (SELECT spc.lastModified FROM SequencerPartitionContainer spc
-           JOIN SequencerParititionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
-           WHERE spcp.partitions_partitionId = OLD.partitionId)
+         last_modified
       );
       
       INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime)
@@ -73,7 +75,7 @@ FOR EACH ROW
           'pool',
           last_modifier,
           CONCAT('pool changed in partition ', OLD.partitionNumber, ' of container ', spc.identificationBarcode, ': ', old_pool_name, ' → ', new_pool_name),
-          spc.lastModified
+          last_modified
         FROM Run_SequencerPartitionContainer rspc
         JOIN SequencerPartitionContainer spc ON spc.containerId = rspc.containers_containerId
         JOIN SequencerPartitionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
@@ -86,9 +88,7 @@ FOR EACH ROW
         'container',
         last_modifier,
         CONCAT('Added to container ', new_container_serial),
-        (SELECT spc.lastModified FROM SequencerPartitionContainer spc
-           JOIN SequencerParititionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
-           WHERE spcp.partitions_partitionId = OLD.partitionId)
+        last_modified
       );
     END IF;
     
@@ -98,9 +98,7 @@ FOR EACH ROW
         'container',
         last_modifier,
         CONCAT('Removed from container ', new_container_serial),
-        (SELECT spc.lastModified FROM SequencerPartitionContainer spc
-           JOIN SequencerParititionContainer_Partition spcp ON spcp.container_containerId = spc.containerId
-           WHERE spcp.partitions_partitionId = OLD.partitionId)
+        last_modified
       );
     END IF;
   END //
