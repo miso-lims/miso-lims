@@ -21,7 +21,7 @@ FOR EACH ROW
     CASE WHEN NEW.discarded <> OLD.discarded THEN CONCAT('discarded: ', OLD.discarded, ' → ', NEW.discarded) END,
     CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN (NEW.accession IS NULL) <> (OLD.accession IS NULL) OR NEW.accession <> OLD.accession THEN 'accession' END,
@@ -39,7 +39,8 @@ FOR EACH ROW
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END
   ), ''),
       NEW.lastModifier,
-      log_message
+      log_message,
+      NEW.lastModified
       );
   END IF;
   END//
@@ -62,7 +63,7 @@ FOR EACH ROW
      CASE WHEN (NEW.concentration IS NULL) <> (OLD.concentration IS NULL) OR NEW.concentration <> OLD.concentration THEN CONCAT('concentration: ', COALESCE(OLD.concentration, 'n/a'), ' → ', COALESCE(NEW.concentration, 'n/a')) END, 
      CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN CONCAT('subproject: ', COALESCE((SELECT alias FROM Subproject WHERE subprojectId = OLD.subprojectId), 'n/a'), ' → ', COALESCE((SELECT alias FROM Subproject WHERE subprojectId = NEW.subprojectId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.archived <> OLD.archived THEN 'archived' END,
@@ -77,7 +78,8 @@ FOR EACH ROW
         CASE WHEN (NEW.subprojectId IS NULL) <> (OLD.subprojectId IS NULL) OR NEW.subprojectId <> OLD.subprojectId THEN 'subprojectId' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      log_message
+      log_message,
+      (SELECT lastModified FROM Sample WHERE sampleId = NEW.sampleId)
       );
   END IF;
   END//
@@ -90,13 +92,14 @@ FOR EACH ROW
   SET log_message = CONCAT_WS(', ',
      CASE WHEN (NEW.samplePurposeId IS NULL) <> (OLD.samplePurposeId IS NULL) OR NEW.samplePurposeId <> OLD.samplePurposeId THEN CONCAT('purpose: ', COALESCE((SELECT alias FROM SamplePurpose WHERE samplePurposeId = OLD.samplePurposeId), 'n/a'), ' → ', COALESCE((SELECT alias FROM SamplePurpose WHERE samplePurposeId = NEW.samplePurposeId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN (NEW.samplePurposeId IS NULL) <> (OLD.samplePurposeId IS NULL) OR NEW.samplePurposeId <> OLD.samplePurposeId THEN 'samplePurposeId' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      log_message
+      log_message,
+      (SELECT lastModified FROM Sample WHERE sampleId = NEW.sampleId)
       );
   END IF;
   END//
@@ -113,7 +116,7 @@ FOR EACH ROW
      CASE WHEN (NEW.thickness IS NULL) <> (OLD.thickness IS NULL) OR NEW.thickness <> OLD.thickness THEN CONCAT('thickness: ', COALESCE(OLD.thickness, 'n/a'), ' → ', COALESCE(NEW.thickness, 'n/a')) END,
      CASE WHEN (NEW.stain IS NULL) <> (OLD.stain IS NULL) OR NEW.stain <> OLD.stain THEN CONCAT('stain: ', COALESCE((SELECT name FROM Stain WHERE stainId = OLD.stain), 'none'), ' → ', COALESCE((SELECT name FROM Stain WHERE stainId = NEW.stain), 'none')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.slides <> OLD.slides THEN 'slides' END,
@@ -122,7 +125,8 @@ FOR EACH ROW
         CASE WHEN (NEW.stain IS NULL) <> (OLD.stain IS NULL) OR NEW.stain <> OLD.stain THEN 'stain' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      log_message
+      log_message,
+      (SELECT lastModified FROM Sample WHERE sampleId = NEW.sampleId)
       );
   END IF;
   END//
@@ -135,13 +139,14 @@ FOR EACH ROW
   SET log_message = CONCAT_WS(', ',
      CASE WHEN NEW.slidesConsumed <> OLD.slidesConsumed THEN CONCAT('slides: ', OLD.slidesConsumed, ' → ', NEW.slidesConsumed) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.slidesConsumed <> OLD.slidesConsumed THEN 'slides' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      log_message
+      log_message,
+      (SELECT lastModified FROM Sample WHERE sampleId = NEW.sampleId)
       );
   END IF;
   END//
@@ -154,13 +159,14 @@ FOR EACH ROW
   SET log_message = CONCAT_WS(', ',
     CASE WHEN NEW.strStatus <> OLD.strStatus THEN CONCAT('STR status: ', OLD.strStatus, ' → ', NEW.strStatus) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
          CASE WHEN NEW.strStatus <> OLD.strStatus THEN 'strStatus' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      log_message
+      log_message,
+      (SELECT lastModified FROM Sample WHERE sampleId = NEW.sampleId)
       );
   END IF;
   END//
@@ -179,7 +185,7 @@ FOR EACH ROW
     CASE WHEN (NEW.tissueOriginId IS NULL) <> (OLD.tissueOriginId IS NULL) OR NEW.tissueOriginId <> OLD.tissueOriginId THEN CONCAT('origin: ', COALESCE((SELECT alias FROM TissueOrigin WHERE tissueOriginId = OLD.tissueOriginId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TissueOrigin WHERE tissueOriginId = NEW.tissueOriginId), 'n/a')) END,
     CASE WHEN (NEW.tissueTypeId IS NULL) <> (OLD.tissueTypeId IS NULL) OR NEW.tissueTypeId <> OLD.tissueTypeId THEN CONCAT('type: ', COALESCE((SELECT alias FROM TissueType WHERE tissueTypeId = OLD.tissueTypeId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TissueType WHERE tissueTypeId = NEW.tissueTypeId), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
          CASE WHEN (NEW.secondaryIdentifier IS NULL) <> (OLD.secondaryIdentifier IS NULL) OR NEW.secondaryIdentifier <> OLD.secondaryIdentifier THEN 'secondaryIdentifier' END,
@@ -193,7 +199,8 @@ FOR EACH ROW
          CASE WHEN (NEW.tubeNumber IS NULL) <> (OLD.tubeNumber IS NULL) OR NEW.tubeNumber <> OLD.tubeNumber THEN 'tubeNumber' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      log_message
+      log_message,
+      (SELECT lastModified FROM Sample WHERE sampleId = NEW.sampleId)
       );
   END IF;
   END//
@@ -207,14 +214,15 @@ FOR EACH ROW
     CASE WHEN NEW.donorSex <> OLD.donorSex THEN CONCAT('donor sex: ', OLD.donorSex, ' → ', NEW.donorSex) END,
     CASE WHEN NEW.externalName <> OLD.externalName THEN CONCAT('externalName: ', OLD.externalName, ' → ', NEW.externalName) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+    INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.sampleId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.donorSex <> OLD.donorSex THEN 'donorSex' END,
         CASE WHEN NEW.externalName <> OLD.externalName THEN 'externalName' END
       ), ''),
       (SELECT lastModifier FROM Sample WHERE sampleId = NEW.sampleId),
-      log_message
+      log_message,
+      (SELECT lastModified FROM Sample WHERE sampleId = NEW.sampleId)
       );
   END IF;
   END//
@@ -224,11 +232,12 @@ DROP TRIGGER IF EXISTS BeforeInsertSample//
 DROP TRIGGER IF EXISTS SampleInsert//
 CREATE TRIGGER SampleInsert AFTER INSERT ON Sample
 FOR EACH ROW
-  INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+  INSERT INTO SampleChangeLog(sampleId, columnsChanged, userId, message, changeTime) VALUES (
     NEW.sampleId,
     '',
     NEW.lastModifier,
-    'Sample created.')//
+    'Sample created.',
+    NEW.lastModified)//
     
 DELIMITER ;
 -- EndNoTest

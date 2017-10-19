@@ -25,7 +25,7 @@ FOR EACH ROW
         CASE WHEN (NEW.kitDescriptorId IS NULL) <> (OLD.kitDescriptorId IS NULL) OR NEW.kitDescriptorId <> OLD.kitDescriptorId THEN CONCAT('kit: ', COALESCE((SELECT name FROM KitDescriptor WHERE kitDescriptorId = OLD.kitDescriptorId), 'n/a'), ' → ', COALESCE((SELECT name FROM KitDescriptor WHERE kitDescriptorId = NEW.kitDescriptorId), 'n/a')) END,
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
+    INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.libraryId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN (NEW.accession IS NULL) <> (OLD.accession IS NULL) OR NEW.accession <> OLD.accession THEN 'accession' END,
@@ -48,7 +48,8 @@ FOR EACH ROW
         CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END
   ), ''),
       NEW.lastModifier,
-      log_message
+      log_message,
+      NEW.lastModified
       );
   END IF;
   END//
@@ -64,14 +65,15 @@ FOR EACH ROW
      CASE WHEN NEW.libraryDesignCodeId <> OLD.libraryDesignCodeId THEN CONCAT('designCode: ', (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = OLD.libraryDesignCodeId), ' → ', (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = NEW.libraryDesignCodeId)) END,
      CASE WHEN (NEW.libraryDesign IS NULL) <> (OLD.libraryDesign IS NULL) OR NEW.libraryDesign <> OLD.libraryDesign THEN CONCAT('library design: ', COALESCE((SELECT name FROM LibraryDesign WHERE libraryDesignId = OLD.libraryDesign), 'n/a'), ' → ', COALESCE((SELECT name FROM LibraryDesign WHERE libraryDesignId = NEW.libraryDesign), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
+    INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.libraryId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.archived <> OLD.archived THEN 'archived' END,
         CASE WHEN (NEW.libraryDesign IS NULL) <> (OLD.libraryDesign IS NULL) OR NEW.libraryDesign <> OLD.libraryDesign THEN 'libraryDesign' END
       ), ''),
       (SELECT lastModifier FROM Library WHERE libraryId = NEW.libraryId),
-      log_message
+      log_message,
+      (SELECT lastModified FROM Library WHERE libraryId = NEW.libraryId)
       );
   END IF;
   END//
@@ -81,11 +83,12 @@ DROP TRIGGER IF EXISTS BeforeInsertLibrary//
 DROP TRIGGER IF EXISTS LibraryInsert//
 CREATE TRIGGER LibraryInsert AFTER INSERT ON Library
 FOR EACH ROW
-  INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
+  INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
     NEW.libraryId,
     '',
     NEW.lastModifier,
-    'Library created.')//
+    'Library created.',
+    NEW.lastModified)//
 
 DELIMITER ;
 -- EndNoTest

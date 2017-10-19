@@ -19,7 +19,7 @@ FOR EACH ROW
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN CONCAT('QC passed: ', COALESCE(OLD.qcPassed, 'n/a'), ' → ', COALESCE(NEW.qcPassed, 'n/a')) END,
         CASE WHEN NEW.ready <> OLD.ready THEN CONCAT('ready: ', OLD.ready, ' → ', NEW.ready) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
+    INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.poolId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN (NEW.alias IS NULL) <> (OLD.alias IS NULL) OR NEW.alias <> OLD.alias THEN 'alias' END,
@@ -32,18 +32,20 @@ FOR EACH ROW
         CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN 'qcPassed' END,
         CASE WHEN NEW.ready <> OLD.ready THEN 'ready' END), ''),
       NEW.lastModifier,
-      log_message);
+      log_message,
+      NEW.lastModified);
   END IF;
   END//
 
 DROP TRIGGER IF EXISTS PoolInsert//
 CREATE TRIGGER PoolInsert AFTER INSERT ON Pool
 FOR EACH ROW
-  INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
+  INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message, changeTime) VALUES (
     NEW.poolId,
     '',
     NEW.lastModifier,
-    'Pool created.')//
+    'Pool created.',
+    NEW.lastModified)//
 
 DELIMITER ;
 -- EndNoTest
