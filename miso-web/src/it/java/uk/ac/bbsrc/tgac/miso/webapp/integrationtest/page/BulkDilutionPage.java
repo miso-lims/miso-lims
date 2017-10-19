@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkDilutionPage extends HeaderFooterPage {
 
-  public static class Columns {
+  public static class DilColumns {
     public static final String NAME = "Dilution Name";
     public static final String ID_BARCODE = "Matrix Barcode";
     public static final String LIBRARY_ALIAS = "Library Alias";
@@ -25,7 +25,7 @@ public class BulkDilutionPage extends HeaderFooterPage {
     public static final String CREATION_DATE = "Creation Date";
     public static final String TARGETED_SEQUENCING = "Targeted Sequencing";
 
-    private Columns() {
+    private DilColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");
     }
   };

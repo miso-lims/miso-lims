@@ -2,13 +2,13 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractPage;
 
 public class ErrorCrawlerIT extends AbstractIT {
@@ -34,6 +34,8 @@ public class ErrorCrawlerIT extends AbstractIT {
     slugs.add("indices");
     slugs.add("studies");
     slugs.add("printers");
+    slugs.add("experiments");
+    slugs.add("submissions");
 
     slugs.add("project/1");
     slugs.add("sample/1");
@@ -71,10 +73,10 @@ public class ErrorCrawlerIT extends AbstractIT {
 
   @Test
   public void testForStacktracesOnPages() {
-    List<String> errors = urlSlugs.stream()
+    String errors = urlSlugs.stream()
         .filter(slug -> AbstractPage.checkForErrors(getDriver(), getBaseUrl(), slug))
-        .collect(Collectors.toList());
-    if (errors.size() > 0) throw new IllegalArgumentException("Errors on page(s):\n" + String.join("\n", errors));
+        .collect(Collectors.joining("\n"));
+    if (!LimsUtils.isStringEmptyOrNull(errors)) throw new IllegalArgumentException("Errors on page(s): " + errors);
   }
 
 }
