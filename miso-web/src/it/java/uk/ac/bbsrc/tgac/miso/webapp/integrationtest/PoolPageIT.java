@@ -264,9 +264,7 @@ public class PoolPageIT extends AbstractIT {
     DataTable available = page1.getTable(PoolTableWrapperId.AVAILABLE_DILUTIONS);
     available.searchFor("LDI701");
     available.checkBoxForRow(0);
-    page1.clickLinkButtonAndGetUrl("Add");
-
-    PoolPage page2 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 701L);
+    PoolPage page2 = page1.addSelectedDilutions();
     DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
     assertEquals(1, includedTable2.countRows());
   }
@@ -279,9 +277,7 @@ public class PoolPageIT extends AbstractIT {
     assertEquals(1, includedTable.countRows());
 
     includedTable.checkBoxForRow(0);
-    page1.clickLinkButtonAndGetUrl("Remove");
-
-    PoolPage page2 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 702L);
+    PoolPage page2 = page1.removeSelectedDilutions();
     DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
     assertEquals(0, includedTable2.countRows());
   }

@@ -31,6 +31,10 @@ public class ListPage extends HeaderFooterPage implements AbstractListPage {
     return new ListPage(driver);
   }
 
+  public String clickButtonAndGetUrl(String linkText) {
+    return clickLinkButtonAndGetUrl(linkText);
+  }
+
   @Override
   public DataTable getTable() {
     return table;

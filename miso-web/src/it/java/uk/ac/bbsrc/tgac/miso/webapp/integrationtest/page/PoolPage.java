@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ButtonText;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
 
@@ -87,6 +88,16 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     WebElement html = getHtmlElement();
     saveButton.click();
     waitForPageRefresh(html);
+    return new PoolPage(getDriver());
+  }
+
+  public PoolPage addSelectedDilutions() {
+    clickLinkButtonAndGetUrl(ButtonText.ADD);
+    return new PoolPage(getDriver());
+  }
+
+  public PoolPage removeSelectedDilutions() {
+    clickLinkButtonAndGetUrl(ButtonText.REMOVE);
     return new PoolPage(getDriver());
   }
 

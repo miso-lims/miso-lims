@@ -32,6 +32,8 @@ public class BulkPoolPage extends HeaderFooterPage {
   };
 
   private static final By EDIT_BUTTON_TEXT = By.linkText("Edit");
+  public static final String POOL_SEPARATELY_URL_FRAGMENT = "miso/library/dilution/bulk/propagate";
+  public static final String POOL_TOGETHER_URL_FRAGMENT = "miso/library/dilution/bulk/merge";
 
   @FindBy(id = "bulkactions")
   private WebElement toolbar;
@@ -54,14 +56,14 @@ public class BulkPoolPage extends HeaderFooterPage {
 
   public static BulkPoolPage getForPoolSeparately(WebDriver driver, String baseUrl, Collection<Long> dilutionIds) {
     String ids = Joiner.on("%2C").join(dilutionIds);
-    String url = baseUrl + "miso/library/dilution/bulk/propagate?ids=" + ids;
+    String url = baseUrl + POOL_SEPARATELY_URL_FRAGMENT + "?ids=" + ids;
     driver.get(url);
     return new BulkPoolPage(driver);
   }
 
   public static BulkPoolPage getForPoolTogether(WebDriver driver, String baseUrl, Collection<Long> dilutionIds) {
     String ids = Joiner.on("%2C").join(dilutionIds);
-    String url = baseUrl + "miso/library/dilution/bulk/merge?ids=" + ids;
+    String url = baseUrl + POOL_TOGETHER_URL_FRAGMENT + "?ids=" + ids;
     driver.get(url);
     return new BulkPoolPage(driver);
   }

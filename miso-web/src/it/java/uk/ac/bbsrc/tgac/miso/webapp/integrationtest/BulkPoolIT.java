@@ -17,6 +17,7 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ButtonText;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPoolPage.Columns;
@@ -57,11 +58,10 @@ public class BulkPoolIT extends AbstractIT {
 
     dilutions.checkBoxForRow(0);
     dilutions.checkBoxForRow(1);
-    String newUrl = listDilutions.clickLinkButtonAndGetUrl("Pool together");
+    String newUrl = listDilutions.clickButtonAndGetUrl(ButtonText.POOL_TOGETHER);
 
-    assertTrue(newUrl.contains("miso/library/dilution/bulk/merge"));
-    String idString = newUrl.split("=")[1];
-    List<String> ids = Arrays.asList(idString.split("%2C"));
+    assertTrue(newUrl.contains(BulkPoolPage.POOL_TOGETHER_URL_FRAGMENT));
+    List<String> ids = Arrays.asList(newUrl.split("=")[1].split("%2C"));
     assertEquals(2, ids.size());
     assertTrue(ids.contains("701"));
     assertTrue(ids.contains("702"));
@@ -78,12 +78,11 @@ public class BulkPoolIT extends AbstractIT {
 
     dilutions.checkBoxForRow(0);
     dilutions.checkBoxForRow(1);
-    String newUrl = listDilutions.clickLinkButtonAndGetUrl("Pool separately");
+    String newUrl = listDilutions.clickButtonAndGetUrl(ButtonText.POOL_SEPARATELY);
 
 
-    assertTrue(newUrl.contains("miso/library/dilution/bulk/propagate"));
-    String idString = newUrl.split("=")[1];
-    List<String> ids = Arrays.asList(idString.split("%2C"));
+    assertTrue(newUrl.contains(BulkPoolPage.POOL_SEPARATELY_URL_FRAGMENT));
+    List<String> ids = Arrays.asList(newUrl.split("=")[1].split("%2C"));
     assertEquals(2, ids.size());
     assertTrue(ids.contains("701"));
     assertTrue(ids.contains("702"));

@@ -297,11 +297,11 @@ public abstract class AbstractPage extends AbstractElement {
     cancelButton.click();
   }
 
-  public String getCurrentUrl() {
+  protected String getCurrentUrl() {
     return getDriver().getCurrentUrl();
   }
 
-  public String clickLinkButtonAndGetUrl(String linkText) {
+  protected String clickLinkButtonAndGetUrl(String linkText) {
     WebElement button = getDriver().findElement(By.linkText(linkText));
     WebElement html = getHtmlElement();
     button.click();
