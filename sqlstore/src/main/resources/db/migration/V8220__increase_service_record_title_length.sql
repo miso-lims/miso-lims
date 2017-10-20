@@ -1,0 +1,1 @@
+ALTER TABLE SequencerServiceRecord CHANGE COLUMN `title` `title` VARCHAR(255) NOT NULL;
