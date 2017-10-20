@@ -100,6 +100,7 @@ ListUtils = (function() {
     var jqTable = jQuery('#' + elementId).html('');
     var options = Utils.setSortFromPriority({
       'aoColumns': columns,
+      'aLengthMenu': [10, 25, 50, 100, 200, 400, 1000],
       'bJQueryUI': true,
       'bAutoWidth': false,
       'iDisplayLength': 25,
