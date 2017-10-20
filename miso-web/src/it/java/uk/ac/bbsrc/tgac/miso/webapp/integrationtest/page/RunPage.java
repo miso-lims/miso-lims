@@ -146,9 +146,9 @@ public class RunPage extends FormPage<RunPage.Field> {
     return new RunPage(getDriver());
   }
 
-  public void searchForPools(boolean assignFirstPool, List<Integer> partitions, String option, String searchText) {
-    checkLaneBoxesAndSelectOption(partitions, "Assign Pool", option);
-    switch (option) {
+  public void searchForPools(boolean assignFirstPool, List<Integer> partitions, String searchMethod, String searchText) {
+    checkLaneBoxesAndSelectOption(partitions, "Assign Pool", searchMethod);
+    switch (searchMethod) {
     case PoolSearch.NO_POOL:
       break;
     case PoolSearch.SEARCH:
@@ -171,9 +171,9 @@ public class RunPage extends FormPage<RunPage.Field> {
     }
   }
 
-  public RunPage assignPools(List<Integer> partitions, String option, String searchText) {
+  public RunPage assignPools(List<Integer> partitions, String searchMethod, String searchText) {
     WebElement html = getHtmlElement();
-    searchForPools(true, partitions, option, searchText);
+    searchForPools(true, partitions, searchMethod, searchText);
     waitForPageRefresh(html);
     return new RunPage(getDriver());
   }

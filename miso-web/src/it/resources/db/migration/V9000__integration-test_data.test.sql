@@ -309,7 +309,8 @@ INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, pa
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
   (2, 'Rapid Run 2x151', 1, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
   (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4'),
-  (4, 'Micro 2x151', 2, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3');
+  (4, 'Micro 2x151', 2, 151, 1, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3'),
+  (5, 'v3 1x101', 1, 101, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3');
 
 INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
   (1, 4),
@@ -654,7 +655,9 @@ INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarc
 (5102, 4, 4, 'IPO5102', 'POOL_SEARCH_2', 'ipobar5102', 'cats', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5103, 4, 4, 'IPO5103', 'POOL_WITH_ORDERS', 'ipobar5103', 'sergeant', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5104, 4, 4, 'IPO5104', 'POOL_WITH_COMPLETED_ORDERS', 'ipobar5104', 'mission accomplished', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5105, 4, 4, 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 2, 'ILLUMINA', 0, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL);
+(5105, 4, 4, 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 2, 'ILLUMINA', 0, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(601, 1, 1, 'IPO601', 'Orders_Test_Pool_1', NULL, NULL, '2017-09-12', 2, 'ILLUMINA', 1, 1, 1, '2017-09-12 10:00:00', '2017-09-12 10:00:00', NULL),
+(602, 1, 1, 'IPO602', 'Add_Order_To_Run', NULL, NULL,  '2017-09-12', 2, 'ILLUMINA', 1, 1, 1, '2017-09-12 10:00:00', '2017-09-12 10:00:00', NULL);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1),
@@ -675,7 +678,9 @@ INSERT INTO PoolOrder (poolOrderId, poolId, partitions, parametersId, createdBy,
 (1, 5103, 2, 4, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),
 (2, 5103, 2, 3, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),
 (3, 5102, 2, 2, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),
-(4, 5104, 2, 2, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00');
+(4, 5104, 2, 2, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),
+(5, 601, 2, 5, 1, 1, '2017-09-12 12:00:00', '2017-09-12 12:00:00'),
+(6, 602, 2, 2, 1, 1, '2017-09-12 12:00:00', '2017-09-12 12:00:00');
 
 INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, securityProfile_profileId, lastModifier, creator, created, lastModified) VALUES
 (1, 1, 1, 'BOX1', 'First Box', 1, 1, 2, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),
@@ -700,7 +705,8 @@ INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId,
 (5009, 4, 'FAIL_LANE_WITH_NOTE', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
 (5010, 4, 'FAIL_LANE_TO_PASS', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
 (5100, 4, 'SEARCH_POOLS', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5101, 4, 'POOL_COMPLETED_ORDER', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02');
+(5101, 4, 'POOL_COMPLETED_ORDER', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(602, 4, 'ORDERS1', 1, 1, 1, '2017-09-13 13:13:13', '2017-09-13 13:13:13');
 
 INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES 
 (1, 1, 1), (2, 1, NULL),
@@ -713,7 +719,8 @@ INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES
 (5901, 1, NULL),
 (5110, 1, NULL),
 (5100, 1, NULL),
-(5104, 1, 5104), (5105, 2, 5104);
+(5104, 1, 5104), (5105, 2, 5104),
+(602, 1, NULL), (603, 2, NULL);
 
 INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partitions_partitionId) VALUES
 (1, 1), (2, 2),
@@ -726,7 +733,8 @@ INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partit
 (5009, 5901),
 (5010, 5110),
 (5100, 5100),
-(5101, 5104), (5101, 5105);
+(5101, 5104), (5101, 5105),
+(602, 602), (602, 603);
 
 INSERT INTO Run (runId, name, securityProfile_profileId, alias, sequencerReference_sequencerReferenceId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
 (1, 'RUN1', 5, 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
@@ -743,9 +751,11 @@ INSERT INTO Run (runId, name, securityProfile_profileId, alias, sequencerReferen
 (5009, 'RUN5009', 5, 'Fail_Lane_With_Note_Run', 5002, 2, 'fail lane with note on run', '/fail/note', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
 (5010, 'RUN5010', 5, 'Fail_Lane_To_Ok_Run', 5002, 2, 'fail lane change to ok', '/fail/ok', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
 (5100, 'RUN5100', 5, 'Search_Pool_Run', 2, 4, 'test pool searches', '/test/searches', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5101, 'RUN5101', 5, 'Pool_Completed_Orders_Run', 2, 2, 'pool orders are complete', '/complete/orders', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00');
+(5101, 'RUN5101', 5, 'Pool_Completed_Orders_Run', 2, 2, 'pool orders are complete', '/complete/orders', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(602, 'RUN602', 5, 'Change_Order_Run', 1, 2, 'test run', '/run/orders', '2017-09-13', NULL, 'Running', 1, '2017-09-13 13:13:13', 1, '2017-09-13 13:13:13');
 
-INSERT INTO RunIllumina (runId, pairedEnd) VALUES (1, 1);
+INSERT INTO RunIllumina (runId, pairedEnd) VALUES (1, 1), (602, 1);
+
 INSERT INTO RunIllumina (runId, callCycle, imgCycle, numCycles, scoreCycle, pairedEnd) VALUES
   (5001, 35, 34, 75, 33, 1),
   (5002, 50, 50, 50, 50, 1),
@@ -771,7 +781,8 @@ INSERT INTO Run_SequencerPartitionContainer (Run_runId, containers_containerId) 
 (5009, 5009),
 (5010, 5010),
 (5100, 5100),
-(5101, 5101);
+(5101, 5101),
+(602, 602);
 
 DELETE FROM Note;
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES

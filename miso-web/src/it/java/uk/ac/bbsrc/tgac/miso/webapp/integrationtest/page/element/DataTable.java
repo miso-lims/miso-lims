@@ -129,6 +129,28 @@ public class DataTable extends AbstractElement {
     return cells.get(colNum);
   }
 
+  public String getTextByOtherLocator(String targetColumnHeading, String locatorColumnHeading, String locatorText) {
+    int targetColNum = columnHeadings.indexOf(targetColumnHeading);
+    int locatorColNum = columnHeadings.indexOf(locatorColumnHeading);
+    if (targetColNum == -1 || locatorColNum == -1) {
+      throw new IllegalArgumentException("Column " + targetColumnHeading + " doesn't exist");
+    }
+    List<WebElement> rows = table.findElements(rowSelector);
+    String targetText = null;
+    for (WebElement row : rows) {
+      List<WebElement> cells = row.findElements(cellSelector);
+      String locatorCell = cells.get(locatorColNum).getText();
+      if (locatorText.equals(locatorCell)) {
+        targetText = cells.get(targetColNum).getText();
+        break;
+      }
+    }
+    if (targetText == null) {
+      throw new IllegalArgumentException("Cannot locate matching row");
+    }
+    return targetText;
+  }
+
   public boolean isTableEmpty() {
     return table.findElements(emptyTableSelector).size() == 1;
   }
