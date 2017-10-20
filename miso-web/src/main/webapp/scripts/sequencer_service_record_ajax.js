@@ -29,7 +29,7 @@ var ServiceRecord = ServiceRecord || {
     jQuery('#serviceRecordForm').parsley().destroy();
 
     jQuery('#title').attr('required', 'true');
-    jQuery('#title').attr('data-parsley-maxlength', '50');
+    jQuery('#title').attr('data-parsley-maxlength', '255');
 
     jQuery('#details').attr('data-parsley-maxlength', '65535');
 
