@@ -366,7 +366,8 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (200, 'PRO200', 'HotSorting', 'SORT', '2017-08-09', 'test sorting by BoxPosition in Handsontable', 1, 'ACTIVE', 1, '2017-08-09 11:51:00'),
   (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 1, 'ACTIVE', 1, '2017-08-14 11:54:00'),
   (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 1, 'ACTIVE', 1, '2017-08-16 14:50:00'),
-  (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 1, 'ACTIVE', 1, '2017-08-15 13:45:00');
+  (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 1, 'ACTIVE', 1, '2017-08-15 13:45:00'),
+  (900, 'PRO900', 'Add Overview', 'POV', '2017-10-20', 'add project overview', 1, 'ACTIVE', 1, '2017-10-20 15:30:00');
 
 INSERT INTO SampleNumberPerProject(projectId, highestSampleNumber, padding, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (100001, 1, 4, 1, '2017-10-11 15:33:00', 1, '2017-10-11 15:33:00');
