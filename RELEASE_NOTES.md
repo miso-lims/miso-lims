@@ -1,3 +1,11 @@
+# 0.2.94
+
+Changes:
+
+ * Fix project overview dialog
+ * Add more numbers for pagination
+ * Add new Brady THT-179-492 labels
+
 # 0.2.93
 
 Changes:

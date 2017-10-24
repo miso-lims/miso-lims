@@ -290,7 +290,7 @@ Project.overview = {
         "<form>" + "<fieldset class='dialog'><label for='principalInvestigator'>Principal Investigator</label>"
             + "<input type='text' name='principalInvestigator' id='principalInvestigator' class='text ui-widget-content ui-corner-all' />"
             + "<label for='numProposedSamples'>No. Proposed Samples</label>"
-            + "<input type='text' name='numProposedSamples' id='numProposedSamples' class='text ui-widget-content ui-corner-all' />"
+            + "<input type='number' min='1' name='numProposedSamples' id='numProposedSamples' class='text ui-widget-content ui-corner-all' />"
             + "</fieldset></form>");
 
     jQuery('#addProjectOverviewDialog').dialog({
@@ -300,7 +300,6 @@ Project.overview = {
       buttons: {
         "Add Overview": function() {
           self.addProjectOverview(projectId, jQuery('#principalInvestigator').val(), jQuery('#numProposedSamples').val());
-          jQuery(this).dialog('close');
         },
         "Cancel": function() {
           jQuery(this).dialog('close');
@@ -310,14 +309,21 @@ Project.overview = {
   },
 
   addProjectOverview: function(projectId, pi, nsamples) {
-    Fluxion.doAjax('projectControllerHelperService', 'addProjectOverview', {
-      'projectId': projectId,
-      'principalInvestigator': pi,
-      'numProposedSamples': nsamples,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': Utils.page.pageReload
-    });
+    if (nsamples <= 0) {
+     jQuery('<div class="parsley-error">Number of samples must be greater than zero</div>').insertAfter('#numProposedSamples');
+    } else {
+      Fluxion.doAjax('projectControllerHelperService', 'addProjectOverview', {
+        'projectId': projectId,
+        'principalInvestigator': pi,
+        'numProposedSamples': nsamples,
+        'url': ajaxurl
+      }, {
+        'doOnSuccess': function() {
+            jQuery('#addProjectOverviewDialog').dialog('close');
+            Utils.page.pageReload();
+          }
+      });
+    }
   },
 
   showProjectOverviewNoteDialog: function(overviewId) {

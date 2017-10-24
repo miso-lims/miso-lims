@@ -5,6 +5,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.titleContains;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -142,5 +143,18 @@ public class ProjectPage extends HeaderFooterPage {
 
   public DataTable getTable(String tableWrapperId) {
     return new DataTable(getDriver(), tableWrapperId);
+  }
+
+  public ProjectPage addOverview(String investigatorName, Integer numSamples) {
+    WebElement html = getHtmlElement();
+    getDriver().findElement(By.linkText("Add Overview")).click();
+    WebElement dialog = getDriver().findElement(By.id("addProjectOverviewDialog"));
+    setText(investigatorName, dialog.findElement(By.id("principalInvestigator")));
+    setText(numSamples.toString(), dialog.findElement(By.id("numProposedSamples")));
+    WebElement addOverview = getDriver().findElements(By.tagName("button")).stream()
+        .filter(button -> button.getText().equals("Add Overview")).findFirst().orElse(null);
+    addOverview.click();
+    waitForPageRefresh(html);
+    return new ProjectPage(getDriver());
   }
 }

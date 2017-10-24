@@ -14,35 +14,35 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.Columns;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
 public class SampleBulkEditIT extends AbstractBulkSampleIT {
 
-  private static final Set<String> identityColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
-      Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.EXTERNAL_NAME, Columns.DONOR_SEX,
-      Columns.SAMPLE_CLASS, Columns.GROUP_ID, Columns.GROUP_DESCRIPTION, Columns.QC_STATUS, Columns.QC_NOTE);
+  private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
+      SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX,
+      SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
-  private static final Set<String> tissueColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
-      Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.SAMPLE_CLASS,
-      Columns.GROUP_ID, Columns.GROUP_DESCRIPTION, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.PASSAGE_NUMBER,
-      Columns.TIMES_RECEIVED,
-      Columns.TUBE_NUMBER, Columns.LAB, Columns.SECONDARY_ID, Columns.TISSUE_MATERIAL, Columns.REGION, Columns.QC_STATUS,
-      Columns.QC_NOTE);
+  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
+      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS,
+      SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER,
+      SamColumns.TIMES_RECEIVED,
+      SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.QC_STATUS,
+      SamColumns.QC_NOTE);
 
-  private static final Set<String> slideColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
-      Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.SAMPLE_CLASS,
-      Columns.GROUP_ID, Columns.GROUP_DESCRIPTION, Columns.SLIDES, Columns.DISCARDS, Columns.THICKNESS, Columns.STAIN,
-      Columns.QC_STATUS, Columns.QC_NOTE);
+  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
+      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS,
+      SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.SLIDES, SamColumns.DISCARDS, SamColumns.THICKNESS, SamColumns.STAIN,
+      SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
-  private static final Set<String> curlsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
-      Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
-      Columns.GROUP_DESCRIPTION, Columns.QC_STATUS, Columns.QC_NOTE);
+  private static final Set<String> curlsColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
+      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
+      SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
-  private static final Set<String> lcmTubeColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
-      Columns.RECEIVE_DATE, Columns.ID_BARCODE, Columns.SAMPLE_TYPE, Columns.SCIENTIFIC_NAME, Columns.SAMPLE_CLASS, Columns.GROUP_ID,
-      Columns.GROUP_DESCRIPTION, Columns.SLIDES_CONSUMED, Columns.QC_STATUS, Columns.QC_NOTE);
+  private static final Set<String> lcmTubeColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
+      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
+      SamColumns.GROUP_DESCRIPTION, SamColumns.SLIDES_CONSUMED, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
   @Before
   public void setup() {
@@ -73,31 +73,31 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     HandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
-    editable.put(Columns.ALIAS, "TEST_0005");
-    editable.put(Columns.DESCRIPTION, "changed");
-    editable.put(Columns.ID_BARCODE, "changed");
-    editable.put(Columns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
-    editable.put(Columns.SCIENTIFIC_NAME, "changed");
-    editable.put(Columns.EXTERNAL_NAME, "changed");
-    editable.put(Columns.DONOR_SEX, "Unspecified");
-    editable.put(Columns.GROUP_ID, "changed");
-    editable.put(Columns.GROUP_DESCRIPTION, "changed");
-    editable.put(Columns.QC_STATUS, "Refused Consent");
+    editable.put(SamColumns.ALIAS, "TEST_0005");
+    editable.put(SamColumns.DESCRIPTION, "changed");
+    editable.put(SamColumns.ID_BARCODE, "changed");
+    editable.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
+    editable.put(SamColumns.SCIENTIFIC_NAME, "changed");
+    editable.put(SamColumns.EXTERNAL_NAME, "changed");
+    editable.put(SamColumns.DONOR_SEX, "Unspecified");
+    editable.put(SamColumns.GROUP_ID, "changed");
+    editable.put(SamColumns.GROUP_DESCRIPTION, "changed");
+    editable.put(SamColumns.QC_STATUS, "Refused Consent");
 
     editable.forEach((k, v) -> table.enterText(k, 0, v));
     editable.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
 
-    assertFalse(table.isWritable(Columns.NAME, 0));
-    assertFalse(table.isWritable(Columns.SAMPLE_CLASS, 0));
-    assertFalse(table.isWritable(Columns.QC_NOTE, 0));
+    assertFalse(table.isWritable(SamColumns.NAME, 0));
+    assertFalse(table.isWritable(SamColumns.SAMPLE_CLASS, 0));
+    assertFalse(table.isWritable(SamColumns.QC_NOTE, 0));
 
     // ensure dependent columns update properly
-    editable.put(Columns.QC_STATUS, "OKd by Collaborator");
-    table.enterText(Columns.QC_STATUS, 0, editable.get(Columns.QC_STATUS));
-    assertEquals(editable.get(Columns.QC_STATUS), table.getText(Columns.QC_STATUS, 0));
-    editable.put(Columns.QC_NOTE, "Approved");
-    table.enterText(Columns.QC_NOTE, 0, editable.get(Columns.QC_NOTE));
-    assertEquals(editable.get(Columns.QC_NOTE), table.getText(Columns.QC_NOTE, 0));
+    editable.put(SamColumns.QC_STATUS, "OKd by Collaborator");
+    table.enterText(SamColumns.QC_STATUS, 0, editable.get(SamColumns.QC_STATUS));
+    assertEquals(editable.get(SamColumns.QC_STATUS), table.getText(SamColumns.QC_STATUS, 0));
+    editable.put(SamColumns.QC_NOTE, "Approved");
+    table.enterText(SamColumns.QC_NOTE, 0, editable.get(SamColumns.QC_NOTE));
+    assertEquals(editable.get(SamColumns.QC_NOTE), table.getText(SamColumns.QC_NOTE, 0));
   }
 
   @Test
@@ -107,17 +107,17 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     SampleHandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
-    editable.put(Columns.ALIAS, "TEST_0002");
-    editable.put(Columns.DESCRIPTION, "new description");
-    editable.put(Columns.ID_BARCODE, "MATRIX");
-    editable.put(Columns.SAMPLE_TYPE, "METAGENOMIC");
-    editable.put(Columns.SCIENTIFIC_NAME, "Mus musculus");
-    editable.put(Columns.EXTERNAL_NAME, "completely new");
-    editable.put(Columns.DONOR_SEX, "Male");
-    editable.put(Columns.GROUP_ID, "500");
-    editable.put(Columns.GROUP_DESCRIPTION, "miles");
-    editable.put(Columns.QC_STATUS, "OKd by Collaborator");
-    editable.put(Columns.QC_NOTE, "Approved");
+    editable.put(SamColumns.ALIAS, "TEST_0002");
+    editable.put(SamColumns.DESCRIPTION, "new description");
+    editable.put(SamColumns.ID_BARCODE, "MATRIX");
+    editable.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
+    editable.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
+    editable.put(SamColumns.EXTERNAL_NAME, "completely new");
+    editable.put(SamColumns.DONOR_SEX, "Male");
+    editable.put(SamColumns.GROUP_ID, "500");
+    editable.put(SamColumns.GROUP_DESCRIPTION, "miles");
+    editable.put(SamColumns.QC_STATUS, "OKd by Collaborator");
+    editable.put(SamColumns.QC_NOTE, "Approved");
 
     // make the changes
     editable.forEach((k, v) -> table.enterText(k, 0, v));
@@ -132,17 +132,17 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     SampleHandsOnTable newTable = newPage.getTable();
 
     Map<String, String> empty = new HashMap<>();
-    empty.put(Columns.ALIAS, "TEST_0002");
-    empty.put(Columns.DESCRIPTION, "");
-    empty.put(Columns.ID_BARCODE, "");
-    empty.put(Columns.SAMPLE_TYPE, "METAGENOMIC");
-    empty.put(Columns.SCIENTIFIC_NAME, "Mus musculus");
-    empty.put(Columns.EXTERNAL_NAME, "completely new");
-    empty.put(Columns.DONOR_SEX, "Unknown");
-    empty.put(Columns.GROUP_ID, "");
-    empty.put(Columns.GROUP_DESCRIPTION, "");
-    empty.put(Columns.QC_STATUS, "Not Ready");
-    empty.put(Columns.QC_NOTE, "");
+    empty.put(SamColumns.ALIAS, "TEST_0002");
+    empty.put(SamColumns.DESCRIPTION, "");
+    empty.put(SamColumns.ID_BARCODE, "");
+    empty.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
+    empty.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
+    empty.put(SamColumns.EXTERNAL_NAME, "completely new");
+    empty.put(SamColumns.DONOR_SEX, "Unknown");
+    empty.put(SamColumns.GROUP_ID, "");
+    empty.put(SamColumns.GROUP_DESCRIPTION, "");
+    empty.put(SamColumns.QC_STATUS, "Not Ready");
+    empty.put(SamColumns.QC_NOTE, "");
 
     // make the changes
     empty.forEach((k, v) -> newTable.enterText(k, 0, v));
@@ -173,24 +173,24 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
    HandsOnTable table = page.getTable();
 
    Map<String, String> editable = new HashMap<>();
-    editable.put(Columns.ALIAS, "TEST_0002_Pa_M_13_2-5");
-    editable.put(Columns.DESCRIPTION, "changed");
-    editable.put(Columns.RECEIVE_DATE, "2015-07-17");
-    editable.put(Columns.ID_BARCODE, "changed"); // increment
-    editable.put(Columns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
-    editable.put(Columns.SCIENTIFIC_NAME, "changed");
-    editable.put(Columns.GROUP_ID, "changed");
-    editable.put(Columns.GROUP_DESCRIPTION, "changed");
-    editable.put(Columns.TISSUE_ORIGIN, "Ly (Lymphocyte)");
-    editable.put(Columns.TISSUE_TYPE, "T (Unclassified tumour)");
-    editable.put(Columns.PASSAGE_NUMBER, "1300");
-    editable.put(Columns.TIMES_RECEIVED, "200");
-    editable.put(Columns.TUBE_NUMBER, "200");
-    editable.put(Columns.LAB, "Pathology (University Health Network)");
-    editable.put(Columns.SECONDARY_ID, "changed");
-    editable.put(Columns.TISSUE_MATERIAL, "Blood");
-    editable.put(Columns.REGION, "changed");
-    editable.put(Columns.QC_STATUS, "Refused Consent");
+    editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-5");
+    editable.put(SamColumns.DESCRIPTION, "changed");
+    editable.put(SamColumns.RECEIVE_DATE, "2015-07-17");
+    editable.put(SamColumns.ID_BARCODE, "changed"); // increment
+    editable.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
+    editable.put(SamColumns.SCIENTIFIC_NAME, "changed");
+    editable.put(SamColumns.GROUP_ID, "changed");
+    editable.put(SamColumns.GROUP_DESCRIPTION, "changed");
+    editable.put(SamColumns.TISSUE_ORIGIN, "Ly (Lymphocyte)");
+    editable.put(SamColumns.TISSUE_TYPE, "T (Unclassified tumour)");
+    editable.put(SamColumns.PASSAGE_NUMBER, "1300");
+    editable.put(SamColumns.TIMES_RECEIVED, "200");
+    editable.put(SamColumns.TUBE_NUMBER, "200");
+    editable.put(SamColumns.LAB, "Pathology (University Health Network)");
+    editable.put(SamColumns.SECONDARY_ID, "changed");
+    editable.put(SamColumns.TISSUE_MATERIAL, "Blood");
+    editable.put(SamColumns.REGION, "changed");
+    editable.put(SamColumns.QC_STATUS, "Refused Consent");
 
    // assert not equals to start
    editable.forEach((k, v) -> assertNotEquals(v, table.getText(k, 0)));
@@ -210,24 +210,24 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     SampleHandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
-    editable.put(Columns.ALIAS, "TEST_0002_Pa_M_13_2-2");
-    editable.put(Columns.DESCRIPTION, "changed description");
-    editable.put(Columns.RECEIVE_DATE, "2016-07-17");
-    editable.put(Columns.ID_BARCODE, "3001"); // increment
-    editable.put(Columns.SAMPLE_TYPE, "METAGENOMIC");
-    editable.put(Columns.SCIENTIFIC_NAME, "Mus musculus");
-    editable.put(Columns.GROUP_ID, "2");
-    editable.put(Columns.GROUP_DESCRIPTION, "Test two");
-    editable.put(Columns.TISSUE_ORIGIN, "Pa (Pancreas)");
-    editable.put(Columns.TISSUE_TYPE, "M (Metastatic tumour)");
-    editable.put(Columns.PASSAGE_NUMBER, "13");
-    editable.put(Columns.TIMES_RECEIVED, "2");
-    editable.put(Columns.TUBE_NUMBER, "2");
-    editable.put(Columns.LAB, "BioBank (University Health Network)");
-    editable.put(Columns.SECONDARY_ID, "changed tube");
-    editable.put(Columns.TISSUE_MATERIAL, "Blood");
-    editable.put(Columns.REGION, "Pancreatic duct");
-    editable.put(Columns.QC_STATUS, "Waiting: Receive Tissue");
+    editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2");
+    editable.put(SamColumns.DESCRIPTION, "changed description");
+    editable.put(SamColumns.RECEIVE_DATE, "2016-07-17");
+    editable.put(SamColumns.ID_BARCODE, "3001"); // increment
+    editable.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
+    editable.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
+    editable.put(SamColumns.GROUP_ID, "2");
+    editable.put(SamColumns.GROUP_DESCRIPTION, "Test two");
+    editable.put(SamColumns.TISSUE_ORIGIN, "Pa (Pancreas)");
+    editable.put(SamColumns.TISSUE_TYPE, "M (Metastatic tumour)");
+    editable.put(SamColumns.PASSAGE_NUMBER, "13");
+    editable.put(SamColumns.TIMES_RECEIVED, "2");
+    editable.put(SamColumns.TUBE_NUMBER, "2");
+    editable.put(SamColumns.LAB, "BioBank (University Health Network)");
+    editable.put(SamColumns.SECONDARY_ID, "changed tube");
+    editable.put(SamColumns.TISSUE_MATERIAL, "Blood");
+    editable.put(SamColumns.REGION, "Pancreatic duct");
+    editable.put(SamColumns.QC_STATUS, "Waiting: Receive Tissue");
 
     // make the changes
     editable.forEach((k, v) -> table.enterText(k, 0, v));
@@ -242,24 +242,24 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     SampleHandsOnTable newTable = newPage.getTable();
 
     Map<String, String> empty = new HashMap<>();
-    empty.put(Columns.ALIAS, "TEST_0002_Pa_M_13_2-2");
-    empty.put(Columns.DESCRIPTION, "");
-    empty.put(Columns.RECEIVE_DATE, "");
-    empty.put(Columns.ID_BARCODE, ""); // increment
-    empty.put(Columns.SAMPLE_TYPE, "METAGENOMIC");
-    empty.put(Columns.SCIENTIFIC_NAME, "Mus musculus");
-    empty.put(Columns.GROUP_ID, "");
-    empty.put(Columns.GROUP_DESCRIPTION, "");
-    empty.put(Columns.TISSUE_ORIGIN, "Pa (Pancreas)");
-    empty.put(Columns.TISSUE_TYPE, "M (Metastatic tumour)");
-    empty.put(Columns.PASSAGE_NUMBER, "");
-    empty.put(Columns.TIMES_RECEIVED, "2");
-    empty.put(Columns.TUBE_NUMBER, "2");
-    empty.put(Columns.LAB, "(None)");
-    empty.put(Columns.SECONDARY_ID, "");
-    empty.put(Columns.TISSUE_MATERIAL, "(None)");
-    empty.put(Columns.REGION, "");
-    empty.put(Columns.QC_STATUS, "Not Ready");
+    empty.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2");
+    empty.put(SamColumns.DESCRIPTION, "");
+    empty.put(SamColumns.RECEIVE_DATE, "");
+    empty.put(SamColumns.ID_BARCODE, ""); // increment
+    empty.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
+    empty.put(SamColumns.SCIENTIFIC_NAME, "Mus musculus");
+    empty.put(SamColumns.GROUP_ID, "");
+    empty.put(SamColumns.GROUP_DESCRIPTION, "");
+    empty.put(SamColumns.TISSUE_ORIGIN, "Pa (Pancreas)");
+    empty.put(SamColumns.TISSUE_TYPE, "M (Metastatic tumour)");
+    empty.put(SamColumns.PASSAGE_NUMBER, "");
+    empty.put(SamColumns.TIMES_RECEIVED, "2");
+    empty.put(SamColumns.TUBE_NUMBER, "2");
+    empty.put(SamColumns.LAB, "(None)");
+    empty.put(SamColumns.SECONDARY_ID, "");
+    empty.put(SamColumns.TISSUE_MATERIAL, "(None)");
+    empty.put(SamColumns.REGION, "");
+    empty.put(SamColumns.QC_STATUS, "Not Ready");
 
     // make the changes
     empty.forEach((k, v) -> newTable.enterText(k, 0, v));
@@ -290,19 +290,19 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     HandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
-    editable.put(Columns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL05");
-    editable.put(Columns.DESCRIPTION, "changed");
-    editable.put(Columns.RECEIVE_DATE, "2015-06-17");
-    editable.put(Columns.ID_BARCODE, "changed"); // increment
-    editable.put(Columns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
-    editable.put(Columns.SCIENTIFIC_NAME, "changed");
-    editable.put(Columns.GROUP_ID, "changed");
-    editable.put(Columns.GROUP_DESCRIPTION, "changed");
-    editable.put(Columns.SLIDES, "1700");
-    editable.put(Columns.DISCARDS, "300");
-    editable.put(Columns.THICKNESS, "700");
-    editable.put(Columns.STAIN, "Hematoxylin+Eosin");
-    editable.put(Columns.QC_STATUS, "Waiting: Path Report");
+    editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL05");
+    editable.put(SamColumns.DESCRIPTION, "changed");
+    editable.put(SamColumns.RECEIVE_DATE, "2015-06-17");
+    editable.put(SamColumns.ID_BARCODE, "changed"); // increment
+    editable.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
+    editable.put(SamColumns.SCIENTIFIC_NAME, "changed");
+    editable.put(SamColumns.GROUP_ID, "changed");
+    editable.put(SamColumns.GROUP_DESCRIPTION, "changed");
+    editable.put(SamColumns.SLIDES, "1700");
+    editable.put(SamColumns.DISCARDS, "300");
+    editable.put(SamColumns.THICKNESS, "700");
+    editable.put(SamColumns.STAIN, "Hematoxylin+Eosin");
+    editable.put(SamColumns.QC_STATUS, "Waiting: Path Report");
 
     // assert not equals to start
     editable.forEach((k, v) -> assertNotEquals(v, table.getText(k, 0)));
@@ -322,19 +322,19 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     SampleHandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
-    editable.put(Columns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL01");
-    editable.put(Columns.DESCRIPTION, "different");
-    editable.put(Columns.RECEIVE_DATE, "2017-06-17");
-    editable.put(Columns.ID_BARCODE, "4003"); // increment
-    editable.put(Columns.SAMPLE_TYPE, "METAGENOMIC");
-    editable.put(Columns.SCIENTIFIC_NAME, "Panthera tigris altaica");
-    editable.put(Columns.GROUP_ID, "12");
-    editable.put(Columns.GROUP_DESCRIPTION, "different");
-    editable.put(Columns.SLIDES, "17");
-    editable.put(Columns.DISCARDS, "3");
-    editable.put(Columns.THICKNESS, "7");
-    editable.put(Columns.STAIN, "Hematoxylin+Eosin");
-    editable.put(Columns.QC_STATUS, "Waiting: Path Report");
+    editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL01");
+    editable.put(SamColumns.DESCRIPTION, "different");
+    editable.put(SamColumns.RECEIVE_DATE, "2017-06-17");
+    editable.put(SamColumns.ID_BARCODE, "4003"); // increment
+    editable.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
+    editable.put(SamColumns.SCIENTIFIC_NAME, "Panthera tigris altaica");
+    editable.put(SamColumns.GROUP_ID, "12");
+    editable.put(SamColumns.GROUP_DESCRIPTION, "different");
+    editable.put(SamColumns.SLIDES, "17");
+    editable.put(SamColumns.DISCARDS, "3");
+    editable.put(SamColumns.THICKNESS, "7");
+    editable.put(SamColumns.STAIN, "Hematoxylin+Eosin");
+    editable.put(SamColumns.QC_STATUS, "Waiting: Path Report");
 
     // make the changes
     editable.forEach((k, v) -> table.enterText(k, 0, v));
@@ -349,19 +349,19 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     SampleHandsOnTable newTable = newPage.getTable();
 
     Map<String, String> empty = new HashMap<>();
-    empty.put(Columns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL01");
-    empty.put(Columns.DESCRIPTION, "");
-    empty.put(Columns.RECEIVE_DATE, "");
-    empty.put(Columns.ID_BARCODE, ""); // increment
-    empty.put(Columns.SAMPLE_TYPE, "METAGENOMIC");
-    empty.put(Columns.SCIENTIFIC_NAME, "Panthera tigris altaica");
-    empty.put(Columns.GROUP_ID, "");
-    empty.put(Columns.GROUP_DESCRIPTION, "");
-    empty.put(Columns.SLIDES, "17");
-    empty.put(Columns.DISCARDS, "3");
-    empty.put(Columns.THICKNESS, "");
-    empty.put(Columns.STAIN, "(None)");
-    empty.put(Columns.QC_STATUS, "Not Ready");
+    empty.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL01");
+    empty.put(SamColumns.DESCRIPTION, "");
+    empty.put(SamColumns.RECEIVE_DATE, "");
+    empty.put(SamColumns.ID_BARCODE, ""); // increment
+    empty.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
+    empty.put(SamColumns.SCIENTIFIC_NAME, "Panthera tigris altaica");
+    empty.put(SamColumns.GROUP_ID, "");
+    empty.put(SamColumns.GROUP_DESCRIPTION, "");
+    empty.put(SamColumns.SLIDES, "17");
+    empty.put(SamColumns.DISCARDS, "3");
+    empty.put(SamColumns.THICKNESS, "");
+    empty.put(SamColumns.STAIN, "(None)");
+    empty.put(SamColumns.QC_STATUS, "Not Ready");
 
     // make the changes
     empty.forEach((k, v) -> newTable.enterText(k, 0, v));
@@ -392,15 +392,15 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     HandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
-    editable.put(Columns.ALIAS, "TEST_0002_Pa_M_13_2-2_C05");
-    editable.put(Columns.DESCRIPTION, "changed");
-    editable.put(Columns.RECEIVE_DATE, "2015-06-17");
-    editable.put(Columns.ID_BARCODE, "changed"); // increment
-    editable.put(Columns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
-    editable.put(Columns.SCIENTIFIC_NAME, "changed");
-    editable.put(Columns.GROUP_ID, "changed");
-    editable.put(Columns.GROUP_DESCRIPTION, "changed");
-    editable.put(Columns.QC_STATUS, "Waiting: Path Report");
+    editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_C05");
+    editable.put(SamColumns.DESCRIPTION, "changed");
+    editable.put(SamColumns.RECEIVE_DATE, "2015-06-17");
+    editable.put(SamColumns.ID_BARCODE, "changed"); // increment
+    editable.put(SamColumns.SAMPLE_TYPE, "TRANSCRIPTOMIC");
+    editable.put(SamColumns.SCIENTIFIC_NAME, "changed");
+    editable.put(SamColumns.GROUP_ID, "changed");
+    editable.put(SamColumns.GROUP_DESCRIPTION, "changed");
+    editable.put(SamColumns.QC_STATUS, "Waiting: Path Report");
 
     // assert not equals to start
     editable.forEach((k, v) -> assertNotEquals(v, table.getText(k, 0)));
@@ -420,15 +420,15 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     SampleHandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
-    editable.put(Columns.ALIAS, "TEST_0002_Pa_M_13_2-2_C01");
-    editable.put(Columns.DESCRIPTION, "different");
-    editable.put(Columns.RECEIVE_DATE, "2017-06-17");
-    editable.put(Columns.ID_BARCODE, "4003"); // increment
-    editable.put(Columns.SAMPLE_TYPE, "METAGENOMIC");
-    editable.put(Columns.SCIENTIFIC_NAME, "Rattus rat");
-    editable.put(Columns.GROUP_ID, "12");
-    editable.put(Columns.GROUP_DESCRIPTION, "different");
-    editable.put(Columns.QC_STATUS, "Waiting: Path Report");
+    editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_C01");
+    editable.put(SamColumns.DESCRIPTION, "different");
+    editable.put(SamColumns.RECEIVE_DATE, "2017-06-17");
+    editable.put(SamColumns.ID_BARCODE, "4003"); // increment
+    editable.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
+    editable.put(SamColumns.SCIENTIFIC_NAME, "Rattus rat");
+    editable.put(SamColumns.GROUP_ID, "12");
+    editable.put(SamColumns.GROUP_DESCRIPTION, "different");
+    editable.put(SamColumns.QC_STATUS, "Waiting: Path Report");
 
     // make the changes
     editable.forEach((k, v) -> table.enterText(k, 0, v));
@@ -443,15 +443,15 @@ public class SampleBulkEditIT extends AbstractBulkSampleIT {
     SampleHandsOnTable newTable = newPage.getTable();
 
     Map<String, String> empty = new HashMap<>();
-    empty.put(Columns.ALIAS, "TEST_0002_Pa_M_13_2-2_C01");
-    empty.put(Columns.DESCRIPTION, "");
-    empty.put(Columns.RECEIVE_DATE, "");
-    empty.put(Columns.ID_BARCODE, ""); // increment
-    empty.put(Columns.SAMPLE_TYPE, "METAGENOMIC");
-    empty.put(Columns.SCIENTIFIC_NAME, "Rattus rat");
-    empty.put(Columns.GROUP_ID, "");
-    empty.put(Columns.GROUP_DESCRIPTION, "");
-    empty.put(Columns.QC_STATUS, "Not Ready");
+    empty.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_C01");
+    empty.put(SamColumns.DESCRIPTION, "");
+    empty.put(SamColumns.RECEIVE_DATE, "");
+    empty.put(SamColumns.ID_BARCODE, ""); // increment
+    empty.put(SamColumns.SAMPLE_TYPE, "METAGENOMIC");
+    empty.put(SamColumns.SCIENTIFIC_NAME, "Rattus rat");
+    empty.put(SamColumns.GROUP_ID, "");
+    empty.put(SamColumns.GROUP_DESCRIPTION, "");
+    empty.put(SamColumns.QC_STATUS, "Not Ready");
 
     // make the changes
     empty.forEach((k, v) -> newTable.enterText(k, 0, v));

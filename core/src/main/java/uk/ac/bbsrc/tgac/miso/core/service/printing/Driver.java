@@ -100,6 +100,44 @@ public enum Driver {
       return sb.toString();
     }
   },
+  BRADY_THT_179_492 {
+    @Override
+    public String encode(Barcodable barcodable) {
+      StringBuilder sb = new StringBuilder();
+
+      try {
+        String barcode = new String(Base64.encodeBase64(barcodable.getIdentificationBarcode().getBytes("UTF-8")));
+        sb.append("mm\n");
+        sb.append("J\n");
+        sb.append("O R\n");
+        sb.append("S l1;0.0,0.00,25.0,25.5,25.0\n");
+        sb.append("B 18,2,0,DATAMATRIX,0.3;").append(barcode).append("\n");
+        if (barcodable.getLabelText().length() > 14) {
+          sb.append("T 1.5,3,0,3,2;");
+          appendBradyEscapedUnicode(sb, barcodable.getLabelText().substring(0, 14));
+          sb.append("\n");
+          sb.append("T 1.5,6,0,3,2;");
+          appendTruncated(14, barcodable.getLabelText().substring(14), s -> appendBradyEscapedUnicode(sb, s));
+          sb.append("\n");
+        } else {
+          sb.append("T 1.5,3,0,3,2;");
+          appendTruncated(14, barcodable.getLabelText(), s -> appendBradyEscapedUnicode(sb, s));
+          sb.append("\n");
+        }
+        if (barcodable.getBarcodeDate() != null) {
+          sb.append("T 1.5,9,0,3,2;");
+          sb.append(LimsUtils.formatDate(barcodable.getBarcodeDate()));
+          sb.append("\n");
+        }
+        sb.append("A 1\n");
+      } catch (UnsupportedEncodingException e) {
+        log.error("get raw state", e);
+        return null;
+      }
+      return sb.toString();
+    }
+  },
+
   BRADY_THT_181_492_3 {
     @Override
     public String encode(Barcodable barcodable) {
