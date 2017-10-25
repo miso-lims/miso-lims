@@ -252,10 +252,13 @@ INSERT INTO TargetedSequencing_KitDescriptor (targetedSequencingId, kitDescripto
   (1, 1), (2, 1), (3, 2);
 
 DELETE FROM BoxUse;
-INSERT INTO BoxUse (alias) VALUES ('DNA'), ('RNA'), ('Libraries'), ('Sequencing'), ('Storage'), ('Tissue');
+INSERT INTO BoxUse (boxUseId, alias) VALUES 
+(1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');
 
 DELETE FROM BoxSize;
-INSERT INTO BoxSize (`rows`, `columns`, `scannable`) VALUES (8, 12, 1), (10, 10, 0);
+INSERT INTO BoxSize (boxSizeId, `rows`, `columns`, `scannable`) VALUES 
+(1, 8, 12, 1),
+(2, 10, 10, 0);
 
 DELETE FROM `_Group`;
 INSERT INTO `_Group` (description, name) VALUES

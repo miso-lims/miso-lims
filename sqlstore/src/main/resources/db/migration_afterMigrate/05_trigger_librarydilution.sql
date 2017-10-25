@@ -12,7 +12,7 @@ FOR EACH ROW
       CASE WHEN NEW.library_libraryId <> OLD.library_libraryId THEN CONCAT('parent: ', (SELECT name FROM Library WHERE libraryId = OLD.library_libraryId), ' → ', (SELECT name FROM Library WHERE libraryId = NEW.library_libraryId)) END,
       CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targeted sequencing: ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = OLD.targetedSequencingId), 'n/a'), ' → ', COALESCE((SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = NEW.targetedSequencingId), 'n/a')) END);
     IF log_message IS NOT NULL AND log_message <> '' THEN
-      INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
+      INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
       NEW.library_libraryId,
         COALESCE(CONCAT_WS(',',
           CASE WHEN NEW.concentration <> OLD.concentration THEN CONCAT(NEW.name, ' concentration') END,
@@ -21,7 +21,8 @@ FOR EACH ROW
           CASE WHEN (NEW.targetedSequencingId IS NULL) <> (OLD.targetedSequencingId IS NULL) OR NEW.targetedSequencingId <> OLD.targetedSequencingId THEN CONCAT(NEW.name, ' targetedSequencingId') END
         ), ''),
         NEW.lastModifier,
-        log_message
+        log_message,
+        NEW.lastUpdated
       );
     END IF;
   END//
@@ -29,11 +30,12 @@ FOR EACH ROW
 DROP TRIGGER IF EXISTS LibraryDilutionInsert//
 CREATE TRIGGER LibraryDilutionInsert AFTER INSERT ON LibraryDilution
 FOR EACH ROW
-  INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message) VALUES (
+  INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
     NEW.library_libraryId,
     '',
     NEW.lastModifier,
-    CONCAT('Library dilution LDI', NEW.dilutionId, ' created.'))//
+    CONCAT('Library dilution LDI', NEW.dilutionId, ' created.'),
+    NEW.lastUpdated)//
 
 DELIMITER ;
 -- EndNoTest
