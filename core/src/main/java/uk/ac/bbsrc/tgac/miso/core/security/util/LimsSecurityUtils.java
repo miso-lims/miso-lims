@@ -79,23 +79,27 @@ public class LimsSecurityUtils {
     // user and this user will inherit the already-persisted userID.
     final UserImpl user = new UserImpl();
 
-    final List<String> roles = new ArrayList<>();
-    for (final GrantedAuthority ga : details.getAuthorities()) {
-      roles.add(removePrefix(ga.toString(), LimsSecurityUtils.rolePrefix));
-    }
-    user.setRoles(roles.toArray(new String[0]));
-
-    user.setActive(details.isAccountNonExpired());
-    user.setAdmin(roles.contains(MisoAuthority.ROLE_ADMIN.name()));
-    user.setExternal(roles.contains(MisoAuthority.ROLE_EXTERNAL.name()));
-    user.setInternal(roles.contains(MisoAuthority.ROLE_INTERNAL.name()));
-
+    updateFromLdapUser(user, details);
     user.setLoginName(details.getUsername().toLowerCase());
-    user.setPassword(details.getPassword());
-    user.setFullName(details.getDisplayName());
-    user.setEmail(details.getMail());
 
     return user;
+  }
+
+  public static void updateFromLdapUser(User target, InetOrgPerson ldapUserDetails) {
+    final List<String> roles = new ArrayList<>();
+    for (final GrantedAuthority ga : ldapUserDetails.getAuthorities()) {
+      roles.add(removePrefix(ga.toString(), LimsSecurityUtils.rolePrefix));
+    }
+    target.setRoles(roles.toArray(new String[0]));
+
+    target.setActive(ldapUserDetails.isAccountNonExpired());
+    target.setAdmin(roles.contains(MisoAuthority.ROLE_ADMIN.name()));
+    target.setExternal(roles.contains(MisoAuthority.ROLE_EXTERNAL.name()));
+    target.setInternal(roles.contains(MisoAuthority.ROLE_INTERNAL.name()));
+
+    target.setPassword(ldapUserDetails.getPassword());
+    target.setFullName(ldapUserDetails.getDisplayName());
+    target.setEmail(ldapUserDetails.getMail());
   }
 
   private static String removePrefix(String s, String prefix) {
@@ -352,7 +356,6 @@ public class LimsSecurityUtils {
    * @return Set<User>
    */
   public static Set<Group> getSelectedReadGroups(User user, SecurableByProfile object) {
-    final SortedSet<Group> su = new TreeSet<>();
     if (user.isAdmin() || (object.getSecurityProfile().getOwner() != null && object.getSecurityProfile().getOwner().equals(user))) {
       return new TreeSet<>(object.getSecurityProfile().getReadGroups());
     }
@@ -400,7 +403,6 @@ public class LimsSecurityUtils {
    * @return Set<User>
    */
   public static Set<Group> getSelectedWriteGroups(User user, SecurableByProfile object) {
-    final SortedSet<Group> su = new TreeSet<>();
     if (user.isAdmin() || (object.getSecurityProfile().getOwner() != null && object.getSecurityProfile().getOwner().equals(user))) {
       return new TreeSet<>(object.getSecurityProfile().getWriteGroups());
     }

@@ -39,11 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.ldap.userdetails.InetOrgPerson;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -57,8 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
@@ -83,8 +76,6 @@ import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 public class DashboardHelperService {
   protected static final Logger log = LoggerFactory.getLogger(DashboardHelperService.class);
   @Autowired
-  private SecurityManager securityManager;
-  @Autowired
   private ProjectService projectService;
   @Autowired
   private ExperimentService experimentService;
@@ -100,70 +91,6 @@ public class DashboardHelperService {
   private StudyService studyService;
   @Autowired
   private PoolService poolService;
-
-  public JSONObject checkUser(HttpSession session, JSONObject json) {
-    String username = json.getString("username");
-    if (isStringEmptyOrNull(username)) {
-      if (SecurityContextHolder.getContext().getAuthentication().getName().equals(username)) {
-        try {
-          User user = securityManager.getUserByLoginName(username);
-          if (user == null) {
-            // user is authed, but doesn't exist in the LIMS DB. Save that user!
-            User u = new UserImpl();
-            Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (o instanceof UserDetails) {
-              UserDetails details = (UserDetails) o;
-              u.setLoginName(details.getUsername());
-              u.setFullName(details.getUsername());
-              u.setPassword(details.getPassword());
-              u.setActive(true);
-
-              if (details.getAuthorities().contains(MisoAuthority.ROLE_ADMIN)) {
-                u.setAdmin(true);
-              }
-
-              if (details.getAuthorities().contains(MisoAuthority.ROLE_INTERNAL)) {
-                u.setInternal(true);
-                u.setRoles(new String[] { "ROLE_INTERNAL" });
-              } else if (details.getAuthorities().contains(MisoAuthority.ROLE_EXTERNAL)) {
-                u.setExternal(true);
-                u.setRoles(new String[] { "ROLE_EXTERNAL" });
-              } else {
-                log.warn("Unrecognised roles");
-              }
-
-              if (details instanceof InetOrgPerson) {
-                u.setFullName(((InetOrgPerson) details).getDisplayName());
-                u.setEmail(((InetOrgPerson) details).getMail());
-              }
-
-              securityManager.saveUser(u);
-            } else {
-              return JSONUtils.SimpleJSONError(
-                  "The UserDetailsService specified in the Spring config cannot support mapping of usernames to UserDetails objects");
-            }
-          } else {
-            // the user isn't null, but LDAP is "newer" than the LIMS, i.e. LDAP pass changed but LIMS still the same
-            Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (o instanceof UserDetails) {
-              UserDetails details = (UserDetails) o;
-              if (!user.getPassword().equals(details.getPassword())) {
-                user.setPassword(details.getPassword());
-                securityManager.saveUser(user);
-              }
-            }
-          }
-          return null;
-        } catch (IOException e) {
-          log.error("check user", e);
-          return JSONUtils.SimpleJSONError("Something went wrong trying to get user information from the database: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("Cannot check LIMS user database table if you are not authenticated as that user!");
-      }
-    }
-    return JSONUtils.SimpleJSONError("Please supply a valid username to check");
-  }
 
   private StringBuilder generateDashboardCell(StringBuilder b, String misoClass, Long id, String name, String alias,
       String... aliasAlternative) {
@@ -439,10 +366,6 @@ public class DashboardHelperService {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   public void setProjectService(ProjectService projectService) {

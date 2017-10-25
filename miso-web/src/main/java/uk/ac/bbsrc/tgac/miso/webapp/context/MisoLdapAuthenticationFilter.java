@@ -139,15 +139,12 @@ public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthentication
         User u = LimsSecurityUtils.fromLdapUser((InetOrgPerson) p);
         // check if a user exists in the database with this username
         User dbu = securityManager.getUserByLoginName(u.getLoginName());
-        if (dbu == null || (dbu != null && !dbu.equals(u))) {
-          long userId = securityManager.saveUser(u);
-        } else if (dbu != null) {
-          // check if the user is same with the ldap user (skipped the password field)
-          dbu.setPassword(u.getPassword());
-          if (dbu.equals(u)) {
-            // save the user with ldap password, this is for when ldap password changed.
-            securityManager.saveUser(dbu);
-          }
+        if (dbu == null || !dbu.equals(u)) {
+          securityManager.saveUser(u);
+        } else {
+          // update user data from LDAP (password, roles, etc.)
+          LimsSecurityUtils.updateFromLdapUser(dbu, (InetOrgPerson) p);
+          securityManager.saveUser(dbu);
         }
       }
     } else {
