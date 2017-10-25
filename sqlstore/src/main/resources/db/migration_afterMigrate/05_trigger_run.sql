@@ -47,14 +47,16 @@ FOR EACH ROW
         CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END) END,
         CASE WHEN (NEW.cycles IS NULL) <> (OLD.cycles IS NULL) OR NEW.cycles <> OLD.cycles THEN CONCAT('cycles: ', COALESCE(OLD.cycles, 'n/a'), ' → ', COALESCE(NEW.cycles, 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime) VALUES (
+    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime)
+    SELECT
       NEW.runId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedend' END,
         CASE WHEN (NEW.cycles IS NULL) <> (OLD.cycles IS NULL) OR NEW.cycles <> OLD.cycles THEN 'cycles' END), ''),
-      (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
+      lastModifier,
       log_message,
-      (SELECT lastModified FROM Run WHERE Run.runId = NEW.runId));
+      lastModified
+    FROM Run WHERE Run.runId = NEW.runId;
   END IF;
   END//
   
@@ -66,13 +68,15 @@ FOR EACH ROW
   SET log_message = CONCAT_WS(', ',
         CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime) VALUES (
+    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime)
+    SELECT
       NEW.runId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedend' END), ''),
-      (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
+      lastModifier,
       log_message,
-      (SELECT lastModified FROM Run WHERE Run.runId = NEW.runId));
+      lastModified
+    FROM Run WHERE Run.runId = NEW.runId;
   END IF;
   END//
 
@@ -84,13 +88,15 @@ FOR EACH ROW
   SET log_message = CONCAT_WS(', ',
         CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN CONCAT('ends: ', CASE WHEN OLD.pairedEnd THEN 'paired' ELSE 'single' END, ' → ', CASE WHEN NEW.pairedEnd THEN 'paired' ELSE 'single' END) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime) VALUES (
+    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime)
+    SELECT
       NEW.runId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.pairedEnd <> OLD.pairedEnd THEN 'pairedend' END), ''),
-      (SELECT lastModifier FROM Run WHERE Run.runId = NEW.runId),
+      lastModifier,
       log_message,
-      (SELECT lastModified FROM Run WHERE Run.runId = NEW.runId));
+      lastModified
+    FROM Run WHERE Run.runId = NEW.runId;
   END IF;
   END//
   

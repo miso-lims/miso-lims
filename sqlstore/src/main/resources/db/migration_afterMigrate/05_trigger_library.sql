@@ -65,16 +65,17 @@ FOR EACH ROW
      CASE WHEN NEW.libraryDesignCodeId <> OLD.libraryDesignCodeId THEN CONCAT('designCode: ', (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = OLD.libraryDesignCodeId), ' → ', (SELECT code FROM LibraryDesignCode WHERE libraryDesignCodeId = NEW.libraryDesignCodeId)) END,
      CASE WHEN (NEW.libraryDesign IS NULL) <> (OLD.libraryDesign IS NULL) OR NEW.libraryDesign <> OLD.libraryDesign THEN CONCAT('library design: ', COALESCE((SELECT name FROM LibraryDesign WHERE libraryDesignId = OLD.libraryDesign), 'n/a'), ' → ', COALESCE((SELECT name FROM LibraryDesign WHERE libraryDesignId = NEW.libraryDesign), 'n/a')) END);
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
+    INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime)
+    SELECT
       NEW.libraryId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.archived <> OLD.archived THEN 'archived' END,
         CASE WHEN (NEW.libraryDesign IS NULL) <> (OLD.libraryDesign IS NULL) OR NEW.libraryDesign <> OLD.libraryDesign THEN 'libraryDesign' END
       ), ''),
-      (SELECT lastModifier FROM Library WHERE libraryId = NEW.libraryId),
+      lastModifier,
       log_message,
-      (SELECT lastModified FROM Library WHERE libraryId = NEW.libraryId)
-      );
+      lastModified
+    FROM Library WHERE libraryId = NEW.libraryId;
   END IF;
   END//
 
