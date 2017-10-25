@@ -92,15 +92,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
       SamColumns.VOLUME, SamColumns.CONCENTRATION, SamColumns.DNASE_TREATED, SamColumns.QC_STATUS,
       SamColumns.QC_NOTE, SamColumns.PURPOSE);
 
-  private static final long projectId = 1L;
-  private static final long identityClassId = 1L;
-  private static final long tissueClassId = 23L;
-  private static final long slideClassId = 24L;
-  private static final long curlsClassId = 8L;
-  private static final long gStockClassId = 11L;
-  private static final long rStockClassId = 13L;
-  private static final long gAliquotClassId = 15L;
-  private static final Long rAliquotClassId = 17L;
+
 
   @Before
   public void setup() {
