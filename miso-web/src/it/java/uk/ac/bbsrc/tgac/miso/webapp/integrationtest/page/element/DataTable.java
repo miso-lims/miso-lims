@@ -85,7 +85,19 @@ public class DataTable extends AbstractElement {
     return processing;
   }
 
+  /**
+   * Returns '0' for a table with no data
+   * 
+   * @return
+   */
   public int countRows() {
+    List<WebElement> allRows = table.findElements(rowSelector);
+    if (allRows.size() == 1) {
+      // empty table has one tr containing one td with text "No data available in table"
+      if (allRows.get(0).findElements(By.tagName("td")).get(0).getText().equals("No data available in table")) {
+        return 0;
+      }
+    }
     return table.findElements(rowSelector).size();
   }
 

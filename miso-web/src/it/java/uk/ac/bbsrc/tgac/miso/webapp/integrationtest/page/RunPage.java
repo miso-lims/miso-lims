@@ -73,7 +73,7 @@ public class RunPage extends FormPage<RunPage.Field> {
     public static final String FAIL_SEQOPS = "→ Failed: SeqOps QC";
   } // end LaneQC class
 
-  public static class TableWrapperId {
+  public static class RunTableWrapperId {
     public static final String PARTITION = "list_partition_wrapper";
     public static final String CONTAINER = "list_container_wrapper";
     public static final String EXPERIMENT = "list_experiment_wrapper";
@@ -139,7 +139,7 @@ public class RunPage extends FormPage<RunPage.Field> {
 
   public RunPage removeContainer(int rowNum) {
     WebElement html = getHtmlElement();
-    DataTable containersTable = new DataTable(getDriver(), TableWrapperId.CONTAINER);
+    DataTable containersTable = new DataTable(getDriver(), RunTableWrapperId.CONTAINER);
     containersTable.checkBoxForRow(rowNum);
     containersSection.findElement(By.linkText("Remove")).click();
     waitForPageRefresh(html);
@@ -201,12 +201,12 @@ public class RunPage extends FormPage<RunPage.Field> {
   }
 
   public String getLaneInfo(String columnHeading, int rowNum) {
-    DataTable partitionsTable = new DataTable(getDriver(), TableWrapperId.PARTITION);
+    DataTable partitionsTable = new DataTable(getDriver(), RunTableWrapperId.PARTITION);
     return partitionsTable.getTextAtCell(columnHeading, rowNum);
   }
 
   private void checkLaneBoxesAndSelectOption(List<Integer> partitions, String titleText, String option) {
-    DataTable partitionsTable = new DataTable(getDriver(), TableWrapperId.PARTITION);
+    DataTable partitionsTable = new DataTable(getDriver(), RunTableWrapperId.PARTITION);
     partitions.forEach(partition -> partitionsTable.checkBoxForRow(partition));
     partitionsSection.findElement(By.linkText(titleText)).click();
     waitUntil(visibilityOf(dialog));

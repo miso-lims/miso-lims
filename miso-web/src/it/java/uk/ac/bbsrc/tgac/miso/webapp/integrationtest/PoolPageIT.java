@@ -18,7 +18,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.Field;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolPage.PoolTableWrapperId;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.dialog.AddNoteDialog;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.Note;
 
 public class PoolPageIT extends AbstractIT {
@@ -250,6 +252,34 @@ public class PoolPageIT extends AbstractIT {
     List<Note> afterDeleteNotes = page2.getNotesSection().getNotes();
     assertEquals(initialNotes.size() - 1, afterDeleteNotes.size());
     assertFalse(afterDeleteNotes.stream().anyMatch(expectedText));
+  }
+
+  @Test
+  public void testAddDilutions() {
+    // goal: add one dilution by selecting it from the list of available dilutions on the pool page
+    PoolPage page1 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 701L);
+    DataTable includedTable = page1.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    assertEquals(0, includedTable.countRows());
+
+    DataTable available = page1.getTable(PoolTableWrapperId.AVAILABLE_DILUTIONS);
+    available.searchFor("LDI701");
+    available.checkBoxForRow(0);
+    PoolPage page2 = page1.addSelectedDilutions();
+    DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    assertEquals(1, includedTable2.countRows());
+  }
+
+  @Test
+  public void testRemoveDilutions() {
+    // goal: remove one dilution from a pool via the pool page
+    PoolPage page1 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 702L);
+    DataTable includedTable = page1.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    assertEquals(1, includedTable.countRows());
+
+    includedTable.checkBoxForRow(0);
+    PoolPage page2 = page1.removeSelectedDilutions();
+    DataTable includedTable2 = page2.getTable(PoolTableWrapperId.INCLUDED_DILUTIONS);
+    assertEquals(0, includedTable2.countRows());
   }
 
   private void assertPoolAttributes(Map<PoolPage.Field, String> expectedValues, Pool pool) {

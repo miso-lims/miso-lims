@@ -8,7 +8,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HoverMenu;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ButtonText;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
 
 public class PoolPage extends FormPage<PoolPage.Field> {
@@ -48,6 +49,16 @@ public class PoolPage extends FormPage<PoolPage.Field> {
 
   } // end Field enum
 
+  public static class PoolTableWrapperId {
+    public static final String QCS = "list_qcs_wrapper";
+    public static final String REQUESTED_ORDERS = "list_order_wrapper";
+    public static final String ORDER_STATUS = "list_completion_wrapper";
+    public static final String RUNS = "list_run_wrapper";
+    public static final String INCLUDED_DILUTIONS = "list_included_wrapper";
+    public static final String AVAILABLE_DILUTIONS = "list_available_wrapper";
+    public static final String CHANGES = "changelog_wrapper";
+  }
+
   private static final String NEW_TITLE_PREFIX = "New Pool ";
 
   @FindBy(id = "save")
@@ -80,8 +91,21 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     return new PoolPage(getDriver());
   }
 
+  public PoolPage addSelectedDilutions() {
+    clickLinkButtonAndGetUrl(ButtonText.ADD);
+    return new PoolPage(getDriver());
+  }
+
+  public PoolPage removeSelectedDilutions() {
+    clickLinkButtonAndGetUrl(ButtonText.REMOVE);
+    return new PoolPage(getDriver());
+  }
+
   public NotesSection<PoolPage> getNotesSection() {
     return notesSection;
   }
 
+  public DataTable getTable(String tableWrapperId) {
+    return new DataTable(getDriver(), tableWrapperId);
+  }
 }
