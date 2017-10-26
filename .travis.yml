@@ -8,8 +8,12 @@ env:
     - MAVEN_SETTINGS="${TRAVIS_BUILD_DIR}/gsi-config"
     - MAVEN_OPTS="-Xms1g -Xmx2g" 
   matrix: 
-    - PLAIN=true
-    - PLAIN=false
+    - JOB=SONAR
+    - JOB=UNIT_TEST
+    - JOB=PLAIN_WEB_IT
+    - JOB=BULK_WEB_IT
+    - JOB=OTHER_WEB_IT
+    - JOB=RUNSCANNER_TEST
 
 git:
   depth: 3
@@ -35,19 +39,8 @@ before_script:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update
   - sudo apt-get install -y pkg-config cmake libjsoncpp-dev autoconf libtool build-essential gcc-5 g++-5
-script:
-  
-  - 'if ($PLAIN) ; then
-        mvn -P external clean verify -DrunPlainITs;
-     else
-        pushd runscanner-illumina && ./build-illumina-interop && autoreconf -i && ./configure && make && popd;
-        PATH=$PATH:$(pwd)/runscanner-illumina mvn clean -P external -Dmaven.javadoc.skip=true -DskipITs=false -DskipIllumina=false install;
-     fi'
-  - 'if [[ ${TRAVIS_PULL_REQUEST_SLUG} == ${TRAVIS_REPO_SLUG} ]] ; then 
-        mvn org.jacoco:jacoco-maven-plugin:prepare-agent sonar:sonar ;
-     else 
-        echo "[WARN] SonarCloud cannot run on pull requests from forks." ; 
-     fi'
+
+script: ./travis_jobs.sh
 
 cache:
   directories:

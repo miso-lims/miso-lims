@@ -11,7 +11,7 @@ import org.junit.Test;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractPage;
 
-public class ErrorCrawlerIT extends AbstractIT {
+public class BulkErrorCrawlerIT extends AbstractIT {
   
   private static final Set<String> urlSlugs;
   static {
