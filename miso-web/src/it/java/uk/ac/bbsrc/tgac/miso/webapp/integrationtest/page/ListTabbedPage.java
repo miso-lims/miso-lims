@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.stalenessOf;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,8 +40,6 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
   private List<WebElement> tableWrapperElements;
   @FindBy(className = "parsley-error")
   private WebElement errors;
-
-  private WebElement addButton = null;
   
   private final List<WebElement> tabs;
 
@@ -64,10 +60,6 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
       tables.add(new DataTable(driver, wrapper.getAttribute("id")));
     });
     setSelectedTable(getTabNumber());
-    if (!driver.findElements(By.partialLinkText("Add")).isEmpty()) {
-      addButton = driver.findElements(By.partialLinkText("Add")).stream()
-          .filter(button -> button.isDisplayed()).findFirst().orElse(null);
-    }
   }
 
   public static ListTabbedPage getTabbedListPage(WebDriver driver, String baseUrl, String listTarget) {
@@ -123,17 +115,7 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
     return tabId.substring(tabId.lastIndexOf("-") + 1);
   }
 
-  public void clickAddButton(List<String> selections) {
-    if (addButton == null) throw new IllegalArgumentException("Add button is not present on page");
-    WebElement html = getHtmlElement();
-    addButton.click();
-    if (selections != null && !selections.isEmpty()) {
-      selections.forEach(linkText -> {
-        WebElement link = dialog.findElement(By.partialLinkText(linkText));
-        link.click();
-        waitUntil(stalenessOf(link));
-      });
-    }
-    waitForPageRefresh(html);
+  public String clickButtonAndGetUrl(String linkText, List<String> selections) {
+    return clickLinkButtonAndGetUrl(linkText, selections);
   }
 }

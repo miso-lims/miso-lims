@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.*;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -32,7 +32,7 @@ public class ListPage extends HeaderFooterPage implements AbstractListPage {
   }
 
   public String clickButtonAndGetUrl(String linkText) {
-    return clickLinkButtonAndGetUrl(linkText);
+    return clickLinkButtonAndGetUrl(linkText, null);
   }
 
   @Override

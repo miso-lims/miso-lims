@@ -2,18 +2,11 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-
-import com.google.common.collect.Lists;
-
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class ContainerPage extends FormPage<ContainerPage.Field> {
 
@@ -43,14 +36,6 @@ public class ContainerPage extends FormPage<ContainerPage.Field> {
       return type;
     }
   } // end Field enum
-  
-  private static final Map<String, Long> idForPlatform;
-  static {
-    idForPlatform = new HashMap<>();
-    idForPlatform.put("Illumina HiSeq 2500", 1L);
-    idForPlatform.put("Illumina MiSeq", 2L);
-    idForPlatform.put("PacBio RS II", 3L);
-  }
 
   @FindBy(id = "save")
   private WebElement saveButton;
@@ -61,14 +46,9 @@ public class ContainerPage extends FormPage<ContainerPage.Field> {
     waitWithTimeout().until(or(titleContains("Flow Cell "), titleContains("8Pac ")));
   }
 
-  public static ContainerPage getForCreate(WebDriver driver, String baseUrl, String platformType, String sequencerModel,
+  public static ContainerPage getForCreate(WebDriver driver, String baseUrl, Long sequencerModelId,
       int numPartitions) {
-    driver.get(baseUrl + "miso/containers");
-    ListTabbedPage listContainers = new ListTabbedPage(driver);
-    String partitionText = numPartitions + " " + PlatformType.get(platformType).getPartitionName() + (numPartitions == 1 ? "" : "s");
-    listContainers
-        .clickAddButton(Lists.newArrayList(sequencerModel, partitionText));
-    driver.get(baseUrl + "miso/container/new/" + idForPlatform.get(sequencerModel) + "?count=" + numPartitions);
+    driver.get(baseUrl + "miso/container/new/" + sequencerModelId.toString() + "?count=" + numPartitions);
     return new ContainerPage(driver);
   }
 

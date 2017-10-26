@@ -3,20 +3,34 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.assertEquals;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ButtonText;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ContainerPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ContainerPage.Field;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage;
 
 public class ContainerPageIT extends AbstractIT {
+
+  private static final Map<String, Long> idForPlatform;
+  static {
+    idForPlatform = new HashMap<>();
+    idForPlatform.put("Illumina HiSeq 2500", 1L);
+    idForPlatform.put("Illumina MiSeq", 2L);
+    idForPlatform.put("PacBio RS II", 3L);
+  }
 
   @Before
   public void setup() {
@@ -24,11 +38,31 @@ public class ContainerPageIT extends AbstractIT {
   }
 
   @Test
-  public void testCreateContainer() throws Exception {
+  public void testCreateContainerDialog() {
+    // goal: ensure clicking to create new MiSeq container goes to the page with the
+    // correct platform and number of partitions
+    ListTabbedPage listContainers = ListTabbedPage.getTabbedListPage(getDriver(), getBaseUrl(), ListTarget.CONTAINERS);
+    String partitionName = PlatformType.get("Illumina").getPartitionName();
+    String containerName = PlatformType.get("Illumina").getContainerName();
+    String miSeq = "Illumina MiSeq";
+    String platformId = idForPlatform.get(miSeq).toString();
+    Integer numPartitions = 1;
+    String partitionText = numPartitions + " " + partitionName + (numPartitions == 1 ? "" : "s");
+    String newUrl = listContainers
+        .clickButtonAndGetUrl(ButtonText.ADD + " " + containerName, Lists.newArrayList(miSeq, partitionText));
+
+    String foundPartitions = newUrl.split("count=")[1];
+    assertEquals("same number of partitions", numPartitions.toString(), foundPartitions);
+    String foundSequencerId = newUrl.split("new/")[1].split("\\?count=")[0];
+    assertEquals("same sequencer ID", platformId, foundSequencerId);
+  }
+
+  @Test
+  public void testSaveNewContainer() throws Exception {
     // goal: create new MiSeq container
     String platform = "Illumina";
     String model = "Illumina MiSeq";
-    ContainerPage page1 = ContainerPage.getForCreate(getDriver(), getBaseUrl(), platform, model, 1);
+    ContainerPage page1 = ContainerPage.getForCreate(getDriver(), getBaseUrl(), idForPlatform.get(model), 1);
     assertEquals("Illumina MiSeq", page1.getField(Field.MODEL));
 
     // default values
