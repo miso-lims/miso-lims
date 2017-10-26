@@ -32,7 +32,7 @@ public class ListPage extends HeaderFooterPage implements AbstractListPage {
   }
 
   public String clickButtonAndGetUrl(String linkText) {
-    return clickLinkButtonAndGetUrl(linkText);
+    return clickLinkButtonAndGetUrl(linkText, null);
   }
 
   @Override

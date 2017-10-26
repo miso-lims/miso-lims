@@ -240,7 +240,9 @@ INSERT INTO LibraryDesign (libraryDesignId, name, sampleClassId, librarySelectio
 DELETE FROM KitDescriptor;
 INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, lastModifier) VALUES
   (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1),
-  (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1);
+  (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1),
+  (3, 'Test Kit Three', 1, 'ACME', '125', 'CLUSTERING', 'ILLUMINA', 1),
+  (4, 'Test Kit Four', 1, 'DONUT', '126', 'MULTIPLEXING', 'ILLUMINA', 1);
   
 DELETE FROM TargetedSequencing;
 INSERT INTO TargetedSequencing (targetedSequencingId, alias, description, archived, createdBy, updatedBy, creationDate, lastUpdated) VALUES
@@ -709,7 +711,8 @@ INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId,
 (5009, 4, 'FAIL_LANE_WITH_NOTE', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
 (5010, 4, 'FAIL_LANE_TO_PASS', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
 (5100, 4, 'SEARCH_POOLS', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5101, 4, 'POOL_COMPLETED_ORDER', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02');
+(5101, 4, 'POOL_COMPLETED_ORDER', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(6001, 4, 'CHANGEABLE', 2, 1, 1, '2017-10-03 14:45', '2017-10-03 14:45');
 
 INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES 
 (1, 1, 1), (2, 1, NULL),
@@ -722,7 +725,8 @@ INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES
 (5901, 1, NULL),
 (5110, 1, NULL),
 (5100, 1, NULL),
-(5104, 1, 5104), (5105, 2, 5104);
+(5104, 1, 5104), (5105, 2, 5104),
+(6001, 1, NULL);
 
 INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partitions_partitionId) VALUES
 (1, 1), (2, 2),
@@ -735,7 +739,8 @@ INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partit
 (5009, 5901),
 (5010, 5110),
 (5100, 5100),
-(5101, 5104), (5101, 5105);
+(5101, 5104), (5101, 5105),
+(6001, 6001);
 
 INSERT INTO Run (runId, name, securityProfile_profileId, alias, sequencerReference_sequencerReferenceId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
 (1, 'RUN1', 5, 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),

@@ -71,16 +71,16 @@ ListTarget.container = {
 
     return [
         {
-          "name": "Create " + platformType.containerName,
+          "name": "Add " + platformType.containerName,
           "handler": function() {
-            Utils.showWizardDialog("Create " + platformType.containerName, Constants.platforms.filter(function(p) {
+            Utils.showWizardDialog("Add " + platformType.containerName, Constants.platforms.filter(function(p) {
               return p.platformType == config.platformType && p.active;
             }).sort(Utils.sorting.standardSort('instrumentModel')).map(
                 function(platform) {
                   return {
                     name: platform.instrumentModel,
                     handler: function() {
-                      Utils.showWizardDialog("Create " + platform.instrumentModel + " " + platformType.containerName,
+                      Utils.showWizardDialog("Add " + platform.instrumentModel + " " + platformType.containerName,
                           platform.partitionSizes.map(function(size) {
 
                             return {

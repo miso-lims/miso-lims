@@ -42,11 +42,11 @@ ListTarget.run = {
       var platformKey = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.namePredicate(config.platformType),
           Constants.platformTypes), 'key');
       return [{
-        name: "Create " + platformKey + " Run",
+        name: "Add " + platformKey + " Run",
         handler: function() {
           Utils.ajaxWithDialog('Getting Sequencer', 'Get', '/miso/rest/sequencer', null, function(sequencers) {
 
-            Utils.showWizardDialog("Create " + platformKey + " Run", sequencers.filter(function(sequencer) {
+            Utils.showWizardDialog("Add " + platformKey + " Run", sequencers.filter(function(sequencer) {
               return sequencer.platform.platformType == config.platformType && !sequencer.dateDecommissioned;
             }).sort(Utils.sorting.standardSort('name')).map(function(sequencer) {
               return {

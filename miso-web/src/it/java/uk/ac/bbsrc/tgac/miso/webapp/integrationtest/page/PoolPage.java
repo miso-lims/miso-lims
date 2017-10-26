@@ -92,12 +92,12 @@ public class PoolPage extends FormPage<PoolPage.Field> {
   }
 
   public PoolPage addSelectedDilutions() {
-    clickLinkButtonAndGetUrl(ButtonText.ADD);
+    clickLinkButtonAndGetUrl(ButtonText.ADD, null);
     return new PoolPage(getDriver());
   }
 
   public PoolPage removeSelectedDilutions() {
-    clickLinkButtonAndGetUrl(ButtonText.REMOVE);
+    clickLinkButtonAndGetUrl(ButtonText.REMOVE, null);
     return new PoolPage(getDriver());
   }
 
