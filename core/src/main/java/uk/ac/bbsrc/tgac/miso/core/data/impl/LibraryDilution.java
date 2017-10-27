@@ -119,6 +119,8 @@ public class LibraryDilution
   private Double volume;
 
   private String identificationBarcode;
+
+  @Column(updatable = false)
   private Long preMigrationId;
 
   @Column(name = "discarded")
