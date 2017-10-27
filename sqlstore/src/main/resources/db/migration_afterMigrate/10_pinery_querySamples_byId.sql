@@ -23,6 +23,7 @@ CREATE PROCEDURE querySampleById(
       , s.lastModifier modifiedById
       , s.identificationBarcode tubeBarcode
       , s.volume volume
+      , s.discarded discarded
       , sai.concentration concentration
       , s.locationBarcode storageLocation
       , NULL kitName
@@ -57,6 +58,10 @@ CREATE PROCEDURE querySampleById(
       , s.scientificName organism
       , subp.alias subproject
       , it.alias institute
+      , slide.slides slides
+      , slide.discards discards
+      , stain.name stain
+      , lcm.slidesConsumed slides_consumed
     FROM Sample s
     LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId
     LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId
@@ -65,7 +70,7 @@ CREATE PROCEDURE querySampleById(
     LEFT JOIN Project p ON p.projectId = s.project_projectId
     LEFT JOIN Subproject subp ON subp.subprojectId = sai.subprojectId
     LEFT JOIN Identity i ON i.sampleId = s.sampleId
-
+    
     LEFT JOIN SampleAliquot sa ON sa.sampleId = sai.sampleId
     LEFT JOIN SamplePurpose sp ON sp.samplePurposeId = sa.samplePurposeId
     LEFT JOIN SampleTissue st ON st.sampleId = s.sampleId
@@ -75,6 +80,10 @@ CREATE PROCEDURE querySampleById(
     LEFT JOIN Lab la ON st.labId = la.labId
     LEFT JOIN Institute it ON la.instituteId = it.instituteId
     LEFT JOIN SampleStock ss ON sai.sampleId = ss.sampleId
+    LEFT JOIN SampleSlide slide ON slide.sampleId = s.sampleId
+    LEFT JOIN Stain stain ON stain.stainId = slide.stain
+    LEFT JOIN SampleLCMTube lcm ON lcm.sampleId = s.sampleId
+
     LEFT JOIN (
       SELECT sqc.sample_sampleId
         , MAX(sqc.qcId) AS qcId
@@ -92,7 +101,7 @@ CREATE PROCEDURE querySampleById(
         AND sqc.type = maxQubitDates.type
       GROUP BY sqc.sample_sampleId
     ) newestQubit ON newestQubit.sample_sampleId = s.sampleId
-
+   
     LEFT JOIN SampleQC qubit ON qubit.qcId = newestQubit.qcId
     LEFT JOIN (
       SELECT sqc.sample_sampleId
@@ -132,7 +141,7 @@ CREATE PROCEDURE querySampleById(
     ) newestQpcr ON newestQpcr.sample_sampleId = s.sampleId
     LEFT JOIN SampleQC qpcr ON qpcr.qcId = newestQpcr.qcId
 
-                                                                                                          LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId
+    LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId
       AND pos.targetType LIKE \'Sample%\'
     LEFT JOIN Box box ON box.boxId = pos.boxId
 
@@ -155,12 +164,13 @@ CREATE PROCEDURE querySampleById(
       , l.lastModifier modifiedById
       , l.identificationBarcode tubeBarcode
       , l.volume volume
+      , l.discarded discarded
       , l.concentration concentration
       , l.locationBarcode storageLocation
       , kd.NAME kitName
       , kd.description kitDescription
       , ldc.code library_design_code
-      , NULL receive_date
+      , l.receivedDate receive_date
       , NULL external_name
       , NULL sex
       , NULL tissue_origin
@@ -189,6 +199,10 @@ CREATE PROCEDURE querySampleById(
       , NULL organism
       , NULL subproject
       , NULL institute
+      , NULL slides
+      , NULL discards
+      , NULL stain
+      , NULL slides_consumed
     FROM Library l
 
     LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
@@ -253,6 +267,7 @@ CREATE PROCEDURE querySampleById(
       , d.lastModifier modifiedById
       , d.identificationBarcode tubeBarcode
       , d.volume volume
+      , d.discarded discarded
       , d.concentration concentration
       , NULL storageLocation
       , NULL kitName
@@ -287,6 +302,10 @@ CREATE PROCEDURE querySampleById(
       , NULL organism
       , NULL subproject
       , NULL institute
+      , NULL slides
+      , NULL discards
+      , NULL stain
+      , NULL slides_consumed
     FROM LibraryDilution d
     JOIN Library parent ON parent.libraryId = d.library_libraryId
     JOIN LibraryType lt ON lt.libraryTypeId = parent.libraryType

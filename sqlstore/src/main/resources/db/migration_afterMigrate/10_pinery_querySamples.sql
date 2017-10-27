@@ -20,6 +20,7 @@ CREATE PROCEDURE queryAllSamples() BEGIN
       , s.lastModifier modifiedById
       , s.identificationBarcode tubeBarcode
       , s.volume volume
+      , s.discarded discarded
       , sai.concentration concentration
       , s.locationBarcode storageLocation
       , NULL kitName
@@ -54,6 +55,10 @@ CREATE PROCEDURE queryAllSamples() BEGIN
       , s.scientificName organism
       , subp.alias subproject
       , it.alias institute
+      , slide.slides slides
+      , slide.discards discards
+      , stain.name stain
+      , lcm.slidesConsumed slides_consumed
     FROM Sample s
     LEFT JOIN DetailedSample sai ON sai.sampleId = s.sampleId
     LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = sai.detailedQcStatusId
@@ -72,6 +77,9 @@ CREATE PROCEDURE queryAllSamples() BEGIN
     LEFT JOIN Lab la ON st.labId = la.labId
     LEFT JOIN Institute it ON la.instituteId = it.instituteId
     LEFT JOIN SampleStock ss ON sai.sampleId = ss.sampleId
+    LEFT JOIN SampleSlide slide ON slide.sampleId = s.sampleId
+    LEFT JOIN Stain stain ON stain.stainId = slide.stain
+    LEFT JOIN SampleLCMTube lcm ON lcm.sampleId = s.sampleId
 
     LEFT JOIN (
       SELECT sqc.sample_sampleId
@@ -153,12 +161,13 @@ CREATE PROCEDURE queryAllSamples() BEGIN
       , l.lastModifier modifiedById
       , l.identificationBarcode tubeBarcode
       , l.volume volume
+      , l.discarded discarded
       , l.concentration concentration
       , l.locationBarcode storageLocation
       , kd.NAME kitName
       , kd.description kitDescription
       , ldc.code library_design_code
-      , NULL receive_date
+      , l.receivedDate receive_date
       , NULL external_name
       , NULL sex
       , NULL tissue_origin
@@ -187,6 +196,10 @@ CREATE PROCEDURE queryAllSamples() BEGIN
       , NULL organism
       , NULL subproject
       , NULL institute
+      , NULL slides
+      , NULL discards
+      , NULL stain
+      , NULL slides_consumed
     FROM Library l
 
     LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
@@ -251,6 +264,7 @@ CREATE PROCEDURE queryAllSamples() BEGIN
       , d.lastModifier modifiedById
       , d.identificationBarcode tubeBarcode
       , d.volume volume
+      , d.discarded discarded
       , d.concentration concentration
       , NULL storageLocation
       , NULL kitName
@@ -285,6 +299,10 @@ CREATE PROCEDURE queryAllSamples() BEGIN
       , NULL organism
       , NULL subproject
       , NULL institute
+      , NULL slides
+      , NULL discards
+      , NULL stain
+      , NULL slides_consumed
     FROM LibraryDilution d
     JOIN Library parent ON parent.libraryId = d.library_libraryId
     JOIN LibraryType lt ON lt.libraryTypeId = parent.libraryType
