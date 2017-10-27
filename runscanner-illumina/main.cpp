@@ -7,6 +7,8 @@
 #include <interop/interop.h>
 #include <json/json.h>
 
+const char *stupidDateFormats[] = {"%m/%d/%Y %I:%M:%S %p", "%y%m%d"};
+
 /**
  * Compute the length of a cycle range.
  *
@@ -18,6 +20,12 @@ int length(const illumina::interop::model::run::cycle_range &range) {
   return (range.last_cycle() >= range.first_cycle())
              ? range.last_cycle() - range.first_cycle() + 1
              : 0;
+}
+
+std::string formatDate(std::tm *timeValue) {
+  std::stringstream date_buffer;
+  date_buffer << std::put_time(timeValue, "%Y-%m-%dT%H:%M:%S");
+  return date_buffer.str();
 }
 
 /**
@@ -410,13 +418,17 @@ int main(int argc, const char **argv) {
          << " Instrument: " << run.run_parameters().version();
   result["software"] = buffer.str();
 
-  /* The Illumina start date associated with a run is a "yymmdd" string, not a
-   * time_t. Reformat it as "YYYY-mm-dd". */
-  std::stringstream start_date;
-  start_date << "20" << run.run_info().date().substr(0, 2) << "-"
-             << run.run_info().date().substr(2, 2) << "-"
-             << run.run_info().date().substr(4, 2) << "T00:00:00";
-  result["startDate"] = start_date.str();
+  /* The Illumina sequencers produce a variety of bad date formats. Reformat it
+   * as "YYYY-mm-ddTHH:MM:ss". */
+  for (const auto dateformat : stupidDateFormats) {
+    std::tm detectedTime = {0};
+    const char *output =
+        strptime(run.run_info().date().c_str(), dateformat, &detectedTime);
+    if (output != nullptr && *output == 0) {
+      result["startDate"] = formatDate(&detectedTime);
+      break;
+    }
+  }
 
   /* Copy all the trivial values from the run information.  */
   result["containerSerialNumber"] = run.run_info().flowcell_id();
@@ -460,10 +472,8 @@ int main(int argc, const char **argv) {
   if (extraction_time == 0) {
     is_complete = false;
   } else {
-    std::stringstream date_buffer;
-    date_buffer << std::put_time(std::localtime(&extraction_time),
-                                 "%Y-%m-%dT%H:%M:%S");
-    result["completionDate"] = date_buffer.str();
+    auto extraction_tm = std::localtime(&extraction_time);
+    result["completionDate"] = formatDate(extraction_tm);
   }
 
   is_complete &= run_summary.cycle_state().called_cycle_range().last_cycle() ==
