@@ -515,7 +515,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
       DetailedLibrary dTarget = (DetailedLibrary) target;
-      dTarget.setPreMigrationId(dSource.getPreMigrationId());
       dTarget.setNonStandardAlias(dSource.hasNonStandardAlias());
       dTarget.setArchived(dSource.getArchived());
       dTarget.setLibraryDesignCode(dSource.getLibraryDesignCode());

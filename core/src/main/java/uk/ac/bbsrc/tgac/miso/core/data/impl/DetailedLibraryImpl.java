@@ -38,6 +38,7 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
   @JoinColumn(name = "libraryDesignCodeId", nullable = false)
   private LibraryDesignCode libraryDesignCode;
 
+  @Column(updatable = false)
   private Long preMigrationId;
   private String groupId;
   private String groupDescription;

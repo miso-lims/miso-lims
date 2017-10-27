@@ -61,6 +61,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Column(nullable = false)
   private boolean nonStandardAlias = false;
   
+  @Column(updatable = false)
   private Long preMigrationId;
 
   @Transient
