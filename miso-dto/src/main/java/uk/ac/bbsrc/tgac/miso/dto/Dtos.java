@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -1344,6 +1345,12 @@ public class Dtos {
     dto.setLongestIndex(from.getLongestIndex());
     dto.setLastModified(formatDateTime(from.getLastModified()));
     dto.setDilutionCount(from.getPoolableElementViews().size());
+    from.getPoolableElementViews().stream()//
+        .map(PoolableElementView::getLibraryDnaSize)//
+        .filter(Objects::nonNull)//
+        .mapToDouble(Long::doubleValue)//
+        .average()//
+        .ifPresent(dto::setInsertSize);
     if (includeContents) {
       Set<DilutionDto> pooledElements = new HashSet<>();
       for (PoolableElementView ld : from.getPoolableElementViews()) {

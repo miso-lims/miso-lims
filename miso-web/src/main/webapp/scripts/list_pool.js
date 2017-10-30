@@ -80,6 +80,15 @@ ListTarget.pool = {
           "include": true,
           "iSortPriority": 0
         }, {
+          "sTitle": "Average Insert Size",
+          "mData": "insertSize",
+          "bSortable": false,
+          "mRender": function(data, type, full) {
+            return data ? Math.round(data) : "N/A";
+          },
+          "include": true,
+          "iSortPriority": 0
+        }, {
           "sTitle": "Last Modified",
           "mData": "lastModified",
           "include": Constants.isDetailedSample,
