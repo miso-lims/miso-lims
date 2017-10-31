@@ -82,6 +82,7 @@ public interface AbstractListPage {
     public static final String EXTERNAL = "External";
     public static final String LOGGED_IN = "Logged In";
     public static final String GROUP_NAME = "Group Name";
+    public static final String AVG_INSERT_SIZE = "Average Insert Size";
   }
 
   public static class ListTarget {
