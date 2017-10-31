@@ -1,3 +1,9 @@
+# 0.2.96
+
+Changes:
+
+ * fixed RunScanner overwriting user-marked run completion
+
 # 0.2.95
 
 Changes:
@@ -9,6 +15,8 @@ Changes:
  * Fixed user data (roles) not updating from LDAP
  * Added default BoxUse and BoxSize
 
+Bad: RunScanner could sometimes overwrite user-marked run completion
+
 # 0.2.94
 
 Changes:
@@ -16,6 +24,8 @@ Changes:
  * Fix project overview dialog
  * Add more numbers for pagination
  * Add new Brady THT-179-492 labels
+
+Bad: RunScanner could sometimes overwrite user-marked run completion
 
 # 0.2.93
 
