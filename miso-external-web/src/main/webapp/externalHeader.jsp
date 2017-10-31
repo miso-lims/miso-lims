@@ -125,9 +125,6 @@
 </script>
 
 <div id="navtabs">
-    <script type="text/javascript">
-        <%-- checkUser('<sec:authentication property="principal.username"/>'); --%>
-    </script>
     <%--<ul>--%>
             <%--<li><a href="<c:url value="/"/>"><span>Home</span></a></li>--%>
 

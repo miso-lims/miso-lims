@@ -82,6 +82,7 @@ public interface AbstractListPage {
     public static final String EXTERNAL = "External";
     public static final String LOGGED_IN = "Logged In";
     public static final String GROUP_NAME = "Group Name";
+    public static final String AVG_INSERT_SIZE = "Average Insert Size";
   }
 
   public static class ListTarget {
@@ -99,6 +100,22 @@ public interface AbstractListPage {
     public static final String BOXES = "boxes";
     public static final String KITS = "kitdescriptors";
     public static final String INDICES = "indices";
+  }
+
+  public static class ButtonText {
+    public static final String CREATE = "Create";
+    public static final String EDIT = "Edit";
+    public static final String PROPAGATE = "Propagate";
+    public static final String PRINT_BARCODES = "Print Barcode(s)";
+    public static final String ADD_QCS = "Add QCs";
+    public static final String EDIT_QCS = "Edit QCs";
+    public static final String RECEIVE = "Receive";
+    public static final String MAKE_DILUTIONS = "Make dilutions";
+    public static final String POOL_TOGETHER = "Pool together";
+    public static final String POOL_SEPARATELY = "Pool separately";
+    public static final String ADD = "Add";
+    public static final String CREATE_ORDER = "Create Order";
+    public static final String REMOVE = "Remove";
   }
 
   public WebElement getErrors();

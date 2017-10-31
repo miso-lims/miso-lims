@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
+import static org.openqa.selenium.support.ui.ExpectedConditions.stalenessOf;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -295,5 +297,24 @@ public abstract class AbstractPage extends AbstractElement {
   protected void clickCancel() {
     WebElement cancelButton = getDriver().findElement(By.id("cancel"));
     cancelButton.click();
+  }
+
+  protected String getCurrentUrl() {
+    return getDriver().getCurrentUrl();
+  }
+
+  protected String clickLinkButtonAndGetUrl(String linkText, List<String> selections) {
+    WebElement button = getDriver().findElement(By.linkText(linkText));
+    WebElement html = getHtmlElement();
+    button.click();
+    if (selections != null && !selections.isEmpty()) {
+      selections.forEach(selection -> {
+        WebElement link = getDriver().findElement(By.id("dialog")).findElement(By.partialLinkText(selection));
+        link.click();
+        waitUntil(stalenessOf(link));
+      });
+    }
+    waitForPageRefresh(html);
+    return getCurrentUrl();
   }
 }

@@ -48,6 +48,8 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
   @FindBy(className = "ui-tabs-active")
   private WebElement selectedTab;
   private DataTable selectedTable;
+  @FindBy(id = "dialog")
+  private WebElement dialog;
 
   public ListTabbedPage(WebDriver driver) {
     super(driver);
@@ -111,5 +113,9 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
   private String getTabNumber() {
     String tabId = selectedTab.findElement(By.tagName("a")).getAttribute("id");
     return tabId.substring(tabId.lastIndexOf("-") + 1);
+  }
+
+  public String clickButtonAndGetUrl(String linkText, List<String> selections) {
+    return clickLinkButtonAndGetUrl(linkText, selections);
   }
 }

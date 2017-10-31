@@ -31,6 +31,7 @@ public class PoolDto implements WritableUrls {
   private int longestIndex;
   private boolean hasLowQualityLibraries;
   private int dilutionCount;
+  private Double insertSize;
 
   public String getAlias() {
     return alias;
@@ -225,5 +226,13 @@ public class PoolDto implements WritableUrls {
 
   public void setDilutionCount(int dilutionCount) {
     this.dilutionCount = dilutionCount;
+  }
+
+  public Double getInsertSize() {
+    return insertSize;
+  }
+
+  public void setInsertSize(Double insertSize) {
+    this.insertSize = insertSize;
   }
 }

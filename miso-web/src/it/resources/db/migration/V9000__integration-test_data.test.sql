@@ -1,15 +1,54 @@
 -- fixes BeforeInsertPool trigger created in V0004
 DROP TRIGGER IF EXISTS BeforeInsertPool;
 
+DELETE FROM `ReferenceGenome`;
+DELETE FROM SampleValidRelationship;
+DELETE FROM LibraryDesign;
+DELETE FROM SampleClass;
+DELETE FROM TissueMaterial;
+DELETE FROM TissueOrigin;
+DELETE FROM TissueType;
+DELETE FROM Lab;
+DELETE FROM Institute;
+DELETE FROM Stain;
+DELETE FROM SamplePurpose;
+DELETE FROM DetailedQcStatus;
+DELETE FROM QCType;
+DELETE FROM LibraryType;
+DELETE FROM LibrarySelectionType;
+DELETE FROM LibraryStrategyType;
+DELETE FROM LibraryDesignCode;
+DELETE FROM TargetedSequencing_KitDescriptor;
+DELETE FROM TargetedSequencing;
+DELETE FROM KitDescriptor;
+DELETE FROM BoxUse;
+DELETE FROM BoxSize;
+DELETE FROM `_Group`;
+DELETE FROM `SecurityProfile`;
+DELETE FROM `SecurityProfile_ReadGroup`;
+DELETE FROM `SecurityProfile_WriteGroup`;
+DELETE FROM `SecurityProfile_ReadUser`;
+DELETE FROM `SecurityProfile_WriteUser`;
+DELETE FROM Indices;
+DELETE FROM IndexFamily;
+DELETE FROM SequencingParameters;
+DELETE FROM PlatformSizes;
+DELETE FROM SequencerReference WHERE upgradedSequencerReferenceId IS NOT NULL;
+DELETE FROM SequencerReference;
+DELETE FROM Platform;
+DELETE FROM ProjectOverview;
+DELETE FROM Project;
+DELETE FROM Note;
+DELETE FROM Library_Note;
+DELETE FROM Pool_Note;
+
 INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
 VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
 
-DELETE FROM `ReferenceGenome`;
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (2, 'Human hg19');
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (3, 'Human hg18 random');
 
-DELETE FROM SampleClass;
 INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, suffix, dnaseTreatable, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Identity',             'Identity',          NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (23, 'Tissue',              'Tissue',            NULL,  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
@@ -28,7 +67,6 @@ INSERT INTO SampleClass (sampleClassId, alias, sampleCategory, suffix, dnaseTrea
 (20, 'rRNA_depleted',       'Aliquot',           'WT_', 0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (21, 'cDNA (aliquot)',      'Aliquot',           'D_',  0, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
 
-DELETE FROM SampleValidRelationship;
 INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate, updatedBy, lastUpdated, archived) VALUES
 ( 8, 11, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
 (10, 11, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
@@ -67,19 +105,16 @@ INSERT INTO SampleValidRelationship (parentId, childId, createdBy, creationDate,
 (24, 13, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0),
 (23, 24, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00', 0);
 
-DELETE FROM TissueMaterial;
-INSERT INTO TissueMaterial(alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
-('Fresh Frozen', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-('FFPE', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-('Blood', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+INSERT INTO TissueMaterial(tissueMaterialId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
+(1, 'Fresh Frozen', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(2, 'FFPE', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(3, 'Blood', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
 
-DELETE FROM TissueOrigin;
 INSERT INTO TissueOrigin(tissueOriginId, alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Bn', 'Brain', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (2, 'Ly', 'Lymphocyte', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (3, 'Pa', 'Pancreas', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
 
-DELETE FROM TissueType;
 INSERT INTO TissueType(tissueTypeId, alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'R','Reference or non-tumour, non-diseased tissue sample. Typically used as a donor-specific comparison to a diseased tissue, usually a cancer',1,'2016-09-26 15:55:43',1,'2016-09-26 15:55:43'),
 (2, 'P','Primary tumour',1,'2016-09-26 15:55:43',1,'2016-09-26 15:55:43'),
@@ -96,21 +131,17 @@ INSERT INTO TissueType(tissueTypeId, alias, description, createdBy, creationDate
 (13, 'U','Unspecified',1,'2017-03-23 22:01:22',1,'2017-03-23 22:01:22'),
 (14, 'n','Unknown',1,'2017-05-29 20:02:03',1,'2017-05-29 20:02:03');
 
-DELETE FROM Institute;
 INSERT INTO Institute(instituteId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'University Health Network',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
 
-DELETE FROM Lab;
 INSERT INTO Lab(labId, alias, instituteId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'BioBank', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (2, 'Pathology', 1, 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
 
-DELETE FROM Stain;
 INSERT INTO Stain (stainId, name, stainCategoryId) VALUES
 (1, 'Cresyl Violet', NULL),
 (2, 'Hematoxylin+Eosin', NULL);
 
-DELETE FROM SamplePurpose;
 INSERT INTO SamplePurpose (samplePurposeId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'CNV',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
 (2, 'Extra',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
@@ -124,7 +155,6 @@ INSERT INTO SamplePurpose (samplePurposeId, alias, createdBy, creationDate, upda
 (10, 'WGA',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00'),
 (11, 'Ion Torrent',1,'2017-07-07 16:34:00',1,'2017-07-07 16:34:00');
 
-DELETE FROM DetailedQcStatus;
 INSERT INTO `DetailedQcStatus` (DetailedQcStatusId, status, description, noteRequired, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1,TRUE,  'Ready',                  0,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44'),
 (2,TRUE,  'OKd by Collaborator',    1,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44'),
@@ -136,7 +166,6 @@ INSERT INTO `DetailedQcStatus` (DetailedQcStatusId, status, description, noteReq
 (9,FALSE, 'Refused Consent',        0,1,'2016-09-26 15:55:44',1,'2016-09-26 15:55:44'),
 (10,NULL, 'Waiting: Receive Tissue',0,1,'2016-09-26 15:55:46',1,'2016-09-26 15:55:46');
 
-DELETE FROM QCType;
 INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfterDecimal) VALUES
 ('RIN', 'RIN', 'Sample', ' ', 0, 1),
 ('DV200', 'DV200', 'Sample', 'percent', 0, 2),
@@ -144,7 +173,6 @@ INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfter
 ('Qubit', 'Qubit', 'Library', 'ng/ul', 0, 2),
 ('qPCR', 'qPCR', 'Library', 'mol/ul', 0, 2);
 
-DELETE FROM LibraryType;
 INSERT INTO LibraryType(libraryTypeId, description, platformType, archived, abbreviation) VALUES
   (1, 'Paired End',  'ILLUMINA',0,'PE'),
   (2, 'Mate Pair',   'ILLUMINA',0,'MP'),
@@ -153,7 +181,6 @@ INSERT INTO LibraryType(libraryTypeId, description, platformType, archived, abbr
   (19,'cDNA',        'PACBIO',  0,NULL),
   (28,'Whole Genome','PACBIO',  0,NULL);
 
-DELETE FROM LibrarySelectionType;
 INSERT INTO LibrarySelectionType (librarySelectionTypeId, name, description) VALUES
   (24,'5-methylcytidine antibody','5-methylcytidine antibody desc'),
   (27,'BluePippin','BluePippin desc'),
@@ -183,7 +210,6 @@ INSERT INTO LibrarySelectionType (librarySelectionTypeId, name, description) VAL
   (20,'size fractionation','size fractionation desc'),
   (4, 'unspecified','unspecified desc');
 
-DELETE FROM LibraryStrategyType;
 INSERT INTO LibraryStrategyType (libraryStrategyTypeId, name, description) VALUES
   (5, 'AMPLICON','AMPLICON desc'),
   (11,'Bisulfite-Seq','Bisulfite-Seq desc'),
@@ -206,7 +232,6 @@ INSERT INTO LibraryStrategyType (libraryStrategyTypeId, name, description) VALUE
   (1, 'WGS','WGS desc'),
   (20,'WXS','WXS desc');
 
-DELETE FROM LibraryDesignCode;
 INSERT INTO LibraryDesignCode (libraryDesignCodeId, code, description) VALUES
   (1, 'AS','ATAC-Seq'),
   (2, 'CH','ChIP-Seq'),
@@ -218,7 +243,6 @@ INSERT INTO LibraryDesignCode (libraryDesignCodeId, code, description) VALUES
   (8, 'WT','Whole Transcriptome'),
   (16,'TR','Total RNA');
 
-DELETE FROM LibraryDesign;
 INSERT INTO LibraryDesign (libraryDesignId, name, sampleClassId, librarySelectionType, libraryStrategyType, libraryDesignCodeId) VALUES
   (1, 'WG',                   15, 3, 1, 7),
   (2, 'TS (Hybrid Selection)',15, 7, 5, 6),
@@ -237,12 +261,12 @@ INSERT INTO LibraryDesign (libraryDesignId, name, sampleClassId, librarySelectio
   (16,'WT',                   20,11,19, 8),
   (17,'TR',                   17,11,19,16);
 
-DELETE FROM KitDescriptor;
 INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, lastModifier) VALUES
   (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1),
-  (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1);
+  (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1),
+  (3, 'Test Kit Three', 1, 'ACME', '125', 'CLUSTERING', 'ILLUMINA', 1),
+  (4, 'Test Kit Four', 1, 'DONUT', '126', 'MULTIPLEXING', 'ILLUMINA', 1);
   
-DELETE FROM TargetedSequencing;
 INSERT INTO TargetedSequencing (targetedSequencingId, alias, description, archived, createdBy, updatedBy, creationDate, lastUpdated) VALUES
   (1, 'Test TarSeq One', 'first test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00'),
   (2, 'Test TarSeq Two', 'second test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00'),
@@ -251,24 +275,19 @@ INSERT INTO TargetedSequencing (targetedSequencingId, alias, description, archiv
 INSERT INTO TargetedSequencing_KitDescriptor (targetedSequencingId, kitDescriptorId) VALUES
   (1, 1), (2, 1), (3, 2);
 
-DELETE FROM BoxUse;
-INSERT INTO BoxUse (alias) VALUES ('DNA'), ('RNA'), ('Libraries'), ('Sequencing'), ('Storage'), ('Tissue');
+INSERT INTO BoxUse (boxUseId, alias) VALUES 
+(1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');
 
-DELETE FROM BoxSize;
-INSERT INTO BoxSize (`rows`, `columns`, `scannable`) VALUES (8, 12, 1), (10, 10, 0);
+INSERT INTO BoxSize (boxSizeId, `rows`, `columns`, `scannable`) VALUES 
+(1, 8, 12, 1),
+(2, 10, 10, 0);
 
-DELETE FROM `_Group`;
 INSERT INTO `_Group` (description, name) VALUES
 ('TestGroup1', 'TestGroup1'), ('TestGroup2', 'TestGroup2');
 
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(3,2),(1,1);
 
-DELETE FROM `SecurityProfile`;
-DELETE FROM `SecurityProfile_ReadGroup`;
-DELETE FROM `SecurityProfile_WriteGroup`;
-DELETE FROM `SecurityProfile_ReadUser`;
-DELETE FROM `SecurityProfile_WriteUser`;
 INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
 VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(10,1,1),(11,1,1),(12,1,NULL),(13,1,NULL),(14,1,NULL),(15,1,NULL);
 
@@ -277,8 +296,6 @@ INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userI
 INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 2);
 INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 2);
 
-DELETE FROM Indices;
-DELETE FROM IndexFamily;
 INSERT INTO IndexFamily (indexFamilyId, name, platformType) VALUES
   (1, 'Single Index 6bp', 'ILLUMINA'),
   (2, 'Dual Index 6bp', 'ILLUMINA');
@@ -297,9 +314,6 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (11, 2, 'B03',      'GGGCCC', 2),
   (12, 2, 'B04',      'TTTAAA', 2);
 
-DELETE FROM SequencingParameters;
-DELETE FROM PlatformSizes;
-DELETE FROM Platform;
 INSERT INTO Platform (platformId, name, instrumentModel, numContainers) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1),
@@ -332,7 +346,6 @@ INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
   (3, 15),
   (3, 16);
 
-DELETE FROM SequencerReference;
 INSERT INTO SequencerReference (referenceId, name, platformId, ip) VALUES
   (1, 'T2000', 1, '127.0.0.1'),
   (2, 'TMS1', 2, '127.0.0.1'),
@@ -350,8 +363,6 @@ INSERT INTO SequencerServiceRecord(recordId, sequencerReferenceId, title, detail
   (151, 101, 'Test 151', NULL, 'tech', NULL, '2017-09-12', NULL, NULL),
   (152, 101, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00');
 
-DELETE FROM ProjectOverview;
-DELETE FROM Project;
 INSERT INTO Project(projectId, name, alias, shortName, creationDate, description, securityProfile_profileId,
   progress, referenceGenomeId, lastUpdated) VALUES
   (1, 'PRO1', 'Project One', 'PRO1', '2017-06-27', 'integration test project one', 1, 'ACTIVE', 1, '2017-06-27 14:11:00'),
@@ -633,7 +644,9 @@ INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId,
 (200001, 'LDI200001', 4, 200001, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
 (200002, 'LDI200002', 3, 200002, NULL, '2017-08-15', 'admin', 2, 1, '2017-08-15 09:01:00'),
 (504, 'LDI504', 5.9, 504, 'TIB_Dil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00'),
-(505, 'LDI505', 3.3, 504, 'TIB_replaceDil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00');
+(505, 'LDI505', 3.3, 504, 'TIB_replaceDil', '2017-08-15', 'admin', 1, 1, '2017-08-15 13:55:00'),
+(701, 'LDI701', 2.2, 504, 'test_pooling_1', '2017-10-16', 'admin', 1, 1, '2017-10-16 15:59:00'),
+(702, 'LDI702', 2.2, 504, 'test_pooling_2', '2017-10-16', 'admin', 1, 1, '2017-10-16 15:59:00');
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, ready, lastModifier, creator, created, lastModified, qcPassed) VALUES
 (1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 2, 'ILLUMINA', 1, 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
@@ -655,7 +668,9 @@ INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarc
 (5102, 4, 4, 'IPO5102', 'POOL_SEARCH_2', 'ipobar5102', 'cats', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5103, 4, 4, 'IPO5103', 'POOL_WITH_ORDERS', 'ipobar5103', 'sergeant', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
 (5104, 4, 4, 'IPO5104', 'POOL_WITH_COMPLETED_ORDERS', 'ipobar5104', 'mission accomplished', '2017-09-27', 2, 'ILLUMINA', 1, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
-(5105, 4, 4, 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 2, 'ILLUMINA', 0, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL);
+(5105, 4, 4, 'IPO5105', 'POOL_NOT_READY', 'ipobar5105', 'unprepared', '2017-09-27', 2, 'ILLUMINA', 0, 1, 1, '2017-09-27 10:00:00', '2017-09-27 10:00:00', NULL),
+(701, 4, 4, 'IPO701', 'TEST_POOLING_DILUTIONS', 'ipobar701', 'test pool', '2017-10-17', 2, 'ILLUMINA', 1, 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL),
+(702, 4, 4, 'IPO702', 'TEST_REMOVING_DILUTIONS', 'ipobar702', 'test pool', '2017-10-17', 2, 'ILLUMINA', 1, 1, 1, '2017-10-17 10:00:00', '2017-10-17 10:00:00', NULL);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1),
@@ -670,7 +685,8 @@ INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (200003, 200001),
 (200003, 200002),
 (200004, 200001),
-(501, 504);
+(501, 504),
+(702, 702);
 
 INSERT INTO PoolOrder (poolOrderId, poolId, partitions, parametersId, createdBy, updatedBy, creationDate, lastUpdated) VALUES
 (1, 5103, 2, 4, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00'),
@@ -701,7 +717,8 @@ INSERT INTO SequencerPartitionContainer (containerId, securityProfile_profileId,
 (5009, 4, 'FAIL_LANE_WITH_NOTE', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
 (5010, 4, 'FAIL_LANE_TO_PASS', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
 (5100, 4, 'SEARCH_POOLS', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
-(5101, 4, 'POOL_COMPLETED_ORDER', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02');
+(5101, 4, 'POOL_COMPLETED_ORDER', 1, 1, 1, '2017-07-21 10:03:02', '2017-07-21 10:03:02'),
+(6001, 4, 'CHANGEABLE', 2, 1, 1, '2017-10-03 14:45', '2017-10-03 14:45');
 
 INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES 
 (1, 1, 1), (2, 1, NULL),
@@ -714,7 +731,8 @@ INSERT INTO `_Partition` (partitionId, partitionNumber, pool_poolId) VALUES
 (5901, 1, NULL),
 (5110, 1, NULL),
 (5100, 1, NULL),
-(5104, 1, 5104), (5105, 2, 5104);
+(5104, 1, 5104), (5105, 2, 5104),
+(6001, 1, NULL);
 
 INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partitions_partitionId) VALUES
 (1, 1), (2, 2),
@@ -727,7 +745,8 @@ INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partit
 (5009, 5901),
 (5010, 5110),
 (5100, 5100),
-(5101, 5104), (5101, 5105);
+(5101, 5104), (5101, 5105),
+(6001, 6001);
 
 INSERT INTO Run (runId, name, securityProfile_profileId, alias, sequencerReference_sequencerReferenceId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
 (1, 'RUN1', 5, 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
@@ -774,15 +793,12 @@ INSERT INTO Run_SequencerPartitionContainer (Run_runId, containers_containerId) 
 (5100, 5100),
 (5101, 5101);
 
-DELETE FROM Note;
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
   (1, '2017-08-22', 1, 'LIB110005 existing note', 1),
   (2, '2017-08-25', 1, 'IPO120001 existing note', 1);
 
-DELETE FROM Library_Note;
 INSERT INTO Library_Note(library_libraryId, notes_noteId) VALUES
   (110005, 1);
 
-DELETE FROM Pool_Note;
 INSERT INTO Pool_Note(pool_poolId, notes_noteId) VALUES
   (120001, 2);

@@ -41,7 +41,7 @@
       <c:when test="${container.id != 0}">Edit</c:when>
       <c:otherwise>Create</c:otherwise>
     </c:choose> ${container.platform.platformType.containerName}
-    <button type="button" class="fg-button ui-state-default ui-corner-all"
+    <button type="button" id="save" class="fg-button ui-state-default ui-corner-all"
           onclick="return Container.validateContainer();">Save</button>
   </h1>
   <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
@@ -56,25 +56,25 @@
   <table class="in">
     <tr>
       <td class="h">Container ID:</td>
-      <td>
+      <td id="containerId">
         <c:choose>
-          <c:when test="${container.id != 0}"><input type='hidden' id='containerId' name='id' value='${container.id}'/>${container.id}</c:when>
+          <c:when test="${container.id != 0}">${container.id}</c:when>
           <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
       </td>
     </tr>
     <tr>
       <td>Serial Number:</td>
-      <td><form:input path="identificationBarcode"/> </td>
+      <td><form:input id="identificationBarcode" path="identificationBarcode"/> </td>
     </tr>
 
     <tr>
       <td>Platform:</td>
-      <td>${container.platform.platformType.key}</td>
+      <td><span id="platform">${container.platform.platformType.key}</span></td>
     </tr>
     <tr>
       <td>Sequencer Model:</td>
-      <td>${container.platform.instrumentModel}</td>
+      <td><span id="model">${container.platform.instrumentModel}</span></td>
     </tr>
     <tr>
       <td>Clustering Kit:</td>

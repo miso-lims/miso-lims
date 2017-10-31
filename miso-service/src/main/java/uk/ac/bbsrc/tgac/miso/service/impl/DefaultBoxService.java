@@ -253,6 +253,7 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       box.setName(generateTemporaryName());
       box.setSecurityProfile(securityProfileStore.get(securityProfileStore.save(box.getSecurityProfile())));
       setChangeDetails(box);
+      box.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(box.getIdentificationBarcode()));
       boxStore.save(box);
 
       if (autoGenerateIdBarcodes) {

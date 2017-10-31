@@ -132,9 +132,6 @@
 
 <div id="navtabs">
     <sec:authorize access="isAuthenticated()">
-    <script type="text/javascript">
-        <%-- checkUser('<sec:authentication property="principal.username"/>'); --%>
-    </script>
     <ul>
         </sec:authorize>
 

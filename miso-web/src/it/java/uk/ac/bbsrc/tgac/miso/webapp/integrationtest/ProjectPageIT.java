@@ -123,7 +123,10 @@ public class ProjectPageIT extends AbstractIT {
         ProjectTable.RUNS);
     tableIds.forEach(id -> assertNotNull("table " + id + " should exist on page", page.getTable(id)));
 
-    String errorString = page.getVisibleErrors().stream().map(error -> error.getText()).collect(Collectors.joining());
+    String errorString = page.getVisibleErrors().stream()
+        .filter(error -> !error.getText().isEmpty())
+        .map(error -> error.getText())
+        .collect(Collectors.joining());
     assertTrue("unexpected errors on project tables: " + errorString, isStringEmptyOrNull(errorString));
   }
 

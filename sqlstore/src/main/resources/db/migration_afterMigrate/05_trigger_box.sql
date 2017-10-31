@@ -13,7 +13,7 @@ FOR EACH ROW
     CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN CONCAT('description: ', COALESCE(OLD.description, 'n/a'), ' → ', COALESCE(NEW.description, 'n/a')) END
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN
-    INSERT INTO BoxChangeLog(boxId, columnsChanged, userId, message) VALUES (
+    INSERT INTO BoxChangeLog(boxId, columnsChanged, userId, message, changeTime) VALUES (
       New.boxId,
       COALESCE(CONCAT_WS(',',
         CASE WHEN NEW.alias <> OLD.alias THEN 'alias' END,
@@ -21,7 +21,8 @@ FOR EACH ROW
         CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN 'locationBarcode' END,
         CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN 'description' END), ''),
       NEW.lastModifier,
-      log_message
+      log_message,
+      NEW.lastModified
     );
   END IF;
   END//
@@ -29,11 +30,12 @@ FOR EACH ROW
 DROP TRIGGER IF EXISTS BoxInsert//
 CREATE TRIGGER BoxInsert AFTER INSERT ON Box
 FOR EACH ROW
-  INSERT INTO BoxChangeLog(boxId, columnsChanged, userId, message) VALUES (
+  INSERT INTO BoxChangeLog(boxId, columnsChanged, userId, message, changeTime) VALUES (
     NEW.boxId,
     '',
     NEW.lastModifier,
-    'Box created.'
+    'Box created.',
+    NEW.lastModified
   )//
 
 DELIMITER ;
