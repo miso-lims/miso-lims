@@ -28,4 +28,6 @@ CALL addTissueOrigin('Sr', 'Serosa');
 CALL addTissueOrigin('Ax', 'Axillary');
 CALL addTissueOrigin('Ba', 'Back');
 CALL addTissueOrigin('Pu', 'Pleura');
+CALL addTissueOrigin('Ur','Urethra');
+CALL addTissueOrigin('Tn','Tonsil');
 -- EndNoTest
