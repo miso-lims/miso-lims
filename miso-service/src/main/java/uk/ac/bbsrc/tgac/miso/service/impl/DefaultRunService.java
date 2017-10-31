@@ -694,24 +694,24 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
             .map(WhineyFunction.rethrow(poolService::getByBarcode)).ifPresent(partition::setPool));
   }
 
-  private boolean updateHealthFromNotification(Run source, final Run target, User user) {
-    if (source.getHealth() == null) {
+  private boolean updateHealthFromNotification(Run notification, final Run managed, User user) {
+    if (notification.getHealth() == null) {
       // If the server has sent us nothing, ignore it.
       return false;
-    } else if (source.getHealth() == HealthType.Unknown) {
+    } else if (notification.getHealth() == HealthType.Unknown) {
       // If it is sending us (effectively) an error, don't update the health if we have something already.
-      if (target.getHealth() == null) {
-        target.setHealth(source.getHealth());
-        target.setCompletionDate(source.getHealth().isDone() ? source.getCompletionDate() : null);
+      if (managed.getHealth() == null) {
+        managed.setHealth(notification.getHealth());
+        managed.setCompletionDate(notification.getHealth().isDone() ? notification.getCompletionDate() : null);
         return true;
       }
     } else {
-      if (!target.didSomeoneElseChangeColumn("health", user) || (target.getHealth().isDone() && !source.getHealth().isDone())) {
+      if (!managed.didSomeoneElseChangeColumn("health", user) || (!managed.getHealth().isDone() && notification.getHealth().isDone())) {
         // A human user has never change the health of this run, so we will.
         // Alternatively, a human set the status to not-done but runscanner has indicated that the run is now done, so we will update with
         // this.
-        target.setHealth(source.getHealth());
-        target.setCompletionDate(source.getHealth().isDone() ? source.getCompletionDate() : null);
+        managed.setHealth(notification.getHealth());
+        managed.setCompletionDate(notification.getHealth().isDone() ? notification.getCompletionDate() : null);
         return true;
       }
     }
