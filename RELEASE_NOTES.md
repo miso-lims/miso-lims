@@ -1,3 +1,14 @@
+# 0.2.95
+
+Changes:
+
+ * Show average insert sizes on List Pools page
+ * Add support for NovaSeq
+ * Fixed missing preMigrationId after bulk saving Libraries
+ * Fixed saving boxes with blank barcode
+ * Fixed user data (roles) not updating from LDAP
+ * Added default BoxUse and BoxSize
+
 # 0.2.94
 
 Changes:
