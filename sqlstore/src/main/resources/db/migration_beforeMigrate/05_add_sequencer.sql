@@ -8,7 +8,6 @@ CREATE PROCEDURE addSequencerReference(
   iPlatformModel varchar(100),
   iSerialNumber varchar(30),
   iIpAddress varchar(50),
-  iAvailable tinyint(1),
   iDateCommissioned date,
   iDateDecommissioned date,
   iUpgradedSequencerReferenceName varchar(30)
@@ -21,7 +20,7 @@ CREATE PROCEDURE addSequencerReference(
       SET errorMessage = CONCAT('Platform ''', iPlatformModel, ''' not found.');
       SIGNAL SQLSTATE '45000' SET message_text = errorMessage;
     END IF;
-    IF iUpgradedSequencerReferenceId IS NOT NULL THEN
+    IF iUpgradedSequencerReferenceName IS NOT NULL THEN
       SELECT referenceId INTO upgradedId FROM SequencerReference WHERE name = iUpgradedSequencerReferenceName;
       IF upgradedId IS NULL THEN
         SET errorMessage = CONCAT('Upgraded sequencer ''', iUpgradedSequencerReferenceName, ''' not found.');
@@ -31,9 +30,9 @@ CREATE PROCEDURE addSequencerReference(
       SET upgradedId = NULL;
     END IF;
     
-    INSERT INTO SequencerReference(name, ipAddress, platformId, available, serialNumber, dateCommissioned, dateDecommissioned,
+    INSERT INTO SequencerReference(name, ip, platformId, serialNumber, dateCommissioned, dateDecommissioned,
     upgradedSequencerReferenceId)
-    VALUES (iName, toIpAddressBlob(iIpAddress), platId, iAvailable, iSerialNumber, iDateCommissioned, iDateDecommissioned, upgradedId);
+    VALUES (iName, toIpAddressBlob(iIpAddress), platId, iSerialNumber, iDateCommissioned, iDateDecommissioned, upgradedId);
   END IF;
 END//
 
