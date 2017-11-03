@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -48,9 +50,9 @@ public interface BoxStore extends Store<Box>, Remover<Box>, PaginatedDataSource<
 
   Collection<BoxSize> listAllBoxSizes() throws IOException;
 
-  void discardSingleTube(Box box, String position) throws IOException;
+  void discardSingleTube(Box box, String position, User currentUser) throws IOException;
 
-  void discardAllTubes(Box box) throws IOException;
+  void discardAllTubes(Box box, User currentUser) throws IOException;
   
   void removeBoxableFromBox(Boxable boxable) throws IOException;
 

@@ -45,6 +45,8 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -178,9 +180,9 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   @Test
   public void testEmptyAllTubes() throws Exception {
     Box box = dao.get(1);
-
+    User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
     assertTrue("precondition failed", box.getBoxables().size() > 0);
-    dao.discardAllTubes(box);
+    dao.discardAllTubes(box, user);
     assertTrue(box.getBoxables().size() == 0);
 
   }
@@ -190,10 +192,11 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
 
     Box box = dao.get(1);
     int count = box.getBoxables().size();
+    User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
 
     assertTrue("precondition failed", box.getBoxables().size() > 0);
     assertTrue(box.getBoxables().containsKey("B02"));
-    dao.discardSingleTube(box, "B02");
+    dao.discardSingleTube(box, "B02", user);
     Box fetchedBox = dao.get(1);
     assertEquals(count - 1, fetchedBox.getBoxables().size());
 
