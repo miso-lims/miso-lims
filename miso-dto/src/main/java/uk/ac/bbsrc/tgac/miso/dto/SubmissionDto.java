@@ -6,7 +6,6 @@ public class SubmissionDto {
   private boolean completed;
   private String creationDate;
   private String description;
-  private String name;
   private long id;
   private String submittedDate;
   private String title;
@@ -30,10 +29,6 @@ public class SubmissionDto {
 
   public long getId() {
     return id;
-  }
-
-  public String getName() {
-    return name;
   }
 
   public String getSubmittedDate() {
@@ -74,10 +69,6 @@ public class SubmissionDto {
 
   public void setId(long id) {
     this.id = id;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   public void setSubmittedDate(String submittedDate) {

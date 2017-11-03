@@ -529,11 +529,11 @@ VALUES
 (2, 'A02', 'SAMPLE', 2);
 
 DELETE FROM Submission;
-INSERT INTO `Submission` (`submissionId`, `creationDate`, `submittedDate`, `verified`, `description`, `name`, `title`, `accession`, `alias`, `completed`)
+INSERT INTO `Submission` (`submissionId`, `creationDate`, `submittedDate`, `verified`, `description`, `title`, `accession`, `alias`, `completed`)
 VALUES
-(1, '2012-04-20', '2012-04-20', 0, 'test description 1', 'name 1', 'title 1', 'accession 1', 'alias 1', 0),
-(2, '2012-04-20', '2012-04-20', 1, 'test description 2', 'name 2', 'title 2', 'accession 2', 'alias 2', 1),
-(3, '2012-04-20', '2012-04-20', 0, 'test description 3', 'name 3', 'title 3', 'accession 3', 'alias 3', 0);
+(1, '2012-04-20', '2012-04-20', 0, 'test description 1', 'title 1', 'accession 1', 'alias 1', 0),
+(2, '2012-04-20', '2012-04-20', 1, 'test description 2', 'title 2', 'accession 2', 'alias 2', 1),
+(3, '2012-04-20', '2012-04-20', 0, 'test description 3', 'title 3', 'accession 3', 'alias 3', 0);
 
 DELETE FROM Submission_Experiment;
 INSERT INTO `Submission_Experiment` (`submission_submissionId`, `experiments_experimentId`)
