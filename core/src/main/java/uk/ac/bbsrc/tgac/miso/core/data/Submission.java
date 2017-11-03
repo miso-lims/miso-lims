@@ -41,7 +41,7 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "Submission")
-public class Submission implements Nameable, Comparable<Submission>, Serializable
+public class Submission implements Comparable<Submission>, Serializable
 {
 
   public static final Long UNSAVED_ID = 0L;
@@ -62,8 +62,6 @@ public class Submission implements Nameable, Comparable<Submission>, Serializabl
       @JoinColumn(name = "submission_submissionId") }, inverseJoinColumns = {
           @JoinColumn(name = "experiments_experimentId") })
   private Set<Experiment> experiments = new HashSet<>();
-
-  private String name;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -102,14 +100,8 @@ public class Submission implements Nameable, Comparable<Submission>, Serializabl
     return experiments;
   }
 
-  @Override
   public long getId() {
     return submissionId;
-  }
-
-  @Override
-  public String getName() {
-    return name;
   }
 
   public Date getSubmissionDate() {
@@ -155,10 +147,6 @@ public class Submission implements Nameable, Comparable<Submission>, Serializabl
 
   public void setId(long id) {
     this.submissionId = id;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   public void setSubmissionDate(Date submissionDate) {

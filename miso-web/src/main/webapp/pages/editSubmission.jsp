@@ -61,15 +61,6 @@
       </td>
     </tr>
     <tr>
-      <td class="h">Name:</td>
-      <td>
-        <c:choose>
-          <c:when test="${submission.id != 0}">${submission.name}</c:when>
-          <c:otherwise><i>Unsaved</i></c:otherwise>
-        </c:choose>
-      </td>
-    </tr>
-    <tr>
       <td class="h">Title:</td>
       <td><form:input path="title"/><span id="titlecounter" class="counter"></span></td>
     </tr>

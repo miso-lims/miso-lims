@@ -1964,7 +1964,6 @@ public class Dtos {
     dto.setCompleted(from.isCompleted());
     dto.setCreationDate(formatDate(from.getCreationDate()));
     dto.setDescription(from.getDescription());
-    dto.setName(from.getName());
     dto.setSubmittedDate(formatDate(from.getSubmissionDate()));
     dto.setTitle(from.getTitle());
     dto.setVerified(from.isVerified());
