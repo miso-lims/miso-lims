@@ -18,6 +18,7 @@ println('Translating schema files from ' + productionSchemaDir.getAbsolutePath()
 
 final String productionScriptPattern = '^(V\\d{4}_.*|afterMigrate|beforeMigrate)\\.sql$'
 final String testSchemaDir = basedir + '/target/test-classes/db/migration/'
+final String testDataFile = basedir + '/src/it/resources/db/migration/integration_test_data.sql'
 
 Files.createDirectories(Paths.get(testSchemaDir))
 for (File file : productionSchemaDir.listFiles()) {
@@ -33,6 +34,12 @@ for (File file : productionSchemaDir.listFiles()) {
     Path srcPath = file.toPath()
     Path dstPath = Paths.get(testSchemaDir + file.getName().replaceFirst('\\.sql$', '.test.sql'))
     String text = new String(Files.readAllBytes(srcPath))
+    
+    // run test data after everything else
+    if (file.getName().matches('^afterMigrate.sql$')) {
+      Path testDataPath = Paths.get(testDataFile);
+      text += new String(Files.readAllBytes(testDataPath));
+    }
      
     Files.write(dstPath, text.getBytes(), StandardOpenOption.CREATE)
     println("Wrote translated schema file: " + dstPath.toAbsolutePath().toString())
