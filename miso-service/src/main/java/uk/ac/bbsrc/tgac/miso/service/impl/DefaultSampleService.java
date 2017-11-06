@@ -455,13 +455,13 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
     SampleClass rootSampleClass = identityClasses.get(0);
 
-    String internalName = sample.getProject().getShortName() + "_";
-    String number = sampleNumberPerProjectService.nextNumber(sample.getProject(), internalName);
-    internalName += number;
     // Cannot generate identity alias via sampleNameGenerator because of dependence on SampleNumberPerProjectService
     if (sample.getProject().getShortName() == null) {
       throw new NullPointerException("Project shortname required to generate Identity alias");
     }
+    String internalName = sample.getProject().getShortName() + "_";
+    String number = sampleNumberPerProjectService.nextNumber(sample.getProject(), internalName);
+    internalName += number;
     SampleIdentity shellParent = (SampleIdentity) sample.getParent();
 
     confirmExternalNameUniqueForProjectIfRequired(shellParent.getExternalName(), sample);
