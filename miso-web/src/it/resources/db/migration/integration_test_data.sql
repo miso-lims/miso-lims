@@ -20,6 +20,7 @@ DELETE FROM LibraryStrategyType;
 DELETE FROM LibraryDesignCode;
 DELETE FROM TargetedSequencing_KitDescriptor;
 DELETE FROM TargetedSequencing;
+DELETE FROM KitDescriptorChangeLog;
 DELETE FROM KitDescriptor;
 DELETE FROM BoxUse;
 DELETE FROM BoxSize;
