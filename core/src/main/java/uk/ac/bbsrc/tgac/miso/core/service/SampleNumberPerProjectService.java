@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.service;
+package uk.ac.bbsrc.tgac.miso.core.service;
 
 import java.io.IOException;
 import java.util.Set;
