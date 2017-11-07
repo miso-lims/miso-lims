@@ -1,21 +1,57 @@
 -- fixes BeforeInsertPool trigger created in V0004
 DROP TRIGGER IF EXISTS BeforeInsertPool;
 
+DELETE FROM `ReferenceGenome`;
+DELETE FROM SampleValidRelationship;
+DELETE FROM LibraryDesign;
+DELETE FROM SampleClass;
+DELETE FROM TissueMaterial;
+DELETE FROM TissueOrigin;
+DELETE FROM TissueType;
+DELETE FROM Lab;
+DELETE FROM Institute;
+DELETE FROM Stain;
+DELETE FROM SamplePurpose;
+DELETE FROM DetailedQcStatus;
+DELETE FROM QCType;
+DELETE FROM LibraryType;
+DELETE FROM LibrarySelectionType;
+DELETE FROM LibraryStrategyType;
+DELETE FROM LibraryDesignCode;
+DELETE FROM TargetedSequencing_KitDescriptor;
+DELETE FROM TargetedSequencing;
+DELETE FROM KitDescriptorChangeLog;
+DELETE FROM KitDescriptor;
+DELETE FROM BoxUse;
+DELETE FROM BoxSize;
+DELETE FROM `_Group`;
+DELETE FROM `SecurityProfile`;
+DELETE FROM `SecurityProfile_ReadGroup`;
+DELETE FROM `SecurityProfile_WriteGroup`;
+DELETE FROM `SecurityProfile_ReadUser`;
+DELETE FROM `SecurityProfile_WriteUser`;
+DELETE FROM Indices;
+DELETE FROM IndexFamily;
+DELETE FROM SequencingParameters;
+DELETE FROM PlatformSizes;
+DELETE FROM SequencerReference WHERE upgradedSequencerReferenceId IS NOT NULL;
+DELETE FROM SequencerReference;
+DELETE FROM Platform;
+DELETE FROM ProjectOverview;
+DELETE FROM Project;
+DELETE FROM Note;
+DELETE FROM Library_Note;
+DELETE FROM Pool_Note;
+
 INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
 VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
 
-DELETE FROM `_Group`;
 INSERT INTO `_Group` (description, name) VALUES
 ('TestGroup1', 'TestGroup1'), ('TestGroup2', 'TestGroup2');
 
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(3,2),(1,1);
 
-DELETE FROM `SecurityProfile`;
-DELETE FROM `SecurityProfile_ReadGroup`;
-DELETE FROM `SecurityProfile_WriteGroup`;
-DELETE FROM `SecurityProfile_ReadUser`;
-DELETE FROM `SecurityProfile_WriteUser`;
 INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
 VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(10,1,1),(11,1,1),(12,1,NULL),(13,1,NULL),(14,1,NULL),(15,1,NULL);
 
@@ -24,21 +60,8 @@ INSERT INTO SecurityProfile_WriteUser(SecurityProfile_profileId, writeUser_userI
 INSERT INTO SecurityProfile_ReadGroup(SecurityProfile_profileId, readGroup_groupId) VALUES (3, 2);
 INSERT INTO SecurityProfile_WriteGroup(SecurityProfile_profileId, writeGroup_groupId) VALUES (4, 2);
 
-DELETE FROM `ReferenceGenome`;
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Triticum aestivum');
 
-DELETE FROM SampleClass;
-DELETE FROM SampleValidRelationship;
-DELETE FROM TissueMaterial;
-DELETE FROM TissueOrigin;
-DELETE FROM TissueType;
-DELETE FROM Institute;
-DELETE FROM Lab;
-DELETE FROM Stain;
-DELETE FROM SamplePurpose;
-DELETE FROM DetailedQcStatus;
-
-DELETE FROM QCType;
 INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfterDecimal) VALUES
 ('RIN', 'RIN', 'Sample', ' ', 0, 1),
 ('DV200', 'DV200', 'Sample', 'percent', 0, 2),
@@ -46,7 +69,6 @@ INSERT INTO QCType (name, description, qcTarget, units, archived, precisionAfter
 ('Qubit', 'Qubit', 'Library', 'ng/ul', 0, 2),
 ('qPCR', 'qPCR', 'Library', 'mol/ul', 0, 2);
 
-DELETE FROM LibraryType;
 INSERT INTO LibraryType(libraryTypeId, description, platformType, archived, abbreviation) VALUES
   (1, 'Paired End',  'ILLUMINA',0,'PE'),
   (2, 'Mate Pair',   'ILLUMINA',0,'MP'),
@@ -55,7 +77,6 @@ INSERT INTO LibraryType(libraryTypeId, description, platformType, archived, abbr
   (19,'cDNA',        'PACBIO',  0,NULL),
   (28,'Whole Genome','PACBIO',  0,NULL);
 
-DELETE FROM LibrarySelectionType;
 INSERT INTO LibrarySelectionType (librarySelectionTypeId, name, description) VALUES
   (24,'5-methylcytidine antibody','5-methylcytidine antibody desc'),
   (27,'BluePippin','BluePippin desc'),
@@ -85,7 +106,6 @@ INSERT INTO LibrarySelectionType (librarySelectionTypeId, name, description) VAL
   (20,'size fractionation','size fractionation desc'),
   (4, 'unspecified','unspecified desc');
 
-DELETE FROM LibraryStrategyType;
 INSERT INTO LibraryStrategyType (libraryStrategyTypeId, name, description) VALUES
   (5, 'AMPLICON','AMPLICON desc'),
   (11,'Bisulfite-Seq','Bisulfite-Seq desc'),
@@ -107,26 +127,20 @@ INSERT INTO LibraryStrategyType (libraryStrategyTypeId, name, description) VALUE
   (2, 'WCS','WCS desc'),
   (1, 'WGS','WGS desc'),
   (20,'WXS','WXS desc');
-  
-DELETE FROM LibraryDesignCode;
+
 DELETE FROM LibraryDesign;
 
-DELETE FROM KitDescriptor;
 INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, lastModifier) VALUES
   (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1),
   (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1);
 
-DELETE FROM BoxUse;
 INSERT INTO BoxUse (boxUseId, alias) VALUES
 (1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');
 
-DELETE FROM BoxSize;
 INSERT INTO BoxSize (boxSizeId, `rows`, `columns`, `scannable`) VALUES
 (1, 8, 12, 1),
 (2, 10, 10, 0);
 
-DELETE FROM Indices;
-DELETE FROM IndexFamily;
 INSERT INTO IndexFamily (indexFamilyId, name, platformType) VALUES
   (1, 'Single Index 6bp', 'ILLUMINA'),
   (2, 'Dual Index 6bp', 'ILLUMINA');
@@ -144,10 +158,7 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (10, 2, 'B02',      'CCCGGG', 2),
   (11, 2, 'B03',      'GGGCCC', 2),
   (12, 2, 'B04',      'TTTAAA', 2);
-  
-DELETE FROM SequencingParameters;
-DELETE FROM PlatformSizes;
-DELETE FROM Platform;
+
 INSERT INTO Platform (platformId, name, instrumentModel, numContainers) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1),
@@ -180,12 +191,9 @@ INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
   (3, 15),
   (3, 16);
 
-DELETE FROM SequencerReference;
 INSERT INTO SequencerReference (referenceId, name, platformId, ip) VALUES
   (1, 'T2500', 1, '127.0.0.1');
-  
-DELETE FROM ProjectOverview;
-DELETE FROM Project;
+
 INSERT INTO Project(projectId, name, alias, shortName, creationDate, description, securityProfile_profileId,
   progress, referenceGenomeId, lastUpdated) VALUES
   (1, 'PRO1', 'PLAIN', NULL, '2017-06-27', 'integration test project one', 1, 'ACTIVE', 1, '2017-06-27 14:11:00');

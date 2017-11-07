@@ -18,6 +18,7 @@ println('Translating schema files from ' + productionSchemaDir.getAbsolutePath()
 
 final String productionScriptPattern = '^(V\\d{4}_.*|afterMigrate|beforeMigrate)\\.sql$'
 final String testSchemaDir = basedir + '/target/test-classes/db/test_migration/'
+final String testDataFile = basedir + '/src/test/resources/db/test_migration/test_data.sql'
 
 Files.createDirectories(Paths.get(testSchemaDir))
 // productionSchemaDir is in src, and beforeMigrate and afterMigrate are in the built directory
@@ -34,6 +35,12 @@ for (File file : productionSchemaDir.listFiles() + new File(basedir + '/target/c
     Path srcPath = file.toPath()
     Path dstPath = Paths.get(testSchemaDir + file.getName().replaceFirst('\\.sql$', '.test.sql'))
     String text = new String(Files.readAllBytes(srcPath))
+    
+    // run test data after everything else
+    if (file.getName().matches('^afterMigrate.sql$')) {
+      Path testDataPath = Paths.get(testDataFile);
+      text += new String(Files.readAllBytes(testDataPath));
+    }
     
     String translated = text
         .replaceAll('(?s)-- ?StartNoTest(.*?)-- ?EndNoTest', '--') // Delete blocks containing non-standard delimiters
