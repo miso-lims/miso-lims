@@ -22,6 +22,9 @@ public class LibraryDesignCode implements Serializable {
   @Column(nullable = false)
   private String description;
 
+  @Column(nullable = false)
+  private Boolean targetedSequencingRequired;
+
   public Long getId() {
     return libraryDesignCodeId;
   };
@@ -44,5 +47,13 @@ public class LibraryDesignCode implements Serializable {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public Boolean isTargetedSequencingRequired() {
+    return targetedSequencingRequired;
+  }
+
+  public void setTargetedSequencingRequired(Boolean targetedSequencingRequired) {
+    this.targetedSequencingRequired = targetedSequencingRequired;
   }
 }

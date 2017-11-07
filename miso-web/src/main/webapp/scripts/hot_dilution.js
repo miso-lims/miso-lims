@@ -64,12 +64,21 @@ HotTarget.dilution = {
           type: 'dropdown',
           trimDropdown: false,
           source: [],
-          validator: HotUtils.validator.permitEmptyDropdown,
           include: Constants.isDetailedSample,
           unpack: function(dil, flat, setCellMeta) {
             flat.targetedSequencingAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
                 .idPredicate(dil.targetedSequencingId), Constants.targetedSequencings), 'alias')
                 || '(None)';
+
+            // whether targeted sequencing is required depends on library's design code
+            var designCode = Utils.array.findFirstOrNull(function(code) {
+              return dil.library.libraryDesignCodeId == code.id;
+            }, Constants.libraryDesignCodes);
+            if (Utils.array.maybeGetProperty(designCode, 'targetedSequencingRequired')) {
+              setCellMeta('validator', HotUtils.validator.requiredAutocompleteWithNullValue('(None)'));
+            } else {
+              setCellMeta('validator', HotUtils.validator.permitEmptyDropdown);
+            }
           },
           pack: function(dil, flat, errorHandler) {
             dil.targetedSequencingId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(tarSeq) {

@@ -914,6 +914,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setCode(from.getCode());
     dto.setDescription(from.getDescription());
+    dto.setTargetedSequencingRequired(from.isTargetedSequencingRequired());
     return dto;
   }
 
@@ -922,6 +923,7 @@ public class Dtos {
     if (from.getId() != null) to.setId(from.getId());
     to.setCode(from.getCode());
     to.setDescription(from.getDescription());
+    to.setTargetedSequencingRequired(from.isTargetedSequencingRequired());
     return to;
   }
 

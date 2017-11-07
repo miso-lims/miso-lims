@@ -53,7 +53,7 @@ var HotUtils = {
     },
 
     /**
-     * Custom validator for text fields that fails on empty or extra-special characters, but passes if text is empty
+     * Custom validator for text fields that fails on extra-special characters, but passes if text is empty
      */
     optionalTextNoSpecialChars: function(value, callback) {
       return callback(Utils.validation.isEmpty(value) || Utils.validation.hasNoSpecialChars(value))
@@ -75,6 +75,20 @@ var HotUtils = {
         callback(false);
       } else {
         Handsontable.AutocompleteValidator.call(this, value, callback);
+      }
+    },
+
+    /**
+     * @return Custom validator for dropdown fields that fails on empty or a specified value that represents null/empty (e.g. "None"), or if
+     *         the value is not a member of the source array
+     */
+    requiredAutocompleteWithNullValue: function(nullValue) {
+      return function(value, callback) {
+        if (value === nullValue) {
+          callback(false);
+        } else {
+          HotUtils.validator.requiredAutocomplete(value, callback);
+        }
       }
     }
   },
