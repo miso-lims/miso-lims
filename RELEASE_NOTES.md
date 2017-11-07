@@ -1,3 +1,12 @@
+# 0.2.97
+
+Changes:
+
+ * correct change user when discarding tubes from box
+ * correct timestamp in pool changed changelogs
+ * require targeted sequencing depending on library design code
+ * redirect to List Pools page after creating an order from bulk or list page
+
 # 0.2.96
 
 Changes:

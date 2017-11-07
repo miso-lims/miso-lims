@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -64,7 +67,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public void discardAllTubes(Box box) throws IOException {
+  public void discardAllTubes(Box box, User currentUser) throws IOException {
     List<BoxableView> originalContents = new ArrayList<>(box.getBoxables().values());
     try {
       box.removeAllBoxables();
@@ -76,22 +79,22 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
     for (BoxableView boxable : originalContents) {
       boxable.setDiscarded(true);
-      updateBoxable(boxable);
+      updateBoxable(boxable, currentUser);
     }
   }
 
   @Override
-  public void discardSingleTube(Box box, String position) throws IOException {
+  public void discardSingleTube(Box box, String position, User currentUser) throws IOException {
     BoxableView target = box.getBoxable(position);
     target.setDiscarded(true);
     box.removeBoxable(position);
     save(box);
-    updateBoxable(target);
+    updateBoxable(target, currentUser);
   }
 
-  private void updateBoxable(BoxableView view) throws IOException {
+  private void updateBoxable(BoxableView view, User currentUser) throws IOException {
     Boxable boxable = getBoxable(view);
-    applyChanges(view, boxable);
+    applyChanges(view, boxable, currentUser);
     currentSession().update(boxable);
   }
 
@@ -100,9 +103,11 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     return (Boxable) currentSession().get(clazz, view.getId().getTargetId());
   }
 
-  private void applyChanges(BoxableView from, Boxable to) {
+  private void applyChanges(BoxableView from, Boxable to, User currentUser) {
     to.setDiscarded(from.isDiscarded());
     to.setVolume(from.getVolume());
+    to.setLastModified(new Date());
+    to.setLastModifier(currentUser);
   }
 
   @Override

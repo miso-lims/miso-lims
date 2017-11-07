@@ -232,7 +232,7 @@ public class DefaultContainerService
     authorizationManager.throwIfNotWritable(original.getSequencerPartitionContainer());
     Pool pool = partition.getPool() == null ? null : poolService.get(partition.getPool().getId());
     original.setPool(pool);
-    original.getSequencerPartitionContainer().setLastModifier(authorizationManager.getCurrentUser());
+    setChangeDetails(original.getSequencerPartitionContainer());
     containerDao.save(original.getSequencerPartitionContainer());
   }
 

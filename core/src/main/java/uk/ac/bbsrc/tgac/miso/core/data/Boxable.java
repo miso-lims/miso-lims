@@ -3,6 +3,8 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -39,6 +41,7 @@ public interface Boxable extends Nameable, Barcodable, SecurableByProfile, Seria
    *
    * @return String alias.
    */
+  @Override
   public String getAlias();
 
   public Box getBox();
@@ -88,5 +91,9 @@ public interface Boxable extends Nameable, Barcodable, SecurableByProfile, Seria
   public void setVolume(Double volume);
 
   public Long getPreMigrationId();
+
+  public void setLastModified(Date lastModified);
+
+  public void setLastModifier(User user);
 
 }

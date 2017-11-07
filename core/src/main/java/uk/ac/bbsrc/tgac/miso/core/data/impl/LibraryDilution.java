@@ -176,14 +176,23 @@ public class LibraryDilution
     return lastModifier;
   }
 
+  @Override
   public void setLastModifier(User lastUpdated) {
     this.lastModifier = lastUpdated;
   }
 
+  /**
+   * @deprecated use {@link #getLastModified()} instead
+   */
+  @Deprecated
   public Date getLastUpdated() {
     return lastUpdated;
   }
 
+  /**
+   * @deprecated use {@link #setLastModified(Date)} instead
+   */
+  @Deprecated
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
@@ -423,6 +432,11 @@ public class LibraryDilution
   @Override
   public Date getLastModified() {
     return lastUpdated;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastUpdated = lastModified;
   }
 
   @Override

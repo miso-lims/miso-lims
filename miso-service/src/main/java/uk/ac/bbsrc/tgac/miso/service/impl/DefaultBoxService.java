@@ -93,14 +93,15 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   @Override
   public void discardAllTubes(Box box) throws IOException {
     authorizationManager.throwIfNotWritable(box);
-
-    boxStore.discardAllTubes(box);
+    User currentUser = authorizationManager.getCurrentUser();
+    boxStore.discardAllTubes(box, currentUser);
   }
 
   @Override
   public void discardSingleTube(Box box, String position) throws IOException {
     authorizationManager.throwIfNotWritable(box);
-    boxStore.discardSingleTube(box, position);
+    User currentUser = authorizationManager.getCurrentUser();
+    boxStore.discardSingleTube(box, position, currentUser);
   }
 
   @Override

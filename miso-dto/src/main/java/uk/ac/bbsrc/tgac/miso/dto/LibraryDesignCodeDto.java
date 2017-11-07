@@ -5,6 +5,7 @@ public class LibraryDesignCodeDto {
   private Long id;
   private String code;
   private String description;
+  private Boolean targetedSequencingRequired;
 
   public Long getId() {
     return id;
@@ -30,9 +31,18 @@ public class LibraryDesignCodeDto {
     this.description = description;
   }
 
+  public Boolean isTargetedSequencingRequired() {
+    return targetedSequencingRequired;
+  }
+
+  public void setTargetedSequencingRequired(Boolean targetedSequencingRequired) {
+    this.targetedSequencingRequired = targetedSequencingRequired;
+  }
+
   @Override
   public String toString() {
-    return "LibraryDesignCodeDto [id=" + id + ", code=" + code + ", description=" + description + "]";
+    return "LibraryDesignCodeDto [id=" + id + ", code=" + code + ", description=" + description + ", targetedSequencingRequired="
+        + targetedSequencingRequired + "]";
   }
 
 }
