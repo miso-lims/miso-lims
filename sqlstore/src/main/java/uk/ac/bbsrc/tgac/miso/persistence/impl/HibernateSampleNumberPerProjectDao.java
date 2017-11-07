@@ -3,9 +3,11 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleNumberPerProjectDao;
 
@@ -67,19 +71,30 @@ public class HibernateSampleNumberPerProjectDao implements SampleNumberPerProjec
     currentSession().update(sampleNumberPerProject);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public synchronized String nextNumber(Project project, User user) {
+  public synchronized String nextNumber(Project project, User user, String partialAlias) {
     SampleNumberPerProject sampleNumberPerProject = getByProject(project);
     if (sampleNumberPerProject == null) {
       sampleNumberPerProject = createSampleNumberPerProject(project, user);
     }
     Integer highestSampleNumber = sampleNumberPerProject.getHighestSampleNumber();
-    highestSampleNumber++;
+    
+    String num = null;
+    List<Sample> existing = null;
+    do {
+      highestSampleNumber++;
+      num = padInteger(sampleNumberPerProject.getPadding(), highestSampleNumber);
+      Criteria criteria = currentSession().createCriteria(SampleImpl.class);
+      criteria.add(Restrictions.eq("alias", partialAlias + num));
+      existing = criteria.list();
+    } while (existing != null && !existing.isEmpty());
+    
     sampleNumberPerProject.setHighestSampleNumber(highestSampleNumber);
     sampleNumberPerProject.setUpdatedBy(user);
     update(sampleNumberPerProject);
-
-    return padInteger(sampleNumberPerProject.getPadding(), highestSampleNumber);
+    
+    return num;
   }
 
   private SampleNumberPerProject createSampleNumberPerProject(Project project, User user) {

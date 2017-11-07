@@ -87,9 +87,9 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   }
 
   @Override
-  public String nextNumber(Project project) throws IOException {
+  public String nextNumber(Project project, String partialAlias) throws IOException {
     User user = authorizationManager.getCurrentUser();
-    return sampleNumberPerProjectDao.nextNumber(project, user);
+    return sampleNumberPerProjectDao.nextNumber(project, user, partialAlias);
   }
 
   @Override

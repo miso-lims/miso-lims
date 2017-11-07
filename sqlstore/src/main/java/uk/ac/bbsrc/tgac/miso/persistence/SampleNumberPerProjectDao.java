@@ -21,5 +21,5 @@ public interface SampleNumberPerProjectDao {
 
   void update(SampleNumberPerProject sampleNumberPerProject);
 
-  String nextNumber(Project project, User user);
+  String nextNumber(Project project, User user, String partialAlias);
 }
