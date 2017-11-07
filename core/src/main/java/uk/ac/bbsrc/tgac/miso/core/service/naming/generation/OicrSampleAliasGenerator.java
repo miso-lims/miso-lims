@@ -14,6 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -21,6 +22,9 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
 
   @Autowired
   private SiblingNumberGenerator siblingNumberGenerator;
+
+  @Autowired
+  private SampleNumberPerProjectService sampleNumberPerProjectService;
 
   private static final String SEPARATOR = "_";
   private static final String DASH = "-";
@@ -32,6 +36,10 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     this.siblingNumberGenerator = siblingNumberGenerator;
   }
 
+  public void setSampleNumberPerProjectService(SampleNumberPerProjectService sampleNumberPerProjectService) {
+    this.sampleNumberPerProjectService = sampleNumberPerProjectService;
+  }
+
   @Override
   public String generate(Sample sample) throws MisoNamingException, IOException {
     if (!LimsUtils.isDetailedSample(sample)) {
@@ -39,6 +47,9 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
     }
     DetailedSample detailed = (DetailedSample) sample;
 
+    if (isIdentitySample(detailed)) {
+      return generateIdentityAlias((SampleIdentity) detailed);
+    }
     for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
       if (isAliquotSample(parent)) {
         return addSiblingTag(parent.getAlias(), detailed);
@@ -56,8 +67,17 @@ public class OicrSampleAliasGenerator implements NameGenerator<Sample> {
         return generateTissueAlias((SampleTissue) detailed, (SampleIdentity) parent);
       }
     }
-    // Identity name generation requires access to SampleNumberPerProjectDao
-    throw new IllegalArgumentException("Cannot generate alias for Identities");
+    throw new IllegalStateException("Unexpected conditions for alias generation");
+  }
+
+  private String generateIdentityAlias(SampleIdentity identity) throws IOException {
+    if (identity.getProject().getShortName() == null) {
+      throw new NullPointerException("Project shortname required to generate Identity alias");
+    }
+    String internalName = identity.getProject().getShortName() + "_";
+    String number = sampleNumberPerProjectService.nextNumber(identity.getProject(), internalName);
+    internalName += number;
+    return internalName;
   }
 
   private String generateTissueAlias(SampleTissue tissue, SampleIdentity identity) {

@@ -3,9 +3,11 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -28,25 +30,26 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 
 public class OicrSampleAliasGeneratorTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  @Mock
+  private SampleNumberPerProjectService sampleNumberPerProjectService;
 
+  @InjectMocks
   private OicrSampleAliasGenerator sut;
 
   @Before
   public void setUp() {
-    sut = new OicrSampleAliasGenerator();
+    MockitoAnnotations.initMocks(this);
   }
 
   @Test
-  public void generateForIdentityExceptionTest() throws Exception {
-    // Cannot generate alias for Identity
+  public void generateForIdentityTest() throws Exception {
     Sample identity = makeIdentity();
-    exception.expect(IllegalArgumentException.class);
-    sut.generate(identity);
+    Mockito.when(sampleNumberPerProjectService.nextNumber(Mockito.any(), Mockito.anyString())).thenReturn("0123");
+    assertEquals("PROJ_0123", sut.generate(identity));
   }
 
   @Test
@@ -240,6 +243,7 @@ public class OicrSampleAliasGeneratorTest {
     Project proj = new ProjectImpl();
     proj.setId(1L);
     proj.setAlias("PROJ");
+    proj.setShortName("PROJ");
     identity.setProject(proj);
 
     return identity;
