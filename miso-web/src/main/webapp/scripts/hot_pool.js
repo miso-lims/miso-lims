@@ -108,7 +108,7 @@ HotTarget.pool = {
 
               var createNext = function(index) {
                 if (index >= pools.length) {
-                  Utils.page.pageReload();
+                  window.location = window.location.origin + '/miso/pools';
                   return;
                 }
 
