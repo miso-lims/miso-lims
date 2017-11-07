@@ -1,4 +1,4 @@
---StartNoTest
+-- StartNoTest
 UPDATE IndexFamily SET platformType = 'ILLUMINA' WHERE name = '454' AND platformType = 'LS454';
 
 CALL addIndexFamily('10X Family', 'ILLUMINA', FALSE);
@@ -214,6 +214,8 @@ CALL addIndex('Lexogen i7', 'H10', 'AACAAG', 1);
 CALL addIndex('Lexogen i7', 'H11', 'AGACCA', 1);
 CALL addIndex('Lexogen i7', 'H12', 'ACACGC', 1);
 
+CALL addIndexFamily('iDES 8bp', 'ILLUMINA', FALSE);
+
 CALL addIndex('iDES 8bp', 'Index 13', 'GAAGCGTT', 1);
 CALL addIndex('iDES 8bp', 'Index 14', 'AGTGAGGT', 1);
 CALL addIndex('iDES 8bp', 'Index 15', 'TTGGCAGT', 1);
@@ -235,4 +237,4 @@ CALL addIndex('iDES 8bp', 'Index 30', 'AAGAGTCG', 1);
 CALL addIndex('iDES 8bp', 'Index 31', 'GCTATAGG', 1);
 CALL addIndex('iDES 8bp', 'Index 32', 'CCACTAAG', 1);
 CALL addIndex('iDES 8bp', 'Index 33', 'ACTCTCTC', 1);
---EndNoTest
+-- EndNoTest

@@ -6,6 +6,7 @@ CALL addInstitute('Sheba Medical Center');
 CALL addLab('Not Specified', 'Sheba Medical Center');
 CALL addLab('BioBank', 'Sheba Medical Center');
 
+CALL addInstitute('Ontario Institute for Cancer Research');
 CALL addLab('Genomics', 'Ontario Institute for Cancer Research');
 
 CALL addInstitute('McGill University');

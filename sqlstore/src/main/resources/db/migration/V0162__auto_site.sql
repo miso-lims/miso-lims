@@ -33,8 +33,8 @@ DROP PROCEDURE IF EXISTS insert_svr_if_not_exists;
 -- StartNoTest
 -- StartNoTest
 DELIMITER //
-DROP PROCEDURE IF EXISTS addIndex//
-CREATE PROCEDURE addIndex(
+DROP PROCEDURE IF EXISTS addIndexTemp//
+CREATE PROCEDURE addIndexTemp(
   iFamilyName varchar(255),
   iName varchar(10),
   iSequence varchar(20),
@@ -58,16 +58,16 @@ CREATE PROCEDURE addIndex(
 END//
 DELIMITER ;
 
-CALL addIndex('TruSeq HT', 'D707', 'CTGAAGCT', 1);
-CALL addIndex('TruSeq HT', 'D708', 'TAATGCGC', 1);
-CALL addIndex('TruSeq HT', 'D709', 'CGGCTATG', 1);
-CALL addIndex('TruSeq HT', 'D710', 'TCCGCGAA', 1);
-CALL addIndex('TruSeq HT', 'D711', 'TCTCGCGC', 1);
-CALL addIndex('TruSeq HT', 'D712', 'AGCGATAG', 1);
+CALL addIndexTemp('TruSeq HT', 'D707', 'CTGAAGCT', 1);
+CALL addIndexTemp('TruSeq HT', 'D708', 'TAATGCGC', 1);
+CALL addIndexTemp('TruSeq HT', 'D709', 'CGGCTATG', 1);
+CALL addIndexTemp('TruSeq HT', 'D710', 'TCCGCGAA', 1);
+CALL addIndexTemp('TruSeq HT', 'D711', 'TCTCGCGC', 1);
+CALL addIndexTemp('TruSeq HT', 'D712', 'AGCGATAG', 1);
 
 CALL addIndex('TruSeq HT', 'D507', 'CAGGACGT', 2);
 CALL addIndex('TruSeq HT', 'D508', 'GTACTGAC', 2);
-DROP PROCEDURE IF EXISTS addIndex;
+DROP PROCEDURE IF EXISTS addIndexTemp;
 -- EndNoTest
 -- EndNoTest
 
