@@ -1,0 +1,27 @@
+version: '3.2'
+services:
+  storage:
+    image: alpine:latest
+    volumes:
+      - /storage/miso
+  mysql-link:
+    image: svendowideit/ambassador:latest
+    command: "lims-db.churrg6mfeyd.us-east-1.rds.amazonaws.com 3306"
+    ports:
+      - "3306:3306"
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    links:
+      - storage
+      - mysql-link
+  proxy:
+#    build: ./nginx
+    image: library/nginx:alpine
+    ports:
+      - "80:80"
+    links:
+      - web:miso-webservice
+
+  
