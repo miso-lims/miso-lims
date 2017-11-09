@@ -18,7 +18,7 @@ DROP PROCEDURE IF EXISTS addIndex//
 CREATE PROCEDURE addIndex(
   iFamilyName varchar(255),
   iName varchar(10),
-  iSequence varchar(20),
+  iSequence varchar(24),
   iPosition int(11)
 ) BEGIN
   DECLARE famId bigint(20);

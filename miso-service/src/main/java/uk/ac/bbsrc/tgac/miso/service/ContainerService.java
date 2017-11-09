@@ -6,6 +6,8 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
@@ -32,5 +34,13 @@ public interface ContainerService extends PaginatedDataSource<SequencerPartition
   Partition getPartition(long partitionId) throws IOException;
 
   void update(Partition partition) throws IOException;
+
+  FlowCellVersion getFlowCellVersion(long id) throws IOException;
+
+  List<FlowCellVersion> listFlowCellVersions() throws IOException;
+
+  PoreVersion getPoreVersion(long id) throws IOException;
+
+  List<PoreVersion> listPoreVersions() throws IOException;
 
 }

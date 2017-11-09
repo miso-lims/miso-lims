@@ -27,16 +27,20 @@ ListTarget.container = {
     return "/miso/rest/container/dt" + (config.platformType ? "/platform/" + config.platformType : "");
   },
   createBulkActions: function(config, projectId) {
-    return config.runId ? [{
-      name: "Remove",
-      action: function(containers) {
-        Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/run/' + config.runId + '/remove', containers.map(Utils.array.getId),
-            Utils.page.pageReload);
+    var actions = HotUtils.makeQcActions('Container');
+    if (config.runId) {
+      actions.push({
+        name: "Remove",
+        action: function(containers) {
+          Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/run/' + config.runId + '/remove', containers.map(Utils.array.getId),
+              Utils.page.pageReload);
 
-      }
+        }
+      });
+    } else {
+      actions.push(HotUtils.printAction('container'));
     }
-
-    ] : [HotUtils.printAction('container')];
+    return actions;
   },
   createStaticActions: function(config, projectId) {
     var platformType = Utils.array.findFirstOrNull(function(pt) {

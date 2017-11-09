@@ -64,7 +64,7 @@
       </td>
     </tr>
     <tr>
-      <td>Serial Number:</td>
+      <td>Serial Number:*</td>
       <td><form:input id="identificationBarcode" path="identificationBarcode"/> </td>
     </tr>
 
@@ -84,10 +84,35 @@
       <td>Multiplexing Kit:</td>
       <td><miso:select id="multiplexingKit" path="multiplexingKit" items="${multiplexingKits}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue="" /></td>
     </tr>
+    
+    <c:if test="${miso:instanceOf(container, 'uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer')}">
+      <tr>
+        <td>Flow Cell Version:</td>
+        <td><miso:select id="flowCellVersion" path="flowCellVersion" items="${flowCellVersions}" itemLabel="alias" itemValue="id" defaultLabel="(Unknown)" defaultValue="" /></td>
+      </tr>
+      <tr>
+        <td>Pore Version:</td>
+        <td><miso:select id="poreVersion" path="poreVersion" items="${poreVersions}" itemLabel="alias" itemValue="id" defaultLabel="(Unknown)" defaultValue="" /></td>
+      </tr>
+      <tr>
+        <td>Received Date:*</td>
+        <td><form:input path="receivedDate" id="receivedDate" /></td>
+      </tr>
+      <tr>
+        <td>Returned Date:</td>
+        <td><form:input path="returnedDate" id="returnedDate" /></td>
+      </tr>
+      <script type="text/javascript">
+      Utils.ui.addDatePicker("receivedDate");
+      Utils.ui.addDatePicker("returnedDate");
+      </script>
+    </c:if>
+    
   </table>
 </form:form>
 
   <c:if test="${container.id != 0}">
+    <miso:qcs id="list_qcs" item="${container}"/>
     <miso:list-section id="list_partition" name="${container.platform.platformType.partitionName}" target="partition" items="${containerPartitions}" config="{ 'platformType' : '${container.platform.platformType.name()}', 'showContainer' : false }"/>
   </c:if>
   <miso:list-section id="list_run" name="Runs" target="run" items="${containerRuns}"/>

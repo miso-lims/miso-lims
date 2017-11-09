@@ -20,7 +20,7 @@ FOR EACH ROW
       NEW.lastModified
     );
   END IF;
-  END//
+END//
 
 DROP TRIGGER IF EXISTS SequencerPartitionContainerInsert//
 CREATE TRIGGER SequencerPartitionContainerInsert AFTER INSERT ON SequencerPartitionContainer
@@ -102,5 +102,32 @@ FOR EACH ROW
       );
     END IF;
   END //
+
+DROP TRIGGER IF EXISTS OxfordNanoporeContainerChange//
+CREATE TRIGGER OxfordNanoporeContainerChange BEFORE UPDATE ON OxfordNanoporeContainer
+FOR EACH ROW
+BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+        CASE WHEN (NEW.flowCellVersionId IS NULL) <> (OLD.flowCellVersionId IS NULL) OR NEW.flowCellVersionId <> OLD.flowCellVersionId THEN CONCAT('flow cell version: ', COALESCE((SELECT alias FROM FlowCellVersion WHERE flowCellVersionId = OLD.flowCellVersionId), 'n/a'), ' → ', COALESCE((SELECT alias FROM FlowCellVersion WHERE flowCellVersionId = NEW.flowCellVersionId), 'n/a')) END,
+        CASE WHEN (NEW.poreVersionId IS NULL) <> (OLD.poreVersionId IS NULL) OR NEW.poreVersionId <> OLD.poreVersionId THEN CONCAT('pore version: ', COALESCE((SELECT alias FROM PoreVersion WHERE poreVersionId = OLD.poreVersionId), 'n/a'), ' → ', COALESCE((SELECT alias FROM PoreVersion WHERE poreVersionId = NEW.poreVersionId), 'n/a')) END,
+        CASE WHEN NEW.receivedDate <> OLD.receivedDate THEN CONCAT('received: ', OLD.receivedDate, ' → ', NEW.receivedDate) END,
+        CASE WHEN (NEW.returnedDate IS NULL) <> (OLD.returnedDate IS NULL) OR NEW.returnedDate <> OLD.returnedDate THEN CONCAT('returned: ', COALESCE(OLD.returnedDate, 'n/a'), ' → ', COALESCE(NEW.returnedDate, 'n/a')) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO SequencerPartitionContainerChangeLog(containerId, columnsChanged, userId, message, changeTime) VALUES (
+      NEW.containerId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN (NEW.flowCellVersionId IS NULL) <> (OLD.flowCellVersionId IS NULL) OR NEW.flowCellVersionId <> OLD.flowCellVersionId THEN 'flowCellVersionId' END,
+        CASE WHEN (NEW.poreVersionId IS NULL) <> (OLD.poreVersionId IS NULL) OR NEW.poreVersionId <> OLD.poreVersionId THEN 'poreVersionId' END,
+        CASE WHEN NEW.receivedDate <> OLD.receivedDate THEN 'receivedDate' END,
+        CASE WHEN (NEW.returnedDate IS NULL) <> (OLD.returnedDate IS NULL) OR NEW.returnedDate <> OLD.returnedDate THEN  'returnedDate' END), ''),
+      (SELECT lastModifier FROM SequencerPartitionContainer WHERE containerId = NEW.containerId),
+      log_message,
+      (SELECT lastModified FROM SequencerPartitionContainer WHERE containerId = NEW.containerId)
+    );
+  END IF;
+END//
+
 DELIMITER ;
+
 -- EndNoTest

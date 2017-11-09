@@ -39,7 +39,7 @@ public class HibernateSiblingNumberGenerator implements SiblingNumberGenerator {
     criteria.add(Restrictions.like("alias", partialAlias, MatchMode.START));
     @SuppressWarnings("unchecked")
     List<Aliasable> aliasables = criteria.list();
-    String regex = "^.{" + partialAlias.length() + "}(\\d*)$";
+    String regex = "^.{" + partialAlias.length() + "}(\\d+)$";
     Pattern pattern = Pattern.compile(regex);
     int next = 0;
     for (Aliasable aliasable : aliasables) {

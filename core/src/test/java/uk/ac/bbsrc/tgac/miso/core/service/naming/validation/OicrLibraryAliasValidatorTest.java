@@ -46,4 +46,10 @@ public class OicrLibraryAliasValidatorTest {
     assertTrue(sut.validate("A123Z_0001_19991231_32").isValid());
   }
 
+  @Test
+  public void testOxfordNanoporePatter() throws Exception {
+    assertTrue(sut.validate("LALA_1010_Ly_R_LIG_WG_1").isValid());
+    assertTrue(sut.validate("ABCD_1234_Pa_P_1D2_MR_123").isValid());
+  }
+
 }

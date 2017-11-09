@@ -44,6 +44,8 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
       return generateIlluminaLibraryAlias(detailed);
     case PACBIO:
       return generatePacBioLibraryAlias(detailed);
+    case OXFORDNANOPORE:
+      return generateOxfordNanoporeLibraryAlias(detailed);
     default:
       throw new MisoNamingException("Alias generation is only available for Illumina and PacBio Libraries");
     }
@@ -146,6 +148,18 @@ public class OicrLibraryAliasGenerator implements NameGenerator<Library> {
   private String getCreationDateString(DetailedLibrary library) {
     DateFormat df = new SimpleDateFormat("yyyyMMdd");
     return df.format(library.getCreationDate());
+  }
+
+  private String generateOxfordNanoporeLibraryAlias(DetailedLibrary library) throws MisoNamingException, IOException {
+    // e.g. PROJ_0001_Pa_P_1D2_WG_1
+    StringBuilder sb = new StringBuilder();
+    sb.append(getIlluminaSampleAliasPart(library));
+    sb.append(SEPARATOR).append(getLibraryTypeAbbreviation(library));
+    sb.append(SEPARATOR).append(getDesignCode(library));
+    sb.append(SEPARATOR);
+    String partial = sb.toString();
+    int siblingNumber = siblingNumberGenerator.getNextSiblingNumber(LibraryImpl.class, partial);
+    return partial + siblingNumber;
   }
 
 }
