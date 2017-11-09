@@ -15,11 +15,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityProfileStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
@@ -120,6 +124,10 @@ public class DefaultContainerService
     managed.setClusteringKit(source.getClusteringKit());
     managed.setMultiplexingKit(source.getMultiplexingKit());
 
+    if (LimsUtils.isOxfordNanoporeContainer(managed)) {
+      applyOxfordNanoporeChanges((OxfordNanoporeContainer) source, (OxfordNanoporeContainer) managed);
+    }
+
     for (Partition sourcePartition : source.getPartitions()) {
       for (Partition managedPartition : managed.getPartitions()) {
         if (sourcePartition == null || managedPartition == null) {
@@ -137,6 +145,13 @@ public class DefaultContainerService
         }
       }
     }
+  }
+
+  public void applyOxfordNanoporeChanges(OxfordNanoporeContainer source, OxfordNanoporeContainer managed) {
+    managed.setFlowCellVersion(source.getFlowCellVersion());
+    managed.setPoreVersion(source.getPoreVersion());
+    managed.setReceivedDate(source.getReceivedDate());
+    managed.setReturnedDate(source.getReturnedDate());
   }
 
   /**
@@ -165,6 +180,15 @@ public class DefaultContainerService
         throw new IllegalArgumentException(descriptor.getName() + " is not a multiplexing kit.");
       }
       container.setMultiplexingKit(descriptor);
+    }
+    if (LimsUtils.isOxfordNanoporeContainer(container)) {
+      OxfordNanoporeContainer ontContainer = (OxfordNanoporeContainer) container;
+      if (ontContainer.getFlowCellVersion() != null) {
+        ontContainer.setFlowCellVersion(containerDao.getFlowCellVersion(ontContainer.getFlowCellVersion().getId()));
+      }
+      if (ontContainer.getPoreVersion() != null) {
+        ontContainer.setPoreVersion(containerDao.getPoreVersion(ontContainer.getPoreVersion().getId()));
+      }
     }
   }
 
@@ -234,6 +258,26 @@ public class DefaultContainerService
     original.setPool(pool);
     setChangeDetails(original.getSequencerPartitionContainer());
     containerDao.save(original.getSequencerPartitionContainer());
+  }
+
+  @Override
+  public FlowCellVersion getFlowCellVersion(long id) throws IOException {
+    return containerDao.getFlowCellVersion(id);
+  }
+
+  @Override
+  public List<FlowCellVersion> listFlowCellVersions() throws IOException {
+    return containerDao.listFlowCellVersions();
+  }
+
+  @Override
+  public PoreVersion getPoreVersion(long id) throws IOException {
+    return containerDao.getPoreVersion(id);
+  }
+
+  @Override
+  public List<PoreVersion> listPoreVersions() throws IOException {
+    return containerDao.listPoreVersions();
   }
 
 }

@@ -189,6 +189,17 @@
     </td>
   </tr>
   </c:if>
+  
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun')}">
+  	<tr>
+      <td>MinKNOW Version:</td>
+      <td><form:input id="minKnowVersion" path="minKnowVersion" class="validateable"/></td>
+    </tr>
+    <tr>
+      <td>Protocol Version:</td>
+      <td><form:input id="protocolVersion" path="protocolVersion" class="validateable"/></td>
+    </tr>
+  </c:if>
 
   <tr>
     <td valign="top">Status:</td>

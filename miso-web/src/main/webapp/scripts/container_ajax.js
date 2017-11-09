@@ -33,6 +33,19 @@ var Container = Container
         jQuery('#identificationBarcode').attr('data-parsley-maxlength', '100');
         jQuery('#identificationBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
+        // Received Date validation
+        jQuery('#receivedDate').attr('class', 'form-control');
+        jQuery('#receivedDate').attr('data-parsley-required', 'true');
+        jQuery('#receivedDate').attr('data-date-format', 'YYYY-MM-DD');
+        jQuery('#receivedDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+        jQuery('#receivedDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+
+        // Returned Date validation
+        jQuery('#returnedDate').attr('class', 'form-control');
+        jQuery('#returnedDate').attr('data-date-format', 'YYYY-MM-DD');
+        jQuery('#returnedDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+        jQuery('#returnedDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+
         jQuery('#container-form').parsley();
         jQuery('#container-form').parsley().validate();
 
@@ -44,7 +57,7 @@ var Container = Container
         if (containerIdField.length > 0) {
           containerId = parseInt(containerIdField.text());
           if (isNaN(containerId)) {
-             containerId = null;
+            containerId = null;
           }
         }
 

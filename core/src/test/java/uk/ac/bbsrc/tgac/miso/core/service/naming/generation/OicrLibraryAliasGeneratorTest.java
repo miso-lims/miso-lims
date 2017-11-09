@@ -68,8 +68,31 @@ public class OicrLibraryAliasGeneratorTest {
 
     Mockito.when(siblingNumberGenerator.getNextSiblingNumber(Mockito.any(), Mockito.any())).thenReturn(2);
 
-
     assertEquals("PROJ_1234_20170913_2", sut.generate(library));
+  }
+
+  @Test
+  public void testGenerateOxfordNanoporeAlias() throws Exception {
+    DetailedLibrary library = new DetailedLibraryImpl();
+    library.setPlatformType(PlatformType.OXFORDNANOPORE);
+
+    DetailedSample sample = new DetailedSampleImpl();
+    sample.setAlias("LALA_1010_Ly_R_nn_1-1_D_1");
+    library.setSample(sample);
+
+    LibraryType libraryType = new LibraryType();
+    libraryType.setAbbreviation("RPD");
+    library.setLibraryType(libraryType);
+
+    library.setDnaSize(300);
+
+    LibraryDesignCode code = new LibraryDesignCode();
+    code.setCode("WG");
+    library.setLibraryDesignCode(code);
+
+    Mockito.when(siblingNumberGenerator.getNextSiblingNumber(Mockito.any(), Mockito.any())).thenReturn(5);
+
+    assertEquals("LALA_1010_Ly_R_RPD_WG_5", sut.generate(library));
   }
 
 }
