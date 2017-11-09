@@ -26,6 +26,7 @@ runscanner_illumina_SOURCES = \
 runscanner_illumina_CPPFLAGS = \
 	-std=c++11 -g -O2 \
 	-I interop \
+	-I interop-build/include \
 	$(JSON_CFLAGS) \
 	$(NULL)
 # These are the linker flags for building runscanner-illumina
