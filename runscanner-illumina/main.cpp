@@ -175,20 +175,30 @@ void add_plot(const illumina::interop::constants::metric_type metric_name,
       options.lane(lane);
       /* Populate the data object. */
       X(run, metric_name, options, data, true);
-      /* Set the name of the lane. If a regular lane, include `{n}` so that the
-       * front end can substitute the pool name. */
-      std::stringstream name;
-      if (lane == 0) {
-        name << "Combined";
-      } else {
-        name << "{" << lane << "}";
+      if (std::accumulate(
+              data.begin(), data.end(), false,
+              [](bool acc,
+                 const illumina::interop::model::plot::series<
+                     illumina::interop::model::plot::candle_stick_point> &
+                     series) { return acc || series.size() > 0; })) {
+        /* Set the name of the lane. If a regular lane, include `{n}` so that
+         * the
+         * front end can substitute the pool name. */
+        std::stringstream name;
+        if (lane == 0) {
+          name << "Combined";
+        } else {
+          name << "{" << lane << "}";
+        }
+        dataset.push_back(std::make_pair(name.str(), std::move(data)));
       }
-      dataset.push_back(std::make_pair(name.str(), std::move(data)));
     }
   } catch (const std::exception &ex) {
     return;
   }
-  render(type_name, dataset, output);
+  if (!dataset.empty()) {
+    render(type_name, dataset, output);
+  }
 }
 
 /* Helper function to add a row to a chart. */
