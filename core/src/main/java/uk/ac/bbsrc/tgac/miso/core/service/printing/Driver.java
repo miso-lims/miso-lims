@@ -30,7 +30,7 @@ public enum Driver {
       sb.append("m m\n");
       sb.append("J\n");
       sb.append("S l1;0,0,6,9,50\n");
-      sb.append("B 1,0,0,CODE128,5,0.25;").append(b.getIdentificationBarcode()).append("\n");
+      sb.append("B 1,0,0,CODE128,5,0.25;").append(getBarcode(b)).append("\n");
       sb.append("A ").append(b.getLabelText()).append("\n");
       return sb.toString();
     }
@@ -42,7 +42,7 @@ public enum Driver {
       StringBuilder sb = new StringBuilder();
 
       try {
-        String barcode = new String(Base64.encodeBase64(barcodable.getIdentificationBarcode().getBytes("UTF-8")));
+        String barcode = getBarcode64(barcodable);
         String alias = barcodable.getLabelText();
         String name = barcodable.getName();
         String barcode64 = new String(Base64.encodeBase64(barcode.getBytes("UTF-8")));
@@ -75,7 +75,7 @@ public enum Driver {
       StringBuilder sb = new StringBuilder();
 
       try {
-        String barcode = new String(Base64.encodeBase64(barcodable.getIdentificationBarcode().getBytes("UTF-8")));
+        String barcode = getBarcode64(barcodable);
         sb.append("mm\n");
         sb.append("J\n");
         sb.append("O R\n");
@@ -106,7 +106,7 @@ public enum Driver {
       StringBuilder sb = new StringBuilder();
 
       try {
-        String barcode = new String(Base64.encodeBase64(barcodable.getIdentificationBarcode().getBytes("UTF-8")));
+        String barcode = getBarcode64(barcodable);
         sb.append("mm\n");
         sb.append("J\n");
         sb.append("O R\n");
@@ -144,7 +144,7 @@ public enum Driver {
       StringBuilder sb = new StringBuilder();
 
       try {
-        String barcode = new String(Base64.encodeBase64(barcodable.getIdentificationBarcode().getBytes("UTF-8")));
+        String barcode = getBarcode64(barcodable);
         String alias = barcodable.getLabelText();
         String name = barcodable.getName();
         String barcode64 = new String(Base64.encodeBase64(barcode.getBytes("UTF-8")));
@@ -210,7 +210,7 @@ public enum Driver {
       }
       sb.append("^BY42,42^FT150,176^BXN,3,200,0,0,1,~\r\n");
       sb.append("^FH\\^FD");
-      sb.append(b.getIdentificationBarcode());
+      sb.append(getBarcode(b));
       sb.append("^FS\r\n");
       sb.append("^FT16,110^A0N,20,19^FH\\^FD");
       appendTruncated(15, b.getBarcodeExtraInfo(), sb::append);
@@ -275,7 +275,7 @@ public enum Driver {
       appendTruncated(12, b.getBarcodeExtraInfo(), sb::append);
       sb.append("^FS\r\n");
       sb.append("^BY32,32^FT158,96^BXN,2,200,0,0,1,~\r\n");
-      sb.append("^FH\\^FD1").append(b.getIdentificationBarcode()).append("^FS\r\n");
+      sb.append("^FH\\^FD1").append(getBarcode(b)).append("^FS\r\n");
       sb.append("^XZ\r\n");
       return sb.toString();
     }
@@ -300,6 +300,18 @@ public enum Driver {
     } else {
       writeEscaped.accept(str);
     }
+  }
+
+  private static String getBarcode(Barcodable barcodable) {
+    String str = barcodable.getIdentificationBarcode();
+    if (LimsUtils.isStringBlankOrNull(str)) {
+      str = barcodable.getName();
+    }
+    return str;
+  }
+
+  private static String getBarcode64(Barcodable barcodable) throws UnsupportedEncodingException {
+    return new String(Base64.encodeBase64(getBarcode(barcodable).getBytes("UTF-8")));
   }
 
   /**
