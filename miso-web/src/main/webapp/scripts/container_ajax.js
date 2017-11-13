@@ -37,10 +37,15 @@ var Container = Container
         jQuery('#container-form').parsley().validate();
 
         // Ensure provided serial number is unique.
-        var serialNumber = jQuery("#identificationBarcode").val();
+        var serialNumberField = jQuery('#identificationBarcode');
+        var serialNumber = serialNumberField.val();
+        var containerIdField = jQuery("#containerId");
         var containerId = null;
-        if (jQuery("#containerId").length > 0) {
-          containerId = jQuery("#containerId").val();
+        if (containerIdField.length > 0) {
+          containerId = parseInt(containerIdField.text());
+          if (isNaN(containerId)) {
+             containerId = null;
+          }
         }
 
         Fluxion.doAjax('containerControllerHelperService', 'isSerialNumberUnique', {
@@ -53,8 +58,7 @@ var Container = Container
               Validate.updateWarningOrSubmit('#container-form', Container.validateStudyAdded);
             } else {
               // Serial number is not unique.
-              var serialNumberField = jQuery('#identificationBarcode').parsley();
-              window.ParsleyUI.addError(serialNumberField, "serialNumberError",
+              window.ParsleyUI.addError(serialNumberField.parsley(), "serialNumberError",
                   'This serial number is already in use. Please choose another.');
               return false;
             }
@@ -62,7 +66,7 @@ var Container = Container
           'doOnError': function(json) {
             // Unable to perform lookup.
             Utils.showOkDialog('Check Serial Number', [json.error]);
-            window.ParsleyUI.addError(serialNumberField, "serialNumberError", 'Unable to determine if serial number is unique.');
+            window.ParsleyUI.addError(serialNumberField.parsley(), "serialNumberError", 'Unable to determine if serial number is unique.');
             return false;
           }
         });
