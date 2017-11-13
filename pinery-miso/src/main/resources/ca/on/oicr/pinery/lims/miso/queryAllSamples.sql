@@ -156,8 +156,8 @@ SELECT l.alias NAME
         ,NULL tissue_region 
         ,NULL tube_id 
         ,NULL str_result 
-        ,NULL group_id 
-        ,NULL group_id_description 
+        ,lai.groupId group_id 
+        ,lai.groupDescription group_id_description 
         ,NULL purpose 
         ,qubit.results qubit_concentration 
         ,NULL nanodrop_concentration 
