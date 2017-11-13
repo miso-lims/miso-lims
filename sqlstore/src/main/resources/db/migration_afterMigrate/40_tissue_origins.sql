@@ -30,4 +30,7 @@ CALL addTissueOrigin('Ba', 'Back');
 CALL addTissueOrigin('Pu', 'Pleura');
 CALL addTissueOrigin('Ur','Urethra');
 CALL addTissueOrigin('Tn','Tonsil');
+CALL addTissueOrigin('Ge', 'Gastroesophageal Junction');
+CALL addTissueOrigin('Pi', 'Penis');
+CALL addTissueOrigin('Fb', 'Fibroid');
 -- EndNoTest
