@@ -93,7 +93,14 @@ HotTarget.qc = function(qcTarget) {
 
         },
         unpack: function(qc, flat, setCellMeta) {
-          flat.results = qc.results;
+          var qcType = Utils.array.findFirstOrNull(function(qcType) {
+            return qcType.qcTarget == qcTarget && qcType.name == flat.typeName;
+          }, Constants.qcTypes);
+          if (qcType != null && qcType.precisionAfterDecimal < 0) {
+            flat.results = qc.results > 0;
+          } else {
+            flat.results = qc.results;
+          }
         },
         pack: function(qc, flat, errorHandler) {
           var qcType = Utils.array.findFirstOrNull(function(qcType) {
