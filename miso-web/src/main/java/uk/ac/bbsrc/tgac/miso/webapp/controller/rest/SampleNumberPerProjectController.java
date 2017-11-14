@@ -47,9 +47,9 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleNumberPerProjectDto;
-import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 
 @Controller
 @RequestMapping("/rest")

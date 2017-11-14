@@ -45,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
@@ -60,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
-import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
@@ -454,22 +454,14 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
           + ". Cannot choose which to use as root sample class.");
     }
     SampleClass rootSampleClass = identityClasses.get(0);
-
-    // Cannot generate identity alias via sampleNameGenerator because of dependence on SampleNumberPerProjectService
-    if (sample.getProject().getShortName() == null) {
-      throw new NullPointerException("Project shortname required to generate Identity alias");
-    }
-    String internalName = sample.getProject().getShortName() + "_";
-    String number = sampleNumberPerProjectService.nextNumber(sample.getProject(), internalName);
-    internalName += number;
     SampleIdentity shellParent = (SampleIdentity) sample.getParent();
-
     confirmExternalNameUniqueForProjectIfRequired(shellParent.getExternalName(), sample);
 
     Sample identitySample = new IdentityBuilder().project(sample.getProject())
         .sampleType(sample.getSampleType()).scientificName(sample.getScientificName()).name(generateTemporaryName())
-        .alias(internalName).rootSampleClass(rootSampleClass).volume(0D).externalName(shellParent.getExternalName())
+        .rootSampleClass(rootSampleClass).volume(0D).externalName(shellParent.getExternalName())
         .donorSex(shellParent.getDonorSex()).build();
+    identitySample.setAlias(namingScheme.generateSampleAlias(identitySample));
 
     setChangeDetails(identitySample);
     return (SampleIdentity) save(identitySample, true);

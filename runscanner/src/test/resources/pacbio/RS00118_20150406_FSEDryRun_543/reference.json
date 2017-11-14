@@ -1,1 +1,28 @@
-{"class":"uk.ac.bbsrc.tgac.miso.dto.PacBioNotificationDto","runAlias":"RS00118_20150406_FSEDryRun","sequencerName":"00118","containerSerialNumber":"RS00118_20150406_FSEDryRun","laneCount":1,"healthType":"Completed","startDate":[2015,4,7,0,59,17],"completionDate":[2015,4,7,1,29,17],"pairedEndRun":false,"software":"2.3.0.1.142990","poolNames":{"A01":""}}
+{
+  "class": "uk.ac.bbsrc.tgac.miso.dto.PacBioNotificationDto",
+  "completionDate": [
+    2015,
+    4,
+    7,
+    1,
+    29,
+    17
+  ],
+  "containerSerialNumber": "RS00118_20150406_FSEDryRun",
+  "healthType": "Completed",
+  "laneCount": 1,
+  "pairedEndRun": false,
+  "poolNames": {
+    "A01": ""
+  },
+  "runAlias": "RS00118_20150406_FSEDryRun",
+  "sequencerName": "00118",
+  "startDate": [
+    2015,
+    4,
+    7,
+    0,
+    59,
+    17
+  ]
+}

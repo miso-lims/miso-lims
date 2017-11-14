@@ -25,6 +25,7 @@ public abstract class AbstractProcessorTest {
     for (File directory : new File(this.getClass().getResource(root).getPath()).listFiles()) {
       NotificationDto result = process(directory);
       NotificationDto reference = mapper.readValue(new File(directory, "reference.json"), clazz);
+      result.setSoftware(null); // We delete this because it is going to change during updates to dependencies.
       result.setSequencerFolderPath(null); // We delete this because it is going to be different in each environment.
       result.setMetrics(null); // We delete these because changes in metrics are non-critical.
       assertEquals(reference, result);

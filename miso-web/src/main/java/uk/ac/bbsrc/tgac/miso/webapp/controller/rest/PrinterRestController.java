@@ -25,7 +25,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -182,7 +181,6 @@ public class PrinterRestController extends RestController {
     return COMMA.splitAsStream(ids)//
         .map(Long::parseLong)//
         .map(WhineyFunction.rethrow(fetcher))//
-        .filter(barcodable -> !LimsUtils.isStringBlankOrNull(barcodable.getIdentificationBarcode()))//
         .filter(printer::printBarcode)//
         .count();
   }
