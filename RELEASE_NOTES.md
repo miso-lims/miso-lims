@@ -1,3 +1,11 @@
+# 0.2.98
+
+Changes:
+
+ * Fix container barcode validation
+ * Generate Identity aliases
+ * Print the name if no barcode is provided
+
 # 0.2.97
 
 Changes:
