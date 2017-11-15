@@ -37,4 +37,5 @@ CALL addKitDescriptor('KAPA OnBead',0,'KAPA','1','LIBRARY','ILLUMINA','n/a');
 CALL addKitDescriptor('Kapa Hyper Prep Plus',0,'Illumina','0','LIBRARY','ILLUMINA','enzymatic fragmentation');
 CALL addKitDescriptor('KAPA Hyper Prep and IDT xGen',5,'KAPA','1','LIBRARY','ILLUMINA','n/a');
 CALL addKitDescriptor('Agilent SureSelect XT Clinical Research',5,'Agilent','1','LIBRARY','ILLUMINA','n/a');
+CALL addKitDescriptor('Agilent SureSelect XT HS',1,'Agilent','1','LIBRARY','ILLUMINA','n/a');
 -- EndNoTest
