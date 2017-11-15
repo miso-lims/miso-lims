@@ -102,9 +102,14 @@ import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
+import io.prometheus.client.Gauge;
+
 @Controller
 public class MenuController implements ServletContextAware {
   protected static final Logger log = LoggerFactory.getLogger(MenuController.class);
+
+  private static final Gauge constantsTimestamp = Gauge
+      .build("miso_constants_timestamp", "The epoch time of the last build of the constants.js file.").register();
 
   private String constantsJs;
   private long constantsJsTime;
@@ -357,6 +362,7 @@ public class MenuController implements ServletContextAware {
     // data, we don't really care since the results are probably the same and jitter of a few seconds is a small error in cache time.
     constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";
     constantsJsTime = System.currentTimeMillis();
+    constantsTimestamp.set(constantsJsTime / 1000.0);
     return constantsJs;
   }
 }
