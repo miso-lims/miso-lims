@@ -54,6 +54,9 @@ public interface Sample
   public static final long UNSAVED_ID = 0L;
   /** Field PREFIX */
   public static final String PREFIX = "SAM";
+
+  public static final String CONCENTRATION_UNITS = "ng/µl";
+
   public void setId(long id);
 
   /**
@@ -242,11 +245,13 @@ public interface Sample
   // TODO: remove below fields to ChangeLoggable interface
   public User getLastModifier();
 
+  @Override
   public void setLastModifier(User user);
 
   @Override
   public Date getLastModified();
 
+  @Override
   public void setLastModified(Date lastModified);
 
   public User getCreator();

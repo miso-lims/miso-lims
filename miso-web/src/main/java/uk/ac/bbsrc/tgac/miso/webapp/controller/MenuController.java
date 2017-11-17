@@ -58,6 +58,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -282,6 +283,7 @@ public class MenuController implements ServletContextAware {
     node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
     node.put("libraryDilutionConcentrationUnits", LibraryDilution.UNITS);
     node.put("poolConcentrationUnits", PoolImpl.CONCENTRATION_UNITS);
+    node.put("sampleConcentrationUnits", Sample.CONCENTRATION_UNITS);
 
     final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 

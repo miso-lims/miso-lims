@@ -474,8 +474,8 @@ HotTarget.sample = (function() {
             include: Constants.isDetailedSample && config.dnaseTreatable
           },
           HotUtils.makeColumnForFloat('Vol. (&#181;l)', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'volume'),
-          HotUtils.makeColumnForFloat('Conc. (ng/&#181;l)', ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt),
-              'concentration'),
+          HotUtils.makeColumnForFloat('Conc. (' + Constants.sampleConcentrationUnits + ')',
+              ((show['Stock'] || show['Aliquot']) && !config.isLibraryReceipt), 'concentration'),
 
           // QC status columns for detailed and non-detailed samples
           {
