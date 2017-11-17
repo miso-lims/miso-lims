@@ -1,3 +1,4 @@
+-- StartNoTest
 SELECT qcTypeId INTO @dnaseQc FROM QCType WHERE name = 'DNAse Treated';
 
 UPDATE SampleStock ss
@@ -17,7 +18,8 @@ AND sample_sampleId IN (
   JOIN SampleClass sc ON sc.sampleClassId = ds.sampleClassId
   WHERE sc.dnaseTreatable = 1
 );
+-- EndNoTest
 
 -- DNAse treated should only be set on dnaseTreatable Stocks. These cases have been fixed automatically.
 -- Next line will fail and require manual fixing for other (unexpected) cases.
-DELETE FROM QCType WHERE qcTypeId = @dnaseQc;
+DELETE FROM QCType WHERE name = 'DNAse Treated';
