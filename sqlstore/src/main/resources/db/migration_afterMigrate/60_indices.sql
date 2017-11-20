@@ -271,4 +271,18 @@ CALL addIndex('SureSelect XT HS', 'E04', 'GGTGCGAA', 1);
 CALL addIndex('SureSelect XT HS', 'F04', 'AACAACCA', 1);
 CALL addIndex('SureSelect XT HS', 'G04', 'CGGATTGC', 1);
 CALL addIndex('SureSelect XT HS', 'H04', 'AGTCACTA', 1);
+
+CALL addIndexFamily('1D Native Barcodes', 'OXFORDNANOPORE', 0);
+CALL addIndex('1D Native Barcodes', 'NB01', 'AAGAAAGTTGTCGGTGTCTTTGTG', 1);
+CALL addIndex('1D Native Barcodes', 'NB02', 'TCGATTCCGTTTGTAGTCGTCTGT', 1);
+CALL addIndex('1D Native Barcodes', 'NB03', 'GAGTCTTGTGTCCCAGTTACCAGG', 1);
+CALL addIndex('1D Native Barcodes', 'NB04', 'TTCGGATTCTATCGTGTTTCCCTA', 1);
+CALL addIndex('1D Native Barcodes', 'NB05', 'CTTGTCCAGGGTTTGTGTAACCTT', 1);
+CALL addIndex('1D Native Barcodes', 'NB06', 'TTCTCGCAAAGGCAGAAAGTAGTC', 1);
+CALL addIndex('1D Native Barcodes', 'NB07', 'GTGTTACCGTGGGAATGAATCCTT', 1);
+CALL addIndex('1D Native Barcodes', 'NB08', 'TTCAGGGAACAAACCAAGTTACGT', 1);
+CALL addIndex('1D Native Barcodes', 'NB09', 'AACTAGGCACAGCGAGTCTTGGTT', 1);
+CALL addIndex('1D Native Barcodes', 'NB10', 'AAGCGTTGAAACCTTTGTCCTCTC', 1);
+CALL addIndex('1D Native Barcodes', 'NB11', 'GTTTCATCTATCGGAGGGAATGGA', 1);
+CALL addIndex('1D Native Barcodes', 'NB12', 'CAGGTAGAAAGAAGCAGAATCGGA', 1);
 -- EndNoTest
