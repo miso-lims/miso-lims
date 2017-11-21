@@ -47,9 +47,8 @@ public class ContainerPageIT extends AbstractIT {
     String miSeq = "Illumina MiSeq";
     String platformId = idForPlatform.get(miSeq).toString();
     Integer numPartitions = 1;
-    String partitionText = numPartitions + " " + partitionName + (numPartitions == 1 ? "" : "s");
     String newUrl = listContainers
-        .clickButtonAndGetUrl(ButtonText.ADD + " " + containerName, Lists.newArrayList(miSeq, partitionText));
+        .clickButtonAndGetUrl(ButtonText.ADD + " " + containerName, Lists.newArrayList(miSeq));
 
     String foundPartitions = newUrl.split("count=")[1];
     assertEquals("same number of partitions", numPartitions.toString(), foundPartitions);
