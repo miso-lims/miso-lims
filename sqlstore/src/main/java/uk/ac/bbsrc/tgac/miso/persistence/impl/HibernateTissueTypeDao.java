@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
-import uk.ac.bbsrc.tgac.miso.persistence.TissueTypeDao;
+import uk.ac.bbsrc.tgac.miso.core.store.TissueTypeDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)

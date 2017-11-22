@@ -13,7 +13,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
-import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
+import uk.ac.bbsrc.tgac.miso.core.store.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
