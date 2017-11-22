@@ -77,6 +77,8 @@ public class DefaultPoolOrderService implements PoolOrderService {
     PoolOrder poolOrder = poolOrderDao.getPoolOrder(poolOrderId);
     Pool pool = poolService.get(poolOrder.getPoolId());
     authorizationManager.throwIfNotWritable(pool);
+    pool.setLastModifier(authorizationManager.getCurrentUser());
+    poolService.save(pool);
     if (poolOrder != null) poolOrderDao.deletePoolOrder(poolOrder);
   }
 
