@@ -1,3 +1,14 @@
+# 0.2.99
+
+Changes:
+
+ * Improved Oxford Nanopore support
+ * Correct change user for order deletion
+ * Automatically choose Add Container options when there's no choice
+ * Consistent units for sample concentration
+ * Remove DNAse Treated QC since there is a field for it
+ * Handle boolean QC results correctly on editing
+
 # 0.2.98
 
 Changes:
