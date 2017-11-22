@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
-import uk.ac.bbsrc.tgac.miso.persistence.TissueOriginDao;
+import uk.ac.bbsrc.tgac.miso.core.store.TissueOriginDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)

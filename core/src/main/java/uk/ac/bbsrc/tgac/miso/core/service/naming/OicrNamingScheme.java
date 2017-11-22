@@ -36,6 +36,7 @@ public class OicrNamingScheme extends AbstractNamingScheme {
   public OicrNamingScheme() {
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(sampleAliasGenerator);
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(libraryAliasGenerator);
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(libraryAliasValidator);
   }
 
   /**

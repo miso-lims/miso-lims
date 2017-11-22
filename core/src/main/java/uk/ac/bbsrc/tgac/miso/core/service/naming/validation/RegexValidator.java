@@ -25,6 +25,10 @@ public abstract class RegexValidator implements NameValidator {
     this.pattern = Pattern.compile(validationRegex);
   }
 
+  public Pattern getValidationPattern() {
+    return pattern;
+  }
+
   @Override
   public void setValidationMessage(String message) {
     this.customValidationMessage = message;
@@ -59,7 +63,7 @@ public abstract class RegexValidator implements NameValidator {
   @Override
   public ValidationResult validate(String value) {
     if (!allowNulls && (value == null || value.isEmpty())) return ValidationResult.failed(getFieldName() + " cannot be empty");
-    if (pattern != null && !pattern.matcher(value).matches()) {
+    if (getValidationPattern() != null && !getValidationPattern().matcher(value).matches()) {
       return ValidationResult.failed(getValidationMessage());
     }
     return ValidationResult.success();
@@ -67,7 +71,7 @@ public abstract class RegexValidator implements NameValidator {
 
   private String getValidationMessage() {
     if (customValidationMessage != null) return customValidationMessage;
-    else return getFieldName() + defaultValidationMessagePart + pattern.pattern();
+    else return getFieldName() + defaultValidationMessagePart + getValidationPattern().pattern();
   }
 
   protected abstract String getFieldName();
