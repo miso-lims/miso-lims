@@ -52,6 +52,8 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String QC_NOTE = "QC Note";
     public static final String PURPOSE = "Purpose";
     public static final String QC_PASSED = "QC Passed?";
+    public static final String PARENT_ALIAS = "Parent Alias";
+    public static final String PARENT_SAMPLE_CLASS = "Parent Sample Class";
 
     private SamColumns() {
       throw new IllegalStateException("Util class not intended for instantiation");
@@ -60,6 +62,7 @@ public class BulkSamplePage extends HeaderFooterPage {
 
   private static final String CREATE_URL_FORMAT = "%smiso/sample/bulk/new?quantity=%d&projectId=%s&sampleClassId=%s";
   private static final String EDIT_URL_FORMAT = "%smiso/sample/bulk/edit?ids=%s";
+  private static final String PROPAGATE_URL_FORMAT = "%smiso/sample/bulk/propagate?parentIds=%s&replicates=%d&sampleClassId=%s";
 
   private final SampleHandsOnTable table;
 
@@ -80,6 +83,14 @@ public class BulkSamplePage extends HeaderFooterPage {
   public static BulkSamplePage getForEdit(WebDriver driver, String baseUrl, Collection<Long> sampleIds) {
     String ids = Joiner.on(',').join(sampleIds);
     String url = String.format(EDIT_URL_FORMAT, baseUrl, ids);
+    driver.get(url);
+    return new BulkSamplePage(driver);
+  }
+
+  public static BulkSamplePage getForPropagate(WebDriver driver, String baseUrl, Collection<Long> parentIds, Integer quantity,
+      Long sampleClassId) {
+    String ids = Joiner.on(',').join(parentIds);
+    String url = String.format(PROPAGATE_URL_FORMAT, baseUrl, ids, quantity, (sampleClassId == null ? "" : sampleClassId.toString()));
     driver.get(url);
     return new BulkSamplePage(driver);
   }

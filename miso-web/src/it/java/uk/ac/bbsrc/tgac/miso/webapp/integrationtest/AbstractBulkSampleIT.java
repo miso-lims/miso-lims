@@ -30,12 +30,26 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTa
 
 public abstract class AbstractBulkSampleIT extends AbstractIT {
 
+  protected static final long projectId = 1L;
+  protected static final long identityClassId = 1L;
+  protected static final long tissueClassId = 23L;
+  protected static final long slideClassId = 24L;
+  protected static final long curlsClassId = 8L;
+  protected static final long lcmTubeClassId = 10L;
+  protected static final long gStockClassId = 11L;
+  protected static final long rStockClassId = 13L;
+  protected static final long cStockClassId = 14L;
+  protected static final long gAliquotClassId = 15L;
+  protected static final long rAliquotClassId = 17L;
+  protected static final long cAliquotClassId = 21L;
+  protected static final long mRnaClassId = 19L;
+
   protected void saveSingleAndAssertSuccess(SampleHandsOnTable table) {
     HandsOnTableSaveResult result = table.save();
 
+    assertTrue("Server errors: " + result.getServerErrors().toString(), result.getServerErrors().isEmpty());
+    assertTrue("Save errors: " + result.getSaveErrors().toString(), result.getSaveErrors().isEmpty());
     assertTrue("Sample save", result.getItemsSaved() == 1);
-    assertTrue("Server errors", result.getServerErrors().isEmpty());
-    assertTrue("Save errors", result.getSaveErrors().isEmpty());
 
     assertTrue("Sample name generation", table.getText(SamColumns.NAME, 0).contains("SAM"));
     assertTrue("Sample alias generation", !isStringEmptyOrNull(table.getText(SamColumns.ALIAS, 0)));

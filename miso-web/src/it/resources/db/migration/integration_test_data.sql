@@ -114,7 +114,8 @@ INSERT INTO TissueMaterial(tissueMaterialId, alias, createdBy, creationDate, upd
 INSERT INTO TissueOrigin(tissueOriginId, alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Bn', 'Brain', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
 (2, 'Ly', 'Lymphocyte', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
-(3, 'Pa', 'Pancreas', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
+(3, 'Pa', 'Pancreas', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00'),
+(4, 'nn', 'Unknown', 1, '2017-07-07 16:34:00', 1, '2017-07-07 16:34:00');
 
 INSERT INTO TissueType(tissueTypeId, alias, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'R','Reference or non-tumour, non-diseased tissue sample. Typically used as a donor-specific comparison to a diseased tissue, usually a cancer',1,'2016-09-26 15:55:43',1,'2016-09-26 15:55:43'),
@@ -379,7 +380,8 @@ INSERT INTO Project(projectId, name, alias, shortName, creationDate, description
   (300, 'PRO300', 'BulkDilutionIT', 'DILT', '2017-08-14', 'bulk dilution test project', 1, 'ACTIVE', 1, '2017-08-14 11:54:00'),
   (400, 'PRO400', 'StudiesIT', 'STUT', '2017-08-16', 'studies test project', 1, 'ACTIVE', 1, '2017-08-16 14:50:00'),
   (500, 'PRO500', 'Tubes In Boxes', 'TIB', '2017-08-15', 'test tubes in and out of boxes', 1, 'ACTIVE', 1, '2017-08-15 13:45:00'),
-  (900, 'PRO900', 'Add Overview', 'POV', '2017-10-20', 'add project overview', 1, 'ACTIVE', 1, '2017-10-20 15:30:00');
+  (900, 'PRO900', 'Add Overview', 'POV', '2017-10-20', 'add project overview', 1, 'ACTIVE', 1, '2017-10-20 15:30:00'),
+  (4440, 'PRO4440', 'Propagate Samples', 'PROP', '2017-10-26', 'propagate samples', 1, 'ACTIVE', 1, '2017-10-26 14:20:00');
 
 INSERT INTO SampleNumberPerProject(projectId, highestSampleNumber, padding, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (100001, 1, 4, 1, '2017-10-11 15:33:00', 1, '2017-10-11 15:33:00');
@@ -437,7 +439,14 @@ INSERT INTO Sample(sampleId, project_projectId, name, alias, securityProfile_pro
   (302, 300, 'SAM302', 'DILT_0001_nn_n_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
   (303, 300, 'SAM303', 'DILT_0001_nn_n_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
   (304, 300, 'SAM304', 'DILT_0001_nn_n_1-1_D_1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
-  (305, 300, 'SAM305', 'DILT_0001_nn_n_1-1_D_2', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00');
+  (305, 300, 'SAM305', 'DILT_0001_nn_n_1-1_D_2', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-08-14 11:55:00', 1, '2017-08-14 11:55:00'),
+  (4441, 4440, 'SAM4441', 'PROP_0001', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4442, 4440, 'SAM4442', 'PROP_0001_nn_n_1-1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4443, 4440, 'SAM4443', 'PROP_0001_nn_n_1-1_SL01', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4444, 4440, 'SAM4444', 'PROP_0001_nn_n_1-1_LCM01', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4445, 4440, 'SAM4445', 'PROP_0001_nn_n_1-1_D_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4446, 4440, 'SAM4446', 'PROP_0001_nn_n_1-1_R_S1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00'),
+  (4447, 4440, 'SAM4447', 'PROP_0001_nn_n_1-1_R_1', 1, 'GENOMIC', 'Homo sapiens', 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00');
 
 INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, concentration, archived) VALUES
 (1, 1, NULL, NULL, NULL, NULL, 1, NULL, NULL, 0),
@@ -453,7 +462,14 @@ INSERT INTO DetailedSample (sampleId, sampleClassId, parentId, siblingNumber, gr
 (11, 21, 10, 2, '7357', 'TEST', 1, NULL, NULL, 0),
 (12, 18, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
 (13, 19, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
-(14, 20, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0);
+(14, 20, 9, 1, '7357', 'TEST', 1, NULL, NULL, 0),
+(4441, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(4442, 23, 4441, 1, NULL, NULL, NULL, NULL, NULL, 0),
+(4443, 24, 4442, 1, NULL, NULL, NULL, NULL, NULL, 0),
+(4444, 10, 4443, 1, NULL, NULL, NULL, NULL, NULL, 0),
+(4445, 14, 4442, 1, NULL, NULL, NULL, NULL, NULL, 0),
+(4446, 13, 4442, 1, NULL, NULL, NULL, NULL, NULL, 0),
+(4447, 17, 4446, 1, NULL, NULL, NULL, NULL, NULL, 0);
 
 INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId, archived) VALUES
   (100001, 1, NULL, 1, 0),  -- Identity
@@ -474,7 +490,7 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
   (200004, 15, NULL, 1, 0), -- gDNA (aliquot)
   (201, 1, NULL, 1, 0),
   (202, 23, NULL, 1, 0),
-  (203, 11, NULL, 1, 0),
+  (203, 24, NULL, 1, 0),
   (204, 15, NULL, 1, 0),
   (205, 15, NULL, 1, 0),
   (206, 15, NULL, 1, 0),
@@ -496,7 +512,8 @@ INSERT INTO Identity (sampleId, externalName, donorSex) VALUES
   (200001, 'IPOT_identity1', 'UNKNOWN'),
   (201, 'SORT_identity_1', 'UNKNOWN'),
   (301, 'DILT_identity_1', 'FEMALE'),
-  (501, 'TIB_identity_1', 'UNKNOWN');
+  (501, 'TIB_identity_1', 'UNKNOWN'),
+  (4441, 'PROP_identity_1', 'UNKNOWN');
 
 INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, secondaryIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
   (2, 1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2),
@@ -506,16 +523,20 @@ INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, secondaryIde
   (200002, 3, 2, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (202, 1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL),
   (302, 1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL),
-  (502, 1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL);;
+  (502, 1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL),
+  (4442, 4, 14, NULL, NULL, NULL, NULL, 1, 1, NULL);
 
 INSERT INTO SampleTissueProcessing(sampleId) VALUES
-(3),(4),(5);
+(3),(4),(5),
+(4443), (4444);
 
 INSERT INTO `SampleSlide` (sampleId, slides) VALUES
-(3, 15);
+(3, 15),
+(4443, 3);
 
 INSERT INTO `SampleLCMTube` (sampleId, slidesConsumed) VALUES
-(5, 10);
+(5, 10),
+(4444, 1);
 
 INSERT INTO `SampleStock` (sampleId, strStatus, dnaseTreated) VALUES
 (6, 'SUBMITTED', 0),
@@ -527,7 +548,9 @@ INSERT INTO `SampleStock` (sampleId, strStatus, dnaseTreated) VALUES
 (200003, 'NOT_SUBMITTED', 0),
 (203, 'NOT_SUBMITTED', 0),
 (303, 'NOT_SUBMITTED', 0),
-(503, 'PASS', 0);
+(503, 'PASS', 0),
+(4445, 'NOT_SUBMITTED', 0),
+(4446, 'NOT_SUBMITTED', 1);
 
 INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 (8, 9),
@@ -545,7 +568,8 @@ INSERT INTO `SampleAliquot` (sampleId, samplePurposeId) VALUES
 (206, NULL),
 (304, NULL),
 (305, NULL),
-(504, NULL);
+(504, NULL),
+(4447, 3);
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, securityProfile_profileId, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, qcPassed, dnaSize,
