@@ -58,6 +58,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -102,9 +103,14 @@ import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
+import io.prometheus.client.Gauge;
+
 @Controller
 public class MenuController implements ServletContextAware {
   protected static final Logger log = LoggerFactory.getLogger(MenuController.class);
+
+  private static final Gauge constantsTimestamp = Gauge
+      .build("miso_constants_timestamp", "The epoch time of the last build of the constants.js file.").register();
 
   private String constantsJs;
   private long constantsJsTime;
@@ -282,6 +288,7 @@ public class MenuController implements ServletContextAware {
     node.put("automaticLibraryAlias", namingScheme.hasLibraryAliasGenerator());
     node.put("libraryDilutionConcentrationUnits", LibraryDilution.UNITS);
     node.put("poolConcentrationUnits", PoolImpl.CONCENTRATION_UNITS);
+    node.put("sampleConcentrationUnits", Sample.CONCENTRATION_UNITS);
 
     final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 
@@ -357,6 +364,7 @@ public class MenuController implements ServletContextAware {
     // data, we don't really care since the results are probably the same and jitter of a few seconds is a small error in cache time.
     constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";
     constantsJsTime = System.currentTimeMillis();
+    constantsTimestamp.set(constantsJsTime / 1000.0);
     return constantsJs;
   }
 }

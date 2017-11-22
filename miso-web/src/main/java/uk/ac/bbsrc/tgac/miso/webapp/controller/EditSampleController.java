@@ -258,6 +258,11 @@ public class EditSampleController {
     return stainService.list();
   }
 
+  @ModelAttribute("sampleConcentrationUnits")
+  public String sampleConcentrationUnits() {
+    return Sample.CONCENTRATION_UNITS;
+  }
+
   public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId)
       throws IOException {
     Project p = s.getProject();

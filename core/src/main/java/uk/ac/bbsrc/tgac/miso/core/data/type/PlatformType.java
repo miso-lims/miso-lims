@@ -30,17 +30,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.IonTorrentRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
+import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 
 /**
  * Enum representing the different platform types available
@@ -79,10 +81,15 @@ public enum PlatformType {
       return new PacBioRun(user);
     }
   }, //
-  OXFORDNANOPORE("OxfordNanopore", "Flow Cell", "Flow Cell", "Flow Cells", "nM", null) {
+  OXFORDNANOPORE("Oxford Nanopore", "Flow Cell", "Flow Cell", "Flow Cells", "nM", null) {
     @Override
     public Run createRun(User user) {
-      throw new NotImplementedException();
+      return new OxfordNanoporeRun(user);
+    }
+
+    @Override
+    public SequencerPartitionContainer createContainer() {
+      return new OxfordNanoporeContainer();
     }
   };
 
@@ -179,6 +186,10 @@ public enum PlatformType {
   }
 
   public abstract Run createRun(User user);
+
+  public SequencerPartitionContainer createContainer() {
+    return new SequencerPartitionContainerImpl();
+  }
 
   public String getPluralPartitionName() {
     return pluralPartitionName;

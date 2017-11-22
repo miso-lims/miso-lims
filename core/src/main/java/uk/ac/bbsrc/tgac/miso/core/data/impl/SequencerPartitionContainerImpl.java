@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -36,6 +37,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -53,6 +56,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
@@ -70,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @Entity
 @Table(name = "SequencerPartitionContainer")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class SequencerPartitionContainerImpl implements SequencerPartitionContainer {
 
   private static final long serialVersionUID = 1L;
@@ -128,6 +133,10 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @ManyToOne
   @JoinColumn(name = "multiplexingKit")
   private KitDescriptor multiplexingKit;
+
+  @OneToMany(targetEntity = ContainerQC.class, mappedBy = "container")
+  private final Collection<ContainerQC> containerQCs = new TreeSet<>();
+
   /**
    * Construct a new SequencerPartitionContainer with a default empty SecurityProfile
    */
@@ -379,7 +388,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   @Override
   public String getAlias() {
-    return "";
+    return getIdentificationBarcode();
   }
 
   @Override
@@ -410,4 +419,14 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     }
 
   };
+
+  @Override
+  public Collection<ContainerQC> getQCs() {
+    return containerQCs;
+  }
+
+  @Override
+  public QcTarget getQcTarget() {
+    return QcTarget.Container;
+  }
 }

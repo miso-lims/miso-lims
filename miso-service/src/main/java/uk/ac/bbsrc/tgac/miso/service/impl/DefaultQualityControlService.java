@@ -11,6 +11,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.QualityControlEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.store.ContainerQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.QcTargetStore;
@@ -28,6 +29,8 @@ public class DefaultQualityControlService implements QualityControlService {
   private LibraryQcStore libraryQcStore;
   @Autowired
   private PoolQcStore poolQcStore;
+  @Autowired
+  private ContainerQcStore containerQcStore;
   @Autowired
   private QualityControlTypeStore qcTypeStore;
   @Autowired
@@ -69,6 +72,8 @@ public class DefaultQualityControlService implements QualityControlService {
       return poolQcStore;
     case Sample:
       return sampleQcStore;
+    case Container:
+      return containerQcStore;
     default:
       throw new IllegalArgumentException("Unknown QC target: " + target);
     }
@@ -94,6 +99,10 @@ public class DefaultQualityControlService implements QualityControlService {
 
   public void setPoolQcStore(PoolQcStore poolQcStore) {
     this.poolQcStore = poolQcStore;
+  }
+
+  public void setContainerQcStore(ContainerQcStore containerQcStore) {
+    this.containerQcStore = containerQcStore;
   }
 
   public void setQcTypeStore(QualityControlTypeStore qcTypeStore) {

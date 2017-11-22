@@ -27,16 +27,20 @@ ListTarget.container = {
     return "/miso/rest/container/dt" + (config.platformType ? "/platform/" + config.platformType : "");
   },
   createBulkActions: function(config, projectId) {
-    return config.runId ? [{
-      name: "Remove",
-      action: function(containers) {
-        Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/run/' + config.runId + '/remove', containers.map(Utils.array.getId),
-            Utils.page.pageReload);
+    var actions = HotUtils.makeQcActions('Container');
+    if (config.runId) {
+      actions.push({
+        name: "Remove",
+        action: function(containers) {
+          Utils.ajaxWithDialog('Removing', 'POST', '/miso/rest/run/' + config.runId + '/remove', containers.map(Utils.array.getId),
+              Utils.page.pageReload);
 
-      }
+        }
+      });
+    } else {
+      actions.push(HotUtils.printAction('container'));
     }
-
-    ] : [HotUtils.printAction('container')];
+    return actions;
   },
   createStaticActions: function(config, projectId) {
     var platformType = Utils.array.findFirstOrNull(function(pt) {
@@ -69,35 +73,42 @@ ListTarget.container = {
 
     }
 
-    return [
-        {
-          "name": "Add " + platformType.containerName,
-          "handler": function() {
-            Utils.showWizardDialog("Add " + platformType.containerName, Constants.platforms.filter(function(p) {
-              return p.platformType == config.platformType && p.active;
-            }).sort(Utils.sorting.standardSort('instrumentModel')).map(
-                function(platform) {
-                  return {
-                    name: platform.instrumentModel,
-                    handler: function() {
-                      Utils.showWizardDialog("Add " + platform.instrumentModel + " " + platformType.containerName,
-                          platform.partitionSizes.map(function(size) {
+    return [{
+      "name": "Add " + platformType.containerName,
+      "handler": function() {
+        var models = Constants.platforms.filter(function(p) {
+          return p.platformType == config.platformType && p.active;
+        }).sort(Utils.sorting.standardSort('instrumentModel')).map(function(platform) {
+          return {
+            name: platform.instrumentModel,
+            handler: function() {
+              var sizes = platform.partitionSizes.map(function(size) {
 
-                            return {
-                              name: size + " " + (size == 1 ? platformType.partitionName : platformType.pluralPartitionName),
-                              handler: function() {
-                                window.location = "/miso/container/new/" + platform.id + "?count=" + size;
-                              }
-                            };
+                return {
+                  name: size + " " + (size == 1 ? platformType.partitionName : platformType.pluralPartitionName),
+                  handler: function() {
+                    window.location = "/miso/container/new/" + platform.id + "?count=" + size;
+                  }
+                };
 
-                          }));
+              });
+              if (sizes.length == 1) {
+                sizes[0].handler();
+              } else {
+                Utils.showWizardDialog("Add " + platform.instrumentModel + " " + platformType.containerName, sizes);
+              }
 
-                    }
-                  };
-                }));
+            }
+          };
+        });
+        if (models.length == 1) {
+          models[0].handler();
+        } else {
+          Utils.showWizardDialog("Add " + platformType.containerName, models);
+        }
 
-          }
-        }, ];
+      }
+    }, ];
   },
   createColumns: function(config, projectId) {
     return [ListUtils.labelHyperlinkColumn("Serial Number", "container", Utils.array.getId, "identificationBarcode", 1, true), {

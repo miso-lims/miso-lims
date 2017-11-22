@@ -99,7 +99,29 @@ FOR EACH ROW
     FROM Run WHERE Run.runId = NEW.runId;
   END IF;
   END//
-  
+
+DROP TRIGGER IF EXISTS RunChangeOxfordNanopore//
+CREATE TRIGGER RunChangeOxfordNanopore BEFORE UPDATE ON RunOxfordNanopore
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500) CHARACTER SET utf8;
+  SET log_message = CONCAT_WS(', ',
+        CASE WHEN (NEW.minKnowVersion IS NULL) <> (OLD.minKnowVersion IS NULL) OR NEW.minKnowVersion <> OLD.minKnowVersion THEN CONCAT('MinKNOW version: ', COALESCE(OLD.minKnowVersion, 'n/a'), ' → ', COALESCE(NEW.minKnowVersion, 'n/a')) END,
+        CASE WHEN (NEW.protocolVersion IS NULL) <> (OLD.protocolVersion IS NULL) OR NEW.protocolVersion <> OLD.protocolVersion THEN CONCAT('Protocol version: ', COALESCE(OLD.protocolVersion, 'n/a'), ' → ', COALESCE(NEW.protocolVersion, 'n/a')) END);
+  IF log_message IS NOT NULL AND log_message <> '' THEN
+    INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime)
+    SELECT
+      NEW.runId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN (NEW.minKnowVersion IS NULL) <> (OLD.minKnowVersion IS NULL) OR NEW.minKnowVersion <> OLD.minKnowVersion THEN 'MinKNOW version' END,
+        CASE WHEN (NEW.protocolVersion IS NULL) <> (OLD.protocolVersion IS NULL) OR NEW.protocolVersion <> OLD.protocolVersion THEN 'Protocol version' END), ''),
+      lastModifier,
+      log_message,
+      lastModified
+    FROM Run WHERE Run.runId = NEW.runId;
+  END IF;
+  END//
+
 DROP TRIGGER IF EXISTS RunInsert//
 CREATE TRIGGER RunInsert AFTER INSERT ON Run
 FOR EACH ROW

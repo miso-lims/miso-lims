@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
+import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
@@ -352,10 +353,12 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       applyLS454Changes((LS454Run) target, (LS454Run) source);
     } else if (isSolidRun(target)) {
       applySolidChanges((SolidRun) target, (SolidRun) source);
+    } else if (isOxfordNanoporeRun(target)) {
+      applyOxfordNanoporeChanges((OxfordNanoporeRun) target, (OxfordNanoporeRun) source);
     }
   }
 
-  private void applyIlluminaChanges(IlluminaRun target, IlluminaRun source) throws IOException {
+  private void applyIlluminaChanges(IlluminaRun target, IlluminaRun source) {
     target.setCallCycle(source.getCallCycle());
     target.setImgCycle(source.getImgCycle());
     target.setNumCycles(source.getNumCycles());
@@ -363,13 +366,18 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setPairedEnd(source.getPairedEnd());
   }
 
-  private void applyLS454Changes(LS454Run target, LS454Run source) throws IOException {
+  private void applyLS454Changes(LS454Run target, LS454Run source) {
     target.setCycles(source.getCycles());
     target.setPairedEnd(source.getPairedEnd());
   }
 
-  private void applySolidChanges(SolidRun target, SolidRun source) throws IOException {
+  private void applySolidChanges(SolidRun target, SolidRun source) {
     target.setPairedEnd(source.getPairedEnd());
+  }
+
+  private void applyOxfordNanoporeChanges(OxfordNanoporeRun target, OxfordNanoporeRun source) {
+    target.setMinKnowVersion(isStringEmptyOrNull(source.getMinKnowVersion()) ? null : source.getMinKnowVersion());
+    target.setProtocolVersion(isStringEmptyOrNull(source.getProtocolVersion()) ? null : source.getProtocolVersion());
   }
 
   /**

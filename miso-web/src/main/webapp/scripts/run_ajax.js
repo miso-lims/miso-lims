@@ -79,6 +79,14 @@ var Run = Run || {
     jQuery('#cycles').attr('data-parsley-maxlength', '10');
     jQuery('#cycles').attr('data-parsley-type', 'number');
 
+    jQuery('#minKnowVersion').attr('class', 'form-control');
+    jQuery('#minKnowVersion').attr('data-parsley-maxlength', '100');
+    jQuery('#minKnowVersion').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    jQuery('#protocolVersion').attr('class', 'form-control');
+    jQuery('#protocolVersion').attr('data-parsley-maxlength', '100');
+    jQuery('#protocolVersion').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
     if (!document.getElementById('startDate').disabled) {
       jQuery('#startDate').attr('class', 'form-control');
       jQuery('#startDate').attr('data-parsley-pattern', Utils.validation.dateRegex);

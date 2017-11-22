@@ -394,7 +394,7 @@
           </td>
         </tr>
         <tr>
-          <td class="h">Concentration (nM):</td>
+          <td class="h">Concentration (${sampleConcentrationUnits}):</td>
           <td><form:input id="concentration" path="concentration"/></td>
         </tr>
       </table>
