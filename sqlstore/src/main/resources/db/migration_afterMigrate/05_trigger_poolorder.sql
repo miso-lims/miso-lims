@@ -20,7 +20,7 @@ FOR EACH ROW
   INSERT INTO PoolChangeLog(poolId, columnsChanged, userId, message) VALUES (
     OLD.poolId,
     '',
-    OLD.updatedBy,
+    (SELECT lastModifier FROM Pool WHERE poolId = OLD.poolId),
     CONCAT(
       'Removed order: ',
       OLD.partitions,
