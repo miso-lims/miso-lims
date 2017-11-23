@@ -8,7 +8,7 @@ SELECT sc.alias NAME
         ,MAX(scl.lastUpdated) latest 
 FROM DetailedSample sai 
 JOIN SampleClass sc ON sc.sampleClassId = sai.sampleClassId 
-JOIN ( 
+LEFT JOIN ( 
         SELECT sampleId, MAX(changeTime) lastUpdated, MIN(changeTime) creationDate  
         FROM SampleChangeLog GROUP BY sampleId 
         ) scl ON sai.sampleId = scl.sampleId 
@@ -27,7 +27,7 @@ SELECT NULL NAME
 FROM Library l 
 JOIN DetailedLibrary lai ON lai.libraryId = l.libraryId 
 JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType 
-JOIN ( 
+LEFT JOIN ( 
         SELECT libraryId, MAX(changeTime) lastUpdated 
         FROM LibraryChangeLog GROUP BY libraryId 
         ) lcl ON l.libraryId = lcl.libraryId 
@@ -44,6 +44,6 @@ SELECT NULL NAME
         ,MIN(d.creationDate) earliest 
         ,MAX(d.lastUpdated) latest 
 FROM LibraryDilution d 
-JOIN Library l ON l.libraryId = d.library_libraryId 
+LEFT JOIN Library l ON l.libraryId = d.library_libraryId 
 JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType 
 GROUP BY l.libraryType

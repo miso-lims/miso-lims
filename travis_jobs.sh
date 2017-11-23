@@ -22,6 +22,9 @@ elif [ "$JOB" = "RUNSCANNER_TEST" ]; then
     pushd runscanner-illumina && ./build-illumina-interop && autoreconf -i && ./configure && make && popd;
     cd runscanner
     PATH=$PATH:$(pwd)/../runscanner-illumina mvn -P external clean test -DskipIllumina=false
+elif [ "$JOB" = "PINERY_IT" ]; then
+    cd pinery-miso
+    mvn clean verify -DskipUTs=true -DskipITs=false
 else
     echo "unknown job"
     exit 1

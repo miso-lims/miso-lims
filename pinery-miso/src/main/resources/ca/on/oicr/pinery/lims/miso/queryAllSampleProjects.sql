@@ -14,7 +14,7 @@ FROM (
         FROM DetailedSample sai 
         INNER JOIN Sample s ON s.sampleId = sai.sampleId 
         INNER JOIN Project sp ON sp.projectId = s.project_projectId 
-        INNER JOIN (SELECT sampleId, MAX(changeTime) as lastUpdated, MIN(changeTime) as creationDate from SampleChangeLog GROUP BY sampleId) scl ON s.sampleId = scl.sampleId 
+        LEFT JOIN (SELECT sampleId, MAX(changeTime) as lastUpdated, MIN(changeTime) as creationDate from SampleChangeLog GROUP BY sampleId) scl ON s.sampleId = scl.sampleId 
          
         UNION ALL 
          
@@ -26,6 +26,6 @@ FROM (
         INNER JOIN Library l ON l.libraryId = lai.libraryId 
         INNER JOIN Sample ls ON l.sample_sampleId = ls.sampleId 
         INNER JOIN Project lp ON lp.projectId = ls.project_projectId 
-        INNER JOIN (SELECT libraryId, MAX(changeTime) as lastUpdated, MIN(changeTime) as creationDate from LibraryChangeLog GROUP BY libraryId) lcl ON l.libraryId = lcl.libraryId 
+        LEFT JOIN (SELECT libraryId, MAX(changeTime) as lastUpdated, MIN(changeTime) as creationDate from LibraryChangeLog GROUP BY libraryId) lcl ON l.libraryId = lcl.libraryId 
         ) combined 
 GROUP BY NAME
