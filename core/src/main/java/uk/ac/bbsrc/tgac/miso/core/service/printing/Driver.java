@@ -74,29 +74,24 @@ public enum Driver {
     public String encode(Barcodable barcodable) {
       StringBuilder sb = new StringBuilder();
 
-      try {
-        String barcode = getBarcode64(barcodable);
-        sb.append("mm\n");
-        sb.append("J\n");
-        sb.append("O R\n");
-        sb.append("S l1;0.0,0.00,17.95,17.95,46.41\n");
-        sb.append("B 4,5,0,DATAMATRIX,0.5;").append(barcode).append("\n");
-        sb.append("T 15,7,0,5,4;");
-        appendTruncated(12, barcodable.getName(), s -> appendBradyEscapedUnicode(sb, s));
+      String barcode = getBarcode(barcodable);
+      sb.append("mm\n");
+      sb.append("J\n");
+      sb.append("O R\n");
+      sb.append("S l1;0.0,0.00,17.95,17.95,46.41\n");
+      sb.append("B 4,5,0,DATAMATRIX,0.5;").append(barcode).append("\n");
+      sb.append("T 15,7,0,5,4;");
+      appendTruncated(12, barcodable.getName(), s -> appendBradyEscapedUnicode(sb, s));
+      sb.append("\n");
+      sb.append("T 15,12,0,3,4;");
+      appendTruncated(12, barcodable.getLabelText(), s -> appendBradyEscapedUnicode(sb, s));
+      sb.append("\n");
+      if (barcodable.getBarcodeDate() != null) {
+        sb.append("T 15,17,0,3,4;");
+        sb.append(LimsUtils.formatDate(barcodable.getBarcodeDate()));
         sb.append("\n");
-        sb.append("T 15,12,0,3,4;");
-        appendTruncated(12, barcodable.getLabelText(), s -> appendBradyEscapedUnicode(sb, s));
-        sb.append("\n");
-        if (barcodable.getBarcodeDate() != null) {
-          sb.append("T 15,17,0,3,4;");
-          sb.append(LimsUtils.formatDate(barcodable.getBarcodeDate()));
-          sb.append("\n");
-        }
-        sb.append("A 1\n");
-      } catch (UnsupportedEncodingException e) {
-        log.error("get raw state", e);
-        return null;
       }
+      sb.append("A 1\n");
       return sb.toString();
     }
   },
@@ -105,35 +100,30 @@ public enum Driver {
     public String encode(Barcodable barcodable) {
       StringBuilder sb = new StringBuilder();
 
-      try {
-        String barcode = getBarcode64(barcodable);
-        sb.append("mm\n");
-        sb.append("J\n");
-        sb.append("O R\n");
-        sb.append("S l1;0.0,0.00,25.0,25.5,25.0\n");
-        sb.append("B 18,2,0,DATAMATRIX,0.3;").append(barcode).append("\n");
-        if (barcodable.getLabelText().length() > 14) {
-          sb.append("T 1.5,3,0,3,2;");
-          appendBradyEscapedUnicode(sb, barcodable.getLabelText().substring(0, 14));
-          sb.append("\n");
-          sb.append("T 1.5,6,0,3,2;");
-          appendTruncated(14, barcodable.getLabelText().substring(14), s -> appendBradyEscapedUnicode(sb, s));
-          sb.append("\n");
-        } else {
-          sb.append("T 1.5,3,0,3,2;");
-          appendTruncated(14, barcodable.getLabelText(), s -> appendBradyEscapedUnicode(sb, s));
-          sb.append("\n");
-        }
-        if (barcodable.getBarcodeDate() != null) {
-          sb.append("T 1.5,9,0,3,2;");
-          sb.append(LimsUtils.formatDate(barcodable.getBarcodeDate()));
-          sb.append("\n");
-        }
-        sb.append("A 1\n");
-      } catch (UnsupportedEncodingException e) {
-        log.error("get raw state", e);
-        return null;
+      String barcode = getBarcode(barcodable);
+      sb.append("mm\n");
+      sb.append("J\n");
+      sb.append("O R\n");
+      sb.append("S l1;0.0,0.00,25.0,25.5,25.0\n");
+      sb.append("B 18,2,0,DATAMATRIX,0.3;").append(barcode).append("\n");
+      if (barcodable.getLabelText().length() > 14) {
+        sb.append("T 1.5,3,0,3,2;");
+        appendBradyEscapedUnicode(sb, barcodable.getLabelText().substring(0, 14));
+        sb.append("\n");
+        sb.append("T 1.5,6,0,3,2;");
+        appendTruncated(14, barcodable.getLabelText().substring(14), s -> appendBradyEscapedUnicode(sb, s));
+        sb.append("\n");
+      } else {
+        sb.append("T 1.5,3,0,3,2;");
+        appendTruncated(14, barcodable.getLabelText(), s -> appendBradyEscapedUnicode(sb, s));
+        sb.append("\n");
       }
+      if (barcodable.getBarcodeDate() != null) {
+        sb.append("T 1.5,9,0,3,2;");
+        sb.append(LimsUtils.formatDate(barcodable.getBarcodeDate()));
+        sb.append("\n");
+      }
+      sb.append("A 1\n");
       return sb.toString();
     }
   },
