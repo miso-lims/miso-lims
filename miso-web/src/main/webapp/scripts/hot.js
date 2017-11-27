@@ -314,6 +314,11 @@ var HotUtils = {
         });
       }
 
+      // render immediately to allow "loading" type messages
+      if (updateJobs.length > 0 && needsRender) {
+        table.render();
+      }
+
       jQuery.when.apply(jQuery, updateJobs).always(function() {
         if (needsRender) {
           table.validateCells(function() {
