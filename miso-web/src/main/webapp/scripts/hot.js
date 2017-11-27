@@ -216,7 +216,6 @@ var HotUtils = {
                 } else {
                   incrementingContentColumns[key]['template'] = template;
                 }
-                incrementing = false;
                 continue;
               }
               if (incrementing) {
@@ -271,7 +270,6 @@ var HotUtils = {
     cellMetaData.forEach(function(data) {
       table.setCellMeta(data.row, data.col, data.key, data.val);
     });
-    var initialSetup = true;
     table.addHook('afterChange', function(changes, source) {
       var needsRender = false;
       // 'changes' is a variable-length array of arrays. Each inner array has
@@ -549,7 +547,6 @@ var HotUtils = {
             });
     table.validateCells(function() {
       table.render();
-      initialSetup = false;
     });
   },
 
