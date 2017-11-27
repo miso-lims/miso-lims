@@ -280,6 +280,7 @@ HotTarget.sample = (function() {
                 && config.targetSampleClass.sampleCategory != 'Identity',
             depends: 'externalName',
             update: function(sam, flat, value, setReadOnly, setOptions, setData) {
+              var deferred = jQuery.Deferred();
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
               var selectedProject = config.project || Utils.array.findFirstOrNull(function(project) {
                 return project[label] == flat.projectAlias;
@@ -291,70 +292,62 @@ HotTarget.sample = (function() {
               }
               if (!Utils.validation.isEmpty(flat.externalName)) {
                 setData('(...searching...)');
-                getIdentities(HotUtils.counter);
+                getIdentities();
               }
+              return deferred.promise();
 
-              function getIdentities(requestCounter) {
+              function getIdentities() {
                 jQuery.ajax({
                   url: "/miso/rest/tree/identities",
                   data: JSON.stringify({
-                    "identitiesSearches": flat.externalName,
-                    "requestCounter": requestCounter
+                    "identitiesSearches": flat.externalName
                   }),
                   contentType: "application/json; charset=utf8",
                   dataType: "json",
                   type: "POST"
                 }).success(
                     function(data) {
-                      // make sure the counter lines up with the one from
-                      // the original request
-                      if (data.requestCounter == requestCounter) {
-                        var potentialIdentities = [];
-
-                        if (selectedProject == null) {
-                          // let the user know they need to select a project
-                          setData("Select a project");
+                      var potentialIdentities = [];
+                      // sort with identities from selected project on top
+                      var identitiesSources = [];
+                      if (data.matchingIdentities.length > 0) {
+                        data.matchingIdentities.sort(function(a, b) {
+                          var aSortId = a.projectId == selectedProject.id ? 0 : a.projectId;
+                          var bSortId = b.projectId == selectedProject.id ? 0 : b.projectId;
+                          return aSortId - bSortId;
+                        })
+                        potentialIdentities = data.matchingIdentities;
+                        for (var i = 0; i < potentialIdentities.length; i++) {
+                          var identityLabel = potentialIdentities[i].alias + " -- " + potentialIdentities[i].externalName;
+                          potentialIdentities[i].label = identityLabel;
+                          identitiesSources.push(identityLabel);
                         }
-                        // sort with identities from selected project on top
-                        var identitiesSources = [];
-                        if (data.matchingIdentities.length > 0) {
-                          data.matchingIdentities.sort(function(a, b) {
-                            var aSortId = a.projectId == selectedProject.id ? 0 : a.projectId;
-                            var bSortId = b.projectId == selectedProject.id ? 0 : b.projectId;
-                            return aSortId - bSortId;
-                          })
-                          potentialIdentities = data.matchingIdentities;
-                          for (var i = 0; i < potentialIdentities.length; i++) {
-                            var identityLabel = potentialIdentities[i].alias + " -- " + potentialIdentities[i].externalName;
-                            potentialIdentities[i].label = identityLabel;
-                            identitiesSources.push(identityLabel);
-                          }
-                        }
-
-                        var indexOfMatchingIdentityInProject = -1;
-                        for (i = 0; i < data.matchingIdentities.length; i++) {
-                          if (data.matchingIdentities[i].projectId == selectedProject.id
-                              && data.matchingIdentities[i].externalName == flat.externalName) {
-                            indexOfMatchingIdentityInProject = i;
-                            break;
-                          }
-                        }
-                        if (indexOfMatchingIdentityInProject >= 0) {
-                          setData(identitiesSources[indexOfMatchingIdentityInProject]);
-                        } else {
-                          identitiesSources.unshift("First Receipt (" + selectedProject[label] + ")");
-                          setData(identitiesSources[0]);
-                        }
-                        requestCounter++;
-                        flat.potentialIdentities = potentialIdentities;
-                        var cellOptions = {
-                          'source': identitiesSources,
-                          'renderer': (identitiesSources.length > 1 ? HotUtils.multipleOptionsRenderer : Handsontable.AutocompleteRenderer)
-                        };
-                        setOptions(cellOptions);
                       }
+
+                      var indexOfMatchingIdentityInProject = -1;
+                      for (i = 0; i < data.matchingIdentities.length; i++) {
+                        if (data.matchingIdentities[i].projectId == selectedProject.id
+                            && data.matchingIdentities[i].externalName == flat.externalName) {
+                          indexOfMatchingIdentityInProject = i;
+                          break;
+                        }
+                      }
+                      if (indexOfMatchingIdentityInProject >= 0) {
+                        setData(identitiesSources[indexOfMatchingIdentityInProject]);
+                      } else {
+                        identitiesSources.unshift("First Receipt (" + selectedProject[label] + ")");
+                        setData(identitiesSources[0]);
+                      }
+                      flat.potentialIdentities = potentialIdentities;
+                      var cellOptions = {
+                        'source': identitiesSources,
+                        'renderer': (identitiesSources.length > 1 ? HotUtils.multipleOptionsRenderer : Handsontable.AutocompleteRenderer)
+                      };
+                      setOptions(cellOptions);
                     }).fail(function(response, textStatus, serverStatus) {
                   HotUtils.showServerErrors(response, serverStatus);
+                }).always(function() {
+                  deferred.resolve();
                 });
               }
             },

@@ -2,8 +2,6 @@
  * Module for Handsontable code which is shared between multiple instances
  */
 var HotUtils = {
-  /** Request counter for AJAX calls */
-  counter: 0,
   serverErrors: [],
 
   validator: {
@@ -276,13 +274,14 @@ var HotUtils = {
     var initialSetup = true;
     table.addHook('afterChange', function(changes, source) {
       var needsRender = false;
-      var synchronous = true;
       // 'changes' is a variable-length array of arrays. Each inner array has
       // the following structure:
       // [rowIndex, colName, oldValue, newValue]
       if (['edit', 'autofill', 'paste'].indexOf(source) == -1) {
         return;
       }
+      // update function may return a promise. If so, we will wait for it to be resolved/rejected before revalidating and rerendering
+      var updateJobs = [];
       for (var i = 0; i < changes.length; i++) {
         // trigger only if old value is different from new value
         if (changes[i][2] == changes[i][3]) {
@@ -295,7 +294,7 @@ var HotUtils = {
           var flat = flatObjects[currentChange[0]];
           var obj = data[currentChange[0]];
           flat[column.data] = '';
-          column.update(obj, flat, currentChange[3], function(readOnly) {
+          var update = column.update(obj, flat, currentChange[3], function(readOnly) {
             table.setCellMeta(currentChange[0], column.hotIndex, 'readOnly', readOnly);
             needsRender = true;
           }, function(optionsObj) {
@@ -305,30 +304,23 @@ var HotUtils = {
                 needsRender = true;
               }
             }
-            if (needsRender && !synchronous && !initialSetup) {
-              table.validateCells(function() {
-                table.render();
-              })
-            }
           }, function(value) {
             flatObjects[currentChange[0]][column.data] = value;
             needsRender = true;
-
-            if (needsRender && !synchronous && !initialSetup) {
-              table.validateCells(function() {
-                table.render();
-              })
-            }
           });
+          if (update) {
+            updateJobs.push(update);
+          }
         });
       }
 
-      if (needsRender) {
-        table.validateCells(function() {
-          table.render();
-        });
-      }
-      synchronous = false;
+      jQuery.when.apply(jQuery, updateJobs).always(function() {
+        if (needsRender) {
+          table.validateCells(function() {
+            table.render();
+          });
+        }
+      });
     });
 
     // For cells that have change notifiers, we have to call them to set up the
