@@ -1,5 +1,10 @@
+WARNING: This is (probably) not the branch you're looking for!
+===================================================
+
+See the develop branch for the latest updates, or the releases section for recent release versions.
+
 MISO: An open source LIMS for small-to-large scale sequencing centres
-=====================================================================
+---------------------------------------------------------------------
 
 &copy; 2013. [The Genome Analysis Centre] [1], Norwich, UK
 
