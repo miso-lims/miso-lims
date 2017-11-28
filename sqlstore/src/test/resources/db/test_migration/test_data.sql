@@ -577,18 +577,26 @@ INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `library
 VALUES (1, 'DESIGN1', 1, 1, 1, 1), 
 (2, 'DESIGN2', 2, 1, 1, 1);
 
-INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`)
-VALUES (15,1,0,NULL,NULL,NULL),
-(16,2,0,15,1,NULL),
-(17,2,0,15,2,1);
+INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic)
+VALUES (15,1,0,NULL,NULL,NULL,0),
+(16,2,0,15,1,NULL,1),
+(17,2,0,15,2,1,0);
 
 DELETE FROM `Identity`;
 INSERT INTO `Identity` (`sampleId`, `externalName`,`donorSex`)
 VALUES (15, '15_EXT15,EXT15','UNKNOWN');
 
-INSERT INTO `SampleTissue`(`sampleId`)
-VALUES (16),
-(17);
+DELETE FROM `TissueOrigin`;
+INSERT INTO `TissueOrigin`(`tissueOriginId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,'Test Origin','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
+
+DELETE FROM `TissueType`;
+INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
+
+INSERT INTO SampleTissue(sampleId, tissueOriginId, tissueTypeId, timesReceived, tubeNumber)
+VALUES (16, 1, 1, 1, 1),
+(17, 1, 1, 1, 2);
 
 DELETE FROM `Institute`;
 INSERT INTO `Institute`(`instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
@@ -605,14 +613,6 @@ VALUES ('1', '1', '1', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:0
 INSERT INTO `SampleNumberPerProject`
 (`sampleNumberPerProjectId`, `projectId`, `highestSampleNumber`, `padding`, `createdBy`, `updatedBy`, `creationDate`, `lastUpdated`)
 VALUES ('2', '3', '9999', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:32:00');
-
-DELETE FROM `TissueOrigin`;
-INSERT INTO `TissueOrigin`(`tissueOriginId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,'Test Origin','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
-
-DELETE FROM `TissueType`;
-INSERT INTO `TissueType`(`tissueTypeId`, `alias`, `description`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:00');
 
 DELETE FROM `DetailedLibrary`;
 INSERT INTO `DetailedLibrary`(`libraryId`, `libraryDesignCodeId`)

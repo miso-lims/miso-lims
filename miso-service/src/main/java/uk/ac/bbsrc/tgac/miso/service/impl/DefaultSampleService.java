@@ -40,12 +40,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
@@ -103,8 +103,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   @Autowired
   private SampleValidRelationshipService sampleValidRelationshipService;
   @Autowired
-  private SampleNumberPerProjectService sampleNumberPerProjectService;
-  @Autowired
   private ProjectStore projectStore;
   @Autowired
   private TissueOriginDao tissueOriginDao;
@@ -145,10 +143,6 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   public void setSampleValidRelationshipService(SampleValidRelationshipService sampleValidRelationshipService) {
     this.sampleValidRelationshipService = sampleValidRelationshipService;
-  }
-
-  public void setSampleNumberPerProjectService(SampleNumberPerProjectService sampleNumberPerProjectService) {
-    this.sampleNumberPerProjectService = sampleNumberPerProjectService;
   }
 
   public void setProjectStore(ProjectStore projectStore) {
@@ -220,22 +214,31 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     authorizationManager.throwIfNotWritable(sample);
     setChangeDetails(sample);
     if (isDetailedSample(sample)) {
+      DetailedSample detailed = (DetailedSample) sample;
       if (!isIdentitySample(sample)) {
-        DetailedSample detailed = (DetailedSample) sample;
-        try {
-          detailed.setParent(findOrCreateParent(detailed));
-          detailed.inheritPermissions(detailed.getParent());
-        } catch (MisoNamingException e) {
-          throw new IOException(e.getMessage(), e);
+        if (detailed.getParent() == null) {
+          throw new IllegalArgumentException("Detailed sample is missing parent identifier");
+        }
+        if (detailed.getParent().getId() != SampleImpl.UNSAVED_ID) {
+          detailed.setParent((DetailedSample) get(detailed.getParent().getId()));
+        } else {
+          try {
+            setIdentity(detailed);
+            if (!isIdentitySample(detailed.getParent())) {
+              detailed.setParent(findOrCreateParent(detailed));
+            }
+          } catch (MisoNamingException e) {
+            throw new IOException(e.getMessage(), e);
+          }
         }
         validateHierarchy(detailed);
       } else {
-        sample.inheritPermissions(sample.getProject());
         if (isUniqueExternalNameWithinProjectRequired() && isExternalNameDuplicatedInProject(sample)) {
           throw new IllegalArgumentException("Sample with external name '" + ((SampleIdentity) sample).getExternalName()
               + "' already exists in project " + sample.getProject().getShortName());
         }
       }
+      detailed.inheritPermissions(detailed.getParent() == null ? detailed.getProject() : detailed.getParent());
     } else {
       sample.inheritPermissions(sample.getProject());
     }
@@ -397,41 +400,21 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     if (sample.getParent() == null) {
       throw new IllegalArgumentException("Detailed sample is missing parent identifier");
     }
-    Sample tempParent = sample.getParent();
+    DetailedSample tempParent = sample.getParent();
     if (tempParent.getId() != Sample.UNSAVED_ID) {
       Sample parent = sampleDao.getSample(tempParent.getId());
       if (parent == null)
         throw new IllegalArgumentException("Parent sample does not exist");
       else
         return (DetailedSample) parent;
-    } else if (isIdentitySample(tempParent)) {
-      if (sample.getIdentityId() != null) {
-        return (DetailedSample) sampleDao.getSample(sample.getIdentityId());
-      } else {
-        // If samples are being bulk received for the same new donor, they will all have a null parentId.
-        // After the new donor's Identity is created, the following samples need to be parented to that now-existing Identity.
-        Collection<SampleIdentity> newlyCreated = getIdentitiesByExternalNameAndProject(((SampleIdentity) tempParent).getExternalName(),
-            sample.getProject().getId());
-        if (newlyCreated.size() > 1) {
-          throw new IllegalArgumentException(
-              "IdentityId is required since there are multiple identities with external name " + ((SampleIdentity) tempParent).getExternalName()
-                  + " in project " + sample.getProject().getId());
-        } else if (newlyCreated.size() == 1) {
-          Sample parent = newlyCreated.iterator().next();
-          if (parent == null)
-            throw new IllegalArgumentException("Parent sample does not exist");
-          else
-            return (DetailedSample) parent;
-        } else {
-          try {
-            return createParentIdentity(sample);
-          } catch (SQLException e) {
-            throw new IOException(e);
-          }
+    } else {
+      if (isTissueSample(tempParent) && isIdentitySample(tempParent.getParent())) {
+        DetailedSample tissueParent = sampleDao.getMatchingGhostTissue((SampleTissue) tempParent);
+        if (tissueParent != null) {
+          return tissueParent;
         }
       }
-    } else {
-      return createGhostParent((DetailedSample) tempParent, sample);
+      return createGhostParent(tempParent, sample);
     }
   }
 
@@ -455,7 +438,55 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     return parent;
   }
 
-  private SampleIdentity createParentIdentity(DetailedSample sample) throws IOException, MisoNamingException, SQLException {
+  private void setIdentity(DetailedSample descendant) throws IOException, MisoNamingException {
+    if (descendant.getParent() == null) {
+      throw new IllegalArgumentException("Detailed sample is missing parent identifier");
+    }
+    DetailedSample child = descendant;
+    DetailedSample parent = descendant.getParent();
+    while (parent.getParent() != null) {
+      child = parent;
+      parent = child.getParent();
+    }
+    if (!isIdentitySample(parent)) {
+      throw new IllegalStateException("Missing Identity at root of hierarchy");
+    }
+    if (descendant.getIdentityId() != null) {
+      parent.setId(descendant.getIdentityId());
+    }
+    SampleIdentity identity = findOrCreateIdentity(descendant, (SampleIdentity) parent);
+    child.setParent(identity);
+  }
+
+  private SampleIdentity findOrCreateIdentity(DetailedSample descendant, SampleIdentity identity) throws IOException, MisoNamingException {
+    if (identity.getId() != SampleImpl.UNSAVED_ID) {
+      return (SampleIdentity) sampleDao.getSample(identity.getId());
+    } else {
+      // If samples are being bulk received for the same new donor, they will all have a null parentId.
+      // After the new donor's Identity is created, the following samples need to be parented to that now-existing Identity.
+      Collection<SampleIdentity> newlyCreated = getIdentitiesByExternalNameAndProject(identity.getExternalName(),
+          descendant.getProject().getId());
+      if (newlyCreated.size() > 1) {
+        throw new IllegalArgumentException(
+            "IdentityId is required since there are multiple identities with external name "
+                + identity.getExternalName()
+                + " in project " + descendant.getProject().getId());
+      } else if (newlyCreated.size() == 1) {
+        Sample parent = newlyCreated.iterator().next();
+        if (parent == null) throw new IllegalArgumentException("Parent sample does not exist");
+        else return (SampleIdentity) parent;
+      } else {
+        try {
+          return createParentIdentity(descendant, identity);
+        } catch (SQLException e) {
+          throw new IOException(e);
+        }
+      }
+    }
+  }
+
+  private SampleIdentity createParentIdentity(DetailedSample sample, SampleIdentity identity) throws IOException, MisoNamingException,
+      SQLException {
     log.debug("Creating a new Identity to use as a parent.");
     List<SampleClass> identityClasses = sampleClassService.listByCategory(SampleIdentity.CATEGORY_NAME);
     if (identityClasses.size() != 1) {
@@ -463,16 +494,16 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
           + ". Cannot choose which to use as root sample class.");
     }
     SampleClass rootSampleClass = identityClasses.get(0);
-    SampleIdentity shellParent = (SampleIdentity) sample.getParent();
-    confirmExternalNameUniqueForProjectIfRequired(shellParent.getExternalName(), sample);
+    confirmExternalNameUniqueForProjectIfRequired(identity.getExternalName(), sample);
 
     Sample identitySample = new IdentityBuilder().project(sample.getProject())
         .sampleType(sample.getSampleType()).scientificName(sample.getScientificName()).name(generateTemporaryName())
-        .rootSampleClass(rootSampleClass).volume(0D).externalName(shellParent.getExternalName())
-        .donorSex(shellParent.getDonorSex()).build();
+        .rootSampleClass(rootSampleClass).volume(0D).externalName(identity.getExternalName())
+        .donorSex(identity.getDonorSex()).build();
     identitySample.setAlias(namingScheme.generateSampleAlias(identitySample));
 
     setChangeDetails(identitySample);
+    identitySample.inheritPermissions(sample.getProject());
     return (SampleIdentity) save(identitySample, true);
   }
 

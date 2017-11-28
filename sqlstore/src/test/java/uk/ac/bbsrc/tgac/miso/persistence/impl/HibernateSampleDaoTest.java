@@ -27,8 +27,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -324,6 +329,22 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     DetailedSample detailed = (DetailedSample) sample;
     assertNotNull(detailed.getParent());
     assertEquals(15L, detailed.getParent().getId());
+  }
+
+  @Test
+  public void getMatchingGhostTissueTest() throws Exception {
+    SampleTissue tissue = new SampleTissueImpl();
+    tissue.setParent(new SampleIdentityImpl());
+    tissue.getParent().setId(15L);
+    tissue.setTissueOrigin(new TissueOriginImpl());
+    tissue.getTissueOrigin().setId(1L);
+    tissue.setTissueType(new TissueTypeImpl());
+    tissue.getTissueType().setId(1L);
+    tissue.setTimesReceived(1);
+    tissue.setTubeNumber(1);
+    SampleTissue match = dao.getMatchingGhostTissue(tissue);
+    assertNotNull(match);
+    assertEquals(16L, match.getId());
   }
 
 }
