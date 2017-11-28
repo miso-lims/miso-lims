@@ -369,6 +369,7 @@ It is possible to set up multiple run scanners managing different sequencers and
 You can view the run scanner's state from the main page.
 
 # Building the Application
+
 Building the application is done by:
 
     mvn clean package -P external
@@ -384,7 +385,7 @@ To install or upgrade, perform the following steps:
 
 1. Backup your existing database.
 1. Stop Tomcat.
-1. <a href="#migrating">Migrate the database to the newest version</a>. (Described below.)
+1. Migrate the database to the newest version. (Described below.)
 1. Remove `$CATALINA_HOME/webapps/ROOT`.
 1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
 1. Make any necessary configuration changes to `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`.
@@ -398,8 +399,8 @@ To install or upgrade, perform the following steps:
         1. Deploy the run scanner.
         1. Restart the run scanner.
 
-<a id="migrating">
 ## Migrating the database
+
 Updating the database (or setting it up initially) will apply patches to the database using Flyway using the `ROOT.war`.
 
     cd ${FLYWAY}
@@ -430,4 +431,5 @@ Once satisfied, push the image to Docker Hub. Note that only members of the [mis
     docker push "misolims/miso-lims:${version}"
     
 # Monitoring
+
 The main MISO application and Run Scanner can be monitored using [Prometheus](http://prometheus.io/).
