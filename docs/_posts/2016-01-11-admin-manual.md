@@ -90,6 +90,7 @@ need to add a grant privilege to the MISO database from your remote machine:
 
 Download the Flyway command line tool and install it.
 
+<a id="root">
 # Setting Up the Application Server
 The application server needs [Tomcat 8](https://tomcat.apache.org/download-80.cgi).
 
@@ -115,19 +116,11 @@ and populate it with the following information:
       username="tgaclims"
       password="tgaclims"/>
       <Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/>
-      <Parameter name="miso.instanceName" value="Your MISO instance name"/>
-      <!-- uncomment if using Runscanner -->
-      <!--
-      <Parameter name="runscanner.configFile" value="/etc/runscanner.json" override="false"/>
-      -->
     </Context>
 
 Make sure the database path in `ROOT.xml` is correct for your install:
 
     url="jdbc:mysql://your.database.server:3306/lims"
-
-Also, set the `miso.instanceName` parameter to something to help distinguish testing
-and production copies of MISO.
 
 If your Tomcat install has the `autoDeploy="true"` flag set in `server.xml`, if
 you delete the `webapps/ROOT` directory and the `ROOT.war` file, Tomcat will
@@ -193,7 +186,7 @@ To use Active Directory, a specific kind of LDAP, set the security method to
 |-----------------------------|------------------------------------------------------------|
 |`security.ad.emailDomain`    | Domain added to username for lookup (e.g. ad.oicr.on.ca)   |
 |`security.ad.url`            | Url for Active Directory server (e.g. ldap://ad.oicr.on.ca)|
-|`security.ad.stripRolePrefix`| Prefix to be removed from group (e.g. MISO_)               |
+|`security.ad.stripRolePrefix`| Prefix to be removed from group (e.g. MISO\_)               |
 
 The search for a user is done against `userPrincipalName` which takes the form of
 an email address. To login the user will type their username and to do the lookup
@@ -317,18 +310,20 @@ Extending the functionality to validate and/or generate additional fields is pos
 require modifications at the Service layer as well.
 
 # Setting Up the Run Scanner
-The run scanner is a webservice  that scans the paths containing
+The run scanner is a webservice that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
-without it, sequencer runs must be added manually. It can be hosted on the same server as
-MISO, or on a different server.
+without it, sequencer runs must be added manually.
 
 Create a file called `ROOT.xml` in the following directory
-`$CATALINA_HOME/conf/Catalina/localhost` on the machine that will host the run scanner, 
-creating the directory if necessary, and populate it with the following information:
+`$CATALINA_HOME/conf/Catalina/localhost` on the machine that will host the run scanner (create 
+the directory if necessary), and populate it with the following information:
 
     <Context>
        <Parameter name="runscanner.configFile" value="/etc/runscanner.json" override="false"/>
     </Context>
+
+If the run scanner is being hosted on the same machine as MISO is, add this `<Parameter>` inside
+the `<Context>` block of the `ROOT.xml` that you have <a href="#root">created previously</a>. 
 
 In `/etc/runscanner.json`, or another path of your choosing, put JSON data describing your instruments. You will need one record for each instrument:
 
