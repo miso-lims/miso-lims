@@ -145,6 +145,40 @@ public class PlainSampleITs extends AbstractIT {
   }
 
   @Test
+  public void testReceiveLibrary() {
+    BulkLibraryPage page = BulkLibraryPage.getForReceive(getDriver(), getBaseUrl(), 1, null, null);
+    HandsOnTable table = page.getTable();
+
+    Map<String, String> attrs = new LinkedHashMap<>();
+    attrs.put(LibColumns.SAMPLE_ALIAS, "PRO1_S1000_test");
+    attrs.put(SamColumns.SAMPLE_TYPE, "GENOMIC");
+    attrs.put(SamColumns.SCIENTIFIC_NAME, "Hank");
+    attrs.put(SamColumns.PROJECT, "PRO1");
+    attrs.put(LibColumns.RECEIVE_DATE, "2017-11-28");
+    attrs.put(LibColumns.PLATFORM, "Illumina");
+    attrs.put(LibColumns.LIBRARY_TYPE, "Paired End");
+    attrs.put(LibColumns.SELECTION, "PCR");
+    attrs.put(LibColumns.STRATEGY, "WGS");
+    attrs.put(LibColumns.INDEX_FAMILY, "No indices");
+    attrs.put(LibColumns.KIT_DESCRIPTOR, "Test Kit");
+    attrs.put(LibColumns.QC_PASSED, "True");
+    attrs.put(LibColumns.SIZE, "321");
+
+    attrs.forEach((k, v) -> table.enterText(k, 0, v));
+    HandsOnTableSaveResult result = table.save();
+
+    assertTrue("Library save", result.getItemsSaved() == 1);
+    assertTrue("Server errors", result.getServerErrors().isEmpty());
+    assertTrue("Save errors", result.getSaveErrors().isEmpty());
+
+    Long savedId = Long.valueOf(table.getText(LibColumns.NAME, 0).substring(3));
+    Library saved = (Library) getSession().get(LibraryImpl.class, savedId);
+    assertTrue("Library name generation", saved.getName().contains("LIB"));
+    assertTrue("Library barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));
+    assertTrue("Library alias generation", !isStringEmptyOrNull(saved.getAlias()));
+  }
+
+  @Test
   public void testCreatePlainDilutionSetup() {
     // Goal: ensure all expected fields are present and no extra and that data can be entered in date field
     // (date field cannot be entered when table is broken)

@@ -77,10 +77,10 @@ public class BulkLibraryPage extends HeaderFooterPage {
     return new BulkLibraryPage(driver);
   }
 
-  public static BulkLibraryPage getForReceive(WebDriver driver, String baseUrl, int quantity, Integer projectId, int aliquotClassId) {
+  public static BulkLibraryPage getForReceive(WebDriver driver, String baseUrl, int quantity, Integer projectId, Integer aliquotClassId) {
     String url = baseUrl + "miso/library/bulk/receive?quantity=" + quantity
         + "&projectId=" + (projectId == null ? "" : projectId)
-        + "&sampleClassId=" + aliquotClassId;
+        + "&sampleClassId=" + (aliquotClassId == null ? "" : aliquotClassId);
     driver.get(url);
     return new BulkLibraryPage(driver);
   }
