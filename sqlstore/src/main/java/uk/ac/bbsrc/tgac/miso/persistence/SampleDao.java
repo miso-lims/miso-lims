@@ -5,8 +5,9 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 
@@ -48,5 +49,16 @@ public interface SampleDao extends SampleStore {
    * @throws IOException
    */
   Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException;
+
+  /**
+   * Find a ghost Tissue with Identity, Tissue Origin, Tissue Type, times received, tube number, and passage number matching the provided
+   * Tissue
+   * 
+   * @param tissue partially-formed tissue, minimally containing all of the above-noted attributes. Tissue Origin, Tissue Type, and
+   *          parent (Identity) must have their IDs set. Passage number may be null
+   * @return the matching ghost tissue, if one exists; null otherwise
+   * @throws IOException
+   */
+  public SampleTissue getMatchingGhostTissue(SampleTissue tissue) throws IOException;
 
 }

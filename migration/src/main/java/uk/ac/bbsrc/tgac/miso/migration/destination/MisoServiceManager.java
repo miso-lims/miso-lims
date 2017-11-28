@@ -508,7 +508,6 @@ public class MisoServiceManager {
     svc.setProjectStore(projectDao);
     svc.setDetailedQcStatusDao(detailedQcStatusDao);
     svc.setSampleClassService(sampleClassService);
-    svc.setSampleNumberPerProjectService(sampleNumberPerProjectService);
     svc.setSamplePurposeDao(samplePurposeDao);
     svc.setSampleValidRelationshipService(sampleValidRelationshipService);
     svc.setSubProjectDao(subprojectDao);
@@ -1114,7 +1113,7 @@ public class MisoServiceManager {
   }
 
   private void updateSampleNumberPerProjectServiceDependencies() {
-    if (sampleService != null) sampleService.setSampleNumberPerProjectService(sampleNumberPerProjectService);
+    // none
   }
 
   public HibernateSampleNumberPerProjectDao getSampleNumberPerProjectDao() {

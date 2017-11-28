@@ -29,10 +29,13 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
@@ -266,6 +269,37 @@ public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableS
     @SuppressWarnings("unchecked")
     Collection<SampleIdentity> records = criteria.list();
     return records;
+  }
+
+  @Override
+  public SampleTissue getMatchingGhostTissue(SampleTissue tissue) {
+    validateGhostTissueLookup(tissue);
+    Criteria criteria = currentSession().createCriteria(SampleTissueImpl.class);
+    criteria.add(Restrictions.eq("isSynthetic", true));
+    criteria.add(Restrictions.eq("parent.id", tissue.getParent().getId()));
+    criteria.add(Restrictions.eq("tissueOrigin.id", tissue.getTissueOrigin().getId()));
+    criteria.add(Restrictions.eq("tissueType.id", tissue.getTissueType().getId()));
+    criteria.add(Restrictions.eq("timesReceived", tissue.getTimesReceived()));
+    criteria.add(Restrictions.eq("tubeNumber", tissue.getTubeNumber()));
+    if (tissue.getPassageNumber() == null) {
+      criteria.add(Restrictions.isNull("passageNumber"));
+    } else {
+      criteria.add(Restrictions.eq("passageNumber", tissue.getPassageNumber()));
+    }
+    return (SampleTissue) criteria.uniqueResult();
+  }
+
+  private void validateGhostTissueLookup(SampleTissue tissue) {
+    if (tissue.getParent() == null
+        || tissue.getParent().getId() == SampleImpl.UNSAVED_ID
+        || tissue.getTissueOrigin() == null
+        || tissue.getTissueOrigin().getId() == TissueOriginImpl.UNSAVED_ID
+        || tissue.getTissueType() == null
+        || tissue.getTissueType().getId() == TissueTypeImpl.UNSAVED_ID
+        || tissue.getTimesReceived() == null
+        || tissue.getTubeNumber() == null) {
+      throw new IllegalArgumentException("Missing tissue attributes required for lookup");
+    }
   }
 
   @Override
