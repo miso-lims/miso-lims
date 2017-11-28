@@ -442,6 +442,15 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     parent.setVolume(0D);
     parent.setSynthetic(true);
     if (child.getIdentityId() != null) parent.setIdentityId(child.getIdentityId());
+    if (isLcmTubeSample(child)) {
+      SampleSlide parentSlides = (SampleSlide) parent;
+      Integer slides = parentSlides.getSlides() == null ? 0 : parentSlides.getSlides();
+      slides += ((SampleLCMTube) child).getSlidesConsumed();
+      parentSlides.setSlides(slides);
+      if (parentSlides.getId() != SampleImpl.UNSAVED_ID) {
+        update(parentSlides);
+      }
+    }
     create(parent);
     return parent;
   }

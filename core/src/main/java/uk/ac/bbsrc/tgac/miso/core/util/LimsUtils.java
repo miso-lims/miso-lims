@@ -58,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
@@ -207,6 +208,11 @@ public class LimsUtils {
   public static boolean isTissueProcessingSample(Sample sample) {
     if (!isDetailedSample(sample)) return false;
     return sample instanceof SampleTissueProcessing || safeCategoryCheck(sample, SampleTissueProcessing.CATEGORY_NAME);
+  }
+
+  public static boolean isLcmTubeSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleLCMTube;
   }
 
   public static boolean isStockSample(Sample sample) {
