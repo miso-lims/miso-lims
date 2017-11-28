@@ -19,7 +19,6 @@
 > You should have received a copy of the GNU General Public License
 > along with MISO.  If not, see <http://www.gnu.org/licenses/>.
 
-View [Full MISO Documentation](http://tgac.github.io/miso-lims/)
 
 ## Trying MISO
 
@@ -44,12 +43,6 @@ To use it:
 Navigate to [http://localhost:8090](http://localhost:8090) to login to miso with
 the credentials **admin/admin**.
 
-There is a [tutorial available](https://oicr-gsi.github.io/miso-docs-oicr/plain-index)
-for introducing new users to MISO's functionality. Some of the resources (MISO URL,
-ways of contacting the MISO administrators) are specific to Ontario Institute for 
-Cancer Research, but this can be changed by forking and configuring the
-[tutorial repository](https://github.com/oicr-gsi/miso-docs-oicr).
-
 ### Virtual Box
 
 An older version of MISO is available in our our virtual machine image with
@@ -73,23 +66,18 @@ virtual image is `miso` / `misoadmin`.
 certain elements is required, such as _Sequencer References_, Printers and any
 additional users and groups.
 
+## User Tutorial
+
+There is a [tutorial available](https://oicr-gsi.github.io/miso-docs-oicr/plain-index)
+for introducing new users to MISO's functionality. Some of the resources (MISO URL,
+ways of contacting the MISO administrators) are specific to Ontario Institute for
+Cancer Research, but this can be changed by forking and configuring the
+[tutorial repository](https://github.com/oicr-gsi/miso-docs-oicr).
+
 ## Running an Instance of MISO 
 
-To run your own MISO instance in the long term, you will need to maintain your
-own fork of the MISO codebase with your configuration changes. For each
-release, you will need to merge the main changes into your local repository and
-then deploy a new version.
-
-For deployment, you will need a MySQL database server, a server to scan the
-sequencer output directories (the run scanner), and a Tomcat
-application server. These can be on the same machine. It is advisable to
-have a separate build environment.
-
-At each upgrade, there are two steps: migrating the database and deploying a
-new application. Each version of the application contains all the migrations
-needed to upgrade any old database to match the current version. However, there
-is no rollback procedure, so a full database backup should be taken before
-migration.
+To run your own MISO instance in the long term, download the 
+[latest release](https://github.com/TGAC/miso-lims/releases/latest).
 
 Installation and configuration details can be found in the [MISO maintainer guide](docs/_posts/2016-01-11-admin-manual.md).
 
