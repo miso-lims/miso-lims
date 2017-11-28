@@ -97,7 +97,7 @@ Create a file called `ROOT.xml` in the following directory
 `$CATALINA_HOME/conf/Catalina/localhost`, creating the directory if necessary,
 and populate it with the following information:
 
-    <Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT" debug="1">
+    <Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT">
       <Resource name="jdbc/MISODB" type="javax.sql.DataSource"
       driverClassName="com.mysql.jdbc.Driver"
       initialSize="32"
@@ -115,14 +115,18 @@ and populate it with the following information:
       username="tgaclims"
       password="tgaclims"/>
       <Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/>
-      <Parameter name="miso.name" value="Test"/>
+      <Parameter name="miso.instanceName" value="Your MISO instance name"/>
+      <!-- uncomment if using Runscanner -->
+      <!--
+      <Parameter name="runscanner.configFile" value="/etc/runscanner.json" override="false"/>
+      -->
     </Context>
 
 Make sure the database path in `ROOT.xml` is correct for your install:
 
     url="jdbc:mysql://your.database.server:3306/lims"
 
-Also, set the `miso.name` parameter to something to help distinguish testing
+Also, set the `miso.instanceName` parameter to something to help distinguish testing
 and production copies of MISO.
 
 If your Tomcat install has the `autoDeploy="true"` flag set in `server.xml`, if
@@ -315,11 +319,12 @@ require modifications at the Service layer as well.
 # Setting Up the Run Scanner
 The run scanner is a webservice  that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
-without it, sequencer runs must be added manually.
+without it, sequencer runs must be added manually. It can be hosted on the same server as
+MISO, or on a different server.
 
 Create a file called `ROOT.xml` in the following directory
-`$CATALINA_HOME/conf/Catalina/localhost`, creating the directory if necessary,
-and populate it with the following information:
+`$CATALINA_HOME/conf/Catalina/localhost` on the machine that will host the run scanner, 
+creating the directory if necessary, and populate it with the following information:
 
     <Context>
        <Parameter name="runscanner.configFile" value="/etc/runscanner.json" override="false"/>
@@ -376,7 +381,7 @@ Building the application is done by:
 There will be two important build artefacts:
 
 * `miso-web/target/ROOT.war`
-* `notification-server/target/notification-server-*.one-jar.jar`
+* `runscanner/runscanner-*.war`
 
 # Releasing and Upgrading
 
@@ -384,14 +389,16 @@ To install or upgrade, perform the following steps:
 
 1. Backup your existing database.
 1. Stop Tomcat.
-1. Migrate the database to the newest version. (Described below.)
-1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
+1. <a href="#migrating">Migrate the database to the newest version</a>. (Described below.)
 1. Remove `$CATALINA_HOME/webapps/ROOT`.
+1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
+1. Make any necessary configuration changes to `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`.
 1. Start Tomcat.
-1. Stop the notification server.
-1. Copy the `notification-server-*.one-jar.jar` to `/srv/notification-server/notification-server.jar`.
-1. Restart the notification server.
+1. Stop the run scanner.
+1. Deploy the run scanner.
+1. Restart the run scanner.
 
+<a id="migrating">
 ## Migrating the database
 Updating the database (or setting it up initially) will apply patches to the database using Flyway using the `ROOT.war`.
 
@@ -402,7 +409,7 @@ Updating the database (or setting it up initially) will apply patches to the dat
 
 
 
-# Building the Docker image
+# Building the Docker image (after building a release)
 
 Pull the tag or snapshot that you want to build and package it:
 
