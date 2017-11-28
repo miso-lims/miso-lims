@@ -314,16 +314,16 @@ The run scanner is a webservice that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
 without it, sequencer runs must be added manually.
 
-Create a file called `ROOT.xml` in the following directory
-`$CATALINA_HOME/conf/Catalina/localhost` on the machine that will host the run scanner (create 
+If run scanner is being hosted on a separate server from MISO, create a file called `ROOT.xml`
+in the following directory `$CATALINA_HOME/conf/Catalina/localhost` on that server (create 
 the directory if necessary), and populate it with the following information:
 
     <Context>
        <Parameter name="runscanner.configFile" value="/etc/runscanner.json" override="false"/>
     </Context>
 
-If the run scanner is being hosted on the same machine as MISO is, add this `<Parameter>` inside
-the `<Context>` block of the `ROOT.xml` that you have <a href="#root">created previously</a>. 
+If the run scanner is being hosted on the same machine as MISO is, create a file called
+`runscanner.xml` and populate it with the same contents as above.
 
 In `/etc/runscanner.json`, or another path of your choosing, put JSON data describing your instruments. You will need one record for each instrument:
 
@@ -388,10 +388,15 @@ To install or upgrade, perform the following steps:
 1. Remove `$CATALINA_HOME/webapps/ROOT`.
 1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
 1. Make any necessary configuration changes to `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`.
-1. Start Tomcat.
-1. Stop the run scanner.
-1. Deploy the run scanner.
-1. Restart the run scanner.
+1. Deploy the runscanner:
+    * If deploying to the same Tomcat as MISO:
+        1. Copy the `runnscanner-*.war` from the build to `$CATALINA_HOME/webapps` and rename it to `runscanner.war`.
+        1. Start Tomcat.
+    * If deploying to a different server than MISO:
+        1. Start Tomcat.
+        1. Stop the run scanner.
+        1. Deploy the run scanner.
+        1. Restart the run scanner.
 
 <a id="migrating">
 ## Migrating the database
