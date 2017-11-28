@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
-public class SampleBulkPropagateIT extends AbstractBulkSampleIT {
+public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
 
   @Before
   public void setup() {
