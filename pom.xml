@@ -27,7 +27,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
-  <version>0.2.100-oicr</version>
+  <version>0.2.101-oicr-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MISO LIMS</name>
   <url>http://tgac.github.io/miso-lims/</url>
@@ -131,7 +131,7 @@
     <connection>scm:git:https://www.github.com/oicr-gsi/miso-lims</connection>
     <developerConnection>scm:git:git@github.com:oicr-gsi/miso-lims</developerConnection>
     <url>http://www.github.com/oicr-gsi/miso-lims</url>
-    <tag>v0.2.100-oicr</tag>
+    <tag>v0.2.100</tag>
   </scm>
   <!-- Bug Tracker -->
   <issueManagement>
