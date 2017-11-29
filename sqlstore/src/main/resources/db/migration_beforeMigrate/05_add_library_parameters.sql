@@ -41,11 +41,12 @@ END//
 DROP PROCEDURE IF EXISTS addLibraryDesignCode//
 CREATE PROCEDURE addLibraryDesignCode(
   iCode varchar(2),
-  iDescription varchar(255)
+  iDescription varchar(255),
+  iTargetedSequencingRequired tinyint(1)
 ) BEGIN
   IF NOT EXISTS (SELECT 1 FROM LibraryDesignCode WHERE code = iCode) THEN
-    INSERT INTO LibraryDesignCode(code, description)
-    VALUES (iCode, iDescription);
+    INSERT INTO LibraryDesignCode(code, description, targetedSequencingRequired)
+    VALUES (iCode, iDescription, iTargetedSequencingRequired);
   END IF;
 END//
 
