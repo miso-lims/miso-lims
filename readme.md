@@ -1,7 +1,7 @@
 WARNING: This is (probably) not the branch you're looking for!
 ===================================================
 
-See the develop branch for the latest updates, or the releases section for recent release versions.
+See the [develop branch](https://github.com/TGAC/miso-lims/tree/develop) for the latest updates, or the [releases section](https://github.com/TGAC/miso-lims/releases) for recent release versions.
 
 MISO: An open source LIMS for small-to-large scale sequencing centres
 ---------------------------------------------------------------------
