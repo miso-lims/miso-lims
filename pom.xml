@@ -141,16 +141,15 @@
   <!-- Maven repository deploy -->
   <distributionManagement>
     <repository>
-      <id>miso-releases</id>
-      <name>MISO repository</name>
-      <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/releases</url>
+      <id>deploy.artifacts.oicr</id>
+      <name>OICR - MISO Releases</name>
+      <url>https://artifacts.oicr.on.ca/artifactory/miso-release</url>
     </repository>
     <snapshotRepository>
-      <id>miso-snapshots</id>
-      <name>MISO snapshot repository</name>
-      <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/snapshots</url>
+      <id>deploy.artifacts.oicr</id>
+      <name>OICR - MISO Snapshots</name>
+      <url>https://artifacts.oicr.on.ca/artifactory/miso-snapshot</url>
     </snapshotRepository>
-    <downloadUrl>http://repos.tgac.ac.uk/maven/repo</downloadUrl>
   </distributionManagement>
   <properties>
     <skipUTs>${skipTests}</skipUTs>
