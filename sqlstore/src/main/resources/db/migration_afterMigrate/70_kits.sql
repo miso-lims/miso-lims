@@ -38,4 +38,5 @@ CALL addKitDescriptor('Kapa Hyper Prep Plus',0,'Illumina','0','LIBRARY','ILLUMIN
 CALL addKitDescriptor('KAPA Hyper Prep and IDT xGen',5,'KAPA','1','LIBRARY','ILLUMINA','n/a');
 CALL addKitDescriptor('Agilent SureSelect XT Clinical Research',5,'Agilent','1','LIBRARY','ILLUMINA','n/a');
 CALL addKitDescriptor('Agilent SureSelect XT HS',1,'Agilent','1','LIBRARY','ILLUMINA','n/a');
+CALL addKitDescriptor('Unspecified',0,'None','None','LIBRARY','ILLUMINA','For libraries with an unknown library kit');
 -- EndNoTest
