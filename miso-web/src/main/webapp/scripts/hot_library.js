@@ -148,12 +148,18 @@ HotTarget.library = (function() {
           {
             header: 'Sample Alias',
             data: 'parentSampleAlias',
-            readOnly: true,
-            include: !config.isLibraryReceipt,
+            readOnly: !config.isLibraryReceipt,
+            include: !config.isLibraryReceipt || !Constants.automaticSampleAlias,
             unpack: function(lib, flat, setCellMeta) {
               flat.parentSampleAlias = lib.parentSampleAlias;
             },
             pack: function(lib, flat, errorHandler) {
+              if (config.isLibraryReceipt && !Constants.automaticSampleAlias) {
+                if (!lib.sample) {
+                  lib.sample = {};
+                }
+                lib.sample.alias = flat.parentSampleAlias;
+              }
             }
           },
           {
@@ -372,8 +378,7 @@ HotTarget.library = (function() {
                 }).map(Utils.array.getName).sort()
               });
             }
-          }, 
-          HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
+          }, HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
           HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume, 'volume', false),
           HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), ];
