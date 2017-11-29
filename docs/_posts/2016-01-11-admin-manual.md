@@ -90,6 +90,7 @@ need to add a grant privilege to the MISO database from your remote machine:
 
 Download the Flyway command line tool and install it.
 
+<a id="root">
 # Setting Up the Application Server
 The application server needs [Tomcat 8](https://tomcat.apache.org/download-80.cgi).
 
@@ -97,7 +98,7 @@ Create a file called `ROOT.xml` in the following directory
 `$CATALINA_HOME/conf/Catalina/localhost`, creating the directory if necessary,
 and populate it with the following information:
 
-    <Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT" debug="1">
+    <Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT">
       <Resource name="jdbc/MISODB" type="javax.sql.DataSource"
       driverClassName="com.mysql.jdbc.Driver"
       initialSize="32"
@@ -115,15 +116,11 @@ and populate it with the following information:
       username="tgaclims"
       password="tgaclims"/>
       <Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/>
-      <Parameter name="miso.name" value="Test"/>
     </Context>
 
 Make sure the database path in `ROOT.xml` is correct for your install:
 
     url="jdbc:mysql://your.database.server:3306/lims"
-
-Also, set the `miso.name` parameter to something to help distinguish testing
-and production copies of MISO.
 
 If your Tomcat install has the `autoDeploy="true"` flag set in `server.xml`, if
 you delete the `webapps/ROOT` directory and the `ROOT.war` file, Tomcat will
@@ -189,7 +186,7 @@ To use Active Directory, a specific kind of LDAP, set the security method to
 |-----------------------------|------------------------------------------------------------|
 |`security.ad.emailDomain`    | Domain added to username for lookup (e.g. ad.oicr.on.ca)   |
 |`security.ad.url`            | Url for Active Directory server (e.g. ldap://ad.oicr.on.ca)|
-|`security.ad.stripRolePrefix`| Prefix to be removed from group (e.g. MISO_)               |
+|`security.ad.stripRolePrefix`| Prefix to be removed from group (e.g. MISO\_)               |
 
 The search for a user is done against `userPrincipalName` which takes the form of
 an email address. To login the user will type their username and to do the lookup
@@ -313,17 +310,20 @@ Extending the functionality to validate and/or generate additional fields is pos
 require modifications at the Service layer as well.
 
 # Setting Up the Run Scanner
-The run scanner is a webservice  that scans the paths containing
+The run scanner is a webservice that scans the paths containing
 sequencer output. It is not required for a functioning MISO install, but
 without it, sequencer runs must be added manually.
 
-Create a file called `ROOT.xml` in the following directory
-`$CATALINA_HOME/conf/Catalina/localhost`, creating the directory if necessary,
-and populate it with the following information:
+If run scanner is being hosted on a separate server from MISO, create a file called `ROOT.xml`
+in the following directory `$CATALINA_HOME/conf/Catalina/localhost` on that server (create 
+the directory if necessary), and populate it with the following information:
 
     <Context>
        <Parameter name="runscanner.configFile" value="/etc/runscanner.json" override="false"/>
     </Context>
+
+If the run scanner is being hosted on the same machine as MISO is, create a file called
+`runscanner.xml` and populate it with the same contents as above.
 
 In `/etc/runscanner.json`, or another path of your choosing, put JSON data describing your instruments. You will need one record for each instrument:
 
@@ -369,6 +369,7 @@ It is possible to set up multiple run scanners managing different sequencers and
 You can view the run scanner's state from the main page.
 
 # Building the Application
+
 Building the application is done by:
 
     mvn clean package -P external
@@ -376,7 +377,7 @@ Building the application is done by:
 There will be two important build artefacts:
 
 * `miso-web/target/ROOT.war`
-* `notification-server/target/notification-server-*.one-jar.jar`
+* `runscanner/runscanner-*.war`
 
 # Releasing and Upgrading
 
@@ -385,14 +386,21 @@ To install or upgrade, perform the following steps:
 1. Backup your existing database.
 1. Stop Tomcat.
 1. Migrate the database to the newest version. (Described below.)
-1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
 1. Remove `$CATALINA_HOME/webapps/ROOT`.
-1. Start Tomcat.
-1. Stop the notification server.
-1. Copy the `notification-server-*.one-jar.jar` to `/srv/notification-server/notification-server.jar`.
-1. Restart the notification server.
+1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
+1. Make any necessary configuration changes to `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`.
+1. Deploy the runscanner:
+    * If deploying to the same Tomcat as MISO:
+        1. Copy the `runnscanner-*.war` from the build to `$CATALINA_HOME/webapps` and rename it to `runscanner.war`.
+        1. Start Tomcat.
+    * If deploying to a different server than MISO:
+        1. Start Tomcat.
+        1. Stop the run scanner.
+        1. Deploy the run scanner.
+        1. Restart the run scanner.
 
 ## Migrating the database
+
 Updating the database (or setting it up initially) will apply patches to the database using Flyway using the `ROOT.war`.
 
     cd ${FLYWAY}
@@ -402,7 +410,7 @@ Updating the database (or setting it up initially) will apply patches to the dat
 
 
 
-# Building the Docker image
+# Building the Docker image (after building a release)
 
 Pull the tag or snapshot that you want to build and package it:
 
@@ -423,4 +431,5 @@ Once satisfied, push the image to Docker Hub. Note that only members of the [mis
     docker push "misolims/miso-lims:${version}"
     
 # Monitoring
+
 The main MISO application and Run Scanner can be monitored using [Prometheus](http://prometheus.io/).

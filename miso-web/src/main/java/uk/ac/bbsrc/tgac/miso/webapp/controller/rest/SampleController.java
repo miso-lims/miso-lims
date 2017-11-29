@@ -272,7 +272,6 @@ public class SampleController extends RestController {
     if (json.getString("identitiesSearches").length() == 0) {
       throw new RestException("Must give search terms to look up identities", Status.BAD_REQUEST);
     }
-    Integer requestCounter = (Integer) json.get("requestCounter");
     Set<Sample> uniqueIdentities = new HashSet<>();
     String searchTerms = json.getString("identitiesSearches");
     for (String term : SampleIdentityImpl.getSetFromString(searchTerms.replaceAll(";", ","))) {
@@ -283,7 +282,6 @@ public class SampleController extends RestController {
     }
     Set<SampleDto> matchingIdentities = uniqueIdentities.stream().map(Dtos::asDto).collect(Collectors.toSet());
     JSONObject allIdentities = new JSONObject();
-    allIdentities.put("requestCounter", requestCounter);
     allIdentities.put("matchingIdentities", matchingIdentities);
     return allIdentities;
   }

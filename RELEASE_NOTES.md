@@ -1,3 +1,13 @@
+# 0.2.100
+
+Changes:
+
+ * receive samples parented to existing ghost tissue
+ * fix slide count for ghost slides
+ * Fix NPE in plain library receipt
+ * Update documentation
+ * Do not base64 encode barcodes
+
 # 0.2.99
 
 Changes:

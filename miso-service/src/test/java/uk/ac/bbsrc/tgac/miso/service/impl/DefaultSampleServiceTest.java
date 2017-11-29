@@ -575,6 +575,7 @@ public class DefaultSampleServiceTest {
     SampleTissue sample = makeUnsavedParentTissue();
     sample.setSampleType("type");
     sample.setScientificName("scientific");
+    sample.setSecurityProfile(new SecurityProfile(new UserImpl()));
     return sample;
   }
 
@@ -585,6 +586,7 @@ public class DefaultSampleServiceTest {
     sample.getSampleClass().setAlias("tissue");
     sample.getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
     Mockito.when(sampleClassService.get(sample.getSampleClass().getId())).thenReturn(sample.getSampleClass());
+    sample.setSecurityProfile(new SecurityProfile(new UserImpl()));
     return sample;
   }
 

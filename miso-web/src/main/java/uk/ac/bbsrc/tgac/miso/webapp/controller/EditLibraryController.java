@@ -766,7 +766,6 @@ public class EditLibraryController {
     private final Project project;
     private final SampleClass aliquotClass;
     private final String defaultSciName;
-    private final boolean isDnaseTreatable;
 
     public BulkReceiveLibraryBackend(LibraryDto dto, Integer quantity, Project project, SampleClass aliquotClass, String defaultSciName)
         throws IOException {
@@ -777,13 +776,14 @@ public class EditLibraryController {
       this.project = project;
       this.aliquotClass = aliquotClass;
       this.defaultSciName = defaultSciName;
-      this.isDnaseTreatable = isDetailedSampleEnabled() && aliquotClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll());
     }
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-      config.putPOJO("targetSampleClass", Dtos.asDto(aliquotClass));
-      config.put("dnaseTreatable", isDnaseTreatable);
+      if (aliquotClass != null) {
+        config.putPOJO("targetSampleClass", Dtos.asDto(aliquotClass));
+        config.put("dnaseTreatable", aliquotClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
+      }
       config.put("create", true);
       config.put("hasProject", project != null);
       if (project == null) {
