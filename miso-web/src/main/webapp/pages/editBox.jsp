@@ -168,22 +168,31 @@
 	    <tr>
 	      <td>Alias:</td><td><span id="selectedAlias"></span></td>
 	    </tr>
-	    <tr>
-	      <td id="currentLocationText"></td><td><span id="currentLocation"></span></td>
-	    </tr>
-	    <tr>
-	      <td>Barcode:</td><td><input type="text" id="selectedBarcode"/> <button id="lookupBarcode" class="ui-state-default" onclick="Box.lookupBoxableByBarcode();">Lookup</button></td>
-	    </tr>
-	    <tr>
-	      <td><button id="updateSelected" class="ui-state-default" onclick="Box.ui.addItemToBox();">Update Position</button></td>
-	    </tr>
-	    <tr>
-	      <td></td>
-	    </tr>
-	    <tr><td><button id="removeSelected" class="ui-state-default" onclick="Box.ui.removeOneItem()">Remove Tube</button>
-	      <button id="emptySelected"  class="ui-state-default" onclick="Box.ui.discardOneItem();">Discard Tube</button>
-	      </td>
-	    </tr>
+        <tr>
+          <td>Barcode:</td><td><span id="selectedBarcode"></span></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>
+            <button id="removeSelected" class="ui-state-default" onclick="Box.ui.removeOneItem()">Remove Tube</button>
+            <button id="emptySelected"  class="ui-state-default" onclick="Box.ui.discardOneItem();">Discard Tube</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Search:</td>
+          <td>
+            <input id="searchField" type="text"/>
+            <button id="search" class="ui-state-default" onclick="Box.ui.searchBoxables();">Lookup</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Results:</td>
+          <td>
+            <img id="ajaxLoader" src="/styles/images/ajax-loader.gif" class="fg-button hidden"/>
+            <select id="resultSelect"/></select>
+            <button id="updateSelected" class="ui-state-default" onclick="Box.ui.addItemToBox();">Update Position</button>
+          </td>
+        </tr>
     </table>
     <p class="warning" id="warningMessages"></p>
     <p>Hold down Control (Windows, Linux) or Command (Mac) to select multiple positions.<br/>
@@ -204,19 +213,21 @@
       },
       data: Box.boxJSON.items
     });
-    jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
+    jQuery('#updateSelected, #removeSelected, #emptySelected, #resultSelect, #search, #searchField')
+        .prop('disabled', true)
+        .addClass('disabled');
     Box.ui.createListingBoxablesTable(Box.boxJSON);
   });
 
-  jQuery('#selectedBarcode').keyup(function(event) {
+  jQuery('#searchField').keyup(function(event) {
     if(event.which == "13"){
-      jQuery('#lookupBarcode').click();
+      jQuery('#search').click();
     }
   });
 
-  jQuery('#selectedBarcode').on('paste', function(e) {
+  jQuery('#searchField').on('paste', function(e) {
     window.setTimeout(function() {
-      jQuery('#lookupBarcode').click();
+      jQuery('#search').click();
     }, 100);
   });
 </script>

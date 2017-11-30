@@ -354,27 +354,6 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetBoxableViewByBarcode() throws Exception {
-    assertNull(dao.getBoxableViewByBarcode("probably not a barcode"));
-
-    BoxableView sample = dao.getBoxableViewByBarcode("SAM1::TEST_0001_Bn_P_nn_1-1_D_1");
-    assertNotNull(sample);
-    assertEquals(new BoxableId(EntityType.SAMPLE, 1L), sample.getId());
-
-    BoxableView library = dao.getBoxableViewByBarcode("LIB1::TEST_0001_Bn_P_PE_300_WG");
-    assertNotNull(library);
-    assertEquals(new BoxableId(EntityType.LIBRARY, 1L), library.getId());
-
-    BoxableView dilution = dao.getBoxableViewByBarcode("LDI1::TEST_0001_Bn_P_PE_300_WG");
-    assertNotNull(dilution);
-    assertEquals(new BoxableId(EntityType.DILUTION, 1L), dilution.getId());
-
-    BoxableView pool = dao.getBoxableViewByBarcode("IPO1::Illumina");
-    assertNotNull(pool);
-    assertEquals(new BoxableId(EntityType.POOL, 1L), pool.getId());
-  }
-
-  @Test
   public void testGetBoxableViewByPreMigrationId() throws Exception {
     assertNull(dao.getBoxableViewByPreMigrationId(32123L));
 
@@ -405,6 +384,27 @@ public class HibernateBoxDaoTest extends AbstractDAOTest {
     List<BoxableView> list = dao.getBoxableViewsByIdList(ids);
     assertNotNull(list);
     assertEquals(2, list.size());
+  }
+
+  @Test
+  public void testGetBoxableViewsBySearchBarcode() throws Exception {
+    List<BoxableView> byBarcode = dao.getBoxableViewsBySearch("SAM1::TEST_0001_Bn_P_nn_1-1_D_1");
+    assertEquals(1, byBarcode.size());
+    assertEquals(new BoxableId(EntityType.SAMPLE, 1L), byBarcode.get(0).getId());
+  }
+
+  @Test
+  public void testGetBoxableViewsBySearchName() throws Exception {
+    List<BoxableView> byName = dao.getBoxableViewsBySearch("LIB3");
+    assertEquals(1, byName.size());
+    assertEquals(new BoxableId(EntityType.LIBRARY, 3L), byName.get(0).getId());
+  }
+
+  @Test
+  public void testGetBoxableViewsBySearchAlias() throws Exception {
+    List<BoxableView> byAlias = dao.getBoxableViewsBySearch("Pool 5");
+    assertEquals(1, byAlias.size());
+    assertEquals(new BoxableId(EntityType.POOL, 5L), byAlias.get(0).getId());
   }
 
 }

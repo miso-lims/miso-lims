@@ -93,10 +93,14 @@ var BoxPosition = function(opts) {
 
 var BoxVisual = function() {
   var self = {};
+  var disabled = false;
 
   self.selectedItems = [];
 
   self.clearSelection = function() {
+    if (disabled) {
+      return;
+    }
     self.selectedItems.forEach(function(item) {
       item.unselect()
     });
@@ -104,6 +108,9 @@ var BoxVisual = function() {
   };
 
   self.select = function(item, skipCallback) {
+    if (disabled) {
+      return;
+    }
     item.select();
     self.selectedItems.push(item);
     if (!skipCallback) {
@@ -112,6 +119,9 @@ var BoxVisual = function() {
   };
 
   self.unselect = function(item, skipCallback) {
+    if (disabled) {
+      return;
+    }
     item.unselect();
     self.selectedItems = self.selectedItems.filter(function(selectedItem) {
       return selectedItem !== item
@@ -227,6 +237,11 @@ var BoxVisual = function() {
     toggleGroupSelection(event, items);
   };
 
+  self.selectPos = function(row, col) {
+    self.clearSelection();
+    self.select(self.position[row][col], false);
+  }
+
   self.getBoxPosition = function(row, col, tCell) {
     var opts = self.getBoxPositionOpts(row, col);
     opts.row = row;
@@ -237,6 +252,10 @@ var BoxVisual = function() {
   };
 
   self.onSelectionChanged = function(items) {
+  };
+
+  self.setDisabled = function(disable) {
+    disabled = disable;
   };
 
   return self;
@@ -342,30 +361,35 @@ Box.Visual = function() {
       });
     }
 
+    Box.ui.clearBoxableSearchResults();
     if (boxables && boxables.length > 0) {
       // filled position selected
       jQuery('#selectedPosition').text(positions[0]);
       jQuery('#selectedName').text(boxables[0].name);
+      if (boxables[0].identificationBarcode) {
+        jQuery('#selectedBarcode').text(boxables[0].identificationBarcode);
+      } else {
+        jQuery('#selectedBarcode').empty();
+      }
       jQuery('#selectedAlias').html(Box.utils.hyperlinkifyBoxable(boxables[0].name, boxables[0].id, boxables[0].alias));
       jQuery('#selectedName').html(Box.utils.hyperlinkifyBoxable(boxables[0].name, boxables[0].id, boxables[0].name));
-      jQuery('#selectedBarcode').val(boxables[0].identificationBarcode);
-      jQuery('#selectedBarcode').select().focus();
-      jQuery('#removeSelected, #emptySelected').prop('disabled', false).removeClass('disabled');
-      jQuery('#currentLocation, #currentLocationText, #warningMessages').html('');
+      jQuery('#removeSelected, #emptySelected, #searchField, #search').prop('disabled', false).removeClass('disabled');
     } else {
       // empty position, no positions, or multiple positions selected
       if (positions.length === 1) {
         jQuery('#selectedPosition').text(positions[0]);
       } else {
         jQuery('#selectedPosition').empty();
+        jQuery('#search, #searchField, #resultSelect, #updateSelected').prop('disabled', true).addClass('disabled');
       }
       jQuery('#selectedName').empty();
       jQuery('#selectedAlias').empty();
-      jQuery('#selectedBarcode').val('');
-      jQuery('#selectedBarcode').focus();
+      jQuery('#selectedBarcode').empty();
       jQuery('#updateSelected, #removeSelected, #emptySelected').prop('disabled', true).addClass('disabled');
-      jQuery('#currentLocation, #currentLocationText, #warningMessages').html('');
     }
+    jQuery('#warningMessages').html('');
+    jQuery('#searchField').val('');
+    jQuery('#searchField').select().focus();
   };
 
   return self;

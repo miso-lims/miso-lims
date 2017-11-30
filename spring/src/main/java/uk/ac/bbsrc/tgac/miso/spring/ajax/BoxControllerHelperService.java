@@ -61,41 +61,6 @@ public class BoxControllerHelperService {
   private BoxScanner boxScanner;
 
   /**
-   * Return one boxable associated with a particular barcode. json must contain the following entries: "barcode": barcode
-   * 
-   * @param HttpSession
-   *          session
-   * @param JSONObject
-   *          json
-   * @return JSONObject Boxable
-   */
-  public JSONObject lookupBoxableByBarcode(HttpSession session, JSONObject json) {
-    JSONObject response = new JSONObject();
-    if (json.has("barcode")) {
-      BoxableView boxable;
-      String barcode = json.getString("barcode");
-      try {
-        boxable = boxService.getViewByBarcode(barcode);
-      } catch (IOException e) {
-        log.debug("Error getting boxable by barcode", e);
-        return JSONUtils.SimpleJSONError("Error looking up barcode " + json.getString("barcode") + ": " + e.getMessage());
-      }
-
-      if (boxable == null) {
-        return JSONUtils.SimpleJSONError(
-            "Could not find barcode " + barcode + ". Confirm that it is associated with a sample, library, or pool before retrying.");
-      }
-
-      response.put("boxable", Dtos.asDto(boxable));
-      if (boxable.isDiscarded())
-        response.put("trashed", boxable.getName() + " (" + boxable.getAlias() + ") has been discarded, and can not be added to the box.");
-      return response;
-    } else {
-      return JSONUtils.SimpleJSONError("Please enter a barcode.");
-    }
-  }
-
-  /**
    * Deletes a box from the database. Requires admin permissions.
    * 
    * @param session
@@ -267,91 +232,6 @@ public class BoxControllerHelperService {
     } else {
       return JSONUtils.SimpleJSONError("Please specify a box alias.");
     }
-  }
-
-  /**
-   * <p>
-   * Scans an individual item (using handheld scanner or keyboard) and: <br>
-   * a) if the item doesn't exist in the box: add the item to the selected position <br>
-   * b) if the item does exist in the box, but in a different location: move the item to the selected position
-   * </p>
-   * 
-   * <p>
-   * Note: this method saves all box contents to the database.
-   * </p>
-   *
-   * @param session
-   * @param json
-   *          must contain the following entries:
-   *          <ul>
-   *          <li>"boxId" : boxId</li>
-   *          <li>"barcode" : barcode of boxable to store in the position</li>
-   *          <li>"position" : a String representing the box row and column to store the boxable in. eg. "H12"</li>
-   *          </ul>
-   * @return JSONObject message indicating success or error
-   */
-  public JSONObject updateOneItem(HttpSession session, JSONObject json) {
-    if (!json.has("boxId") || !json.has("barcode") || !json.has("position")) {
-      return JSONUtils.SimpleJSONError("Invalid boxId, barcode or position given.");
-    }
-
-    long boxId = json.getLong("boxId");
-    String barcode = json.getString("barcode");
-    String position = json.getString("position");
-
-    Box box = null;
-    try {
-      box = boxService.get(boxId);
-      if (box == null) throw new IOException("Box not found");
-    } catch (IOException e) {
-      log.debug("Error getting box with ID " + boxId, e);
-      return JSONUtils.SimpleJSONError("Error looking up this box: " + e.getMessage());
-    }
-
-    if (!box.isValidPosition(position)) return JSONUtils.SimpleJSONError("Invalid position given!");
-
-    // get the requested Sample/Library from the db
-    BoxableView boxable = null;
-    try {
-      boxable = boxService.getViewByBarcode(barcode);
-    } catch (IOException e) {
-      log.debug("Error getting boxable", e);
-      return JSONUtils.SimpleJSONError("Error finding item with barcode " + barcode + ": " + e.getMessage());
-    }
-
-    if (boxable == null) return JSONUtils.SimpleJSONError("Could not find sample, library or pool with barcode " + barcode
-        + ". Please associate this barcode with a sample, library or pool before retrying.");
-    if (boxable.isDiscarded()) return JSONUtils
-        .SimpleJSONError(boxable.getName() + " (" + boxable.getAlias() + ") has been discarded, and can not be added to the box.");
-
-    // if the selected item is already in the box, remove it here and add it to the correct position in next step
-    String oldPos = null;
-    for (Map.Entry<String, BoxableView> entry : box.getBoxables().entrySet()) {
-      if (entry.getValue().getId().equals(boxable.getId())) {
-        oldPos = entry.getKey();
-        break;
-      }
-    }
-    if (oldPos != null) box.removeBoxable(oldPos);
-
-    // if an item already exists at this position, its location will be set to unknown.
-    box.setBoxable(position, boxable);
-    log.info("Adding " + boxable.getName() + " to " + box.getName());
-
-    Map<String, Object> response = new HashMap<>();
-    try {
-      box.setLastModifier(authorizationManager.getCurrentUser());
-      boxService.save(box);
-
-      ObjectMapper mapper = new ObjectMapper();
-      response.put("boxJSON", mapper.writer().writeValueAsString(Dtos.asDto(boxService.get(box.getId()), true)));
-      response.put("addedToBox", boxable.getName() + " was successfully added to position " + position);
-    } catch (IOException e) {
-      log.debug("Error updating one boxable item", e);
-      return JSONUtils.SimpleJSONError("Error updating one item:" + e.getMessage());
-    }
-
-    return JSONUtils.JSONObjectResponse(response);
   }
 
   /**

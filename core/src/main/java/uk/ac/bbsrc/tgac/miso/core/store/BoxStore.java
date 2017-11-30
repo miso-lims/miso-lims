@@ -66,12 +66,19 @@ public interface BoxStore extends Store<Box>, Remover<Box>, PaginatedDataSource<
 
   public BoxableView getBoxableView(BoxableId id) throws IOException;
 
-  public BoxableView getBoxableViewByBarcode(String barcode) throws IOException;
-
   public BoxableView getBoxableViewByPreMigrationId(Long preMigrationId) throws IOException;
 
   public List<BoxableView> getBoxableViewsByBarcodeList(Collection<String> barcodes) throws IOException;
 
   public List<BoxableView> getBoxableViewsByIdList(Collection<BoxableId> ids) throws IOException;
+
+  /**
+   * Finds BoxableViews with identificationBarcode, name, or alias matching the provided search string. Returns exact matches only,
+   * and excludes any discarded items
+   * 
+   * @param search string to search for
+   * @return all matches
+   */
+  public List<BoxableView> getBoxableViewsBySearch(String search);
 
 }
