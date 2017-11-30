@@ -23,7 +23,7 @@ public class PrometheusCollectionFilter extends GenericFilterBean {
   private final static Counter throwCount = Counter.build().name("tomcat_servlet_throws").labelNames("uri", "method")
       .help("The number of exceptions thrown from this endpoint.").register();
   private final static Histogram times = Histogram.build().name("tomcat_servlet_process_time").labelNames("uri", "method", "code")
-      .help("The time, in nano seconds, this endpoint takes to process a request.").exponentialBuckets(1000, 10, 7).register();
+      .help("The time, in nano seconds, this endpoint takes to process a request.").exponentialBuckets(1000, 10, 9).register();
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

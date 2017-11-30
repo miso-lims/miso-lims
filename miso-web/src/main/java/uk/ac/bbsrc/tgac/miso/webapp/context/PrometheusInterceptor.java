@@ -13,7 +13,7 @@ public class PrometheusInterceptor implements MethodInterceptor {
   private final static Counter hits = Counter.build().name("miso_method_requests").labelNames("javaclass", "method")
       .help("The number of requests for this method.").register();
   private final static Histogram times = Histogram.build().name("miso_method_time").labelNames("javaclass", "method")
-      .help("The time, in nano seconds, this method takes to run.").exponentialBuckets(1000, 10, 7).register();
+      .help("The time, in nano seconds, this method takes to run.").exponentialBuckets(1000, 10, 9).register();
   private final static Counter throwCounts = Counter.build().name("miso_method_throws").labelNames("javaclass", "method")
       .help("The number of times this method has thrown an exception.").register();
   private final static Histogram resultCounts = Histogram.build().name("miso_method_results").labelNames("javaclass", "method")
