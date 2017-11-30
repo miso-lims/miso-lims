@@ -136,14 +136,6 @@
       <li><a href="<c:url value="/miso/projects"/>"><span>My Projects</span></a></li>
     </sec:authorize>
 
-    <%--<sec:authorize access="hasRole('ROLE_INTERNAL')">--%>
-      <%--<li><a href="<c:url value="/miso/analysis"/>"><span>Analysis</span></a></li>--%>
-    <%--</sec:authorize>--%>
-
-    <%--<sec:authorize access="hasRole('ROLE_INTERNAL')">--%>
-      <%--<li><a href="<c:url value="/miso/flexreports"/>"><span>Reports</span></a></li>--%>
-    <%--</sec:authorize>--%>
-
     <sec:authorize access="isAuthenticated()">
       <li>
         <a href="<c:url value="http://oicr-gsi.github.io/miso-docs-oicr/plain-index"/>"><span>Help</span></a>

@@ -64,18 +64,6 @@
   <bean id="dashboard" class="uk.ac.bbsrc.tgac.miso.spring.ajax.DashboardHelperService">
   </bean>
 
-  <bean id="flexReportingControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.FlexReportingControllerHelperService">
-  </bean>
-
-  <bean id="projectsTreeControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectTreeControllerHelperService">
-  </bean>
-
-  <bean id="taskControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.TaskControllerHelperService">
-  </bean>
-
-  <bean id="externalSectionControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExternalSectionControllerHelperService">
-  </bean>
-
   <bean id="importExportControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ImportExportControllerHelperService">
   </bean>
   
