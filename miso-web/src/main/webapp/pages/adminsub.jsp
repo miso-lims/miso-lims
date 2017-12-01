@@ -1,6 +1,6 @@
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -22,64 +22,53 @@
   --%>
 
 <div id="subcontent">
-    <h2>Navigation</h2>
-    <br/>
-    <%--<h2>Search</h2>--%>
-    <%--<span class="inline">--%>
-    <%--<form action="/miso/search">--%>
-    <%--<input type="text" id="search" value="Search for..." onfocus="clearInputField(this);"/><input value="Search"--%>
-    <%--type="submit"/>--%>
-    <%--</form>--%>
-    <%--</span><br/>--%>
-
-    <h2>Sample Processing</h2>
-    <ul class="bullets">
-        <li><a href="<c:url value="/miso/sample/receipt"/>">Receive Samples</a></li>
-        <li><a href="<c:url value="/miso/importexport"/>">Import & Export</a></li>
-        <%--<li><a href="<c:url value="/miso/plate/import"/>">Import Plate Sheet</a></li>--%>
-        <%--<li><a href="<c:url value="/miso/plate/export"/>">Export Plate Sheet</a></li>--%>
-    </ul>
-
-    <h2>Sequencing</h2>
-    <ul class="bullets">
-        <li><a href="<c:url value="/miso/pools/ready"/>">Ready to Run</a></li>
-        <li><a href="<c:url value="/miso/container/new"/>">Create New Partition Container</a></li>
-        <li><a href="<c:url value="/miso/run/new"/>">Create New Run</a></li>
-    </ul>
+	<h2>Sample Processing</h2>
+	<ul class="bullets">
+		<li><a href="<c:url value="/miso/sample/receipt"/>">Receive
+				Samples</a></li>
+		<li><a href="<c:url value="/miso/importexport"/>">Import &amp;
+				Export</a></li>
+	</ul>
 
     <h2>Tracking</h2>
     <ul class="bullets">
-        <li><a href="<c:url value="/miso/runs"/>">List Runs</a></li>
-        <li><a href="<c:url value="/miso/containers"/>">List Partition Containers</a></li>
-        <li><a href="<c:url value="/miso/experiments"/>">List Experiments</a></li>
-        <li><a href="<c:url value="/miso/pools"/>">List Pools</a></li>
-        <li><a href="<c:url value="/miso/libraries"/>">List Libraries</a></li>
-        <li><a href="<c:url value="/miso/samples"/>">List Samples</a></li>
-        <li><a href="<c:url value="/miso/studies"/>">List Studies</a></li>
-        <li><a href="<c:url value="/miso/kitdescriptors"/>">List Consumables</a></li>
-        <li><a href="<c:url value="/miso/plates"/>">List Plates</a></li>
+        <li><a href="<c:url value="/miso/samples"/>">Samples</a></li>
+        <li><a href="<c:url value="/miso/libraries"/>">Libraries</a></li>
+        <li><a href="<c:url value="/miso/dilutions"/>">Dilutions</a></li>
+        <li><a href="<c:url value="/miso/pools"/>">Pools</a></li>
+        <li><a href="<c:url value="/miso/poolorders"/>">Orders</a></li>
+        <li><a href="<c:url value="/miso/containers"/>">Sequencing Containers</a></li>
+        <li><a href="<c:url value="/miso/runs"/>">Runs</a></li>
+        <li><a href="<c:url value="/miso/boxes"/>">Boxes</a></li>
+        <li><a href="<c:url value="/miso/sequencers"/>">Sequencers</a></li>
+        <li><a href="<c:url value="/miso/kitdescriptors"/>">Kits</a></li>
+        <li><a href="<c:url value="/miso/indices"/>">Indices</a></li>
+        <li><a href="<c:url value="/miso/studies"/>">Studies</a></li>
+        <li><a href="<c:url value="/miso/printers"/>">Printers</a></li>
     </ul>
 
-    <h2>Print Jobs</h2>
+    <c:if test="${detailedSample}">
+      <h2>Institute Defaults</h2>
+      <ul class="bullets">
+          <li><a href="<c:url value="/miso/tissuematerial/list"/>">Tissue Materials</a></li>
+          <li><a href="<c:url value="/miso/samplepurpose/list"/>">Sample Purposes</a></li>
+          <li><a href="<c:url value="/miso/subproject/list"/>">Subprojects</a></li>
+          <li><a href="<c:url value="/miso/institute/list"/>">Institutes</a></li>
+          <li><a href="<c:url value="/miso/lab/list"/>">Labs</a></li>
+      </ul>
+    </c:if>
+	
+    <h2>SRA</h2>
     <ul class="bullets">
-        <li><a href="<c:url value="/miso/printjobs"/>">My Print Jobs</a></li>
-        <li><a href="<c:url value="/miso/custombarcode"/>">Custom Barcode Printing</a></li>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <li><a href="<c:url value="/miso/admin/configuration/printers"/>">Printers</a></li>
-        </sec:authorize>
+        <li><a href="<c:url value="/miso/experiments"/>">Experiments</a></li>
+        <li><a href="<c:url value="/miso/submissions"/>">Submissions</a></li>
     </ul>
 
-    <sec:authorize access="hasRole('ROLE_ADMIN')">
-        <h2>User Administration</h2>
-        <ul class="bullets">
-            <li><a href="<c:url value="/miso/admin/users"/>">List Users</a></li>
-            <li><a href="<c:url value="/miso/admin/user/new"/>">Create User</a></li>
-        </ul>
-
-        <h2>Group Administration</h2>
-        <ul class="bullets">
-            <li><a href="<c:url value="/miso/admin/groups"/>">List Groups</a></li>
-            <li><a href="<c:url value="/miso/admin/group/new"/>">Create Group</a></li>
-        </ul>
+	<sec:authorize access="hasRole('ROLE_ADMIN')">
+	  <h2>User Administration</h2>
+      <ul class="bullets">
+        <li><a href="<c:url value="/miso/admin/users"/>">Users</a></li>
+        <li><a href="<c:url value="/miso/admin/groups"/>">Groups</a></li>
+      </ul>
     </sec:authorize>
 </div>

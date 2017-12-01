@@ -1,6 +1,6 @@
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -20,6 +20,7 @@
   ~
   ~ **********************************************************************
   --%>
+<%@ page import="uk.ac.bbsrc.tgac.miso.Version" %>
 
 </div>
 <div id="footer">
@@ -27,9 +28,10 @@
 
     <p>
         &copy; 2010 - <fmt:formatDate value="${timestamp}" pattern="yyyy"/>
-        Brought to you by <a href="http://www.tgac.ac.uk/" target="_blank">The Genome Analysis Centre</a>
+        Brought to you by <a href="http://www.tgac.ac.uk/" target="_blank">The Genome Analysis Centre</a>,
+        <a href="http://oicr.on.ca/" target="_blank">The Ontario Institute for Cancer Research</a>,
         and the element <a href="http://en.wikipedia.org/wiki/Sodium" target="_blank">sodium</a> | Version:
-        0.2.1-SNAPSHOT
+        <%=Version.VERSION%>
     </p>
 </div>
 </body>

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,34 +23,45 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import org.apache.commons.codec.binary.Base64;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.ldap.userdetails.InetOrgPerson;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.event.Alert;
-import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -65,77 +76,36 @@ import java.util.List;
 public class DashboardHelperService {
   protected static final Logger log = LoggerFactory.getLogger(DashboardHelperService.class);
   @Autowired
-  private SecurityManager securityManager;
+  private ProjectService projectService;
   @Autowired
-  private RequestManager requestManager;
+  private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private LibraryDilutionService dilutionService;
+  @Autowired
+  private RunService runService;
+  @Autowired
+  private SampleService sampleService;
+  @Autowired
+  private StudyService studyService;
+  @Autowired
+  private PoolService poolService;
 
-  public JSONObject checkUser(HttpSession session, JSONObject json) {
-    String username = json.getString("username");
-    if (username != null && !username.equals("")) {
-      if (SecurityContextHolder.getContext().getAuthentication().getName().equals(username)) {
-        try {
-          User user = securityManager.getUserByLoginName(username);
-          if (user == null) {
-            //user is authed, but doesn't exist in the LIMS DB. Save that user!
-            User u = new UserImpl();
-            Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (o instanceof UserDetails) {
-              UserDetails details = (UserDetails) o;
-              u.setLoginName(details.getUsername());
-              u.setFullName(details.getUsername());
-              u.setPassword(details.getPassword());
-              u.setActive(true);
-
-              if (details.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
-                u.setAdmin(true);
-              }
-
-              if (details.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_INTERNAL"))) {
-                u.setInternal(true);
-                u.setRoles(new String[]{"ROLE_INTERNAL"});
-              }
-              else if (details.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_EXTERNAL"))) {
-                u.setExternal(true);
-                u.setRoles(new String[]{"ROLE_EXTERNAL"});
-              }
-              else {
-                log.warn("Unrecognised roles");
-              }
-
-              if (details instanceof InetOrgPerson) {
-                u.setFullName(((InetOrgPerson) details).getDisplayName());
-                u.setEmail(((InetOrgPerson) details).getMail());
-              }
-
-              securityManager.saveUser(u);
-            }
-            else {
-              return JSONUtils.SimpleJSONError("The UserDetailsService specified in the Spring config cannot support mapping of usernames to UserDetails objects");
-            }
-          }
-          else {
-            //the user isn't null, but LDAP is "newer" than the LIMS, i.e. LDAP pass changed but LIMS still the same
-            Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (o instanceof UserDetails) {
-              UserDetails details = (UserDetails) o;
-              if (!user.getPassword().equals(details.getPassword())) {
-                user.setPassword(details.getPassword());
-                securityManager.saveUser(user);
-              }
-            }
-          }
-          return null;
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-          return JSONUtils.SimpleJSONError("Something went wrong trying to get user information from the database: " + e.getMessage());
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Cannot check LIMS user database table if you are not authenticated as that user!");
-      }
+  private StringBuilder generateDashboardCell(StringBuilder b, String misoClass, Long id, String name, String alias,
+      String... aliasAlternative) {
+    b.append("<a class=\"dashboardresult\" href=\"/miso/" + misoClass + "/" + id
+        + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+    b.append("Name: <b>" + name + "</b><br/>");
+    if (aliasAlternative == null || aliasAlternative.length == 0) {
+      b.append("Alias");
+    } else {
+      b.append((isStringEmptyOrNull(aliasAlternative[0]) ? "Alias"
+          : aliasAlternative[0]));
     }
-    return JSONUtils.SimpleJSONError("Please supply a valid username to check");
+    b.append(": <b>" + alias + "</b><br/>");
+    b.append("</div></a>");
+    return b;
   }
 
   public JSONObject searchProject(HttpSession session, JSONObject json) {
@@ -143,30 +113,53 @@ public class DashboardHelperService {
     try {
       List<Project> projects;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
-        projects = new ArrayList<Project>(requestManager.listAllProjectsBySearch(searchStr));
-      }
-      else {
-        projects = new ArrayList<Project>(requestManager.listAllProjectsWithLimit(50));
+      if (!isStringEmptyOrNull(searchStr)) {
+        projects = new ArrayList<>(projectService.listAllProjectsBySearch(searchStr));
+      } else {
+        projects = new ArrayList<>(projectService.listAllProjectsWithLimit(50));
       }
 
       if (projects.size() > 0) {
         Collections.sort(projects);
         Collections.reverse(projects);
         for (Project p : projects) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + p.getProjectId() + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + p.getName() + "</b><br/>");
-          b.append("Alias: <b>" + p.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "project", p.getProjectId(), p.getName(), p.getAlias());
         }
-      }
-      else {
+      } else {
         b.append("No matches");
       }
       return JSONUtils.JSONObjectResponse("html", b.toString());
 
+    } catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
-    catch (IOException e) {
+  }
+
+  public JSONObject searchPool(HttpSession session, JSONObject json) {
+    String searchStr = json.getString("str");
+    try {
+      Collection<Pool> pools;
+      if (!isStringEmptyOrNull(searchStr)) {
+        pools = new ArrayList<>(poolService.list(0, 0, false, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
+      } else {
+        pools = new ArrayList<>(poolService.list(0, 50, false, "id"));
+      }
+
+      StringBuilder b = new StringBuilder();
+      if (pools.size() > 0) {
+        for (Pool p : pools) {
+          generateDashboardCell(b, "pool", p.getId(), p.getName(), p.getAlias());
+        }
+      } else {
+        b.append("No matches");
+      }
+      return JSONUtils.JSONObjectResponse("html", b.toString());
+
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -177,29 +170,23 @@ public class DashboardHelperService {
     try {
       List<Study> studies;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
-        studies = new ArrayList<Study>(requestManager.listAllStudiesBySearch(searchStr));
-      }
-      else {
-        studies = new ArrayList<Study>(requestManager.listAllStudiesWithLimit(50));
+      if (!isStringEmptyOrNull(searchStr)) {
+        studies = new ArrayList<>(studyService.listBySearch(searchStr));
+      } else {
+        studies = new ArrayList<>(studyService.listWithLimit(50));
       }
 
       if (studies.size() > 0) {
         Collections.sort(studies);
         Collections.reverse(studies);
         for (Study s : studies) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/study/" + s.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + s.getName() + "</b><br/>");
-          b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "study", s.getId(), s.getName(), s.getAlias());
         }
-      }
-      else {
+      } else {
         b.append("No matches");
       }
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -210,29 +197,23 @@ public class DashboardHelperService {
     try {
       List<Experiment> experiments;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
-        experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsBySearch(searchStr));
-      }
-      else {
-        experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsWithLimit(50));
+      if (!isStringEmptyOrNull(searchStr)) {
+        experiments = new ArrayList<>(experimentService.listAllBySearch(searchStr));
+      } else {
+        experiments = new ArrayList<>(experimentService.listAllWithLimit(50));
       }
 
       if (experiments.size() > 0) {
         Collections.sort(experiments);
         Collections.reverse(experiments);
         for (Experiment e : experiments) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/experiment/" + e.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + e.getName() + "</b><br/>");
-          b.append("Alias: <b>" + e.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "experiment", e.getId(), e.getName(), e.getAlias());
         }
-      }
-      else {
+      } else {
         b.append("No matches");
       }
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -241,31 +222,26 @@ public class DashboardHelperService {
   public JSONObject searchRun(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
     try {
-      List<Run> runs;
-      StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
-        runs = new ArrayList<Run>(requestManager.listAllRunsBySearch(searchStr));
-      }
-      else {
-        runs = new ArrayList<Run>(requestManager.listAllRunsWithLimit(50));
+      Collection<Run> runs;
+      if (!isStringEmptyOrNull(searchStr)) {
+        runs = new ArrayList<>(runService.list(0, 0, false, "startDate",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
+      } else {
+        runs = new ArrayList<>(runService.list(0, 50, false, "startDate"));
       }
 
+      StringBuilder b = new StringBuilder();
       if (runs.size() > 0) {
-        Collections.sort(runs);
-        Collections.reverse(runs);
         for (Run r : runs) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/run/" + r.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + r.getName() + "</b><br/>");
-          b.append("Alias: <b>" + r.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "run", r.getId(), r.getName(), r.getAlias());
         }
-      }
-      else {
+      } else {
         b.append("No matches");
       }
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -274,36 +250,31 @@ public class DashboardHelperService {
   public JSONObject searchLibraryDilution(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
     try {
-      List<LibraryDilution> libraryDilutions;
-      StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
-        libraryDilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsBySearchOnly(searchStr));
-      }
-      else {
-        libraryDilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsWithLimit(50));
+      Collection<LibraryDilution> dilutions;
+      if (!isStringEmptyOrNull(searchStr)) {
+        dilutions = new ArrayList<>(dilutionService.list(0, 0, false, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
+      } else {
+        dilutions = new ArrayList<>(dilutionService.list(0, 50, false, "id"));
       }
 
-      if (libraryDilutions.size() > 0) {
-        Collections.sort(libraryDilutions);
-        Collections.reverse(libraryDilutions);
-        for (LibraryDilution ld : libraryDilutions) {
+      StringBuilder b = new StringBuilder();
+      if (dilutions.size() > 0) {
+        for (LibraryDilution ld : dilutions) {
           if (ld != null) {
             if (ld.getLibrary() != null) {
-              b.append("<a class=\"dashboardresult\" href=\"/miso/library/" + ld.getLibrary().getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-              b.append("Name: <b>" + ld.getName() + "</b><br/>");
-              b.append("From Library: <b>" + ld.getLibrary().getAlias() + "(" + ld.getLibrary().getName() + ")</b><br/>");
-//              b.append("From Sample: <b>" + ld.getLibrary().getSample().getAlias() + "(" + ld.getLibrary().getSample().getName() + ")</b><br/>");
-              b.append("</div></a>");
+              String libraryAliasAndName = ld.getLibrary().getAlias() + " (" + ld.getLibrary().getName() + ")";
+              generateDashboardCell(b, "library", ld.getLibrary().getId(), ld.getName(), libraryAliasAndName, "From Library");
             }
           }
         }
-      }
-      else {
+      } else {
         b.append("No matches");
       }
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -311,241 +282,113 @@ public class DashboardHelperService {
 
   public JSONObject searchLibrary(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
+
     try {
-      List<Library> libraries;
-      StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
-        if (LimsUtils.isBase64String(searchStr)) {
-          //Base64-encoded string, most likely a barcode image beeped in. decode and search
-          searchStr = new String(Base64.decodeBase64(searchStr));
-        }
-        libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(searchStr));
-      }
-      else {
-        libraries = new ArrayList<Library>(requestManager.listAllLibrariesWithLimit(50));
+      Collection<Library> libraries;
+      if (!isStringEmptyOrNull(searchStr)) {
+        libraries = new ArrayList<>(libraryService.list(0, 0, false, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
+      } else {
+        libraries = new ArrayList<>(libraryService.list(0, 50, false, "id"));
       }
 
+      StringBuilder b = new StringBuilder();
       if (libraries.size() > 0) {
-        Collections.sort(libraries);
-        Collections.reverse(libraries);
         for (Library l : libraries) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/library/" + l.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + l.getName() + "</b><br/>");
-          b.append("Alias: <b>" + l.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "library", l.getId(), l.getName(), l.getAlias());
         }
-      }
-      else {
+      } else {
         b.append("No matches");
       }
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
-  public JSONObject searchSample(HttpSession session, JSONObject json) {
+  public JSONObject searchSample(HttpSession session, JSONObject json) throws IOException {
     String searchStr = json.getString("str");
     try {
-      List<Sample> samples;
-      StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
-        if (LimsUtils.isBase64String(searchStr)) {
-          //Base64-encoded string, most likely a barcode image beeped in. decode and search
-          searchStr = new String(Base64.decodeBase64(searchStr));
-        }
-        samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
-      }
-      else {
-        samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(50));
+      Collection<Sample> samples;
+      if (!isStringEmptyOrNull(searchStr)) {
+        samples = new ArrayList<>(sampleService.list(0, 0, false, "id",
+            PaginationFilter.parse(searchStr, SecurityContextHolder.getContext().getAuthentication().getName(), x -> {
+              // Discard errors
+            })));
+      } else {
+        samples = new ArrayList<>(sampleService.list(0, 50, false, "id"));
       }
 
+      StringBuilder b = new StringBuilder();
       if (samples.size() > 0) {
-        Collections.sort(samples);
-        Collections.reverse(samples);
         for (Sample s : samples) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/sample/" + s.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
-          b.append("Name: <b>" + s.getName() + "</b><br/>");
-          b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
-          b.append("</div></a>");
+          generateDashboardCell(b, "sample", s.getId(), s.getName(), s.getAlias());
         }
-      }
-      else {
+      } else {
         b.append("No matches");
       }
+
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
-  }
-
-  public JSONObject checkAlerts(HttpSession session, JSONObject json) {
-    JSONObject response = new JSONObject();
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!requestManager.listUnreadAlertsByUserId(user.getUserId()).isEmpty()) {
-        response.put("newAlerts", true);
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-    return response;
-  }
-
-  public JSONObject getAlerts(HttpSession session, JSONObject json) {
-    StringBuilder b = new StringBuilder();
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      List<Alert> alerts;
-      if (json.has("showReadAlerts") && json.getBoolean("showReadAlerts")) {
-        alerts = new ArrayList<Alert>(requestManager.listAlertsByUserId(user.getUserId()));
-      }
-      else {
-        alerts = new ArrayList<Alert>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
-      }
-      Collections.sort(alerts);
-      for (Alert a : alerts) {
-        if (a.getAlertLevel().equals(AlertLevel.CRITICAL) || a.getAlertLevel().equals(AlertLevel.HIGH)) {
-          b.append("<div alertId='" + a.getAlertId() + "' class=\"dashboard error\">");
-        }
-        else {
-          b.append("<div alertId='" + a.getAlertId() + "' class=\"dashboard\">");
-        }
-
-        b.append(a.getAlertDate() + " <b>" + a.getAlertTitle() + "</b><br/>");
-        b.append(a.getAlertText() + "<br/>");
-        if (!a.getAlertRead()) {
-          b.append("<span onclick='Utils.alert.confirmAlertRead(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
-        }
-        b.append("</div>");
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-
-    return JSONUtils.JSONObjectResponse("html", b.toString());
-  }
-
-  public JSONObject getSystemAlerts(HttpSession session, JSONObject json) {
-    StringBuilder b = new StringBuilder();
-
-    long limit = 20;
-    if (json.has("limit")) limit = json.getLong("limit");
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        List<Alert> alerts = new ArrayList<Alert>(requestManager.listAlertsByUserId(0L, limit));
-        Collections.sort(alerts);
-        Collections.reverse(alerts);
-        for (Alert a : alerts) {
-          if (a.getAlertLevel().equals(AlertLevel.CRITICAL) || a.getAlertLevel().equals(AlertLevel.HIGH)) {
-            b.append("<div alertId='" + a.getAlertId() + "' class=\"dashboard error\">");
-          }
-          else {
-            b.append("<div alertId='" + a.getAlertId() + "' class=\"dashboard\">");
-          }
-
-          b.append(a.getAlertDate() + " <b>" + a.getAlertTitle() + "</b><br/>");
-          b.append(a.getAlertText() + "<br/>");
-          b.append("</div>");
-        }
-      }
-      else {
-        JSONUtils.SimpleJSONError("Failed: You do not have access to view system level alerts");
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-
-    return JSONUtils.JSONObjectResponse("html", b.toString());
-  }
-
-  public JSONObject setAlertAsRead(HttpSession session, JSONObject json) {
-    Long alertId = json.getLong("alertId");
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Alert a = requestManager.getAlertById(alertId);
-      if (a.getAlertUser().equals(user)) {
-        a.setAlertRead(true);
-        requestManager.saveAlert(a);
-      }
-      else {
-        JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONResponse("ok");
-  }
-
-  public JSONObject setAllAlertsAsRead(HttpSession session, JSONObject json) {
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      List<Alert> alerts = new ArrayList<Alert>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
-      for (Alert a : alerts) {
-        if (a.getAlertUser().equals(user)) {
-          a.setAlertRead(true);
-          requestManager.saveAlert(a);
-        }
-        else {
-          JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
-        }
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-    return JSONUtils.SimpleJSONResponse("ok");
   }
 
   public JSONObject showLatestReceivedSamples(HttpSession session, JSONObject json) {
     try {
       StringBuilder b = new StringBuilder();
-      Collection<Sample> samples = requestManager.listAllSamplesByReceivedDate(100);
+      Collection<Sample> samples = sampleService.listByReceivedDate(100);
+
+      Set<Long> uniqueProjects = new HashSet<>();
 
       if (samples.size() > 0) {
         for (Sample s : samples) {
-          if (s.getReceivedDate() != null) {
-            b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + s.getProject().getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          if (s.getReceivedDate() != null && !uniqueProjects.contains(s.getProject().getId())) {
+            b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + s.getProject().getId()
+                + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
             b.append("Name: <b>" + s.getProject().getName() + "</b><br/>");
             b.append("Alias: <b>" + s.getProject().getAlias() + "</b><br/>");
-            b.append("Last Received: <b>" + LimsUtils.getDateAsString(s.getReceivedDate()) + "</b><br/>");
+            b.append("Last Received: <b>" + LimsUtils.formatDate(s.getReceivedDate()) + "</b><br/>");
             b.append("</div>");
+
+            uniqueProjects.add(s.getProject().getId());
           }
         }
-      }
-      else {
+      } else {
         b.append("No matches");
       }
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
+
+  public void setDilutionService(LibraryDilutionService dilutionService) {
+    this.dilutionService = dilutionService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 }

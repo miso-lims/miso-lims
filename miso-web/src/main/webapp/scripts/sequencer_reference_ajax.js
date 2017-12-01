@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -21,90 +21,133 @@
  * *********************************************************************
  */
 
-var Sequencer = Sequencer || {};
+var Sequencer = Sequencer || {
+
+  validateSequencerReference: function() {
+    Validate.cleanFields('#sequencer_reference_form');
+
+    jQuery('#sequencer_reference_form').parsley().destroy();
+
+    jQuery('#serialNumber').attr('data-parsley-maxlength', '30');
+
+    jQuery('#name').attr('required', 'true');
+    jQuery('#name').attr('data-parsley-maxlength', '30');
+
+    jQuery('#ipAddress').attr('required', 'true');
+
+    jQuery('#datecommissionedpicker').attr('data-date-format', 'YYYY-MM-DD');
+    jQuery('#datecommissionedpicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#datecommissionedpicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+
+    jQuery('#datedecommissionedpicker').attr('data-date-format', 'YYYY-MM-DD');
+    jQuery('#datedecommissionedpicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#datedecommissionedpicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+
+    jQuery('#upgradedSequencerReference').attr('type', 'number');
+    jQuery('#upgradedSequencerReference').attr('data-parsley-error-message', 'Upgrade must refer to an existing sequencer.');
+
+    if (jQuery('input[name="status"]:checked').val() != "production") {
+      jQuery('#datedecommissionedpicker').attr('required', 'true');
+    } else {
+      jQuery('#datedecommissionedpicker').removeAttr('required');
+    }
+
+    if (jQuery('input[name="status"]:checked').val() === "upgraded") {
+      jQuery('#upgradedSequencerReference').attr('required', 'true');
+      jQuery('#upgradedSequencerReference').attr('min', '1');
+    } else {
+      jQuery('#upgradedSequencerReference').removeAttr('required');
+      jQuery('#upgradedSequencerReference').removeAttr('min');
+    }
+
+    jQuery('#sequencer_reference_form').parsley();
+    jQuery('#sequencer_reference_form').parsley().validate();
+
+    Validate.updateWarningOrSubmit('#sequencer_reference_form');
+    return false;
+  }
+
+};
 
 Sequencer.ui = {
-  insertSequencerReferenceRow : function() {
-    var self = this;
-    Fluxion.doAjax(
-      'sequencerReferenceControllerHelperService',
-      'listPlatforms',
-      {'url':ajaxurl},
-      {'doOnSuccess':self.processSequencerReferenceRow}
-    );
-  },
 
-  processSequencerReferenceRow : function(json) {
-    $('sequencerReferenceTable').insertRow(1);
-
-    var column1 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-    column1.innerHTML = "<i>Unsaved</i>";
-    var column2 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-    column2.innerHTML = "<input id='sequencername' name='sequencername' type='text'/>";
-    var column3 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-  //  column3.innerHTML = "<input id='platform' name='platform' type='text'/>";
-    column3.innerHTML = "<select id='platforms' name='platform'>" +json.platforms+ "</select>";
-    var column4 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-    column4.innerHTML = "<input id='server' name='server' type='text' onkeyup='Sequencer.ui.validateServer(this)'/>";
-    var column5 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-    column5.innerHTML = "<div id='available'></div>";
-    var column6 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-    column6.id = "addTd";
-    column6.innerHTML = "Add";
-  },
-
-  validateServer : function(t) {
-    $('available').innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
-
-    if (t.value != t.lastValue) {
-      if (t.timer) clearTimeout(t.timer);
-
-      t.timer = setTimeout(function () {
-        Fluxion.doAjax(
-          'sequencerReferenceControllerHelperService',
-          'checkServerAvailability',
-          {'server':t.value, 'url':ajaxurl},
-          {"doOnSuccess": function(json) {
-            $('available').innerHTML = json.html;
-            if (json.html == "OK") {
-              $('available').setAttribute("style", "background-color:green");
-              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Sequencer.ui.addSequencerReference();'/>Add</a>";
-            }
-            else {
-              $('available').setAttribute("style", "background-color:red");
-            }
-          }
-        });
-      }, 200);
-      t.lastValue = t.value;
+  hideStatusRowsReadOnly: function(decommissioned, upgraded, upgradedId, upgradedName) {
+    if (!decommissioned) {
+      jQuery("#decommissionedRow").hide();
+    }
+    if (!upgraded) {
+      jQuery("#upgradedReferenceRow").hide();
+    } else {
+      jQuery("#upgradedSequencerReferenceLink").empty();
+      jQuery("#upgradedSequencerReferenceLink").append("<a href='/miso/sequencer/" + upgradedId + "'>" + upgradedName + "</a>");
     }
   },
 
-  addSequencerReference : function() {
-    var f = Utils.mappifyForm("addReferenceForm");
-    Fluxion.doAjax(
-      'sequencerReferenceControllerHelperService',
-      'addSequencerReference',
-      {
-        'name':f.sequencername,
-        'platform':f.platform,
-        'server':f.server,
-        'url':ajaxurl},
-      {'doOnSuccess':Utils.page.pageReload}
-    );
+  showStatusRows: function() {
+    switch (jQuery('input[name="status"]:checked').val()) {
+    case "production":
+      Sequencer.ui.hideDecommissioned();
+      Sequencer.ui.hideUpgradedSequencerReference();
+      break;
+    case "retired":
+      Sequencer.ui.showDecommissioned();
+      Sequencer.ui.hideUpgradedSequencerReference();
+      break;
+    case "upgraded":
+      Sequencer.ui.showDecommissioned();
+      Sequencer.ui.showUpgradedSequencerReference();
+      break;
+    }
   },
 
-  deleteSequencerReference : function(refId, successfunc) {
-    if (confirm("Are you sure you really want to delete sequencer reference "+refId+"? This operation is permanent!")) {
-      Fluxion.doAjax(
-        'sequencerReferenceControllerHelperService',
-        'deleteSequencerReference',
-        {'refId':refId, 'url':ajaxurl},
-        {'doOnSuccess':function(json) {
-            successfunc();
-          }
+  hideDecommissioned: function() {
+    jQuery("#decommissionedRow").hide();
+    jQuery("#datedecommissionedpicker").val("");
+  },
+
+  showDecommissioned: function() {
+    if (jQuery("#datedecommissionedpicker").val() == "") {
+      jQuery("#datedecommissionedpicker").val(jQuery.datepicker.formatDate(Utils.ui.goodDateFormat, new Date()));
+    }
+    jQuery("#decommissionedRow").show();
+  },
+
+  hideUpgradedSequencerReference: function() {
+    jQuery("#upgradedReferenceRow").hide();
+    jQuery("#upgradedSequencerReference").val("");
+  },
+
+  showUpgradedSequencerReference: function() {
+    jQuery("#upgradedReferenceRow").show();
+    Sequencer.ui.updateUpgradedSequencerReferenceLink();
+  },
+
+  updateUpgradedSequencerReferenceLink: function() {
+    jQuery("#upgradedSequencerReferenceLink").empty();
+    if (jQuery("#upgradedSequencerReference").val() != "" && jQuery("#upgradedSequencerReference").val() != 0) {
+      jQuery("#upgradedSequencerReferenceLink").append(
+          "<a href='/miso/sequencer/" + jQuery("#upgradedSequencerReference").val() + "'>View</a>");
+    }
+  },
+
+  addServiceRecord: function(isDecommissioned, sequencerId) {
+    if (!isDecommissioned) {
+      window.location = '/miso/sequencer/servicerecord/new/' + sequencerId;
+    } else {
+      Utils.showOkDialog('Error adding Service Record', ['Cannot add Service Records to a retired sequencer.']);
+    }
+  },
+
+  deleteServiceRecord: function(recordId, successfunc) {
+    if (confirm("Are you sure you really want to delete service record " + recordId + "? This operation is permanent!")) {
+      Fluxion.doAjax('serviceRecordControllerHelperService', 'deleteServiceRecord', {
+        'recordId': recordId,
+        'url': ajaxurl
+      }, {
+        'doOnSuccess': function(json) {
+          successfunc();
         }
-      );
+      });
     }
-  }
+  },
 };

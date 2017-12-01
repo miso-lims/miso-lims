@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -22,18 +22,14 @@
  */
 
 var Dashboard = Dashboard || {
-  showLatestReceivedtSamples: function () {
+  showLatestReceivedtSamples: function() {
     jQuery('#latestSamplesList').html("<img src='/styles/images/ajax-loader.gif'/>");
-    Fluxion.doAjax(
-            'dashboard',
-            'showLatestReceivedSamples',
-            {
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              jQuery('#latestSamplesList').html(json.html);
-            }
-            });
-
+    Fluxion.doAjax('dashboard', 'showLatestReceivedSamples', {
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': function(json) {
+        jQuery('#latestSamplesList').html(json.html);
+      }
+    });
   }
 };

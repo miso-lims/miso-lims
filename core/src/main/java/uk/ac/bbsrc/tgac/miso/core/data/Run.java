@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,250 +23,466 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonManagedReference;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Note;
-import org.w3c.dom.Document;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
 /**
- * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link SequencerReference},
- * comprising one or more {@link SequencerPartitionContainer} objects in which {@link Pool}s are placed on
- * {@link SequencerPoolPartition}s.
+ * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link SequencerReference}, comprising one or more
+ * {@link SequencerPartitionContainer} objects in which {@link Pool}s are placed on {@link SequencerPoolPartition}s.
  * <p/>
  * Runs can be QCed via {@link RunQC} objects, and are always associated with a given {@link PlatformType}
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile","submissionDocument"})
-public interface Run extends SecurableByProfile, Submittable<Document>, Comparable, Reportable, Watchable, Deletable, Nameable, Alertable {
-  /** Field PREFIX  */
+@Entity
+@Table(name = "Run")
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Run
+    implements SecurableByProfile, Comparable<Run>, Watchable, Deletable, Nameable, ChangeLoggable, Aliasable,
+    Serializable {
+  private static final long serialVersionUID = 1L;
+
+  /** Field PREFIX */
   public static final String PREFIX = "RUN";
 
-  /**
-   * Returns the runId of this Run object.
-   *
-   * @return Long runId.
-   */
-  @Deprecated
-  public Long getRunId();
+  public static final Long UNSAVED_ID = 0L;
+
+  private String accession;
+
+  @Column(nullable = false)
+  private String alias;
+
+  @OneToMany(targetEntity = RunChangeLog.class, mappedBy = "run", cascade = CascadeType.REMOVE)
+  private final Collection<ChangeLog> changeLogs = new ArrayList<>();
+  @Temporal(TemporalType.DATE)
+  private Date completionDate;
+
+  @ManyToMany(targetEntity = SequencerPartitionContainerImpl.class)
+  @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
+      @JoinColumn(name = "Run_runId") }, inverseJoinColumns = {
+          @JoinColumn(name = "containers_containerId") })
+  private List<SequencerPartitionContainer> containers = new ArrayList<>();
+
+  private String description;
+  private String filePath;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private HealthType health = HealthType.Unknown;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator", nullable = false, updatable = false)
+  private User creator;
+
+  @Column(name = "created", nullable = false, updatable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationTime;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
+  private User lastModifier;
+
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
+
+  private String metrics;
+
+  private String name;
+
+  @ManyToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Run_Note", joinColumns = {
+      @JoinColumn(name = "run_runId") }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId") })
+  private Collection<Note> notes = new HashSet<>();
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long runId = UNSAVED_ID;
+
+  @ManyToOne(targetEntity = SecurityProfile.class, cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "securityProfile_profileId")
+  private SecurityProfile securityProfile = new SecurityProfile();
+
+  @ManyToOne(targetEntity = SequencerReferenceImpl.class)
+  @JoinColumn(name = "sequencerReference_sequencerReferenceId", nullable = false)
+  private SequencerReference sequencerReference;
+
+  @ManyToOne
+  @JoinColumn(name = "sequencingParameters_parametersId")
+  private SequencingParameters sequencingParameters;
+  @Temporal(TemporalType.DATE)
+  private Date startDate;
+
+  @Transient
+  // not Hibernate-managed
+  private Group watchGroup;
+
+  @ManyToMany(targetEntity = UserImpl.class)
+  @JoinTable(name = "Run_Watcher", joinColumns = { @JoinColumn(name = "runId") }, inverseJoinColumns = { @JoinColumn(name = "userId") })
+  private Set<User> watchUsers = new HashSet<>();
 
   /**
-   * Sets the runId of this Run object.
-   *
-   * @param runId runId.
+   * Construct a new Run with a default empty SecurityProfile
    */
-  @Deprecated
-  public void setRunId(Long runId);
-
-  public void setId(long id);
+  public Run() {
+    setSecurityProfile(new SecurityProfile());
+  }
 
   /**
-   * Returns the sequencerReference of this Run object.
-   *
-   * @return SequencerReference sequencerReference.
+   * Construct a new Run with a SecurityProfile owned by the given User
+   * 
+   * @param user
+   *          of type User
+   * 
    */
-  public SequencerReference getSequencerReference();
+  public Run(User user) {
+    setSecurityProfile(new SecurityProfile(user));
+  }
 
-  /**
-   * Sets the platformType of this Run object.
-   *
-   * @param sequencerReference SequencerReference.
-   */
-  public void setSequencerReference(SequencerReference sequencerReference);
+  public void addNote(Note note) {
+    this.notes.add(note);
+  }
 
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers();
+  public void addSequencerPartitionContainer(SequencerPartitionContainer f) {
+    f.setSecurityProfile(getSecurityProfile());
+    if (f.getId() == 0L && f.getIdentificationBarcode() == null) {
+      // can't validate it so add it anyway. this will only usually be the case for new run population.
+      this.containers.add(f);
+    } else {
+      if (!this.containers.contains(f)) {
+        this.containers.add(f);
+      }
+    }
+  }
 
-  public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers);
+  @Override
+  public void addWatcher(User user) {
+    watchUsers.add(user);
+  }
 
-  public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer);
+  @Override
+  public int compareTo(Run t) {
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
+    return 0;
+  }
 
-  /**
-   * Returns the platformType of this Run object.
-   *
-   * @return PlatformType platformType.
-   */
-  public PlatformType getPlatformType();
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    RunChangeLog changeLog = new RunChangeLog();
+    changeLog.setRun(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
+  }
 
-  /**
-   * Sets the platformType of this Run object.
-   *
-   * @param platformType PlatformType.
-   */
-  public void setPlatformType(PlatformType platformType);
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof Run)) return false;
+    Run them = (Run) obj;
+    // If not saved, then compare resolved actual objects. Otherwise
+    // just compare IDs.
+    if (getId() == UNSAVED_ID || them.getId() == UNSAVED_ID) {
+      return getAlias().equals(them.getAlias());
+    } else {
+      return getId() == them.getId();
+    }
+  }
 
-  /**
-   * Returns the accession of this Run object.
-   *
-   * @return String accession.
-   */
-  public String getAccession();
+  public String getAccession() {
+    return accession;
+  }
 
-  /**
-   * Sets the accession of this Run object.
-   *
-   * @param accession String.
-   */
-  public void setAccession(String accession);
+  @Override
+  public String getAlias() {
+    return alias;
+  }
 
-  /**
-   * Returns the alias of this Run object.
-   *
-   * @return String alias.
-   */
-  public String getAlias();
+  public Date getCompletionDate() {
+    return completionDate;
+  }
 
-  /**
-   * Sets the alias of this Run object.
-   *
-   * @param alias String.
-   */
-  public void setAlias(String alias);
+  public String getDescription() {
+    return description;
+  }
 
-  /**
-   * Sets the name of this Run object.
-   *
-   * @param name name.
-   */
-  public void setName(String name);
+  public String getFilePath() {
+    return filePath;
+  }
 
-  /**
-   * Returns the description of this Run object.
-   *
-   * @return String description.
-   */
-  public String getDescription();
+  public HealthType getHealth() {
+    return health;
+  }
 
-  /**
-   * Sets the description of this Run object.
-   *
-   * @param description description.
-   */
-  public void setDescription(String description);
+  @Override
+  public long getId() {
+    return runId;
+  }
 
-  /**
-   * Returns the platformRunId of this Run object.
-   *
-   * @return Integer platformRunId.
-   */
-  public Integer getPlatformRunId();
+  public User getLastModifier() {
+    return lastModifier;
+  }
 
-  /**
-   * Sets the platformRunId of this Run object.
-   *
-   * @param platformRunId the actual run number on the sequencing instrument.
-   */
-  public void setPlatformRunId(Integer platformRunId);
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
 
-  /**
-   * Returns the cycles of this Run object.
-   *
-   * @return Integer cycles.
-   */
-  public Integer getCycles();
+  public Date getLastModified() {
+    return lastModified;
+  }
 
-  /**
-   * Sets the cycles of this Run object.
-   *
-   * @param cycles cycles.
-   */
-  public void setCycles(Integer cycles);
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
 
-  /**
-   * Returns the pairedEnd attribute of this Run object.
-   *
-   * @return Boolean pairedEnd.
-   */
-  public Boolean getPairedEnd();
+  public User getCreator() {
+    return creator;
+  }
 
-  /**
-   * Sets the pairedEnd attribute of this Run object.
-   *
-   * @param pairedEnd pairedEnd.
-   */
-  public void setPairedEnd(Boolean pairedEnd);
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
 
-  /**
-   * Returns the filePath of this Run object.
-   *
-   * @return String filePath.
-   */
-  public String getFilePath();
+  public Date getCreationTime() {
+    return creationTime;
+  }
 
-  /**
-   * Sets the filePath of this Run object.
-   *
-   * @param filePath filePath.
-   *
-   */
-  public void setFilePath(String filePath);
+  public void setCreationTime(Date created) {
+    this.creationTime = created;
+  }
 
-  /**
-   * Returns the status of this Run object.
-   *
-   * @return Status status.
-   */
-  public Status getStatus();
+  public String getMetrics() {
+    return metrics;
+  }
 
-  /**
-   * Sets the status of this Run object.
-   *
-   * @param status status.
-   */
-  public void setStatus(Status status);
+  @Override
+  public String getName() {
+    return name;
+  }
 
-  /**
-   * Registers that a RunQC has been carried out on this Run
-   *
-   * @param runQC of type RunQC
-   * @throws MalformedRunQcException when the RunQC registered is not valid
-   */
-  public void addQc(RunQC runQC) throws MalformedRunQcException;
+  public Collection<Note> getNotes() {
+    return notes;
+  }
 
-  /**
-   * Returns the RunQC carried out on this Run object.
-   *
-   * @return Collection<RunQC> runQCs.
-   */
-  //@JsonManagedReference(value="runqcs")
-  public Collection<RunQC> getRunQCs();
+  @Override
+  public SecurityProfile getSecurityProfile() {
+    return securityProfile;
+  }
 
-  /**
-   * Sets the notes of this Sample object.
-   *
-   * @param notes notes.
-   */
-  public void setNotes(Collection<Note> notes);
+  public List<SequencerPartitionContainer> getSequencerPartitionContainers() {
+    if (this.containers != null) Collections.sort(this.containers);
+    return containers;
+  }
 
-  /**
-   * Adds a Note to the Set of notes of this Sample object.
-   *
-   * @param note Note.
-   */
-  public void addNote(Note note);
+  public SequencerReference getSequencerReference() {
+    return sequencerReference;
+  }
 
-  /**
-   * Returns the notes of this Sample object.
-   *
-   * @return Collection<Note> notes.
-   */
-  public Collection<Note> getNotes();
+  public SequencingParameters getSequencingParameters() {
+    return sequencingParameters;
+  }
 
-  Date getLastUpdated();
+  public Date getStartDate() {
+    return startDate;
+  }
 
-  void setLastUpdated(Date lastUpdated);
+  @Override
+  public String getWatchableIdentifier() {
+    return getName();
+  }
+
+  @Override
+  public Set<User> getWatchers() {
+    Set<User> allWatchers = new HashSet<>();
+    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
+    if (watchUsers != null) allWatchers.addAll(watchUsers);
+    return allWatchers;
+  }
+
+  public Group getWatchGroup() {
+    return watchGroup;
+  }
+
+  public Set<User> getWatchUsers() {
+    return watchUsers;
+  }
+
+  @Override
+  public int hashCode() {
+    if (getId() != UNSAVED_ID) {
+      return (int) getId();
+    } else {
+      final int PRIME = 37;
+      int hashcode = 1;
+      if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
+      return hashcode;
+    }
+  }
+
+  @Override
+  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
+    if (parent.getSecurityProfile().getOwner() != null) {
+      setSecurityProfile(parent.getSecurityProfile());
+    } else {
+      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
+    }
+  }
+
+  @Override
+  public boolean isDeletable() {
+    return getId() != Run.UNSAVED_ID;
+  }
+
+  public boolean isFull() {
+    return containers.size() >= sequencerReference.getPlatform().getNumContainers();
+  }
+
+  @Override
+  public void removeWatcher(User user) {
+    watchUsers.remove(user);
+  }
+
+  public void setAccession(String accession) {
+    this.accession = accession;
+  }
+
+  public void setAlias(String alias) {
+    this.alias = alias;
+  }
+
+  public void setCompletionDate(Date completionDate) {
+    this.completionDate = completionDate;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public void setFilePath(String filePath) {
+    this.filePath = filePath;
+  }
+
+  public void setHealth(HealthType health) {
+    if (health.isAllowedFromSequencer()) {
+      this.health = health;
+    } else {
+      throw new IllegalArgumentException("Cannot set a status to " + health.getKey());
+    }
+  }
+
+  public void setId(long id) {
+    this.runId = id;
+  }
+
+  public void setMetrics(String metrics) {
+    this.metrics = metrics;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setNotes(Collection<Note> notes) {
+    this.notes = notes;
+  }
+
+  @Override
+  public void setSecurityProfile(SecurityProfile securityProfile) {
+    this.securityProfile = securityProfile;
+  }
+
+  public void setSequencerPartitionContainers(List<SequencerPartitionContainer> containers) {
+    this.containers = containers;
+  }
+
+  public void setSequencerReference(SequencerReference sequencerReference) {
+    this.sequencerReference = sequencerReference;
+  }
+
+  public void setSequencingParameters(SequencingParameters parameters) {
+    this.sequencingParameters = parameters;
+  }
+
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
+  }
+
+  @Override
+  public void setWatchGroup(Group watchGroup) {
+    this.watchGroup = watchGroup;
+  }
+
+  public void setWatchUsers(Set<User> watchUsers) {
+    this.watchUsers = watchUsers;
+  }
+
+  @Override
+  public boolean userCanRead(User user) {
+    return securityProfile.userCanRead(user);
+  }
+
+  @Override
+  public boolean userCanWrite(User user) {
+    return securityProfile.userCanWrite(user);
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLogs;
+  }
+
+  public Boolean getPairedEnd() {
+    return null;
+  }
+
+  public void setPairedEnd(boolean pairedEnd) {
+    throw new UnsupportedOperationException("Cannot set paired end on runs from this platform.");
+  }
+  
+  public abstract PlatformType getPlatformType();
+
 }

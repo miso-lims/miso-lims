@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,68 +23,87 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+
 /**
  * Defines a DAO interface for storing SequencerPartitionContainers
- *
+ * 
  * @author Rob Davey
  * @since 0.1.6
  */
-public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer<SequencerPoolPartition>>, NamingSchemeAware<SequencerPartitionContainer<SequencerPoolPartition>>, Remover<SequencerPartitionContainer<SequencerPoolPartition>> {
-  /**
-   * Retrieve a SequencerPartitionContainer from an underlying data store given a SequencerPartitionContainer ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param sequencerPartitionContainerId of type long
-   * @return SequencerPartitionContainer
-   * @throws java.io.IOException when
-   */
-  //SequencerPartitionContainer<SequencerPoolPartition> lazyGet(long sequencerPartitionContainerId) throws IOException;
+public interface SequencerPartitionContainerStore extends Remover<SequencerPartitionContainer>,
+    PaginatedDataSource<SequencerPartitionContainer> {
+
+  public SequencerPartitionContainer save(SequencerPartitionContainer container) throws IOException;
+
+  public SequencerPartitionContainer get(long id) throws IOException;
+
+  public List<SequencerPartitionContainer> listAll() throws IOException;
+
+  public int count() throws IOException;
 
   /**
    * Get the SequencerPartitionContainer that contains a given {@link SequencerPoolPartition}
-   *
-   * @param partitionId of type long
+   * 
+   * @param partitionId
+   *          of type long
    * @return SequencerPartitionContainer
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
-  SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerByPartitionId(long partitionId) throws IOException;
+  SequencerPartitionContainer getSequencerPartitionContainerByPartitionId(long partitionId) throws IOException;
 
   /**
    * List all SequencerPartitionContainers given a parent Run ID
-   *
-   * @param runId of type long
+   * 
+   * @param runId
+   *          of type long
    * @return List<SequencerPartitionContainer>
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
-  List<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainersByRunId(long runId) throws IOException;
+  List<SequencerPartitionContainer> listAllSequencerPartitionContainersByRunId(long runId) throws IOException;
 
   /**
    * List all SequencerPartitionContainers given an ID barcode
-   *
-   * @param barcode of type String
+   * 
+   * @param barcode
+   *          of type String
    * @return List<SequencerPartitionContainer>
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
-  List<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByBarcode(String barcode) throws IOException;
+  List<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode) throws IOException;
 
   /**
    * List all SequencerPoolPartitions that are contained by a given {@link SequencerPartitionContainer}
-   *
-   * @param sequencerPartitionContainerId of type long
+   * 
+   * @param sequencerPartitionContainerId
+   *          of type long
    * @return Collection<? extends SequencerPoolPartition>
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
-  Collection<? extends SequencerPoolPartition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException;
+  Collection<Partition> listPartitionsByContainerId(long sequencerPartitionContainerId) throws IOException;
+
+  Partition getPartitionById(long partitionId);
+
+  public void update(Partition partition);
+
+  public FlowCellVersion getFlowCellVersion(long id);
+
+  public List<FlowCellVersion> listFlowCellVersions();
+
+  public PoreVersion getPoreVersion(long id);
+
+  public List<PoreVersion> listPoreVersions();
+
 }

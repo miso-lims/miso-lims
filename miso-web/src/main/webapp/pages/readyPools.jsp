@@ -1,6 +1,6 @@
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -49,7 +49,7 @@
 <c:forEach items="${platformTypes}" var="pt" varStatus="c">
   <div id="tab-${c.count}">
     <h1>
-      <div id="${pt}totalCount">${pt} Pools</div>
+      <span id="${pt}totalCount">${pt} Pools</span>
     </h1>
 
     <form id="filter-form${c.count}">Filter:
@@ -63,19 +63,17 @@
         <th>Alias</th>
         <th>Barcode</th>
         <th>Date Created</th>
-        <th class="fit">Edit</th>
+        <th>Low Quality</th>
       </tr>
       </thead>
       <tbody>
       <c:forEach items="${pools[pt]}" var="ipool">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${ipool.name}</td>
-          <td>${ipool.alias}</td>
+          <td><b><a href='<c:url value="/miso/pool/${ipool.id}"/>'>${ipool.name}</a></b></td> 
+          <td><a href='<c:url value="/miso/pool/${ipool.id}"/>'>${ipool.alias}</a></td>
           <td>${ipool.identificationBarcode}</td>
           <td>${ipool.creationDate}</td>
-          <td class="misoicon"
-              onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
+          <td>${ipool.hasLowQualityMembers}</td>
         </tr>
       </c:forEach>
       </tbody>
@@ -93,19 +91,15 @@
           <th>Alias</th>
           <th>Barcode</th>
           <th>Date Created</th>
-          <th class="fit">Edit</th>
         </tr>
         </thead>
         <tbody>
         <c:forEach items="${usedpools[pt]}" var="ipool">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${ipool.name}</td>
-            <td>${ipool.alias}</td>
+            <td><b><a href='<c:url value="/miso/pool/${ipool.id}"/>'>${ipool.name}</a></b></td> 
+            <td><a href='<c:url value="/miso/pool/${ipool.id}"/>'>${ipool.alias}</a></td>
             <td>${ipool.identificationBarcode}</td>
             <td>${ipool.creationDate}</td>
-            <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span
-                class="ui-icon ui-icon-pencil"/></td>
           </tr>
         </c:forEach>
         </tbody>

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -27,7 +27,7 @@ package uk.ac.bbsrc.tgac.miso.integration.util;
  * uk.ac.bbsrc.tgac.miso.core.exception
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03-Sep-2010
  * @since 0.0.2
@@ -40,7 +40,7 @@ public class IntegrationException extends Exception {
   public IntegrationException(String s, Throwable cause) {
     super(s);
     if (cause != null) {
-        initCause(cause);
+      initCause(cause);
     }
   }
 }

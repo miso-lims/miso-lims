@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,78 +12,45 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-/**
- * A QC that is specifically carried out on a given {@link Library}
- *
- * @author Rob Davey
- * @since 0.0.2
- */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-//@JsonIgnoreProperties({"library","deletable"})
-public interface LibraryQC extends QC {
-  /**
-   * Returns the library of this LibraryQC object.
-   *
-   * @return Library library.
-   */
-  @JsonBackReference(value="qclibrary")
-  public Library getLibrary();
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 
-  /**
-   * Sets the library of this LibraryQC object.
-   *
-   * @param library library.
-   * @throws MalformedLibraryException when the Library being set is not valid  
-   */
-  public void setLibrary(Library library) throws MalformedLibraryException;
+@Entity
+@Table(name = "LibraryQC")
+public class LibraryQC extends QC {
 
-  /**
-   * Returns the insertSize (in base pairs) of this LibraryQC object.
-   *
-   * @return Integer insertSize.
-   */
-  public Integer getInsertSize();
+  private static final long serialVersionUID = 1L;
 
-  /**
-   * Sets the insertSize (in base pairs) of this LibraryQC object.
-   *
-   * @param insertSize insertSize.
-   *
-   */
-  public void setInsertSize(Integer insertSize);
+  @ManyToOne(targetEntity = LibraryImpl.class)
+  @JoinColumn(name = "library_libraryId")
+  private Library library;
 
-  /**
-   * Returns the results of this QC object.
-   *
-   * @return Double results.
-   */
-  public Double getResults();
+  public Library getLibrary() {
+    return library;
+  }
 
-  /**
-   * Sets the results of this QC object.
-   *
-   * @param results results.
-   */
-  public void setResults(Double results);  
+  public void setLibrary(Library library) {
+    this.library = library;
+  }
+
+  @Override
+  public QualityControllable<?> getEntity() {
+    return library;
+  }
+
 }

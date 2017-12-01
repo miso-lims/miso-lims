@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -24,30 +24,38 @@
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * This enum represents the health of a particular object, given some kind of underlying process
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public enum HealthType {
-  Unknown("Unknown"),
-  Completed("Completed"),
-  Failed("Failed"),
-  Started("Started"),
-  Stopped("Stopped"),
-  Running("Running");
+  Unknown("Unknown", 0, true, false), //
+  Completed("Completed", -1, true, true), //
+  Failed("Failed", 0, true, true), //
+  Started("Started", -1, true, false), //
+  Stopped("Stopped", -1, true, true), //
+  Running("Running", -1, true, false), //
+  Requested("Requested", 1, false, false);
 
-  /** Field key  */
-  private String key;
+  public static final Comparator<HealthType> COMPARATOR = new Comparator<HealthType>() {
+    @Override
+    public int compare(HealthType o1, HealthType o2) {
+      int p1 = o1 == null ? -1 : o1.ordinal();
+      int p2 = o2 == null ? -1 : o2.ordinal();
+      return p1 - p2;
+    }
+  };
   /**
    * Field lookup
    */
-  private static final Map<String, HealthType> lookup = new HashMap<String, HealthType>();
+  private static final Map<String, HealthType> lookup = new HashMap<>();
 
   static {
     for (HealthType s : EnumSet.allOf(HealthType.class))
@@ -55,18 +63,10 @@ public enum HealthType {
   }
 
   /**
-   * Constructs a HealthType based on a given key
-   *
-   * @param key of type String
-   */
-  HealthType(String key) {
-    this.key = key;
-  }
-
-  /**
    * Returns a HealthType given an enum key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    * @return HealthType
    */
   public static HealthType get(String key) {
@@ -74,24 +74,64 @@ public enum HealthType {
   }
 
   /**
+   * Returns the keys of this HealthType enum.
+   * 
+   * @return ArrayList<String> keys.
+   */
+  public static ArrayList<String> getKeys() {
+    ArrayList<String> keys = new ArrayList<>();
+    for (HealthType h : HealthType.values()) {
+      keys.add(h.getKey());
+    }
+    return keys;
+  }
+
+  /** Field key */
+  private final String key;
+
+  private final int multiplier;
+
+  private final boolean allowedFromSequencer;
+
+  private final boolean isDone;
+
+  /**
+   * Constructs a HealthType based on a given key
+   * 
+   * @param key
+   *          of type String
+   */
+  HealthType(String key, int multiplier, boolean allowedFromSequencer, boolean isDone) {
+    this.key = key;
+    this.multiplier = multiplier;
+    this.allowedFromSequencer = allowedFromSequencer;
+    this.isDone = isDone;
+  }
+
+  /**
    * Returns the key of this HealthType enum.
-   *
+   * 
    * @return String key.
    */
   public String getKey() {
     return key;
   }
 
-  /**
-   * Returns the keys of this HealthType enum.
-   *
-   * @return ArrayList<String> keys.
-   */
-  public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
-    for (HealthType h : HealthType.values()) {
-      keys.add(h.getKey());
-    }
-    return keys;
+  public int getMultiplier() {
+    return multiplier;
   }
+
+  /**
+   * Whether is health type may be used as a status from a sequencer.
+   * 
+   * Some health information is used for pool order completions that cannot be a state of an actual sequencer run's status.
+   */
+  public boolean isAllowedFromSequencer() {
+    return allowedFromSequencer;
+  }
+
+  public boolean isDone() {
+    return isDone;
+  }
+
 }

@@ -1,6 +1,6 @@
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -22,8 +22,6 @@
   --%>
 
 <%@ include file="../header.jsp" %>
-<script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/task_ajax.js?ts=${timestamp.time}'/>"></script>
 <div id="maincontent">
 <div id="contentcolumn">
 

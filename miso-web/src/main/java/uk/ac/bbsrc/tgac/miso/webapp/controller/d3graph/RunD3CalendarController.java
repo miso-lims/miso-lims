@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,29 +23,28 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.d3graph;
 
+import java.io.IOException;
+import java.util.Collection;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 
-import java.io.IOException;
-import java.util.Collection;
-
-
 /**
- * Created by IntelliJ IDEA.
- * User: thankia
- * Date: 06/12/11
- * Time: 11:36
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: thankia Date: 06/12/11 Time: 11:36 To change this template use File | Settings | File Templates.
  */
 @Controller
 @RequestMapping("/d3graph/run")
@@ -54,30 +53,31 @@ public class RunD3CalendarController {
   protected static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private RunService runService;
 
   @RequestMapping(method = RequestMethod.GET)
   public @ResponseBody JSONArray graphd3Rest() throws IOException {
     try {
-      Collection<Run> runs = requestManager.listAllRuns();
+      Collection<Run> runs = runService.list();
       JSONArray runsArray = new JSONArray();
       for (Run r : runs) {
-        runsArray.add(JSONObject.fromObject("{'ID':'" + r.getId()
-                                            + "','Name':'" + r.getName()
-                                            + "','Start':'" + (r.getStatus() != null ? r.getStatus().getStartDate() : "")
-                                            + "','Stop':'" + (r.getStatus() != null ? r.getStatus().getCompletionDate() : "")
-                                            + "','Instrument':'" + r.getSequencerReference().getId()
-                                            + "','InstrumentName':'" +  r.getSequencerReference().getPlatform().getInstrumentModel()
-                                            + "','Health':'" + (r.getStatus() != null && r.getStatus().getHealth() != null ? r.getStatus().getHealth().getKey() : "")
-                                            + "','Description':'" + r.getDescription()+  "'}"));
+        runsArray.add(JSONObject.fromObject(
+            "{'ID':'" + r.getId() + "','Name':'" + r.getName() + "','Start':'" + (r.getStartDate())
+                + "','Stop':'" + (r.getCompletionDate()) + "','Instrument':'"
+                + r.getSequencerReference().getId() + "','InstrumentName':'" + r.getSequencerReference().getPlatform().getInstrumentModel()
+                + "','Health':'" + (r.getHealth() != null ? r.getHealth().getKey() : "")
+                + "','Description':'" + r.getDescription() + "'}"));
       }
       return runsArray;
-    }
-    catch (InvalidOperationException e) {
+    } catch (InvalidOperationException e) {
       log.debug("Failed", e);
       JSONArray runsArray = new JSONArray();
       runsArray.add(JSONObject.fromObject("{'Error':" + e + "}"));
       return runsArray;
     }
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 }

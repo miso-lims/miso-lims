@@ -1039,7 +1039,6 @@ $.jgrid.extend({
 				if(ret[0] === false) {
 					$("#FormError>td","#"+frmtb).html(ret[1]);
 					$("#FormError","#"+frmtb).show();
-					// return; 
 				}
 			}
 			function compareData(nObj, oObj ) {

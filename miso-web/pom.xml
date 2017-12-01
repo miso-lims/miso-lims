@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ Copyright (c) 2017. Earlham Institute, Norwich, UK, and
+  ~ the Ontario Institute for Cancer Research, Ontario, Canada. 
+  ~ MISO project contacts: Robert Davey @ EI (formerly TGAC), 
+  ~ Morgan Taschuk @ OICR 
   ~
   ~ **********************************************************************
   ~
@@ -14,73 +16,313 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses />.
   ~
   ~ **********************************************************************
-  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.2.99</version>
   </parent>
-
-  <groupId>${parent.groupId}</groupId>
-  <version>${parent.version}</version>
   <artifactId>miso-web</artifactId>
-
   <packaging>war</packaging>
   <name>MISO MVC</name>
-  <modelVersion>4.0.0</modelVersion>
-
+  <properties>
+    <skipITs>true</skipITs>
+    <cargoInitGoal>start</cargoInitGoal>
+    <mysql.db>lims</mysql.db>
+    <mysql.user>tgaclims</mysql.user>
+    <mysql.pw>tgaclims</mysql.pw>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>aopalliance</groupId>
+      <artifactId>aopalliance</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.lowagie</groupId>
+      <artifactId>itext</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-apache-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+      <artifactId>oauth-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+      <artifactId>oauth-signature</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_hotspot</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_servlet</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_hibernate</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus.jmx</groupId>
+      <artifactId>collector</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>javax.servlet.jsp-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.json-lib</groupId>
+      <artifactId>json-lib</artifactId>
+      <classifier>jdk15</classifier>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.fluxion</groupId>
+      <artifactId>fluxion-spi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>stax</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>webdrivermanager</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-ldap</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-taglibs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-aop</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+      <artifactId>core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+      <artifactId>integration-tools</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+      <artifactId>miso-dto</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+      <artifactId>miso-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+      <artifactId>spring</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>stax</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+      <artifactId>sqlstore</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.tgac.fluxion.ajax</groupId>
+      <artifactId>fluxion-ajax-3</artifactId>
+    </dependency>
+    <dependency>
+      <!-- Do not remove - used by container -->
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <build>
     <finalName>ROOT</finalName>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-          <encoding>${project.build.sourceEncoding}</encoding>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
+        <groupId>com.samaxes.maven</groupId>
+        <artifactId>minify-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>unpack-fluxion-ajax-js</id>
-            <phase>process-resources</phase>
+            <id>default-minify</id>
             <goals>
-              <goal>unpack</goal>
+              <goal>minify</goal>
             </goals>
             <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>net.sourceforge.fluxion.ajax</groupId>
-                  <artifactId>fluxion-ajax-js</artifactId>
-                  <version>1.0-alpha-12</version>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                </artifactItem>
-              </artifactItems>
-              <excludes>META-INF</excludes>
-              <outputDirectory>target/ROOT/scripts/fluxion-ajax/</outputDirectory>
-              <overWriteReleases>true</overWriteReleases>
+              <charset>UTF-8</charset>
+              <cssSourceDir>styles</cssSourceDir>
+              <cssSourceIncludes>
+                <cssSourceInclude>*.css</cssSourceInclude>
+              </cssSourceIncludes>
+              <cssFinalFile>style.css</cssFinalFile>
+              <jsSourceDir>scripts</jsSourceDir>
+              <jsSourceFiles>
+                <jsSourceFile>jquery/datatables/js/jquery.dataTables.min.js</jsSourceFile>
+              </jsSourceFiles>
+              <jsSourceIncludes>
+                <jsSourceInclude>*.js</jsSourceInclude>
+              </jsSourceIncludes>
+              <jsSourceExcludes>
+                <jsSourceExclude>xregexp-all-min.js</jsSourceExclude>
+                <jsSourceExclude>runCalendar.js</jsSourceExclude>
+              </jsSourceExcludes>
+              <jsFinalFile>header_script.js</jsFinalFile>
             </configuration>
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
     </plugins>
   </build>
-
   <profiles>
     <profile>
       <id>sql</id>
@@ -91,104 +333,23 @@
         </property>
       </activation>
       <build>
+        <resources>
+          <resource>
+            <filtering>true</filtering>
+            <directory>src/main/resources</directory>
+          </resource>
+        </resources>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-            <version>${war-plugin-version}</version>
-            <configuration>
-              <webResources>
-                <resource>
-                  <directory>src/main/resources/sql</directory>
-                  <targetPath>WEB-INF</targetPath>
-                  <filtering>true</filtering>
-                  <includes>
-                    <include>db-config.xml</include>
-                  </includes>
-                </resource>
-              </webResources>
-            </configuration>
           </plugin>
         </plugins>
-
-        <resources>
-          <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-            <excludes>
-              <exclude>db4o/*</exclude>
-            </excludes>
-          </resource>
-        </resources>
       </build>
-
-      <dependencies>
-        <dependency>
-          <groupId>${parent.groupId}</groupId>
-          <artifactId>sqlstore</artifactId>
-          <version>${parent.version}</version>
-        </dependency>
-      </dependencies>
-
       <properties>
-        <spring-version>3.1.3.RELEASE</spring-version>
-      </properties>
-
-    </profile>
-
-    <profile>
-      <id>db4o</id>
-      <activation>
-        <property>
-          <name>database</name>
-          <value>db4o</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <version>${war-plugin-version}</version>
-            <configuration>
-              <webResources>
-                <resource>
-                  <directory>src/main/resources/db4o</directory>
-                  <targetPath>WEB-INF</targetPath>
-                  <filtering>true</filtering>
-                  <includes>
-                    <include>db-config.xml</include>
-                  </includes>
-                </resource>
-              </webResources>
-            </configuration>
-          </plugin>
-        </plugins>
-
-        <resources>
-          <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-            <excludes>
-              <exclude>sql/*</exclude>
-            </excludes>
-          </resource>
-        </resources>
-      </build>
-
-      <dependencies>
-        <dependency>
-          <groupId>${parent.groupId}</groupId>
-          <artifactId>db4ostore</artifactId>
-          <version>${parent.version}</version>
-        </dependency>
-      </dependencies>
-
-      <properties>
-        <spring-version>3.1.3.RELEASE</spring-version>
+        <spring-version>${spring-version}</spring-version>
       </properties>
     </profile>
-
     <profile>
       <id>external</id>
       <activation>
@@ -198,11 +359,34 @@
         </property>
       </activation>
       <build>
+        <resources>
+          <resource>
+            <filtering>true</filtering>
+            <directory>src/main/resources/external</directory>
+            <includes>
+              <include>miso.properties</include>
+            </includes>
+            <excludes>
+              <exclude>../internal/*</exclude>
+            </excludes>
+          </resource>
+          <resource>
+            <filtering>true</filtering>
+            <directory>src/main/resources</directory>
+            <includes>
+              <include>fluxion/</include>
+              <include>status/</include>
+            </includes>
+            <excludes>
+              <exclude>../internal/*</exclude>
+              <exclude>../external/*</exclude>
+            </excludes>
+          </resource>
+        </resources>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-            <version>${war-plugin-version}</version>
             <configuration>
               <webResources>
                 <resource>
@@ -210,346 +394,546 @@
                   <targetPath>WEB-INF/classes</targetPath>
                   <filtering>true</filtering>
                   <excludes>
-                    <exclude>sql/*</exclude>
                     <exclude>internal/*</exclude>
                     <exclude>external/*</exclude>
-                    <exclude>db4o/*</exclude>
                   </excludes>
-                </resource>
-                <resource>
-                  <directory>src/main/resources/sql</directory>
-                  <targetPath>WEB-INF</targetPath>
-                  <filtering>true</filtering>
-                  <includes>
-                    <include>db-config.xml</include>
-                  </includes>
                 </resource>
               </webResources>
             </configuration>
           </plugin>
         </plugins>
-        <resources>
-          <resource>
-            <directory>src/main/resources/external</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>miso.properties</include>
-            </includes>
-            <excludes>
-              <exclude>../internal/*</exclude>
-              <exclude>../db4o/*</exclude>
-            </excludes>
-          </resource>
-          <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>fluxion/</include>
-              <include>status/</include>
-            </includes>
-            <excludes>
-              <exclude>../sql/*</exclude>
-              <exclude>../internal/*</exclude>
-              <exclude>../external/*</exclude>
-              <exclude>../db4o/*</exclude>
-            </excludes>
-          </resource>
-        </resources>
       </build>
     </profile>
-
+    <profile>
+      <id>integration-test-setup</id>
+      <activation>
+        <property>
+          <!-- activate when integration tests are enabled -->
+          <name>skipITs</name>
+          <value>false</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <!-- separate integration test sources/resources from unit tests -->
+	        <groupId>org.codehaus.mojo</groupId>
+	        <artifactId>build-helper-maven-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>add-it-sources</id>
+	            <phase>generate-test-sources</phase>
+	            <goals>
+	              <goal>add-test-source</goal>
+	            </goals>
+	            <configuration>
+	              <sources>
+	                <source>src/it/java</source>
+	              </sources>
+	            </configuration>
+	          </execution>
+	          <execution>
+	            <id>add-it-resources</id>
+	            <phase>generate-test-resources</phase>
+	            <goals>
+	              <goal>add-test-resource</goal>
+	            </goals>
+	            <configuration>
+	              <resources>
+	                <resource>
+	                  <filtering>true</filtering>
+	                  <directory>src/it/resources</directory>
+	                </resource>
+	              </resources>
+	            </configuration>
+	          </execution>
+	          <!-- Reserve ports for Tomcat -->
+	          <execution>
+	            <id>reserve-network-port</id>
+                <phase>pre-integration-test</phase>
+	            <goals>
+	              <goal>reserve-network-port</goal>
+	            </goals>
+	            <configuration>
+	              <portNames>
+	                <portName>miso.it.tomcat.servlet.port</portName>
+                    <portName>miso.it.tomcat.ajp.port</portName>
+	              </portNames>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+	      <plugin>
+	        <!-- copy Flyway migrations from sqlstore -->
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-dependency-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>copy-sqlstore-scripts</id>
+	            <phase>generate-test-resources</phase>
+	            <goals>
+	              <goal>unpack</goal>
+	            </goals>
+	            <configuration>
+	              <artifactItems>
+	                <artifactItem>
+	                  <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+	                  <artifactId>sqlstore</artifactId>
+	                  <outputDirectory>target/test-classes/sqlstore</outputDirectory>
+	                  <includes>db/**</includes>
+	                  <excludes>db/migration/V9000__integration-test_plain_data.test-plain.sql</excludes>
+	                </artifactItem>
+	              </artifactItems>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+	      <plugin>
+	        <!-- translate Flyway migrations -->
+	        <groupId>org.codehaus.gmaven</groupId>
+	        <artifactId>groovy-maven-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>translate-schema</id>
+	            <phase>generate-test-resources</phase>
+	            <goals>
+	              <goal>execute</goal>
+	            </goals>
+	            <configuration>
+	              <source>${project.basedir}/src/it/resources/db/scripts/schema_translator.groovy</source>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.21.0</version>
+            <configuration>
+            <removeVolumes>true</removeVolumes>
+              <images>
+                <image>
+                  <name>mysql:5.7</name>
+                  <alias>mysql</alias>
+                  <run>
+                    <env>
+                      <MYSQL_ROOT_PASSWORD>abc123</MYSQL_ROOT_PASSWORD>
+                      <MYSQL_USER>${mysql.user}</MYSQL_USER>
+                      <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
+                      <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
+                    </env>
+                    <ports>
+                      <port>${mysql.port}:3306</port>
+                    </ports>
+                    <wait>
+                      <time>10000</time>
+                    </wait>
+                  </run>
+                </image>
+              </images>
+            </configuration>
+            <executions>
+              <execution>
+                <id>start</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+	      <plugin>
+	        <!-- populate DB -->
+	        <groupId>org.flywaydb</groupId>
+	        <artifactId>flyway-maven-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>integration-test-db</id>
+	            <phase>pre-integration-test</phase>
+	            <goals>
+	              <goal>clean</goal>
+	              <goal>migrate</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	        <configuration>
+	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	          <user>${mysql.user}</user>
+	          <password>${mysql.pw}</password>
+	          <locations>
+                <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
+                <location>classpath:db/migration</location>
+              </locations>
+	          <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
+	        </configuration>
+	      </plugin>
+	      <plugin>
+	        <!-- launch standalone Tomcat server and deploy MISO -->
+	        <groupId>org.codehaus.cargo</groupId>
+	        <artifactId>cargo-maven2-plugin</artifactId>
+	        <executions>
+              <execution>
+                <id>start-container</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <!-- 'start' by default. Specify 'run' to keep Tomcat running until stopped manually -->
+                  <goal>${cargoInitGoal}</goal>
+                </goals>
+              </execution>
+	          <execution>
+	            <id>stop-container</id>
+	            <phase>post-integration-test</phase>
+	            <goals>
+	              <goal>stop</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	        <configuration>
+	          <container>
+	            <containerId>tomcat8x</containerId>
+	            <artifactInstaller>
+	              <groupId>org.apache.tomcat</groupId>
+	              <artifactId>tomcat</artifactId>
+	              <version>8.0.44</version>
+	            </artifactInstaller>
+	            <systemProperties>
+	              <security.method>jdbc</security.method>
+	            </systemProperties>
+	            <dependencies>
+	              <dependency>
+	                <groupId>mysql</groupId>
+      				<artifactId>mysql-connector-java</artifactId>
+	              </dependency>
+	            </dependencies>
+	          </container>
+	          <configuration>
+	            <type>standalone</type>
+	            <home>${project.build.directory}/tomcat8</home>
+	            <properties>
+	              <cargo.servlet.port>${miso.it.tomcat.servlet.port}</cargo.servlet.port>
+                  <cargo.tomcat.ajp.port>${miso.it.tomcat.ajp.port}</cargo.tomcat.ajp.port>
+	            </properties>
+	            <configfiles>
+	              <configfile>
+	                <file>${project.build.directory}/test-classes/tomcat-config/</file>
+	                <todir>conf/Catalina/localhost</todir>
+	              </configfile>
+	            </configfiles>
+	            <datasources>
+	              <datasource>
+	                <jndiName>jdbc/MISODB</jndiName>
+	                <connectionType>javax.sql.Datasource</connectionType>
+	                <driverClass>com.mysql.jdbc.Driver</driverClass>
+	                <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	                <username>${mysql.user}</username>
+	                <password>${mysql.pw}</password>
+	              </datasource>
+	            </datasources>
+	          </configuration>
+	        </configuration>
+	      </plugin>
+	      <!-- run integration tests -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <systemPropertyVariables>
+                <!-- Make URLs available for tests -->
+                <miso.it.baseUrl>http://localhost:${miso.it.tomcat.servlet.port}/</miso.it.baseUrl>
+                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</miso.it.mysql.url>
+                <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
+                <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
+              </systemPropertyVariables>
+              <skipTests>${skipITs}</skipTests>
+              <excludes>
+                <exclude>**/PlainSampleITs.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <!-- Plain Sample tests -->
+    <profile>
+      <id>integration-test-setup-plain</id>
+      <activation>
+        <property>
+          <!-- activate when plain integration test parameter is given -->
+          <name>runPlainITs</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <!-- separate integration test sources/resources from unit tests -->
+	        <groupId>org.codehaus.mojo</groupId>
+	        <artifactId>build-helper-maven-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>add-it-sources</id>
+	            <phase>generate-test-sources</phase>
+	            <goals>
+	              <goal>add-test-source</goal>
+	            </goals>
+	            <configuration>
+	              <sources>
+	                <source>src/it/java</source>
+	              </sources>
+	            </configuration>
+	          </execution>
+	          <execution>
+	            <id>add-it-resources</id>
+	            <phase>generate-test-resources</phase>
+	            <goals>
+	              <goal>add-test-resource</goal>
+	            </goals>
+	            <configuration>
+	              <resources>
+	                <resource>
+	                  <filtering>true</filtering>
+	                  <directory>src/it/resources</directory>
+	                </resource>
+	              </resources>
+	            </configuration>
+	          </execution>
+	          <!-- Reserve ports for Tomcat -->
+	          <execution>
+	            <id>reserve-network-port</id>
+                <phase>pre-integration-test</phase>
+	            <goals>
+	              <goal>reserve-network-port</goal>
+	            </goals>
+	            <configuration>
+	              <portNames>
+	                <portName>miso.it.plain.tomcat.servlet.port</portName>
+                    <portName>miso.it.plain.tomcat.ajp.port</portName>
+	              </portNames>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+	      <plugin>
+	        <!-- copy Flyway migrations from sqlstore -->
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-dependency-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>copy-sqlstore-scripts</id>
+	            <phase>generate-test-resources</phase>
+	            <goals>
+	              <goal>unpack</goal>
+	            </goals>
+	            <configuration>
+	              <artifactItems>
+	                <artifactItem>
+	                  <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+	                  <artifactId>sqlstore</artifactId>
+	                  <outputDirectory>target/test-classes/sqlstore</outputDirectory>
+	                  <includes>db/**</includes>
+	                  <excludes>db/migration/V9000_integration-test_data.test.sql</excludes>
+	                </artifactItem>
+	              </artifactItems>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+	      <plugin>
+	        <!-- translate Flyway migrations -->
+	        <groupId>org.codehaus.gmaven</groupId>
+	        <artifactId>groovy-maven-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>translate-schema</id>
+	            <phase>generate-test-resources</phase>
+	            <goals>
+	              <goal>execute</goal>
+	            </goals>
+	            <configuration>
+	              <source>${project.basedir}/src/it/resources/db/scripts/schema_translator_plain.groovy</source>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.21.0</version>
+            <configuration>
+            <removeVolumes>true</removeVolumes>
+              <images>
+                <image>
+                  <name>mysql:5.7</name>
+                  <alias>mysql</alias>
+                  <run>
+                    <env>
+                      <MYSQL_ROOT_PASSWORD>abc123</MYSQL_ROOT_PASSWORD>
+                      <MYSQL_USER>${mysql.user}</MYSQL_USER>
+                      <MYSQL_PASSWORD>${mysql.pw}</MYSQL_PASSWORD>
+                      <MYSQL_DATABASE>${mysql.db}</MYSQL_DATABASE>
+                    </env>
+                    <ports>
+                      <port>${mysql.port}:3306</port>
+                    </ports>
+                    <wait>
+                      <time>10000</time>
+                    </wait>
+                  </run>
+                </image>
+              </images>
+            </configuration>
+            <executions>
+              <execution>
+                <id>start</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+	      <plugin>
+	        <!-- populate DB -->
+	        <groupId>org.flywaydb</groupId>
+	        <artifactId>flyway-maven-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>integration-test-db</id>
+	            <phase>pre-integration-test</phase>
+	            <goals>
+	              <goal>clean</goal>
+	              <goal>migrate</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	        <configuration>
+	          <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	          <user>${mysql.user}</user>
+	          <password>${mysql.pw}</password>
+	          <locations>
+                <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
+                <location>classpath:db/migration</location>
+              </locations>
+	          <sqlMigrationSuffix>.test-plain.sql</sqlMigrationSuffix>
+	        </configuration>
+	      </plugin>
+	      <plugin>
+	        <!-- launch standalone Tomcat server and deploy MISO -->
+	        <groupId>org.codehaus.cargo</groupId>
+	        <artifactId>cargo-maven2-plugin</artifactId>
+	        <executions>
+              <execution>
+                <id>start-container</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <!-- 'start' by default. Specify 'run' to keep Tomcat running until stopped manually -->
+                  <goal>${cargoInitGoal}</goal>
+                </goals>
+              </execution>
+	          <execution>
+	            <id>stop-container</id>
+	            <phase>post-integration-test</phase>
+	            <goals>
+	              <goal>stop</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	        <configuration>
+	          <container>
+	            <containerId>tomcat8x</containerId>
+	            <artifactInstaller>
+	              <groupId>org.apache.tomcat</groupId>
+	              <artifactId>tomcat</artifactId>
+	              <version>8.0.44</version>
+	            </artifactInstaller>
+	            <systemProperties>
+	              <security.method>jdbc</security.method>
+	            </systemProperties>
+	            <dependencies>
+	              <dependency>
+	                <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+	              </dependency>
+	            </dependencies>
+	          </container>
+	          <configuration>
+	            <type>standalone</type>
+	            <home>${project.build.directory}/tomcat8</home>
+	            <properties>
+	              <cargo.servlet.port>${miso.it.plain.tomcat.servlet.port}</cargo.servlet.port>
+                  <cargo.tomcat.ajp.port>${miso.it.plain.tomcat.ajp.port}</cargo.tomcat.ajp.port>
+	            </properties>
+	            <configfiles>
+	              <configfile>
+	                <file>${project.build.directory}/test-classes/tomcat-plain-config/</file>
+	                <todir>conf/Catalina/localhost</todir>
+	              </configfile>
+	            </configfiles>
+	            <datasources>
+	              <datasource>
+	                <jndiName>jdbc/MISODB</jndiName>
+	                <connectionType>javax.sql.Datasource</connectionType>
+	                <driverClass>com.mysql.jdbc.Driver</driverClass>
+	                <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</url>
+	                <username>${mysql.user}</username>
+	                <password>${mysql.pw}</password>
+	              </datasource>
+	            </datasources>
+	          </configuration>
+	        </configuration>
+	      </plugin>
+	      <!-- run integration tests -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <systemPropertyVariables>
+                <!-- Make URLs available for tests -->
+                <miso.it.baseUrl>http://localhost:${miso.it.plain.tomcat.servlet.port}/</miso.it.baseUrl>
+                <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?autoReconnect=true</miso.it.mysql.url>
+                <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
+                <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
+              </systemPropertyVariables>
+              <skipITs>false</skipITs>
+              <excludes>
+                <exclude>**/*IT.java</exclude>
+              </excludes>
+              <includes>
+                <include>**/PlainSampleITs.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
-
-  <repositories>
-    <repository>
-      <id>hasbanana-repo</id>
-      <name>hasBanana Repository</name>
-      <url>http://www.hasbanana.com/maven/repo</url>
-    </repository>
-
-    <!--<repository>
-      <id>sonatype-sourceforge-snapshots</id>
-      <name>Sonatype SF Repository</name>
-      <url>http://oss.sonatype.org/content/repositories/sourceforge-snapshots/</url>
-    </repository>-->
-
-    <repository>
-      <id>Atlassian Maven Repository</id>
-      <url>https://maven.atlassian.com/public</url>
-    </repository>
-
-    <repository>
-      <id>Java.Net Maven Repository</id>
-      <url>http://download.java.net/maven/2</url>
-    </repository>
-  </repositories>
-
-  <dependencies>
-    <dependency>
-      <groupId>${parent.groupId}</groupId>
-      <artifactId>spring</artifactId>
-      <version>${parent.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${parent.groupId}</groupId>
-      <artifactId>integration-tools</artifactId>
-      <version>${parent.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${parent.groupId}</groupId>
-      <artifactId>run-tools</artifactId>
-      <version>${parent.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${parent.groupId}</groupId>
-      <artifactId>runstats-client</artifactId>
-      <version>${parent.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${parent.groupId}</groupId>
-      <artifactId>notification-consumer-services</artifactId>
-      <version>${parent.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${parent.groupId}</groupId>
-      <artifactId>tagbarcode-strategies</artifactId>
-      <version>${parent.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-aop</artifactId>
-      <version>${spring-version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
-      <version>${spring-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-taglibs</artifactId>
-      <version>${spring-security-version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-aop</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-web</artifactId>
-      <version>${spring-security-version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-aop</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>${spring-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-core</artifactId>
-      <version>${spring-security-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-config</artifactId>
-      <version>${spring-security-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-ldap</artifactId>
-      <version>${spring-security-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security.oauth</groupId>
-      <artifactId>spring-security-oauth</artifactId>
-      <version>1.0.0.RELEASE</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-tx</artifactId>
-      <version>${spring-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.integration</groupId>
-      <artifactId>spring-integration-core</artifactId>
-      <version>${spring-integration-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.integration</groupId>
-      <artifactId>spring-integration-http</artifactId>
-      <version>${spring-integration-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.integration</groupId>
-      <artifactId>spring-integration-xml</artifactId>
-      <version>${spring-integration-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.integration</groupId>
-      <artifactId>spring-integration-ip</artifactId>
-      <version>${spring-integration-version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
-      <version>${jstl-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jsp-api</artifactId>
-      <version>2.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib-nodep</artifactId>
-      <version>2.2.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <type>pom</type>
-      <version>2.8.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <version>2.6.9</version>
-    </dependency>
-
-    <dependency>
-      <groupId>javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <version>${javassist-version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j-version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>${jdom-version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.sourceforge.fluxion.ajax</groupId>
-      <artifactId>fluxion-ajax-3</artifactId>
-      <version>1.0-alpha-4</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sourceforge.fluxion.ajax</groupId>
-      <artifactId>fluxion-ajax-js</artifactId>
-      <version>1.0-alpha-12</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sourceforge.fluxion.ajax.beans</groupId>
-      <artifactId>fluxion-ajax-beans</artifactId>
-      <version>1.0-alpha-3</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.sf.json-lib</groupId>
-      <artifactId>json-lib</artifactId>
-      <version>2.4</version>
-      <classifier>jdk15</classifier>
-    </dependency>
-
-    <!--
-      <dependency>
-        <groupId>oauth.signpost</groupId>
-        <artifactId>signpost-core</artifactId>
-        <version>1.2</version>
-        <exclusions>
-            <exclusion>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-            </exclusion>
-        </exclusions>
-      </dependency>
-
-    <dependency>
-        <groupId>com.atlassian.jira</groupId>
-        <artifactId>jira-rest-java-client</artifactId>
-        <version>0.1.1</version>
-        <exclusions>
-            <exclusion>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
-    -->
-
-    <dependency>
-      <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-      <artifactId>oauth-signature</artifactId>
-      <version>1.5</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-      <artifactId>oauth-client</artifactId>
-      <version>1.5</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-apache-client</artifactId>
-      <version>1.5</version>
-    </dependency>
-    <!--
-    <dependency>
-      <groupId>org.atmosphere</groupId>
-      <artifactId>atmosphere-jquery</artifactId>
-      <version>0.8.2</version>
-    </dependency>
-    -->
-  </dependencies>
-  <properties>
-    <war-plugin-version>2.4</war-plugin-version>
-    <jdom-version>1.1</jdom-version>
-    <jstl-version>1.2</jstl-version>
-    <javassist-version>3.8.0.GA</javassist-version>
-    <log4j-version>1.2.16</log4j-version>
-    <slf4j-log4j-version>1.6.0</slf4j-log4j-version>
-    <jetty-version>6.1.7</jetty-version>
-    <spring-version>3.1.3.RELEASE</spring-version>
-    <spring-security-version>3.1.3.RELEASE</spring-security-version>
-    <spring-integration-version>2.2.0.RELEASE</spring-integration-version>
-    <mysql-version>5.1.10</mysql-version>
-  </properties>
 </project>

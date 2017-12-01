@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,43 +23,46 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Map;
+
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * Defines a DAO interface for storing SequencerReferences
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface SequencerReferenceStore extends Store<SequencerReference>, Remover<SequencerReference> {
-  /**
-   * Get a SequencerReference that holds information about a Run given a Run ID
-   *
-   * @param runId of type long
-   * @return SequencerReference
-   * @throws IOException when
-   */
-  SequencerReference getByRunId(long runId) throws IOException;
+public interface SequencerReferenceStore
+    extends Store<SequencerReference>, Remover<SequencerReference>, PaginatedDataSource<SequencerReference> {
 
   /**
    * Get a SequencerReference by a given name
-   *
-   * @param referenceName of type String
+   * 
+   * @param referenceName
+   *          of type String
    * @return SequencerReference
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   SequencerReference getByName(String referenceName) throws IOException;
 
   /**
-   * Get all SequencerReferences of a given PlatformType, e.g. PlatformType.ILLUMINA
-   *
-   * @param platformType of type PlatformType
-   * @return Collection<SequencerReference>
-   * @throws IOException when
+   * Get the SequencerReference which was the pre-upgrade SequencerReference for the SequencerReference provided (by its id)
+   * Returns null if provided SequencerReference has not been upgraded.
+   * 
+   * @param upgradedReferenceId
+   *          of type long
+   * @return SequencerReference
+   * @throws IOException if there is more than one pre-upgrade SequencerReference for the provided SequencerReference
    */
-  Collection<SequencerReference> listByPlatformType(PlatformType platformType) throws IOException;
+  SequencerReference getByUpgradedReference(long upgradedReferenceId) throws IOException;
+
+  /**
+   * @return a map containing all column names and max lengths from the Sequencer Reference table
+   * @throws IOException
+   */
+  public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException;
 }

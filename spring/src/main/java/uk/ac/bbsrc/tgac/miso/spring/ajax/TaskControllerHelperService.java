@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,23 +23,24 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.integration.AnalysisQueryService;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
-
-import javax.servlet.http.HttpSession;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 15/11/11
  * @since 0.1.3
@@ -67,8 +68,7 @@ public class TaskControllerHelperService {
         return j;
       }
       return JSONUtils.SimpleJSONError("No pipeline name specified");
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate pipeline: " + e.getMessage());
     }
   }
@@ -78,8 +78,7 @@ public class TaskControllerHelperService {
       JSONObject j = new JSONObject();
       j.put("runningTasks", getAnalysisQueryService().getRunningTasks());
       return j;
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate running tasks: " + e.getMessage());
     }
   }
@@ -89,8 +88,7 @@ public class TaskControllerHelperService {
       JSONObject j = new JSONObject();
       j.put("pendingTasks", getAnalysisQueryService().getPendingTasks());
       return j;
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate pending tasks: " + e.getMessage());
     }
   }
@@ -100,8 +98,7 @@ public class TaskControllerHelperService {
       JSONObject j = new JSONObject();
       j.put("failedTasks", getAnalysisQueryService().getFailedTasks());
       return j;
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate running tasks: " + e.getMessage());
     }
   }
@@ -111,8 +108,7 @@ public class TaskControllerHelperService {
       JSONObject j = new JSONObject();
       j.put("completedTasks", getAnalysisQueryService().getCompletedTasks());
       return j;
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate completed tasks: " + e.getMessage());
     }
   }
@@ -122,8 +118,7 @@ public class TaskControllerHelperService {
       JSONObject j = new JSONObject();
       j.put("pipelines", getAnalysisQueryService().getPipelines());
       return j;
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate pipelines: " + e.getMessage());
     }
   }
@@ -137,8 +132,7 @@ public class TaskControllerHelperService {
       }
       log.info("Submitting: " + out.toString());
       return getAnalysisQueryService().submitTask(out);
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate pipelines: " + e.getMessage());
     }
   }

@@ -7,7 +7,6 @@
 --%>
 
 <%@ include file="../header.jsp" %>
-<script type="text/javascript" src="<c:url value='/scripts/import_export_ajax.js?ts=${timestamp.time}'/>"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>"
@@ -17,7 +16,7 @@
     <div id="contentcolumn">
 
         <h1>
-            Library & Pool Sheet Import
+            Library &amp; Pool Sheet Import
         </h1>
 
         <div id="librarypoolsheetformdiv" class="simplebox ui-corner-all">
@@ -43,11 +42,6 @@
         <div id="librarypoolsheet_statusdiv"></div>
     </div>
 </div>
-<script type="text/javascript">
-    jQuery(document).ready(function () {
-
-    });
-</script>
 <%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -28,20 +28,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 
 @Controller
 @SessionAttributes("user")
@@ -51,13 +55,6 @@ public class EditGroupController {
   @Autowired
   private SecurityManager securityManager;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -65,16 +62,20 @@ public class EditGroupController {
   @ModelAttribute("users")
   public Collection<User> populateUsers() throws IOException {
     try {
-      List<User> users = new ArrayList<User>(securityManager.listAllUsers());
+      List<User> users = new ArrayList<>(securityManager.listAllUsers());
       Collections.sort(users);
       return users;
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list users", ex);
       }
       throw ex;
     }
+  }
+  
+  @ModelAttribute("maxLengths")
+  public Map<String, Integer> maxLengths() throws IOException {
+    return securityManager.getGroupColumnSizes();
   }
 
   @RequestMapping(value = "/admin/group/new", method = RequestMethod.GET)
@@ -88,14 +89,12 @@ public class EditGroupController {
   }
 
   @RequestMapping(value = "/admin/group/{groupId}", method = RequestMethod.GET)
-  public ModelAndView adminSetupForm(@PathVariable Long groupId,
-                                ModelMap model) throws IOException {
+  public ModelAndView adminSetupForm(@PathVariable Long groupId, ModelMap model) throws IOException {
     try {
-      model.put("group", groupId == Group.UNSAVED_ID ? dataObjectFactory.getGroup()
-                                                     : securityManager.getGroupById(groupId));
+      model.put("group", groupId == Group.UNSAVED_ID ? new Group() : securityManager.getGroupById(groupId));
+      model.put("title", groupId == Group.UNSAVED_ID ? "New Group" : ("Group " + groupId));
       return new ModelAndView("/pages/editGroup.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show group", ex);
       }
@@ -104,8 +103,7 @@ public class EditGroupController {
   }
 
   @RequestMapping(value = "/tech/group/{groupId}", method = RequestMethod.GET)
-  public ModelAndView techSetupForm(@PathVariable Long groupId,
-                                ModelMap model) throws IOException {
+  public ModelAndView techSetupForm(@PathVariable Long groupId, ModelMap model) throws IOException {
     return adminSetupForm(groupId, model);
   }
 
@@ -115,20 +113,19 @@ public class EditGroupController {
   }
 
   @RequestMapping(value = "/admin/group/{groupId}", method = RequestMethod.POST)
-  public String adminProcessSubmitExisting(@PathVariable Long groupId, @ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
+  public String adminProcessSubmitExisting(@PathVariable Long groupId, @ModelAttribute("group") Group group, ModelMap model,
+      SessionStatus session) throws IOException {
     group.setGroupId(groupId);
     return adminProcessSubmit(group, model, session);
   }
 
-  public String adminProcessSubmit(@ModelAttribute("group") Group group,
-                              ModelMap model, SessionStatus session) throws IOException {
+  public String adminProcessSubmit(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
     try {
       securityManager.saveGroup(group);
       session.setComplete();
       model.clear();
       return "redirect:/miso/admin/groups";
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save group", ex);
       }
@@ -146,15 +143,13 @@ public class EditGroupController {
     return techProcessSubmit(group, model, session);
   }
 
-  public String techProcessSubmit(@ModelAttribute("group") Group group,
-                              ModelMap model, SessionStatus session) throws IOException {
+  public String techProcessSubmit(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
     try {
       securityManager.saveGroup(group);
       session.setComplete();
       model.clear();
       return "redirect:/miso/tech/groups";
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save group", ex);
       }

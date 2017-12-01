@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,83 +12,42 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import java.lang.reflect.Method;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
+import java.util.Comparator;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 01/12/11
  * @since 0.1.3
  */
-public class AliasComparator extends AlphanumericComparator {
-  private Method method;
-  private boolean isAscending = true;
-  private boolean isNullsLast = true;
-  private static final Object[] EMPTY_OBJECT_ARRAY = new Object[]{};
-
-  public AliasComparator(Class c) throws NoSuchMethodException, IllegalArgumentException {
-    method = c.getMethod("getAlias");
-    Class returnClass = method.getReturnType();
-    if (returnClass.getName().equals("void")) {
-      String message = method.getName() + " has a void return type";
-      throw new IllegalArgumentException(message);
-    }
+public class AliasComparator<T extends Aliasable> implements Comparator<T> {
+  protected String getProperty(T object) {
+    String alias = object.getAlias();
+    return isStringEmptyOrNull(alias) ? null : alias;
   }
 
   @Override
-  public int compare(Object object1, Object object2) {
-    String alias1 = null;
-    String alias2 = null;
-
-    try {
-      alias1 = (String)method.invoke(object1, EMPTY_OBJECT_ARRAY);
-      alias2 = (String)method.invoke(object2, EMPTY_OBJECT_ARRAY);
-    }
-    catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-
-    // Treat empty strings like nulls
-    if (alias1.length() == 0) {
-      alias1 = null;
-    }
-
-    if (alias2.length() == 0) {
-      alias2 = null;
-    }
-
-    // Handle sorting of null values
-    if (alias1 == null && alias2 == null) return 0;
-    if (alias1 == null) return isNullsLast ? 1 : -1;
-    if (alias2 == null) return isNullsLast ? -1 : 1;
-
-    //  Compare objects
-    String c1;
-    String c2;
-
-    if (isAscending) {
-      c1 = alias1;
-      c2 = alias2;
-    }
-    else {
-      c1 = alias2;
-      c2 = alias1;
-    }
-
-    return super.compare(c1, c2);
+  public int compare(T o1, T o2) {
+    int aliasComparison = AlphanumericComparator.INSTANCE.compare(getProperty(o1), getProperty(o2));
+    return aliasComparison == 0 ? Long.compare(o1.getId(), o2.getId()) : aliasComparison;
   }
+
 }

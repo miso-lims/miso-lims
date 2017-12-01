@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,63 +12,53 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 
 /**
- * A QC that is specifically carried out on a given {@link Sample}
- *
+ * uk.ac.bbsrc.tgac.miso.core.data.impl
+ * <p/>
+ * Info
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-//@JsonIgnoreProperties({"deletable"})
-public interface SampleQC extends QC {
-  /**
-   * Returns the sample of this SampleQC object.
-   *
-   * @return Sample sample.
-   */
-  @JsonBackReference(value="qcsample")
-  public Sample getSample();
+@Entity
+@Table(name = "SampleQC")
+public class SampleQC extends QC {
 
-  /**
-   * Sets the sample of this SampleQC object.
-   *
-   * @param sample sample.
-   * @throws MalformedSampleException when the Sample being set is not valid  
-   */
-  public void setSample(Sample sample) throws MalformedSampleException;
+  private static final long serialVersionUID = 1L;
 
-  /**
-   * Returns the results of this QC object.
-   *
-   * @return Double results.
-   */
-  public Double getResults();
+  @ManyToOne(targetEntity = SampleImpl.class)
+  @JoinColumn(name = "sample_sampleId")
+  private Sample sample;
 
-  /**
-   * Sets the results of this QC object.
-   *
-   * @param results results.
-   */
-  public void setResults(Double results);  
+  public Sample getSample() {
+    return sample;
+  }
+
+  public void setSample(Sample sample) {
+    this.sample = sample;
+  }
+
+  @Override
+  public QualityControllable<?> getEntity() {
+    return sample;
+  }
+
 }

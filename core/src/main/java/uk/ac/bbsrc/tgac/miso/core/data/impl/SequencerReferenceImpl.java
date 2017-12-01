@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,29 +23,51 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.io.IOException;
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 
-import java.io.Serializable;
-import java.net.InetAddress;
-
 /**
  * Concrete implementation to encapsulate a reference to a physical machine attached to a sequencer
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
+@Entity
+@Table(name = "SequencerReference")
 public class SequencerReferenceImpl extends AbstractSequencerReference implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   /**
    * Constructor SequencerReferenceImpl creates a new SequencerReference instance
-   *
-   * @param name of type String
-   * @param ip of type InetAddress
-   * @param platform of type Platform
+   * 
+   * @param name
+   *          of type String
+   * @param ip
+   *          of type InetAddress
+   * @param platform
+   *          of type Platform
    */
-  public SequencerReferenceImpl(String name, InetAddress ip, Platform platform) {
+  public SequencerReferenceImpl(String name, String ip, Platform platform) {
     setName(name);
     setIpAddress(ip);
     setPlatform(platform);
+  }
+
+  /**
+   * Exists for Hibernate purposes
+   * 
+   * @throws IOException
+   */
+  public SequencerReferenceImpl() {
+    setPlatform(null);
+    setName(null);
+    setIpAddress(null);
   }
 }

@@ -23,7 +23,6 @@ $.jqDnR={
   		return false;
   	},
 	stop:function(){
-		//E.css('opacity',M.o);
 		$(document).unbind('mousemove',J.drag).unbind('mouseup',J.stop);
 	}
 };
@@ -57,7 +56,6 @@ i=function(e,h,k,aR){
 					k:d.k
 				};
 			} else {M1 = false;}			
- 			//E.css({opacity:0.8});
  			$(document).mousemove($.jqDnR.drag).mouseup($.jqDnR.stop);
  			return false;
  		});

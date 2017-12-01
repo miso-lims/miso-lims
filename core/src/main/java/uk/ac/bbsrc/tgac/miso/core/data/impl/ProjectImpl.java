@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -22,18 +22,15 @@
  */
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import javax.persistence.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
-import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
 
-import java.io.Serializable;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 
 /**
  * Concrete implementation of a Project, inheriting from the simlims core Project
@@ -42,7 +39,11 @@ import java.io.Serializable;
  * @since 0.0.2
  */
 @Entity
+@Table(name = "Project")
 public class ProjectImpl extends AbstractProject implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   /**
    * Construct a new Project with a default empty SecurityProfile
    */
@@ -52,30 +53,12 @@ public class ProjectImpl extends AbstractProject implements Serializable {
 
   /**
    * Construct a new Project with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public ProjectImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
   }
 
-  public void buildSubmission() {
-    /*
-    try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      submissionDocument = docBuilder.newDocument();
-    }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    ERASubmissionFactory.generateProjectSubmissionXML(submissionDocument, this);
-    */
-  }
-
-  /**
-   * Method buildReport ...
-   */
-  public void buildReport() {
-
-  }
 }

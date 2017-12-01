@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,65 +12,90 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
  * <p/>
  * Info
- *
+ * 
  * @author bianx
  */
 @Controller
 @RequestMapping("/rest/external")
 @SessionAttributes("external")
-public class ExternalRestController {
+public class ExternalRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(ExternalRestController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
+  @Autowired
+  private ContainerService containerService;
+  @Autowired
+  private RunService runService;
+  @Autowired
+  private SampleService sampleService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public void setProjectService(ProjectService projectService) {
+    this.projectService = projectService;
   }
 
-  @RequestMapping(value = "projects", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  String jsonRest() throws IOException {
+  public void setContainerService(ContainerService containerService) {
+    this.containerService = containerService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  @RequestMapping(value = "projects", method = RequestMethod.GET, produces = "application/json")
+  public @ResponseBody String jsonRest() throws IOException {
     StringBuilder sb = new StringBuilder();
-    Collection<Project> lp = requestManager.listAllProjects();
+    Collection<Project> lp = projectService.listAllProjects();
     int pi = 0;
     for (Project p : lp) {
       pi++;
@@ -85,7 +110,7 @@ public class ExternalRestController {
   public String jsonRestProjectList(Long projectId) throws IOException {
     StringBuilder sb = new StringBuilder();
 
-    Project p = requestManager.getProjectById(projectId);
+    Project p = projectService.getProjectById(projectId);
     sb.append("'id':'" + projectId + "'");
     sb.append(",");
     sb.append("'name':'" + p.getName() + "'");
@@ -95,15 +120,14 @@ public class ExternalRestController {
     return "{" + sb.toString() + "}";
   }
 
-
-  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  String jsonRestProject(@PathVariable Long projectId,
-                         ModelMap model) throws IOException {
+  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET, produces = "application/json")
+  public @ResponseBody String jsonRestProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     StringBuilder sb = new StringBuilder();
 
-    Project p = requestManager.getProjectById(projectId);
+    Project p = projectService.getProjectById(projectId);
+    if (p == null) {
+      throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
+    }
     sb.append("'id':'" + projectId + "'");
     sb.append(",");
     sb.append("'name':'" + p.getName() + "'");
@@ -142,24 +166,21 @@ public class ExternalRestController {
     sb.append(",");
 
     sb.append("'samples':[");
-    Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
+    Collection<Sample> samples = sampleService.listByProjectId(projectId);
     if (samples.size() > 0) {
       int si = 0;
       for (Sample sample : samples) {
         si++;
-        String sampleQubit = "not available";
-        if (requestManager.listAllSampleQCsBySampleId(sample.getId()).size() > 0) {
-          ArrayList<SampleQC> sampleQcList = new ArrayList(requestManager.listAllSampleQCsBySampleId(sample.getId()));
-          SampleQC lastQc = sampleQcList.get(sampleQcList.size() - 1);
-          sampleQubit = (lastQc.getResults() != null ? lastQc.getResults().toString() : "");
-        }
+        String sampleQubit = sample.getQCs().stream().filter(qc -> qc.getType().getName().contains("Qubit"))
+            .sorted((a, b) -> b.getDate().compareTo(a.getDate())).findFirst().map(qc -> qc.getResults().toString()).orElse("not available");
         sb.append("{");
         sb.append("'alias':'" + sample.getAlias() + "'");
         sb.append(",");
         sb.append("'qcPassed':'" + (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "'");
         sb.append(",");
 
-        sb.append("'receivedDate':'" + (sample.getReceivedDate() != null ? LimsUtils.getDateAsString(sample.getReceivedDate()) : "not available") + "'");
+        sb.append("'receivedDate':'"
+            + (sample.getReceivedDate() != null ? LimsUtils.formatDate(sample.getReceivedDate()) : "not available") + "'");
         sb.append(",");
         sb.append("'sampleType':'" + (sample.getSampleType() != null ? sample.getSampleType() : "") + "'");
         sb.append(",");
@@ -176,25 +197,24 @@ public class ExternalRestController {
     sb.append(",");
 
     sb.append("'runs':[");
-    Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
+    Collection<Run> runs = runService.listByProjectId(projectId);
     if (runs.size() > 0) {
       int ri = 0;
       for (Run run : runs) {
         ri++;
-        if (!run.getStatus().getHealth().getKey().equals("Failed")) {
-          ArrayList<String> runSamples = new ArrayList();
-          Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager.listSequencerPartitionContainersByRunId(run.getId());
+        if (run.getHealth() != HealthType.Failed) {
+          ArrayList<String> runSamples = new ArrayList<>();
+          Collection<SequencerPartitionContainer> spcs = containerService.listByRunId(run.getId());
           if (spcs.size() > 0) {
-            for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+            for (SequencerPartitionContainer spc : spcs) {
 
               if (spc.getPartitions().size() > 0) {
-                for (SequencerPoolPartition spp : spc.getPartitions()) {
+                for (Partition spp : spc.getPartitions()) {
                   if (spp.getPool() != null) {
-                    if (spp.getPool().getDilutions().size() > 0) {
-                      for (Dilution dilution : spp.getPool().getDilutions()) {
-                        Sample sample = dilution.getLibrary().getSample();
-                        if (sample.getProject().equals(p)) {
-                          runSamples.add(sample.getAlias());
+                    if (spp.getPool().getPoolableElementViews().size() > 0) {
+                      for (PoolableElementView dilution : spp.getPool().getPoolableElementViews()) {
+                        if (dilution.getProjectId().equals(p.getId())) {
+                          runSamples.add(dilution.getSampleAlias());
                         }
                       }
                     }
@@ -204,17 +224,22 @@ public class ExternalRestController {
             }
           }
 
-
           sb.append("{");
           sb.append("'name':'" + run.getName() + "'");
           sb.append(",");
-          sb.append("'status':'" + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "'");
+          sb.append("'status':'"
+              + (run.getHealth() != null ? run.getHealth().getKey() : "") + "'");
           sb.append(",");
-          sb.append("'startDate':'" + (run.getStatus() != null && run.getStatus().getStartDate() != null ? run.getStatus().getStartDate().toString() : "") + "'");
+          sb.append("'startDate':'"
+              + (run.getStartDate() != null ? run.getStartDate().toString() : "") + "'");
           sb.append(",");
-          sb.append("'completionDate':'" + (run.getStatus() != null && run.getStatus().getCompletionDate() != null ? run.getStatus().getCompletionDate().toString() : "") + "'");
+          sb.append("'completionDate':'" + (run.getCompletionDate() != null
+              ? run.getCompletionDate().toString()
+              : "") + "'");
           sb.append(",");
-          sb.append("'platformType':'" + (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "'");
+          sb.append("'platformType':'" + (run.getSequencerReference().getPlatform().getPlatformType() != null
+              ? run.getSequencerReference().getPlatform().getPlatformType().getKey()
+              : "") + "'");
           sb.append(",");
           sb.append("'samples':[");
           if (runSamples.size() > 0) {
@@ -240,4 +265,5 @@ public class ExternalRestController {
 
     return "{" + sb.toString() + "}";
   }
+
 }

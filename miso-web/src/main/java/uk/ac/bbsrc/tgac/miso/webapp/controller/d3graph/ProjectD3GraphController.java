@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,28 +23,40 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.d3graph;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import java.io.IOException;
+import java.util.Collection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 
-import java.io.IOException;
-import java.util.Collection;
-
 /**
- * Created by IntelliJ IDEA.
- * User: bianx
- * Date: 27/09/11
- * Time: 15:02
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: bianx Date: 27/09/11 Time: 15:02 To change this template use File | Settings | File Templates.
  */
 
 @Controller
@@ -54,37 +66,41 @@ public class ProjectD3GraphController {
   protected static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private ProjectService projectService;
+  @Autowired
+  private ExperimentService experimentService;
+  @Autowired
+  private LibraryService libraryService;
+  @Autowired
+  private RunService runService;
+  @Autowired
+  private SampleService sampleService;
+  @Autowired
+  private StudyService studyService;
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  JSONObject d3graphRest(@PathVariable Long projectId) throws IOException {
+  public @ResponseBody JSONObject d3graphRest(@PathVariable Long projectId) throws IOException {
 
     try {
-      Project p = requestManager.getProjectById(projectId);
+      Project p = projectService.getProjectById(projectId);
       JSONObject projectJSON = new JSONObject();
       projectJSON.put("name", p.getName());
       projectJSON.put("show", "PROJECT");
       projectJSON.put("description", p.getAlias());
       JSONArray projectChildrenArray = new JSONArray();
-      Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
-      Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
-      Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
+      Collection<Sample> samples = sampleService.listByProjectId(p.getProjectId());
+      Collection<Run> runs = runService.listByProjectId(p.getProjectId());
+      Collection<Study> studies = studyService.listByProjectId(p.getProjectId());
 
       JSONObject runJSON = new JSONObject();
       JSONArray runsArray = new JSONArray();
 
-
       runJSON.put("name", "Runs");
       runJSON.put("description", "");
       for (Run run : runs) {
-        if (run.getStatus() != null
-            && run.getStatus().getHealth() != null
-            && run.getStatus().getHealth().getKey().equals("Completed")) {
+        if (run.getHealth() == HealthType.Completed) {
           runsArray.add(JSONObject.fromObject("{'name': '" + run.getName() + "','description':'" + run.getAlias() + "','color': '1'}"));
-        }
-        else {
+        } else {
           runsArray.add(JSONObject.fromObject("{'name': '" + run.getName() + "','description':'" + run.getAlias() + "','color': '0'}"));
         }
       }
@@ -104,14 +120,15 @@ public class ProjectD3GraphController {
         JSONArray substudiesArray = new JSONArray();
         substudyJSON.put("name", study.getName());
         substudyJSON.put("description", study.getAlias());
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
+        Collection<Experiment> experiments = experimentService.listAllByStudyId(study.getId());
         if (experiments.size() > 0) {
           JSONObject experimentJSON = new JSONObject();
           JSONArray experimentsArray = new JSONArray();
           experimentJSON.put("name", "experiment");
           experimentJSON.put("description", "");
           for (Experiment e : experiments) {
-            experimentsArray.add(JSONObject.fromObject("{'name': '" + e.getName() + "','description':'" + e.getAlias() + "','color': '2'}"));
+            experimentsArray
+                .add(JSONObject.fromObject("{'name': '" + e.getName() + "','description':'" + e.getAlias() + "','color': '2'}"));
           }
           experimentJSON.put("children", experimentsArray);
           substudiesArray.add(experimentJSON);
@@ -133,7 +150,7 @@ public class ProjectD3GraphController {
       sampleJSON.put("name", "Samples");
       sampleJSON.put("description", "");
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
+        Collection<Library> libraries = libraryService.listBySampleId(sample.getId());
         if (libraries.size() == 0) {
 
           String sampleQC = "0";
@@ -142,34 +159,24 @@ public class ProjectD3GraphController {
               sampleQC = "1";
             }
           }
-          samplesArray.add(JSONObject.fromObject("{'name': '" + sample.getName() + "','description':'" + sample.getAlias() + "','color': '" + sampleQC + "'}"));
-        }
-        else {
+          samplesArray.add(JSONObject
+              .fromObject("{'name': '" + sample.getName() + "','description':'" + sample.getAlias() + "','color': '" + sampleQC + "'}"));
+        } else {
           JSONObject libraryJSON = new JSONObject();
           JSONArray librariesArray = new JSONArray();
 
           libraryJSON.put("name", "Libraries");
 
           for (Library library : libraries) {
-//              Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutionsByLibraryId(library.getLibraryId());
-//              if (lds.size() > 0) {
-//                JSONObject dilutionsJSON = new JSONObject();
-//                for (LibraryDilution ld : lds) {
-//                  dilutionsJSON.put(ld.getName(), "2");
-//                }
-//                librariesJSON.put(library.getName(), dilutionsJSON);
-//              }
-//              else {
-            if (library.getLibraryQCs().size() > 0) {
-              librariesArray.add(JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '1'}"));
+            if (library.getQCs().size() > 0) {
+              librariesArray.add(
+                  JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '1'}"));
+            } else {
+              librariesArray.add(
+                  JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '0'}"));
             }
-            else {
-              librariesArray.add(JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '0'}"));
-            }
-//              }
           }
           libraryJSON.put("children", librariesArray);
-
 
           JSONObject subsampleJSON = new JSONObject();
           subsampleJSON.put("name", sample.getName());
@@ -185,21 +192,16 @@ public class ProjectD3GraphController {
 
       projectJSON.put("children", projectChildrenArray);
       return projectJSON;
-    }
-    catch (IOException
-            e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
   @RequestMapping(method = RequestMethod.GET)
-  public
-  @ResponseBody
-  JSONObject graphd3Rest() throws IOException {
+  public @ResponseBody JSONObject graphd3Rest() throws IOException {
     try {
-      //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Collection<Project> projects = requestManager.listAllProjects();
+      Collection<Project> projects = projectService.listAllProjects();
 
       JSONObject miso = new JSONObject();
       JSONArray projectsArray = new JSONArray();
@@ -216,109 +218,30 @@ public class ProjectD3GraphController {
       miso.put("description", "");
       miso.put("children", projectsArray);
       return miso;
-    }
-    catch (IOException
-            e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
-  //Old Protovis Code, not being used
+  public void setExperimentService(ExperimentService experimentService) {
+    this.experimentService = experimentService;
+  }
 
-//
-//  @RequestMapping(value = "/projects/graph", method = RequestMethod.GET)
-//  public
-//  @ResponseBody
-//  JSONObject graphRest() throws IOException {
-//    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-//    Collection<Project> projects = requestManager.listAllProjects();
-//    JSONObject pj = new JSONObject();
-//    try {
-//      for (Project p : projects) {
-//        JSONObject j = new JSONObject();
-//        Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
-//        Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
-//        Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
-//
-//        JSONObject runsJSON = new JSONObject();
-//        JSONObject studiesJSON = new JSONObject();
-//        JSONObject samplesJSON = new JSONObject();
-//
-//        for (Run run : runs) {
-//          if (run.getStatus() != null
-//              && run.getStatus().getHealth() != null
-//              && run.getStatus().getHealth().getKey().equals("Completed")) {
-//            runsJSON.put(run.getName(), "1");
-//          }
-//          else {
-//            runsJSON.put(run.getName(), "0");
-//          }
-//        }
-//
-//        for (Study study : studies) {
-//          Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getStudyId());
-//          if (experiments.size() > 0) {
-//            JSONObject experimentsJSON = new JSONObject();
-//            for (Experiment e : experiments) {
-//              experimentsJSON.put(e.getName(), "2");
-//            }
-//            studiesJSON.put(study.getName(), experimentsJSON);
-//          }
-//        }
-//
-//        for (Sample sample : samples) {
-//          Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getSampleId());
-//          if (libraries.size() == 0) {
-//            if (sample.getQcPassed()) {
-//              samplesJSON.put(sample.getName(), "1");
-//            }
-//            else {
-//              samplesJSON.put(sample.getName(), "0");
-//            }
-//          }
-//          else {
-//            JSONObject librariesJSON = new JSONObject();
-//            for (Library library : libraries) {
-//              Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutionsByLibraryId(library.getLibraryId());
-//              if (lds.size() > 0) {
-//                JSONObject dilutionsJSON = new JSONObject();
-//                for (LibraryDilution ld : lds) {
-//                  dilutionsJSON.put(ld.getName(), "2");
-//                }
-//                librariesJSON.put(library.getName(), dilutionsJSON);
-//              }
-//              else {
-//                if (library.getLibraryQCs().size() > 0) {
-//                  librariesJSON.put(library.getName(), "1");
-//                }
-//                else {
-//                  librariesJSON.put(library.getName(), "0");
-//                }
-//              }
-//            }
-//            samplesJSON.put(sample.getName(), librariesJSON);
-//          }
-//        }
-//        if (runs.size() > 0) {
-//          j.put("Runs", runsJSON);
-//        }
-//        if (studies.size() > 0) {
-//          j.put("Studies", studiesJSON);
-//        }
-//        if (samples.size() > 0) {
-//          j.put("Samples", samplesJSON);
-//        }
-//        if (runs.size() > 0 || studies.size() > 0 || samples.size() > 0) {
-//          pj.put(p.getName(), j);
-//        }
-//      }
-//      return pj;
-//    }
-//    catch (IOException e) {
-//      log.debug("Failed", e);
-//      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-//    }
-//  }
+  public void setLibraryService(LibraryService libraryService) {
+    this.libraryService = libraryService;
+  }
+
+  public void setRunService(RunService runService) {
+    this.runService = runService;
+  }
+
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+  public void setStudyService(StudyService studyService) {
+    this.studyService = studyService;
+  }
 
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,234 +12,369 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.*;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.w3c.dom.Document;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ExperimentChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import java.util.Collection;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 /**
- * An Experiment contains design information about a sequencing experiment,
- * as part of a parent {@link Study}.
- *
- * Experiments are associated with {@link Run} objects via {@link Pool} objects
- * which contain the actual sequencable material in prepared form. A Pool is
- * attached to an Experiment which is then assigned to an instrument
- * {@link SequencerPoolPartition}.
- *
- * @author Rob Davey
- * @since 0.0.2
+ * An Experiment contains design information about a sequencing experiment, as part of a parent {@link Study}.
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile"})
-public interface Experiment extends SecurableByProfile, Submittable<Document>, Comparable, Deletable, Nameable {
+@Entity
+@Table(name = "Experiment")
+public class Experiment implements SecurableByProfile, Comparable<Experiment>, Deletable, Nameable, ChangeLoggable, Serializable {
+  @Entity
+  @Embeddable
+  @Table(name = "Experiment_Run_Partition")
+  public static class RunPartition implements Serializable {
+    private static final long serialVersionUID = 1L;
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "experiment_experimentId")
+    private Experiment experiment;
+    @Id
+    @ManyToOne(targetEntity = PartitionImpl.class)
+    @JoinColumn(name = "partition_partitionId")
+    private Partition partition;
+    @ManyToOne
+    @JoinColumn(name = "run_runId")
+    private Run run;
 
-  /** Field UNSAVED_ID  */
-  public static final Long UNSAVED_ID = 0L;
+    public Experiment getExperiment() {
+      return experiment;
+    }
 
-  /** Field PREFIX  */
+    public Partition getPartition() {
+      return partition;
+    }
+
+    public Run getRun() {
+      return run;
+    }
+
+    public void setExperiment(Experiment experiment) {
+      this.experiment = experiment;
+    }
+
+    public void setPartition(Partition partition) {
+      this.partition = partition;
+    }
+
+    public void setRun(Run run) {
+      this.run = run;
+    }
+  }
+
+  /** Field PREFIX */
   public static final String PREFIX = "EXP";
 
-  /**
-   * Returns the experimentId of this Experiment object.
-   *
-   * @return Long experimentId.
-   */
-  @Deprecated
-  public Long getExperimentId();
+  private static final long serialVersionUID = 1L;
+
+  /** Field UNSAVED_ID */
+  public static final Long UNSAVED_ID = 0L;
+
+  private String accession;
+
+  private String alias;
+
+  @OneToMany(targetEntity = ExperimentChangeLog.class, mappedBy = "experiment")
+  private final List<ChangeLog> changeLog = new ArrayList<>();
+
+  private String description;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long experimentId = UNSAVED_ID;
+
+  @ManyToMany(targetEntity = KitImpl.class)
+  @JoinTable(name = "Experiment_Kit", inverseJoinColumns = { @JoinColumn(name = "kits_kitId") }, joinColumns = {
+      @JoinColumn(name = "experiments_experimentId") })
+  private Collection<Kit> kits = new HashSet<>();
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier")
+  private User lastModifier;
+
+  // defines a library on which this experiment will operate.
+  @ManyToOne(targetEntity = LibraryImpl.class)
+  @JoinColumn(name = "library_libraryId")
+  private Library library;
+
+  @Column(nullable = false)
+  private String name;
+
+  @ManyToOne(targetEntity = Platform.class)
+  @JoinColumn(name = "platform_platformId")
+  private Platform platform;
+
+  // defines the parent run which processes this experiment
+  @OneToMany(mappedBy = "experiment", cascade=CascadeType.ALL)
+  private List<RunPartition> runPartitions;
+
+  @ManyToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "securityProfile_profileId")
+  private SecurityProfile securityProfile = new SecurityProfile();
+
+  @ManyToOne(targetEntity = StudyImpl.class)
+  @JoinColumn(name = "study_studyId")
+  private Study study;
+  @Column(nullable = false)
+  private String title;
 
   /**
-   * Sets the experimentId of this Experiment object.
-   *
-   * @param experimentId the id of this Experiment object.
-   *
+   * Construct a new Experiment with a default empty SecurityProfile
    */
-  @Deprecated
-  public void setExperimentId(Long experimentId);
+  public Experiment() {
+  }
 
-  public void setId(long id);
+  @CoverageIgnore
+  public void addKit(Kit kit) {
+    this.kits.add(kit);
+  }
 
-  /**
-   * Returns the study of this Experiment object.
-   *
-   * @return Study study.
-   */
-  @JsonBackReference(value = "study")
-  public Study getStudy();
+  @Override
+  @CoverageIgnore
+  public int compareTo(Experiment t) {
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
+    return 0;
+  }
 
-  /**
-   * Sets the study of this Experiment object.
-   *
-   * @param s study.
-   *
-   */
-  public void setStudy(Study s);
-
-  /**
-   * Returns the accession of this Experiment object.
-   *
-   * @return String accession.
-   */
-  public String getAccession();
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    ExperimentChangeLog changeLogEntry = new ExperimentChangeLog();
+    changeLogEntry.setExperiment(this);
+    changeLogEntry.setSummary(summary);
+    changeLogEntry.setColumnsChanged(columnsChanged);
+    changeLogEntry.setUser(user);
+    return changeLogEntry;
+  }
 
   /**
-   * Sets the accession of this Experiment object.
-   *
-   * @param accession accession.
-   *
+   * Equivalency is based on getId() if set, otherwise on name, description and creation date.
    */
-  public void setAccession(String accession);
+  @Override
+  @CoverageIgnore
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof Experiment)) return false;
+    final Experiment them = (Experiment) obj;
+    // If not saved, then compare resolved actual objects. Otherwise
+    // just compare IDs.
+    if (getId() == UNSAVED_ID || them.getId() == UNSAVED_ID) {
+      if (getName() != null && them.getName() != null) {
+        return getName().equals(them.getName());
+      } else {
+        return getAlias().equals(them.getAlias());
+      }
+    } else {
+      return getId() == them.getId();
+    }
+  }
 
-  /**
-   * Returns the alias of this Experiment object.
-   *
-   * @return String alias.
-   */
-  public String getAlias();
+  public String getAccession() {
+    return accession;
+  }
 
-  /**
-   * Sets the alias of this Experiment object.
-   *
-   * @param alias alias.
-   *
-   */
-  public void setAlias(String alias);
+  public String getAlias() {
+    return alias;
+  }
 
-  /**
-   * Returns the title of this Experiment object.
-   *
-   * @return String title.
-   */
-  public String getTitle();
+  @Override
+  public List<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
 
-  /**
-   * Sets the title of this Experiment object.
-   *
-   * @param title title.
-   *
-   */
-  public void setTitle(String title);
+  public String getDescription() {
+    return description;
+  }
 
-  /**
-   * Returns the name of this Experiment object.
-   *
-   * @return String name.
-   */
-  public String getName();
+  @Override
+  public long getId() {
+    return experimentId;
+  }
 
-  /**
-   * Sets the name of this Experiment object.
-   *
-   * @param name name.
-   *
-   */
-  public void setName(String name);
+  public Collection<Kit> getKits() {
+    return kits;
+  }
 
-  /**
-   * Returns the description of this Experiment object.
-   *
-   * @return String description.
-   */
-  public String getDescription();
+  public Collection<Kit> getKitsByKitType(KitType kitType) {
+    final ArrayList<Kit> ks = new ArrayList<>();
+    for (final Kit k : kits) {
+      if (k.getKitDescriptor().getKitType().equals(kitType)) {
+        ks.add(k);
+      }
+    }
+    Collections.sort(ks);
+    return ks;
+  }
 
-  /**
-   * Sets the description of this Experiment object.
-   *
-   * @param description description.
-   *
-   */
-  public void setDescription(String description);
+  public User getLastModifier() {
+    return lastModifier;
+  }
 
-  /**
-   * Returns the platform of this Experiment object.
-   *
-   * @return Platform platform.
-   */
-  public Platform getPlatform();
+  public Library getLibrary() {
+    return library;
+  }
 
-  /**
-   * Sets the platform of this Experiment object.
-   *
-   * @param platform platform.
-   *
-   */
-  public void setPlatform(Platform platform);
+  @Override
+  public String getName() {
+    return name;
+  }
 
-  /**
-   * Returns the run of this Experiment object.
-   *
-   * @return Run run.
-   */
-  public Run getRun();
+  public Platform getPlatform() {
+    return platform;
+  }
 
-  /**
-   * Sets the run of this Experiment object.
-   *
-   * @param run run.
-   *
-   */
-  public void setRun(Run run);
+  public List<RunPartition> getRunPartitions() {
+    return runPartitions;
+  }
 
-  /**
-   * Sets the pool of this Experiment object.
-   *
-   * @param pool pool.
-   *
-   */
-  public void setPool(Pool pool);
+  @Override
+  public SecurityProfile getSecurityProfile() {
+    return securityProfile;
+  }
 
-  /**
-   * Returns the pool of this Experiment object.
-   *
-   * @return Pool pool.
-   */
-  @JsonBackReference(value="pool")
-  public Pool<? extends Poolable> getPool();
+  public Study getStudy() {
+    return study;
+  }
 
-  /**
-   * Sets the kits of this Experiment object.
-   *
-   * @param kits kits.
-   */
-  public void setKits(Collection<Kit> kits);
+  public String getTitle() {
+    return title;
+  }
 
-  /**
-   * Add a Kit to this Experiment object
-   *
-   * @param kit of type Kit
-   */
-  public void addKit(Kit kit);
+  @Override
+  @CoverageIgnore
+  public int hashCode() {
+    if (getId() != UNSAVED_ID) {
+      return (int) getId();
+    } else {
+      final int PRIME = 37;
+      int hashcode = 1;
+      if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
+      if (getAlias() != null) hashcode = 37 * hashcode + getAlias().hashCode();
+      return hashcode;
+    }
+  }
 
-  /**
-   * Returns the kits used to construct this Experiment object.
-   *
-   * @return Collection<Kit> kits.
-   */
-  public Collection<Kit> getKits();
+  @Override
+  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
+    if (parent.getSecurityProfile().getOwner() != null) {
+      setSecurityProfile(parent.getSecurityProfile());
+    } else {
+      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
+    }
+  }
 
-  /**
-   * Return kits used within this experiment of a given KitType
-   *
-   * @param kitType of type KitType
-   * @return Collection<Kit>
-   */
-  @JsonIgnore
-  public Collection<Kit> getKitsByKitType(KitType kitType);
+  @Override
+  @CoverageIgnore
+  public boolean isDeletable() {
+    return getId() != UNSAVED_ID;
+  }
+
+  public void setAccession(String accession) {
+    this.accession = accession;
+  }
+
+  public void setAlias(String alias) {
+    this.alias = alias;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public void setId(long id) {
+    this.experimentId = id;
+  }
+
+  public void setKits(Collection<Kit> kits) {
+    this.kits = kits;
+  }
+
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  public void setLibrary(Library library) {
+    this.library = library;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setPlatform(Platform platform) {
+    this.platform = platform;
+  }
+
+  public void setRunPartitions(List<RunPartition> runPartitions) {
+    this.runPartitions = runPartitions;
+  }
+
+  @Override
+  public void setSecurityProfile(SecurityProfile profile) {
+    this.securityProfile = profile;
+  }
+
+  public void setStudy(Study study) {
+    this.study = study;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  @Override
+  @CoverageIgnore
+  public boolean userCanRead(User user) {
+    return securityProfile.userCanRead(user);
+  }
+
+  @Override
+  @CoverageIgnore
+
+  public boolean userCanWrite(User user) {
+    return securityProfile.userCanWrite(user);
+  }
 }

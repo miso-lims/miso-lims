@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,7 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax.multipart;
 
-import net.sourceforge.fluxion.ajax.beans.util.FileUploadListener;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
@@ -35,16 +40,13 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.sourceforge.fluxion.ajax.beans.util.FileUploadListener;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax.multipart
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -68,12 +70,11 @@ public class AjaxMultipartResolver extends CommonsMultipartResolver {
           multipartContentTypes.put(f.getName(), f.getContentType());
         }
       }
-      return new DefaultMultipartHttpServletRequest(request, parsingResult.getMultipartFiles(), parsingResult.getMultipartParameters(), multipartContentTypes);
-    }
-    catch (FileUploadBase.SizeLimitExceededException ex) {
+      return new DefaultMultipartHttpServletRequest(request, parsingResult.getMultipartFiles(), parsingResult.getMultipartParameters(),
+          multipartContentTypes);
+    } catch (FileUploadBase.SizeLimitExceededException ex) {
       throw new MaxUploadSizeExceededException(fileUpload.getSizeMax(), ex);
-    }
-    catch (FileUploadException ex) {
+    } catch (FileUploadException ex) {
       throw new MultipartException("Could not parse multipart servlet request", ex);
     }
   }
@@ -86,4 +87,3 @@ public class AjaxMultipartResolver extends CommonsMultipartResolver {
     this.fileUploadListener = fileUploadListener;
   }
 }
-

@@ -1,6 +1,6 @@
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -29,21 +29,14 @@
 
 --%>
 <%@ include file="../header.jsp" %>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
-<script src="<c:url value='/scripts/statsdb.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/statsdbperbasecontent.js'/>" type="text/javascript"></script>
+<div id="maincontent" class="${not empty run.health ? 'run.health.key' : ''}">
 
-<script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/run_validation.js?ts=${timestamp.time}'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>"></script>
-
-<c:choose>
-  <c:when test="${not empty run.status}"><div id="maincontent" class="${run.status.health.key}"></c:when>
-  <c:otherwise><div id="maincontent"></c:otherwise>
-</c:choose>
 <div id="contentcolumn">
-<form:form action="/miso/run" method="POST" modelAttribute="run" autocomplete="off"
-           onsubmit="return validate_run(this);">
+<form:form id="run-form" data-parsley-validate="" action="/miso/run" method="POST" modelAttribute="run" autocomplete="off">
 
 <sessionConversation:insertSessionConversationId attributeName="run"/>
 
@@ -52,9 +45,23 @@
     <c:when test="${run.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Run
-  <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button type="button" id="save" onclick="return Run.validateRun();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
-
+<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+  <c:if test="${run.id != 0 && miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
+    <a href="<c:url value='/miso/rest/run/${run.id}/samplesheet'/>" class="ui-button ui-state-default">Sample Sheet (1.8)</a>
+    <a href="<c:url value='/miso/rest/run/${run.id}/oldsamplesheet'/>" class="ui-button ui-state-default">Sample Sheet (1.7)</a>
+    <span></span>
+  </c:if>
+  <c:choose>
+    <c:when test="${run.id != 0 && isWatching}">
+      <a href='javascript:void(0);' onclick="Run.alert.unwatchRun(${run.id});" class="ui-button ui-state-default">Stop watching</a>
+    </c:when>
+    <c:when test="${run.id != 0}">
+      <a href='javascript:void(0);' onclick="Run.alert.watchRun(${run.id});" class="ui-button ui-state-default">Watch</a>
+    </c:when>
+  </c:choose>
+</div>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
@@ -62,37 +69,37 @@
   Each run partition (lane/chamber) holds a Pool which is linked to a number of Experiments to facilitate multiplexing
   if required.
 </div>
-<h2>Run Information</h2>
-<ul class="sddm" style="margin: 0px 8px 0 0;">
-  <li>
-    <a onmouseover="mopen('runMenu')" onmouseout="mclosetime()">Options
-      <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-    </a>
 
-    <div id="runMenu"
-         onmouseover="mcancelclosetime()"
-         onmouseout="mclosetime()">
-      <c:choose>
-        <c:when test="${not empty runMap[run.id]}">
-          <a href='javascript:void(0);' onclick="Run.alert.unwatchRun(${run.id});">Stop watching</a>
-        </c:when>
-        <c:otherwise>
-          <a href='javascript:void(0);' onclick="Run.alert.watchRun(${run.id});">Watch</a>
-        </c:otherwise>
-      </c:choose>
-    </div>
-  </li>
-</ul>
+<div class="bs-callout bs-callout-warning hidden">
+  <h2>Oh snap!</h2>
+  <p>This form seems to be invalid!</p>
+</div>
+
+<h2>Run Information</h2>
 <table class="in">
   <tr>
     <td class="h">Run ID:</td>
-    <td>
+    <td><span id="runId">
       <c:choose>
         <c:when test="${run.id != 0}">
           <input type='hidden' id='runId' name='runId' value='${run.id}'/>${run.id}
         </c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
+    </span></td>
+  </tr>
+  <tr>
+    <td class="h">Name:</td>
+    <td><span id="name">
+      <c:choose>
+      <c:when test="${run.id != 0}">${run.name}</c:when>
+      <c:otherwise><i>Unsaved</i></c:otherwise>
+      </c:choose>
+    </span></td>
+  </tr>
+  <tr>
+    <td class="h">Alias:*</td>
+    <td><form:input id="alias" path="alias" class="validateable"/><span id="aliascounter" class="counter"></span>
     </td>
   </tr>
   <c:if test="${not empty run.accession}">
@@ -100,99 +107,105 @@
       <td class="h">Accession:</td>
       <td><a href="http://www.ebi.ac.uk/ena/data/view/${run.accession}" target="_blank">${run.accession}</a>
       </td>
-        <%--<td><a href="void(0);" onclick="popup('help/runAccession.html');">Help</a></td>--%>
     </tr>
   </c:if>
   <tr>
-    <c:choose>
-      <c:when test="${run.id == 0}">
-        <td>Platform:</td>
-        <td>
-          <c:choose>
-            <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:radiobuttons
-                id="platformTypes" path="platformType" items="${platformTypes}"
-                onchange="Run.ui.changePlatformType(this);"
-                disabled="disabled"/></c:when>
-            <c:otherwise><form:radiobuttons id="platformTypes" path="platformType" items="${platformTypes}"
-                                            onchange="Run.ui.changePlatformType(this);"/></c:otherwise>
-          </c:choose>
-        </td>
-      </c:when>
-      <c:otherwise>
-        <td>Platform</td>
-        <td>${run.platformType.key}</td>
-      </c:otherwise>
-    </c:choose>
+    <td>Platform:</td>
+    <td><span id="platform">${run.sequencerReference.platform.platformType.key}</span></td>
   </tr>
-
   <tr>
-    <c:choose>
-      <c:when test="${run.id == 0}">
-        <td>Sequencer:</td>
-        <td id="sequencerReferenceSelect">
-          <i>Please choose a platform above...</i>
-        </td>
-      </c:when>
-      <c:otherwise>
-        <td>Sequencer</td>
-        <td>${run.sequencerReference.name} - ${run.sequencerReference.platform.instrumentModel}</td>
-      </c:otherwise>
-    </c:choose>
+    <td>Sequencer:</td>
+    <td><span id="sequencer">${run.sequencerReference.name} - ${run.sequencerReference.platform.instrumentModel}</span></td>
   </tr>
-
   <tr>
-    <td>Name:</td>
+    <td>Sequencing Parameters:*</td>
+    <td><miso:select id="sequencingParameters" path="sequencingParameters" items="${sequencingParameters}" itemLabel="name" itemValue="id" defaultLabel="SELECT" defaultValue="" /></td>
+  </tr>
+  <tr>
+    <td></td>
     <td>
-      <c:choose>
-        <c:when test="${run.id != 0}">${run.name}</c:when>
-        <c:otherwise><i>Unsaved</i></c:otherwise>
-      </c:choose>
+      <div class="parsley-errors-list filled" id="sequencingParametersError">
+        <div class="parsley-required"></div>
+      </div>
     </td>
-      <%--<td><a href="void(0);" onclick="popup('help/runName.html');">Help</a></td>--%>
   </tr>
-  <tr>
-    <td class="h">Alias:</td>
-    <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span>
-    </td>
-      <%--<td><a href="void(0);" onclick="popup('help/runAlias.html');">Help</a></td>--%>
-  </tr>
+
   <tr>
     <td>Description:</td>
     <td>
       <c:choose>
-        <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:input
-            path="description" disabled="disabled" class="validateable"/></c:when>
-        <c:otherwise><form:input path="description" class="validateable"/></c:otherwise>
+        <c:when test="${run.health.key ne 'Unknown'}">
+           <form:input id="description" path="description" disabled="disabled" class="validateable"/>
+        </c:when>
+
+        <c:otherwise><form:input id="description" path="description" class="validateable"/></c:otherwise>
       </c:choose>
       <span id="descriptioncounter" class="counter"></span>
     </td>
-      <%--<td><a href="void(0);" onclick="popup('help/runDescription.html');">Help</a></td>--%>
   </tr>
   <tr>
-    <td>Run Path:</td>
+    <td>Run Path:*</td>
     <td>
       <c:choose>
-        <c:when test="${not empty run.filePath}">${run.filePath}</c:when>
-        <c:otherwise><form:input path="filePath"/></c:otherwise>
+        <c:when test="${empty run.filePath or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}"><form:input id="filePath" path="filePath"/></c:when>
+        <c:otherwise><span id="filePath">${run.filePath}</span></c:otherwise>
       </c:choose>
     </td>
   </tr>
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun')}">
+    <tr>
+      <td>Number of Cycles:</td>
+      <td><form:input id="numCycles" path="numCycles" class="validateable"/></td>
+    </tr>
+    <tr>
+      <td>Called Cycles:</td>
+      <td><form:input id="callCycle" path="callCycle" class="validateable"/></td>
+    </tr>
+    <tr>
+      <td>Imaged Cycles:</td>
+      <td><form:input id="imgCycle" path="imgCycle" class="validateable"/></td>
+    </tr>
+    <tr>
+      <td>Scored Cycles:</td>
+      <td><form:input id="scoreCycle" path="scoreCycle" class="validateable"/></td>
+    </tr>
+  </c:if>
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.LS454Run')}">
+    <tr>
+      <td>Cycles:</td>
+      <td><form:input id="cycles" path="cycles" class="validateable"/></td>
+    </tr>
+
+  </c:if>
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun') or miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.SolidRun') or miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.LS454Run')}">
   <tr>
-    <td>Paired End:</td>
+    <td><label for="pairedEnd">Paired End:</label></td>
     <td>
       <c:choose>
-        <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:checkbox
-            value="${run.pairedEnd}" path="pairedEnd" disabled="disabled"/></c:when>
-        <c:otherwise><form:checkbox value="${run.pairedEnd}" path="pairedEnd"/></c:otherwise>
+         <c:when test="${run.health.key ne 'Unknown'}"><form:checkbox
+           value="${run.pairedEnd}" path="pairedEnd" id="pairedEnd" disabled="disabled"/></c:when>
+        <c:otherwise><form:checkbox value="${run.pairedEnd}" path="pairedEnd" id="pairedEnd"/></c:otherwise>
       </c:choose>
     </td>
   </tr>
+  </c:if>
+  
+  <c:if test="${miso:instanceOf(run, 'uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun')}">
+  	<tr>
+      <td>MinKNOW Version:</td>
+      <td><form:input id="minKnowVersion" path="minKnowVersion" class="validateable"/></td>
+    </tr>
+    <tr>
+      <td>Protocol Version:</td>
+      <td><form:input id="protocolVersion" path="protocolVersion" class="validateable"/></td>
+    </tr>
+  </c:if>
 
   <tr>
     <td valign="top">Status:</td>
     <td>
-      <form:radiobuttons id="status.health" path="status.health" items="${healthTypes}"
-                         onchange="checkForCompletionDate();"/><br/>
+      <form:radiobuttons id="health" path="health" items="${healthTypes}"
+                         onchange="Run.checkForCompletionDate(true);"/><br/>
       <table class="list" id="runStatusTable">
         <thead>
         <tr>
@@ -203,61 +216,66 @@
         </thead>
         <tbody>
         <tr>
-          <td><fmt:formatDate pattern="dd/MM/yyyy" value="${run.status.startDate}"/></td>
           <c:choose>
-            <c:when test="${(run.status.health.key eq 'Completed' and empty run.status.completionDate)
-                    or run.status.health.key eq 'Failed'
-                    or run.status.health.key eq 'Stopped'}">
-              <td><form:input path="status.completionDate"/></td>
+          <c:when test="${run.id == 0 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <td><form:input path="startDate" id="startDate" /></td>
+          
               <script type="text/javascript">
-                Utils.ui.addDatePicker("status\\.completionDate");
+              Utils.ui.addDatePicker("startDate");
+              </script>
+            </c:when>
+            <c:otherwise>
+              <td id="startDate">
+                <fmt:formatDate pattern="yyyy-MM-dd" value="${run.startDate}"/>
+              </td>
+            </c:otherwise>
+          </c:choose>
+          <c:choose>
+          <c:when test="${(run.health.isDone() and empty run.completionDate) or run.id == 0 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <td><form:input path="completionDate" id="completionDate" /></td>
+          
+              <script type="text/javascript">
+              Utils.ui.addDatePicker("completionDate");
+              Run.checkForCompletionDate(false);
               </script>
             </c:when>
             <c:otherwise>
               <td id="completionDate">
-                <fmt:formatDate pattern="dd/MM/yyyy" value="${run.status.completionDate}"/>
+                <fmt:formatDate pattern="yyyy-MM-dd" value="${run.completionDate}"/>
               </td>
             </c:otherwise>
           </c:choose>
           <td>
-            <fmt:formatDate value="${run.status.lastUpdated}" dateStyle="long" pattern="dd/MM/yyyy HH:mm:ss"/>
+            <fmt:formatDate value="${run.lastModified}" dateStyle="long" pattern="yyyy-MM-dd HH:mm:ss"/>
           </td>
         </tr>
         </tbody>
       </table>
-
-      <c:if test="${not empty run.status.xml}">
-        ${statusXml}
-      </c:if>
     </td>
   </tr>
 
 </table>
+
+<script type="text/javascript">
+	jQuery(document).ready(function () {
+	  // Attaches a Parsley form validator.
+	  Validate.attachParsley('#run-form');
+	});
+</script>
+
 <%@ include file="permissions.jsp" %>
 <c:if test="${run.id != 0}">
-  <c:if test="${statsAvailable}">
-    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#stats_arrowclick'), 'stats');">Statistics
-      <div id="stats_arrowclick" class="toggleLeft"></div>
-    </div>
-    <div id="stats">
-      <h1>Statistics</h1>
-
-      <div id="summarydiv"></div>
-    </div>
-  </c:if>
-
-  <c:if test="${run.status.health.key ne 'Failed' and run.status.health.key ne 'Stopped' and metrixEnabled and run.platformType.key eq 'Illumina'}">
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
+  <c:if test="${run.id != 0}">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>
   <div id="metrix">
-    <h1>InterOp Metrics</h1>
-
-    <div id="metrixdiv"></div>
+    <h1>Metrics</h1>
+    <div id="metricsdiv"></div>
   </div>
   <script type="text/javascript">
     jQuery(document).ready(function () {
-      Stats.getInterOpMetrics('${run.alias}', '${run.platformType.key}');
+      RunGraph.renderMetrics(${metrics}, ${partitionNames});
     });
   </script>
   </c:if>
@@ -288,10 +306,13 @@
             <b>${note.creationDate}</b>: ${note.text}
           <span class="float-right"
                 style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-            <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+            <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                             or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-            <span style="color:#000000"><a href='#' onclick="Run.ui.deleteRunNote('${run.runId}', '${note.noteId}');">
-              <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
+              <span style="color:#000000">
+                <a href='#' onclick="Run.ui.deleteRunNote('${run.id}', '${note.noteId}');">
+                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span>
+                </a>
+              </span>
             </c:if>
           </span>
           </div>
@@ -303,432 +324,20 @@
   <br/>
 </c:if>
 
-<c:if test="${not empty run.status and run.status.health.key eq 'Completed'}">
-  <h1>Run QC</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="qcmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='javascript:void(0);' class="add"
-           onclick="Run.qc.generateRunQCRow(${run.id}); return false;">Add Run QC</a>
-        <c:if test="${operationsQcPassed}">
-          <a href='<c:url value="/miso/analysis/new/run/${run.id}"/>' class="add">Initiate Analysis</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
-<span style="clear:both">
-  <div id="addRunQC"></div>
-  <table class="list in" id="runQcTable">
-    <thead>
-    <tr>
-      <th>QCed By</th>
-      <th>QC Date</th>
-      <th>Method</th>
-      <th>Process Selection</th>
-      <th>Info</th>
-      <th>Do Not Process</th>
-    </tr>
-    </thead>
-    <tbody>
-    <c:if test="${not empty run.runQCs}">
-      <c:forEach items="${run.runQCs}" var="qc">
-        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${qc.qcCreator}</td>
-          <td><fmt:formatDate value="${qc.qcDate}"/></td>
-          <td>${qc.qcType.name}</td>
-          <td>
-            <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="fCount">
-              <table class="containerSummary">
-                <tr>
-                  <c:forEach items="${container.partitions}" var="partition">
-                    <c:if test="${not empty qc.partitionSelections and fn:length(qc.partitionSelections) > 0}">
-                      <c:forEach items="${qc.partitionSelections}" var="selection">
-                        <c:if test="${selection.partitionNumber eq partition.partitionNumber}">
-                          <td id="${qc.id}_${run.id}_${container.id}_${partition.partitionNumber}"
-                              class="smallbox partitionOccupied">${partition.partitionNumber}</td>
-                        </c:if>
-                      </c:forEach>
-                    </c:if>
-                  </c:forEach>
-                </tr>
-              </table>
-              <c:if test="${fn:length(run.sequencerPartitionContainers) > 1
-                    and fCount < fn:length(run.sequencerPartitionContainers)}">
-                <br/>
-              </c:if>
-            </c:forEach>
-          </td>
-          <td>${qc.information}</td>
-          <td>${qc.doNotProcess}</td>
-        </tr>
-      </c:forEach>
-    </c:if>
-    </tbody>
-  </table>
-</span>
-</c:if>
-
-<div id="runinfo">
-<table width="100%">
-<tbody>
-<tr>
-<td width="50%" valign="top">
-<h2>Run Parameters</h2>
-
-<div id="runPartitions">
-<c:choose>
-<c:when test="${empty run.sequencerPartitionContainers}">
-  Container:
-  <c:choose>
-    <c:when test="${not empty run.sequencerReference}">
-      <c:forEach var="platformContainerCount" begin="1"
-                 end="${run.sequencerReference.platform.numContainers}" step="1"
-                 varStatus="platformContainer">
-        <input id='container${platformContainerCount}select' name='containerselect'
-               onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
-               type='radio'
-               value='${platformContainerCount}'/>${platformContainerCount}
-      </c:forEach>
-    </c:when>
-    <c:otherwise>
-      <input id='container1select' name='containerselect'
-             onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
-             type='radio' value='1'/>1
-    </c:otherwise>
-  </c:choose>
-  <br/>
-
-  <div id='containerdiv' class="note ui-corner-all"></div>
-</c:when>
-<c:otherwise>
-  <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="containerCount">
-    <div class="note ui-corner-all">
-      <h2>Container ${containerCount.count}</h2>
-      <c:if test="${not empty container.identificationBarcode}">
-        <ul class="sddm">
-          <li>
-            <a onmouseover="mopen('containermenu')" onmouseout="mclosetime()">Options
-              <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-            </a>
-
-            <div class="run" id="containermenu"
-                 onmouseover="mcancelclosetime()"
-                 onmouseout="mclosetime()">
-              <c:if test="${run.platformType.key eq 'Illumina'}">
-                <a href="javascript:void(0);"
-                   onclick="Run.container.generateCasava17DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
-                  CSV (pre-1.8)</a>
-                <a href="javascript:void(0);"
-                   onclick="Run.container.generateCasava18DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
-                  CSV (1.8+)</a>
-              </c:if>
-            </div>
-          </li>
-        </ul>
-      </c:if>
-      <div style="clear:both"></div>
-      <table class="in">
-        <tr>
-          <c:choose>
-            <c:when test="${empty container.identificationBarcode}">
-              <td>ID:</td>
-              <td>
-                <button onclick='Run.container.lookupContainer(this, ${containerCount.index});'
-                        type='button' class='right-button ui-state-default ui-corner-all'>
-                  Lookup
-                </button>
-                <div style='overflow:hidden'>
-                  <form:input
-                      path="sequencerPartitionContainers[${containerCount.index}].identificationBarcode"/>
-                </div>
-              </td>
-            </c:when>
-            <c:otherwise>
-              <td>ID:</td>
-              <td>
-                <span id="idBarcode">${container.identificationBarcode}</span>
-                <a href="javascript:void(0);"
-                   onclick="Run.ui.editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
-                  <span class="fg-button ui-icon ui-icon-pencil"></span>
-                </a>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
-        <tr>
-          <c:choose>
-            <c:when test="${empty container.locationBarcode}">
-              <td>Location:</td>
-              <td><form:input
-                  path="sequencerPartitionContainers[${containerCount.index}].locationBarcode"/></td>
-            </c:when>
-            <c:otherwise>
-              <td>Location:</td>
-              <td>
-                <span id="locationBarcode">${container.locationBarcode}</span>
-                <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <a href="javascript:void(0);"
-                     onclick="Run.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), ${containerCount.index})">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
-                  </a>
-                </c:if>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
-        <tr>
-          <c:choose>
-            <c:when test="${empty container.validationBarcode}">
-              <td>Validation:</td>
-              <td><form:input
-                  path="sequencerPartitionContainers[${containerCount.index}].validationBarcode"/></td>
-            </c:when>
-            <c:otherwise>
-              <td>Validation:</td>
-              <td>
-                <span id="validationBarcode">${container.validationBarcode}</span>
-                <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <a href="javascript:void(0);"
-                     onclick="editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
-                  </a>
-                </c:if>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
-          <%--
-          <tr>
-              <td>Paired: ${container.paired}</td>
-          </tr>
-          --%>
-      </table>
-      <div id='partitionErrorDiv'></div>
-      <div id="partitionDiv">
-        <i class="italicInfo">Click in a partition box to beep/type in barcodes, or double click a
-          pool on the right to sequentially add pools to the container</i>
-        <table class="in">
-          <th>Partition No.</th>
-          <th>Pool</th>
-          <c:if test="${statsAvailable}">
-            <th>Stats</th>
-          </c:if>
-          <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
-            <tr>
-              <td>${partition.partitionNumber}</td>
-              <td width="90%">
-                <c:choose>
-                  <c:when test="${not empty partition.pool}">
-                    <div class="dashboard">
-                        <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(run.platformType.key)}/${partition.pool.id}"/>'> --%>
-                      <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
-                          ${partition.pool.name}
-                        (${partition.pool.creationDate})
-                      </a><br/>
-                      <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
-                        <c:choose>
-                          <c:when test="${not empty partition.pool.experiments}">
-                            <i><c:forEach items="${partition.pool.experiments}" var="experiment">
-                              ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.dilutions)} dilutions)<br/>
-                            </c:forEach>
-                            </i>
-                            <script>
-                              jQuery(document).ready(function () {
-                                Run.container.checkPoolExperiment('#partition_span_${partitionCount.index}', ${partition.pool.id}, ${partitionCount.index});
-                              });
-                            </script>
-                            <input type="hidden"
-                                   name="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
-                                   id="pId${partitionCount.index}"
-                                   value="${partition.pool.id}"/>
-                          </c:when>
-                          <c:otherwise>
-                            <i>No experiment linked to this pool</i>
-                          </c:otherwise>
-                        </c:choose>
-                      </span>
-                    </div>
-                  </c:when>
-                  <c:otherwise>
-                    <div id="p_div_${partitionCount.index}"
-                         class="elementListDroppableDiv">
-                      <div class="runPartitionDroppable"
-                           bind="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
-                           partition="${containerCount.index}_${partitionCount.index}"
-                           ondblclick='Run.container.populatePartition(this, ${containerCount.index}, ${partitionCount.index});'></div>
-                    </div>
-                  </c:otherwise>
-                </c:choose>
-              </td>
-              <c:if test="${statsAvailable}">
-                <td><img id="charttrigger" src="<c:url value='/styles/images/chart-bar-icon.png'/>"
-                         border="0"
-                         onclick="Stats.getPartitionStats(${run.id}, ${partition.partitionNumber}); checkstats(${run.id}, ${partition.partitionNumber}); ">
-                </td>
-              </c:if>
-            </tr>
-          </c:forEach>
-        </table>
-      </div>
-      <input type="hidden" value="${container.id}"
-             id="sequencerPartitionContainers${containerCount.count-1}"
-             name="sequencerPartitionContainers"/>
+  <c:if test="${run.id != 0}">
+    <div id="containers">
+      <miso:list-section id="list_container" name="${run.platformType.containerName}" target="container" items="${runContainers}" alwaysShow="true" config="${partitionConfig}"/>
     </div>
-  </c:forEach>
-</c:otherwise>
-</c:choose>
-  <%-- <form:hidden path="sequencerPartitionContainers"/> --%>
-</div>
-</td>
-<td width="50%" valign="top">
-  <h2>Available Pools</h2>
-  <c:choose>
-    <c:when test="${not empty run.platformType}">
-      <input id="showOnlyReady" type="checkbox" checked="true"
-             onclick="Run.pool.toggleReadyToRunCheck(this, '${run.platformType.key}');"/>Only Ready to Run pools?
-      <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
-        <input type="text" size="8" id="searchPools" name="searchPools"/></div>
-      <script type="text/javascript">
-        Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
-          Run.pool.poolSearch(jQuery('#searchPools').val(), '${run.platformType.key}');
-        }, 300, 2);
-      </script>
-    </c:when>
-    <c:otherwise>
-      <input id="showOnlyReady" type="checkbox" checked="true"
-             onclick="Run.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformType]:checked').val());"/>Only Ready to Run pools?
-      <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
-        <input type="text" size="8" id="searchPools" name="searchPools"/></div>
-      <script type="text/javascript">
-        Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
-          Run.pool.poolSearch(jQuery('#searchPools').val(), jQuery('input[name=platformType]:checked').val());
-        }, 300, 2);
-      </script>
-    </c:otherwise>
-  </c:choose>
-  <div id='poolList' class="elementList ui-corner-all" style="height:500px">
-  </div>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-<script type="text/javascript">
-  jQuery("#charttrigger").colorbox({
-    width: "90%",
-    html: "<div style='display:none'> " +
-          "<div id=\"graphpanel\"> " +
-          "<div id=\"statresultgraph\">" +
-          "<center><h2>Sample <span id=chartSample></span> Partition <span id=chartPartition></span> Statistics</h2></center> " +
-          "<div id=\"statstable\"></div> " +
-          "<div style=\"width: 45%; left: 10px; position: absolute;\"><h2>Quality Profile</h2>  " +
-          "<div id=\"statschartqualityprofile\" style=\"width: 100%; height:650px; position: absolute; overflow-x: scroll; overflow-y: hidden; \"></div>" +
-          "</div> " +
-          "<div style=\"width: 45%; right: 10px; position: absolute;\"><h2>Per Base Content</h2>    " +
-          "<div id=\"statschartperbasecontent\" style=\"width: 100%; right: 10px; position: absolute;\"></div>" +
-          "</div>" +
-          "<div id=\"statschartmessage\"></div> " +
-          "</div>" +
-          "</div>" +
-          "</div>"});
-
-  jQuery(document).ready(function () {
-    jQuery('#alias').simplyCountable({
-      counter: '#aliascounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['alias']},
-      countDirection: 'down'
-    });
-
-    jQuery('#description').simplyCountable({
-      counter: '#descriptioncounter',
-      countType: 'characters',
-      maxCount: ${maxLengths['description']},
-      countDirection: 'down'
-    });
-
-    <c:choose>
-    <c:when test="${not empty run.platformType}">
-      Run.pool.poolSearch("", '${run.platformType.key}');
-      <c:if test="${run.id != 0}">
-        Stats.checkRunProgress('${run.alias}', '${run.platformType.key}');
-      </c:if>
-    </c:when>
-    <c:otherwise>
-      Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
-    </c:otherwise>
-    </c:choose>
-
-    <c:if test="${statsAvailable}">
-      Stats.getRunStats(${run.id});
-    </c:if>
-  });
-
-  function checkstats(runId, lane) {
-    jQuery('#statschartmessage').html("");
-    jQuery('#statschartqualityprofile').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
-
-    Fluxion.doAjax(
-      'statsControllerHelperService',
-      'getSummaryRunstatsDiagram',
-      {'runId': runId, 'lane': lane, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        jQuery('#statschartqualityprofile').html("");
-        readStats(json);
-      }
-      }
-    );
-
-    jQuery('#statschartmessage').html("");
-    jQuery('#statschartperbasecontent').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
-
-    Fluxion.doAjax(
-      'statsControllerHelperService',
-      'getPerPositionBaseContentDiagram',
-      {'runId': runId, 'lane': lane, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        readStatsperbasecontent(json);
-      }
-      }
-    );
-  }
-
-  function readStats(json) {
-    readStatsdb(json);
-  }
-
-  function checkstatsperbasecontent(runId, lane) {
-    jQuery('#statschartmessage').html("");
-    jQuery('#chartheader').html("Per Base Percentage");
-    jQuery('#statschart').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
-
-    Fluxion.doAjax(
-      'statsControllerHelperService',
-      'getPerPositionBaseContentDiagram',
-      {'runId': runId, 'lane': lane, 'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        readStatsperbasecontent(json);
-      }
-      }
-    );
-  }
-
-  function readStatsperbasecontent(json) {
-    readStatsdbperbasecontent(json);
-  }
-</script>
-
-<br/>
+    <div id="partitions">
+      <miso:list-section id="list_partition" name="${run.platformType.pluralPartitionName}" target="partition" items="${runPartitions}" config="${partitionConfig}"/>
+    </div>
+    <div id="experiments">
+      <miso:list-section id="list_experiment" name="Experiments" target="experiment" alwaysShow="true" items="${experiments}" config="${experimentConfiguration}"/>
+    </div>
+  </c:if>
 </form:form>
+<miso:changelog item="${run}"/>
+</div>
 </div>
 </div>
 

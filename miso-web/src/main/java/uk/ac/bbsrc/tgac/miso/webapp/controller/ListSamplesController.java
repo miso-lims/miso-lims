@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,32 +23,29 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import java.io.IOException;
+import java.util.Collection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 /**
  * com.eaglegenomics.miso.web
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -57,28 +54,24 @@ public class ListSamplesController {
   protected static final Logger log = LoggerFactory.getLogger(ListSamplesController.class);
 
   @Autowired
-  private SecurityManager securityManager;
+  private SampleService sampleService;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
   }
 
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  @ModelAttribute("title")
+  public String title() {
+    return "Samples";
   }
 
   @RequestMapping(value = "/samples/rest/", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  Collection<Sample> jsonRest() throws IOException {
-    return requestManager.listAllSamples();
+  public @ResponseBody Collection<Sample> jsonRest() throws IOException {
+    return sampleService.list();
   }
 
   @RequestMapping("/samples")
-  public ModelAndView listSamples() throws Exception {
-    return new ModelAndView("/pages/listSamples.jsp");
+  public ModelAndView listSamples(ModelMap model) throws Exception {
+    return new ListItemsPage("sample").list(model);
   }
 }

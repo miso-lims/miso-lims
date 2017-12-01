@@ -3,7 +3,7 @@
 
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -26,15 +26,21 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form method="POST" commandName="group" autocomplete="off">
+    <form:form id="group-form" method="POST" commandName="group" autocomplete="off">
 
       <sessionConversation:insertSessionConversationId attributeName="group"/>
 
       <h1><c:choose><c:when
-          test="${not empty group.groupId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
+          test="${group.groupId != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Group
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button onclick="return Group.validateGroup();" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
+
+      <div class="bs-callout bs-callout-warning hidden">
+            <h2>Oh snap!</h2>
+            <p>This form seems to be invalid!</p>
+      </div>
+
       <table class="in">
         <tr>
           <td class="h">Group ID:</td>
@@ -42,11 +48,11 @@
         </tr>
         <tr>
           <td class="h">Name:</td>
-          <td><form:input path="name"/></td>
+          <td><form:input id="name" path="name"/><span id="nameCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Description:</td>
-          <td><form:input path="description"/></td>
+          <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Users:</td>
@@ -63,6 +69,26 @@
     </form:form>
   </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    Validate.attachParsley('#group-form');
+    
+    jQuery('#name').simplyCountable({
+      counter: '#nameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['name']},
+      countDirection: 'down'
+    });
+
+    jQuery('#description').simplyCountable({
+      counter: '#descriptionCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['description']},
+      countDirection: 'down'
+    });
+  });
+</script>
 
 <%@ include file="adminsub.jsp" %>
 

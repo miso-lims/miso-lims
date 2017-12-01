@@ -1,7 +1,7 @@
 <%@ include file="../header.jsp" %>
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -21,7 +21,6 @@
   ~
   ~ **********************************************************************
   --%>
-<script type="text/javascript" src="<c:url value='/scripts/dashboard.js?ts=${timestamp.time}'/>"></script>
 <div id="maincontent">
     <div id="contentcolumn">
         <h1>Dashboard</h1>
@@ -83,7 +82,16 @@
                 </div>
             </div>
         </div>
+        <div class="dashboard_widget">
 
+            <div class="widget_title ui-corner-top">
+                Pool <input type="text" size="20" id="searchPool" name="searchPool"/>
+            </div>
+            <div class="widget ui-corner-bottom">
+                <div id="searchPoolresult">
+                </div>
+            </div>
+        </div>
         <div class="dashboard_widget">
 
             <div class="widget_title ui-corner-top">
@@ -97,6 +105,7 @@
     </div>
 </div>
 <script type="text/javascript">
+  jQuery(document).ready(function() {
     Dashboard.showLatestReceivedtSamples();
     Search.loadAll();
     Utils.timer.typewatchFunc(jQuery('#searchProject'), function () {
@@ -114,6 +123,10 @@
     Utils.timer.typewatchFunc(jQuery('#searchLibraryDilution'), function () {
         Search.dashboardSearch(jQuery('#searchLibraryDilution'))
     }, 300, 2);
+    Utils.timer.typewatchFunc(jQuery('#searchPool'), function () {
+      Search.dashboardSearch(jQuery('#searchPool'))
+    }, 300, 2);
+  });
 </script>
 <%@ include file="adminsub.jsp" %>
 

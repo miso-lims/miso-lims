@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -21,202 +21,250 @@
  * *********************************************************************
  */
 
-var Sample = Sample || {
-  deleteSample: function (sampleId, successfunc) {
-    if (confirm("Are you sure you really want to delete SAM" + sampleId + "? This operation is permanent!")) {
-      Fluxion.doAjax(
-        'sampleControllerHelperService',
-        'deleteSample',
-        {'sampleId': sampleId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
-        }
-      });
-    }
+// Custom Parsley validator to validate Sample alias server-side
+window.Parsley.addValidator('sampleAlias', {
+  validateString: function(value) {
+    var deferred = new jQuery.Deferred();
+    Fluxion.doAjax('sampleControllerHelperService', 'validateSampleAlias', {
+      'alias': value,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': function(json) {
+        deferred.resolve();
+      },
+      'doOnError': function(json) {
+        deferred.reject(json.error);
+      }
+    });
+    return deferred.promise();
   },
-
-  removeSampleFromGroup: function(sampleId, sampleGroupId, successfunc) {
-    if (confirm("Are you sure you really want to remove SAM" + sampleId + " from Sample group "+sampleGroupId+"?")) {
-      Fluxion.doAjax(
-        'sampleControllerHelperService',
-        'removeSampleFromGroup',
-        {'sampleId': sampleId, 'sampleGroupId':sampleGroupId, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          successfunc();
-        }
-      });
-    }
+  messages: {
+    en: 'Alias must conform to the naming scheme.'
   }
-};
+});
 
-Sample.qc = {
-  generateSampleQCRow: function (sampleId) {
-    var self = this;
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'getSampleQCUsers',
-      {
+var Sample = Sample || {
+  deleteSample: function(sampleId, successfunc) {
+    if (confirm("Are you sure you really want to delete SAM" + sampleId + "? This operation is permanent!")) {
+      Fluxion.doAjax('sampleControllerHelperService', 'deleteSample', {
         'sampleId': sampleId,
         'url': ajaxurl
-      },
-      {'doOnSuccess': self.insertSampleQCRow}
-    );
-  },
-
-  insertSampleQCRow: function (json, includeId) {
-    if (!jQuery('#sampleQcTable').attr("qcInProgress")) {
-      jQuery('#sampleQcTable').attr("qcInProgress", "true");
-
-      $('sampleQcTable').insertRow(1);
-      //QCId  QCed By  	QC Date  	Method  	Results
-
-      if (includeId) {
-        var column1 = $('sampleQcTable').rows[1].insertCell(-1);
-        column1.innerHTML = "<input type='hidden' id='sampleId' name='sampleId' value='" + json.sampleId + "'/>";
-      }
-
-      var column2 = $('sampleQcTable').rows[1].insertCell(-1);
-      column2.innerHTML = "<select id='sampleQcUser' name='sampleQcUser'>" + json.qcUserOptions + "</select>";
-      var column3 = $('sampleQcTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='sampleQcDate' name='sampleQcDate' type='text'/>";
-      var column4 = $('sampleQcTable').rows[1].insertCell(-1);
-      column4.innerHTML = "<select id='sampleQcType' name='sampleQcType' onchange='Sample.qc.changeSampleQcUnits(this);'/>";
-      var column5 = $('sampleQcTable').rows[1].insertCell(-1);
-      column5.innerHTML = "<input id='sampleQcResults' name='sampleQcResults' type='text'/><span id='units'/>";
-      var column6 = $('sampleQcTable').rows[1].insertCell(-1);
-      column6.innerHTML = "<a href='javascript:void(0);' onclick='Sample.qc.addSampleQC();'/>Add</a>";
-
-      Utils.ui.addMaxDatePicker("sampleQcDate", 0);
-
-      Fluxion.doAjax(
-        'sampleControllerHelperService',
-        'getSampleQcTypes',
-        {'url': ajaxurl},
-        {
-          'doOnSuccess': function (json) {
-            jQuery('#sampleQcType').html(json.types);
-            jQuery('#units').html(jQuery('#sampleQcType option:first').attr("units"));
-          }
+      }, {
+        'doOnSuccess': function(json) {
+          successfunc();
         }
-      );
-    }
-    else {
-      alert("Cannot add another QC when one is already in progress.")
-    }
-  },
-
-  changeSampleQcUnits: function (input) {
-    jQuery('#units').html(jQuery('#sampleQcType').find(":selected").attr("units"));
-  },
-
-  addSampleQC: function () {
-    var f = Utils.mappifyForm("addQcForm");
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'addSampleQC',
-      {
-        'sampleId': f.id,
-        'qcCreator': f.sampleQcUser,
-        'qcDate': f.sampleQcDate,
-        'qcType': f.sampleQcType,
-        'results': f.sampleQcResults,
-        'url': ajaxurl},
-      {'updateElement': 'sampleQcTable',
-        'doOnSuccess': function (json) {
-          jQuery('#sampleQcTable').removeAttr("qcInProgress");
-        }
-      }
-    );
-  },
-
-  changeSampleQCRow: function (qcId) {
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'changeSampleQCRow',
-      {
-        'qcId': qcId,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#results' + qcId).html(json.results);
-          jQuery('#edit' + qcId).html(json.edit);
-        }
-      }
-    );
-  },
-
-  editSampleQC: function (qcId) {
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'editSampleQC',
-      {
-        'qcId': qcId,
-        'result': jQuery('#' + qcId).val(),
-        'url': ajaxurl
-      },
-      {'doOnSuccess': Utils.page.pageReload
-      }
-    );
-  },
-
-  saveBulkLibraryQc: function (tableName) {
-    var lTable = jQuery(tableName);
-    Utils.ui.disableButton('bulkLibraryQcButton');
-    DatatableUtils.collapseInputs(tableName);
-
-    var table = lTable.dataTable();
-    var aReturn = [];
-
-    var nodes = DatatableUtils.fnGetSelected(table);
-    for (var i = 0; i < nodes.length; i++) {
-      var obj = {};
-      jQuery(nodes[i]).find("td:gt(0)").each(function () {
-        var at = jQuery(this).attr("name");
-        obj[at] = jQuery(this).text();
       });
-      obj["qcCreator"] = jQuery('#currentUser').text();
-      obj["libraryId"] = obj["name"].substring(3);
-      aReturn.push(obj);
+    }
+  },
+
+  removeSampleFromOverview: function(sampleId, overviewId, successfunc) {
+    if (confirm("Are you sure you really want to remove SAM" + sampleId + " from overview?")) {
+      Fluxion.doAjax('sampleControllerHelperService', 'removeSampleFromOverview', {
+        'sampleId': sampleId,
+        'overviewId': overviewId,
+        'url': ajaxurl
+      }, {
+        'doOnSuccess': function(json) {
+          successfunc();
+        }
+      });
+    }
+  },
+
+  validateSample: function(isDetailedSample, skipAliasValidation, isNewSample) {
+    Validate.cleanFields('#sample-form');
+    jQuery('#sample-form').parsley().destroy();
+
+    // Alias input field validation
+    // 'data-parsley-required' attribute is set in JSP based on whether alias generation is enabled
+    jQuery('#alias').attr('class', 'form-control');
+    jQuery('#alias').attr('data-parsley-maxlength', '100');
+    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    if (skipAliasValidation) {
+      jQuery('#alias').attr('data-parsley-required', 'true');
+    } else {
+      jQuery('#alias').attr('data-parsley-sample-alias', '');
+      jQuery('#alias').attr('data-parsley-debounce', '500');
     }
 
-    if (aReturn.length > 0) {
-      if (validate_library_qcs(aReturn)) {
-        Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'bulkAddLibraryQCs',
-          {
-            'qcs': aReturn,
-            'url': ajaxurl
-          },
-          {'doOnSuccess': function(json) {
-            Sample.library.processBulkLibraryQcTable(tableName, json);
-          }}
-        );
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-maxlength', '255');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    // Project validation
+    jQuery('#project').attr('class', 'form-control');
+    jQuery('#project').attr('data-parsley-required', 'true');
+    jQuery('#project').attr('data-parsley-error-message', 'You must select a project.');
+
+    // Date of Receipt validation: ensure date is of correct form
+    jQuery('#receiveddatepicker').attr('class', 'form-control');
+    jQuery('#receiveddatepicker').attr('data-date-format', 'YYYY-MM-DD');
+    jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+
+    // Sample Type validation
+    jQuery('#sampleTypes').attr('class', 'form-control');
+    jQuery('#sampleTypes').attr('required', 'true');
+    jQuery('#sampleTypes').attr('data-parsley-error-message', 'You must select a Sample Type');
+    jQuery('#sampleTypes').attr('data-parsley-errors-container', '#sampleTypesError');
+
+    // Scientific Name validation
+    jQuery('#scientificName').attr('class', 'form-control');
+    jQuery('#scientificName').attr('data-parsley-required', 'true');
+    jQuery('#scientificName').attr('data-parsley-maxlength', '100');
+    jQuery('#scientificName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    // Volume validation
+    jQuery('#volume').attr('class', 'form-control');
+    jQuery('#volume').attr('data-parsley-maxlength', '10');
+    jQuery('#volume').attr('data-parsley-type', 'number');
+
+    if (isDetailedSample) {
+
+      if (isNewSample) {
+        // External Name validation
+        jQuery('#externalName').attr('class', 'form-control');
+        jQuery('#externalName').attr('data-parsley-required', 'true');
+        jQuery('#externalName').attr('data-parsley-maxlength', '255');
+        jQuery('#externalName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
       }
-      else {
-        alert("The insertSize and Concentration field can only contain integers, and the result field can only contain integers or decimals.");
-        Utils.ui.reenableButton('bulkLibraryQcButton', "Save QCs");
+
+      // SampleClass validation
+      jQuery('#sampleClass').attr('class', 'form-control');
+      jQuery('#sampleClass').attr('data-parsley-required', 'true');
+
+      // Concentration validation
+      jQuery('#concentration').attr('class', 'form-control');
+      jQuery('#concentration').attr('data-parsley-type', 'number');
+
+      // Group ID validation
+      jQuery('#groupId').attr('class', 'form-control');
+      jQuery('#groupId').attr('data-parsley-type', 'alphanum');
+      jQuery('#groupId').attr('data-parsley-maxlength', '10');
+
+      // Group Description validation
+      jQuery('#groupDescription').attr('class', 'form-control');
+      jQuery('#groupDescription').attr('data-parsley-maxlength', '255');
+      jQuery('#groupDescription').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+      // Tissue Class validation
+      jQuery('#tissueClass').attr('class', 'form-control');
+      jQuery('#tissueClass').attr('data-parsley-required', 'true');
+
+      // TissueOrigin validation
+      jQuery('#tissueOrigin').attr('class', 'form-control');
+      jQuery('#tissueOrigin').attr('data-parsley-required', 'true');
+
+      // TissueType validation
+      jQuery('#tissueType').attr('class', 'form-control');
+      jQuery('#tissueType').attr('data-parsley-required', 'true');
+
+      // Secondary Identifier validation
+      jQuery('#secondaryIdentifier').attr('class', 'form-control');
+      jQuery('#secondaryIdentifier').attr('data-parsley-maxlength', '255');
+      jQuery('#secondaryIdentifier').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+      // Region validation
+      jQuery('#region').attr('class', 'form-control');
+      jQuery('#region').attr('data-parsley-maxlength', '255');
+      jQuery('#region').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+      // PassageNumber validation
+      jQuery('#passageNumber').attr('class', 'form-control');
+      jQuery('#passageNumber').attr('data-parsley-type', 'integer');
+
+      // TimesReceived validation
+      jQuery('#timesReceived').attr('class', 'form-control');
+      jQuery('#timesReceived').attr('data-parsley-required', 'true');
+      jQuery('#timesReceived').attr('data-parsley-type', 'integer');
+
+      // TubeNumber validation
+      jQuery('#tubeNumber').attr('class', 'form-control');
+      jQuery('#tubeNumber').attr('data-parsley-required', 'true');
+      jQuery('#tubeNumber').attr('data-parsley-type', 'integer');
+
+      if (jQuery('#detailedQcStatusNote').is(':visible')) {
+        jQuery('#detailedQcStatusNote').attr('class', 'form-control');
+        jQuery('#detailedQcStatusNote').attr('data-parsley-required', 'true');
+        jQuery('#detailedQcStatusNote').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+      }
+
+      var selectedId = jQuery('#sampleClass').is('select') ? jQuery('#sampleClass option:selected').val() : jQuery('#sampleClass').val();
+      var sampleCategory = Sample.options.getSampleCategoryByClassId(selectedId);
+      // assign sample class alias based on whether text or dropdown menu are present
+      var sampleClassAlias = '';
+      if (jQuery('#sampleClass').is('select')) {
+        sampleClassAlias = jQuery('#sampleClass option:selected').text();
+      } else {
+        sampleClassAlias = jQuery('#sampleClassAlias').text();
+      }
+      switch (sampleCategory) {
+      case 'Tissue Processing':
+        switch (sampleClassAlias) {
+        case 'Slide':
+          // Cuts validation
+          jQuery('#cuts').attr('class', 'form-control');
+          jQuery('#cuts').attr('data-parsley-type', 'digits');
+          jQuery('#cuts').attr('data-parsley-required', 'true');
+
+          // Discards validation
+          jQuery('#discards').attr('class', 'form-control');
+          jQuery('#discards').attr('data-parsley-type', 'digits');
+          jQuery('#discards').attr('data-parsley-required', 'true');
+
+          // Thickness validation
+          jQuery('#thickness').attr('class', 'form-control');
+          jQuery('#thickness').attr('data-parsley-type', 'number');
+          break;
+        case 'LCM Tube':
+          jQuery('#slidesConsumed').attr('class', 'form-control');
+          jQuery('#slidesConsumed').attr('data-parsley-type', 'digits');
+          jQuery('#slidesConsumed').attr('data-parsley-required', 'true');
+          break;
+        }
+        break;
+      case 'Stock':
+        // fall-though to aliquot case (identical restrictions)
+      case 'Aliquot':
+        // TissueClass validation
+        jQuery('#tissueClass').attr('class', 'form-control');
+        jQuery('#tissueClass').attr('data-parsley-required', 'true');
+        break;
       }
     }
-    else {
-      alert("You have not selected any QC rows to save!\nPlease click the Select column cells in the rows you wish to save.");
-      Utils.ui.reenableButton('bulkLibraryQcButton', "Save QCs");
-    }
+
+    jQuery('#sample-form').parsley();
+    jQuery('#sample-form').parsley().validate();
+
+    Validate.updateWarningOrSubmit('#sample-form');
+  },
+
+  validateNCBITaxon: function() {
+    Fluxion.doAjax('sampleControllerHelperService', 'lookupNCBIScientificName', {
+      'scientificName': jQuery('#scientificName').val(),
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': jQuery('#scientificName').removeClass().addClass("ok"),
+      'doOnError': function(json) {
+        jQuery('#scientificName').removeClass().addClass("error");
+        alert(json.error);
+      }
+    });
   }
 };
 
 Sample.library = {
-  processBulkLibraryQcTable: function (tableName, json) {
+  processBulkLibraryQcTable: function(tableName, json) {
     Utils.ui.reenableButton('bulkLibraryQcButton', "Save QCs");
 
     var a = json.saved;
     for (var i = 0; i < a.length; i++) {
-      jQuery(tableName).find("tr:gt(0)").each(function () {
+      jQuery(tableName).find("tr:gt(0)").each(function() {
         if (jQuery(this).attr("libraryId") === a[i].libraryId) {
           jQuery(this).removeClass('row_selected');
           jQuery(this).addClass('row_saved');
-          jQuery(this).find("td").each(function () {
+          jQuery(this).find("td").each(function() {
             jQuery(this).css('background', '#CCFF99');
             if (jQuery(this).hasClass('rowSelect')) {
               jQuery(this).removeClass('rowSelect');
@@ -230,412 +278,480 @@ Sample.library = {
     if (json.errors) {
       var errors = json.errors;
       var errorStr = "";
-      for (var i = 0; i < errors.length; i++) {
-        errorStr += errors[i].error + "\n";
-        jQuery(tableName).find("tr:gt(0)").each(function () {
-          if (jQuery(this).attr("libraryId") === errors[i].libraryId) {
-            jQuery(this).find("td").each(function () {
+      for (var j = 0; j < errors.length; j++) {
+        errorStr += errors[j].error + "\n";
+        jQuery(tableName).find("tr:gt(0)").each(function() {
+          if (jQuery(this).attr("libraryId") === errors[j].libraryId) {
+            jQuery(this).find("td").each(function() {
               jQuery(this).css('background', '#EE9966');
             });
           }
         });
       }
       alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
-    }
-    else {
+    } else {
       location.reload(true);
     }
   },
 
-  saveBulkLibraryDilutions: function (tableName) {
-    var self = this;
-    Utils.ui.disableButton('bulkLibraryDilutionButton');
-    DatatableUtils.collapseInputs(tableName);
-
-    var table = jQuery(tableName).dataTable();
-    var aReturn = [];
-    var aTrs = table.fnGetNodes();
-    for (var i = 0; i < aTrs.length; i++) {
-      if (jQuery(aTrs[i]).hasClass('row_selected')) {
-        var obj = {};
-        jQuery(aTrs[i]).find("td:gt(0)").each(function () {
-          var at = jQuery(this).attr("name");
-          obj[at] = jQuery(this).text();
-        });
-        obj["dilutionCreator"] = jQuery('#currentUser').text();
-        obj["libraryId"] = obj["name"].substring(3);
-        aReturn.push(obj);
-      }
+  validateLibraryQcs: function(json) {
+    var ok = true;
+    for (var i = 0; i < json.length; i++) {
+      if (!json[i].results.match(/[0-9]+(\.[0-9]+)?/) || Utils.validation.isNullCheck(json[i].qcDate))
+        ok = false;
     }
-
-    if (aReturn.length > 0) {
-      if (validate_library_dilutions(aReturn)) {
-        Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'bulkAddLibraryDilutions',
-          {
-            'dilutions': aReturn,
-            'url': ajaxurl
-          },
-          {'doOnSuccess': function(json) {
-            self.processBulkLibraryDilutionTable(tableName, json);
-          }}
-        );
-      }
-      else {
-        alert("The insertSize field can only contain integers, and the result field can only contain integers or decimals.");
-        Utils.ui.reenableButton('bulkLibraryDilutionButton', "Save Dilutions");
-      }
-    }
-    else {
-      alert("You have not selected any Dilution rows to save!\nPlease click the Select column cells in the rows you wish to save.");
-      Utils.ui.reenableButton('bulkLibraryDilutionButton', "Save Dilutions");
-    }
+    return ok;
   },
-
-  processBulkLibraryDilutionTable: function (tableName, json) {
-    Utils.ui.reenableButton('bulkLibraryDilutionButton', "Save Dilutions");
-
-    var a = json.saved;
-    for (var i = 0; i < a.length; i++) {
-      jQuery(tableName).find("tr:gt(0)").each(function () {
-        if (jQuery(this).attr("libraryId") == a[i].libraryId) {
-          jQuery(this).removeClass('row_selected');
-          jQuery(this).addClass('row_saved');
-          jQuery(this).find("td").each(function () {
-            jQuery(this).css('background', '#CCFF99');
-            if (jQuery(this).hasClass('rowSelect')) {
-              jQuery(this).removeClass('rowSelect');
-              jQuery(this).removeAttr('name');
-            }
-          });
-        }
-      });
-    }
-
-    if (json.errors) {
-      var errors = json.errors;
-      var errorStr = "";
-      for (var i = 0; i < errors.length; i++) {
-        errorStr += errors[i].error + "\n";
-        jQuery(tableName).find("tr:gt(0)").each(function () {
-          if (jQuery(this).attr("libraryId") === errors[i].libraryId) {
-            jQuery(this).find("td").each(function () {
-              jQuery(this).css('background', '#EE9966');
-            });
-          }
-        });
-      }
-      alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
-    }
-    else {
-      location.reload(true);
-    }
-  }
 };
 
-Sample.barcode = {
-  printSampleBarcodes: function () {
-    var samples = [];
-    for (var i = 0; i < arguments.length; i++) {
-      samples[i] = {'sampleId': arguments[i]};
-    }
+Sample.options = {
 
-    Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Sample',
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                  json.services +
-                  "</select></fieldset></form>");
+  getSampleGroupsBySubProjectId: function(subProjectId) {
+    return Constants.sampleGroups.filter(function(sampleGroup) {
+      return sampleGroup.subprojectId == subProjectId;
+    });
+  },
 
-          jQuery(function () {
-            jQuery('#printServiceSelectDialog').dialog({
-              autoOpen: false,
-              width: 400,
-              modal: true,
-              resizable: false,
-              buttons: {
-                "Print": function () {
-                  Fluxion.doAjax(
-                    'sampleControllerHelperService',
-                    'printSampleBarcodes',
-                    {
-                      'serviceName': jQuery('#serviceSelect').val(),
-                      'samples': samples,
-                      'url': ajaxurl
-                    },
-                    {
-                      'doOnSuccess': function (json) {
-                        alert(json.response);
-                      }
-                    }
-                  );
-                  jQuery(this).dialog('close');
-                },
-                "Cancel": function () {
-                  jQuery(this).dialog('close');
-                }
-              }
-            });
-          });
-          jQuery('#printServiceSelectDialog').dialog('open');
-        },
-        'doOnError': function (json) {
-          alert(json.error);
-        }
-      }
-    );
+  getSampleGroupsByProjectId: function(projectId) {
+    return Constants.sampleGroups.filter(function(sampleGroup) {
+      return sampleGroup.projectId == projectId && !sampleGroup.subprojectId;
+    });
+  },
+
+  getSubProjectsByProjectId: function(projectId) {
+    return Constants.subprojects.filter(function(subProject) {
+      return subProject.parentProjectId == projectId;
+    });
+  },
+
+  getSampleCategoryByClassId: function(sampleClassId) {
+    var results = Constants.sampleClasses.filter(function(sampleClass) {
+      return sampleClass.id == sampleClassId;
+    });
+    return results.length > 0 ? results[0].sampleCategory : null;
   }
+
 };
 
 Sample.ui = {
-  editSampleIdBarcode: function (span, id) {
-    Fluxion.doAjax(
-      'loggedActionService',
-      'logAction',
-      {
-        'objectId': id,
-        'objectType': 'Sample',
-        'action': 'editSampleIdBarcode',
-        'url': ajaxurl
-      },
-      {}
-    );
 
-    var v = span.find('a').text();
-    if (v && v !== "") {
-      span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");
+  filterSampleGroupOptions: function() {
+    var validSampleGroups = [];
+    var subProjectId = Sample.ui.getSelectedSubprojectId();
+    if (subProjectId) {
+      validSampleGroups = Sample.options.getSampleGroupsBySubProjectId(subProjectId);
+    } else {
+      var projectId = Sample.ui.getSelectedProjectId();
+      if (projectId) {
+        validSampleGroups = Sample.options.getSampleGroupsByProjectId(projectId);
+      }
+    }
+
+    jQuery('#sampleGroup').empty().append('<option value = "">None</option>');
+    for (var i = 0, l = validSampleGroups.length; i < l; i++) {
+      jQuery('#sampleGroup').append('<option value = "' + validSampleGroups[i].id + '">' + validSampleGroups[i].groupId + '</option>');
     }
   },
 
-  editSampleLocationBarcode: function (span) {
+  projectChanged: function() {
+    Sample.ui.filterSubProjectOptions();
+    Sample.ui.filterSampleGroupOptions();
+  },
+
+  subProjectChanged: function() {
+    Sample.ui.filterSampleGroupOptions();
+  },
+
+  filterSubProjectOptions: function(setId) {
+    var selected = setId ? setId : (jQuery('#subProject').val() ? jQuery('#subProject').val() : "");
+    var projectId = Sample.ui.getSelectedProjectId();
+    var subProjects = Sample.options.getSubProjectsByProjectId(projectId);
+    jQuery('#subProject').empty().append('<option value = "">None</option>');
+    for (var i = 0, l = subProjects.length; i < l; i++) {
+      jQuery('#subProject').append('<option value = "' + subProjects[i].id + '">' + subProjects[i].alias + '</option>');
+    }
+    jQuery('#subProject').val(selected);
+  },
+
+  getSelectedProjectId: function() {
+    return jQuery('#project option:selected').val() || jQuery('#project').val();
+  },
+
+  getSelectedSubprojectId: function() {
+    return jQuery('#subProject option:selected').val() || jQuery('#subProject').val();
+  },
+
+  /**
+   * Update display when user selects different sample classes during new sample receipt
+   */
+  sampleClassChanged: function() {
+    var sampleClassId = parseInt(jQuery('#sampleClass option:selected').val());
+    var sampleClass = Constants.sampleClasses.filter(function(sampleClass) {
+      return sampleClass.id == sampleClassId;
+    })[0];
+    if (!sampleClass) {
+      Sample.ui.setUpForTissue();
+      return;
+    }
+    jQuery('#sampleCategory').val(sampleClass.sampleCategory);
+    switch (sampleClass.sampleCategory) {
+    case 'Aliquot':
+      Sample.ui.setUpForAliquot();
+      break;
+    case 'Tissue Processing':
+      Sample.ui.setUpForProcessing();
+      if (sampleClass.alias == 'LCM Tube') {
+        jQuery('#lcmTubeTable').show();
+      } else {
+        jQuery('#lcmTubeTable').hide();
+      }
+      if (sampleClass.alias == 'Slide') {
+        jQuery('#slideTable').show();
+      } else {
+        jQuery('#slideTable').hide();
+      }
+      break;
+    case 'Stock':
+      Sample.ui.setUpForStock();
+      break;
+    default:
+      Sample.ui.setUpForTissue();
+      break;
+    }
+  },
+
+  /**
+   * Update display with note required (or not) for QC Status
+   */
+  detailedQcStatusChanged: function() {
+    // delete everything from the note
+    jQuery('#detailedQcStatusNote').val('');
+
+    // find the selected detailedQcStatus
+    var dqcsId = jQuery('#detailedQcStatus option:selected').val();
+    var selectedDQCS = Utils.array.findFirstOrNull(Utils.array.idPredicate(dqcsId), Constants.detailedQcStatuses);
+    if (selectedDQCS !== null && selectedDQCS.noteRequired) {
+      jQuery('#qcStatusNote').show();
+    } else {
+      jQuery('#qcStatusNote').hide();
+    }
+  },
+
+  setUpForTissue: function() {
+    jQuery('#detailedSampleAliquot').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#detailedSampleStock').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#detailedSampleAliquot').hide();
+    jQuery('#detailedSampleStock').hide();
+    jQuery('#slideTable').hide();
+    jQuery('#lcmTubeTable').hide();
+    jQuery('#tissueClassRow').hide();
+    jQuery('#stockClassRow').hide();
+    jQuery('#tissueClass').val('');
+    jQuery('#detailedSampleTissue').show();
+  },
+
+  setUpForProcessing: function() {
+    jQuery('#tissueClassRow').show();
+    jQuery('#stockClassRow').hide();
+    jQuery('#detailedSampleStock').hide();
+    jQuery('#detailedSampleAliquot').hide();
+  },
+
+  setUpForAliquot: function() {
+    jQuery('#detailedSampleStock').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#tissueClassRow').show();
+    jQuery('#stockClassRow').show();
+    jQuery('#detailedSampleStock').show();
+    jQuery('#detailedSampleAliquot').show();
+  },
+
+  setUpForStock: function() {
+    jQuery('#detailedSampleAliquot').find(':input').each(function() {
+      jQuery(this).val('');
+    });
+    jQuery('#tissueClassRow').show();
+    jQuery('#stockClassRow').hide();
+    jQuery('#detailedSampleStock').show();
+    jQuery('#detailedSampleAliquot').hide();
+    jQuery('#slideTable').hide();
+    jQuery('#lcmTubeTable').hide();
+  },
+
+  editSampleLocationBarcode: function(span) {
     var v = span.find('a').text();
     span.html("<input type='text' value='" + v + "' name='locationBarcode' id='locationBarcode'>");
   },
 
-  showSampleLocationChangeDialog: function (sampleId) {
+  showSampleLocationChangeDialog: function(sampleId) {
     var self = this;
-    jQuery('#changeSampleLocationDialog')
-      .html("<form>" +
-            "<fieldset class='dialog'>" +
-            "<label for='notetext'>New Location:</label>" +
-            "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
-            "</fieldset></form>");
+    jQuery('#changeSampleLocationDialog').html(
+        "<form>" + "<fieldset class='dialog'>" + "<label for='notetext'>New Location:</label>"
+            + "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>"
+            + "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#changeSampleLocationDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function () {
-            self.changeSampleLocation(sampleId, jQuery('#locationBarcodeInput').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
+    jQuery('#changeSampleLocationDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function() {
+          self.changeSampleLocation(sampleId, jQuery('#locationBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function() {
+          jQuery(this).dialog('close');
         }
-      });
-    });
-    jQuery('#changeSampleLocationDialog').dialog('open');
-  },
-
-  changeSampleLocation: function (sampleId, barcode) {
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'changeSampleLocation',
-      {
-        'sampleId': sampleId,
-        'locationBarcode': barcode,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': Utils.page.pageReload
       }
-    );
+    });
   },
 
-  showSampleNoteDialog: function (sampleId) {
+  changeSampleLocation: function(sampleId, barcode) {
+    Fluxion.doAjax('sampleControllerHelperService', 'changeSampleLocation', {
+      'sampleId': sampleId,
+      'locationBarcode': barcode,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': Utils.page.pageReload
+    });
+  },
+
+  showSampleNoteDialog: function(sampleId) {
     var self = this;
     jQuery('#addSampleNoteDialog')
-      .html("<form>" +
-            "<fieldset class='dialog'>" +
-            "<label for='internalOnly'>Internal Only?</label>" +
-            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
-            "<br/>" +
-            "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
-            "</fieldset></form>");
+        .html(
+            "<form>"
+                + "<fieldset class='dialog'>"
+                + "<label for='internalOnly'>Internal Only?</label>"
+                + "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />"
+                + "<br/>" + "<label for='notetext'>Text</label>"
+                + "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' autofocus />"
+                + "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#addSampleNoteDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Note": function () {
+    jQuery('#addSampleNoteDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add Note": function() {
+          if (jQuery('#notetext').val().length > 0) {
             self.addSampleNote(sampleId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
             jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
+          } else {
+            jQuery('#notetext').focus();
           }
+        },
+        "Cancel": function() {
+          jQuery(this).dialog('close');
         }
-      });
-    });
-    jQuery('#addSampleNoteDialog').dialog('open');
-  },
-
-  addSampleNote: function (sampleId, internalOnly, text) {
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'addSampleNote',
-      {
-        'sampleId': sampleId,
-        'internalOnly': internalOnly,
-        'text': text,
-        'url': ajaxurl
-      },
-      {
-        'doOnSuccess': Utils.page.pageReload
       }
-    );
+    });
   },
 
-  deleteSampleNote: function (sampleId, noteId) {
+  addSampleNote: function(sampleId, internalOnly, text) {
+    Fluxion.doAjax('sampleControllerHelperService', 'addSampleNote', {
+      'sampleId': sampleId,
+      'internalOnly': internalOnly,
+      'text': text,
+      'url': ajaxurl
+    }, {
+      'doOnSuccess': Utils.page.pageReload
+    });
+  },
+
+  deleteSampleNote: function(sampleId, noteId) {
     if (confirm("Are you sure you want to delete this note?")) {
-      Fluxion.doAjax(
-        'sampleControllerHelperService',
-        'deleteSampleNote',
-        {'sampleId': sampleId, 'noteId': noteId, 'url': ajaxurl},
-        {'doOnSuccess': Utils.page.pageReload}
-      );
+      Fluxion.doAjax('sampleControllerHelperService', 'deleteSampleNote', {
+        'sampleId': sampleId,
+        'noteId': noteId,
+        'url': ajaxurl
+      }, {
+        'doOnSuccess': Utils.page.pageReload
+      });
     }
   },
 
-  receiveSample: function (input) {
+  showExternalNameChangeDialog: function() {
+    jQuery('#externalNameDialog').html(
+        "<form>" + "<fieldset class='dialog'>" + "<strong><label for='externalNameInput'>External Name(s):</label></strong>"
+            + "<input type='text' id='externalNameInput' class='text ui-widget-content ui-corner-all' required/>"
+            + "<div id='parentSelectDiv'></div>  <span id='selectButton'></span>" + "</fieldset></form>");
+    var oldExternalName = jQuery('#externalName').val();
+
+    jQuery('#externalNameDialog')
+        .dialog(
+            {
+              width: 400,
+              modal: true,
+              resizable: true,
+              buttons: {
+                "Validate External Name(s)": function() {
+                  jQuery('#externalNameVal').val(jQuery('#externalNameInput').val());
+                  jQuery('#externalName').val(jQuery('#externalNameInput').val());
+                  jQuery('#externalNameInput').after('<img id="ajaxLoader" src="/../styles/images/ajax-loader.gif" class="fg-button"/>');
+                  jQuery
+                      .ajax(
+                          {
+                            url: "/miso/rest/tree/identities",
+                            data: "{\"identitiesSearches\":" + JSON.stringify([jQuery('#externalNameInput').val()])
+                                + ", \"requestCounter\":1}",
+                            contentType: 'application/json; charset=utf8',
+                            dataType: 'json',
+                            type: 'POST'
+                          })
+                      .complete(function(data) {
+                        console.log(data);
+                      })
+                      .success(
+                          function(data) {
+                            var identitiesResults = data.matchingIdentities;
+                            var parentSelect = Sample.ui.createParentSelect(identitiesResults);
+                            jQuery('#ajaxLoader').remove();
+                            jQuery('#parentSelectDiv').html(parentSelect);
+                            var selectParent = function() {
+                              jQuery('#parentAlias').html(jQuery('#parentSelect option:selected').text());
+                              jQuery('#identityId').val(jQuery('#parentSelect option:selected').val());
+                              var externalName;
+                              if (jQuery('#parentSelect').val() === '') {
+                                externalName = jQuery('#externalNameInput').val();
+                              } else {
+                                externalName = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(jQuery(
+                                    '#parentSelect').val()), identitiesResults), 'externalName');
+                              }
+                              jQuery('#externalNameVal').html(externalName);
+                              jQuery('#externalName').html(externalName);
+                            };
+                            jQuery('#selectButton')
+                                .html(
+                                    '<button type="button" id="chooseParent" class="ui-state-default" style="padding:5px;margin:8px 0px;">Select</button>')
+                            jQuery('#chooseParent').click(function() {
+                              selectParent();
+                              jQuery('#externalNameDialog').dialog('close');
+                            });
+                          }).fail(function(data) {
+                        jQuery('#externalNameVal').val(oldExternalName);
+                        jQuery('#externalName').val(oldExternalName);
+                        jQuery('#externalNameDialog').dialog('close');
+                      });
+                },
+                "Cancel": function() {
+                  jQuery(this).dialog('close');
+                }
+              }
+            });
+  },
+
+  createParentSelect: function(identities) {
+    var selectedProjectId = jQuery('#project').val();
+    var sortedIdentities;
+    if (identities.length) {
+      sortedIdentities = identities.sort(function(a, b) {
+        var aSortId = a.projectId == selectedProjectId ? 0 : a.projectId;
+        var bSortId = b.projectId == selectedProjectId ? 0 : b.projectId;
+        return aSortId - bSortId;
+      });
+    } else {
+      sortedIdentities = identities;
+    }
+    var parentSelect = ['<select id="parentSelect" style="padding:3px;">'];
+    var projShortName = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(selectedProjectId),
+        HotUtils.projects), 'shortname');
+    var hasIdentityInProject = (sortedIdentities.length > 0 && sortedIdentities[0].projectId == selectedProjectId);
+    if (!hasIdentityInProject)
+      parentSelect.push('<option value="">First Receipt' + (projShortName ? ' (' + projShortName + ')' : '') + '</option>');
+    for (var i = 0; i < sortedIdentities.length; i++) {
+      parentSelect.push('<option value="' + sortedIdentities[i].id + '">' + sortedIdentities[i].alias + " --"
+          + sortedIdentityes[i].externalName + '</option>');
+    }
+    parentSelect.push('</select>');
+    return parentSelect.join('');
+  },
+
+  receiveSample: function(input) {
     var barcode = jQuery(input).val();
     if (!Utils.validation.isNullCheck(barcode)) {
-      barcode = Utils.validation.base64Check(barcode);
-      jQuery(input).val(barcode);
 
-      Fluxion.doAjax(
-        'sampleControllerHelperService',
-        'getSampleByBarcode',
-        {'barcode': barcode, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          var sample_desc = "<div id='" + json.id + "' class='dashboard'><table width=100%><tr><td>Sample Name: " + json.name + "<br> Sample ID: " + json.id + "<br>Desc: " + json.desc + "<br>Sample Type:" + json.type + "</td><td style='position: absolute;' align='right'><span class='float-right ui-icon ui-icon-circle-close' onclick='Sample.ui.removeSample(" + json.id + ");' style='position: absolute; top: 0; right: 0;'></span></td></tr></table> </div>";
-          if (jQuery("#" + json.id).length == 0) {
-            jQuery("#sample_pan").append(sample_desc);
-            jQuery('#msgspan').html("");
-          }
-          else {
-            jQuery('#msgspan').html("<i>This sample has already been scanned</i>");
-          }
+      Fluxion
+          .doAjax(
+              'sampleControllerHelperService',
+              'getSampleByBarcode',
+              {
+                'barcode': barcode,
+                'url': ajaxurl
+              },
+              {
+                'doOnSuccess': function(json) {
+                  var sample_desc = "<div id='"
+                      + json.id
+                      + "' class='dashboard'><table width=100%><tr><td>Sample Name: "
+                      + json.name
+                      + "<br> Sample ID: "
+                      + json.id
+                      + "<br>Desc: "
+                      + json.desc
+                      + "<br>Sample Type:"
+                      + json.type
+                      + "</td><td style='position: absolute;' align='right'><span class='float-right ui-icon ui-icon-circle-close' onclick='Sample.ui.removeSample("
+                      + json.id + ");' style='position: absolute; top: 0; right: 0;'></span></td></tr></table> </div>";
+                  if (jQuery("#" + json.id).length === 0) {
+                    jQuery("#sample_pan").append(sample_desc);
+                    jQuery('#msgspan').html("");
+                  } else {
+                    jQuery('#msgspan').html("<i>This sample has already been scanned</i>");
+                  }
 
-          //unbind to stop change error happening every time
-          //jQuery(input).unbind('keyup');
+                  // unbind to stop change error happening every time
 
-          //clear and focus
-          jQuery(input).val("");
-          jQuery(input).focus();
-
-          //rebind after setting focus
-          // Fixed for MISO-353 commented
-          // Utils.timer.typewatchFunc(jQuery('#searchSampleByBarcode'), function() {
-          // Sample.ui.receiveSample(jQuery('#searchSampleByBarcode'));
-          // }, 100, 4);
-          },
-          'doOnError': function (json) {
-            jQuery('#msgspan').html("<i>" + json.error + "</i>");
-          }
-        }
-      );
-    }
-    else {
-      jQuery('#msgspan').html("")
+                  // clear and focus
+                  jQuery(input).val("");
+                  jQuery(input).focus();
+                },
+                'doOnError': function(json) {
+                  jQuery('#msgspan').html("<i>" + json.error + "</i>");
+                }
+              });
+    } else {
+      jQuery('#msgspan').html("");
     }
   },
 
-  removeSample: function (sample) {
+  removeSample: function(sample) {
     jQuery("#" + sample).remove();
   },
 
-  setSampleReceiveDate: function (sampleList) {
+  setSampleReceiveDate: function(sampleList) {
     var samples = [];
-    jQuery(sampleList).children('div').each(function (e) {
+    jQuery(sampleList).children('div').each(function() {
       var sdiv = jQuery(this);
-      samples.push({'sampleId': sdiv.attr("id")});
+      samples.push({
+        'sampleId': sdiv.attr("id")
+      });
     });
 
     if (samples.length > 0) {
-      Fluxion.doAjax(
-        'sampleControllerHelperService',
-        'setSampleReceivedDateByBarcode',
-        {'samples': samples, 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
+      Fluxion.doAjax('sampleControllerHelperService', 'setSampleReceivedDateByBarcode', {
+        'samples': samples,
+        'url': ajaxurl
+      }, {
+        'doOnSuccess': function(json) {
           alert(json.result);
         }
       });
-    }
-    else {
+    } else {
       alert("No samples scanned");
     }
   },
-
-  createListingSamplesTable: function () {
-    jQuery('#listingSamplesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
-    jQuery.fn.dataTableExt.oSort['no-sam-asc'] = function (x, y) {
-      var a = parseInt(x.replace(/^SAM/i, ""));
-      var b = parseInt(y.replace(/^SAM/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-sam-desc'] = function (x, y) {
-      var a = parseInt(x.replace(/^SAM/i, ""));
-      var b = parseInt(y.replace(/^SAM/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    };
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'listSamplesDataTable',
-      {
-        'url': ajaxurl
-      },
-      {'doOnSuccess': function (json) {
-        jQuery('#listingSamplesTable').html('');
-        jQuery('#listingSamplesTable').dataTable({
-          "aaData": json.array,
-          "aoColumns": [
-            { "sTitle": "Sample Name", "sType": "no-sam"},
-            { "sTitle": "Alias"},
-            { "sTitle": "Type"},
-            { "sTitle": "QC Passed"},
-            { "sTitle": "QC Result"},
-            { "sTitle": "Edit"}
-          ],
-          "bJQueryUI": true,
-          "iDisplayLength": 25,
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-          "aaSorting": [
-            [0, "desc"]
-          ]
-        });
-        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-        jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
-      }
-      }
-    );
-  }
 };
+
+/**
+ * Catches and logs errors.
+ */
+window.addEventListener('error', function(e) {
+  var error = e.error;
+  console.log(error);
+});

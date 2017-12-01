@@ -1,6 +1,6 @@
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -22,20 +22,17 @@
   --%>
 
 <%@ include file="../header.jsp" %>
-<script src="<c:url value='/scripts/flexreport.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-
 <script src="<c:url value='/scripts/jquery/datatables/js/TableTools.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/dataTables.tableTools.css'/>" rel="stylesheet" type="text/css">
-
 <script src="<c:url value='/scripts/jquery/datatables/js/ZeroClipboard.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/runCalendar.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/runCalendar.js'/>" type="text/javascript"></script>
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
 <link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>" rel="stylesheet" type="text/css">
 
+<div id="maincontent">
+<div id="contentcolumn">
 <div id="tabs">
 <ul>
   <li><a href="#tabProjects"><span>Projects Report</span></a></li>
@@ -47,12 +44,12 @@
 </ul>
 <div id="tabProjects">
   <h1>
-    <div id="tab1_title">Projects Report</div>
+    <span id="tab1_title">Projects Report</span>
   </h1>
 
   <fieldset>
     <legend> Filter Projects</legend>
-    <table border="0">
+    <table class="no-border">
       <tr>
         <td>Name, Alias, Description Contains:</td>
         <td><input type="text" id="projectReportSearchInput" size="20"/></td>
@@ -77,19 +74,23 @@
           <select id="projectProgress" name="projectProgress">
           </select></td>
       </tr>
-      <button class="fg-button ui-state-default ui-corner-all"
-              id="generateProjectsFlexReportButton"
-              onclick="Reports.generateProjectsFlexReport();">
-        Generate Report
-      </button>
-      <button class="fg-button ui-state-default ui-corner-all" id="resetProjectsFlexReportButton"
-              onclick="Reports.ui.initProjects();">
-        Reset
-      </button>
-      <button class="fg-button ui-state-default ui-corner-all" id="searchProjects"
-              onclick="Reports.search.searchProjects();">
-        Search
-      </button>
+      <tr>
+        <td class="full-width">
+          <button class="fg-button ui-state-default ui-corner-all"
+                  id="generateProjectsFlexReportButton"
+                  onclick="Reports.generateProjectsFlexReport();">
+            Generate Report
+          </button>
+          <button class="fg-button ui-state-default ui-corner-all" id="resetProjectsFlexReportButton"
+                  onclick="Reports.ui.initProjects();">
+            Reset
+          </button>
+          <button class="fg-button ui-state-default ui-corner-all" id="searchProjects"
+                  onclick="Reports.search.searchProjects();">
+            Search
+          </button>
+        </td>
+      </tr>
     </table>
   </fieldset>
 
@@ -98,11 +99,11 @@
   </form>
 
   <br/>
-  <table width="100%" border="0" id="projectOverviewFlexReportTable" style='visibility: hidden'>
+  <table id="projectOverviewFlexReportTable" class="full-width no-border" style="visibility: hidden">
     <tr>
-      <td valign="top" width="50%" id="projectOverviewCell" class="ui-widget ui-widget-content ui-corner-all">
+      <td valign="top" id="projectOverviewCell" class="ui-widget ui-widget-content ui-corner-all half-width">
       </td>
-      <td align="center" width="50%">
+      <td align="center" class="half-width">
         <div id="projectStatusChartWrapper">
           <div id="projectStatusChart" class="ui-widget ui-widget-content ui-corner-all"></div>
         </div>
@@ -111,18 +112,18 @@
   </table>
   <br/>
 
-  <div id="projectsFlexReport" class="ui-widget ui-widget-content ui-corner-all" style='visibility: hidden'></div>
-  <div id="projectsDetailReport" class="ui-widget ui-widget-content ui-corner-all" style='visibility: hidden'></div>
+  <div id="projectsFlexReport" class="ui-widget ui-widget-content ui-corner-all" style="visibility: hidden"></div>
+  <div id="projectsDetailReport" class="ui-widget ui-widget-content ui-corner-all" style="visibility: hidden"></div>
 </div>
 
 <div id="tabProjectRunLane">
   <h1>
-    <div id="tabProjectRunLane_title">Project - Run - Lane Report</div>
+    <span id="tabProjectRunLane_title">Project - Run - Lane Report</span>
   </h1>
 
   <fieldset>
     <legend>Filter Projects</legend>
-    <table border="0">
+    <table class="no-border">
       <tr>
         <td><b>Project</b> Name, Alias, Description Contains:</td>
         <td><input type="text" id="projectRunLaneReportSearchInput" size="20"/></td>
@@ -141,15 +142,19 @@
           </script>
         </td>
       </tr>
-      <button class="fg-button ui-state-default ui-corner-all"
-              id="generateSampleRelationReportButton"
-              onclick="Reports.generateSampleRelationReport();">
-        Generate Report
-      </button>
-      <button class="fg-button ui-state-default ui-corner-all" id="searchProjectRunLane"
-              onclick="Reports.search.searchProjectRunLane();">
-        Search
-      </button>
+      <tr>
+        <td class="full-width">
+          <button class="fg-button ui-state-default ui-corner-all"
+                  id="generateSampleRelationReportButton"
+                  onclick="Reports.generateSampleRelationReport();">
+            Generate Report
+          </button>
+          <button class="fg-button ui-state-default ui-corner-all" id="searchProjectRunLane"
+                  onclick="Reports.search.searchProjectRunLane();">
+            Search
+          </button>
+        </td>
+      </tr>
     </table>
   </fieldset>
 
@@ -157,17 +162,17 @@
     <div id="projectRunLaneResultTable"><i>Please search for projects to be reported...</i></div>
   </form>
 
-  <div id='projectRunLaneFlexReport' class='ui-widget ui-widget-content ui-corner-all' style='visibility: hidden'></div>
+  <div id="projectRunLaneFlexReport" class="ui-widget ui-widget-content ui-corner-all" style="visibility: hidden"></div>
 </div>
 
 <div id="tabSamples">
   <h1>
-    <div id="tabSamples_title">Samples Report</div>
+    <span id="tabSamples_title">Samples Report</span>
   </h1>
 
   <fieldset>
     <legend> Filter Samples</legend>
-    <table border="0">
+    <table class="no-border">
       <tr>
         <td>Name, Alias, Description Contains:</td>
         <td><input type="text" id="sampleReportSearchInput" size="20"/></td>
@@ -203,19 +208,23 @@
             <option value="unknown">Unknown</option>
           </select></td>
       </tr>
-      <button class="fg-button ui-state-default ui-corner-all"
-              id="generateSamplesFlexReportButton"
-              onclick="Reports.generateSamplesFlexReport();">
-        Generate Report
-      </button>
-      <button class="fg-button ui-state-default ui-corner-all" id="resetSamplesFlexReportButton"
-              onclick="Reports.ui.initSamples();">
-        Reset
-      </button>
-      <button class="fg-button ui-state-default ui-corner-all" id="searchSamples"
-              onclick="Reports.search.searchSamples();">
-        Search
-      </button>
+      <tr>
+        <td class="full-width">
+          <button class="fg-button ui-state-default ui-corner-all"
+                  id="generateSamplesFlexReportButton"
+                  onclick="Reports.generateSamplesFlexReport();">
+            Generate Report
+          </button>
+          <button class="fg-button ui-state-default ui-corner-all" id="resetSamplesFlexReportButton"
+                  onclick="Reports.ui.initSamples();">
+            Reset
+          </button>
+          <button class="fg-button ui-state-default ui-corner-all" id="searchSamples"
+                  onclick="Reports.search.searchSamples();">
+            Search
+          </button>
+        </td>
+      </tr>
     </table>
   </fieldset>
 
@@ -225,12 +234,12 @@
 
   <br/>
 
-  <table width="100%" border="0" id='sampleOverviewFlexReportTable' style='visibility: hidden'>
+  <table id="sampleOverviewFlexReportTable" class="full-width no-border" style="visibility: hidden">
     <tr>
-      <td valign="top" width="50%" id="sampleOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
+      <td valign="top" id="sampleOverviewCell" class="ui-widget ui-widget-content ui-corner-all half-width">
       </td>
-      <td align="center" width="50%">
-        <div class="ui-widget ui-widget-content  ui-corner-all">
+      <td align="center" class="half-width">
+        <div class="ui-widget ui-widget-content ui-corner-all">
           <div id="sampleTypesChartWrapper">
             <div id="sampleTypesChart"></div>
           </div>
@@ -248,12 +257,12 @@
 
 <div id="tabLibraries">
   <h1>
-    <div id="tabLibraries_title">Libraries Report</div>
+    <span id="tabLibraries_title">Libraries Report</span>
   </h1>
 
   <fieldset>
     <legend> Filter Libraries</legend>
-    <table border="0">
+    <table class="no-border">
       <tr>
         <td>Name, Alias, Description Contains:</td>
         <td><input type="text" id="libraryReportSearchInput" size="20"/></td>
@@ -289,19 +298,23 @@
             <option value="false">Not Passed</option>
           </select></td>
       </tr>
-      <button class="fg-button ui-state-default ui-corner-all"
-              id="generateLibrariesFlexReportButton"
-              onclick="Reports.generateLibrariesFlexReport();">
-        Generate Report
-      </button>
-      <button class="fg-button ui-state-default ui-corner-all" id="resetLibrariesFlexReportButton"
-              onclick="Reports.ui.initLibraries();">
-        Reset
-      </button>
-      <button class="fg-button ui-state-default ui-corner-all" id="searchLibraries"
-              onclick="Reports.search.searchLibraries();">
-        Search
-      </button>
+      <tr>
+        <td class="full-width">
+          <button class="fg-button ui-state-default ui-corner-all"
+                  id="generateLibrariesFlexReportButton"
+                  onclick="Reports.generateLibrariesFlexReport();">
+            Generate Report
+          </button>
+          <button class="fg-button ui-state-default ui-corner-all" id="resetLibrariesFlexReportButton"
+                  onclick="Reports.ui.initLibraries();">
+            Reset
+          </button>
+          <button class="fg-button ui-state-default ui-corner-all" id="searchLibraries"
+                  onclick="Reports.search.searchLibraries();">
+            Search
+          </button>
+        </td>
+      </tr>
     </table>
   </fieldset>
 
@@ -310,11 +323,11 @@
   </form>
 
   <br/>
-  <table width="100%" border="0" id='libraryOverviewFlexReportTable' style='visibility: hidden'>
+  <table class="full-width no-border" id='libraryOverviewFlexReportTable' style="visibility: hidden">
     <tr>
-      <td valign="top" width="50%" id="libraryOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
+      <td valign="top" id="libraryOverviewCell" class="ui-widget ui-widget-content ui-corner-all half-width">
       </td>
-      <td align="center" width="50%">
+      <td align="center" class="half-width">
 
         <div class="ui-widget ui-widget-content  ui-corner-all">
           <div id="libraryPlatformChartWrapper">
@@ -329,18 +342,18 @@
   </table>
   <br/>
 
-  <div id="librariesFlexReport" class="ui-widget ui-widget-content  ui-corner-all" style='visibility: hidden'></div>
-  <div id="librariesRelationQC" class="ui-widget ui-widget-content  ui-corner-all" style='visibility: hidden'></div>
+  <div id="librariesFlexReport" class="ui-widget ui-widget-content  ui-corner-all" style="visibility: hidden"></div>
+  <div id="librariesRelationQC" class="ui-widget ui-widget-content  ui-corner-all" style="visibility: hidden"></div>
 </div>
 
 <div id="tabRuns">
   <h1>
-    <div id="tab2_title">Runs Report</div>
+    <span id="tab2_title">Runs Report</span>
   </h1>
 
   <fieldset>
     <legend>Filter Runs</legend>
-    <table border="0">
+    <table class="no-border">
       <tr>
         <td>Name, Alias, Description Contains:</td>
         <td><input type="text" id="runReportSearchInput" size="20"/></td>
@@ -385,19 +398,22 @@
           <select id="runPlatform" name="runPlatform">
           </select></td>
       </tr>
-
-      <button class="fg-button ui-state-default ui-corner-all" id="generateRunsFlexReportButton"
-              onclick="Reports.generateRunsFlexReport()">
-        Generate Report
-      </button>
-      <button class="fg-button ui-state-default ui-corner-all" id="resetRunsFlexReportButton"
-              onclick="Reports.ui.initRuns();">
-        Reset
-      </button>
-      <button class="fg-button ui-state-default ui-corner-all" id="searchRuns"
-              onclick="Reports.search.searchRuns();">
-        Search
-      </button>
+      <tr>
+        <td class="full-width">
+          <button class="fg-button ui-state-default ui-corner-all" id="generateRunsFlexReportButton"
+                  onclick="Reports.generateRunsFlexReport()">
+            Generate Report
+          </button>
+          <button class="fg-button ui-state-default ui-corner-all" id="resetRunsFlexReportButton"
+                  onclick="Reports.ui.initRuns();">
+            Reset
+          </button>
+          <button class="fg-button ui-state-default ui-corner-all" id="searchRuns"
+                  onclick="Reports.search.searchRuns();">
+            Search
+          </button>
+        </td>
+      </tr>
     </table>
   </fieldset>
   <form name="generateRunsFlexReportForm" id="generateRunsFlexReportForm" method="POST">
@@ -405,11 +421,11 @@
   </form>
 
   <br/>
-  <table width="100%" border="0" id="runOverviewFlexReportTable" style='visibility: hidden'>
+  <table class="full-width no-border" id="runOverviewFlexReportTable" style="visibility: hidden">
     <tr>
-      <td valign="top" width="50%" id="runOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
+      <td valign="top" id="runOverviewCell" class="ui-widget ui-widget-content  ui-corner-all half-width">
       </td>
-      <td align="center" wiPrevdth="50%">
+      <td align="center" class="half-width">
 
         <div class="ui-widget ui-widget-content  ui-corner-all">
 
@@ -431,7 +447,7 @@
 
 <div style="height:1000px;" id="tabResource">
   <div>
-    <table width="100%">
+    <table class="full-width">
       <tr valign="top">
         <td>
           <div id="sequencerslist"></div>
@@ -450,7 +466,7 @@
         <td colspan=2>
           <b> Show me: </b> &nbsp;
           <select id='datepicking' name='datepicking' onchange='Reports.ui.updateCalendar();'>
-            <option value=cyear selected=""> Current Year</option>
+            <option value=cyear selected="selected"> Current Year</option>
             <option value=lweek> Last week</option>
             <option value=lmonth> Last Month</option>
             <option value=l3month> Last Three Month</option>
@@ -504,4 +520,8 @@
     Reports.ui.getSequencersList();
   });
 </script>
+</div>
+</div>
+
+<%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>

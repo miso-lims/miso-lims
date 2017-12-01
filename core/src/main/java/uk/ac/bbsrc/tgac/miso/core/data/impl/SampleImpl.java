@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,33 +23,34 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
 
-import javax.persistence.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Set;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Entity
-public class SampleImpl extends AbstractSample implements Serializable {
+@Table(name = "Sample")
+@Inheritance(strategy = InheritanceType.JOINED)
+public class SampleImpl extends AbstractSample {
+
+  private static final long serialVersionUID = 1L;
+
   /**
    * Construct a new Sample with a default empty SecurityProfile
    */
@@ -58,48 +59,42 @@ public class SampleImpl extends AbstractSample implements Serializable {
   }
 
   /**
-  * Construct a new Sample with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * Construct a new Sample with a SecurityProfile owned by the given User
+   * 
+   * @param user
+   *          of type User
    */
   public SampleImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
   }
 
   /**
-   * If the given User can read the parent Project, construct a new Sample with a SecurityProfile inherited from the parent Project.
-   * If not, construct a new Sample with a SecurityProfile owned by the given User
-   *
-   * @param project of type Project
-   * @param user of type User
+   * If the given User can read the parent Project, construct a new Sample with a SecurityProfile inherited from the parent Project. If not,
+   * construct a new Sample with a SecurityProfile owned by the given User
+   * 
+   * @param project
+   *          of type Project
+   * @param user
+   *          of type User
    */
   public SampleImpl(Project project, User user) {
     if (project.userCanRead(user)) {
       setProject(project);
       setSecurityProfile(project.getSecurityProfile());
-    }
-    else {
+    } else {
+      log.error(String.format("User %s does not have permission to read Project %s. Unable to create Sample.", user.getFullName(),
+          project.getAlias()));
       setSecurityProfile(new SecurityProfile(user));
     }
   }
 
-  public void buildSubmission() {
-    /*
-    try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      submissionDocument = docBuilder.newDocument();
-    }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    ERASubmissionFactory.generateSampleSubmissionXML(submissionDocument, this);
-    */
-  }
-  
-  /**
-   * Method buildReport ...
-   */
-  public void buildReport() {
-
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    SampleChangeLog changeLog = new SampleChangeLog();
+    changeLog.setSample(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }

@@ -2,7 +2,7 @@
 
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -29,7 +29,7 @@
 
 <ul>
   <c:forEach var="execCount" begin="1" end="${request.executionCount}" step="1">
-    <li><a href='<c:url value="/miso/request/view/${request.requestId}/${execCount}"/>'>View results for
+    <li><a href='<c:url value="/miso/request/view/${request.id}/${execCount}"/>'>View results for
       execution ${execCount}</a></li>
   </c:forEach>
 </ul>
@@ -39,11 +39,11 @@
   <c:forEach items="${request.notes}" var="note">
     <c:choose>
       <c:when test="${not note.internalOnly}">
-        <li><fmt:formatDate value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
+        <li><fmt:formatDate pattern="yyyy-MM-dd" value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
       </c:when>
       <c:otherwise>
         <sec:authorize access="hasRole('ROLE_INTERNAL')">
-          <li><fmt:formatDate value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
+          <li><fmt:formatDate pattern="yyyy-MM-dd" value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
         </sec:authorize>
       </c:otherwise>
     </c:choose>
@@ -57,7 +57,7 @@
     <tr>
       <td>Note:</td>
       <td>
-        <input type="hidden" name="requestId" value="${request.requestId}"/>
+        <input type="hidden" name="requestId" value="${request.id}"/>
         <textarea name="text">Type note in here</textarea>
       </td>
     </tr>

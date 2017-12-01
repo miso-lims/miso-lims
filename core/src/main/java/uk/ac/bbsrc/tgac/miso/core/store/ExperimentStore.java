@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,72 +23,57 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
-
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 
 /**
  * Defines a DAO interface for storing Experiments
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<Experiment>, NamingSchemeAware<Experiment> {
-  /**
-   * Retrieve an Experiment from an underlying data store given an Experiment ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param experimentId of type long
-   * @return Experiment
-   * @throws IOException when
-   */
-  //Experiment lazyGet(long experimentId) throws IOException;
-
+public interface ExperimentStore extends Store<Experiment>, Remover<Experiment> {
   /**
    * List all Experiments that match a search criteria
-   *
-   * @param query of type String
+   * 
+   * @param query
+   *          of type String
    * @return Collection<Experiment>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Experiment> listBySearch(String query) throws IOException;
 
   /**
    * List all Experiments that are part of a Study given a Study ID
-   *
-   * @param studyId of type long
+   * 
+   * @param studyId
+   *          of type long
    * @return Collection<Experiment>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Experiment> listByStudyId(long studyId) throws IOException;
 
   /**
-   * List all Experiments that are part of a Submission given a Submission ID
-   *
-   * @param submissionId of type long
-   * @return Collection<Experiment>
-   * @throws IOException when
-   */
-  Collection<Experiment> listBySubmissionId(long submissionId) throws IOException;
-
-  /**
-   * List all Experiments that are related to a given Pool given a Pool ID
-   *
-   * @param poolId of type long
-   * @return Collection<Experiment>
-   * @throws IOException when
-   */
-  Collection<Experiment> listByPoolId(long poolId) throws IOException;
-
-  /**
    * List all persisted objects
-   *
+   * 
    * @return Collection<Experiment>
-   * @throws IOException when the objects cannot be retrieved
+   * @throws IOException
+   *           when the objects cannot be retrieved
    */
   Collection<Experiment> listAllWithLimit(long limit) throws IOException;
+  
+  /**
+   * @return a map containing all column names and max lengths from the Experiments table
+   * @throws IOException
+   */
+  public Map<String, Integer> getExperimentColumnSizes() throws IOException;
+
+  Collection<Experiment> listByLibrary(long id) throws IOException;
+
+  Collection<Experiment> listByRun(long runId) throws IOException;
 }

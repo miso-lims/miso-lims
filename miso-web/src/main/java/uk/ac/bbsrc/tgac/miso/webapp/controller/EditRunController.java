@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,52 +12,69 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
-import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import javax.xml.transform.TransformerException;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
+import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PlatformService;
+import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.service.impl.PartitionQCService;
+import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ExperimentListConfiguration;
+import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
 
 @Controller
 @RequestMapping("/run")
@@ -65,62 +82,51 @@ import javax.xml.transform.TransformerException;
 public class EditRunController {
   protected static final Logger log = LoggerFactory.getLogger(EditRunController.class);
 
+  /**
+   * Get a stream of source of metrics
+   * 
+   * Normally, metrics collected by run scanner are stored in the MISO database, but it is possible to provide others here.
+   */
+  public Stream<RunMetricsSource> getSources() {
+    return Stream.of(Run::getMetrics);
+  }
+
   @Autowired
   private SecurityManager securityManager;
+  @Autowired
+  private ChangeLogService changeLogService;
+  @Autowired
+  private RunService runService;
+  @Autowired
+  private PlatformService platformService;
+  @Autowired
+  private PartitionQCService partitionQCService;
 
   @Autowired
-  private RequestManager requestManager;
-
+  private SequencerReferenceService sequencerReferenceService;
   @Autowired
-  private DataObjectFactory dataObjectFactory;
-
+  private SequencingParametersService sequencingParametersService;
   @Autowired
-  private JdbcTemplate interfaceTemplate;
-
+  private LibraryService libraryService;
   @Autowired
-  private RunAlertManager runAlertManager;
-
-  private RunStatsManager runStatsManager;
-
-  @Autowired
-  private ApplicationContextProvider applicationContextProvider;
-
-  public void setApplicationContextProvider(ApplicationContextProvider applicationContextProvider) {
-    this.applicationContextProvider = applicationContextProvider;
-  }
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+  private ExperimentService experimentService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
 
-  public void setRunAlertManager(RunAlertManager runAlertManager) {
-    this.runAlertManager = runAlertManager;
-  }
-
-  public void setRunStatsManager(RunStatsManager runStatsManager) {
-    this.runStatsManager = runStatsManager;
+  public void setRunService(RunService runService) {
+    this.runService = runService;
   }
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Run");
+    return runService.getRunColumnSizes();
   }
 
   @ModelAttribute("platformTypes")
-  public Collection<String> populatePlatformTypes() {
-    return PlatformType.getKeys();
+  public Collection<String> populatePlatformTypes() throws IOException {
+    return PlatformType.platformTypeNames(platformService.listActivePlatformTypes());
   }
 
   @ModelAttribute("healthTypes")
@@ -130,15 +136,14 @@ public class EditRunController {
 
   @ModelAttribute("platforms")
   public Collection<Platform> populatePlatforms() throws IOException {
-    return requestManager.listAllPlatforms();
+    return platformService.list();
   }
 
   public Boolean isMultiplexed(Run run) throws IOException {
-    if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
-      //for (SequencerPartitionContainer<SequencerPoolPartition> f : requestManager.listSequencerPartitionContainersByRunId(run.getId())) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> f : run.getSequencerPartitionContainers()) {
-        for (SequencerPoolPartition p : f.getPartitions()) {
-          if (p.getPool() != null && p.getPool().getDilutions().size() > 1) {
+    if (run != null && run.getId() != Run.UNSAVED_ID) {
+      for (SequencerPartitionContainer f : run.getSequencerPartitionContainers()) {
+        for (Partition p : f.getPartitions()) {
+          if (p.getPool() != null && p.getPool().getPoolableElementViews().size() > 1) {
             return true;
           }
         }
@@ -147,149 +152,68 @@ public class EditRunController {
     return false;
   }
 
-  @ModelAttribute("metrixEnabled")
-  public Boolean isMetrixEnabled() {
-    MisoPropertyExporter exporter = (MisoPropertyExporter)applicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey("miso.notification.interop.enabled") && Boolean.parseBoolean(misoProperties.get("miso.notification.interop.enabled"));
-  }
-
-
-  public Boolean hasOperationsQcPassed(Run run) throws IOException {
-    if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
-      for (RunQC qc : run.getRunQCs()) {
-        if ("SeqOps QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  public Boolean hasInformaticsQcPassed(Run run) throws IOException {
-    if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
-      for (RunQC qc : run.getRunQCs()) {
-        if ("SeqInfo QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  public Collection<Pool<? extends Poolable>> populateAvailablePools(User user) throws IOException {
-    return requestManager.listAllPools();
-  }
-
-  public Collection<Pool> populateAvailablePools(PlatformType platformType, User user) throws IOException {
-    List<Pool> pools = new ArrayList<Pool>(requestManager.listAllPoolsByPlatform(platformType));
-    Collections.sort(pools);
-    return pools;
-  }
-
-  public Collection<Experiment> populateAvailableExperiments(User user) throws IOException {
-    return requestManager.listAllExperiments();
-  }
-
-  public Collection<Experiment> populateAvailableExperiments(PlatformType platformType, User user) throws IOException {
-    List<Experiment> exps = new ArrayList<Experiment>();
-    for (Experiment e : requestManager.listAllExperiments()) {
-      if (e.getPlatform() != null && e.getPlatform().getPlatformType().equals(platformType)) {
-        exps.add(e);
-      }
-    }
-    Collections.sort(exps);
-    return exps;
-  }
-
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
-  public ModelAndView newUnassignedRun(ModelMap model) throws IOException {
-    //clear any existing run in the model
+  @RequestMapping(value = "/new/{srId}", method = RequestMethod.GET)
+  public ModelAndView newUnassignedRun(@PathVariable Long srId, ModelMap model) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    // clear any existing run in the model
     model.addAttribute("run", null);
-    return setupForm(AbstractRun.UNSAVED_ID, model);
+    SequencerReference sequencerReference = sequencerReferenceService.get(srId);
+    Run run = sequencerReference.getPlatform().getPlatformType().createRun(user);
+    run.setSequencerReference(sequencerReference);
+    return setupForm(run, model);
+
   }
-
-/*  @RequestMapping(value = "/new/experiment/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedRun(@PathVariable Long experimentId,
-                                     ModelMap model) throws IOException {
-    //clear any existing run in the model
-    model.addAttribute("run", null);
-    return setupForm(AbstractRun.UNSAVED_ID, experimentId, model);
-  }*/
-
-/*  @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long runId,
-                                ModelMap model) throws IOException {
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = requestManager.getRunById(runId);
-      if (run != null) {
-        if (!run.userCanRead(user)) {
-          throw new SecurityException("Permission denied.");
-        }
-
-        model.put("formObj", run);
-        model.put("run", run);
-        model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
-        model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
-        model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
-      }
-      else {
-        throw new SecurityException("No such Run");
-      }
-      return new ModelAndView("/pages/editRun.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show experiment", ex);
-      }
-      throw ex;
-    }
-  } */
-
 
   @RequestMapping(value = "/rest/{runId}", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  Run jsonRest(@PathVariable Long runId) throws IOException {
-    return requestManager.getRunById(runId);
+  public @ResponseBody Run jsonRest(@PathVariable Long runId) throws IOException {
+    return runService.get(runId);
+  }
+
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return changeLogService.listAll("Run");
   }
 
   @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long runId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
+    Run run = runService.get(runId);
+
+    return setupForm(run, model);
+
+  }
+
+  @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET)
+  public ModelAndView setupForm(@PathVariable String runAlias, ModelMap model) throws IOException {
+    Run run = runService.getRunByAlias(runAlias);
+    return setupForm(run, model);
+
+  }
+
+  public ModelAndView setupForm(Run run, ModelMap model) throws IOException {
+
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = null;
 
-      if (runId == AbstractRun.UNSAVED_ID) {
-        run = dataObjectFactory.getRun(user);
+      if (run.getId() == Run.UNSAVED_ID) {
         model.put("title", "New Run");
-        model.put("availablePools", populateAvailablePools(user));
         model.put("multiplexed", false);
-      }
-      else {
-        run = requestManager.getRunById(runId);
-        if (run == null) {
-          throw new SecurityException("No such Run.");
-        }
-        else {
-          model.put("title", "Run " + runId);
-          //model.put("availablePools", populateAvailablePools(run.getPlatformType(), user));
-          model.put("multiplexed", isMultiplexed(run));
-          try {
-            if (runStatsManager != null) {
-              model.put("statsAvailable", runStatsManager.hasStatsForRun(run));
-            }
-            model.put("operationsQcPassed", hasOperationsQcPassed(run));
-            model.put("informaticsQcPassed", hasInformaticsQcPassed(run));
-          }
-          catch (RunStatsException e) {
-            e.printStackTrace();
-          }
-
-          //runAlertManager.push(run);
+        model.put("metrics", "[]");
+        model.put("partitionNames", "[]");
+      } else {
+        model.put("title", "Run " + run.getId());
+        model.put("multiplexed", isMultiplexed(run));
+        model.put("metrics",
+            getSources().filter(Objects::nonNull).map(source -> source.fetchMetrics(run))
+                .filter(metrics -> !LimsUtils.isStringBlankOrNull(metrics))
+                .collect(new JsonArrayCollector()));
+        if (run.getSequencerPartitionContainers().size() == 1) {
+          ObjectMapper mapper = new ObjectMapper();
+          model.put("partitionNames", mapper.writeValueAsString(
+              run.getSequencerPartitionContainers().get(0).getPartitions().stream()
+                  .sorted((a, b) -> a.getPartitionNumber() - b.getPartitionNumber())
+                  .map(partition -> partition.getPool() == null ? "N/A" : partition.getPool().getAlias()).collect(Collectors.toList())));
+        } else {
+          model.put("partitionNames", "[]");
         }
       }
 
@@ -297,38 +221,49 @@ public class EditRunController {
         throw new SecurityException("Permission denied.");
       }
 
-      if (run.getStatus() == null) {
-        run.setStatus(new StatusImpl());
-      }
-      else {
-        try {
-          InputStream in = StatsController.class.getResourceAsStream("/status/xsl/"+run.getPlatformType().getKey().toLowerCase()+"/statusXml.xsl");
-          if (in != null && run.getStatus().getXml() != null) {
-            String xsl = LimsUtils.inputStreamToString(in);
-            model.put("statusXml", (SubmissionUtils.xslTransform(run.getStatus().getXml(), xsl)));
-          }
-        }
-        catch (TransformerException e) {
-          model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + run.getAlias(), e.getMessage()));
-          e.printStackTrace();
-        }
-      }
+      model.put("sequencingParameters",
+          sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getId()));
+
+      model.put("runContainers", run.getSequencerPartitionContainers().stream().map(Dtos::asDto).collect(Collectors.toList()));
+      model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
+          .map(WhineyFunction.rethrow(partition -> {
+            PartitionDto dto = Dtos.asDto(partition);
+            PartitionQC qc = partitionQCService.get(run, partition);
+            if (qc != null) {
+              dto.setQcType(qc.getType().getId());
+              dto.setQcNotes(qc.getNotes());
+            } else {
+              dto.setQcNotes("");
+            }
+            return dto;
+          })).collect(Collectors.toList()));
 
       model.put("formObj", run);
       model.put("run", run);
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
+      model.put("isWatching", run.getWatchers().contains(user));
 
-      Map<Long, String> runMap = new HashMap<Long, String>();
-      if (run.getWatchers().contains(user)) {
-        runMap.put(run.getId(), user.getLoginName());
-      }
-      model.put("overviewMap", runMap);
+      ObjectMapper mapper = new ObjectMapper();
+      ObjectNode partitionConfig = mapper.createObjectNode();
+      partitionConfig.put("platformType", run.getPlatformType().name());
+      partitionConfig.put("platformId", run.getSequencerReference().getPlatform().getId());
+      partitionConfig.put("runId", run.getId());
+      partitionConfig.put("isFull", run.isFull());
+      partitionConfig.put("showContainer", true);
+      partitionConfig.put("sequencingParametersId", run.getSequencingParameters() == null ? 0 : run.getSequencingParameters().getId());
+      model.put("partitionConfig", mapper.writeValueAsString(partitionConfig));
+      model.put("experiments",
+          experimentService.listAllByRunId(run.getId()).stream().map(Dtos::asDto)
+              .collect(Collectors.toList()));
+      model.put("experimentConfiguration",
+          mapper.writeValueAsString(
+              new ExperimentListConfiguration(experimentService, libraryService, run.getSequencerReference().getPlatform(),
+                  run)));
 
       return new ModelAndView("/pages/editRun.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show run", ex);
       }
@@ -337,20 +272,28 @@ public class EditRunController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("run") Run run,
-                              ModelMap model, SessionStatus session) throws IOException, MalformedRunException {
+  public String processSubmit(@ModelAttribute("run") Run run, ModelMap model, SessionStatus session) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!run.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
+      for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
+        for (Partition partition : container.getPartitions()) {
+          if (partition.getPool() != null) {
+            partition.getPool().setLastModifier(user);
+          }
+        }
       }
 
-      requestManager.saveRun(run);
+      long runId = run.getId();
+      if (run.getId() == Run.UNSAVED_ID) {
+        runId = runService.create(run);
+      } else {
+        runService.update(run);
+      }
+
       session.setComplete();
       model.clear();
-      return "redirect:/miso/run/" + run.getId();
-    }
-    catch (IOException ex) {
+      return "redirect:/miso/run/" + runId;
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save run", ex);
       }

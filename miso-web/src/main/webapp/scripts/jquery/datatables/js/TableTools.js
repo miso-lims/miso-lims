@@ -1256,8 +1256,6 @@ TableTools.prototype = {
 		}
 		
 		$(nButton).click( function (e) {
-			//e.preventDefault();
-			
 			if ( oConfig.fnClick !== null )
 			{
 				oConfig.fnClick.call( that, nButton, oConfig, null );

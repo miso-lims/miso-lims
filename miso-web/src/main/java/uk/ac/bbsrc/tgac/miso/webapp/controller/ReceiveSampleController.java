@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -27,7 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -38,9 +39,9 @@ public class ReceiveSampleController {
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws Exception {
     try {
+      model.put("title", "Receive Samples");
       return new ModelAndView("/pages/sampleReceipt.jsp", model);
-    }
-    catch (Exception ex) {
+    } catch (Exception ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show sample", ex);
       }

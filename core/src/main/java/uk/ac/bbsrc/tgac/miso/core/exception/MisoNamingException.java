@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -27,20 +27,21 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * uk.ac.bbsrc.tgac.miso.core.exception
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 30-Jun-2011
  * @since 0.0.3
  */
 public class MisoNamingException extends Exception {
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Construct a new MisoNamingException containing a user-friendly message as to why the failure occurred
+   * 
+   * @param s user-friendly message
+   */
   public MisoNamingException(String s) {
     super(s);
   }
 
-  public MisoNamingException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
-    }
-  }
 }

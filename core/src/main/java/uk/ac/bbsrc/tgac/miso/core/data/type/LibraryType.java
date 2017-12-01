@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,53 +23,72 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
+import javax.persistence.Table;
 
 /**
- * Provides model access to the underlying MISO LibraryType lookup table. These types should match the SRA submission schema for
- * Library types.
+ * Provides model access to the underlying MISO LibraryType lookup table. These types should match the SRA submission schema for Library
+ * types.
  * <p/>
  * See:
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-public class LibraryType implements Comparable, Serializable {
+@Entity
+@Table(name = "LibraryType")
+public class LibraryType implements Comparable<LibraryType>, Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryTypeId  */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long libraryTypeId = LibraryType.UNSAVED_ID;
-  /** Field description  */
+
+  @Column(nullable = false)
   private String description;
-  /** Field platformType  */
-  private String platformType;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private PlatformType platformType;
+
+  @Column(nullable = false)
+  private Boolean archived;
+
+  private String abbreviation;
 
   /**
    * Returns the libraryTypeId of this LibraryType object.
-   *
+   * 
    * @return Long libraryTypeId.
    */
-  public Long getLibraryTypeId() {
+  public Long getId() {
     return libraryTypeId;
   }
 
   /**
    * Sets the libraryTypeId of this LibraryType object.
-   *
-   * @param libraryTypeId libraryTypeId.
+   * 
+   * @param libraryTypeId
+   *          libraryTypeId.
    */
-  public void setLibraryTypeId(Long libraryTypeId) {
+  public void setId(Long libraryTypeId) {
     this.libraryTypeId = libraryTypeId;
   }
 
   /**
    * Returns the description of this LibraryType object.
-   *
+   * 
    * @return String description.
    */
   public String getDescription() {
@@ -78,8 +97,9 @@ public class LibraryType implements Comparable, Serializable {
 
   /**
    * Sets the description of this LibraryType object.
-   *
-   * @param description description.
+   * 
+   * @param description
+   *          description.
    */
   public void setDescription(String description) {
     this.description = description;
@@ -87,30 +107,44 @@ public class LibraryType implements Comparable, Serializable {
 
   /**
    * Returns the platformType of this LibraryType object.
-   *
-   * @return String platformType.
+   * 
+   * @return PlatformType platformType.
    */
-  public String getPlatformType() {
+  public PlatformType getPlatformType() {
     return platformType;
   }
 
   /**
    * Sets the platformType of this LibraryType object.
-   *
-   * @param platformType platformType.
+   * 
+   * @param platformType
+   *          platformType.
    */
-  public void setPlatformType(String platformType) {
+  public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
+  }
+
+  public Boolean getArchived() {
+    return archived;
+  }
+
+  public void setArchived(Boolean archived) {
+    this.archived = archived;
+  }
+
+  public String getAbbreviation() {
+    return abbreviation;
+  }
+
+  public void setAbbreviation(String abbreviation) {
+    this.abbreviation = abbreviation;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof LibraryType))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof LibraryType)) return false;
     LibraryType them = (LibraryType) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -119,10 +153,9 @@ public class LibraryType implements Comparable, Serializable {
 
   @Override
   public int hashCode() {
-    if (getLibraryTypeId() != UNSAVED_ID) {
-      return getLibraryTypeId().intValue();
-    }
-    else {
+    if (getId() != UNSAVED_ID) {
+      return getId().intValue();
+    } else {
       int hashcode = -1;
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
       if (getPlatformType() != null) hashcode = 37 * hashcode + getPlatformType().hashCode();
@@ -131,8 +164,7 @@ public class LibraryType implements Comparable, Serializable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    LibraryType t = (LibraryType)o;
+  public int compareTo(LibraryType t) {
     return getDescription().compareTo(t.getDescription());
   }
 }

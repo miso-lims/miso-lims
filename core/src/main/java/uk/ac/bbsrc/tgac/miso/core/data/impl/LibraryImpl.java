@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,24 +23,37 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 
-import java.io.Serializable;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-public class LibraryImpl extends AbstractLibrary implements Serializable {
+@Entity
+@Table(name = "Library")
+@Inheritance(strategy = InheritanceType.JOINED)
+public class LibraryImpl extends AbstractLibrary {
+
+  private static final long serialVersionUID = 1L;
+
   protected static final Logger log = LoggerFactory.getLogger(LibraryImpl.class);
 
   /**
@@ -52,8 +65,9 @@ public class LibraryImpl extends AbstractLibrary implements Serializable {
 
   /**
    * Construct a new Library with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public LibraryImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
@@ -63,9 +77,18 @@ public class LibraryImpl extends AbstractLibrary implements Serializable {
     if (sample.userCanRead(user)) {
       setSample(sample);
       setSecurityProfile(sample.getSecurityProfile());
-    }
-    else {
+    } else {
       setSecurityProfile(new SecurityProfile(user));
     }
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    LibraryChangeLog changeLog = new LibraryChangeLog();
+    changeLog.setLibrary(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }

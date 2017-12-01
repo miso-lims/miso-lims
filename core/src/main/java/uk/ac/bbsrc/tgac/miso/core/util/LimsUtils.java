@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,414 +12,89 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
-import java.nio.CharBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
+import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 
 /**
  * Utility class to provde helpful functions to MISO
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class LimsUtils {
-  public static final long SYSTEM_USER_ID = 0;
 
-  protected static final Logger log = LoggerFactory.getLogger(LimsUtils.class);
-
-  private static final Pattern p = Pattern.compile("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$");
-
-  public static String unicodeify(String barcode) {
-    log.debug("ORIGINAL :: " + barcode);
-    StringBuilder b = new StringBuilder();
-    int count = 0;
-    for (Character c : barcode.toCharArray()) {
-      if (Character.UnicodeBlock.of(c) != Character.UnicodeBlock.BASIC_LATIN) {
-        int codePoint = Character.codePointAt(barcode, count);
-        b.append("[U:$").append(String.format("%04x", codePoint).toUpperCase()).append("]");
-      }
-      else {
-        b.append(c);
-      }
-      count++;
-    }
-    log.debug("UNICODED :: " + b.toString());
-    return b.toString();
-  }
-
-  public static boolean isBase64String(String base64) {
-    //nasty 20-character length hack for base64 strings.
-    //just have to hope that people don't generally search for 4-mer 20+ length strings very often
-    return base64.length() > 20 && p.matcher(base64).matches();
-  }
-
-  public static boolean isUrlValid(URL url) {
-    try {
-      HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-      connection.setRequestMethod("HEAD");
-      int responseCode = connection.getResponseCode();
-      return (responseCode == 200);
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
-
-  public static boolean isUrlValid(URI uri) {
-    try {
-      URL url = uri.toURL();
-      return isUrlValid(url);
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
+  private static final Logger log = LoggerFactory.getLogger(LimsUtils.class);
 
   public static boolean isStringEmptyOrNull(String s) {
     return "".equals(s) || s == null;
   }
 
-  /**
-   * Join a collection, akin to Perl's join(), using a given delimiter to produce a single String 
-   *
-   * @param s of type Collection
-   * @param delimiter of type String
-   * @return String
-   * @throws IllegalArgumentException
-   */
-  public static String join(Collection s, String delimiter) throws IllegalArgumentException {
-    if (s == null) { throw new IllegalArgumentException("Collection to join must not be null"); }
-    StringBuffer buffer = new StringBuffer();
-    Iterator iter = s.iterator();
-    while (iter.hasNext()) {
-      buffer.append(iter.next());
-      if (iter.hasNext() && delimiter != null) {
-        buffer.append(delimiter);
-      }
-    }
-    return buffer.toString();
+  public static boolean isStringBlankOrNull(String s) {
+    return s == null || "".equals(s.trim());
+  }
+
+  public static String nullifyStringIfBlank(String s) {
+    return (isStringBlankOrNull(s) ? null : s);
   }
 
   /**
-   * Join an Array, akin to Perl's join(), using a given delimiter to produce a single String
-   *
-   * @param s of type Object[]
-   * @param delimiter of type String
-   * @return String
-   */
-  public static String join(Object[] s, String delimiter) {
-    StringBuffer buffer = new StringBuffer();
-    for (int i = 0; i < s.length; i++) {
-      buffer.append(s[i]);
-      if (i<s.length-1) {
-        buffer.append(delimiter);
-      }
-    }
-    return buffer.toString();
-  }
-
-  public static <T> List<List<T>> partition(List<T> list, int size) {
-
-   if (list == null)
-      throw new NullPointerException(
-          "'list' must not be null");
-    if (!(size > 0))
-      throw new IllegalArgumentException(
-          "'size' must be greater than 0");
-
-    return new Partition<T>(list, size);
-  }
-
-  private static class Partition<T> extends AbstractList<List<T>> {
-
-    final List<T> list;
-    final int size;
-
-    Partition(List<T> list, int size) {
-      this.list = list;
-      this.size = size;
-    }
-
-    @Override
-    public List<T> get(int index) {
-      int listSize = size();
-      if (listSize < 0)
-        throw new IllegalArgumentException("negative size: " + listSize);
-      if (index < 0)
-        throw new IndexOutOfBoundsException(
-            "index " + index + " must not be negative");
-      if (index >= listSize)
-        throw new IndexOutOfBoundsException(
-            "index " + index + " must be less than size " + listSize);
-      int start = index * size;
-      int end = Math.min(start + size, list.size());
-      return list.subList(start, end);
-    }
-
-    @Override
-    public int size() {
-      return (list.size() + size - 1) / size;
-    }
-
-    @Override
-    public boolean isEmpty() {
-      return list.isEmpty();
-    }
-  }
-
-  /**
-   * Computes the relative complement of two sets, i.e. those elements that are in A but not in B
-   *
-   * @param needles of type Set
-   * @param haystack of type Set
-   * @return Set
-   */
-  public static Set relativeComplement(Set needles, Set haystack) {
-    Set diff = (Set)((HashSet)needles).clone();
-    diff.removeAll(haystack);
-    return diff;
-  }
-
-  /**
-   * SLOWLY computes the relative complement of two sets, i.e. those elements that are in A but not in B, based on an object's given accessor to a property.
-   * <p/>
-   * This is distinctly less efficient than {@link uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.relativeComplement()} (this method uses reflection) but
-   * can avoid comparing objects by hashcode. This is useful when trying to compare objects that have been persisted, and therefore have unique
-   * IDs and Names, to objects that haven't, and hence have no ID or Name.
-   * <p/>
-   * If an exception occurs, null is returned.
-   *
-   * @param c of type Class
-   * @param needles of type Set
-   * @param haystack of type Set
-   * @return Set
-   */
-  public static Set relativeComplementByProperty(Class c, String methodName, Set needles, Set haystack) {
-    try {
-      Method m = c.getMethod(methodName);
-      Set diff = (Set)((HashSet)needles).clone();
-
-      if (diff.size() > haystack.size()) {
-        for (Iterator<?> i = haystack.iterator(); i.hasNext(); ) {
-          Object h = i.next();
-          String hProp = (String)m.invoke(h);
-          for (Iterator<?> j = diff.iterator(); j.hasNext(); ) {
-            Object n = j.next();
-            String nProp = (String)m.invoke(n);
-            if (nProp.equals(hProp)) {
-              j.remove();
-            }
-          }
-        }
-      } else {
-        for (Iterator<?> i = diff.iterator(); i.hasNext(); ) {
-          Object n = i.next();
-          String nProp = (String)m.invoke(n);
-          for (Iterator<?> j = haystack.iterator(); j.hasNext(); ) {
-            Object h = j.next();
-            String hProp = (String)m.invoke(h);
-            if (nProp.equals(hProp)) {
-              i.remove();
-            }
-          }
-        }
-      }
-      return diff;
-    }
-    catch (ConcurrentModificationException e) {
-      e.printStackTrace();
-      log.error("Backing set modification outside iterator.");
-    }
-    catch (NoSuchMethodException e) {
-      e.printStackTrace();
-      log.error("Class " + c.getName() + " doesn't declare a "+methodName+" method.");
-    }
-    catch (InvocationTargetException e) {
-      e.printStackTrace();
-      log.error("Cannot invoke "+methodName+" on class " + c.getName());
-    }
-    catch (IllegalAccessException e) {
-      e.printStackTrace();
-      log.error("Cannot invoke "+methodName+" on class " + c.getName());
-    }
-    return null;
-  }
-
-  public static String findHyperlinks(String text) {
-    if (!LimsUtils.isStringEmptyOrNull(text)) {
-      Pattern p = Pattern.compile("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))");
-      Matcher m = p.matcher(text);
-
-      StringBuffer sb = new StringBuffer();
-      while (m.find()) {
-        m.appendReplacement(sb, "<a href='$0'>$0</a>");
-      }
-      m.appendTail(sb);
-      return sb.toString();
-    }
-    else {
-      return "";
-    }
-  }
-
-  public static String lookupLocation(String locationBarcode) {
-    //TODO - proper lookup!
-    /*
-    if (locationBarcode is valid) {
-      retrieve text representation of location and return
-    }
-    else {
-      return null;
-    }
-     */
-    return locationBarcode;
-  }
-  
-  public static void unzipFile(File source) {
-    unzipFile(source, null);
-  }
-
-  public static boolean unzipFile(File source, File destination) {
-    final int BUFFER = 2048;
-    
-    try {
-      BufferedOutputStream dest = null;
-      FileInputStream fis = new FileInputStream(source);
-      ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
-      ZipEntry entry;
-      while ((entry = zis.getNextEntry()) != null) {
-        File outputFile = null;
-
-        if (destination != null && destination.exists() && destination.isDirectory()) {
-          outputFile = new File(destination, entry.getName());
-        }
-        else {
-          outputFile = new File(entry.getName());
-        }
-
-        if (entry.isDirectory()) {
-          System.out.println("Extracting directory: " + entry.getName());
-          LimsUtils.checkDirectory(outputFile, true);
-        }
-        else {
-          System.out.println("Extracting file: " + entry.getName());
-          int count;
-          byte data[] = new byte[BUFFER];
-          FileOutputStream fos = new FileOutputStream(outputFile);
-          dest = new BufferedOutputStream(fos, BUFFER);
-          while ((count = zis.read(data, 0, BUFFER)) != -1) {
-            dest.write(data, 0, count);
-          }
-          dest.flush();
-          dest.close();
-        }
-      }
-      zis.close();
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      return false;
-    }
-    return true;
-  }
-
-  public static void zipFiles(Set<File> files, File outpath) throws IOException {
-    // Create a buffer for reading the files
-    byte[] buf = new byte[1024];
-
-    ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outpath));
-
-    // Compress the files
-    for (File f : files) {
-      FileInputStream in = new FileInputStream(f);
-
-      // Add ZIP entry to output stream.
-      out.putNextEntry(new ZipEntry(f.getName()));
-
-      // Transfer bytes from the file to the ZIP file
-      int len;
-      while ((len = in.read(buf)) > 0) {
-          out.write(buf, 0, len);
-      }
-
-      // Complete the entry
-      out.closeEntry();
-      in.close();
-    }
-
-    // Complete the ZIP file
-    out.close();
-  }
-
-  public static void writeFile(InputStream in, File path) throws IOException {
-    OutputStream out = null;
-    try {
-      out = new FileOutputStream(path);
-      try {
-        byte[] buf = new byte[16884];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-          out.write(buf, 0, len);
-        }
-      }
-      catch (IOException e) {
-        log.error("Could not write file: " + path.getAbsolutePath());
-        e.printStackTrace();
-      }
-      finally {
-        try {
-          in.close();
-        } catch (IOException e) {
-          // ignore
-        }
-      }
-    }
-    finally {
-      if (out != null) {
-        out.close();
-      }
-    }
-  }
-
-  /**
-   * Checks that a directory exists. This method will attempt to create the directory if it doesn't exist and if the attemptMkdir flag is true  
-   *
+   * Checks that a directory exists. This method will attempt to create the directory if it doesn't exist and if the attemptMkdir flag is
+   * true
+   * 
    * @param path of type File
    * @param attemptMkdir of type boolean
    * @return boolean true if the directory exists/was created, false if not
@@ -430,163 +105,25 @@ public class LimsUtils {
 
     if (attemptMkdir) {
       storageOk = path.exists() || path.mkdirs();
-    }
-    else {
+    } else {
       storageOk = path.exists();
     }
 
     if (!storageOk) {
-      StringBuilder sb = new StringBuilder("The directory ["+path.toString()+"] doesn't exist");
+      StringBuilder sb = new StringBuilder("The directory [" + path.toString() + "] doesn't exist");
       if (attemptMkdir) {
         sb.append(" or is not creatable");
       }
       sb.append(". Please create this directory and ensure that it is writable.");
-      throw new IOException(sb.toString()); 
-    }
-    else {
+      throw new IOException(sb.toString());
+    } else {
       if (attemptMkdir) {
         log.info("Directory (" + path + ") exists.");
-      }
-      else {
+      } else {
         log.info("Directory (" + path + ") OK.");
       }
     }
     return storageOk;
-  }
-
-  /**
-   * Similar to checkDirectory, but for single files.
-   *
-   * @param path of type File
-   * @return boolean true if the file exists, false if not
-   * @throws IOException when the file doesn't exist
-   */
-  public static boolean checkFile(File path) throws IOException {
-    boolean storageOk = path.exists();
-    if (!storageOk) {
-      StringBuilder sb = new StringBuilder("The file ["+path.toString()+"] doesn't exist.");
-      throw new IOException(sb.toString());
-    }
-    else {
-      log.info("File (" + path + ") OK.");
-    }
-    return storageOk;
-  }  
-
-  /**
-   * Helper method to parse and store output from a given process' stdout and stderr
-   *
-   * @param process of type Process
-   * @return Map<String, String>
-   * @throws IOException when
-   */
-  public static Map<String, String> checkPipes(Process process) throws IOException {
-    HashMap<String, String> r = new HashMap<String, String>();
-    String error = LimsUtils.processStdErr(process);
-    if (error.equals("")) {
-      String out = LimsUtils.processStdOut(process);
-      log.debug(out);
-      r.put("ok", out);
-    }
-    else {
-      log.error(error);
-      r.put("error", error);
-    }
-    return r;
-  }
-
-  public static byte[] objectToByteArray(Object o) throws IOException {
-    ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    ObjectOutputStream oos = new ObjectOutputStream(bout);
-    oos.writeObject(o);
-    return bout.toByteArray();
-  }
-
-  public static Object byteArrayToObject(byte[] bytes) throws IOException, ClassNotFoundException {
-    ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
-    ObjectInputStream ois = new ObjectInputStream(bin);
-    return ois.readObject();
-  }
-
-  /**
-   * Reads the contents of an InputStream into a String
-   *
-   * @param in of type InputStream
-   * @return String
-   * @throws IOException when
-   */
-  public static String inputStreamToString(InputStream in) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    String line;
-    BufferedReader br = new BufferedReader(new InputStreamReader(in));
-    while ((line = br.readLine()) != null) {
-      sb.append(line);
-    }
-    return sb.toString();
-  }
-
-  /**
-   * Reads the contents of an File into a String
-   *
-   * @param f of type File
-   * @return String
-   * @throws IOException when
-   */
-  public static String fileToString(File f) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    String line;
-    BufferedReader br = new BufferedReader(new FileReader(f));
-    while ((line = br.readLine()) != null) {
-      sb.append(line);
-    }
-    return sb.toString();
-  }
-
-  public static File stringToFile(String s, File f) throws IOException {
-    PrintWriter p = new PrintWriter(f);
-    p.println(s);
-    safeClose(p);
-    return f;
-  }
-
-  /**
-   * Reads the contents of an InputStream into a byte[]
-   *
-   * @param in of type InputStream
-   * @return byte[]
-   * @throws IOException when
-   */
-  public static byte[] inputStreamToByteArray(InputStream in) throws IOException {
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-    int nRead;
-    byte[] data = new byte[16384];
-    while ((nRead = in.read(data, 0, data.length)) != -1) {
-      buffer.write(data, 0, nRead);
-    }
-    buffer.flush();
-    return buffer.toByteArray();
-  }
-
-  /**
-   * Process stdout from a given Process and concat it to a single String
-   *
-   * @param p of type Process
-   * @return String
-   * @throws IOException when
-   */
-  private static String processStdOut(Process p) throws IOException {
-    return inputStreamToString(p.getInputStream());
-  }
-
-  /**
-   * Process stderr from a given Process and concat it to a single String
-   *
-   * @param p of type Process
-   * @return String
-   * @throws IOException when
-   */
-  private static String processStdErr(Process p) throws IOException {
-    return inputStreamToString(p.getErrorStream());
   }
 
   public static String getCurrentDateAsString(DateFormat df) {
@@ -597,159 +134,42 @@ public class LimsUtils {
     return getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd"));
   }
 
-  public static String getDateAsString(Date date) {
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    return df.format(date);
+  public static String formatDate(Date date) {
+    return date == null ? null : getDateFormat().format(date);
   }
 
-  public static final Pattern linePattern = Pattern.compile(".*\r?\n");
-
-  public static Matcher grep(CharBuffer cb, Pattern pattern) {
-    Matcher lm = linePattern.matcher(cb);  // Line matcher
-    Matcher pm = null;                     // Pattern matcher
-    while (lm.find()) {
-      CharSequence cs = lm.group();      // The current line
-      if (pm == null)
-        pm = pattern.matcher(cs);
-      else
-        pm.reset(cs);
-      if (pm.find()) {
-        return pm;
-      }
-      if (lm.end() == cb.limit()) break;
-    }
-    return null;
-  }
-
-  public static Matcher grep(File f, Pattern p) throws IOException {
-    // Charset and decoder for ISO-8859-15
-    Charset charset = Charset.forName("ISO-8859-15");
-    CharsetDecoder decoder = charset.newDecoder();
-
-    // Open the file and then get a channel from the stream
-    FileInputStream fis = new FileInputStream(f);
-    FileChannel fc = fis.getChannel();
-
-    // Get the file's size and then map it into memory
-    int sz = (int) fc.size();
-    MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, sz);
-
-    // Decode the file into a char buffer
-    CharBuffer cb = decoder.decode(bb);
-
-    // Perform the search
-    Matcher m = grep(cb, p);
-
-    // Close the channel and the stream
-    fc.close();
-
-    return m;
-  }
-
-  public static Matcher tailGrep(File f, Pattern p, int lines) throws IOException, FileNotFoundException {
-    // Open the file and then get a channel from the stream
-    FileInputStream fis = new FileInputStream(f);
-    FileChannel fc = fis.getChannel();
-    try {
-      // Get the file's size and then map it into memory
-      int sz = (int) fc.size();
-      MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, sz);
-
-      long cnt = 0;
-      long i = 0;
-      for (i = sz - 1; i >= 0; i--) {
-        if (bb.get((int) i) == '\n') {
-          cnt++;
-          if (cnt == lines + 1)
-            break;
-        }
-      }
-
-      int offset = (int) i + 1;
-
-      if (offset >= bb.limit()) throw new NoSuchElementException();
-      ByteArrayOutputStream sb = new ByteArrayOutputStream();
-      while (offset < bb.limit()) {
-        for (; offset < bb.limit(); offset++) {
-          sb.write(bb.get(offset));
-        }
-      }
-
-      // Decode the file into a char buffer
-      CharBuffer cb = CharBuffer.wrap(sb.toString());
-
-      // Perform the search
-      return grep(cb, p);
-    }
-    catch (IOException e) {
-      throw e;
-    }
-    finally {
-      // Close the channel and the stream
-      safeClose(fc);
-    }
-  }
-
-  public static String reflectString(Object o) {
-    StringBuilder result = new StringBuilder();
-    try {
-      result.append(o.getClass().getName());
-      result.append("\n————————————\n");
-      Class c = o.getClass();
-      Field fieldList[] = c.getDeclaredFields();
-      for(Field entry: fieldList) {
-        result.append(entry.getName());
-        result.append(":");
-        result.append(entry.get(o));
-        result.append("\n");
-      }
-    } catch (Exception e) {
-      result.append("\n\nERROR: " + e.getMessage() + "\n\n");
-    }
-    return result.toString();
-  }
-
-  // put this anywhere you like in your common code.
-  public static void safeClose(Closeable c) {
-    try {
-      c.close();
-    } catch (Throwable t) {
-      // Resource close failed!  There's only one thing we can do:
-      // Log the exception using your favorite logging framework
-      t.printStackTrace();
-    }
-  }
-
-  public static String capitalise(String s) {
-    return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-  }
-
-  public static String noddyCamelCaseify(String s) {
-    return Character.toLowerCase(s.charAt(0)) + s.substring(1);
-  }
-
-  public static List<Class<?>> getAllInterfaces(Class<?> cls) {
-    if (cls == null) {
+  public static Date parseDate(String dateString) {
+    if (isStringEmptyOrNull(dateString)) {
       return null;
     }
-    List<Class<?>> list = new ArrayList<Class<?>>();
-    while (cls != null) {
-      Class[] interfaces = cls.getInterfaces();
-      for (int i = 0; i < interfaces.length; i++) {
-        if (!list.contains(interfaces[i])) {
-          list.add(interfaces[i]);
-        }
-        List superInterfaces = getAllInterfaces(interfaces[i]);
-        for (Iterator it = superInterfaces.iterator(); it.hasNext(); ) {
-          Class intface = (Class) it.next();
-          if (!list.contains(intface)) {
-            list.add(intface);
-          }
-        }
-      }
-      cls = cls.getSuperclass();
+    try {
+      return getDateFormat().parse(dateString);
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("Invalid date string");
     }
-    return list;
+  }
+
+  public static String formatDateTime(Date date) {
+    return date == null ? null : getDateTimeFormat().format(date);
+  }
+
+  public static Date parseDateTime(String dateString) {
+    if (isStringEmptyOrNull(dateString)) {
+      return null;
+    }
+    try {
+      return getDateTimeFormat().parse(dateString);
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("Invalid datetime string");
+    }
+  }
+
+  public static DateFormat getDateFormat() {
+    return new SimpleDateFormat("yyyy-MM-dd");
+  }
+
+  public static DateFormat getDateTimeFormat() {
+    return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
   }
 
   public static void inheritUsersAndGroups(SecurableByProfile child, SecurityProfile parentProfile) {
@@ -760,8 +180,219 @@ public class LimsUtils {
     childProfile.setWriteUsers(parentProfile.getWriteUsers());
   }
 
-  public static String getSimpleCurrentDate() {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-   	return sdf.format(new Date());
+  public static boolean isDetailedSample(Sample sample) {
+    return sample instanceof DetailedSample;
+  }
+
+  public static boolean isPlainSample(Sample sample) {
+    return !isDetailedSample(sample);
+  }
+
+  private static boolean safeCategoryCheck(Sample sample, String category) {
+    DetailedSample detailedSample = (DetailedSample) sample;
+    if (detailedSample.getSampleClass() == null) return false;
+    return category.equals(detailedSample.getSampleClass().getSampleCategory());
+  }
+
+  public static boolean isIdentitySample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleIdentity || safeCategoryCheck(sample, SampleIdentity.CATEGORY_NAME);
+  }
+
+  public static boolean isTissueSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleTissue || safeCategoryCheck(sample, SampleTissue.CATEGORY_NAME);
+  }
+
+  public static boolean isTissueProcessingSample(Sample sample) {
+    if (!isDetailedSample(sample)) return false;
+    return sample instanceof SampleTissueProcessing || safeCategoryCheck(sample, SampleTissueProcessing.CATEGORY_NAME);
+  }
+
+  public static boolean isStockSample(Sample sample) {
+    return sample instanceof SampleStock || safeCategoryCheck(sample, SampleStock.CATEGORY_NAME);
+  }
+
+  public static boolean isAliquotSample(Sample sample) {
+    return sample instanceof SampleAliquot || safeCategoryCheck(sample, SampleAliquot.CATEGORY_NAME);
+  }
+
+  public static boolean isDetailedLibrary(Library library) {
+    return library instanceof DetailedLibrary;
+  }
+
+  public static boolean isIlluminaRun(Run run) {
+    return run instanceof IlluminaRun;
+  }
+
+  public static boolean isPacBioRun(Run run) {
+    return run instanceof PacBioRun;
+  }
+
+  public static boolean isLS454Run(Run run) {
+    return run instanceof LS454Run;
+  }
+
+  public static boolean isSolidRun(Run run) {
+    return run instanceof SolidRun;
+  }
+
+  public static boolean isOxfordNanoporeRun(Run run) {
+    return run instanceof OxfordNanoporeRun;
+  }
+
+  public static boolean isOxfordNanoporeContainer(SequencerPartitionContainer container) {
+    return container instanceof OxfordNanoporeContainer;
+  }
+
+  public static <T extends DetailedSample> T getParent(Class<T> targetParentClass, DetailedSample start) {
+    for (DetailedSample current = deproxify(start.getParent()); current != null; current = deproxify(current.getParent())) {
+      if (targetParentClass.isInstance(current)) {
+        @SuppressWarnings("unchecked")
+        T result = (T) current;
+        return result;
+      }
+    }
+    return null;
+  }
+
+  public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) throws IOException {
+    ValidationResult val = namingScheme.validateName(object.getName());
+    if (!val.isValid()) throw new IOException("Save failed - invalid name:" + val.getMessage());
+  }
+
+  /**
+   * universal temporary name prefix. TODO: these same methods are in sqlstore DbUtils;
+   * use those when refactoring away the ProjectService.
+   */
+  static final private String TEMPORARY_NAME_PREFIX = "TEMPORARY_";
+
+  /**
+   * Generate a temporary name using a UUID.
+   * 
+   * @return Temporary name
+   */
+  static public String generateTemporaryName() {
+    return TEMPORARY_NAME_PREFIX + UUID.randomUUID();
+  }
+
+  /**
+   * Check if the nameable object has a temporary name.
+   * 
+   * @param nameable Nameable object
+   * @return
+   */
+  static public boolean hasTemporaryName(Nameable nameable) {
+    return nameable != null && nameable.getName() != null && nameable.getName().startsWith(TEMPORARY_NAME_PREFIX);
+  }
+
+  /**
+   * Check if the Boxable item has a temporary name
+   * 
+   * @param boxable Boxable item
+   * @return
+   */
+  static public boolean hasTemporaryAlias(Boxable boxable) {
+    return boxable != null && boxable.getAlias() != null && boxable.getAlias().startsWith(TEMPORARY_NAME_PREFIX);
+  }
+
+  /**
+   * Generates a unique barcode for a Nameable entity, and sets the identificationBarcode property for Boxables and LibraryDilutions.
+   * 
+   * @param nameable Nameable object
+   * @throws IOException
+   */
+  public static void generateAndSetIdBarcode(Nameable nameable) throws IOException {
+    String barcode = null;
+    if (nameable instanceof LibraryDilution && nameable.getName() != null) {
+      barcode = nameable.getName();
+      if (((LibraryDilution) nameable).getLibrary() != null
+          && ((LibraryDilution) nameable).getLibrary().getAlias() != null) {
+        barcode += "::" + ((LibraryDilution) nameable).getLibrary().getAlias();
+      }
+      ((LibraryDilution) nameable).setIdentificationBarcode(barcode);
+    } else if (nameable instanceof Boxable && nameable.getName() != null) {
+      barcode = nameable.getName();
+      if (((Boxable) nameable).getAlias() != null) {
+        barcode += "::" + ((Boxable) nameable).getAlias();
+      }
+      ((Boxable) nameable).setIdentificationBarcode(barcode);
+    } else {
+      throw new IOException("Error generating barcode");
+    }
+  }
+
+  public static void appendSet(StringBuilder target, Collection<String> items, String prefix) {
+    if (items.isEmpty()) return;
+    target.append(" ");
+    target.append(prefix);
+    target.append(": ");
+    boolean first = true;
+    for (String item : items) {
+      if (first) {
+        first = false;
+      } else {
+        target.append(", ");
+      }
+      target.append(item);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T deproxify(T from) {
+    if (from instanceof HibernateProxy) {
+      HibernateProxy proxy = (HibernateProxy) from;
+      from = (T) proxy.getHibernateLazyInitializer().getImplementation();
+    }
+    return from;
+  }
+
+  public static String[] prefix(String prefix, String... suffixes) {
+    String[] results = new String[suffixes.length];
+    for (int i = 0; i < suffixes.length; i++) {
+      results[i] = prefix + suffixes[i];
+    }
+    return results;
+  }
+
+  /**
+   * Switches from a representation of date without time or a time zone to one that contains milliseconds from epoch as interpreted from
+   * some place with a time zone. No good will come of this. Turn back now.
+   * 
+   * @param localDate A date without time.
+   * @param timezone A time zone. We'll calculate milliseconds from the epoch from this particular time zone.
+   * @return Milliseconds from the epoch.
+   */
+  public static Date toBadDate(LocalDate localDate, ZoneId timezone) {
+    return localDate == null ? null : Date.from(localDate.atStartOfDay(timezone).toInstant());
+  }
+
+  public static Date toBadDate(LocalDate localDate) {
+    return toBadDate(localDate, ZoneId.systemDefault());
+  }
+
+  public static Date toBadDate(LocalDateTime localDate) {
+    return localDate == null ? null : toBadDate(localDate.toLocalDate());
+  }
+
+  public static <T> Predicate<T> rejectUntil(Predicate<T> check) {
+    return new Predicate<T>() {
+      private boolean state = false;
+
+      @Override
+      public boolean test(T t) {
+        if (state) {
+          return true;
+        }
+        state = check.test(t);
+        return false;
+      }
+
+    };
+  }
+
+  @SafeVarargs
+  public static Set<String> concatSets(Set<String>... sets) {
+    return Arrays.stream(sets).flatMap(Collection::stream).collect(Collectors.toSet());
   }
 }

@@ -2,7 +2,7 @@
 
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -26,14 +26,20 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <c:choose>
-      <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-        <form:form action="/miso/admin/user" method="POST" commandName="user" autocomplete="off">
+      <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN') and (user.loginName ne SPRING_SECURITY_CONTEXT.authentication.principal.username)}">
+        <form:form id="user-form" data-parsley-validation="" action="/miso/admin/user" method="POST" commandName="user" autocomplete="off">
           <sessionConversation:insertSessionConversationId attributeName="user"/>
           <h1><c:choose><c:when
               test="${not empty user.userId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
             User
-            <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+            <button onclick="return User.validateUser();" class="fg-button ui-state-default ui-corner-all">Save</button>
           </h1>
+
+          <div class="bs-callout bs-callout-warning hidden">
+            <h2>Oh snap!</h2>
+            <p>This form seems to be invalid!</p>
+          </div>
+
           <table class="in">
             <tr>
               <td class="h">User ID:</td>
@@ -43,7 +49,7 @@
               <td>Full name:</td>
               <td>
                 <sec:authorize access="hasRole('ROLE_ADMIN')">
-                  <form:input path="fullName"/>
+                  <form:input id="fullName" path="fullName"/><span id="fullNameCounter" class="counter"></span>
                 </sec:authorize>
 
                 <sec:authorize access="hasRole('ROLE_TECH')">
@@ -55,7 +61,7 @@
               <td>Login name:</td>
               <td>
                 <sec:authorize access="hasRole('ROLE_ADMIN')">
-                  <form:input path="loginName"/>
+                  <form:input id="loginName" path="loginName"/><span id="loginNameCounter" class="counter"></span>
                 </sec:authorize>
 
                 <sec:authorize access="hasRole('ROLE_TECH')">
@@ -69,7 +75,7 @@
                 <c:choose>
                   <c:when test="${(user.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                    <form:input path="email"/>
+                    <form:input id="email" path="email"/><span id="emailCounter" class="counter"></span>
                   </c:when>
                   <c:otherwise>
                     <sec:authorize access="hasRole('ROLE_TECH')">
@@ -81,11 +87,7 @@
             </tr>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
               <c:choose>
-                <c:when test="${securityMethod eq 'jdbc'}">
-                  <tr>
-                    <td>Current Password:</td>
-                    <td><form:password path="password"/></td>
-                  </tr>
+                <c:when test="${mutablePassword}">
                   <tr>
                     <td>New Password:</td>
                     <td><input type="password" name="newpassword" id="newpassword"/></td>
@@ -98,8 +100,7 @@
                 <c:otherwise>
                   <tr>
                     <td>Password:</td>
-                    <td><i>Password change support only available for the 'jdbc' security method. If using LDAP, please change
-                      the user password in your LDAP server.</i></td>
+                    <td><i>Change password using the method specified by IT.</i></td>
                   </tr>
                 </c:otherwise>
               </c:choose>
@@ -130,14 +131,6 @@
                 </div>
               </td>
             </tr>
-            <tr>
-              <td>Supplemental Roles:</td>
-              <td>
-                <div id="roles" class="checklist">
-                  <form:checkboxes items="${roles}" path="roles"/>
-                </div>
-              </td>
-            </tr>
           </table>
         </form:form>
       </c:when>
@@ -145,7 +138,7 @@
         <form:form action="/miso/user" method="POST" commandName="user" autocomplete="off">
           <sessionConversation:insertSessionConversationId attributeName="user"/>
           <h1>Edit Your Account
-            <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+            <button onclick="return User.validateUser()" class="fg-button ui-state-default ui-corner-all">Save</button>
           </h1>
           <table class="in">
             <tr>
@@ -178,7 +171,7 @@
               </td>
             </tr>
             <c:choose>
-              <c:when test="${securityMethod eq 'jdbc'}">
+              <c:when test="${mutablePassword}">
                 <tr>
                   <td>Current Password:</td>
                   <td><form:password path="password"/></td>
@@ -195,8 +188,7 @@
               <c:otherwise>
                 <tr>
                   <td>Password:</td>
-                  <td><i>Password change support only available for the 'jdbc' security method. If using LDAP, please change
-                    the user password in your LDAP server.</i></td>
+                  <td><i>Change password using the method specified by IT.</i></td>
                 </tr>
               </c:otherwise>
             </c:choose>
@@ -206,6 +198,33 @@
     </c:choose>
   </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    Validate.attachParsley('#user-form');
+    
+    jQuery('#fullName').simplyCountable({
+      counter: '#fullNameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['fullName']},
+      countDirection: 'down'
+    });
+
+    jQuery('#loginName').simplyCountable({
+      counter: '#loginNameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['loginName']},
+      countDirection: 'down'
+    });
+    
+    jQuery('#email').simplyCountable({
+      counter: '#emailCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['email']},
+      countDirection: 'down'
+    });
+  });
+</script>
 
 <%@ include file="adminsub.jsp" %>
 

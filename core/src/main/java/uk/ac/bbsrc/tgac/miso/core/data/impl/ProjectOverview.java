@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,59 +12,75 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import com.eaglegenomics.simlims.core.Note;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.eaglegenomics.simlims.core.User;
-//import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-//import com.fasterxml.jackson.annotation.JsonTypeInfo;
-//import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.jfree.base.log.DefaultLog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.ProjectOverviewListener;
-import uk.ac.bbsrc.tgac.miso.core.event.model.ProjectOverviewEvent;
-import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.*;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.Watchable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"project","samples","libraries","runs","qcPassedSamples"})
-public class ProjectOverview implements Watchable, Alertable, Nameable, Serializable {
+@Entity
+@Table(name = "ProjectOverview")
+public class ProjectOverview implements Watchable, Nameable, Serializable {
+
   protected static final Logger log = LoggerFactory.getLogger(ProjectOverview.class);
+
+  private static final String NAME_PREFIX = "POV";
+
+  private static final long serialVersionUID = 1L;
 
   public static final Long UNSAVED_ID = 0L;
 
@@ -72,35 +88,103 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long overviewId = ProjectOverview.UNSAVED_ID;
 
-  private Project project;
-
+  @Column(name = "allLibraryQcPassed", nullable = false)
+  private boolean allLibrariesQcPassed;
+  @Column(nullable = false)
+  private boolean allPoolsConstructed;
+  @Column(nullable = false)
+  private boolean allRunsCompleted;
+  @Column(nullable = false)
+  private boolean locked;
+  @Column(nullable = false)
+  private boolean primaryAnalysisCompleted;
+  @Column(nullable = false)
   private String principalInvestigator;
 
-  @Deprecated
-  private Collection<Sample> samples = new HashSet<Sample>();
-
-  private EntityGroup<ProjectOverview, Sample> sampleGroup;
-
-  private Collection<Library> libraries = new HashSet<Library>();
-  private Collection<Run> runs = new HashSet<Run>();
-  private Collection<Note> notes = new HashSet<Note>();
-  private Date startDate;
-  private Date endDate;
-  private Integer numProposedSamples;
-  private boolean locked;
-  private boolean allSampleQcPassed;
-  private boolean libraryPreparationComplete;
-  private boolean allLibrariesQcPassed;
-  private boolean allPoolsConstructed;
-  private boolean allRunsCompleted;
-  private boolean primaryAnalysisCompleted;
-  private Set<MisoListener> listeners = new HashSet<MisoListener>();
-  private Set<User> watchers = new HashSet<User>();
+  @Column(nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
+  @Temporal(TemporalType.DATE)
+  private Date startDate;
+
+  @Temporal(TemporalType.DATE)
+  private Date endDate;
+  private Integer numProposedSamples;
+  private boolean allSampleQcPassed;
+
+  @Transient
+  private boolean libraryPreparationComplete;
+
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "ProjectOverview_Note", joinColumns = {
+      @JoinColumn(name = "overview_overviewId") }, inverseJoinColumns = {
+          @JoinColumn(name = "notes_noteId") })
+  private Collection<Note> notes = new HashSet<>();
+
+  @ManyToOne(targetEntity = ProjectImpl.class)
+  @JoinColumn(name = "project_projectId")
+  private Project project;
+
+  @ManyToMany(targetEntity = SampleImpl.class)
+  @JoinTable(name = "ProjectOverview_Sample", joinColumns = { @JoinColumn(name = "projectOverview_overviewId") }, inverseJoinColumns = {
+      @JoinColumn(name = "sample_sampleId") })
+  private Set<Sample> sampleGroup;
+
+  @Transient
+  // not Hibernate-managed
+  private Group watchGroup;
+
+  @ManyToMany(targetEntity = UserImpl.class)
+  @Fetch(FetchMode.SUBSELECT)
+  @JoinTable(name = "ProjectOverview_Watcher", joinColumns = { @JoinColumn(name = "overviewId") }, inverseJoinColumns = {
+      @JoinColumn(name = "userId") })
+  private Set<User> watchUsers = new HashSet<>();
+
   @Override
-  public String getName() {
-    return "POV"+getId();
+  public void addWatcher(User user) {
+    watchUsers.add(user);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    ProjectOverview other = (ProjectOverview) obj;
+    return new EqualsBuilder()
+        .append(allLibrariesQcPassed, other.allLibrariesQcPassed)
+        .append(allPoolsConstructed, other.allPoolsConstructed)
+        .append(allRunsCompleted, other.allRunsCompleted)
+        .append(allSampleQcPassed, other.allSampleQcPassed)
+        .append(endDate, other.endDate)
+        .append(libraryPreparationComplete, other.libraryPreparationComplete)
+        .append(locked, other.locked)
+        .append(numProposedSamples, other.numProposedSamples)
+        .append(primaryAnalysisCompleted, other.primaryAnalysisCompleted)
+        .append(principalInvestigator, other.principalInvestigator)
+        .append(startDate, other.startDate)
+        .isEquals();
+  }
+
+  public boolean getAllLibrariesQcPassed() {
+    return allLibrariesQcPassed;
+  }
+
+  public boolean getAllPoolsConstructed() {
+    return allPoolsConstructed;
+  }
+
+  public boolean getAllRunsCompleted() {
+    return allRunsCompleted;
+  }
+
+  public boolean getAllSampleQcPassed() {
+    return allSampleQcPassed;
+  }
+
+  public Date getEndDate() {
+    return endDate;
   }
 
   @Override
@@ -108,89 +192,47 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
     return overviewId;
   }
 
-  public void setId(Long overviewId) {
-    this.overviewId = overviewId;
+  public Date getLastUpdated() {
+    return lastUpdated;
   }
 
-  @Deprecated
-  public Long getOverviewId() {
-    return overviewId;
-  }
-
-  @Deprecated
-  public void setOverviewId(Long overviewId) {
-    this.overviewId = overviewId;
-  }
-
-  public Project getProject() {
-    return project;
-  }
-
-  public void setProject(Project project) {
-    this.project = project;
-  }
-
-  public String getPrincipalInvestigator() {
-    return principalInvestigator;
-  }
-
-  public void setPrincipalInvestigator(String principalInvestigator) {
-    this.principalInvestigator = principalInvestigator;
-  }
-
-  public Date getStartDate() {
-    return startDate;
-  }
-
-  public void setStartDate(Date startDate) {
-    this.startDate = startDate;
-  }
-
-  public Date getEndDate() {
-    return endDate;
-  }
-
-  public void setEndDate(Date endDate) {
-    this.endDate = endDate;
-  }
-
-  public Integer getNumProposedSamples() {
-    return numProposedSamples;
-  }
-
-  public void setNumProposedSamples(Integer numProposedSamples) {
-    this.numProposedSamples = numProposedSamples;
+  public boolean getLibraryPreparationComplete() {
+    return libraryPreparationComplete;
   }
 
   public boolean getLocked() {
     return locked;
   }
 
-  public void setLocked(boolean locked) {
-    this.locked = locked;
+  @Override
+  public String getName() {
+    return NAME_PREFIX + getId();
   }
 
-  public EntityGroup<ProjectOverview, Sample> getSampleGroup() {
-    return sampleGroup;
+  public Collection<Note> getNotes() {
+    return notes;
   }
 
-  public void setSampleGroup(EntityGroup<ProjectOverview, Sample> sampleGroup) {
-    this.sampleGroup = sampleGroup;
+  public Integer getNumProposedSamples() {
+    return numProposedSamples;
   }
 
-  public Set<Sample> getSamples() {
-    return sampleGroup.getEntities();
+  public boolean getPrimaryAnalysisCompleted() {
+    return primaryAnalysisCompleted;
   }
 
-  @Deprecated
-  public void setSamples(Set<Sample> samples) {
-    getSampleGroup().setEntities(samples);
+  public String getPrincipalInvestigator() {
+    return principalInvestigator;
+  }
+
+  public Project getProject() {
+    return project;
   }
 
   public Collection<Sample> getQcPassedSamples() {
-    List<Sample> qcSamples = new ArrayList<Sample>();
+    List<Sample> qcSamples = new ArrayList<>();
     if (getSampleGroup() != null) {
-      for (Sample s : getSampleGroup().getEntities()) {
+      for (Sample s : getSampleGroup()) {
         if (s != null && s.getQcPassed() != null && s.getQcPassed()) {
           qcSamples.add(s);
         }
@@ -199,209 +241,16 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
     return qcSamples;
   }
 
-  public Collection<Library> getLibraries() {
-    return libraries;
+  public Set<Sample> getSampleGroup() {
+    return sampleGroup;
   }
 
-  public void setLibraries(Collection<Library> libraries) {
-    this.libraries = libraries;
+  public Set<Sample> getSamples() {
+    return sampleGroup;
   }
 
-  public Collection<Run> getRuns() {
-    return runs;
-  }
-
-  public void setRuns(Collection<Run> runs) {
-    this.runs = runs;
-  }
-
-  public Collection<Note> getNotes() {
-    return notes;
-  }
-
-  public void setNotes(Collection<Note> notes) {
-    this.notes = notes;
-  }
-
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
-
-  @Override
-  public Set<MisoListener> getListeners() {
-    return this.listeners;
-  }
-
-  @Override
-  public boolean addListener(MisoListener listener) {
-    return listeners.add(listener);
-  }
-
-  @Override
-  public boolean removeListener(MisoListener listener) {
-    return listeners.remove(listener);
-  }
-
-  public boolean getAllSampleQcPassed() {
-    return allSampleQcPassed;
-  }
-
-  public void setAllSampleQcPassed(boolean allSampleQcPassed) {
-    if (this.allSampleQcPassed != allSampleQcPassed && allSampleQcPassed) {
-      this.allSampleQcPassed = allSampleQcPassed;
-      fireSampleQcPassedEvent();
-    }
-    else {
-      this.allSampleQcPassed = allSampleQcPassed;
-    }
-  }
-
-  public boolean getLibraryPreparationComplete() {
-    return libraryPreparationComplete;
-  }
-
-  public void setLibraryPreparationComplete(boolean libraryPreparationComplete) {
-    if (this.libraryPreparationComplete != libraryPreparationComplete && libraryPreparationComplete) {
-      this.libraryPreparationComplete = libraryPreparationComplete;
-      fireLibraryPreparationCompleteEvent();
-    }
-    else {
-      this.libraryPreparationComplete = libraryPreparationComplete;
-    }
-  }
-
-  public boolean getAllLibrariesQcPassed() {
-    return allLibrariesQcPassed;
-  }
-
-  public void setAllLibrariesQcPassed(boolean allLibrariesQcPassed) {
-    if (this.allLibrariesQcPassed != allLibrariesQcPassed && allLibrariesQcPassed) {
-      this.allLibrariesQcPassed = allLibrariesQcPassed;
-      fireLibraryQcPassedEvent();
-    }
-    else {
-      this.allLibrariesQcPassed = allLibrariesQcPassed;
-    }
-  }
-
-  public boolean getAllPoolsConstructed() {
-    return allPoolsConstructed;
-  }
-
-  public void setAllPoolsConstructed(boolean allPoolsConstructed) {
-    if (this.allPoolsConstructed != allPoolsConstructed && allPoolsConstructed) {
-      this.allPoolsConstructed = allPoolsConstructed;
-      firePoolsConstructedEvent();
-    }
-    else {
-      this.allPoolsConstructed = allPoolsConstructed;
-    }
-  }
-
-  public boolean getAllRunsCompleted() {
-    return allRunsCompleted;
-  }
-
-  public void setAllRunsCompleted(boolean allRunsCompleted) {
-    if (this.allRunsCompleted != allRunsCompleted && allRunsCompleted) {
-      this.allRunsCompleted = allRunsCompleted;
-      fireRunsCompletedEvent();
-    }
-    else {
-      this.allRunsCompleted = allRunsCompleted;
-    }
-  }
-
-  public boolean getPrimaryAnalysisCompleted() {
-    return primaryAnalysisCompleted;
-  }
-
-  public void setPrimaryAnalysisCompleted(boolean primaryAnalysisCompleted) {
-    if (this.primaryAnalysisCompleted != primaryAnalysisCompleted && primaryAnalysisCompleted) {
-      this.primaryAnalysisCompleted = primaryAnalysisCompleted;
-      firePrimaryAnalysisCompletedEvent();
-    }
-    else {
-      this.primaryAnalysisCompleted = primaryAnalysisCompleted;
-    }
-  }
-
-  protected void fireSampleQcPassedEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.ALL_SAMPLES_QC_PASSED, this.getProject().getAlias() + " : all project samples have passed QC.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  protected void fireLibraryPreparationCompleteEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.LIBRARY_PREPARATION_COMPLETED, this.getProject().getAlias() + " : all libraries have been constructed.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  protected void fireLibraryQcPassedEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.ALL_LIBRARIES_QC_PASSED, this.getProject().getAlias() + " : all project libraries have passed QC.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  protected void firePoolsConstructedEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.POOL_CONSTRUCTION_COMPLETE, this.getProject().getAlias() + " : all project samples have now been pooled.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  protected void fireRunsCompletedEvent () {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.ALL_RUNS_COMPLETED, this.getProject().getAlias() + " : all project runs have now completed.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  protected void firePrimaryAnalysisCompletedEvent() {
-    if (this.getId() != 0L) {
-      ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.PRIMARY_ANALYSIS_COMPLETED, this.getProject().getAlias() + " : primary analysis has completed.");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(poe);
-      }
-    }
-  }
-
-  @Override
-  public Set<User> getWatchers() {
-    return watchers;
-  }
-
-  @Override
-  public void setWatchers(Set<User> watchers) {
-    this.watchers = watchers;
-  }
-
-  @Override
-  public void addWatcher(User user) {
-    watchers.add(user);
-  }
-
-  @Override
-  public void removeWatcher(User user) {
-    watchers.remove(user);
+  public Date getStartDate() {
+    return startDate;
   }
 
   @Override
@@ -409,23 +258,119 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
     return getName();
   }
 
+  @Override
+  public Set<User> getWatchers() {
+    Set<User> allWatchers = new HashSet<>();
+    if (watchGroup != null) allWatchers.addAll(watchGroup.getUsers());
+    if (watchUsers != null) allWatchers.addAll(watchUsers);
+    return allWatchers;
+  }
+
+  public Group getWatchGroup() {
+    return watchGroup;
+  }
+
+  public Set<User> getWatchUsers() {
+    return watchUsers;
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 47)
+        .append(allLibrariesQcPassed)
+        .append(allPoolsConstructed)
+        .append(allRunsCompleted)
+        .append(allSampleQcPassed)
+        .append(endDate)
+        .append(libraryPreparationComplete)
+        .append(locked)
+        .append(numProposedSamples)
+        .append(primaryAnalysisCompleted)
+        .append(principalInvestigator)
+        .append(startDate)
+        .toHashCode();
+  }
+
   public boolean isDeletable() {
     return getId() != ProjectOverview.UNSAVED_ID;
   }
 
   @Override
-  public int hashCode() {
-    if (this.getId() != ProjectOverview.UNSAVED_ID) {
-      return (int)this.getId();
-    }
-    else {
-      int hashcode = this.getPrincipalInvestigator().hashCode();
-      if (getNumProposedSamples() != null) hashcode = 37 * hashcode + this.getNumProposedSamples().hashCode();
-      if (getStartDate() != null) hashcode = 37 * hashcode + this.getStartDate().hashCode();
-      if (getEndDate() != null) hashcode = 37 * hashcode + this.getEndDate().hashCode();
-      if (getNotes() != null) hashcode = 37 * hashcode + this.getNotes().hashCode();
-      return hashcode;
-    }
+  public void removeWatcher(User user) {
+    watchUsers.remove(user);
+  }
+
+  public void setAllLibrariesQcPassed(boolean allLibrariesQcPassed) {
+    this.allLibrariesQcPassed = allLibrariesQcPassed;
+  }
+
+  public void setAllPoolsConstructed(boolean allPoolsConstructed) {
+    this.allPoolsConstructed = allPoolsConstructed;
+  }
+
+  public void setAllRunsCompleted(boolean allRunsCompleted) {
+    this.allRunsCompleted = allRunsCompleted;
+  }
+
+  public void setAllSampleQcPassed(boolean allSampleQcPassed) {
+    this.allSampleQcPassed = allSampleQcPassed;
+  }
+
+  public void setEndDate(Date endDate) {
+    this.endDate = endDate;
+  }
+
+  public void setId(Long overviewId) {
+    this.overviewId = overviewId;
+  }
+
+  public void setLastUpdated(Date lastUpdated) {
+    this.lastUpdated = lastUpdated;
+  }
+
+  public void setLibraryPreparationComplete(boolean libraryPreparationComplete) {
+    this.libraryPreparationComplete = libraryPreparationComplete;
+  }
+
+  public void setLocked(boolean locked) {
+    this.locked = locked;
+  }
+
+  public void setNotes(Collection<Note> notes) {
+    this.notes = notes;
+  }
+
+  public void setNumProposedSamples(Integer numProposedSamples) {
+    this.numProposedSamples = numProposedSamples;
+  }
+
+  public void setPrimaryAnalysisCompleted(boolean primaryAnalysisCompleted) {
+    this.primaryAnalysisCompleted = primaryAnalysisCompleted;
+  }
+
+  public void setPrincipalInvestigator(String principalInvestigator) {
+    this.principalInvestigator = principalInvestigator;
+  }
+
+  public void setProject(Project project) {
+    this.project = project;
+  }
+
+  public void setSampleGroup(Set<Sample> sampleGroup) {
+    this.sampleGroup = sampleGroup;
+  }
+
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
+  }
+
+  @Override
+  public void setWatchGroup(Group watchGroup) {
+    this.watchGroup = watchGroup;
+  }
+
+  public void setWatchUsers(Set<User> watchUsers) {
+    this.watchUsers = watchUsers;
   }
 
   @Override
@@ -435,9 +380,9 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
     sb.append(" : ");
     sb.append(getName());
     sb.append(" : ");
-    if (getSampleGroup() != null && !getSampleGroup().getEntities().isEmpty()) {
+    if (getSampleGroup() != null && !getSampleGroup().isEmpty()) {
       sb.append(" [ ");
-      sb.append(LimsUtils.join(getSampleGroup().getEntities(), ","));
+      sb.append(getSampleGroup().stream().map(Object::toString).collect(Collectors.joining(",")));
       sb.append(" ] ");
     }
     return sb.toString();

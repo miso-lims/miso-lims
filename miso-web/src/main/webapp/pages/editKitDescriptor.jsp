@@ -1,6 +1,6 @@
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -21,6 +21,10 @@
   ~ **********************************************************************
   --%>
 <%@ include file="../header.jsp" %>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
+
 <div id="maincontent">
   <div id="contentcolumn">
     <form:form action="/miso/kitdescriptor" method="POST" commandName="kitDescriptor" autocomplete="off">
@@ -28,7 +32,7 @@
       <sessionConversation:insertSessionConversationId attributeName="kitDescriptor"/>
 
       <h1><c:choose><c:when
-          test="${kitDescriptor.kitDescriptorId != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
+          test="${kitDescriptor.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Kit Descriptor
         <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
@@ -43,14 +47,14 @@
           <td class="h">ID:</td>
           <td>
             <c:choose>
-              <c:when test="${kitDescriptor.kitDescriptorId != 0}">${kitDescriptor.kitDescriptorId}</c:when>
+              <c:when test="${kitDescriptor.id != 0}">${kitDescriptor.id}</c:when>
               <c:otherwise><i>Unsaved</i></c:otherwise>
             </c:choose>
           </td>
         </tr>
         <tr>
           <td class="h">Name:</td>
-          <td><form:input path="name"/></td>
+          <td><form:input id="name" path="name"/><span id="nameCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Version:</td>
@@ -58,19 +62,23 @@
         </tr>
         <tr>
           <td class="h">Manufacturer:</td>
-          <td><form:input path="manufacturer"/></td>
+          <td><form:input id="manufacturer" path="manufacturer"/><span id="manufacturerCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Part Number:</td>
-          <td><form:input path="partNumber"/></td>
+          <td><form:input id="partNumber" path="partNumber"/><span id="partNumberCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Stock Level:</td>
           <td><form:input path="stockLevel"/></td>
         </tr>
         <tr>
+          <td class="h">Description:</td>
+          <td><form:input path="description"/><span id="descriptionCounter" class="counter"></span></td>
+        </tr>
+        <tr>
           <c:choose>
-            <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.kitType}">
+            <c:when test="${kitDescriptor.id == 0 or empty kitDescriptor.kitType}">
               <td>Kit Type:</td>
               <td>
                 <form:select id="kitTypes" path="kitType" items="${kitTypes}"/>
@@ -84,10 +92,12 @@
         </tr>
         <tr>
           <c:choose>
-            <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.platformType}">
+            <c:when test="${kitDescriptor.id == 0 or empty kitDescriptor.platformType}">
               <td>Platform Type:</td>
               <td>
-                <form:select id="platformTypes" path="platformType" items="${platformTypes}"/>
+                <form:select id="platformTypes" path="platformType">
+                  <form:options items="${platformTypes}" itemValue="key" itemLabel="key"/>
+                </form:select>
               </td>
             </c:when>
             <c:otherwise>
@@ -98,8 +108,40 @@
         </tr>
       </table>
     </form:form>
+    <miso:changelog item="${kitDescriptor}"/>
   </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#name').simplyCountable({
+      counter: '#nameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['name']},
+      countDirection: 'down'
+    });
+
+    jQuery('#manufacturer').simplyCountable({
+      counter: '#manufacturerCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['manufacturer']},
+      countDirection: 'down'
+    });
+    
+    jQuery('#partNumber').simplyCountable({
+      counter: '#partNumberCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['partNumber']},
+      countDirection: 'down'
+    });
+    jQuery('#description').simplyCountable({
+      counter: '#descriptionCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['description']},
+      countDirection: 'down'
+    });
+  });
+</script>
 
 <%@ include file="adminsub.jsp" %>
 

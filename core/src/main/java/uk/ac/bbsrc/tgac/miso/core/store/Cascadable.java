@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -27,15 +27,16 @@ import javax.persistence.CascadeType;
 
 /**
  * A simple interface to define DAO objects that recognise that they are part of a persistence cascade.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface Cascadable {
   /**
    * Sets the cascadeType of this Cascadable object.
-   *
-   * @param cascadeType cascadeType.
+   * 
+   * @param cascadeType
+   *          cascadeType.
    */
   public void setCascadeType(CascadeType cascadeType);
 }

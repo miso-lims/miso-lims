@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,16 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.ldap.userdetails.InetOrgPerson;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -40,11 +31,24 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.ldap.userdetails.InetOrgPerson;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 
 /**
- * A Spring filter that checks at a given point in the login filter chain whether an authenticated LDAP user exists in the underlying MISO database.
- *
+ * A Spring filter that checks at a given point in the login filter chain whether an authenticated LDAP user exists in the underlying MISO
+ * database.
+ * 
  * @author Rob Davey
  * @date 08-Sep-2010
  * @since 0.0.2
@@ -59,8 +63,9 @@ public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthentication
 
   /**
    * Sets the securityManager of this MisoLdapAuthenticationFilter object.
-   *
-   * @param securityManager securityManager.
+   * 
+   * @param securityManager
+   *          securityManager.
    */
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -75,20 +80,25 @@ public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthentication
 
   @Override
   public void setSessionAuthenticationStrategy(SessionAuthenticationStrategy strategy) {
-    //forcing this filter to expose the super session auth strategy to this class' doFilter
-    //the parent sessionStrategy is private! :(
+    // forcing this filter to expose the super session auth strategy to this class' doFilter
+    // the parent sessionStrategy is private! :(
     this.strategy = strategy;
     super.setSessionAuthenticationStrategy(strategy);
   }
 
   /**
    * Does the filtering at the given point in the filter chain.
-   *
-   * @param req   of type ServletRequest
-   * @param res   of type ServletResponse
-   * @param chain of type FilterChain
-   * @throws IOException      when
-   * @throws ServletException when
+   * 
+   * @param req
+   *          of type ServletRequest
+   * @param res
+   *          of type ServletResponse
+   * @param chain
+   *          of type FilterChain
+   * @throws IOException
+   *           when
+   * @throws ServletException
+   *           when
    */
   @Override
   public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -114,8 +124,7 @@ public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthentication
           return;
         }
         strategy.onAuthentication(authResult, request, response);
-      }
-      catch (AuthenticationException failed) {
+      } catch (AuthenticationException failed) {
         // Authentication failed
         unsuccessfulAuthentication(request, response, failed);
         return;
@@ -124,36 +133,23 @@ public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthentication
       successfulAuthentication(request, response, chain, authResult);
 
       // this will verify that the LDAP user is mirrored into the LIMS DB
-//      Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//      if (p instanceof InetOrgPerson) {
-//        User u = LimsSecurityUtils.fromLdapUser((InetOrgPerson) p);
-//        User dbu = securityManager.getUserByLoginName(u.getLoginName());
-//        if (dbu != null && !dbu.equals(u)) {
-//          long userId = securityManager.saveUser(u);
-//        }
-//      }
       Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
       if (p instanceof InetOrgPerson) {
-        //map the LDAP user details to a MISO User
+        // map the LDAP user details to a MISO User
         User u = LimsSecurityUtils.fromLdapUser((InetOrgPerson) p);
-        //check if a user exists in the database with this username
+        // check if a user exists in the database with this username
         User dbu = securityManager.getUserByLoginName(u.getLoginName());
-        if (dbu == null || (dbu != null && !dbu.equals(u))) {
-          long userId = securityManager.saveUser(u);
-        }
-        else if (dbu != null) {
-          // check if the user is same with the ldap user (skipped the password field)
-          dbu.setPassword(u.getPassword());
-          if (dbu.equals(u)) {
-            // save the user with ldap password, this is for when ldap password changed.
-            securityManager.saveUser(dbu);
-          }
+        if (dbu == null || !dbu.equals(u)) {
+          securityManager.saveUser(u);
+        } else {
+          // update user data from LDAP (password, roles, etc.)
+          LimsSecurityUtils.updateFromLdapUser(dbu, (InetOrgPerson) p);
+          securityManager.saveUser(dbu);
         }
       }
-    }
-    else {
+    } else {
       // If it's a GET, we ignore this request and send it
-      // to the next filter in the chain.  In this case, that
+      // to the next filter in the chain. In this case, that
       // pretty much means the request will hit the /login
       // controller which will process the request to show the
       // login page.

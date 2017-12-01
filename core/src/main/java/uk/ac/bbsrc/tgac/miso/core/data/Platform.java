@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,98 +23,148 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import java.io.Serializable;
+import java.util.Set;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * A Platform describes metadata about potentially any hardware item, but is usully linked to a sequencer implementation.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-public interface Platform extends Comparable {
-  /**
-   * Returns the platformId of this Platform object.
-   *
-   * @return Long platformId.
-   */
-  public Long getPlatformId();
+@Entity
+@Table(name = "Platform")
+
+public class Platform implements Comparable<Platform>, Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  public static final Long UNSAVED_ID = 0L;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "name")
+  private PlatformType platformType;
+
+  @Column(nullable = true)
+  private String description;
+
+  @Column(nullable = false)
+  private String instrumentModel;
+
+  private int numContainers;
+
+  @ElementCollection
+  @CollectionTable(name = "PlatformSizes", joinColumns = { @JoinColumn(name = "platform_platformId") })
+  @Column(name = "partitionSize")
+  private Set<Integer> partitionSizes;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long platformId = Platform.UNSAVED_ID;
+
+  public Long getId() {
+    return platformId;
+  }
+
+  public void setId(Long platformId) {
+    this.platformId = platformId;
+  }
+
+  public PlatformType getPlatformType() {
+    return platformType;
+  }
+
+  public void setPlatformType(PlatformType platformType) {
+    this.platformType = platformType;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getInstrumentModel() {
+    return instrumentModel;
+  }
+
+  public void setInstrumentModel(String instrumentModel) {
+    this.instrumentModel = instrumentModel;
+  }
+
+  public String getNameAndModel() {
+    return platformType.getKey() + " - " + instrumentModel;
+  }
+
+  public int getNumContainers() {
+    return numContainers;
+  }
+
+  public void setNumContainers(int numContainers) {
+    this.numContainers = numContainers;
+  }
+
+  public Set<Integer> getPartitionSizes() {
+    return partitionSizes;
+  }
+
+  public void setPartitionSizes(Set<Integer> partitionSizes) {
+    this.partitionSizes = partitionSizes;
+  }
 
   /**
-   * Sets the platformId of this Platform object.
-   *
-   * @param platformId platformId.
+   * Equivalency is based on id if set, otherwise on name, description and creation date.
    */
-  public void setPlatformId(Long platformId);
 
-  /**
-   * Returns the platformType of this Platform object.
-   *
-   * @return PlatformType platformType.
-   */
-  public PlatformType getPlatformType();
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof Platform)) return false;
+    Platform them = (Platform) obj;
+    // If not saved, then compare resolved actual objects. Otherwise
+    // just compare IDs.
+    if (getId() == Platform.UNSAVED_ID || them.getId() == Platform.UNSAVED_ID) {
+      return getPlatformType().equals(them.getPlatformType()) && getDescription().equals(them.getDescription());
+    } else {
+      return getId().longValue() == them.getId().longValue();
+    }
+  }
 
-  /**
-   * Sets the platformType of this Platform object.
-   *
-   * @param name platformType.
-   */
-  public void setPlatformType(PlatformType name);
+  @Override
+  public int hashCode() {
+    if (getId() != Platform.UNSAVED_ID) {
+      return getId().intValue();
+    } else {
+      final int PRIME = 37;
+      int hashcode = -1;
+      if (getPlatformType() != null) hashcode = PRIME * hashcode + getPlatformType().hashCode();
+      if (getDescription() != null) hashcode = PRIME * hashcode + getDescription().hashCode();
+      return hashcode;
+    }
+  }
 
-  /**
-   * Returns the description of this Platform object.
-   *
-   * @return String description.
-   */
-  public String getDescription();
+  @Override
+  public int compareTo(Platform t) {
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
+    return 0;
+  }
 
-  /**
-   * Sets the description of this Platform object.
-   *
-   * @param description description.
-   */
-  public void setDescription(String description);
-
-  /**
-   * Returns the instrumentModel of this Platform object.
-   *
-   * @return String instrumentModel.
-   */
-  public String getInstrumentModel();
-
-  /**
-   * Sets the instrumentModel of this Platform object.
-   *
-   * @param instrumentModel instrumentModel.
-   */
-  public void setInstrumentModel(String instrumentModel);
-
-  /**
-   * Returns the concatenation of the name and instrument model of this Platform object.
-   *
-   * @return String nameAndModel.
-   */
-  public String getNameAndModel();
-
-  /**
-   * Returns the number of sequencer partition containers of this Platform object.
-   *
-   * @return Integer numContainers.
-   */
-  public Integer getNumContainers();
-
-  /**
-   * Sets the number of sequencer partition containers of this Platform object.
-   *
-   * @param numContainers numContainers.
-   *
-   */
-  public void setNumContainers(Integer numContainers);
 }

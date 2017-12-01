@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,180 +12,176 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.w3c.dom.Document;
+import java.util.Collection;
+import java.util.Date;
+
+import com.eaglegenomics.simlims.core.Group;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-import java.util.Collection;
-import java.util.Date;
-
 /**
- * A Project represents the top level object in the MISO data model. A Project couples together {@link Study} and
- * {@link Sample} objects to record information about a given sequencing project.
+ * A Project represents the top level object in the MISO data model. A Project couples together {@link Study} and {@link Sample} objects to
+ * record information about a given sequencing project.
  * <p/>
- * A Project's progress status is tracked by its {@link ProgressType} enumeration. A Project describes a collaborator or
- * PI via the {@link ProjectOverview} object, whereby proposed start and end dates, number of expected samples and watchers
- * can be assigned.
- *
+ * A Project's progress status is tracked by its {@link ProgressType} enumeration. A Project describes a collaborator or PI via the
+ * {@link ProjectOverview} object, whereby proposed start and end dates, number of expected samples and watchers can be assigned.
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile"})
-public interface Project extends com.eaglegenomics.simlims.core.Project,
-                                 Comparable,
-                                 SecurableByProfile,
-                                 Submittable<Document>,
-                                 Reportable,
-                                 Deletable,
-                                 Watchable,
-                                 Nameable,
-                                 Alertable {
-  /** Field PREFIX  */
+public interface Project extends com.eaglegenomics.simlims.core.Project, Comparable<Project>, SecurableByProfile,
+    Deletable, Watchable, Nameable {
+  /** Field PREFIX */
   public static final String PREFIX = "PRO";
 
   public void setId(long id);
 
   /**
    * Returns the alias of this Project object.
-   *
+   * 
    * @return String alias.
    */
   String getAlias();
 
   /**
    * Sets the alias of this Project object.
-   *
-   * @param alias alias.
+   * 
+   * @param alias
+   *          alias.
    */
   void setAlias(String alias);
 
   /**
+   * Returns the short name, used as a prefix for generating sample names, or the alias if not specified.
+   */
+  String getShortName();
+
+  /**
+   * Sets the short name, used as a prefix for generating sample names.
+   */
+  void setShortName(String shortName);
+
+  /**
    * Returns the progress of this Project object.
-   *
+   * 
    * @return ProgressType progress.
    */
   ProgressType getProgress();
 
   /**
    * Sets the progress of this Project object.
-   *
-   * @param progress progress.
+   * 
+   * @param progress
+   *          progress.
    */
   void setProgress(ProgressType progress);
 
   /**
    * Returns the registered samples of this Project object.
-   *
+   * 
    * @return Collection<Sample> samples.
    */
   Collection<Sample> getSamples();
 
   /**
-   * Returns the registered samples of this Project object.
-   *
-   * @return Collection<Run> runs.
-   */
-  Collection<Run> getRuns();
-
-  /**
    * Returns the registered studies of this Project object.
-   *
+   * 
    * @return Collection<Study> studies.
    */
   Collection<Study> getStudies();
 
   /**
    * Returns the overviews of this Project object.
-   *
+   * 
    * @return Collection<ProjectOverview> overviews.
    */
   Collection<ProjectOverview> getOverviews();
 
   /**
    * Returns the overview of this Project object with the given ID
-   *
-   * @param overviewId of type Long
+   * 
+   * @param overviewId
+   *          of type Long
    * @return ProjectOverview overview.
    */
   ProjectOverview getOverviewById(Long overviewId);
 
   /**
    * Registers a collection of samples to this Project object.
-   *
-   * @param samples samples.
+   * 
+   * @param samples
+   *          samples.
    */
   void setSamples(Collection<Sample> samples);
 
   /**
-   * Registers a collection of samples to this Project object.
-   *
-   * @param runs runs.
-   */
-  void setRuns(Collection<Run> runs);
-
-  /**
    * Register that a Sample has been recieved in relation to this Project
-   *
-   * @param sample of type Sample
+   * 
+   * @param sample
+   *          of type Sample
    */
   void addSample(Sample sample);
 
   /**
    * Registers a collection of studies to this Project object.
-   *
-   * @param studies studies.
+   * 
+   * @param studies
+   *          studies.
    */
   void setStudies(Collection<Study> studies);
 
   /**
    * Registers a collection of project overviews to this Project object.
-   *
-   * @param overviews overviews.
+   * 
+   * @param overviews
+   *          overviews.
    */
   void setOverviews(Collection<ProjectOverview> overviews);
 
   /**
    * Returns the associated issue keys of this Project object.
-   *
+   * 
    * @return Collection<String> issueKeys.
    */
   Collection<String> getIssueKeys();
 
   /**
    * Registers a collection of issue keys from an issue tracker to this Project object.
-   *
-   * @param issueKeys issueKeys.
+   * 
+   * @param issueKeys
+   *          issueKeys.
    */
   void setIssueKeys(Collection<String> issueKeys);
 
   /**
    * Registers an issue key from an issue tracker to this Project object.
-   *
-   * @param issueKey issueKey.
+   * 
+   * @param issueKey
+   *          issueKey.
    */
   void addIssueKey(String issueKey);
 
   Date getLastUpdated();
 
   void setLastUpdated(Date lastUpdated);
+
+  public ReferenceGenome getReferenceGenome();
+
+  public void setReferenceGenome(ReferenceGenome referenceGenome);
+
+  @Override
+  public void setWatchGroup(Group group);
 }

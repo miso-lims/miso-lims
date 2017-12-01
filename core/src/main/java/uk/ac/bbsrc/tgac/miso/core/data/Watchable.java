@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,15 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.User;
-import org.codehaus.jackson.annotate.JsonIgnore;
-
-import java.util.Collection;
 import java.util.Set;
+
+import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * A Watchable object can be assigned watchers that will receive alerts upon the occurence of defined events.
- *
+ * 
  * @author Rob Davey
  * @date 05/12/11
  * @since 0.1.3
@@ -39,34 +38,33 @@ import java.util.Set;
 public interface Watchable {
   /**
    * Returns the Set of {@link User}s watching this Watchable object
+   * 
    * @return the Set of watchers for this object
    */
-  @JsonIgnore
   Set<User> getWatchers();
 
   /**
-   * Sets the Set of {@link User}s watching this Watchable object
-   * @param watchers
-   */
-  void setWatchers(Set<User> watchers);
-
-  /**
    * Adds a {@link User} to this Watchable object's watcher list
+   * 
    * @param user
    */
   void addWatcher(User user);
 
   /**
    * Removes a {@link User} from this Watchable object's watcher list
+   * 
    * @param user
    */
   void removeWatcher(User user);
 
   /**
-   * Returns the unique Watchable identifier for this Watchable object. This is usually a property from the object
-   * itself, such as a unique name or ID.
+   * Returns the unique Watchable identifier for this Watchable object. This is usually a property from the object itself, such as a unique
+   * name or ID.
+   * 
    * @return a String representing the watchable identifier for this object
    */
-  @JsonIgnore
   String getWatchableIdentifier();
+
+  public void setWatchGroup(Group watchGroup);
+
 }

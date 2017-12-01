@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,62 +23,141 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
-import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
-import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
-import java.util.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
-/**
- * Created by IntelliJ IDEA.
- * User: davey
- * Date: 10-Feb-2010
- * Time: 09:43:30
- */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile"})
-public interface Submission<I, O, R> extends Submittable<O>, SecurableByProfile, Nameable, Comparable {
+@Entity
+@Table(name = "Submission")
+public class Submission implements Comparable<Submission>, Serializable
+{
 
   public static final Long UNSAVED_ID = 0L;
 
-  @Deprecated
-  public Long getSubmissionId();
-  @Deprecated
-  public void setSubmissionId(Long submissionId);
+  private static final long serialVersionUID = 1L;
 
-  public void setId(long id);
+  private String accession;
+  private String alias;
+  private boolean completed;
 
-  public void setName(String name);
-  public String getAlias();
-  public void setAlias(String alias);
-  public String getAccession();
-  public void setAccession(String accession);
-  public String getDescription();
-  public void setDescription(String description);
-  public String getTitle();
-  public void setTitle(String title);
-  public Date getCreationDate();
-  public void setCreationDate(Date creationDate);
-  public Date getSubmissionDate();
-  public void setSubmissionDate(Date submissionDate);
-  public boolean isVerified();
-  public void setVerified(boolean verified);
-  public boolean isCompleted();
-  public void setCompleted(boolean completed);
-  public void addSubmissionElement(I i);
-  public Set<Submittable<O>> getSubmissionElements();
-  public SubmissionActionType getSubmissionActionType();
-  public void setSubmissionActionType(SubmissionActionType submissionActionType);
-  public R submit(SubmissionManager<I, O, R> manager) throws SubmissionException;
+  @Temporal(TemporalType.DATE)
+  private Date creationDate;
 
-  Date getLastUpdated();
-  void setLastUpdated(Date lastUpdated);
+  private String description;
+
+  @ManyToMany(targetEntity = Experiment.class)
+  @JoinTable(name = "Submission_Experiment", joinColumns = {
+      @JoinColumn(name = "submission_submissionId") }, inverseJoinColumns = {
+          @JoinColumn(name = "experiments_experimentId") })
+  private Set<Experiment> experiments = new HashSet<>();
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long submissionId = UNSAVED_ID;
+
+  @Temporal(TemporalType.DATE)
+  private Date submittedDate;
+
+  private String title;
+  private boolean verified;
+
+  @Override
+  public int compareTo(Submission t) {
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
+    return 0;
+  }
+
+  public String getAccession() {
+    return accession;
+  }
+
+  public String getAlias() {
+    return alias;
+  }
+
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public Set<Experiment> getExperiments() {
+    return experiments;
+  }
+
+  public long getId() {
+    return submissionId;
+  }
+
+  public Date getSubmissionDate() {
+    return submittedDate;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public boolean isCompleted() {
+    return completed;
+  }
+
+  public boolean isVerified() {
+    return verified;
+  }
+
+  public void setAccession(String accession) {
+    this.accession = accession;
+  }
+
+  public void setAlias(String alias) {
+    this.alias = alias;
+  }
+
+  public void setCompleted(boolean completed) {
+    this.completed = completed;
+  }
+
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+
+  public void setExperiments(Set<Experiment> experiments) {
+    this.experiments = experiments;
+  }
+
+  public void setId(long id) {
+    this.submissionId = id;
+  }
+
+  public void setSubmissionDate(Date submissionDate) {
+    this.submittedDate = submissionDate;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public void setVerified(boolean verified) {
+    this.verified = verified;
+  }
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,26 +23,27 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
 
-import java.io.IOException;
-
 /**
- * Created by IntelliJ IDEA.
- * User: davey
- * Date: 05-Feb-2010
- * Time: 12:20:07
+ * Created by IntelliJ IDEA. User: davey Date: 05-Feb-2010 Time: 12:20:07
  */
 @Controller
 @RequestMapping("/registerUser")
@@ -66,18 +67,17 @@ public class UserRegistrationController {
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws IOException {
     model.put("user", new UserImpl());
+    model.put("title", "New User");
     return new ModelAndView("/pages/registerUser.jsp", model);
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("user") User user,
-                              ModelMap model, SessionStatus session) throws IOException {
+  public String processSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session) throws IOException {
     try {
-      //encode the password as set by the passwordCodecService
+      // encode the password as set by the passwordCodecService
       if (passwordCodecService != null) {
         user.setPassword(passwordCodecService.getEncoder().encodePassword(user.getPassword(), null));
-      }
-      else {
+      } else {
         log.warn("No passwordCodecService set! Passwords will be stored in plaintext!");
       }
 
@@ -85,8 +85,7 @@ public class UserRegistrationController {
       session.setComplete();
       model.clear();
       return "redirect:/miso/mainMenu";
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to register user", ex);
       }

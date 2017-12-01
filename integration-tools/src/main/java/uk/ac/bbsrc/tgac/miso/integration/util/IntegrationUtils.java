@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -28,44 +28,37 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * uk.ac.bbsrc.tgac.miso.integration.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 04/11/11
  * @since 0.1.3
  */
 public class IntegrationUtils {
-
-  public static String makePostRequest(String host, int port, String query) throws IntegrationException {
+  private static final Logger log = LoggerFactory.getLogger(IntegrationUtils.class);
+  
+    public static String makePostRequest(String host, int port, String query) throws IntegrationException {
     if (query == null || query.isEmpty()) {
       throw new IntegrationException("Query must be populated when calling makePostRequest.");
     }
@@ -96,10 +89,10 @@ public class IntegrationUtils {
     return rtn;
 
   }
-
+  
   /**
    * Sets up the socket connection to a given host
-   *
+   * 
    * @param host
    *          of type String
    * @param port
@@ -112,14 +105,14 @@ public class IntegrationUtils {
     try {
       return new Socket(host, port);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("prepare socket", e);
       throw new IntegrationException("Cannot connect to " + host + ":" + port + ". Cause: " + e.getMessage());
     }
   }
 
   /**
    * Sends a String message to a given host socket
-   *
+   * 
    * @param socket
    *          of type Socket
    * @param query
@@ -163,10 +156,10 @@ public class IntegrationUtils {
 
       return response.toString().replace("\\\n", "").replace("\\\t", "");
     } catch (UnknownHostException e) {
-      System.err.println("Cannot resolve host: " + socket.getInetAddress());
+      log.error("Cannot resolve host: " + socket.getInetAddress(), e);
       throw new IntegrationException(e.getMessage());
     } catch (IOException e) {
-      System.err.println("Couldn't get I/O for the connection to: " + socket.getInetAddress());
+      log.error("Couldn't get I/O for the connection to: " + socket.getInetAddress(), e);
       throw new IntegrationException(e.getMessage());
     } finally {
       try {
@@ -177,7 +170,7 @@ public class IntegrationUtils {
           rd.close();
         }
       } catch (Throwable t) {
-        t.printStackTrace();
+        log.error("close socket", t);
       }
     }
   }
@@ -199,6 +192,7 @@ public class IntegrationUtils {
     while (-1 != (n = bis.read(buffer))) {
       out.write(buffer, 0, n);
     }
+    bis.close();
     return out.toByteArray();
   }
 }

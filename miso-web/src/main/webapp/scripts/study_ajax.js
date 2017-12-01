@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -22,58 +22,26 @@
  */
 
 var Study = Study || {
-  deleteStudy : function(studyId, successfunc) {
-    if (confirm("Are you sure you really want to delete STU" + studyId + "? This operation is permanent!")) {
-      Fluxion.doAjax(
-        'studyControllerHelperService',
-        'deleteStudy',
-        {'studyId':studyId, 'url':ajaxurl},
-        {'doOnSuccess':function(json) {
-          successfunc();
-        }
-      });
-    }
-  }
-};
+  // Validate methods can be found in parsley_form_validations.js
+  validateStudy: function() {
+    Validate.cleanFields('#study-form');
 
-Study.ui = {
-  createListingStudiesTable : function() {
-    jQuery('#listingStudiesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
-    jQuery.fn.dataTableExt.oSort['no-stu-asc'] = function(x, y) {
-      var a = parseInt(x.replace(/^STU/i, ""));
-      var b = parseInt(y.replace(/^STU/i, ""));
-      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-    };
-    jQuery.fn.dataTableExt.oSort['no-stu-desc'] = function(x, y) {
-      var a = parseInt(x.replace(/^STU/i, ""));
-      var b = parseInt(y.replace(/^STU/i, ""));
-      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-    };
-    Fluxion.doAjax(
-      'studyControllerHelperService',
-      'listStudiesDataTable',
-      {
-        'url':ajaxurl
-      },
-      {'doOnSuccess': function(json) {
-        jQuery('#listingStudiesTable').html('');
-        jQuery('#listingStudiesTable').dataTable({
-          "aaData": json.array,
-          "aoColumns": [
-            { "sTitle": "Study Name", "sType":"no-stu"},
-            { "sTitle": "Alias"},
-            { "sTitle": "Description"},
-            { "sTitle": "Type"},
-            { "sTitle": "Edit"}
-          ],
-          "bJQueryUI": true,
-          "iDisplayLength":  25,
-          "aaSorting":[
-            [0,"desc"]
-          ]
-        });
-      }
-      }
-    );
+    jQuery('#study-form').parsley().destroy();
+
+    // Alias input field validation
+    jQuery('#alias').attr('class', 'form-control');
+    jQuery('#alias').attr('data-parsley-required', 'true');
+    jQuery('#alias').attr('data-parsley-maxlength', '100');
+
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    jQuery('#description').attr('data-parsley-maxlength', '255');
+
+    jQuery('#study-form').parsley();
+    jQuery('#study-form').parsley().validate();
+
+    Validate.updateWarningOrSubmit('#study-form');
+    return false;
   }
 };

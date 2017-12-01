@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,23 +23,55 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.KitDescriptorChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-
-import javax.persistence.*;
-import java.io.Serializable;
 
 /**
  * A KitDescriptor handles information about a consumable element that is generally typed by a name, manufacturer and part number. Kits use
  * KitDescriptors, coupled with a lot number, to represent a real-world manifestation of a consumable kit.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Entity
-public class KitDescriptor implements Serializable {
+@Table(name = "KitDescriptor")
+public class KitDescriptor implements Serializable, ChangeLoggable {
 
-  /** Field UNSAVED_ID  */
+  public static int sortByName(KitDescriptor a, KitDescriptor b) {
+    return a.getName().compareTo(b.getName());
+  }
+  private static final long serialVersionUID = 1L;
+
+  /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
 
   @Id
@@ -50,34 +82,53 @@ public class KitDescriptor implements Serializable {
   private String manufacturer = "";
   private String partNumber = "";
   private Integer stockLevel = 0;
+  private String description = "";
+
+  @OneToMany(targetEntity = KitDescriptorChangeLog.class, mappedBy = "kitDescriptor")
+  private Collection<ChangeLog> changelog = new ArrayList<>();
+
+  @ManyToMany(targetEntity = TargetedSequencing.class)
+  @JoinTable(name = "TargetedSequencing_KitDescriptor", inverseJoinColumns = {
+      @JoinColumn(name = "targetedSequencingId") }, joinColumns = {
+          @JoinColumn(name = "kitDescriptorId") })
+  private Set<TargetedSequencing> targetedSequencing = new HashSet<>();
+
+  public void setTargetedSequencing(Set<TargetedSequencing> targetedSequencing) {
+    this.targetedSequencing = targetedSequencing;
+  }
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier", nullable = false)
+  private User lastModifier;
 
   @Enumerated(EnumType.STRING)
   private KitType kitType;
-  
+
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
 
   /**
    * Returns the kitDescriptorId of this KitDescriptor object.
-   *
+   * 
    * @return Long kitDescriptorId.
    */
-  public Long getKitDescriptorId() {
+  public Long getId() {
     return kitDescriptorId;
   }
 
   /**
    * Sets the kitDescriptorId of this KitDescriptor object.
-   *
-   * @param kitDescriptorId kitDescriptorId.
+   * 
+   * @param kitDescriptorId
+   *          kitDescriptorId.
    */
-  public void setKitDescriptorId(Long kitDescriptorId) {
+  public void setId(Long kitDescriptorId) {
     this.kitDescriptorId = kitDescriptorId;
   }
 
   /**
    * Returns the name of this KitDescriptor object.
-   *
+   * 
    * @return String name.
    */
   public String getName() {
@@ -86,8 +137,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the name of this KitDescriptor object.
-   *
-   * @param name name.
+   * 
+   * @param name
+   *          name.
    */
   public void setName(String name) {
     this.name = name;
@@ -104,8 +156,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the version of this KitDescriptor object.
-   *
-   * @param version version.
+   * 
+   * @param version
+   *          version.
    */
   public void setVersion(Double version) {
     this.version = version;
@@ -113,7 +166,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the manufacturer of this KitDescriptor object.
-   *
+   * 
    * @return String manufacturer.
    */
   public String getManufacturer() {
@@ -122,8 +175,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the manufacturer of this KitDescriptor object.
-   *
-   * @param manufacturer manufacturer.
+   * 
+   * @param manufacturer
+   *          manufacturer.
    */
   public void setManufacturer(String manufacturer) {
     this.manufacturer = manufacturer;
@@ -131,7 +185,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the partNumber of this KitDescriptor object.
-   *
+   * 
    * @return String partNumber.
    */
   public String getPartNumber() {
@@ -140,8 +194,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the partNumber of this KitDescriptor object.
-   *
-   * @param partNumber partNumber.
+   * 
+   * @param partNumber
+   *          partNumber.
    */
   public void setPartNumber(String partNumber) {
     this.partNumber = partNumber;
@@ -149,7 +204,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the stockLevel of this KitDescriptor object.
-   *
+   * 
    * @return Integer stockLevel.
    */
   public Integer getStockLevel() {
@@ -158,16 +213,36 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the stockLevel of this KitDescriptor object.
-   *
-   * @param stockLevel stockLevel.
+   * 
+   * @param stockLevel
+   *          stockLevel.
    */
   public void setStockLevel(Integer stockLevel) {
     this.stockLevel = stockLevel;
   }
 
   /**
-   * Returns the kitType of this KitDescriptor object.
+   * Sets the description of this KitDescriptor object.
    *
+   * @param description
+   *          description.
+   */
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  /**
+   * Returns the description of this KitDescriptor object.
+   *
+   * @return String description.
+   */
+  public String getDescription() {
+    return description;
+  }
+
+  /**
+   * Returns the kitType of this KitDescriptor object.
+   * 
    * @return KitType kitType.
    */
   public KitType getKitType() {
@@ -176,9 +251,10 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the kitType of this KitDescriptor object.
-   *
-   * @param kitType kitType.
-   *
+   * 
+   * @param kitType
+   *          kitType.
+   * 
    */
   public void setKitType(KitType kitType) {
     this.kitType = kitType;
@@ -186,7 +262,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the platformType of this KitDescriptor object.
-   *
+   * 
    * @return PlatformType platformType.
    */
   public PlatformType getPlatformType() {
@@ -195,21 +271,44 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the platformType of this KitDescriptor object.
-   *
-   * @param platformType platformType.
+   * 
+   * @param platformType
+   *          platformType.
    */
   public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
   }
 
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changelog;
+  }
+
+  public void setChangeLog(Collection<ChangeLog> changelog) {
+    this.changelog = changelog;
+  }
+
+  public User getLastModifier() {
+    return lastModifier;
+   }
+
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  public Set<TargetedSequencing> getTargetedSequencing() {
+    return targetedSequencing;
+  }
+
   /**
    * Method toString ...
+   * 
    * @return String
    */
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    sb.append(getKitDescriptorId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
     sb.append(" : ");
@@ -217,9 +316,51 @@ public class KitDescriptor implements Serializable {
     sb.append(" : ");
     sb.append(getKitType());
     sb.append(" : ");
-    sb.append(getPlatformType());    
+    sb.append(getPlatformType());
     sb.append(" : ");
-    sb.append(getStockLevel());    
+    sb.append(getStockLevel());
+    sb.append(" : ");
+    sb.append(getDescription());
     return sb.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(21, 51)
+        .append(description)
+        .append(kitType)
+        .append(manufacturer)
+        .append(name)
+        .append(partNumber)
+        .append(platformType)
+        .append(version)
+        .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    KitDescriptor other = (KitDescriptor) obj;
+    return new EqualsBuilder()
+        .append(description, other.description)
+        .append(kitType, other.kitType)
+        .append(manufacturer, other.manufacturer)
+        .append(name, other.name)
+        .append(partNumber, other.partNumber)
+        .append(platformType, other.platformType)
+        .append(version, other.version)
+        .isEquals();
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    KitDescriptorChangeLog changeLog = new KitDescriptorChangeLog();
+    changeLog.setKitDescriptor(this);
+    changeLog.setSummary(summary);
+    changeLog.setColumnsChanged(columnsChanged);
+    changeLog.setUser(user);
+    return changeLog;
   }
 }

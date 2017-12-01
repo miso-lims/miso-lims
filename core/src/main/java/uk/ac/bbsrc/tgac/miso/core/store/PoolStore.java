@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,15 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * Defines a DAO interface for storing Pools
@@ -39,90 +41,74 @@ import java.util.List;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool<? extends Poolable>>, NamingSchemeAware<Pool<? extends Poolable>> {
-  /**
-   * Get a Pool given a barcode and its platform
-   *
-   * @param barcode of type String
-   * @param platformType of type PlatformType
-   * @return Pool
-   * @throws IOException when
-   */
-  Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException;
+public interface PoolStore extends Store<Pool>, Remover<Pool>, PaginatedDataSource<Pool> {
 
   /**
-   * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Sample} by means of that
-   * Sample's {@link uk.ac.bbsrc.tgac.miso.core.data.Library} objects
+   * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Library} by means of that Library's
+   * {@link LibraryDilution} objects
    *
-   * @param sampleId of type long
-   * @return List<Pool<? extends Poolable>
-   * @throws IOException when
+   * @param libraryId
+   *          of type long
+   * @return List<Pool<? extends Poolable<?,?>>
+   * @throws IOException
+   *           when
    */
-  Collection<Pool<? extends Poolable>> listBySampleId(long sampleId) throws IOException;
-
-  /**
-   * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Library} by means of that
-   * Library's {@link uk.ac.bbsrc.tgac.miso.core.data.Dilution} objects
-   *
-   * @param libraryId of type long
-   * @return List<Pool<? extends Poolable>
-   * @throws IOException when
-   */
-  Collection<Pool<? extends Poolable>> listByLibraryId(long libraryId) throws IOException;
+  Collection<Pool> listByLibraryId(long libraryId) throws IOException;
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Project}
    *
-   * @param projectId of type long
-   * @return List<Pool<? extends Poolable>
-   * @throws IOException when
+   * @param projectId
+   *          of type long
+   * @return List<Pool<? extends Poolable<?,?>>
+   * @throws IOException
+   *           when
    */
-  Collection<Pool<? extends Poolable>> listByProjectId(long projectId) throws IOException;
+  Collection<Pool> listByProjectId(long projectId) throws IOException;
 
   /**
    * List all Pools that are for a given {@link PlatformType}
    *
-   * @param platformType of type PlatformType
-   * @return List<Pool<? extends Poolable>
-   * @throws IOException when
+   * @param platformType
+   *          of type PlatformType (null for wildcard)
+   * @param query the search term to use (null for wildcard)
+   * @param limit the number of results to return (null for all)
+   * @param ready if true limit to only pools
+   * @return List<Pool<? extends Poolable<?,?>>
+   * @throws IOException
+   *           when
    */
-  List<Pool<? extends Poolable>> listAllByPlatform(PlatformType platformType) throws IOException;
+  List<Pool> listAllByCriteria(PlatformType platformType, String query, Integer limit, boolean ready) throws IOException;
 
   /**
-   * List all Pools that are for a given {@link PlatformType} that match a search query String
+   * List all Samples associated with identificationBarcodes from the given identificationBarcode list
    *
-   * @param platformType of type PlatformType
-   * @param query of type String
-   * @return List<Pool<? extends Poolable>
-   * @throws IOException when
+   * @return Collection<Sample
+   * @throws IOException
+   *           when the objects cannot be retrieved
    */
-  List<Pool<? extends Poolable>> listAllByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
+  Collection<Pool> getByBarcodeList(Collection<String> barcodeList) throws IOException;
 
   /**
-   * List "ready to run" Pools that are for a given {@link PlatformType}
-   *
-   * @param platformType of type PlatformType
-   * @return List<Pool<? extends Poolable>
-   * @throws IOException when
-   */
-  List<Pool<? extends Poolable>> listReadyByPlatform(PlatformType platformType) throws IOException;
-
-  /**
-   * List "ready to run" Pools that are for a given {@link PlatformType} that match a search query String
-   *
-   * @param platformType of type PlatformType
-   * @param query of type String
-   * @return List<Pool<? extends Poolable>
-   * @throws IOException when
-   */
-  List<Pool<? extends Poolable>> listReadyByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
-
-  /**
-   * Get any Pool related to an Experiment given an Experiment ID
-   *
-   * @param e of type Experiment
+   * List the Pool associated with a given identificationBarcode
+   * 
+   * @param barcode
+   *          of type String
    * @return Pool
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
-  Pool<? extends Poolable> getPoolByExperiment(Experiment e) throws IOException;
+  Pool getByBarcode(String barcode) throws IOException;
+
+  /**
+   * @return a map containing all column names and max lengths from the Pool table
+   * @throws IOException
+   */
+  public Map<String, Integer> getPoolColumnSizes() throws IOException;
+
+  void removeWatcher(Pool pool, User watcher);
+
+  void addWatcher(Pool pool, User watcher);
+
+  Collection<Pool> listPoolsById(List<Long> poolIds);
 }

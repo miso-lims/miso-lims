@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,16 +23,19 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
-
-import java.io.IOException;
-import java.util.Collection;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * Defines a DAO interface for storing Libraries
@@ -40,7 +43,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSchemeAware<Library> {
+public interface LibraryStore extends Store<Library>, Remover<Library>, PaginatedDataSource<Library> {
 
   /**
    * Get a Library given a ID barcode
@@ -61,13 +64,13 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   Collection<Library> listBySearch(String query) throws IOException;
 
   /**
-   * Get a Library given a Library alias
+   * Get all Library with a given Library alias
    *
    * @param alias of type String
-   * @return Library
-   * @throws IOException when
+   * @return all libraries with the given alias
+   * @throws IOException
    */
-  Library getByAlias(String alias) throws IOException;
+  Collection<Library> listByAlias(String alias) throws IOException;
 
   /**
    * List all Libraries generated from a Sample given a parent Sample ID
@@ -88,6 +91,14 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   Collection<Library> listByProjectId(long projectId) throws IOException;
 
   /**
+   * List all Libraries associated with ids from the given id list
+   *
+   * @return Collection<Library>
+   * @throws IOException when the objects cannot be retrieved or read
+   */
+  Collection<Library> getByIdList(List<Long> idList) throws IOException;
+
+  /**
    * Get a LibraryType given a LibraryType ID
    *
    * @param libraryTypeId of type long
@@ -95,15 +106,6 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
    * @throws IOException when
    */
   LibraryType getLibraryTypeById(long libraryTypeId) throws IOException;
-
-  /**
-   * Get a LibraryType given a LibraryType description
-   *
-   * @param description of type String
-   * @return LibraryType
-   * @throws IOException when
-   */
-  LibraryType getLibraryTypeByDescription(String description) throws IOException;
 
   /**
    * Get a LibraryType given a LibraryType description and platform
@@ -149,19 +151,11 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
    * @return LibraryStrategyType
    * @throws IOException when
    */
-  LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;  
-
-  /**
-   * Get a TagBarcode given a TagBarcode ID
-   *
-   * @param tagBarcodeId of type long
-   * @return TagBarcode
-   * @throws IOException when
-   */
-  TagBarcode getTagBarcodeById(long tagBarcodeId) throws IOException;  
+  LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
 
   /**
    * List all LibraryTypes
+   *
    * @return Collection<LibraryType>
    * @throws IOException when
    */
@@ -170,11 +164,11 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   /**
    * List all LibraryTypes available to a given platform
    *
-   * @param platformName of type String
+   * @param platform PlatformType
    * @return Collection<LibraryType>
    * @throws IOException when
    */
-  Collection<LibraryType> listLibraryTypesByPlatform(String platformName) throws IOException;
+  Collection<LibraryType> listLibraryTypesByPlatform(PlatformType platform) throws IOException;
 
   /**
    * List all LibrarySelectionTypes
@@ -193,55 +187,46 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException;
 
   /**
-   * List all TagBarcodes
+   * Return the Library associated with a given positionId
    *
-   * @return Collection<LibraryStrategyType>
-   * @throws IOException when
+   * @param positionId of type long
+   * @return Boxable
    */
-  Collection<TagBarcode> listAllTagBarcodes() throws IOException;
+  Boxable getByPositionId(long positionId);
 
   /**
-   * List all TagBarcodes by a given Platform
+   * List all libraries associated with an identificationBarcode from given list of identificationBarcodes (from scan)
    *
-   * @return Collection<TagBarcode>
-   * @throws IOException when
-   */
-  Collection<TagBarcode> listTagBarcodesByPlatform(String platformName) throws IOException;
-
-  /**
-   * List all TagBarcodes in a given strategy
-   *
-   * @return Collection<TagBarcode>
-   * @throws IOException when
-   */
-  Collection<TagBarcode> listTagBarcodesByStrategyName(String strategyName) throws IOException;
-
-  /**
-   * List all libraries related to a given LibraryDilution given a LibraryDilution ID
-   *
-   * @param dilutionId of type long
-   * @return Collection<Library>
-   * @throws IOException when
-   */
-  Collection<Library> listByLibraryDilutionId(long dilutionId) throws IOException;
-
-  /**
-   * Retrieve a Library from an underlying data store given a Library ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param libraryId of type long
-   * @return Library
-   * @throws IOException when
-   */
-  //Library lazyGet(long libraryId) throws IOException;
-
-  /**
-   * List all persisted objects
-   *
+   * @param barcodeList
    * @return Collection<Library>
    * @throws IOException when the objects cannot be retrieved
    */
-  Collection<Library> listAllWithLimit(long limit) throws IOException;
+  Collection<Library> getByBarcodeList(Collection<String> barcodeList) throws IOException;
+
+  /**
+   * @return a map containing all column names and max lengths from the Library table
+   * @throws IOException
+   */
+  public Map<String, Integer> getLibraryColumnSizes() throws IOException;
+
+  /**
+   *
+   * @param querystr of type String
+   * @return a count of how many libraries match the querystr
+   * @throws IOException
+   */
+  long countLibrariesBySearch(String querystr) throws IOException;
+
+  Library getAdjacentLibrary(long libraryId, boolean before) throws IOException;
+
+  List<Library> searchByCreationDate(Date from, Date to) throws IOException;
+
+  /**
+   * Retrieves a single Library by preMigrationId (DetailedLibrary only)
+   * 
+   * @param preMigrationId preMigration ID of Library
+   * @throws IOException
+   */
+  Library getByPreMigrationId(Long preMigrationId) throws IOException;
+
 }

@@ -2,7 +2,7 @@
 
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -23,8 +23,8 @@
   ~ **********************************************************************
   --%>
 
-<script type="text/javascript" src="<c:url value='/scripts/task_ajax.js?ts=${timestamp.time}'/>"></script>
-
+<div id="maincontent">
+<div id="contentcolumn">
 <div id="tabs">
   <ul>
     <li><a href="#tab-1"><span>Tasks</span></a></li>
@@ -117,4 +117,9 @@
       Tasks.ui.populateCompletedTasks();
     });
   </script>
+</div>
+</div>
+</div>
+
+<%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>

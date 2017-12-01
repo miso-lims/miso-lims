@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,12 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
  * Defines a DAO interface for storing Runs
@@ -36,19 +39,7 @@ import java.util.List;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSchemeAware<Run> {
-  /**
-   * Retrieve a Run from an underlying data store given a Run ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param runId of type long
-   * @return Run
-   * @throws IOException when
-   */
-  //Run lazyGet(long runId) throws IOException;
-
+public interface RunStore extends Store<Run>, Remover<Run>, PaginatedDataSource<Run> {
   /**
    * Gets the latest Run, by start date, that is associated with the given container
    *
@@ -68,11 +59,12 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException;
 
   /**
-   * List all Runs that match a search criteria
+   * List all Runs with name, alias, or description containing the query string
    *
-   * @param query of type String
+   * @param query String to search for
    * @return Collection<Run>
-   * @throws IOException when
+   * @throws IOException
+   * @throws NullPointerException if query is null
    */
   Collection<Run> listBySearch(String query) throws IOException;
 
@@ -86,22 +78,12 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   Run getByAlias(String alias) throws IOException;
 
   /**
-   * List all Runs related to an Experiment given an Experiment ID
-   *
-   * @param experimentId of type long
-   * @return List<Run>
-   * @throws IOException when
-   */
-  @Deprecated
-  List<Run> listByExperimentId(long experimentId) throws IOException;
-
-  /**
    * List all Runs using a Pool given a Pool ID
    *
    * @param poolId of type long
    * @return List<Run>
    * @throws IOException when
-   */  
+   */
   List<Run> listByPoolId(long poolId) throws IOException;
 
   /**
@@ -123,30 +105,42 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   List<Run> listByProjectId(long projectId) throws IOException;
 
   /**
-   * List all Runs carried out on a Platform given a Platform ID 
+   * List all Runs carried out on a Platform given a Platform ID
    *
    * @param platformId of type long
    * @return List<Run>
    * @throws IOException when
    */
   List<Run> listByPlatformId(long platformId) throws IOException;
-  
+
   /**
-   * List all Runs by their health given a HealthType 
+   * List all Runs by their health given a HealthType
    *
-   * @param health of type String
-   * @return List<Run>
-   * @throws IOException when
+   * @param health status to search for
+   * @return all runs with matching status
+   * @throws IOException
    */
   List<Run> listByStatus(String health) throws IOException;
 
   /**
-   * List all persisted objects
-   *
-   * @return Collection<Run>
-   * @throws IOException when the objects cannot be retrieved
+   * List all runs for a given sequencer reference id
+   * 
+   * @param sequencerReferenceId id of the sequencer reference to get runs for
+   * @return all runs with matching sequencer reference id
    */
-  Collection<Run> listAllWithLimit(long limit) throws IOException;
+  List<Run> listBySequencerId(long sequencerReferenceId) throws IOException;
 
-  int[] saveAll(Collection<Run> runs) throws IOException;
+  /**
+   * @return a map containing all column names and max lengths from the Run table
+   * @throws IOException
+   */
+  public Map<String, Integer> getRunColumnSizes() throws IOException;
+
+  public long countRuns() throws IOException;
+
+  public long countBySearch(String querystr) throws IOException;
+
+  public void addWatcher(Run run, User watcher);
+
+  public void removeWatcher(Run run, User watcher);
 }

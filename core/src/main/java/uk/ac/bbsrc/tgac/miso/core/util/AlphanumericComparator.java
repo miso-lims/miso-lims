@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -29,19 +29,25 @@ import java.util.Comparator;
  * uk.ac.bbsrc.tgac.miso.core.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 01/12/11
  * @since 0.1.3
  */
-public class AlphanumericComparator implements Comparator {
+public final class AlphanumericComparator implements Comparator<String> {
+  public static final AlphanumericComparator INSTANCE = new AlphanumericComparator();
   @Override
-  public int compare(Object firstObjToCompare, Object secondObjToCompare) {
-    String firstString = firstObjToCompare.toString();
-    String secondString = secondObjToCompare.toString();
+  public final int compare(String firstString, String secondString) {
 
-    if (secondString == null || firstString == null) {
+    if (secondString == null && firstString == null) {
       return 0;
+    }
+
+    if (firstString == null && secondString != null) {
+      return -1;
+    }
+    if (firstString != null && secondString == null) {
+      return 1;
     }
 
     int lengthFirstStr = firstString.length();
@@ -66,8 +72,7 @@ public class AlphanumericComparator implements Comparator {
 
         if (index1 < lengthFirstStr) {
           ch1 = firstString.charAt(index1);
-        }
-        else {
+        } else {
           break;
         }
       } while (Character.isDigit(ch1) == Character.isDigit(space1[0]));
@@ -78,8 +83,7 @@ public class AlphanumericComparator implements Comparator {
 
         if (index2 < lengthSecondStr) {
           ch2 = secondString.charAt(index2);
-        }
-        else {
+        } else {
           break;
         }
       } while (Character.isDigit(ch2) == Character.isDigit(space2[0]));
@@ -93,8 +97,7 @@ public class AlphanumericComparator implements Comparator {
         Integer firstNumberToCompare = new Integer(str1.trim());
         Integer secondNumberToCompare = new Integer(str2.trim());
         result = firstNumberToCompare.compareTo(secondNumberToCompare);
-      }
-      else {
+      } else {
         result = str1.compareTo(str2);
       }
 

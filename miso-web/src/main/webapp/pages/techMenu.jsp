@@ -3,7 +3,7 @@
 
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -29,20 +29,6 @@
     <h1>Technician Menu</h1>
 
     <div class="column">
-      <div class="portlet">
-        <div class="portlet-header">Sequencing Machines</div>
-        <div class="portlet-content">
-          <a href="<c:url value="/miso/stats/ls454"/>">454</a><br/>
-          <a href="<c:url value="/miso/stats/illumina"/>">Illumina</a><br/>
-          <a href="<c:url value="/miso/stats/solid"/>">SOLiD</a><br/><br/>
-        </div>
-      </div>
-      <div class="portlet">
-        <div class="portlet-header">Barcode Printing</div>
-        <div class="portlet-content">
-          <a href="<c:url value="/miso/custombarcode"/>">Custom Barcode Printing</a><br/>
-        </div>
-      </div>
     </div>
   </div>
 </div>

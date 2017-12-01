@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -31,20 +31,21 @@ import org.springframework.context.ApplicationContextAware;
  * uk.ac.bbsrc.tgac.miso.webapp.context
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 05-Aug-2011
  * @since 0.0.3
  */
 
-public class ApplicationContextProvider implements ApplicationContextAware{
+public class ApplicationContextProvider implements ApplicationContextAware {
   private static ApplicationContext ctx = null;
 
   public static ApplicationContext getApplicationContext() {
     return ctx;
   }
 
+  @Override
   public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-    this.ctx = ctx;
+    ApplicationContextProvider.ctx = ctx;
   }
 }

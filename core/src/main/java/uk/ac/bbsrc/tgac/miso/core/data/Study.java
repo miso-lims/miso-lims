@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,165 +23,143 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonManagedReference;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-import org.w3c.dom.Document;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-
+import java.io.Serializable;
 import java.util.Collection;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A Study is a subset of work carried out for a {@link Project}, comprising one or more {@link Experiment}s.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile"})
-public interface Study extends SecurableByProfile, Submittable<Document>, Comparable, Deletable, Nameable {
+public interface Study extends SecurableByProfile, Comparable<Study>, Deletable, Nameable, ChangeLoggable, Aliasable, Serializable {
 
-  /** Field PREFIX  */
+  /** Field PREFIX */
   public static final String PREFIX = "STU";
-
-  /**
-   * Returns the studyId of this Study object.
-   *
-   * @return Long studyId.
-   */
-  @Deprecated
-  public Long getStudyId();
-
-  /**
-   * Sets the studyId of this Study object.
-   *
-   * @param studyId studyId.
-   */
-  @Deprecated
-  public void setStudyId(Long studyId);
 
   public void setId(long id);
 
   /**
    * Returns the project of this Study object.
-   *
+   * 
    * @return Project project.
    */
-  @JsonBackReference(value="project")
   public Project getProject();
 
   /**
    * Sets the project of this Study object.
-   *
-   * @param project project.
+   * 
+   * @param project
+   *          project.
    */
   public void setProject(Project project);
 
   /**
    * Returns the accession of this Study object.
-   *
+   * 
    * @return String accession.
    */
   public String getAccession();
 
   /**
    * Sets the accession of this Study object.
-   *
-   * @param accession accession.
+   * 
+   * @param accession
+   *          accession.
    */
   public void setAccession(String accession);
 
   /**
    * Sets the name of this Study object.
-   *
-   * @param name name.
+   * 
+   * @param name
+   *          name.
    */
   public void setName(String name);
 
   /**
    * Returns the description of this Study object.
-   *
+   * 
    * @return String description.
    */
   public String getDescription();
 
   /**
    * Sets the description of this Study object.
-   *
-   * @param description description.
+   * 
+   * @param description
+   *          description.
    */
   public void setDescription(String description);
 
   /**
    * Returns the alias of this Study object.
-   *
+   * 
    * @return String alias.
    */
+  @Override
   public String getAlias();
 
   /**
    * Sets the alias of this Study object.
-   *
-   * @param alias alias.
+   * 
+   * @param alias
+   *          alias.
    */
   public void setAlias(String alias);
 
   /**
-   * Returns the abstract of this Study object.
-   *
-   * @return String abstract.
-   */
-  public String getAbstract();
-
-  /**
-   * Sets the abstract of this Study object.
-   *
-   * @param abs abs.
-   */
-  public void setAbstract(String abs);
-
-
-  /**
    * Returns the studyType of this Study object.
-   *
-   * @return String studyType.
+   * 
+   * @return StudyType studyType.
    */
-  public String getStudyType();
+  public StudyType getStudyType();
 
   /**
    * Sets the studyType of this Study object.
-   *
-   * @param studyType studyType.
+   * 
+   * @param studyType
+   *          studyType.
    */
-  public void setStudyType(String studyType);
+  public void setStudyType(StudyType studyType);
 
   /**
    * Registers an Experiment that will be undertaken as part of this Study
-   *
-   * @param e of type Experiment
-   * @throws MalformedExperimentException when the Experiment being registered is not valid
+   * 
+   * @param e
+   *          of type Experiment
    */
-  public void addExperiment(Experiment e) throws MalformedExperimentException;
+  public void addExperiment(Experiment e);
 
   /**
    * Returns the registered Experiments of this Study object.
-   *
+   * 
    * @return Collection<Experiment> experiments.
    */
-  //@JsonManagedReference(value="experiments")
   public Collection<Experiment> getExperiments();
-  
+
   /**
    * Sets the experiments of this Study object.
-   *
-   * @param experiments experiments.
+   * 
+   * @param experiments
+   *          experiments.
    */
   public void setExperiments(Collection<Experiment> experiments);
+
+  @Override
+  public Collection<ChangeLog> getChangeLog();
+
+  /**
+   * Returns the user who last modified this item.
+   */
+  public User getLastModifier();
+
+  /**
+   * Sets the user who last modified this item. It should always be set to the current user on save.
+   */
+  public void setLastModifier(User user);
 }

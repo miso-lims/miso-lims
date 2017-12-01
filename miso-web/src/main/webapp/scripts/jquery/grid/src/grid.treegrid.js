@@ -26,8 +26,6 @@ $.jgrid.extend({
 				// NS Model
 					rd[isLeaf] = (parseInt(rgt,10) === parseInt(lft,10)+1) ? 'true' : 'false';
 				}
-			} else {
-				//row.parent_id = rd[$t.p.treeReader.parent_id_field];
 			}
 			var curLevel = parseInt(rd[level],10), ident,lftpos;
 			if($t.p.tree_root_level === 0) {
@@ -156,7 +154,6 @@ $.jgrid.extend({
 			var $t = this;
 			if(!$t.grid || !$t.p.treeGrid) { return; }
 			var childern = $($t).jqGrid("getNodeChildren",record),
-			//if ($($t).jqGrid("isVisibleNode",record)) {
 			expanded = $t.p.treeReader.expanded_field;
 			$(childern).each(function(i){
 				var id  = $.jgrid.getAccessor(this,$t.p.localReader.id);
@@ -165,7 +162,6 @@ $.jgrid.extend({
 					$($t).jqGrid("expandRow",this);
 				}
 			});
-			//}
 		});
 	},
 	collapseRow : function (record) {

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,12 +23,24 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,61 +48,52 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
  * uk.ac.bbsrc.tgac.miso.core.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/12/11
  * @since 0.1.4
  */
 public class TaxonomyUtils {
-  protected static final Logger log = LoggerFactory.getLogger(TaxonomyUtils.class);
+  private static final Logger log = LoggerFactory.getLogger(TaxonomyUtils.class);
 
   private static final String ncbiEntrezUtilsURL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?";
 
   public static String checkScientificNameAtNCBI(String scientificName) {
     try {
-      String query = ncbiEntrezUtilsURL+"db=taxonomy&term="+URLEncoder.encode(scientificName, "UTF-8");
-      final HttpClient httpclient = new DefaultHttpClient();
+      String query = ncbiEntrezUtilsURL + "db=taxonomy&term=" + URLEncoder.encode(scientificName, "UTF-8");
+      final HttpClient httpclient = HttpClientBuilder.create().build();
       HttpGet httpget = new HttpGet(query);
       try {
         HttpResponse response = httpclient.execute(httpget);
         String out = parseEntity(response.getEntity());
         log.info(out);
         try {
-          Document d = SubmissionUtils.emptyDocument();
-          SubmissionUtils.transform(new UnicodeReader(out), d);
+          DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+          Document d = docBuilder.newDocument();
+
+          TransformerFactory.newInstance().newTransformer().transform(new StreamSource(new UnicodeReader(out)), new DOMResult(d));
+
           NodeList nl = d.getElementsByTagName("Id");
           for (int i = 0; i < nl.getLength(); i++) {
-            Element e = (Element)nl.item(i);
+            Element e = (Element) nl.item(i);
             return e.getTextContent();
           }
+        } catch (ParserConfigurationException e) {
+          log.error("check scientific name at NCBI", e);
+        } catch (TransformerException e) {
+          log.error("check scientific name at NCBI", e);
         }
-        catch (ParserConfigurationException e) {
-          e.printStackTrace();
-        }
-        catch (TransformerException e) {
-          e.printStackTrace();
-        }
+      } catch (ClientProtocolException e) {
+        log.error("check scientific name at NCBI", e);
+      } catch (IOException e) {
+        log.error("check scientific name at NCBI", e);
       }
-      catch (ClientProtocolException e) {
-        e.printStackTrace();
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+    } catch (UnsupportedEncodingException e) {
+      log.error("check scientific name at NCBI", e);
     }
     return null;
   }
@@ -98,8 +101,7 @@ public class TaxonomyUtils {
   private static String parseEntity(HttpEntity entity) throws IOException {
     if (entity != null) {
       return EntityUtils.toString(entity, "UTF-8");
-    }
-    else {
+    } else {
       throw new IOException("Null entity in REST response");
     }
   }

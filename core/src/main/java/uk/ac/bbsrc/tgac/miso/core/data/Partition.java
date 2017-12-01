@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,66 +23,68 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import java.io.Serializable;
 
 /**
- * A Partition represents a compartment on a {@link SequencerPartitionContainer} on a sequencing platform,
- * e.g. a lane on Illumina, a chamber on 454, or a SMRT cell on a PacBio.
- *
+ * A Partition represents a compartment on a {@link SequencerPartitionContainer} on a sequencing platform, e.g. a lane on Illumina, a
+ * chamber on 454, or a SMRT cell on a PacBio.
+ * 
  * A Partition has a unique ID as well as a number describing its relative position in a SequencerPartitionContainer.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile","submissionDocument"})
-public interface Partition extends SecurableByProfile, Comparable {
+public interface Partition extends Identifiable, Comparable<Partition>, Deletable, Serializable {
   /**
    * Returns the sequencerPartitionContainer of this Partition object.
-   *
+   * 
    * @return SequencerPartitionContainer sequencerPartitionContainer.
    */
   SequencerPartitionContainer getSequencerPartitionContainer();
 
   /**
    * Sets the sequencerPartitionContainer of this Partition object.
-   *
-   * @param sequencerPartitionContainer sequencerPartitionContainer.
+   * 
+   * @param sequencerPartitionContainer
+   *          sequencerPartitionContainer.
    */
   void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer);
 
   /**
-   * Returns the id of this Partition object.
-   *
-   * @return Long id.
-   */
-  long getId();
-
-  /**
    * Sets the id of this Partition object.
-   *
-   * @param id id.
+   * 
+   * @param id
+   *          id.
    */
   void setId(long id);
 
   /**
    * Returns the partitionNumber, relative to the parent SequencerPartitionContainer, of this Partition object.
-   *
+   * 
    * @return Integer partitionNumber.
    */
   Integer getPartitionNumber();
 
   /**
    * Sets the partitionNumber, relative to the parent SequencerPartitionContainer, of this Partition object.
-   *
-   * @param partitionNumber partitionNumber.
+   * 
+   * @param partitionNumber
+   *          partitionNumber.
    */
   void setPartitionNumber(Integer partitionNumber);
+
+  /**
+   * Returns the pool of this SequencerPoolPartition object.
+   * 
+   * @return Pool pool.
+   */
+  public Pool getPool();
+
+  /**
+   * Sets the pool of this SequencerPoolPartition object.
+   * 
+   * @param pool
+   *          pool.
+   */
+  public void setPool(Pool pool);
 }

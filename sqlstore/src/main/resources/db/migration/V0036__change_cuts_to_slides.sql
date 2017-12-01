@@ -1,0 +1,2 @@
+ALTER TABLE `SampleCVSlide` CHANGE COLUMN `cuts` `slides` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `SampleLCMTube` CHANGE COLUMN `cutsConsumed` `slidesConsumed` INT(11) NOT NULL DEFAULT 0;

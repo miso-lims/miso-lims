@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,15 +23,21 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager
@@ -42,7 +48,7 @@ import java.util.*;
  * @since 0.0.2
  */
 public class MisoFilesManager implements FilesManager {
-  protected static final Logger log = LoggerFactory.getLogger(MisoFilesManager.class);
+  private static final Logger log = LoggerFactory.getLogger(MisoFilesManager.class);
 
   private String fileStorageDirectory;
 
@@ -50,89 +56,46 @@ public class MisoFilesManager implements FilesManager {
     this.fileStorageDirectory = fileStorageDirectory;
   }
 
+  @Override
   public String getFileStorageDirectory() {
     return this.fileStorageDirectory;
   }
-   /*
-   public File createFile(Class type, String qualifier, String name) throws IOException {
-    File dir = new File(fileStorageDirectory+"/"+type.getSimpleName().toLowerCase()+"/"+qualifier);
-    if (LimsUtils.checkDirectory(dir, true)) {
-      File newFile = new File(dir, name);
-      log.info("Attempting to store " + newFile.getAbsolutePath());
-      if ((newFile.exists() && newFile.length() != file.length()) || !newFile.exists()) {
-        FileOutputStream fout = null;
-        try {
-          byte[] fileData = new byte[(int)file.length()];
-          FileInputStream fis = null;
 
-          try {
-            fis = new FileInputStream(file);
-            fis.read(fileData);
-          } catch (IOException e) {
-            fileData = null;
-          } finally {
-            if (fis != null) {
-              try {
-                fis.close();
-              } catch (IOException e) {
-                // ignore
-              }
-            }
-          }
-          fout = new FileOutputStream(newFile);
-          fout.write(fileData);
-        }
-        finally {
-          if (fout != null) {
-            fout.close();
-          }
-        }
-        return newFile;
-      }
-      else {
-        log.info("File already exists - not overwriting.");
-        return newFile;
-      }
-    }
-    return null;
-  }
-    */
+  @Override
   public File storeFile(Class type, String qualifier, File file) throws IOException {
-    File dir = new File(fileStorageDirectory+"/"+type.getSimpleName().toLowerCase()+"/"+qualifier);
+    final File dir = new File(fileStorageDirectory + "/" + type.getSimpleName().toLowerCase() + "/" + qualifier);
     if (LimsUtils.checkDirectory(dir, true)) {
-      File newFile = new File(dir, file.getName().replace(" ", "_"));
+      final File newFile = new File(dir, file.getName().replace(" ", "_"));
       log.info("Attempting to store " + newFile.getAbsolutePath());
       if ((newFile.exists() && newFile.length() != file.length()) || !newFile.exists()) {
         FileOutputStream fout = null;
         try {
-          byte[] fileData = new byte[(int)file.length()];
+          byte[] fileData = new byte[(int) file.length()];
           FileInputStream fis = null;
 
           try {
             fis = new FileInputStream(file);
             fis.read(fileData);
-          } catch (IOException e) {
+          } catch (final IOException e) {
             fileData = null;
           } finally {
             if (fis != null) {
               try {
                 fis.close();
-              } catch (IOException e) {
+              } catch (final IOException e) {
                 // ignore
               }
             }
           }
           fout = new FileOutputStream(newFile);
           fout.write(fileData);
-        }
-        finally {
+        } finally {
           if (fout != null) {
             fout.close();
           }
         }
         return newFile;
-      }
-      else {
+      } else {
         log.info("File already exists - not overwriting.");
         return newFile;
       }
@@ -144,85 +107,80 @@ public class MisoFilesManager implements FilesManager {
     return storeFile(type.getClass(), qualifier, file);
   }
 
+  @Override
   public File generateTemporaryFile(String prefix, String suffix, File baseDir) throws IOException {
     if (baseDir.exists()) {
-      return File.createTempFile(prefix,suffix,baseDir);
-    }
-    else {
+      return File.createTempFile(prefix, suffix, baseDir);
+    } else {
       log.warn("MISO temporary files directory doesn't seem to exist. Trying to create it...");
       if (baseDir.mkdirs()) {
         log.warn("MISO temporary files directory created.. retrying file generation...");
-        return File.createTempFile(prefix,suffix,baseDir);
-      }
-      else {
-        throw new IOException("Could not create MISO temporary file directory ("+baseDir+"). Please create this directory or allow the parent to be writable to MISO.");
+        return File.createTempFile(prefix, suffix, baseDir);
+      } else {
+        throw new IOException("Could not create MISO temporary file directory (" + baseDir
+            + "). Please create this directory or allow the parent to be writable to MISO.");
       }
     }
   }
 
   public File generateTemporaryFile(String prefix, String suffix) throws IOException {
-    File tempPath = new File(fileStorageDirectory, "/temp/");
+    final File tempPath = new File(fileStorageDirectory, "/temp/");
     if (tempPath.exists()) {
-      return File.createTempFile(prefix,suffix,tempPath);
-    }
-    else {
+      return File.createTempFile(prefix, suffix, tempPath);
+    } else {
       log.warn("MISO temporary files directory doesn't seem to exist. Trying to create it...");
       if (tempPath.mkdirs()) {
         log.warn("MISO temporary files directory created.. retrying file generation...");
-        return File.createTempFile(prefix,suffix,tempPath);
-      }
-      else {
-        throw new IOException("Could not create MISO temporary file directory ("+tempPath+"). Please create this directory or allow the parent to be writable to MISO.");
+        return File.createTempFile(prefix, suffix, tempPath);
+      } else {
+        throw new IOException("Could not create MISO temporary file directory (" + tempPath
+            + "). Please create this directory or allow the parent to be writable to MISO.");
       }
     }
   }
 
-  public Collection<File> getFiles(Class type, String qualifier) throws IOException  {
-    //log.debug("getFiles called for qualifier:..." + qualifier);
-    File path = new File(fileStorageDirectory+"/"+type.getSimpleName().toLowerCase()+"/"+qualifier+"/");
-    //log.debug("filepath:..." + path.getAbsolutePath());
+  @Override
+  public Collection<File> getFiles(Class type, String qualifier) throws IOException {
+    File path = new File(fileStorageDirectory + "/" + type.getSimpleName().toLowerCase() + "/" + qualifier + "/");
 
     if (path.exists()) {
       if (path.canRead()) {
-        File[] files = path.listFiles();
-        if (files!=null) return Arrays.asList(files);
+        final File[] files = path.listFiles();
+        if (files != null) return Arrays.asList(files);
       }
     }
     return Collections.emptyList();
   }
 
-  public Collection<File> getFiles(Object type, String qualifier) throws IOException  {
+  public Collection<File> getFiles(Object type, String qualifier) throws IOException {
     return getFiles(type.getClass(), qualifier);
   }
 
+  @Override
   public Collection<String> getFileNames(Class type, String qualifier) throws IOException {
-    File path = new File(fileStorageDirectory+"/"+type.getSimpleName().toLowerCase()+"/"+qualifier+"/");
+    final File path = new File(fileStorageDirectory + "/" + type.getSimpleName().toLowerCase() + "/" + qualifier + "/");
     if (path.exists()) {
       if (path.canRead()) {
-  //      SecurityProfile profile = type.getSecurityProfile();
-  //      if (profile.userCanRead(user)) {
-        File[] files = path.listFiles();
+        final File[] files = path.listFiles();
         if (files != null) {
-          List<String> names = new ArrayList<String>();
-          for (File f : Arrays.asList(files)) {
+          final List<String> names = new ArrayList<>();
+          for (final File f : Arrays.asList(files)) {
             names.add(f.getName());
           }
           Collections.sort(names);
           return names;
         }
-      }
-      else {
+      } else {
         throw new IOException("It seems that the MISO file directory is not readable. Check the Spring configuration.");
       }
-    }
-    else {
+    } else {
       log.warn("MISO files directory doesn't seem to exist. Trying to create it...");
       if (path.mkdirs()) {
         log.warn("MISO files directory created.. retrying file listing...");
         return getFileNames(type, qualifier);
-      }
-      else {
-        throw new IOException("Could not create LIMS file directory ("+path+"). Please create this directory or allow the parent to be writable to MISO.");
+      } else {
+        throw new IOException("Could not create LIMS file directory (" + path
+            + "). Please create this directory or allow the parent to be writable to MISO.");
       }
     }
     return Collections.emptyList();
@@ -233,47 +191,43 @@ public class MisoFilesManager implements FilesManager {
   }
 
   protected File getFile(Class type, String qualifier, String fileName, boolean createIfNotExist) throws IOException {
-//    SecurityProfile profile = type.getSecurityProfile();
-    File path = new File(fileStorageDirectory+"/"+type.getSimpleName().toLowerCase()+"/"+qualifier+"/");
-    File file = new File(path, fileName);
+    final File path = new File(fileStorageDirectory + "/" + type.getSimpleName().toLowerCase() + "/" + qualifier + "/");
+    final File file = new File(path, fileName);
     log.info("Looking up " + file);
     if (path.exists()) {
       if (file.exists()) {
         if (file.canRead()) {
-  //      if (profile.userCanRead(user)) {
           log.info("OK");
           return file;
-        }
-        else {
+        } else {
           throw new IOException("Access denied. Please check file permissions.");
         }
-      }
-      else {
+      } else {
         if (createIfNotExist && file.createNewFile()) {
           log.info("OK");
           return file;
         }
         throw new IOException("No such file.");
       }
-    }
-    else {
+    } else {
       log.warn("MISO files directory doesn't seem to exist. Trying to create it...");
       if (path.mkdirs()) {
         log.warn("MISO files directory created.. retrying file listing...");
         return getFile(type, qualifier, fileName, createIfNotExist);
-      }
-      else {
-        throw new IOException("Could not create MISO file directory ("+path+"). Please create this directory or allow the parent to be writable to MISO.");
+      } else {
+        throw new IOException("Could not create MISO file directory (" + path
+            + "). Please create this directory or allow the parent to be writable to MISO.");
       }
     }
   }
 
   public File getNewFile(Class type, String qualifier, String fileName) throws IOException {
-    return getFile(type, qualifier, fileName, true);  
+    return getFile(type, qualifier, fileName, true);
   }
 
+  @Override
   public File getFile(Class type, String qualifier, String fileName) throws IOException {
-    return getFile(type, qualifier, fileName, false);  
+    return getFile(type, qualifier, fileName, false);
   }
 
   public File getNewFile(Object type, String qualifier, String fileName) throws IOException {
@@ -282,5 +236,12 @@ public class MisoFilesManager implements FilesManager {
 
   public File getFile(Object type, String qualifier, String fileName) throws IOException {
     return getFile(type.getClass(), qualifier, fileName, false);
+  }
+
+  @Override
+  public void deleteFile(Class<?> type, String qualifier, String fileName) throws IOException {
+    final File remove = getFile(type, qualifier, fileName, false);
+    remove.delete();
+    log.info(MessageFormat.format("{0} {1} deleted.", qualifier, fileName));
   }
 }

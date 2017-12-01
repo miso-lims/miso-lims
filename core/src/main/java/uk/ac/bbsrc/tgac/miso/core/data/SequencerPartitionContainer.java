@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,136 +23,115 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+
 /**
- * A SequencerPartitionContainer describes a collection of {@link Partition} objects that can be used as part of a
- * sequencer {@link Run}.
- *
+ * A SequencerPartitionContainer describes a collection of {@link Partition} objects that can be used as part of a sequencer {@link Run}.
+ * 
  * @author Rob Davey
  * @date 14/05/12
  * @since 0.1.6
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile", "run"})
-public interface SequencerPartitionContainer<T extends Partition> extends SecurableByProfile, Deletable, Comparable, Barcodable, Locatable {
-  /**
-   * Returns the containerId of this Container object.
-   *
-   * @return Long containerId.
-   */
-  @Deprecated
-  Long getContainerId();
-
-  /**
-   * Sets the containerId of this Container object.
-   *
-   * @param containerId the id of this Container object
-   *
-   */
-  @Deprecated
-  void setContainerId(Long containerId);
+public interface SequencerPartitionContainer
+    extends SecurableByProfile, Deletable, Comparable<SequencerPartitionContainer>, Barcodable, ChangeLoggable, Serializable,
+    QualityControllable<ContainerQC>
+{
 
   public void setId(long id);
 
   /**
-   * Sets the name of this Container object.
-   *
-   * @param name name.
+   * Returns the runs of this Container object.
+   * 
+   * @return Collection<Run> run.
    */
-  public void setName(String name);
+  Collection<Run> getRuns();
 
   /**
-   * Returns the run of this Container object.
-   *
-   * @return Run run.
+   * Returns the {@link Run} with
+   * a) the latest start date (of the runs which have a known status), or
+   * b) the last modified date
+   * 
+   * @return Run run
    */
-  Run getRun();
-
-  /**
-   * Sets the run of this Container object.
-   *
-   * @param run The run of which this Container is a part.
-   *
-   */
-  void setRun(Run run);
+  Run getLastRun();
 
   /**
    * Get the list of {@link Partition} objects comprising this container
-   *
+   * 
    * @return List<Partition> partitions
    */
-  List<T> getPartitions();
+  List<Partition> getPartitions();
 
   /**
    * Set the list of {@link Partition} objects comprising this container
-   *
+   * 
    * @param partitions List<Partition>
    */
-  void setPartitions(List<T> partitions);
+  void setPartitions(List<Partition> partitions);
 
   /**
    * Get a {@link Partition} at a given relative partition number index (base-1)
-   *
+   * 
    * @param partitionNumber
    * @return the {@link Partition} at the given index
    */
-  T getPartitionAt(int partitionNumber);
+  Partition getPartitionAt(int partitionNumber);
 
   /**
    * Set the number of partitions that this container can hold
-   *
+   * 
    * @param partitionLimit
    */
   void setPartitionLimit(int partitionLimit);
 
   /**
-   * Initialise this container with empty {@link Partition} objects of type T up to the specified partition limit
-   */
-  void initEmptyPartitions();
-
-  /**
    * Returns the platform of this Container object.
-   *
+   * 
    * @return Platform platform.
    */
   public Platform getPlatform();
 
   /**
    * Sets the platform of this Container object.
-   *
+   * 
    * @param platform Platform.
    */
   public void setPlatform(Platform platform);
 
-  /**
-   * If this container has been validated by an external piece of equipment, retrieve this barcode string
-   *
-   * @return String validationBarcode
-   */
-  public String getValidationBarcode();
+  @Override
+  public Collection<ChangeLog> getChangeLog();
 
-  /**
-   * If this container has been validated by an external piece of equipment, set the barcode string
-   *
-   * @param validationBarcode
-   */
-  public void setValidationBarcode(String validationBarcode);
+  // TODO: remove below fields to ChangeLoggable interface
+  public User getLastModifier();
 
-  /**
-   * Add new partition
-   *
-   *
-   */
-  public void addNewPartition();
+  public void setLastModifier(User user);
+
+  public Date getLastModified();
+
+  public void setLastModified(Date lastModified);
+
+  public User getCreator();
+
+  public void setCreator(User user);
+
+  public Date getCreationTime();
+
+  public void setCreationTime(Date creationTime);
+
+  void setClusteringKit(KitDescriptor clusteringKit);
+
+  KitDescriptor getClusteringKit();
+
+  KitDescriptor getMultiplexingKit();
+
+  void setMultiplexingKit(KitDescriptor multiplexingKit);
 }

@@ -135,7 +135,6 @@ table.dataTable tr.even td.sorting_3 { background-color: #F9F9FF; }
 /* Full number pagination */
 .paging_full_numbers {
 	height: 22px;
-	line-height: 22px;
 }
 .paging_full_numbers a:active {
 	outline: none

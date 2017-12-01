@@ -1,0 +1,6 @@
+-- StartNoTest
+DROP FUNCTION IF EXISTS `nextval`;
+DROP TRIGGER IF EXISTS PlateChange;
+DROP TRIGGER IF EXISTS PlateInsert;
+DROP TRIGGER IF EXISTS StatusChange;
+-- EndNoTest

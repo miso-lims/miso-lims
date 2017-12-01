@@ -7,6 +7,7 @@ import org.springframework.web.bind.support.SessionAttributeStore;
 import org.springframework.web.bind.support.WebBindingInitializer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+
 import uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer;
 import uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore;
 
@@ -14,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore;
  * uk.ac.bbsrc.tgac.miso.webapp.context
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 07/02/13
  * @since 0.1.9
@@ -36,11 +37,11 @@ public class WebConfig extends WebMvcConfigurationSupport {
     return sessionAttributeStore;
   }
 
+  @Override
   @Bean
   public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
     RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter();
     adapter.setWebBindingInitializer(bindingInitializer());
-    adapter.setSessionAttributeStore(sessionAttributeStore());
     return adapter;
   }
 }

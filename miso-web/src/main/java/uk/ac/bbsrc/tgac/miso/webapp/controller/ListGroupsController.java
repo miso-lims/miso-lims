@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -25,47 +25,47 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
+
 @Controller
 public class ListGroupsController {
-	protected static final Logger log = LoggerFactory.getLogger(ListGroupsController.class);
 
-	@Autowired
-	private SecurityManager securityManager;
+  private final ListItemsPage groupsPage = new ListItemsPageWithAuthorization("group", this::getSecurityManager);
 
-	public void setSecurityManager(SecurityManager securityManager) {
-		this.securityManager = securityManager;
-	}
+  @Autowired
+  private SecurityManager securityManager;
 
-	@RequestMapping("/admin/groups")
-	public ModelAndView adminListGroups() throws IOException {
-		try {
-			return new ModelAndView("/pages/listGroups.jsp", "groups", securityManager.listAllGroups());
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to list groups", ex);
-			}
-			throw ex;
-		}
-	}
+  @RequestMapping("/admin/groups")
+  public ModelAndView adminListGroups(ModelMap model) throws IOException {
+    return groupsPage.list(model, securityManager.listAllGroups().stream().map(Dtos::asDto));
+  }
 
-	@RequestMapping("/tech/groups")
-	public ModelAndView techListGroups() throws IOException {
-		try {
-			return new ModelAndView("/pages/listGroups.jsp", "groups", securityManager.listAllGroups());
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to list groups", ex);
-			}
-			throw ex;
-		}
-	}
+  public SecurityManager getSecurityManager() {
+    return securityManager;
+  }
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
+
+  @RequestMapping("/tech/groups")
+  public ModelAndView techListGroups(ModelMap model) throws IOException {
+    return groupsPage.list(model, securityManager.listAllGroups().stream().map(Dtos::asDto));
+  }
+
+  @ModelAttribute("title")
+  public String title() {
+    return "Groups";
+  }
 }

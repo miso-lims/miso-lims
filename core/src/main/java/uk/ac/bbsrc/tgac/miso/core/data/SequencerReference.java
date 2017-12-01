@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,33 +23,142 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import java.io.Serializable;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.Set;
 
 /**
- * A SequencerReference is a {@link HardwareReference} specifically designated with a {@link Platform}
- *
+ * A SequencerReference is a sequencing machine specifically designated with a {@link Platform}
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-public interface SequencerReference extends HardwareReference, Deletable {
+public interface SequencerReference extends Nameable, Deletable, Serializable {
+  /**
+   * Sets the id of this SequencerReference object.
+   * 
+   * @param id
+   *          id.
+   */
+  void setId(Long id);
+
+  /**
+   * Sets the name of this SequencerReference object.
+   * 
+   * @param name
+   *          name.
+   */
+  void setName(String name);
+
   /**
    * Sets the platform of this SequencerReference object.
-   *
-   * @param platform platform.
+   * 
+   * @param platform
+   *          platform.
    */
   void setPlatform(Platform platform);
-  
+
   /**
    * Returns the platform of this SequencerReference object.
-   *
+   * 
    * @return Platform platform.
    */
   Platform getPlatform();
+  
+  /**
+   * Sets the serial number of this SequencerReference object.
+   * 
+   * @param serialNumber of type String
+   */
+  public void setSerialNumber(String serialNumber);
+  
+  /**
+   * Returns the serial number of this SequencerReference object.
+   * 
+   * @return String serialNumber
+   */
+  public String getSerialNumber();
+
+  /**
+   * Sets the ipAddress of this SequencerReference object.
+   * 
+   * @param ip of type String
+   */
+  void setIpAddress(String ip);
+
+  /**
+   * Returns the String ipAddress of this SequencerReference object.
+   * 
+   * @return String ipAddress.
+   */
+  String getIpAddress();
+
+  /**
+   * Returns the fully qualified domain name (FQDN) of this SequencerReference object.
+   * 
+   * @return String FQDN.
+   * @throws UnknownHostException
+   */
+  String getFQDN() throws UnknownHostException;
+
+  /**
+   * Sets the date when use of this sequencer began
+   * 
+   * @param date
+   */
+  public void setDateCommissioned(Date date);
+  
+  /**
+   * @return the date when use of this sequencer began
+   */
+  public Date getDateCommissioned();
+  
+  /**
+   * Sets the date when use of this sequencer ended
+   * 
+   * @param date
+   */
+  public void setDateDecommissioned(Date date);
+  
+  /**
+   * @return the date when use of this sequencer ended
+   */
+  public Date getDateDecommissioned();
+  
+  /**
+   * Sets the upgraded sequencer reference, which is a new version of this same sequencer, likely renamed during an upgrade
+   * 
+   * @param sequencer
+   */
+  public void setUpgradedSequencerReference(SequencerReference sequencer);
+  
+  /**
+   * @return the upgraded sequencer reference, which is a new version of this same sequencer, likely renamed during an upgrade
+   */
+  public SequencerReference getUpgradedSequencerReference();
+  
+  /**
+   * @return true if the sequencer is currently being used in production; false if it is retired
+   */
+  public boolean isActive();
+  
+  /**
+   * @param date the date when this sequencer was most recently serviced
+   */
+  public void setLastServicedDate(Date date);
+  
+  /**
+   * @return the service date of the most recent service record for this sequencer, or null if there are no such service records
+   */
+  public Date getLastServicedDate();
+  
+  Set<Run> getRuns();
+
+  void setRuns(Set<Run> runs);
+
+  Set<SequencerServiceRecord> getServiceRecords();
+
+  void setServiceRecords(Set<SequencerServiceRecord> serviceRecords);
+
 }

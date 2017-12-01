@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,45 +23,28 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
-import java.util.Collection;
+import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 /**
  * Controller for listing libraries
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Controller
 public class ListLibrariesController {
-  protected static final Logger log = LoggerFactory.getLogger(ListLibrariesController.class);
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  @ModelAttribute("title")
+  public String title() {
+    return "Libraries";
   }
-
-  @Deprecated
-  @RequestMapping(value = "/libraries/rest/", method = RequestMethod.GET)
-  public @ResponseBody Collection<Library> jsonRest() throws IOException {
-    return requestManager.listAllLibraries();
-  }
-
   @RequestMapping("/libraries")
-  public ModelAndView listLibraries() throws Exception {
-    return new ModelAndView("/pages/listLibraries.jsp");
+  public ModelAndView listLibraries(ModelMap model) throws Exception {
+    return new ListItemsPage("library").list(model);
   }
 }

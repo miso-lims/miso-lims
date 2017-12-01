@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,38 +23,49 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
+import javax.persistence.Table;
+
+import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 
 /**
- * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC analysis. 
+ * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC
+ * analysis.
  * <p/>
  * See:
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-public class QcType implements Comparable, Serializable {
+@Entity
+@Table(name = "QCType")
+public class QcType implements Comparable<QcType>, Serializable {
+  private static final long serialVersionUID = 1L;
+
   public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryTypeId  */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long qcTypeId = QcType.UNSAVED_ID;
-  /** Field name */
   private String name;
-  /** Field description  */
   private String description;
-  /** Field qcTarget  */
-  private String qcTarget;
-  /** Field units  */
+  /** Refers to the entity to which this QcType can be applied (e.g. Sample, Pool, Run) */
+  @Enumerated(EnumType.STRING)
+  private QcTarget qcTarget;
   private String units;
+  private Integer precisionAfterDecimal;
+  private boolean archived;
 
   /**
    * Returns the qcTypeId of this QcType object.
-   *
+   * 
    * @return Long qcTypeId.
    */
   public Long getQcTypeId() {
@@ -63,8 +74,9 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Sets the qcTypeId of this QcType object.
-   *
-   * @param qcTypeId qcTypeId.
+   * 
+   * @param qcTypeId
+   *          qcTypeId.
    */
   public void setQcTypeId(Long qcTypeId) {
     this.qcTypeId = qcTypeId;
@@ -72,7 +84,7 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Returns the name of this QcType object.
-   *
+   * 
    * @return String name.
    */
   public String getName() {
@@ -81,8 +93,9 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Sets the name of this QcType object.
-   *
-   * @param name name.
+   * 
+   * @param name
+   *          name.
    */
   public void setName(String name) {
     this.name = name;
@@ -90,7 +103,7 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Returns the description of this LibraryType object.
-   *
+   * 
    * @return String description.
    */
   public String getDescription() {
@@ -99,8 +112,9 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Sets the description of this LibraryType object.
-   *
-   * @param description description.
+   * 
+   * @param description
+   *          description.
    */
   public void setDescription(String description) {
     this.description = description;
@@ -108,25 +122,26 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Returns the qcTarget of this QcType object.
-   *
+   * 
    * @return String qcTarget.
    */
-  public String getQcTarget() {
+  public QcTarget getQcTarget() {
     return qcTarget;
   }
 
   /**
    * Sets the qcTarget of this QcType object.
-   *
-   * @param qcTarget qcTarget.
+   * 
+   * @param qcTarget
+   *          qcTarget.
    */
-  public void setQcTarget(String qcTarget) {
+  public void setQcTarget(QcTarget qcTarget) {
     this.qcTarget = qcTarget;
   }
 
   /**
    * Returns the units of this QcType object.
-   *
+   * 
    * @return String units.
    */
   public String getUnits() {
@@ -135,48 +150,100 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Sets the units of this QcType object.
-   *
-   * @param units units.
+   * 
+   * @param units
+   *          units.
    */
   public void setUnits(String units) {
     this.units = units;
   }
 
+  /**
+   * Represents the number of digits after a decimal that this QcType is capable of offering.
+   * A precision of zero represents an Integer.
+   * A precision of -1 represents a boolean. A QC performed with a boolean precision QcType should have a result of either 1 or 0.
+   * 
+   * @return Integer precisionAfterDecimal
+   */
+  public Integer getPrecisionAfterDecimal() {
+    return precisionAfterDecimal;
+  }
+
+  /**
+   * Sets the precision of this QcType object.
+   * 
+   * @param precisionAfterDecimal
+   */
+  public void setPrecisionAfterDecimal(Integer precisionAfterDecimal) {
+    this.precisionAfterDecimal = precisionAfterDecimal;
+  }
+
+  /**
+   * Returns whether this QcType is archived
+   * 
+   * @return boolean archived
+   */
+  public boolean isArchived() {
+    return archived;
+  }
+
+  /**
+   * Sets the archived value for this QcType object.
+   * 
+   * @param archived
+   */
+  public void setArchived(boolean archived) {
+    this.archived = archived;
+  }
+
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof QcType))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof QcType)) return false;
     QcType them = (QcType) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    return getName().equals(them.getName());
+    return getName().equals(them.getName()) && getQcTarget().equals(them.getQcTarget());
   }
 
   @Override
   public int hashCode() {
     if (getQcTypeId() != UNSAVED_ID) {
       return getQcTypeId().intValue();
-    }
-    else {
+    } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
+      if (getQcTarget() != null) hashcode = 37 * hashcode + getQcTarget().hashCode();
       return hashcode;
     }
   }
 
   @Override
-  public int compareTo(Object o) {
-    QcType t = (QcType)o;
-    int name = getName().compareTo(t.getName());
-    if (name != 0) return name;
+  public int compareTo(QcType t) {
+    if (getName() != null && t.getName() != null) {
+      int name = getName().compareTo(t.getName());
+      if (name != 0) return name;
+    }
 
     if (getQcTypeId() < t.getQcTypeId()) return -1;
     if (getQcTypeId() > t.getQcTypeId()) return 1;
     return 0;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getQcTypeId());
+    sb.append(" : ");
+    sb.append(getName());
+    sb.append(" : ");
+    sb.append(getDescription());
+    sb.append(" : ");
+    sb.append(getQcTarget());
+    sb.append(" : ");
+    sb.append(getUnits());
+    return sb.toString();
   }
 }

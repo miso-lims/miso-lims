@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -27,12 +27,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * uk.ac.bbsrc.tgac.miso.core.exception
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03-Sep-2010
  * @since 0.0.2
  */
 public class InputFormException extends Exception {
+  private static final long serialVersionUID = 1L;
+
   public InputFormException(String s) {
     super(s);
   }
@@ -40,7 +42,7 @@ public class InputFormException extends Exception {
   public InputFormException(String s, Throwable cause) {
     super(s);
     if (cause != null) {
-        initCause(cause);
+      initCause(cause);
     }
   }
 }

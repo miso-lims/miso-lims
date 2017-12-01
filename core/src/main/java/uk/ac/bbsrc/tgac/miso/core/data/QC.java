@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,79 +23,123 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.Securable;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-
+import java.io.Serializable;
 import java.util.Date;
 
-/**
- * A QC represents a validation step carried out on a given model object,
- * e.g. a {@link Library} via a {@link LibraryQC}, a {@link Sample} via a {@link SampleQC}, or a  {@link Run} via a
- * {@link RunQC}
- *
- * @author Rob Davey
- * @since 0.0.2
- */
-public interface QC extends Securable, Comparable, Deletable {
-  public long getId();
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
-  public void setId(long id);
+import com.eaglegenomics.simlims.core.User;
 
-  /**
-   * Returns the qcId of this QC object.
-   *
-   * @return Long qcId.
-   */
-  @Deprecated
-  public Long getQcId();
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
-  /**
-   * Sets the qcId of this QC object.
-   *
-   * @param qcId qcId.
-   */
-  @Deprecated
-  public void setQcId(Long qcId);
+@MappedSuperclass
+public abstract class QC implements Serializable, Comparable<QC> {
+  private static final long serialVersionUID = 1L;
 
-  /**
-   * Returns the qcCreator of this QC object.
-   *
-   * @return String qcCreator.
-   */
-  public String getQcCreator();
+  public static final Long UNSAVED_ID = 0L;
 
-  /**
-   * Sets the qcCreator of this QC object.
-   *
-   * @param creator qcCreator.
-   */
-  public void setQcCreator(String creator);
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator")
+  private User creator;
 
-  /**
-   * Returns the qcMethod of this QC object.
-   *
-   * @return String qcMethod.
-   */
-  public QcType getQcType();
+  @Temporal(TemporalType.DATE)
+  private Date date = new Date();
 
-  /**
-   * Sets the QcType of this QC object.
-   *
-   * @param type type.
-   */
-  public void setQcType(QcType type);
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long qcId = QC.UNSAVED_ID;
 
-  /**
-   * Returns the qcDate of this QC object.
-   *
-   * @return Date qcDate.
-   */
-  public Date getQcDate();
+  private Double results;
 
-  /**
-   * Sets the qcDate of this QC object.
-   *
-   * @param date qcDate.
-   */
-  public void setQcDate(Date date);
+  @ManyToOne
+  @JoinColumn(name = "type")
+  private QcType type;
+
+  public User getCreator() {
+    return creator;
+  }
+
+  public Date getDate() {
+    return date;
+  }
+
+  public abstract QualityControlEntity getEntity();
+
+  public long getId() {
+    return qcId;
+  }
+
+  public Double getResults() {
+    return results;
+  }
+
+  public QcType getType() {
+    return type;
+  }
+
+  public void setCreator(User creator) {
+    this.creator = creator;
+  }
+
+  public void setDate(Date date) {
+    this.date = date;
+  }
+
+  public void setId(long qcId) {
+    this.qcId = qcId;
+  }
+
+  public void setResults(Double results) {
+    this.results = results;
+  }
+
+  public void setType(QcType type) {
+    this.type = type;
+  }
+
+  @Override
+  public int compareTo(QC o) {
+    if (type != null && !type.equals(o.getType())) {
+      return type.compareTo(o.getType());
+    }
+    return date.compareTo(o.getDate());
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((date == null) ? 0 : date.hashCode());
+    result = prime * result + (int) (qcId ^ (qcId >>> 32));
+    result = prime * result + ((results == null) ? 0 : results.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    QC other = (QC) obj;
+    if (date == null) {
+      if (other.date != null) return false;
+    } else if (!date.equals(other.date)) return false;
+    if (qcId != other.qcId) return false;
+    if (results == null) {
+      if (other.results != null) return false;
+    } else if (!results.equals(other.results)) return false;
+    if (type == null) {
+      if (other.type != null) return false;
+    } else if (!type.equals(other.type)) return false;
+    return true;
+  }
 }

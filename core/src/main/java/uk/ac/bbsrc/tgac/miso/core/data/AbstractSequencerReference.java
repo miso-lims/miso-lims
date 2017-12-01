@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,28 +23,72 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.InetAddress;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 
 /**
- * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer 
- *
+ * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
+@MappedSuperclass
 public abstract class AbstractSequencerReference implements SequencerReference {
-  protected static final Logger log = LoggerFactory.getLogger(AbstractSequencerReference.class);
+
+  private static final long serialVersionUID = 1L;
+
+  private static final Logger log = LoggerFactory.getLogger(AbstractSequencerReference.class);
 
   public static final Long UNSAVED_ID = 0L;
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "referenceId")
   private long id = AbstractSequencerReference.UNSAVED_ID;
+
+  @Column(nullable = false)
   private String name;
+
+  @ManyToOne(targetEntity = Platform.class)
+  @JoinColumn(name = "platformId", nullable = false)
   private Platform platform;
-  private Boolean available;
-  private InetAddress ip;
+
+  private String ip;
+
+  private String serialNumber;
+  @Temporal(TemporalType.DATE)
+  private Date dateCommissioned;
+  @Temporal(TemporalType.DATE)
+  private Date dateDecommissioned = null;
+
+  @OneToOne(targetEntity = SequencerReferenceImpl.class, optional = true)
+  @JoinColumn(name = "upgradedSequencerReferenceId")
+  private SequencerReference upgradedSequencerReference;
+
+  @Transient
+  private Date lastServicedDate;
 
   @Override
   public void setId(Long id) {
@@ -66,52 +110,137 @@ public abstract class AbstractSequencerReference implements SequencerReference {
     return this.name;
   }
 
+  @Override
   public void setPlatform(Platform platform) {
     this.platform = platform;
   }
 
+  @Override
   public Platform getPlatform() {
     return this.platform;
   }
 
-  public void setAvailable(Boolean available) {
-    this.available = available;
+  @Override
+  public void setIpAddress(String ip) {
+    if (ip == null) {
+      this.ip = null;
+    } else {
+      try {
+        InetAddress inet = InetAddress.getByName(ip);
+        this.ip = (inet != null ? inet.getHostAddress() : null);
+      } catch (IOException e) {
+        log.error("Error getting InetAddress from given ip " + ip, e);
+        throw new IllegalArgumentException("Error getting InetAddress from given ip " + ip, e);
+      }
+    }
   }
 
-  public Boolean getAvailable() {
-    return this.available;
-  }
-
-  public void checkAvailability(int timeout) throws IOException {
-    this.available = getIpAddress().isReachable(timeout);
-  }
-
-  public void setIpAddress(InetAddress ip) {
-    this.ip = ip;
-  }
-
-  public InetAddress getIpAddress() {
+  @Override
+  public String getIpAddress() {
     return this.ip;
   }
 
-  public String getFQDN() {
-    return getIpAddress().getCanonicalHostName();
+  @Override
+  public void setSerialNumber(String serialNumber) {
+    this.serialNumber = serialNumber;
   }
 
+  @Override
+  public String getSerialNumber() {
+    return serialNumber;
+  }
+
+  @Override
+  public void setDateCommissioned(Date date) {
+    this.dateCommissioned = date;
+  }
+
+  @Override
+  public Date getDateCommissioned() {
+    return dateCommissioned;
+  }
+
+  @Override
+  public void setDateDecommissioned(Date date) {
+    this.dateDecommissioned = date;
+  }
+
+  @Override
+  public Date getDateDecommissioned() {
+    return dateDecommissioned;
+  }
+
+  @Override
+  public void setUpgradedSequencerReference(SequencerReference sequencer) {
+    this.upgradedSequencerReference = sequencer;
+  }
+
+  @Override
+  public SequencerReference getUpgradedSequencerReference() {
+    return upgradedSequencerReference;
+  }
+
+  @Override
+  public String getFQDN() throws UnknownHostException {
+    return getIpAddress() == null ? null : InetAddress.getByName(getIpAddress()).getCanonicalHostName();
+  }
+
+  @Override
   public boolean isDeletable() {
     return getId() != AbstractSequencerReference.UNSAVED_ID;
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getId());
-    sb.append(" : ");
-    sb.append(getName());
-    sb.append(" : ");
-    sb.append(getFQDN());
-    sb.append(" : ");
-    sb.append(getAvailable());
-    return sb.toString();
+    return "AbstractSequencerReference [id=" + id
+        + ", name=" + name
+        + ", platform=" + platform.getId()
+        + ", ip=" + ip
+        + ", serialNumber=" + serialNumber
+        + ", dateCommissioned=" + dateCommissioned
+        + ", dateDecommissioned=" + dateDecommissioned
+        + ", upgradedSequencerReference=" + (upgradedSequencerReference == null ? null : upgradedSequencerReference.getId()) + "]";
   }
+  
+  @Override
+  public boolean isActive() {
+    return dateDecommissioned == null;
+  }
+  
+  @Override
+  public void setLastServicedDate(Date date) {
+    this.lastServicedDate = date;
+  }
+  
+  @Override
+  public Date getLastServicedDate() {
+    return lastServicedDate;
+  }
+  
+  @OneToMany(targetEntity = Run.class, mappedBy = "sequencerReference")
+  private Set<Run> runs = new HashSet<>();
+
+  @Override
+  public Set<Run> getRuns() {
+    return runs;
+  }
+
+  @Override
+  public void setRuns(Set<Run> runs) {
+    this.runs = runs;
+  }
+
+  @OneToMany(targetEntity = SequencerServiceRecord.class, mappedBy = "sequencerReference")
+  private Set<SequencerServiceRecord> serviceRecords = new HashSet<>();
+
+  @Override
+  public Set<SequencerServiceRecord> getServiceRecords() {
+    return serviceRecords;
+  }
+
+  @Override
+  public void setServiceRecords(Set<SequencerServiceRecord> serviceRecords) {
+    this.serviceRecords = serviceRecords;
+  }
+
 }

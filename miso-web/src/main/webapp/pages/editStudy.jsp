@@ -1,6 +1,6 @@
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -31,18 +31,20 @@
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form action="/miso/study" method="POST" commandName="study" autocomplete="off"
-               onsubmit="return validate_study(this);">
+    <form:form id="study-form" data-parsley-validate="" action="/miso/study" method="POST" commandName="study" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="study"/>
       <h1>
         <c:choose>
           <c:when test="${study.id != 0}">Edit</c:when>
           <c:otherwise>Create</c:otherwise>
         </c:choose> Study
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button id="save" type="submit" class="fg-button ui-state-default ui-corner-all" onclick="return Study.validateStudy();">Save</button>
       </h1>
       <div class="breadcrumbs">
         <ul>
@@ -52,10 +54,10 @@
           <li>
             <div class="breadcrumbsbubbleInfo">
               <div class="trigger">
-                <a href='<c:url value="/miso/project/${study.project.id}"/>'>${study.project.name}</a>
+                <a href='<c:url value="/miso/project/${study.project.id}"/>'>${study.project.alias}</a>
               </div>
               <div class="breadcrumbspopup">
-                  ${study.project.alias}
+                  ${study.project.name}
               </div>
             </div>
           </li>
@@ -67,43 +69,47 @@
       <div id="notediv" class="note" style="display:none;">A Study contains more fine-grained information about
         the sequencing Project. Studies can contain any number of sequencing Experiments and Analysis.
       </div>
+
+      <div class="bs-callout bs-callout-warning hidden">
+        <h2>Oh snap!</h2>
+        <p>This form seems to be invalid</p>
+      </div>
+
       <h2>Study Information</h2>
       <table class="in">
       <tr>
         <td class="h">Study ID:</td>
-        <td>
+        <td><span id="studyId">
           <c:choose>
             <c:when test="${study.id != 0}">${study.id}</c:when>
             <c:otherwise><i>Unsaved</i></c:otherwise>
           </c:choose>
-        </td>
+        </span></td>
       </tr>
       <tr>
-        <td class="h">Project ID:</td>
+        <td class="h">Project Name:</td>
         <td>
           <input type="hidden" value="${study.project.id}" name="project" id="project"/>
-          <a href='<c:url value="/miso/project/${study.project.id}"/>'>${study.project.name}</a>
+          <a href='<c:url value="/miso/project/${study.project.id}"/>'><span id="projectName">${study.project.name}</span></a>
         </td>
       </tr>
       <tr>
         <td>Name:</td>
-        <td>
+        <td><span id="name">
           <c:choose>
             <c:when test="${study.id != 0}">${study.name}</c:when>
             <c:otherwise><i>Unsaved</i></c:otherwise>
           </c:choose>
-        </td>
+        </span></td>
       </tr>
       <tr>
         <td class="h">Alias:</td>
-        <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
-          <%--<td><a href="void(0);" onclick="popup('help/studyAlias.html');">Help</a></td>--%>
+        <td><form:input id="alias" path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
       </tr>
       <tr>
         <td>Description:</td>
-        <td><form:input path="description" class="validateable"/><span id="descriptioncounter" class="counter"></span>
+        <td><form:input id="description" path="description" class="validateable"/><span id="descriptioncounter" class="counter"></span>
         </td>
-          <%--<td><a href="void(0);" onclick="popup('help/studyDescription.html');">Help</a></td>--%>
       </tr>
       <c:if test="${not empty study.accession}">
         <tr>
@@ -111,20 +117,19 @@
           <td><a href="http://www.ebi.ac.uk/ena/data/view/${study.accession}"
                  target="_blank">${study.accession}</a>
           </td>
-            <%--<td><a href="void(0);" onclick="popup('help/studyAccession.html');">Help</a></td>--%>
         </tr>
       </c:if>
       <tr>
         <td>Study Type:</td>
-        <td><form:select items="${studyTypes}" path="studyType"/></td>
+        <td><miso:select id="studyType" path="studyType" items="${studyTypes}" itemLabel="name" itemValue="id" /></td>
       </tr>
       <c:choose>
-        <c:when test="${!empty project and study.securityProfile.profileId eq project.securityProfile.profileId}">
+        <c:when test="${study.securityProfile.profileId eq study.project.securityProfile.profileId}">
           <tr>
             <td>Permissions</td>
             <td><i>Inherited from project </i><a
-                href='<c:url value="/miso/project/${project.id}"/>'>${project.name}</a>
-              <input type="hidden" value="${project.securityProfile.profileId}"
+                href='<c:url value="/miso/project/${project.id}"/>'>${study.project.name}</a>
+              <input type="hidden" value="${study.project.securityProfile.profileId}"
                      name="securityProfile" id="securityProfile"/>
             </td>
           </tr>
@@ -136,74 +141,19 @@
         </c:otherwise>
       </c:choose>
       <br/>
-
-      <c:choose>
-        <c:when test="${study.id != 0}">
-          <h1>
-            <div id="totalCount">
-            </div>
-          </h1>
-          <ul class="sddm">
-            <li>
-              <a onmouseover="mopen('expmenu')" onmouseout="mclosetime()">Options
-                <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-              </a>
-
-              <div id="expmenu"
-                   onmouseover="mcancelclosetime()"
-                   onmouseout="mclosetime()">
-                <a href='<c:url value="/miso/experiment/new/${study.id}"/>' class="add">Add new
-                  Experiment</a>
-              </div>
-            </li>
-          </ul>
-          <span style="clear:both">
-            <table class="list" id="table">
-              <thead>
-              <tr>
-                <th>Experiment Name</th>
-                <th>Experiment Alias</th>
-                <th>Description</th>
-                <th>Platform</th>
-                <th class="fit">Edit</th>
-              </tr>
-              </thead>
-              <tbody>
-              <c:forEach items="${study.experiments}" var="experiment">
-                <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                  <td><b>${experiment.name}</b></td>
-                  <td>${experiment.alias}</td>
-                  <td>${experiment.description}</td>
-                  <td>${experiment.platform.platformType.key}
-                    - ${experiment.platform.instrumentModel}</td>
-                  <td class="misoicon"
-                      onclick="window.location.href='<c:url value="/miso/experiment/${experiment.id}"/>'">
-                    <span class="ui-icon ui-icon-pencil"/></td>
-                </tr>
-              </c:forEach>
-              </tbody>
-            </table>
-          </span>
-          <script type="text/javascript">
-            jQuery(document).ready(function () {
-              jQuery("#table").tablesorter({
-                headers: {
-                  4: {
-                    sorter: false
-                  }
-                }
-              });
-            });
-            jQuery(document).ready(function () {
-              writeTotalNo();
-            });
-            function writeTotalNo() {
-              jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Experiments");
-            }
-          </script>
-        </c:when>
-      </c:choose>
+      
+      <script type="text/javascript">
+        jQuery(document).ready(function () {
+          // Attaches a Parsley form validator. 
+          Validate.attachParsley('#study-form');
+        });
+      </script>
     </form:form>
+
+    <c:if test="${study.id != 0}">
+        <miso:list-section id="list_experiments" alwaysShow="true" name="Experiments" target="experiment" items="${experiments}" config="{ studyId : ${study.id} }"/>
+    </c:if>
+    <miso:changelog item="${study}"/>
   </div>
 </div>
 

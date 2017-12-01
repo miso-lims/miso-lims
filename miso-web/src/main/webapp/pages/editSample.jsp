@@ -1,6 +1,6 @@
 <%--
   ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ MISO project contacts: Robert Davey @ TGAC
   ~ **********************************************************************
   ~
   ~ This file is part of MISO.
@@ -34,36 +34,36 @@
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
-<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
+<link href="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.css'/>" rel="stylesheet" type="text/css" />
+<script src="<c:url value='/scripts/handsontable/dist/pikaday/pikaday.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/handsontable/dist/moment/moment.js'/>" type="text/javascript"></script>
 
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-
-<script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/handsontable/dist/handsontable.full.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/handsontable_renderers.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" media="screen" href="/scripts/handsontable/dist/handsontable.full.css">
 
 <div id="maincontent">
 <div id="contentcolumn">
-<c:if test="${sample.id == 0 and not empty sample.project}">
-<div id="tabs">
-<ul>
-  <li><a href="#tab-1"><span>Single</span></a></li>
-  <li><a href="#tab-2"><span>Bulk</span></a></li>
-</ul>
 
-<div id="tab-1">
-</c:if>
-
-<form:form action="/miso/sample" method="POST" commandName="sample" autocomplete="off" acceptCharset="utf-8">
+<form:form id="sample-form" data-parsley-validate="" action="/miso/sample" method="POST" commandName="sample" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="sample"/>
+<input type="hidden" id="sampleCategory" name="sampleCategory" value="${sampleId eq 0 ? 'new' : sampleCategory}"/>
 <h1>
   <c:choose>
-    <c:when test="${sample.id != 0}">Edit</c:when>
-    <c:otherwise>Create</c:otherwise>
+    <c:when test="${sample.id != 0}"><span id="status" data-status="edit">Edit</span></c:when>
+    <c:otherwise><span id="status" data-status="create">Create</span></c:otherwise>
   </c:choose> Sample
   <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return validate_sample(this.form);">Save
+      onclick="return Sample.validateSample(${detailedSample},
+      ${detailedSample && (sample.hasNonStandardAlias() || sample.parent.hasNonStandardAlias())}, ${sample.id == 0});">
+    Save
   </button>
 </h1>
+<div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
+  <c:if test="${sample.id != 0 && not empty sample.identificationBarcode}"><span class="ui-button ui-state-default" onclick="Utils.printDialog('sample', [${sample.id}]);">Print Barcode</span></c:if>
+</div>
 
 <c:if test="${not empty sample.project}">
   <div class="breadcrumbs">
@@ -74,10 +74,10 @@
       <li>
         <div class="breadcrumbsbubbleInfo">
           <div class="trigger">
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
+            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${detailedSample ? sample.project.shortName : sample.project.alias}</a>
           </div>
           <div class="breadcrumbspopup">
-              ${sample.project.alias}
+              ${sample.project.name}
           </div>
         </div>
       </li>
@@ -101,181 +101,516 @@
   sequencing experiments are to be based. Samples can be used in any number of sequencing Experiments in the form
   of a Library that is often processed further into pooled Dilutions.
 </div>
-<h2>Sample Information</h2>
 
-<div class="barcodes">
-  <div class="barcodeArea ui-corner-all">
-    <c:choose>
-      <c:when test="${empty sample.locationBarcode}">
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span><form:input
-          path="locationBarcode" size="8"/>
-      </c:when>
-      <c:otherwise>
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span>
-        <ul class="barcode-ddm">
-          <li>
-            <a onmouseover="mopen('locationBarcodeMenu')" onmouseout="mclosetime()">
-              <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-              <span id="locationBarcode" style="float:right; margin-top:6px; padding-bottom: 11px;">${sample.locationBarcode}</span>
-            </a>
-
-            <div id="locationBarcodeMenu"
-                 onmouseover="mcancelclosetime()"
-                 onmouseout="mclosetime()">
-              <a href="javascript:void(0);"
-                 onclick="Sample.ui.showSampleLocationChangeDialog(${sample.id});">Change
-                location</a>
-            </div>
-          </li>
-        </ul>
-        <div id="changeSampleLocationDialog" title="Change Sample Location"></div>
-      </c:otherwise>
-    </c:choose>
-  </div>
-  <div class="barcodeArea ui-corner-all">
-    <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
-    <c:if test="${not empty sample.identificationBarcode}">
-      <ul class="barcode-ddm">
-        <li>
-          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
-            <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-            <span id="idBarcode" style="float:right"></span>
-          </a>
-
-          <div id="idBarcodeMenu"
-               onmouseover="mcancelclosetime()"
-               onmouseout="mclosetime()">
-            <a href="javascript:void(0);"
-               onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
-          </div>
-        </li>
-      </ul>
-      <script type="text/javascript">
-        jQuery(document).ready(function () {
-          Fluxion.doAjax(
-            'sampleControllerHelperService',
-            'getSampleBarcode',
-            {
-              'sampleId':${sample.id},
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              jQuery('#idBarcode').html("<img style='height:30px; border:0;' src='<c:url value='/temp/'/>" + json.img + "'/>");
-            }
-          });
-        });
-      </script>
-    </c:if>
-  </div>
-  <div id="printServiceSelectDialog" title="Select a Printer"></div>
+<div class="bs-callout bs-callout-warning hidden">
+  <h2>Oh snap!</h2>
+  <p>This form seems to be invalid!</p>
 </div>
+
+<h2>Sample Information</h2>
 <div>
-  <table class="in">
+  <table class="in" <c:if test="${detailedSample && sample.isSynthetic()}">style="background-color: #ddd"</c:if>>
     <tr>
       <td class="h">Sample ID:</td>
-      <td>
+      <td><span id="sampleId">
         <c:choose>
           <c:when test="${sample.id != 0}">${sample.id}</c:when>
           <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
-      </td>
+      </span></td>
     </tr>
+    <c:if test="${detailedSample && sample.isSynthetic()}"><tr><td colspan="2" style="font-size: 200%; font-weight:bold;">This entity does not exist except for sample tracking purposes!</td></tr></c:if>
     <tr>
-      <td>Project ID:</td>
+      <td>Project:*</td>
       <c:choose>
         <c:when test="${empty sample.project}">
           <td>
-            <div id="projectlist" class="checklist">
-              <form:checkboxes items="${accessibleProjects}" path="project" itemValue="id"
-                               itemLabel="name" onclick="Utils.ui.uncheckOthers('project', this);"/>
-            </div>
+            <form:select id="project" path="project" onchange="Sample.ui.projectChanged();">
+              <option value="">SELECT</option>
+              <c:forEach items="${accessibleProjects}" var="proj">
+                <option value="${proj.id}" <c:if test="${proj.id == sample.project.id}">selected="selected"</c:if>>
+                  <c:choose>
+                    <c:when test="${detailedSample}">${proj.shortName} (${proj.name})</c:when>
+                    <c:otherwise>${proj.name}: ${proj.alias}</c:otherwise>
+                  </c:choose>
+                </option>
+              </c:forEach>
+            </form:select>
           </td>
         </c:when>
         <c:otherwise>
           <td>
             <input type="hidden" value="${sample.project.id}" name="project" id="project"/>
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
+            <a href='<c:url value="/miso/project/${sample.project.id}"/>'><span id="projectName">${sample.project.name} (<c:if test="${detailedSample}">${sample.project.shortName} &#8212; </c:if>${sample.project.alias})</span></a>
           </td>
         </c:otherwise>
       </c:choose>
     </tr>
     <tr>
       <td>Name:</td>
-      <td>
+      <td><span id="name">
         <c:choose>
           <c:when test="${sample.id != 0}">${sample.name}</c:when>
           <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
-      </td>
+      </span></td>
     </tr>
     <tr>
-      <td class="h">Alias:</td>
-      <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
-        <%--<td><a href="void(0);" onclick="popup('help/sampleAlias.html');">Help</a></td>--%>
+      <td class="h">
+        Alias:
+        <c:choose>
+          <c:when test="${!aliasGenerationEnabled || sample.id != 0}">
+            *
+          </c:when>
+          <c:otherwise>
+            (blank to auto-generate)
+          </c:otherwise>
+        </c:choose>
+      </td>
+      <td><form:input id="alias" path="alias" name="alias" data-parsley-required='${!aliasGenerationEnabled || sample.id != 0}'/><span id="aliasCounter" class="counter"></span>
+        <c:if test="${detailedSample}">
+          <c:if test="${sample.hasNonStandardAlias() || sample.parent.hasNonStandardAlias()}">
+	          <ul class="parsley-errors-list filled" id="nonStandardAlias">
+	            <li class="parsley-custom-error-message">
+	            Double-check this alias -- it will be saved even if it is duplicated or does not follow the naming standard!
+	            </li>
+	          </ul>
+	        </c:if>
+        </c:if>
+      </td>
     </tr>
     <tr>
       <td>Description:</td>
-      <td><form:input path="description" class="validateable"/><span id="descriptioncounter"
-                                                                     class="counter"></span>
+      <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span>
       </td>
-        <%--<td><a href="void(0);" onclick="popup('help/sampleDescription.html');">Help</a></td>--%>
     </tr>
+    <c:if test="${not autoGenerateIdBarcodes}">
+      <tr>
+        <td class="h">Matrix Barcode:</td>
+        <td><form:input id="identificationBarcode" path="identificationBarcode" name="identificationBarcode"/></td>
+      </tr>
+    </c:if>
     <tr>
       <td>Date of receipt:</td>
       <td>
-        <form:input path="receivedDate" id="receiveddatepicker"/>
+        <form:input path="receivedDate" id="receiveddatepicker" placeholder="YYYY-MM-DD"/>
         <script type="text/javascript">
           Utils.ui.addDatePicker("receiveddatepicker");
         </script>
       </td>
     </tr>
     <tr>
-      <td class="h">Scientific Name:</td>
-      <td><form:input path="scientificName"/>
+      <td class="h">Scientific Name:*</td>
+      <td><form:input id="scientificName" path="scientificName" value="${sample.scientificName.length() > 0 ? sample.scientificName : defaultSciName}" /><span id="scientificNameCounter" class="counter"></span>
         <c:if test="${sessionScope.taxonLookupEnabled}">
-        <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), validate_ncbi_taxon, 1000, 2);</script>
+        <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), Sample.validateNCBITaxon, 1000, 2);</script>
+        </c:if>
       </td>
-      </c:if>
-        <%--<td><a href="void(0);" onclick="popup('help/sampleScientificName.html');">Help</a></td>--%>
     </tr>
     <c:if test="${not empty sample.accession}">
       <tr>
         <td class="h">Accession:</td>
         <td><a href="http://www.ebi.ac.uk/ena/data/view/${sample.accession}">${sample.accession}</a>
         </td>
-          <%--<td><a href="void(0);" onclick="popup('help/sampleAccession.html');">Help</a></td>--%>
       </tr>
     </c:if>
     <tr>
-      <td>Sample Type:</td>
+      <td>Sample Type:*</td>
       <td><form:select id="sampleTypes" path="sampleType" items="${sampleTypes}"/></td>
     </tr>
-    <tr bgcolor="yellow">
-      <td>QC Passed:</td>
-      <td>
-        <form:radiobutton path="qcPassed" value="" label="Unknown"/>
-        <form:radiobutton path="qcPassed" value="true" label="True"/>
-        <form:radiobutton path="qcPassed" value="false" label="False"/>
-      </td>
-    </tr>
     <c:choose>
-    <c:when
-        test="${!empty sample.project and sample.securityProfile.profileId eq sample.project.securityProfile.profileId}">
+    <c:when test="${not detailedSample}">
+	  <tr bgcolor="yellow">
+	    <td>QC Passed:</td>
+	    <td>
+	      <form:radiobutton path="qcPassed" value="" label="Unknown"/>
+	      <form:radiobutton path="qcPassed" value="true" label="True"/>
+	      <form:radiobutton path="qcPassed" value="false" label="False"/>
+	    </td>
+	  </tr>
+    </c:when>
+    <c:otherwise>
+      <tr>
+        <td>QC Status*:</td>
+        <td>
+          <miso:select id="detailedQcStatus" path="detailedQcStatus" items="${detailedQcStatuses}" itemLabel="description"
+                      itemValue="id" defaultLabel="Not Ready" defaultValue="" onchange="Sample.ui.detailedQcStatusChanged();"/>
+        </td>
+      </tr>
+      <tr id="qcStatusNote" style="display:none">
+        <td>QC Status Note*:</td>
+        <td><form:input id="detailedQcStatusNote" path="detailedQcStatusNote"/></td>
+      </tr> 
+      <c:if test="${not empty sample.detailedQcStatusNote}">
+	    <script type="text/javascript">
+	      jQuery(document).ready(function () {
+	        jQuery('#qcStatusNote').show('fast');
+	      });
+	    </script>
+      </c:if>
+    </c:otherwise>
+    </c:choose>
     <tr>
-      <td>Permissions</td>
-      <td><i>Inherited from project </i>
-        <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
-        <input type="hidden" value="${sample.project.securityProfile.profileId}"
-               name="securityProfile" id="securityProfile"/>
+      <td>Volume (&#181;l):</td>
+      <td><form:input id="volume" path="volume"/></td>
+    </tr>
+    <tr>
+      <td><label for="discarded">Discarded:</label></td>
+      <td><form:checkbox id="discarded" path="discarded"/></td>
+    </tr>
+    <tr>
+      <td class="h"><label for="locationBarcode">Location:</label></td>
+      <td><form:input id="locationBarcode" path="locationBarcode"/></td>
+    </tr>
+    <tr>
+      <td class="h">Box Location:</td>
+      <td>
+        <c:if test="${!empty sample.box.locationBarcode}">${sample.box.locationBarcode},</c:if>
+        <c:if test="${!empty sample.boxPosition}"><a href='<c:url value="/miso/box/${sample.box.id}"/>'>${sample.box.alias}, ${sample.boxPosition}</a></c:if>
       </td>
     </tr>
   </table>
-  </c:when>
-  <c:otherwise>
-    </table>
-    <%@ include file="permissions.jsp" %>
-  </c:otherwise>
+  <%@ include file="volumeControl.jspf" %>
+  <c:if test="${detailedSample}">
+
+    <script type="text/javascript">
+      <c:if test="${sample.id == 0}">
+        jQuery(document).ready(function () {
+          Sample.ui.sampleClassChanged();
+        });
+      </c:if>
+    </script>
+
+    <br/>
+    <div id="detailedSample">
+      <c:if test="${sampleCategory eq 'Identity' or sampleCategory eq 'new'}">
+        <br/>
+        <div id="detailedSampleIdentity">
+          <h2>Identity</h2>
+          <table class="in">
+            <c:if test="${sample.id == 0}">
+              <tr>
+                <td class="h">Parent:</td>
+                <td id="parentAliasTd"><span id="parentAlias"></span><form:input type="hidden" id="identityId" path="identityId"/></td>
+              </tr>
+            </c:if>
+            <tr>
+              <td class="h">External Names (comma separated):*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}">
+                    <span id="externalNameVal"></span>  <span id="externalNameDialog" title="Find or Create Identity"></span><button type="button" onclick="Sample.ui.showExternalNameChangeDialog()">Find or Create Identity</button>
+                    <form:input type="hidden" id="externalName" path="externalName"/>
+                  </c:when>
+                  <c:otherwise>
+                    <span id="externalName">${sample.externalName}</span>
+                  </c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Sex:</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}">
+                    <form:select id="donorSex" path="donorSex">
+                    <c:forEach var="donorSexOption" items="${donorSexOptions}">
+                      <option value="${donorSexOption}" <c:if test="${sample.donorSex == donorSexOption}">selected="selected"</c:if>>
+                        ${donorSexOption.label}
+                      </option>
+                    </c:forEach>
+                    </form:select>
+                  </c:when>
+                  <c:otherwise>
+                    ${sample.donorSex}
+                  </c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </c:if>
+
+      <br/>
+      <h2>Details</h2>
+      <table class="in">
+        <c:if test="${sample.id != 0}">
+          <tr>
+            <td class="h">Parent:</td>
+            <c:choose>
+              <c:when test="${empty sample.parent}">
+                <td>n/a</td>
+              </c:when>
+              <c:otherwise>
+                <td><a href='<c:url value="/miso/sample/${sample.parent.id}"/>'><span id="parentAlias">${sample.parent.alias}</span></a></td>
+              </c:otherwise>
+            </c:choose>
+          </tr>
+        </c:if>
+        <tr>
+          <td class="h">Sample Class:*</td>
+          <td>
+            <c:choose>
+              <c:when test="${sample.id == 0}">
+                <miso:select id="sampleClass" path="sampleClass" items="${sampleClasses}" itemLabel="alias"
+                    itemValue="id" defaultLabel="SELECT" defaultValue="" onchange="Sample.ui.sampleClassChanged();"/>
+              </c:when>
+              <c:otherwise>
+                <input type="hidden" id="sampleClass" value="${sample.sampleClass.id}"/>
+                <span id="sampleClassAlias">${sample.sampleClass.alias}</span>
+              </c:otherwise>
+            </c:choose>
+          </td>
+        </tr>
+        <tr>
+          <td class="h">Sub-project:</td>
+          <td>
+            <form:select id="subProject" path="subproject" onchange="Sample.ui.subProjectChanged()">
+              <%-- list filtered and filled by js --%>
+              <script type="text/javascript">
+                jQuery(document).ready(function () {
+                  Sample.ui.filterSubProjectOptions(${empty sample.subproject ? null : sample.subproject.id});
+                });
+              </script>
+            </form:select>
+          </td>
+        </tr>
+        <tr>
+          <td class="h">Group ID:</td>
+          <td>
+            <form:input id="groupId" path="groupId"/>
+          </td>
+        </tr>
+        <tr>
+          <td class="h">Group Description:</td>
+          <td>
+            <form:input id="groupDescription" path="groupDescription"/>
+          </td>
+        </tr>
+        <tr>
+          <td class="h">Concentration (${sampleConcentrationUnits}):</td>
+          <td><form:input id="concentration" path="concentration"/></td>
+        </tr>
+      </table>
+
+      <c:if test="${sampleCategory eq 'Tissue' or sampleCategory eq 'new'}">
+        <br/>
+        <div id="detailedSampleTissue">
+          <h2>Tissue</h2>
+          <table class="in">
+            <c:if test="${sample.id == 0}">
+              <tr id="tissueClassRow">
+                <td class="h">Tissue Class:*</td>
+                <td>
+                  <miso:select id="tissueClass" path="tissueClass" items="${tissueClasses}" itemLabel="alias"
+                      itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+                </td>
+              </tr>
+            </c:if>
+            <tr>
+              <td class="h">Tissue Origin:*</td>
+              <td>
+                 <miso:select id="tissueOrigin" path="tissueOrigin" items="${tissueOrigins}" itemLabel="itemLabel"
+                     itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Tissue Type:*</td>
+              <td>
+                 <miso:select id="tissueType" path="tissueType" items="${tissueTypes}" itemLabel="itemLabel"
+                     itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Passage Number:</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}"><form:input id="passageNumber" path="passageNumber"/></c:when>
+                  <c:otherwise><span id="passageNumber">${!empty sample.passageNumber ? sample.passageNumber : 'n/a'}</span></c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Times Received:*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}"><form:input id="timesReceived" path="timesReceived"/></c:when>
+                  <c:otherwise><span id="timesReceived">${!empty sample.timesReceived ? sample.timesReceived : 'n/a'}</span></c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Tube Number:*</td>
+              <td>
+                <c:choose>
+                  <c:when test="${sample.id == 0}"><form:input id="tubeNumber" path="tubeNumber"/></c:when>
+                  <c:otherwise><span id="tubeNumber">${!empty sample.tubeNumber ? sample.tubeNumber : 'n/a'}</span></c:otherwise>
+                </c:choose>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Tissue Material:</td>
+              <td>
+                <miso:select id="tissueMaterial" path="tissueMaterial" items="${tissueMaterials}" itemLabel="alias"
+                    itemValue="id" defaultLabel="SELECT" defaultValue=""/>
+              </td>
+            </tr>
+            <tr>
+              <td class="h">Region:</td>
+              <td><form:input id="region" path="region"/></td>
+            </tr>
+            <tr>
+              <td class="h">Secondary Identifier:</td>
+              <td><form:input id="secondaryIdentifier" path="secondaryIdentifier"/></td>
+            </tr>
+            <tr>
+              <td class="h">Lab:</td>
+              <td>
+               <miso:select id="lab" path="lab" items="${labs}" itemLabel="itemLabel" itemValue="id" defaultLabel="SELECT"
+                   defaultValue=""/>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </c:if>
+
+      <c:if test="${sampleCategory eq 'Tissue Processing' or sampleCategory eq 'new'}">
+        <br/>
+        <c:choose>
+        <c:when test="${sampleClass eq 'Slide' or sampleCategory eq 'new'}">
+        <div id="slideTable">
+          <h2>Tissue Processing</h2>
+          <table class="in">
+            <tr>
+              <td class="h">Slides Remaining:</td>
+              <td id="slidesRemaining">${sample.getSlidesRemaining()}</td>
+            </tr>
+            <tr>
+              <td class="h">Slides:*</td>
+              <td><form:input id="slides" path="slides"/></td>
+            </tr>
+            <tr>
+              <td class="h">Discards:*</td>
+              <td><form:input id="discards" path="discards"/></td>
+            </tr>
+            <tr>
+              <td class="h">Thickness (&#181;m):</td>
+              <td><form:input id="thickness" path="thickness"/></td>
+            </tr>
+            <tr>
+              <td class="h">Stain:</td>
+              <td>
+               <miso:select id="stain" path="stain" items="${stains}" itemLabel="name" itemValue="id" defaultLabel="(None)" defaultValue=""/>
+              </td>
+            </tr>
+          </table>
+        </div>
+        </c:when>
+        <c:when test="${sampleClass eq 'LCM Tube' or sampleCategory eq 'new'}">
+        <div id="lcmTubeTable">
+          <h2>Tissue Processing</h2>
+          <table class="in">
+            <tr>
+              <td class="h">Slides Consumed:*</td>
+              <td><form:input id="slidesConsumed" path="slidesConsumed"/></td>
+            </tr>
+          </table>
+        </div>
+        </c:when>
+        </c:choose>
+      </c:if>
+
+      <c:if test="${sampleCategory eq 'Stock' or sampleCategory eq 'new'}">
+        <br/>
+        <div id="detailedSampleStock">
+          <h2>Stock</h2>
+          <table class="in">
+            <tr>
+              <td class="h">STR Status</td>
+              <td>
+                <form:select id="strStatus" path="strStatus">
+                  <c:forEach var="strStatusOption" items="${strStatusOptions}">
+                    <option value="${strStatusOption}" <c:if test="${sample.strStatus == strStatusOption}">selected="selected"</c:if>>
+                      ${strStatusOption.label}
+                    </option>
+                  </c:forEach>
+                </form:select>
+              </td>
+            </tr>
+            <c:if test="${sample.sampleClass.DNAseTreatable}">
+              <tr>
+                <td class="h"><label for="DNAseTreated">DNAse Treated:</label></td>
+                <td><form:checkbox id="DNAseTreated" path="DNAseTreated"/></td>
+              </tr>
+            </c:if>
+          </table>
+        </div>
+      </c:if>
+
+      <c:if test="${sampleCategory eq 'Aliquot' or sampleCategory eq 'new'}">
+        <br/>
+        <div id="detailedSampleAliquot">
+          <h2>Aliquot</h2>
+          <table class="in">
+            <tr>
+              <td class="h">Purpose:</td>
+              <td>
+                <miso:select id="samplePurpose" path="samplePurpose" items="${samplePurposes}" itemLabel="alias"
+                    itemValue="id" defaultLabel="Unknown" defaultValue=""/>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </c:if>
+    </div>
+  </c:if>
+
+  <c:choose>
+    <c:when test="${!empty sample.project and sample.securityProfile.profileId eq sample.project.securityProfile.profileId}">
+      <table class ="in">
+        <tr>
+          <td>Permissions</td>
+          <td><i>Inherited from project </i>
+            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name} (${sample.project.alias})</a>
+            <input type="hidden" value="${sample.project.securityProfile.profileId}"
+                   name="securityProfile" id="securityProfile"/>
+          </td>
+        </tr>
+      </table>
+    </c:when>
+    <c:otherwise>
+      <%@ include file="permissions.jsp" %>
+    </c:otherwise>
   </c:choose>
+
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      // Attach Parsley form validator
+      Validate.attachParsley('#sample-form');
+
+      // display identification barcode image
+      if (document.getElementById('idBarcodePresent')) {
+        var sampleId = parseInt(document.getElementById('idBarcodePresent').getAttribute('data-sampleId'));
+        var idbarcode = document.getElementById('idBarcodePresent').getAttribute('data-idbarcode');
+        Fluxion.doAjax(
+          'sampleControllerHelperService',
+          'getSampleBarcode',
+          {
+            'sampleId': sampleId,
+            'url': ajaxurl
+          },
+          {
+            'doOnSuccess': function (json) {
+              var img = '<img style="height:30px; border:0;" alt="'+idbarcode+'" title="'+idbarcode+'" src="/temp/'+json.img+'"/>';
+              document.getElementById('idBarcode').innerHTML = img;
+            }
+          }
+        );
+      }
+      HotUtils.projects = ${projectsDtos};
+    });
+  </script>
+
   <c:if test="${sample.id != 0}">
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
       <div id="notes_arrowclick" class="toggleLeftDown"></div>
@@ -295,17 +630,16 @@
           </div>
         </li>
       </ul>
-        <%-- <div style="clear:both"></div> --%>
       <c:if test="${fn:length(sample.notes) > 0}">
         <div class="note" style="clear:both">
           <c:forEach items="${sample.notes}" var="note" varStatus="n">
             <div class="exppreview" id="sample-notes-${n.count}">
               <b>${note.creationDate}</b>: ${note.text}
               <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-                <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                <c:if test="${(note.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <span style="color:#000000"><a href='#' onclick="Sample.ui.deleteSampleNote('${sample.sampleId}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
+                <span style="color:#000000"><a href='#' onclick="Sample.ui.deleteSampleNote('${sample.id}', '${note.noteId}');">
+                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"></span></a></span>
                 </c:if>
               </span>
             </div>
@@ -320,985 +654,50 @@
 </form:form>
 
 <c:if test="${sample.id != 0}">
-  <a name="sampleqc"></a>
+  <miso:qcs id="list_qc" item="${sample}"/>
 
-  <h1>
-    <div id="qcsTotalCount"></div>
-  </h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="qcmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='javascript:void(0);' class="add"
-           onclick="Sample.qc.generateSampleQCRow(${sample.id}); return false;">Add Sample QC</a>
-      </div>
-    </li>
-  </ul>
-    <span style="clear:both">
-      <div id="addSampleQC"></div>
-      <form id='addQcForm'>
-        <table class="list" id="sampleQcTable" class="in">
-          <thead>
-          <tr>
-              <%--
-              <sec:authorize access="hasRole('ROLE_ADMIN')">
-                  <th class="fit">ID</th>
-              </sec:authorize>
-              --%>
-            <th>QCed By</th>
-            <th>QC Date</th>
-            <th>Method</th>
-            <th>Results</th>
-            <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                  or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <th align="center">Edit</th>
-            </c:if>
-          </tr>
-          </thead>
-          <tbody>
-          <c:if test="${not empty sample.sampleQCs}">
-            <c:forEach items="${sample.sampleQCs}" var="qc">
-              <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                  <%--
-                  <sec:authorize access="hasRole('ROLE_ADMIN')">
-                      <td class="fit">${qc.qcId}</td>
-                  </sec:authorize>
-                  --%>
-                <td>${qc.qcCreator}</td>
-                <td><fmt:formatDate value="${qc.qcDate}"/></td>
-                <td>${qc.qcType.name}</td>
-                <td id="results${qc.id}">${qc.results} ${qc.qcType.units}</td>
-                <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                          or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
-                                                          onclick="Sample.qc.changeSampleQCRow('${qc.id}','${sample.id}')">
-                    <span class="ui-icon ui-icon-pencil"></span></a></td>
-                </c:if>
-              </tr>
-            </c:forEach>
-          </c:if>
-          </tbody>
-        </table>
-        <input type='hidden' id='sampleId' name='id' value='${sample.id}'/>
-      </form>
-    </span>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery("#sampleQcTable").tablesorter();
-      jQuery('#qcsTotalCount').html(jQuery('#sampleQcTable>tbody>tr:visible').length.toString() + " QCs");
-      jQuery('#librariesTotalCount').html(jQuery('#library_table>tbody>tr:visible').length.toString() + " Libraries");
-    });
-  </script>
-  <br/>
-  <%--
-      <h2 class="hrule">Upload SampleQC File</h2>
-      <table class="in">
-          <tr>
-              <td width="30%">
-                  <form method='post'
-                        id='ajax_upload_form'
-                        action="<c:url value="/miso/upload/sampleqc"/>"
-                        enctype="multipart/form-data"
-                        target="target_upload"
-                        onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.page.pageReload);">
-                      <input type="hidden" name="sampleId" value="${sample.sampleId}"/><br/>
-                      <input type="file" name="file"/><br/>
-                      <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-                  </form>
-                  <iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>
-                  <div id="statusdiv"></div>
-              </td>
-          </tr>
-      </table>
-
-      <ul>
-          <c:forEach items="${qcFiles}" var="file">
-              <li><a href="<c:url value='/miso/download/sample/${sample.sampleId}/qc/${file.key}'/>">${file.value}</a>
-              </li>
-          </c:forEach>
-      </ul>
-  --%>
-  <a name="library"></a>
-
-  <h1>
-    <div id="librariesTotalCount">
-    </div>
-  </h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('librarymenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="librarymenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='<c:url value="/miso/library/new/${sample.id}"/>' class="add">Add Library</a><br/>
-
-        <c:if test="${not empty sample.libraries}">
-          <a href='javascript:void(0);' onclick='bulkLibraryQcTable();' class="add">Bulk QC these
-            Libraries</a>
-          <a href='javascript:void(0);' onclick='bulkLibraryDilutionTable();' class="add">Bulk Add Library
-            Dilutions</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
-    <span style="clear:both">
-      <table class="list" id="library_table">
-        <thead>
-        <tr>
-          <th>Library Name</th>
-          <th>Library Alias</th>
-          <th>Library Type</th>
-          <th>QC Passed</th>
-          <th class="fit">Edit</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${sample.libraries}" var="library">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td><b>${library.name}</b></td>
-            <td>${library.alias}</td>
-            <td>${library.libraryType.description}</td>
-            <td>${library.qcPassed}</td>
-            <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'"><span
-                class="ui-icon ui-icon-pencil"/></td>
-          </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-    </span>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery('#library_table').dataTable({
-        "aaSorting": [
-          [1, 'asc']
-        ],
-        "aoColumns": [
-          null,
-          { "sType": 'natural' },
-          null,
-          null,
-          null
-        ],
-        "iDisplayLength": 50,
-        "bJQueryUI": true,
-        "bRetrieve": true
-      });
-    });
-  </script>
-
-  <c:if test="${not empty samplePools}">
-    <br/>
-    <h1>${fn:length(samplePools)} Pools</h1>
-    <ul class="sddm">
-      <li>
-        <a onmouseover="mopen('poolsmenu')" onmouseout="mclosetime()">Options
-          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-        </a>
-
-        <div id="poolsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <a href="javascript:void(0);" onclick="Pool.barcode.selectPoolBarcodesToPrint('#pools_table');">Print Barcodes ...</a>
-        </div>
-      </li>
-    </ul>
-
-    <span style="clear:both">
-      <table class="list" id="pools_table">
-        <thead>
-        <tr>
-          <th>Pool Name</th>
-          <th>Pool Alias</th>
-          <th>Pool Platform</th>
-          <th>Pool Creation Date</th>
-          <th>Pool Concentration</th>
-          <th class="fit">Edit</th>
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <th class="fit">DELETE</th>
-          </sec:authorize>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${samplePools}" var="pool">
-          <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td><b>${pool.name}</b></td>
-            <td>${pool.alias}</td>
-            <td>${pool.platformType.key}</td>
-            <td>${pool.creationDate}</td>
-            <td>${pool.concentration}</td>
-              <%-- <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td> --%>
-            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'">
-              <span class="ui-icon ui-icon-pencil"/>
-            </td>
-            <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);">
-                <span class="ui-icon ui-icon-trash"/>
-              </td>
-            </sec:authorize>
-          </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-      <script type="text/javascript">
-        jQuery(document).ready(function () {
-          jQuery('#pools_table').dataTable({
-            "aaSorting": [
-              [1, 'asc'],
-              [3, 'asc']
-            ],
-            "aoColumns": [
-              null,
-              { "sType": 'natural' },
-              null,
-              null,
-              null,
-              null
-              <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-            ],
-            "iDisplayLength": 50,
-            "bJQueryUI": true,
-            "bRetrieve": true
-          });
-        });
-      </script>
-    </span>
+  <c:if test="${ !detailedSample or detailedSample and sampleCategory eq 'Aliquot' }">
+    <miso:list-section id="list_library" name="Libraries" target="library" items="${sampleLibraries}"/>
   </c:if>
 
-  <c:if test="${not empty sampleRuns}">
-    <br/>
-    <h1>${fn:length(sampleRuns)} Runs</h1>
-
-    <table class="list" id="run_table">
-      <thead>
-      <tr>
-        <th>Run Name</th>
-        <th>Run Alias</th>
-        <th>Partitions</th>
-        <th class="fit">Edit</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${sampleRuns}" var="run" varStatus="runCount">
-        <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b>${run.name}</b></td>
-          <td>${run.alias}</td>
-          <td>
-            <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="fCount">
-              <table class="containerSummary">
-                <tr>
-                  <c:forEach items="${container.partitions}" var="partition">
-                    <td id="partition${runCount.count}_${fCount.count}_${partition.partitionNumber}"
-                        class="smallbox">${partition.partitionNumber}</td>
-                    <c:if test="${not empty poolSampleMap[partition.pool.id]}">
-                      <script type="text/javascript">
-                        jQuery(document).ready(function () {
-                          jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').addClass("partitionOccupied");
-                          jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').prop("title", "${partition.pool.name}");
-                          <c:if test="${metrixEnabled}">
-                            jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').click(function() {
-                              //TODO open colorbox with SAV style plots in
-                              Stats.getInterOpMetricsForLane('${run.alias}', '${partition.pool.platformType}', '${partition.partitionNumber}');
-                            });
-                          </c:if>
-                        });
-                      </script>
-                    </c:if>
-                  </c:forEach>
-                </tr>
-              </table>
-              <c:if test="${fn:length(run.sequencerPartitionContainers) > 1}">
-                <br/>
-              </c:if>
-            </c:forEach>
-          </td>
-          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
-            <span class="ui-icon ui-icon-pencil"/>
-          </td>
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
-            </td>
-          </sec:authorize>
-        </tr>
-      </c:forEach>
-      </tbody>
-    </table>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#run_table').dataTable({
-          "aaSorting": [
-            [0, 'asc'],
-            [1, 'asc']
-          ],
-          "aoColumns": [
-            null,
-            null,
-            null,
-            null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true
-        });
-      });
-    </script>
+  <c:if test="${detailedSample}">
+    <miso:list-section id="list_relation" name="Relationships" target="sample" items="${sampleRelations}"/>
   </c:if>
+
+  <miso:list-section id="list_pool" name="Pools" target="pool" items="${samplePools}"/>
+  <miso:list-section id="list_run" name="Runs" target="run" items="${sampleRuns}"/>
+  <miso:changelog item="${sample}"/>
 </c:if>
-
-<c:if test="${sample.id == 0 and not empty sample.project}">
+<div id="dialog"></div>
 </div>
-<div id="tab-2" align="center">
-  <div class="breadcrumbs">
-    <ul>
-      <li>
-        <a href="/">Home</a>
-      </li>
-      <li>
-        <div class="breadcrumbsbubbleInfo">
-          <div class="trigger">
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
-          </div>
-          <div class="breadcrumbspopup">
-              ${sample.project.alias}
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <h1>Create Samples
-    <button id="bulkSampleButton" onClick="submitBulkSamples();" class="fg-button ui-state-default ui-corner-all">
-      Save
-    </button>
-  </h1>
-  <br/>
-  <br/>
 
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#options_arrowclick'), 'optionsdiv');">Table
-    Options
-    <div id="options_arrowclick" class="toggleLeft"></div>
-  </div>
-  <div id="optionsdiv" class="note" style="display:none;">
-    <input type="checkbox" name="autoIncrementSampleAlias" checked="checked"/>Increment Sample Aliases
-    Automatically<br/>
-  </div>
-  <table id="cinput" class="display">
-    <thead>
-    <tr>
-      <th>Sample Alias</th>
-      <th>Description</th>
-      <th>Scientific Name</th>
-      <th>Receipt Date</th>
-      <th>Type</th>
-        <%-- <th>ID Barcode</th> --%>
-      <th>Location Barcode</th>
-      <th>Notes</th>
-      <th>Copy</th>
-      <th>Delete</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-  <div id="pager"></div>
-</div>
 </div>
 
 <script type="text/javascript">
-var sampleheaders = ['alias', 'description', 'scientificName', 'receivedDate', 'sampleType', 'locationBarcode', 'note'];
-jQuery(document).ready(function () {
-  var oTable = jQuery('#cinput').dataTable({
-    "aoColumnDefs": [
-      {
-        "bUseRendered": false,
-        "aTargets": [ 0 ]
-      }
-    ],
-    "bPaginate": false,
-    "bInfo": false,
-    "bJQueryUI": true,
-    "bAutoWidth": true,
-    "bSort": false,
-    "sDom": '<<"toolbar">f>r<t>ip>'
-  });
-  //jQuery("div.toolbar").html("<a onclick=\"fnClickAddRow();\" href=\"javascript:void(0);\">Add a new row</a>");
-  jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-  jQuery("div.toolbar").html("<button onclick=\"bulkCopySample();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Bulk Copy</span></button> <button onclick=\"fnClickAddRow();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Add Row</span></button>");
-  //setEditables(oTable);
+  jQuery(document).ready(function () {
+    jQuery('#alias').simplyCountable({
+      counter: '#aliasCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['alias']},
+      countDirection: 'down'
+    });
 
-  jQuery("#tabs").tabs();
-  jQuery("#tabs").removeClass('ui-widget').removeClass('ui-widget-content');
-});
+    jQuery('#description').simplyCountable({
+      counter: '#descriptionCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['description']},
+      countDirection: 'down'
+    });
 
-function bulkCopySample() {
-  var table = jQuery('#cinput').dataTable();
-  var numrows = table.fnGetNodes().length;
-  var nodes = table.fnGetNodes();
-
-  if (numrows > 0) {
-    var copynumer = prompt("Note: This will copy the LAST row of table. \nPlease enter the copy number of samples to add ", "1");
-
-
-    var obj = {};
-    for (var j = 0; j < (nodes[numrows - 1].cells.length) - 1; j++) {
-      obj[sampleheaders[j]] = jQuery(nodes[numrows - 1].cells[j]).text();
-    }
-
-    if (Utils.validation.isNullCheck(obj.alias) ||
-        Utils.validation.isNullCheck(obj.description) ||
-        Utils.validation.isNullCheck(obj.scientificName) ||
-        Utils.validation.isNullCheck(obj.sampleType)) {
-      ok = false;
-      jQuery(nodes[numrows - 1]).css('background', '#EE9966');
-    }
-    else {
-      for (var i = 0; i < copynumer - 1; i++) {
-        copyRow(numrows - 1);
-      }
-    }
-  }
-  else {
-    alert("Please Enter some Sample Data first to Bulk Copy");
-  }
-}
-
-function fnClickAddRow(rowdata) {
-  var table = jQuery('#cinput').dataTable();
-  var a = [];
-  if (rowdata && rowdata.length > 0) {
-    a = table.fnAddData(rowdata);
-  }
-  else {
-    a = table.fnAddData(
-      [ "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "<span style='text-align:center;' name='copy-button' class='ui-icon ui-icon-arrowrefresh-1-n' title='Copy row'></span>",
-        "<span style='text-align:center;' name='del-button' class='ui-icon ui-icon-trash' title='Delete row'></span>"
-      ]
-    );
-  }
-
-  var tr = table.fnGetNodes(a[0]);
-  jQuery(tr).find("span[name='copy-button']").each(function () {
-    jQuery(this).click(function () {
-      copyRow(table.fnGetPosition(tr));
+    jQuery('#scientificName').simplyCountable({
+      counter: '#scientificNameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['scientificName']},
+      countDirection: 'down'
     });
   });
-
-  jQuery(tr).find("span[name='del-button']").each(function () {
-    jQuery(this).click(function () {
-      if (confirm("Are you sure you want to delete row " + table.fnGetPosition(tr) + "?")) {
-        table.fnDeleteRow(table.fnGetPosition(tr));
-      }
-    });
-  });
-
-  var nTr = table.fnSettings().aoData[a[0]].nTr;
-  for (var i = 0; i < sampleheaders.length; i++) {
-    jQuery(nTr.cells[i]).attr("name", sampleheaders[i]);
-    if (sampleheaders[i] === "sampleType") {
-      jQuery(nTr.cells[i]).addClass("sampleSelect");
-    }
-    else if (sampleheaders[i] === "receivedDate") {
-      jQuery(nTr.cells[i]).addClass("dateSelect");
-    }
-    else {
-      jQuery(nTr.cells[i]).addClass("defaultEditable");
-    }
-  }
-
-  setEditables(table);
-}
-
-function copyRow(row) {
-  DatatableUtils.collapseInputs('#cinput');
-
-  var table = jQuery('#cinput').dataTable();
-  var numrows = table.fnGetNodes().length;
-  var lastRow = table.fnGetData(numrows - 1);
-  var rowToCopy = table.fnGetData(row);
-  if (jQuery("input[name=autoIncrementSampleAlias]").length > 0 && jQuery('input[name=autoIncrementSampleAlias]').is(':checked')) {
-    var re = new RegExp(/[A-z0-9]+_S([0-9]+)_[\s\S]*/);
-    if (rowToCopy[0].match(re) && lastRow[0].match(re)) {
-      rowToCopy[0] = lastRow[0].replace(/_S([\d]+)_/, function (a, b) {
-        return "_S" + (parseInt(b, 10) + 1) + "_";
-      });
-    }
-  }
-  fnClickAddRow(rowToCopy);
-}
-
-function setEditables(datatable) {
-  //jQuery('td:not(:eq(8)):not(:eq(3)):not(:eq(4))', datatable.fnGetNodes()).editable(function(value, settings) {
-  //jQuery('td .defaultEditable', datatable.fnGetNodes()).editable(function(value, settings) {
-  jQuery('.defaultEditable').editable(function (value, settings) {
-    return value;
-  },
-  {
-    callback: function (sValue, y) {
-      var aPos = datatable.fnGetPosition(this);
-      datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-    },
-    submitdata: function (value, settings) {
-      return {
-        "row_id": this.parentNode.getAttribute('id'),
-        "column": datatable.fnGetPosition(this)[2]
-      };
-    },
-    onblur: 'submit',
-    placeholder: '',
-    height: '14px'
-  });
-
-  jQuery(".sampleSelect").editable(function (value, settings) {
-    return value;
-  },
-  {
-    data: '{${sampleTypesString}}',
-    type: 'select',
-    onblur: 'submit',
-    placeholder: '',
-    style: 'inherit',
-    callback: function (sValue, y) {
-      var aPos = datatable.fnGetPosition(this);
-      datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-    },
-    submitdata: function (value, settings) {
-      return {
-        "row_id": this.parentNode.getAttribute('id'),
-        "column": datatable.fnGetPosition(this)[2]
-      };
-    }
-  });
-
-  jQuery(".dateSelect").editable(function (value, settings) {
-    return value;
-  },
-  {
-    type: 'datepicker',
-    width: '100px',
-    onblur: 'submit',
-    placeholder: '',
-    style: 'inherit',
-    datepicker: {
-      dateFormat: 'dd/mm/yy',
-      showButtonPanel: true,
-      maxDate: 0
-    },
-     callback: function (sValue, y) {
-      var aPos = datatable.fnGetPosition(this);
-      datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-    },
-    submitdata: function (value, settings) {
-      return {
-        "row_id": this.parentNode.getAttribute('id'),
-        "column": datatable.fnGetPosition(this)[2]
-      };
-    }
-  });
-
-  jQuery('.defaultEditable').bind('keydown', function (evt) {
-    if (evt.keyCode == 9) {
-      /* Submit the current element */
-      jQuery('input', this)[0].blur();
-
-      /* Activate the next element */
-      if (jQuery(this).next('.defaultEditable').length == 1) {
-        jQuery(this).next('.defaultEditable').click();
-      }
-      else if (jQuery('.defaultEditable', jQuery(this.parentNode).next()).length > 0) {
-        jQuery('.defaultEditable:eq(0)', jQuery(this.parentNode).next()).click();
-      }
-      return false;
-    }
-  });
-}
-
-function submitBulkSamples() {
-  jQuery('#bulkSampleButton').attr('disabled', 'disabled');
-  jQuery('#bulkSampleButton').html("Processing...");
-
-  DatatableUtils.collapseInputs('#cinput');
-
-  var table = jQuery('#cinput').dataTable();
-  var nodes = table.fnGetNodes();
-  var ok = true;
-  var arr = [];
-  for (var i = 0; i < nodes.length; i++) {
-    var obj = {};
-    for (var j = 0; j < (nodes[i].cells.length) - 1; j++) {
-      obj[sampleheaders[j]] = jQuery(nodes[i].cells[j]).text();
-    }
-
-    if (Utils.validation.isNullCheck(obj.alias) ||
-        Utils.validation.isNullCheck(obj.description) ||
-        Utils.validation.isNullCheck(obj.scientificName) ||
-        Utils.validation.isNullCheck(obj.sampleType)) {
-      ok = false;
-      jQuery(nodes[i]).css('background', '#EE9966');
-    }
-    else {
-      jQuery(nodes[i]).css('background', '#CCFF99');
-      arr.push(JSON.stringify(obj));
-    }
-  }
-
-  if (ok) {
-    Fluxion.doAjax(
-      'sampleControllerHelperService',
-      'bulkSaveSamples',
-      {'projectId':${sample.project.id},
-        'samples': "[" + arr.join(',') + "]",
-        'url': ajaxurl
-      },
-      {'doOnSuccess': function (json) {
-        var taxonErrorSamples = json.taxonErrorSamples;
-        var savedSamples = json.savedSamples;
-        if (savedSamples.length == nodes.length) {
-          if (taxonErrorSamples.length > 0) {
-            table.find("tr:gt(0)").each(function () {
-              for (var j = 0; j < taxonErrorSamples.length; j++) {
-                if (jQuery(this.cells[0]).text() === taxonErrorSamples[j]) {
-                  jQuery(this).css('background', '#EE9966');
-                }
-              }
-            });
-
-            alert("Samples saved, but those highlighted in red did not have valid taxon information. Any submissions made from these samples may not be valid!");
-          }
-          else {
-            window.location.href = '<c:url value='/miso/project/${sample.project.id}'/>';
-          }
-        }
-        else {
-          jQuery('#bulkSampleButton').removeAttr('disabled');
-          jQuery('#bulkSampleButton').html("Save");
-
-          table.find("tr:gt(0)").each(function () {
-            for (var j = 0; j < savedSamples.length; j++) {
-              if (jQuery(this.cells[0]).text() === savedSamples[j]) {
-                table.fnDeleteRow(this);
-              }
-              else {
-                jQuery(this).css('background', '#EE9966');
-              }
-            }
-          });
-
-          alert("Samples highlighted in red did not save. Please check that the sample alias is unique!");
-        }
-      }
-    });
-  }
-  else {
-    alert("The highlighted data rows in red are missing an alias, description, scientific name or sample type.");
-    setEditables(table);
-  }
-  jQuery('#bulkSampleButton').removeAttr('disabled');
-  jQuery('#bulkSampleButton').html("Save");
-}
-
 </script>
-</c:if>
 
-<c:if test="${not empty sample.libraries}">
-<script type="text/javascript">
-function bulkLibraryQcTable() {
-  //destroy current table and recreate
-  jQuery('#library_table').dataTable().fnDestroy();
-  //bug fix to reset table width
-  jQuery('#library_table').removeAttr("style");
-
-  jQuery('#library_table').addClass("display");
-
-  //remove edit header and column
-  jQuery('#library_table tr:first th:eq(4)').remove();
-  jQuery('#library_table tr:first th:eq(3)').remove();
-
-  var libraryheaders = ['rowsel',
-                        'name',
-                        'alias',
-                        'libraryType',
-                        'qcDate',
-                        'qcType',
-                        'insertSize',
-                        'results'];
-
-  jQuery('#library_table').find("tr").each(function () {
-    jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-    jQuery(this).find("td:eq(4)").remove();
-    jQuery(this).find("td:eq(3)").remove();
-    //jQuery(this).find("td:eq(2)").addClass("passedCheck");
-  });
-
-  //headers
-  jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
-  jQuery("#library_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-  jQuery("#library_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-  jQuery("#library_table tr:first").append("<th>Insert Size</th>");
-  jQuery("#library_table tr:first").append("<th>Results</th>");
-
-  //columns
-  jQuery("#library_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
-  jQuery("#library_table tr:gt(0)").append("<td class='dateSelect'></td>");
-  jQuery("#library_table tr:gt(0)").append("<td class='typeSelect'></td>");
-  jQuery("#library_table tr:gt(0)").append("<td class='defaultEditable'></td>");
-  jQuery("#library_table tr:gt(0)").append("<td class='defaultEditable'></td>");
-
-  var datatable = jQuery('#library_table').dataTable({
-    "aoColumnDefs": [
-      {
-        "bUseRendered": false,
-        "aTargets": [ 0 ]
-      }
-    ],
-    "bPaginate": false,
-    "bInfo": false,
-    "bJQueryUI": true,
-    "bAutoWidth": true,
-    "bSort": false,
-    "bFilter": false,
-    "sDom": '<<"toolbar">f>r<t>ip>'
-  });
-
-  jQuery('#library_table').find("tr:gt(0)").each(function () {
-    for (var i = 0; i < this.cells.length; i++) {
-      jQuery(this.cells[i]).attr("name", libraryheaders[i]);
-    }
-  });
-
-  jQuery('#library_table .rowSelect').click(function () {
-    if (jQuery(this).parent().hasClass('row_selected'))
-      jQuery(this).parent().removeClass('row_selected');
-    else
-      jQuery(this).parent().addClass('row_selected');
-  });
-
-  jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-  jQuery("div.toolbar").html("<button id=\"bulkLibraryQcButton\" onclick=\"Sample.qc.saveBulkLibraryQc();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save QCs</span></button>");
-
-  jQuery('#library_table .defaultEditable').editable(function (value, settings) {
-    return value;
-  },
-  {
-    callback: function (sValue, y) {
-      var aPos = datatable.fnGetPosition(this);
-      datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-    },
-    submitdata: function (value, settings) {
-      return {
-        "row_id": this.parentNode.getAttribute('id'),
-        "column": datatable.fnGetPosition(this)[2]
-      };
-    },
-    onblur: 'submit',
-    placeholder: '',
-    height: '14px'
-  });
-
-  jQuery("#library_table .typeSelect").editable(function (value, settings) {
-    return value;
-  },
-  {
-    data: '{${libraryQcTypesString}}',
-    type: 'select',
-    onblur: 'submit',
-    placeholder: '',
-    style: 'inherit',
-    callback: function (sValue, y) {
-      var aPos = datatable.fnGetPosition(this);
-      datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-    },
-    submitdata: function (value, settings) {
-      return {
-        "row_id": this.parentNode.getAttribute('id'),
-        "column": datatable.fnGetPosition(this)[2]
-      };
-    }
-  });
-
-  jQuery("#library_table .dateSelect").editable(function (value, settings) {
-    return value;
-  },
-  {
-    type: 'datepicker',
-    width: '100px',
-    onblur: 'submit',
-    placeholder: '',
-    style: 'inherit',
-    datepicker: {
-      dateFormat: 'dd/mm/yy',
-      showButtonPanel: true,
-      maxDate: 0
-    },
-    callback: function (sValue, y) {
-      var aPos = datatable.fnGetPosition(this);
-      datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-    },
-    submitdata: function (value, settings) {
-      return {
-        "row_id": this.parentNode.getAttribute('id'),
-        "column": datatable.fnGetPosition(this)[2]
-      };
-    }
-  });
-
-  jQuery("#library_table .passedCheck").editable(function (value, settings) {
-    return value;
-  },
-  {
-    type: 'checkbox',
-    onblur: 'submit',
-    placeholder: '',
-    style: 'inherit',
-    callback: function (sValue, y) {
-      var aPos = datatable.fnGetPosition(this);
-      datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-    },
-    submitdata: function (value, settings) {
-      return {
-        "row_id": this.parentNode.getAttribute('id'),
-        "column": datatable.fnGetPosition(this)[2]
-      };
-    }
-  });
-}
-
-function bulkLibraryDilutionTable() {
-  if (!jQuery('#library_table').hasClass("display")) {
-    //destroy current table and recreate
-    jQuery('#library_table').dataTable().fnDestroy();
-    //bug fix to reset table width
-    jQuery('#library_table').removeAttr("style");
-
-    jQuery('#library_table').addClass("display");
-
-    //remove edit header and column
-    jQuery('#library_table tr:first th:eq(4)').remove();
-    jQuery('#library_table tr:first th:eq(3)').remove();
-
-    var dilutionheaders = ['rowsel',
-                           'name',
-                           'alias',
-                           'libraryType',
-                           'dilutionDate',
-                           'results'];
-
-    jQuery('#library_table').find("tr").each(function () {
-      jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-      jQuery(this).find("td:eq(4)").remove();
-      jQuery(this).find("td:eq(3)").remove();
-      //jQuery(this).find("td:eq(2)").addClass("passedCheck");
-    });
-
-    //headers
-    jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>Dilution Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>Results</th>");
-
-    //columns
-    jQuery("#library_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
-    jQuery("#library_table tr:gt(0)").append("<td class='dateSelect'></td>");
-    jQuery("#library_table tr:gt(0)").append("<td class='defaultEditable'></td>");
-
-    var datatable = jQuery('#library_table').dataTable({
-      "aoColumnDefs": [
-        {
-          "bUseRendered": false,
-          "aTargets": [ 0 ]
-        }
-      ],
-      "bPaginate": false,
-      "bInfo": false,
-      "bJQueryUI": true,
-      "bAutoWidth": true,
-      "bSort": false,
-      "bFilter": false,
-      "sDom": '<<"toolbar">f>r<t>ip>'
-    });
-
-    jQuery('#library_table').find("tr:gt(0)").each(function () {
-      for (var i = 0; i < this.cells.length; i++) {
-        jQuery(this.cells[i]).attr("name", dilutionheaders[i]);
-      }
-    });
-
-    jQuery('#library_table .rowSelect').click(function () {
-      if (jQuery(this).parent().hasClass('row_selected'))
-        jQuery(this).parent().removeClass('row_selected');
-      else
-        jQuery(this).parent().addClass('row_selected');
-    });
-
-    jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("div.toolbar").html("<button id=\"bulkLibraryDilutionButton\" onclick=\"Sample.library.saveBulkLibraryDilutions();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save Dilutions</span></button>");
-
-    jQuery('#library_table .defaultEditable').editable(function (value, settings) {
-      return value;
-    },
-    {
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      },
-      onblur: 'submit',
-      placeholder: '',
-      height: '14px'
-    });
-
-    jQuery("#library_table .dateSelect").editable(function (value, settings) {
-      return value;
-    },
-    {
-      type: 'datepicker',
-      width: '100px',
-      onblur: 'submit',
-      placeholder: '',
-      style: 'inherit',
-      datepicker: {
-        dateFormat: 'dd/mm/yy',
-        showButtonPanel: true,
-        maxDate: 0
-      },
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      }
-    });
-  }
-}
-</script>
-</c:if>
-
-</div>
-</div>
 <%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>

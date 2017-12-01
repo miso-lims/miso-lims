@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -12,115 +12,96 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
-import java.util.Collection;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
+import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
  * <p/>
  * Info
- *
+ * 
  * @author Xingdong Bian
  */
 @Controller
 @RequestMapping("/rest/container")
 @SessionAttributes("container")
-public class ContainerRestController {
+public class ContainerRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(ContainerRestController.class);
 
   @Autowired
-  private RequestManager requestManager;
+  private ContainerService containerService;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  private final JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto> jQueryBackend = new JQueryDataTableBackend<SequencerPartitionContainer, ContainerDto>() {
+
+    @Override
+    protected ContainerDto asDto(SequencerPartitionContainer model) {
+      return Dtos.asDto(model);
+    }
+
+    @Override
+    protected PaginatedDataSource<SequencerPartitionContainer> getSource() throws IOException {
+      return containerService;
+    }
+
+  };
+
+  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET, produces = "application/json")
+  public @ResponseBody List<ContainerDto> jsonRest(@PathVariable String containerBarcode) throws IOException {
+    return containerService.listByBarcode(containerBarcode).stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET)
-  public
+  @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
-  String jsonRest(@PathVariable String containerBarcode) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> sequencerPartitionContainerCollection = requestManager.listSequencerPartitionContainersByBarcode(containerBarcode);
-    int i = 0;
-    for (SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer : sequencerPartitionContainerCollection) {
-      i++;
-      sb.append("{");
-      sb.append("\"containerId\":\"" + sequencerPartitionContainer.getId() + "\",");
-      sb.append("\"identificationBarcode\":\"" + sequencerPartitionContainer.getIdentificationBarcode() + "\",");
-      sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
-      sb.append("\"partitions\":[");
-      int ip = 0;
-      for (SequencerPoolPartition partition : sequencerPartitionContainer.getPartitions()) {
-        ip++;
-        sb.append("{");
-        sb.append("\"partition\":\"" + partition.getId() + "\",");
-        sb.append("\"pool\":");
-        if (partition.getPool() != null) {
-          sb.append("{");
-          sb.append("\"poolName\":\"" + partition.getPool().getName() + "\",");
-          sb.append("\"poolDate\":\"" + partition.getPool().getCreationDate() + "\",");
-          //experiments
-          sb.append("\"experiments\":[");
-          int ie = 0;
-          for (Experiment experiment : partition.getPool().getExperiments()) {
-            ie++;
-            ObjectMapper mappere = new ObjectMapper();
-            sb.append(mappere.writeValueAsString(experiment));
-            if (ie < partition.getPool().getExperiments().size()) {
-              sb.append(",");
-            }
-          }
-          sb.append("],");
+  public DataTablesResponseDto<ContainerDto> dataTable(HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    return jQueryBackend.get(request, response, uriBuilder);
+  }
 
-          //dilutions
-          sb.append("\"poolableElements\":[");
-          int id = 0;
-          for (Poolable poolable : partition.getPool().getPoolableElements()) {
-            id++;
-            ObjectMapper mapperd = new ObjectMapper();
-            sb.append(mapperd.writeValueAsString(poolable));
-            if (id < partition.getPool().getDilutions().size()) {
-              sb.append(",");
-            }
-
-          }
-          sb.append("]");
-          sb.append("}");
-        }
-        else {
-          sb.append("\"\"");
-        }
-        sb.append("}");
-        if (ip < sequencerPartitionContainer.getPartitions().size()) {
-          sb.append(",");
-        }
-      }
-      sb.append("]");
-      sb.append("}");
+  @RequestMapping(value = "/dt/platform/{platform}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<ContainerDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
+      HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    PlatformType platformType = PlatformType.valueOf(platform);
+    if (platformType == null) {
+      throw new RestException("Invalid platform.", Status.BAD_REQUEST);
     }
-    if (i < sequencerPartitionContainerCollection.size()) {
-      sb.append(",");
-    }
-    return "[" + sb.toString() + "]";
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(platformType));
   }
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * MISO project contacts: Robert Davey @ TGAC
  * *********************************************************************
  *
  * This file is part of MISO.
@@ -23,41 +23,47 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-
 import java.io.IOException;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+
 /**
  * Defines a DAO interface for storing Platforms
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface PlatformStore extends Store<Platform> {
   /**
    * Get a Platform given a model name
-   *
-   * @param model of type String
+   * 
+   * @param model
+   *          of type String
    * @return Platform
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Platform getByModel(String model) throws IOException;
 
   /**
-   * List all Platforms
-   *
+   * List all Platforms given a Platform manufacturer name
+   * 
+   * @param name
+   *          of type String
    * @return List<Platform>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
-  List<Platform> listByName() throws IOException;
+  List<Platform> listByName(String name) throws IOException;
 
   /**
    * List all distinct Platform names
    * 
    * @return List<String>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
-  List<String> listDistinctPlatformNames() throws IOException;
+  List<PlatformType> listDistinctPlatformNames() throws IOException;
 }
