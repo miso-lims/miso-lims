@@ -22,6 +22,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
@@ -112,6 +114,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -297,7 +303,10 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
-    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
+    if (from.getBox() != null) {
+      dto.setBox(asDto(from.getBox(), true));
+      dto.setBoxPosition(from.getBoxPosition());
+    }
     dto.setSampleType(from.getSampleType());
     dto.setReceivedDate(from.getReceivedDate() == null ? null : formatDate(from.getReceivedDate()));
     if (from.getQcPassed() != null) {
@@ -636,7 +645,18 @@ public class Dtos {
       to.setProject(new ProjectImpl());
       to.getProject().setProjectId(from.getProjectId());
     }
+    to.setBoxPosition((SampleBoxPosition) makeBoxablePosition(from, (SampleImpl) to));
     return to;
+  }
+
+  private static <T extends AbstractBoxableDto, U extends AbstractBoxable> AbstractBoxPosition makeBoxablePosition(T from, U to) {
+    if (from.getBox() != null && (from.getBox().getId() != null || !isStringEmptyOrNull(from.getBoxPosition()))) {
+      AbstractBoxPosition bp = to.getEntityType().makeBoxPosition();
+      bp.setBox(to(from.getBox()));
+      bp.setPosition(from.getBoxPosition());
+      return bp;
+    }
+    return null;
   }
 
   private static SampleIdentityDto asIdentitySampleDto(SampleIdentity from) {
@@ -1099,7 +1119,10 @@ public class Dtos {
     }
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
-    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
+    if (from.getBox() != null) {
+      dto.setBox(asDto(from.getBox(), true));
+      dto.setBoxPosition(from.getBoxPosition());
+    }
     if (from.getSample().getBox() != null) {
       dto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
     }
@@ -1183,7 +1206,14 @@ public class Dtos {
     if (from.getReceivedDate() != null) {
       to.setReceivedDate(parseDate(from.getReceivedDate()));
     }
+    to.setBoxPosition((LibraryBoxPosition) makeBoxablePosition(from, (LibraryImpl) to));
     return to;
+  }
+
+  public static List<BoxDto> asBoxDtos(Collection<Box> boxes, boolean includeBoxables) {
+    return boxes.stream()
+        .map(box -> asDto(box, includeBoxables))
+        .collect(Collectors.toList());
   }
 
   public static BoxDto asDto(Box from, boolean includeBoxables) {
@@ -1266,6 +1296,10 @@ public class Dtos {
       dto.setTargetedSequencingId(from.getTargetedSequencing().getId());
     }
     dto.setLibrary(libraryDto);
+    if (from.getBox() != null) {
+      dto.setBox(asDto(from.getBox(), true));
+      dto.setBoxPosition(from.getBoxPosition());
+    }
     return dto;
   }
 
@@ -1334,6 +1368,7 @@ public class Dtos {
       to.setTargetedSequencing(new TargetedSequencing());
       to.getTargetedSequencing().setId(from.getTargetedSequencingId());
     }
+    to.setBoxPosition((DilutionBoxPosition) makeBoxablePosition(from, to));
     return to;
   }
 
@@ -1376,7 +1411,10 @@ public class Dtos {
     dto.setDuplicateIndices(from.hasDuplicateIndices());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
-    dto.setBoxId(from.getBox() == null ? null : from.getBox().getId());
+    if (from.getBox() != null) {
+      dto.setBox(asDto(from.getBox(), true));
+      dto.setBoxPosition(from.getBoxPosition());
+    }
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
     return dto;
   }
@@ -1719,6 +1757,7 @@ public class Dtos {
     }).collect(Collectors.toSet()));
     to.setQcPassed(dto.getQcPassed());
     to.setReadyToRun(dto.getReadyToRun());
+    to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));
     return to;
   }
 

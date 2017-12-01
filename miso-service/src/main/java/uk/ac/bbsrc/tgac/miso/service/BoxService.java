@@ -8,6 +8,7 @@ import java.util.Map;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -33,6 +34,8 @@ public interface BoxService extends PaginatedDataSource<Box> {
    */
   public Collection<BoxableView> getViewsFromBarcodeList(Collection<String> barcodeList) throws IOException;
 
+  public List<Box> getBySearch(String search);
+
   public Collection<BoxSize> listSizes() throws IOException;
 
   /**
@@ -52,5 +55,13 @@ public interface BoxService extends PaginatedDataSource<Box> {
   public List<BoxableView> getBoxableViewsBySearch(String search);
 
   public BoxableView getBoxableView(BoxableId id) throws IOException;
+
+  /**
+   * Moves a Boxable from its current (persisted) location to the location specified in the object's box and boxPosition
+   * 
+   * @param boxable Boxable to update, with its box (id) and boxPosition set accordingly
+   * @throws IOException
+   */
+  public void updateBoxableLocation(Boxable boxable) throws IOException;
 
 }

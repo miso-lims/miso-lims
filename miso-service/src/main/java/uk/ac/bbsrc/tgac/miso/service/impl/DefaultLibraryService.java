@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
@@ -81,6 +82,8 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   private KitService kitService;
   @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private BoxService boxService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -158,7 +161,9 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     if (isStringEmptyOrNull(library.getAlias()) && namingScheme.hasLibraryAliasGenerator()) {
       library.setAlias(generateTemporaryName());
     }
-    return save(library, true).getId();
+    long savedId = save(library, true).getId();
+    boxService.updateBoxableLocation(library);
+    return savedId;
   }
 
   @Override
@@ -172,6 +177,7 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
     loadChildEntities(updatedLibrary);
     makeChangeLogForIndices(originalIndices, updatedLibrary.getIndices(), updatedLibrary);
     save(updatedLibrary, validateAliasUniqueness);
+    boxService.updateBoxableLocation(library);
   }
 
   @Override
@@ -614,6 +620,10 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
 
   public void setChangeLogService(ChangeLogService changeLogService) {
     this.changeLogService = changeLogService;
+  }
+
+  public void setBoxService(BoxService boxService) {
+    this.boxService = boxService;
   }
 
   public void setAutoGenerateIdBarcodes(Boolean autoGenerateIdBarcodes) {

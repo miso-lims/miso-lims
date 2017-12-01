@@ -88,6 +88,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Column(nullable = false)
   private String name;
 
+  private String alias;
   private String description;
   private String accession;
 
@@ -199,6 +200,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public void setBoxPosition(LibraryBoxPosition boxPosition) {
+    this.boxPosition = boxPosition;
+  }
+
+  @Override
   public long getId() {
     return libraryId;
   }
@@ -216,6 +222,16 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public String getAlias() {
+    return alias;
+  }
+
+  @Override
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   @Override

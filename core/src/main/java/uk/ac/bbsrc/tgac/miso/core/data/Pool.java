@@ -33,6 +33,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -208,6 +209,8 @@ public interface Pool
   @Override
   void setWatchGroup(Group group);
 
+  public void setBoxPosition(PoolBoxPosition boxPosition);
+
   /**
    * @return the user-specified date that this Pool was created
    */
@@ -229,11 +232,13 @@ public interface Pool
   /**
    * Sets the user who last modified this item. It should always be set to the current user on save.
    */
+  @Override
   public void setLastModifier(User user);
 
   @Override
   public Date getLastModified();
 
+  @Override
   public void setLastModified(Date lastModified);
 
   public User getCreator();

@@ -85,7 +85,7 @@ public class TimeShiftingInterceptorTest extends AbstractDAOTest {
     ldi.setCreationDate(date);
     ldi.setDilutionCreator("me");
     ldi.setName("Jim");
-    ldi.setLastUpdated(new Date());
+    ldi.setLastModified(new Date());
     ldi.setLastModifier((User) session.get(UserImpl.class, 1L));
 
     Long newId = (Long) session.save(ldi);

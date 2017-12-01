@@ -32,6 +32,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -293,6 +294,8 @@ public interface Library
 
   void setDnaSize(Integer dnaSize);
 
+  public void setBoxPosition(LibraryBoxPosition boxPosition);
+
   /**
    * @return the user-specified date that this Library was created
    */
@@ -315,11 +318,13 @@ public interface Library
   /**
    * Sets the user who last modified this item. It should always be set to the current user on save.
    */
+  @Override
   public void setLastModifier(User user);
 
   @Override
   public Date getLastModified();
 
+  @Override
   public void setLastModified(Date lastModified);
 
   public User getCreator();

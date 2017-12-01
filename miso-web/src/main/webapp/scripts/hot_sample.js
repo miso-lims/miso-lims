@@ -35,7 +35,7 @@ HotTarget.sample = (function() {
     return Utils.array.findFirstOrNull(function(item) {
       return item.label == flatObj.identityAlias;
     }, flatObj.potentialIdentities);
-  }
+  };
 
   return {
 
@@ -95,7 +95,7 @@ HotTarget.sample = (function() {
         show['Tissue Processing'] = false;
       }
 
-      return [
+      var columns = [
           {
             header: 'Sample Name',
             data: 'name',
@@ -305,46 +305,44 @@ HotTarget.sample = (function() {
                   contentType: "application/json; charset=utf8",
                   dataType: "json",
                   type: "POST"
-                }).success(
-                    function(data) {
-                      var potentialIdentities = [];
-                      // sort with identities from selected project on top
-                      var identitiesSources = [];
-                      if (data.matchingIdentities.length > 0) {
-                        data.matchingIdentities.sort(function(a, b) {
-                          var aSortId = a.projectId == selectedProject.id ? 0 : a.projectId;
-                          var bSortId = b.projectId == selectedProject.id ? 0 : b.projectId;
-                          return aSortId - bSortId;
-                        })
-                        potentialIdentities = data.matchingIdentities;
-                        for (var i = 0; i < potentialIdentities.length; i++) {
-                          var identityLabel = potentialIdentities[i].alias + " -- " + potentialIdentities[i].externalName;
-                          potentialIdentities[i].label = identityLabel;
-                          identitiesSources.push(identityLabel);
-                        }
-                      }
+                }).success(function(data) {
+                  var potentialIdentities = [];
+                  // sort with identities from selected project on top
+                  var identitiesSources = [];
+                  if (data.length > 0) {
+                    data.sort(function(a, b) {
+                      var aSortId = a.projectId == selectedProject.id ? 0 : a.projectId;
+                      var bSortId = b.projectId == selectedProject.id ? 0 : b.projectId;
+                      return aSortId - bSortId;
+                    })
+                    potentialIdentities = data;
+                    for (var i = 0; i < potentialIdentities.length; i++) {
+                      var identityLabel = potentialIdentities[i].alias + " -- " + potentialIdentities[i].externalName;
+                      potentialIdentities[i].label = identityLabel;
+                      identitiesSources.push(identityLabel);
+                    }
+                  }
 
-                      var indexOfMatchingIdentityInProject = -1;
-                      for (i = 0; i < data.matchingIdentities.length; i++) {
-                        if (data.matchingIdentities[i].projectId == selectedProject.id
-                            && data.matchingIdentities[i].externalName == flat.externalName) {
-                          indexOfMatchingIdentityInProject = i;
-                          break;
-                        }
-                      }
-                      if (indexOfMatchingIdentityInProject >= 0) {
-                        setData(identitiesSources[indexOfMatchingIdentityInProject]);
-                      } else {
-                        identitiesSources.unshift("First Receipt (" + selectedProject[label] + ")");
-                        setData(identitiesSources[0]);
-                      }
-                      flat.potentialIdentities = potentialIdentities;
-                      var cellOptions = {
-                        'source': identitiesSources,
-                        'renderer': (identitiesSources.length > 1 ? HotUtils.multipleOptionsRenderer : Handsontable.AutocompleteRenderer)
-                      };
-                      setOptions(cellOptions);
-                    }).fail(function(response, textStatus, serverStatus) {
+                  var indexOfMatchingIdentityInProject = -1;
+                  for (i = 0; i < data.length; i++) {
+                    if (data[i].projectId == selectedProject.id && data[i].externalName == flat.externalName) {
+                      indexOfMatchingIdentityInProject = i;
+                      break;
+                    }
+                  }
+                  if (indexOfMatchingIdentityInProject >= 0) {
+                    setData(identitiesSources[indexOfMatchingIdentityInProject]);
+                  } else {
+                    identitiesSources.unshift("First Receipt (" + selectedProject[label] + ")");
+                    setData(identitiesSources[0]);
+                  }
+                  flat.potentialIdentities = potentialIdentities;
+                  var cellOptions = {
+                    'source': identitiesSources,
+                    'renderer': (identitiesSources.length > 1 ? HotUtils.multipleOptionsRenderer : Handsontable.AutocompleteRenderer)
+                  };
+                  setOptions(cellOptions);
+                }).fail(function(response, textStatus, serverStatus) {
                   HotUtils.showServerErrors(response, serverStatus);
                 }).always(function() {
                   deferred.resolve();
@@ -562,6 +560,15 @@ HotTarget.sample = (function() {
           // Aliquot columns
           HotUtils.makeColumnForConstantsList('Purpose', show['Aliquot'] && !config.isLibraryReceipt, 'samplePurposeAlias',
               'samplePurposeId', 'id', 'alias', Constants.samplePurposes, true)];
+
+      if (!config.isLibraryReceipt) {
+        var spliceIndex = columns.indexOf(columns.filter(function(column) {
+          return column.data === 'identificationBarcode';
+        })[0]) + 1;
+        columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+      }
+
+      return columns;
     },
 
     bulkActions: [

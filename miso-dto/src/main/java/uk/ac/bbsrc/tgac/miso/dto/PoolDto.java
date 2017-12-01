@@ -6,7 +6,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class PoolDto implements WritableUrls {
+public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   private Long id;
   private String url;
@@ -24,7 +24,6 @@ public class PoolDto implements WritableUrls {
   private String creationDate;
   private String lastModified;
   private String description;
-  private Long boxId;
   private boolean discarded;
   private String volume;
   private String platformType;
@@ -39,10 +38,6 @@ public class PoolDto implements WritableUrls {
 
   public Integer getAvgInsertSize() {
     return avgInsertSize;
-  }
-
-  public Long getBoxId() {
-    return boxId;
   }
 
   public String getConcentration() {
@@ -107,10 +102,6 @@ public class PoolDto implements WritableUrls {
 
   public void setAvgInsertSize(Integer avgInsertSize) {
     this.avgInsertSize = avgInsertSize;
-  }
-
-  public void setBoxId(Long boxId) {
-    this.boxId = boxId;
   }
 
   public void setConcentration(String concentration) {

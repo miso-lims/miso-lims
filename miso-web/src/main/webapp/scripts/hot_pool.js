@@ -7,7 +7,7 @@ HotTarget.pool = {
   fixUp: function(lib, errorHandler) {
   },
   createColumns: function(config, create, data) {
-    return [{
+    var columns = [{
       header: 'Pool Name',
       data: 'name',
       readOnly: true,
@@ -63,6 +63,12 @@ HotTarget.pool = {
         HotUtils.makeColumnForFloat('Volume (&#181;l)', true, 'volume', false),
         HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
         HotUtils.makeColumnForBoolean('Ready to Run?', true, 'readyToRun', true)];
+
+    var spliceIndex = columns.indexOf(columns.filter(function(column) {
+      return column.data === 'identificationBarcode';
+    })[0]) + 1;
+    columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+    return columns;
   },
 
   bulkActions: [{

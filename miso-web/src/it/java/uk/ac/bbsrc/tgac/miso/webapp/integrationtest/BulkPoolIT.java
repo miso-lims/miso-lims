@@ -27,8 +27,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkPoolIT extends AbstractIT {
 
-  private static final Set<String> commonColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.BARCODE, Columns.CREATE_DATE,
-      Columns.CONCENTRATION, Columns.VOLUME, Columns.QC_PASSED, Columns.READY_TO_RUN);
+  private static final Set<String> commonColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.BARCODE, Columns.BOX_SEARCH,
+      Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.CREATE_DATE, Columns.CONCENTRATION, Columns.VOLUME, Columns.QC_PASSED,
+      Columns.READY_TO_RUN);
 
   @Before
   public void setup() {
