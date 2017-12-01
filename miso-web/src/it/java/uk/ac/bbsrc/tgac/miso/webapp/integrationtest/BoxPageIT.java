@@ -99,7 +99,7 @@ public class BoxPageIT extends AbstractIT {
 
     // add the item
     visualization.selectPosition(position);
-    visualization.lookupBarcode("TIB_SamStock");
+    visualization.searchBoxables("TIB_SamStock");
     visualization.updatePosition(false);
     
     // confirm values post-add
@@ -124,7 +124,7 @@ public class BoxPageIT extends AbstractIT {
 
     // do the lookup
     visualization.selectPosition(position);
-    visualization.lookupBarcode("Bad Barcode");
+    visualization.searchBoxables("Bad Barcode");
     assertFalse(visualization.isUpdatePositionButtonClickable());
 
     // confirm nothing has changed
@@ -158,7 +158,7 @@ public class BoxPageIT extends AbstractIT {
     assertTrue("checking that no tube is in position F12", visualization.isEmptyPosition(finalPosition));
 
     visualization.selectPosition(finalPosition);
-    visualization.lookupBarcode(libraryBarcode);
+    visualization.searchBoxables(libraryBarcode);
     visualization.updatePosition(false);
 
     // confirm positions post-move
@@ -198,7 +198,7 @@ public class BoxPageIT extends AbstractIT {
 
     // move the item from one box to the next
     secondVisualization.selectPosition(position);
-    secondVisualization.lookupBarcode(barcode);
+    secondVisualization.searchBoxables(barcode);
     secondVisualization.updatePosition(false);
 
     // confirm values post-move
@@ -289,7 +289,7 @@ public class BoxPageIT extends AbstractIT {
 
     // replace the tube
     visualization.selectPosition(position);
-    visualization.lookupBarcode("TIB_replaceDil");
+    visualization.searchBoxables("TIB_replaceDil");
     visualization.updatePosition(true);
 
     // assert values post-replace
