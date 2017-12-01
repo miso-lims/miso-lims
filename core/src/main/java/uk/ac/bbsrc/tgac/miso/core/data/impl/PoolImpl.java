@@ -128,6 +128,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Column(length = NAME_LENGTH)
   private String name;
 
+  private String alias;
+
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinTable(name = "Pool_Note", joinColumns = {
       @JoinColumn(name = "pool_poolId") }, inverseJoinColumns = {
@@ -236,6 +238,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
+  public void setBoxPosition(PoolBoxPosition boxPosition) {
+    this.boxPosition = boxPosition;
+  }
+
+  @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
   }
@@ -288,6 +295,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public String getAlias() {
+    return alias;
   }
 
   @Override
@@ -425,6 +437,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   @Override

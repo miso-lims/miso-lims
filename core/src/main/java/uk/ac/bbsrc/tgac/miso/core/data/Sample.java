@@ -31,6 +31,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -241,6 +242,8 @@ public interface Sample
    *          qcs.
    */
   void setQCs(Collection<SampleQC> qcs);
+
+  public void setBoxPosition(SampleBoxPosition boxPosition);
 
   // TODO: remove below fields to ChangeLoggable interface
   public User getLastModifier();

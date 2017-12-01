@@ -52,8 +52,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import net.sf.json.JSONObject;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -267,22 +265,19 @@ public class SampleController extends RestController {
    */
   @RequestMapping(value = "/identities", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public JSONObject getIdentitiesBySearch(@RequestBody JSONObject json,
+  public Set<SampleDto> getIdentitiesBySearch(@RequestBody com.fasterxml.jackson.databind.JsonNode json,
       HttpServletResponse response) throws IOException {
-    if (json.getString("identitiesSearches").length() == 0) {
+    if (json.get("identitiesSearches").asText().length() == 0) {
       throw new RestException("Must give search terms to look up identities", Status.BAD_REQUEST);
     }
     Set<Sample> uniqueIdentities = new HashSet<>();
-    String searchTerms = json.getString("identitiesSearches");
+    String searchTerms = json.get("identitiesSearches").asText();
     for (String term : SampleIdentityImpl.getSetFromString(searchTerms.replaceAll(";", ","))) {
       Collection<SampleIdentity> matches = sampleService.getIdentitiesByExternalNameOrAlias(term);
       for (SampleIdentity identity : matches) {
         uniqueIdentities.add(identity);
       }
     }
-    Set<SampleDto> matchingIdentities = uniqueIdentities.stream().map(Dtos::asDto).collect(Collectors.toSet());
-    JSONObject allIdentities = new JSONObject();
-    allIdentities.put("matchingIdentities", matchingIdentities);
-    return allIdentities;
+    return uniqueIdentities.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
 }

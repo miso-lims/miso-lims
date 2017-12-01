@@ -36,63 +36,34 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTa
 
 public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
+  // columns for creating Identity and everything else
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME,
-      SamColumns.DONOR_SEX, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS,
+      SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.SAMPLE_TYPE,
+      SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX, SamColumns.SAMPLE_CLASS,
+      SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS,
       SamColumns.QC_NOTE);
 
-  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
-      SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
-      SamColumns.GROUP_DESCRIPTION, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.QC_STATUS,
-      SamColumns.QC_NOTE);
+  // columns for creating Tissue and everything downstream of it
+  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.IDENTITY_ALIAS,
+      SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER,
+      SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
 
-  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
-      SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
-      SamColumns.GROUP_DESCRIPTION, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.SLIDES,
-      SamColumns.DISCARDS, SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+  // columns specific to creating Slides
+  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SLIDES, SamColumns.DISCARDS, SamColumns.THICKNESS,
+      SamColumns.STAIN);
 
-  private static final Set<String> curlsColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
-      SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
-      SamColumns.GROUP_DESCRIPTION, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.QC_STATUS,
-      SamColumns.QC_NOTE);
+  // columns specific to creating curls
+  private static final Set<String> curlsColumns = Sets.newHashSet();
 
-  private static final Set<String> gDnaStockColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
-      SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
-      SamColumns.GROUP_DESCRIPTION, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.STR_STATUS,
-      SamColumns.VOLUME, SamColumns.CONCENTRATION, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+  // columns specific to creating gDNA stocks
+  private static final Set<String> gDnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.CONCENTRATION);
 
-  private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
-      SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
-      SamColumns.GROUP_DESCRIPTION, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.STR_STATUS,
-      SamColumns.VOLUME, SamColumns.CONCENTRATION, SamColumns.DNASE_TREATED, SamColumns.QC_STATUS,
-      SamColumns.QC_NOTE);
+  // columns specific to creating RNA stocks
+  private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.STR_STATUS, SamColumns.VOLUME, SamColumns.CONCENTRATION,
+      SamColumns.DNASE_TREATED);
 
-  private static final Set<String> gDnaAliquotColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
-      SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
-      SamColumns.GROUP_DESCRIPTION, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.STR_STATUS,
-      SamColumns.VOLUME, SamColumns.CONCENTRATION, SamColumns.QC_STATUS, SamColumns.QC_NOTE, SamColumns.PURPOSE);
-
-  private static final Set<String> rnaAliquotColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT,
-      SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
-      SamColumns.GROUP_DESCRIPTION, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.STR_STATUS,
-      SamColumns.VOLUME, SamColumns.CONCENTRATION, SamColumns.DNASE_TREATED, SamColumns.QC_STATUS,
-      SamColumns.QC_NOTE, SamColumns.PURPOSE);
-
-
+  // columns specific to creating aliquots
+  private static final Set<String> aliquotColumns = Sets.newHashSet(SamColumns.PURPOSE);
 
   @Before
   public void setup() {
@@ -116,11 +87,15 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   @Test
   public void testCreateTissueSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(identityColumns);
+    expectedHeadings.addAll(tissueColumns);
+
     BulkSamplePage page = getCreatePage(1, null, tissueClassId);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(tissueColumns.size(), headings.size());
-    for (String col : tissueColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -297,11 +272,16 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   @Test
   public void testCreateSlideSetup() throws Exception {
     // Goal: ensure all expected fields are present, and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(identityColumns);
+    expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(slideColumns);
+
     BulkSamplePage page = getCreatePage(1, null, slideClassId);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(slideColumns.size(), headings.size());
-    for (String col : slideColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -420,11 +400,16 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   @Test
   public void testCreateCurlsSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(identityColumns);
+    expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(curlsColumns);
+
     BulkSamplePage page = getCreatePage(1, null, curlsClassId);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(curlsColumns.size(), headings.size());
-    for (String col : curlsColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -521,11 +506,16 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   @Test
   public void testCreateGdnaStockSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(identityColumns);
+    expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(gDnaStockColumns);
+
     BulkSamplePage page = getCreatePage(1, null, gStockClassId);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(gDnaStockColumns.size(), headings.size());
-    for (String col : gDnaStockColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -642,11 +632,16 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   @Test
   public void testCreateRnaStockSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(identityColumns);
+    expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(rnaStockColumns);
+
     BulkSamplePage page = getCreatePage(1, null, rStockClassId);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(rnaStockColumns.size(), headings.size());
-    for (String col : rnaStockColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -766,11 +761,17 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   @Test
   public void testCreateGdnaAliquotSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(identityColumns);
+    expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(gDnaStockColumns);
+    expectedHeadings.addAll(aliquotColumns);
+
     BulkSamplePage page = getCreatePage(1, null, gAliquotClassId);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(gDnaAliquotColumns.size(), headings.size());
-    for (String col : gDnaAliquotColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -891,11 +892,17 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   @Test
   public void testCreateRnaAliquotSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(identityColumns);
+    expectedHeadings.addAll(tissueColumns);
+    expectedHeadings.addAll(rnaStockColumns);
+    expectedHeadings.addAll(aliquotColumns);
+
     BulkSamplePage page = getCreatePage(1, null, rAliquotClassId);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(rnaAliquotColumns.size(), headings.size());
-    for (String col : rnaAliquotColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());

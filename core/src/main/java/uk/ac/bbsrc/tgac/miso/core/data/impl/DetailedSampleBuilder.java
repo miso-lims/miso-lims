@@ -41,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -967,5 +968,10 @@ public class DetailedSampleBuilder
   @Override
   public String getBarcodeExtraInfo() {
     return getDescription();
+  }
+
+  @Override
+  public void setBoxPosition(SampleBoxPosition boxPosition) {
+    throw new UnsupportedOperationException("Method not implemented on builder");
   }
 }

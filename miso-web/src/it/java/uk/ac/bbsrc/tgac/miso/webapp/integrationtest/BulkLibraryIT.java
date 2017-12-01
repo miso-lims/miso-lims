@@ -36,8 +36,9 @@ public class BulkLibraryIT extends AbstractIT {
   private static final Logger log = LoggerFactory.getLogger(BulkLibraryIT.class);
 
   private static final Set<String> commonColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.ALIAS, LibColumns.ID_BARCODE,
-      LibColumns.DESCRIPTION, LibColumns.GROUP_ID, LibColumns.GROUP_DESC, LibColumns.DESIGN, LibColumns.CODE, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE,
-      LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2, LibColumns.KIT_DESCRIPTOR,
+      LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DESCRIPTION, LibColumns.GROUP_ID,
+      LibColumns.GROUP_DESC, LibColumns.DESIGN, LibColumns.CODE, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE, LibColumns.SELECTION,
+      LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2, LibColumns.KIT_DESCRIPTOR,
       LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.VOLUME, LibColumns.CONCENTRATION);
 
   private static final Set<String> editColumns = Sets.newHashSet(LibColumns.RECEIVE_DATE, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION);

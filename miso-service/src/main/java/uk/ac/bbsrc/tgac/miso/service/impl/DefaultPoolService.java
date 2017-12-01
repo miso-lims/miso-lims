@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PoolableElementViewService;
@@ -53,6 +54,8 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   private NamingScheme namingScheme;
   @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private BoxService boxService;
   @Autowired
   private SecurityManager securityManager;
   @Autowired
@@ -76,6 +79,10 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
 
   public void setChangeLogService(ChangeLogService changeLogService) {
     this.changeLogService = changeLogService;
+  }
+
+  public void setBoxService(BoxService boxService) {
+    this.boxService = boxService;
   }
 
   public void setPoolableElementViewService(PoolableElementViewService poolableElementViewService) {
@@ -181,6 +188,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       pool.setVolume(0.0);
     }
 
+    long savedId;
     if (pool.getId() == PoolImpl.UNSAVED_ID) {
       pool.setName(generateTemporaryName());
       loadPooledElements(pool.getPoolableElementViews(), pool);
@@ -196,23 +204,24 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       } catch (MisoNamingException e) {
         throw new IOException("Invalid name for pool", e);
       }
+      savedId = poolStore.save(pool);
     } else {
-      Pool original = poolStore.get(pool.getId());
-      authorizationManager.throwIfNotWritable(original);
-      original.setAlias(pool.getAlias());
-      original.setConcentration(pool.getConcentration());
-      original.setDescription(pool.getDescription());
-      original.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(pool.getIdentificationBarcode()));
-      original.setPlatformType(pool.getPlatformType());
-      original.setQcPassed(pool.getQcPassed());
-      original.setReadyToRun(pool.getReadyToRun());
-      original.setVolume(pool.getVolume());
-      original.setDiscarded(pool.isDiscarded());
-      original.setCreationDate(pool.getCreationDate());
+      Pool managed = poolStore.get(pool.getId());
+      authorizationManager.throwIfNotWritable(managed);
+      managed.setAlias(pool.getAlias());
+      managed.setConcentration(pool.getConcentration());
+      managed.setDescription(pool.getDescription());
+      managed.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(pool.getIdentificationBarcode()));
+      managed.setPlatformType(pool.getPlatformType());
+      managed.setQcPassed(pool.getQcPassed());
+      managed.setReadyToRun(pool.getReadyToRun());
+      managed.setVolume(pool.getVolume());
+      managed.setDiscarded(pool.isDiscarded());
+      managed.setCreationDate(pool.getCreationDate());
 
-      Set<String> originalItems = extractDilutionNames(original.getPoolableElementViews());
-      loadPooledElements(pool, original);
-      Set<String> updatedItems = extractDilutionNames(original.getPoolableElementViews());
+      Set<String> originalItems = extractDilutionNames(managed.getPoolableElementViews());
+      loadPooledElements(pool, managed);
+      Set<String> updatedItems = extractDilutionNames(managed.getPoolableElementViews());
 
       Set<String> added = new TreeSet<>(updatedItems);
       added.removeAll(originalItems);
@@ -233,11 +242,11 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
         changeLog.setUser(pool.getLastModifier());
         changeLogService.create(changeLog);
       }
-      pool = original;
-      setChangeDetails(pool);
+      setChangeDetails(managed);
+      savedId = poolStore.save(managed);
     }
-    long id = poolStore.save(pool);
-    return id;
+    boxService.updateBoxableLocation(pool);
+    return savedId;
   }
 
   /**

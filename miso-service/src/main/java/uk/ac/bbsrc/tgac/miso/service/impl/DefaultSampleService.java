@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
@@ -120,6 +121,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   private LabService labService;
   @Autowired
   private StainService stainService;
+  @Autowired
+  private BoxService boxService;
 
   @Autowired
   private NamingScheme namingScheme;
@@ -175,6 +178,10 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   public void setLabService(LabService labService) {
     this.labService = labService;
+  }
+
+  public void setBoxService(BoxService boxService) {
+    this.boxService = boxService;
   }
 
   public void setNamingScheme(NamingScheme namingScheme) {
@@ -248,7 +255,9 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     if (isStringEmptyOrNull(sample.getAlias()) && namingScheme.hasSampleAliasGenerator()) {
       sample.setAlias(generateTemporaryName());
     }
-    return save(sample, true).getId();
+    long savedId = save(sample, true).getId();
+    boxService.updateBoxableLocation(sample);
+    return savedId;
   }
 
   /**
@@ -603,21 +612,22 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public void update(Sample sample) throws IOException {
-    Sample updatedSample = get(sample.getId());
-    boolean validateAliasUniqueness = !updatedSample.getAlias().equals(sample.getAlias());
-    authorizationManager.throwIfNotWritable(updatedSample);
-    applyChanges(updatedSample, sample);
-    setChangeDetails(updatedSample);
-    loadChildEntities(updatedSample);
-    if (isDetailedSample(updatedSample)) {
-      DetailedSample detailedUpdated = (DetailedSample) updatedSample;
+    Sample managed = get(sample.getId());
+    boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
+    authorizationManager.throwIfNotWritable(managed);
+    applyChanges(managed, sample);
+    setChangeDetails(managed);
+    loadChildEntities(managed);
+    if (isDetailedSample(managed)) {
+      DetailedSample detailedUpdated = (DetailedSample) managed;
       if (detailedUpdated.getParent() != null) {
         detailedUpdated.setParent((DetailedSample) get(detailedUpdated.getParent().getId()));
         validateHierarchy(detailedUpdated);
       }
     }
 
-    save(updatedSample, validateAliasUniqueness);
+    save(managed, validateAliasUniqueness);
+    boxService.updateBoxableLocation(sample);
   }
 
   /**

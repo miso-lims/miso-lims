@@ -18,9 +18,6 @@ public abstract class AbstractBoxable implements Boxable {
   private boolean discarded;
   @Column(nullable = true)
   private Double volume;
-  
-  @Column(name = "alias")
-  private String alias;
 
   @Override
   public Double getVolume() {
@@ -44,19 +41,8 @@ public abstract class AbstractBoxable implements Boxable {
   }
 
   @Override
-  public String getAlias() {
-    return alias;
-  }
-
-  @Override
-  public void setAlias(String alias) {
-    this.alias = alias;
-  }
-
-  @Override
   public int hashCode() {
     return new HashCodeBuilder(1, 31)
-        .append(alias)
         .append(discarded)
         .append(volume)
         .toHashCode();
@@ -69,7 +55,6 @@ public abstract class AbstractBoxable implements Boxable {
     if (getClass() != obj.getClass()) return false;
     AbstractBoxable other = (AbstractBoxable) obj;
     return new EqualsBuilder()
-        .append(alias, other.alias)
         .append(discarded, other.discarded)
         .append(volume, other.volume)
         .isEquals();

@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -115,6 +116,9 @@ public class DefaultSampleServiceTest {
 
   @Mock
   private NamingScheme namingScheme;
+
+  @Mock
+  private BoxService boxService;
 
   @InjectMocks
   private DefaultSampleService sut;

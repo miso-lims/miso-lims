@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.BoxChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
@@ -109,7 +110,12 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
     Box o = boxStore.get(boxId);
     authorizationManager.throwIfNotReadable(o);
     return o;
+  }
 
+  private Box getDetached(long boxId) throws IOException {
+    Box o = boxStore.getDetached(boxId);
+    authorizationManager.throwIfNotReadable(o);
+    return o;
   }
 
   @Override
@@ -161,6 +167,11 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   public List<Box> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
       throws IOException {
     return authorizationManager.filterUnreadable(boxStore.list(errorHandler, offset, limit, sortDir, sortCol, filter));
+  }
+
+  @Override
+  public List<Box> getBySearch(String search) {
+    return boxStore.getBySearch(search);
   }
 
   @Override
@@ -320,6 +331,32 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
       }
     } else {
       box.setLastModified(now);
+    }
+  }
+
+  @Override
+  public void updateBoxableLocation(Boxable boxable) throws IOException {
+    if (boxable.getBox() != null && boxable.getBoxPosition() == null) {
+      throw new IllegalArgumentException("Box position missing");
+    } else if (boxable.getBoxPosition() != null && (boxable.getBox() == null || boxable.getBox().getId() == AbstractBox.UNSAVED_ID)) {
+      throw new IllegalArgumentException("Box position set, but no box specified");
+    }
+    BoxableView managed = getBoxableView(new BoxableId(boxable.getEntityType(), boxable.getId()));
+    if (managed.getBoxId() != null && boxable.getBox() == null) {
+      Box box = getDetached(managed.getBoxId());
+      box.removeBoxable(managed.getBoxPosition());
+      save(box);
+    } else if (boxable.getBox() != null && (
+        managed.getBoxId() == null
+            || managed.getBoxId().longValue() != boxable.getBox().getId()
+            || !managed.getBoxPosition().equals(boxable.getBoxPosition())
+        )) {
+      Box box = getDetached(boxable.getBox().getId());
+      if (box.getBoxable(boxable.getBoxPosition()) != null) {
+        throw new IllegalArgumentException(String.format("Box position already occupied: %s %s", box.getName(), boxable.getBoxPosition()));
+      }
+      box.setBoxable(boxable.getBoxPosition(), BoxableView.fromBoxable(boxable));
+      save(box);
     }
   }
 

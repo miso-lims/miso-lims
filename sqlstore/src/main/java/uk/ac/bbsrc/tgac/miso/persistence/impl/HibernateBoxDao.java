@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
@@ -116,6 +117,14 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
+  public Box getDetached(long boxId) throws IOException {
+    Box box = (Box) currentSession().get(BoxImpl.class, boxId);
+    Hibernate.initialize(box.getBoxables());
+    currentSession().evict(box);
+    return box;
+  }
+
+  @Override
   public Box getBoxByAlias(String alias) throws IOException {
     Criteria criteria = currentSession().createCriteria(BoxImpl.class);
     criteria.add(Restrictions.eq("alias", alias));
@@ -157,6 +166,22 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
+  public List<Box> getBySearch(String search) {
+    if (search == null) {
+      throw new NullPointerException("No search String provided");
+    }
+    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
+    criteria.add(Restrictions.or(
+        Restrictions.eq("identificationBarcode", search),
+        Restrictions.eq("name", search),
+        Restrictions.eq("alias", search)
+        ));
+    @SuppressWarnings("unchecked")
+    List<Box> results = criteria.list();
+    return results;
+  }
+
+  @Override
   public Collection<BoxSize> listAllBoxSizes() throws IOException {
     Criteria criteria = currentSession().createCriteria(BoxSize.class);
     @SuppressWarnings("unchecked")
@@ -184,7 +209,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   @Override
   public boolean remove(Box box) throws IOException {
     if (box.getId() != AbstractBox.UNSAVED_ID) {
-      currentSession().delete(box);
+      Box persisted = (Box) currentSession().merge(box);
+      currentSession().delete(persisted);
       return true;
     }
     return false;
@@ -207,7 +233,8 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     }
     Box box = get(boxId);
     box.removeBoxable(position);
-    currentSession().save(box);
+    Box persisted = (Box) currentSession().merge(box);
+    currentSession().update(persisted);
   }
 
   @Override
@@ -215,7 +242,7 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     if (box.getId() == AbstractBox.UNSAVED_ID) {
       return (long) currentSession().save(box);
     } else {
-      // Merge required to allow temporary eviction during update in DefaultMigrationTarget
+      // Merge required to allow temporary eviction during update (see getDetached)
       Box persisted = (Box) currentSession().merge(box);
       currentSession().update(persisted);
       return box.getId();

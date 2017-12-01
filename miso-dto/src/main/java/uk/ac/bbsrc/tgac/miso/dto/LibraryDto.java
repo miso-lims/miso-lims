@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
     @JsonSubTypes.Type(value = DetailedLibraryDto.class, name = "Detailed"),
     @JsonSubTypes.Type(value = LibraryDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
-public class LibraryDto implements WritableUrls {
+public class LibraryDto extends AbstractBoxableDto implements WritableUrls {
 
   private String alias;
   private String concentration;
@@ -44,7 +44,6 @@ public class LibraryDto implements WritableUrls {
   private String indexFamilyName;
   private String url;
   private String volume;
-  private Long boxId;
   private List<QcDto> qcs;
   private Integer dnaSize;
   private Long kitDescriptorId;
@@ -54,10 +53,6 @@ public class LibraryDto implements WritableUrls {
 
   public String getAlias() {
     return alias;
-  }
-
-  public Long getBoxId() {
-    return boxId;
   }
 
   public String getConcentration() {
@@ -178,10 +173,6 @@ public class LibraryDto implements WritableUrls {
 
   public void setAlias(String alias) {
     this.alias = alias;
-  }
-
-  public void setBoxId(Long boxId) {
-    this.boxId = boxId;
   }
 
   public void setConcentration(String concentration) {

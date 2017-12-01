@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -90,6 +91,12 @@ public class BoxRestController extends RestController {
     boxService.save(box);
     Box saved = boxService.get(boxId);
     return Dtos.asDto(saved, true);
+  }
+
+  @RequestMapping(value = "/boxes/search")
+  public @ResponseBody List<BoxDto> search(@RequestParam("q") String search) {
+    List<Box> results = boxService.getBySearch(search);
+    return Dtos.asBoxDtos(results, true);
   }
 
   private static BoxableId parseEntityIdentifier(String identifier) {

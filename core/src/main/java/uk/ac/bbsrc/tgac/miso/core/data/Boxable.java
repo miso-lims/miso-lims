@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.function.Supplier;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -9,6 +10,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
@@ -18,19 +23,25 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 public interface Boxable extends Nameable, Barcodable, SecurableByProfile, Serializable {
 
   public enum EntityType {
-    SAMPLE(SampleImpl.class),
-    LIBRARY(LibraryImpl.class),
-    DILUTION(LibraryDilution.class),
-    POOL(PoolImpl.class);
+    SAMPLE(SampleImpl.class, SampleBoxPosition::new),
+    LIBRARY(LibraryImpl.class, LibraryBoxPosition::new),
+    DILUTION(LibraryDilution.class, DilutionBoxPosition::new),
+    POOL(PoolImpl.class, PoolBoxPosition::new);
 
     private final Class<? extends Boxable> persistClass;
+    private final Supplier<? extends AbstractBoxPosition> positionConstructor;
 
-    private EntityType(Class<? extends Boxable> persistClass) {
+    private EntityType(Class<? extends Boxable> persistClass, Supplier<? extends AbstractBoxPosition> positionConstructor) {
       this.persistClass = persistClass;
+      this.positionConstructor = positionConstructor;
     }
 
     public Class<? extends Boxable> getPersistClass() {
       return persistClass;
+    }
+
+    public AbstractBoxPosition makeBoxPosition() {
+      return positionConstructor.get();
     }
   }
 

@@ -525,12 +525,12 @@ public class DefaultMigrationTarget implements MigrationTarget {
     }
     log.debug("Saving library dilution " + friendlyName);
     if (replaceChangeLogs) {
-      if (ldi.getCreationDate() == null || ldi.getLastUpdated() == null) {
+      if (ldi.getCreationDate() == null || ldi.getLastModified() == null) {
         throw new IOException("Cannot save dilution due to missing timestamps");
       }
     } else {
       ldi.setCreationDate(timeStamp);
-      ldi.setLastUpdated(timeStamp);
+      ldi.setLastModified(timeStamp);
     }
 
     Collection<ChangeLog> ghostChangeLog = null;

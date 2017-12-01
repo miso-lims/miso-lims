@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-public class DilutionDto implements WritableUrls {
+public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   private Long id;
   private String name;

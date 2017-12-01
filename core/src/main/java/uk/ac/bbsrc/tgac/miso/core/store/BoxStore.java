@@ -20,6 +20,17 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * 
  */
 public interface BoxStore extends Store<Box>, Remover<Box>, PaginatedDataSource<Box> {
+
+  /**
+   * Retrieve a Box that is disconnected from Hibernate, with its lazy-loading relationships initialized. This is to prevent Hibernate
+   * from dirty-checking and auto-flushing changes, which circumvents the Service layer
+   * 
+   * @param boxId
+   * @return
+   * @throws IOException
+   */
+  public Box getDetached(long boxId) throws IOException;
+
   /**
    * Retrieve a Box from data store given a Box alias.
    * 
@@ -43,6 +54,8 @@ public interface BoxStore extends Store<Box>, Remover<Box>, PaginatedDataSource<
   BoxUse getUseById(long id) throws IOException;
 
   BoxSize getSizeById(long id) throws IOException;
+
+  public List<Box> getBySearch(String search);
 
   Collection<BoxUse> listAllBoxUses() throws IOException;
   
