@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +28,7 @@ public class BoxableRestController extends RestController {
   @RequestMapping(value = "/search", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
   public List<BoxableDto> search(@RequestParam("q") String search, HttpServletRequest request, HttpServletResponse response,
-      UriComponentsBuilder uriBuilder) throws IOException {
+      UriComponentsBuilder uriBuilder) {
     List<BoxableView> results = boxService.getBoxableViewsBySearch(search);
     return Dtos.asBoxableDtos(results);
   }
