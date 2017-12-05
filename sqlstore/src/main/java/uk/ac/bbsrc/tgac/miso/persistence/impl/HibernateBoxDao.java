@@ -228,13 +228,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public BoxableView getBoxableViewByBarcode(String barcode) throws IOException {
-    Criteria criteria = currentSession().createCriteria(BoxableView.class);
-    criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    return (BoxableView) criteria.uniqueResult();
-  }
-
-  @Override
   public List<BoxableView> getBoxableViewsByBarcodeList(Collection<String> barcodes) throws IOException {
     Criteria criteria = currentSession().createCriteria(BoxableView.class);
     criteria.add(Restrictions.in("identificationBarcode", barcodes));
@@ -261,6 +254,23 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     criteria.add(Restrictions.eq("preMigrationId", preMigrationId));
     BoxableView result = (BoxableView) criteria.uniqueResult();
     return result;
+  }
+
+  @Override
+  public List<BoxableView> getBoxableViewsBySearch(String search) {
+    if (search == null) {
+      throw new NullPointerException("No search String provided");
+    }
+    Criteria criteria = currentSession().createCriteria(BoxableView.class);
+    criteria.add(Restrictions.or(
+        Restrictions.eq("identificationBarcode", search),
+        Restrictions.eq("name", search),
+        Restrictions.eq("alias", search)
+        ));
+    criteria.add(Restrictions.eq("discarded", false));
+    @SuppressWarnings("unchecked")
+    List<BoxableView> results = criteria.list();
+    return results;
   }
 
   public void setJdbcTemplate(JdbcTemplate template) {

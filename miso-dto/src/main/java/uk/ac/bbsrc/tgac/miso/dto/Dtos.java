@@ -1219,6 +1219,12 @@ public class Dtos {
     return items;
   }
 
+  public static List<BoxableDto> asBoxableDtos(List<BoxableView> boxables) {
+    return boxables.stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
+  }
+
   public static BoxableDto asDto(BoxableView from) {
     BoxableDto dto = new BoxableDto();
     dto.setId(from.getId().getTargetId());

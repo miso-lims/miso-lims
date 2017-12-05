@@ -143,8 +143,13 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public BoxableView getViewByBarcode(String barcode) throws IOException {
-    return boxStore.getBoxableViewByBarcode(barcode);
+  public BoxableView getBoxableView(BoxableId id) throws IOException {
+    return boxStore.getBoxableView(id);
+  }
+
+  @Override
+  public List<BoxableView> getBoxableViewsBySearch(String search) {
+    return boxStore.getBoxableViewsBySearch(search);
   }
 
   @Override
