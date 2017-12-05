@@ -53,8 +53,8 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @SessionAttributes("user")
@@ -65,10 +65,17 @@ public class EditUserController {
   private SecurityManager securityManager;
 
   @Autowired
+  private AuthorizationManager authorizationManager;
+
+  @Autowired
   private PasswordCodecService passwordCodecService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
   }
 
   public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
@@ -150,7 +157,7 @@ public class EditUserController {
   public String adminProcessSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
       throws IOException {
     try {
-      if (!SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(MisoAuthority.ROLE_ADMIN)) {
+      if (!authorizationManager.isAdminUser()) {
         throw new IOException("Only administrator can use admin edit page.");
       }
       String newPassword = request.getParameter("newpassword");
