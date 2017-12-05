@@ -79,7 +79,8 @@ var Box = Box
       },
 
       createVisualization: function() {
-        var selected = Box.visual.selected;
+        Box.visual.setDisabled(false);
+        var selected = (Box.visual.selectedItems && Box.visual.selectedItems.length === 1) ? Box.visual.selectedItems[0] : null;
         Box.visual.create({
           div: '#boxContentsTable',
           size: {
@@ -89,7 +90,7 @@ var Box = Box
           data: Box.boxJSON.items
         });
         if (selected) {
-          Box.visual.click(selected.row, selected.col);
+          Box.visual.selectPos(selected.row, selected.col);
         }
       },
 
@@ -127,52 +128,6 @@ var Box = Box
         }
         Utils.showConfirmDialog('Delete Box', 'Delete', ["Are you sure you really want to delete BOX" + Box.boxId
             + "? This operation is permanent!"], deleteIt);
-      },
-
-      lookupBoxableByBarcode: function() {
-        var barcode = jQuery('#selectedBarcode').val();
-        if (!jQuery('#selectedPosition').text()) {
-          jQuery('#warningMessages').html("Please select a single position from the grid, then rescan the barcode.");
-          return null;
-        }
-        if (Utils.validation.isNullCheck(barcode)) {
-          Utils.showOkDialog('Empty barcode', ['Please enter a barcode']);
-        } else {
-          jQuery('#lookupBarcode').prop('disabled', true).addClass('disabled');
-          jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
-          Fluxion.doAjax('boxControllerHelperService', 'lookupBoxableByBarcode', {
-            'barcode': barcode,
-            'url': ajaxurl
-          }, {
-            'doOnSuccess': function(json) {
-              var boxable = json.boxable;
-              jQuery('#selectedName').html(Box.utils.hyperlinkifyBoxable(boxable.name, boxable.id, boxable.name));
-              jQuery('#selectedAlias').html(Box.utils.hyperlinkifyBoxable(boxable.name, boxable.id, boxable.alias));
-              jQuery('#currentLocationText').html("Current Location:");
-              if (boxable.boxAlias) {
-                jQuery('#currentLocation').html(boxable.boxAlias + " - " + boxable.boxPosition);
-              } else {
-                jQuery('#currentLocation').html("unknown");
-              }
-              jQuery('#lookupBarcode').prop('disabled', false).removeClass('disabled');
-              jQuery('#warningMessages').html('');
-              if (json.hasOwnProperty("trashed")) {
-                jQuery('#warningMessages').html(json.trashed);
-                jQuery('#updateSelected').prop('disabled', true).addClass('disabled');
-              } else {
-                jQuery('#updateSelected').prop('disabled', false).removeClass('disabled');
-              }
-              Box.ui.createListingBoxablesTable(Box.boxJSON);
-              jQuery('#updateSelected').focus();
-            },
-            'doOnError': function(json) {
-              jQuery('#warningMessages').html('');
-              Utils.showOkDialog('Error looking up item', [json.error]);
-              jQuery('#selectedBarcode').val('').focus();
-              jQuery('#lookupBarcode').prop('disabled', false).removeClass('disabled');
-            }
-          });
-        }
       },
 
       // Validate methods are in parsley_form_validations.js
@@ -323,7 +278,7 @@ Box.ui = {
     if (items.length < 1) {
       if (Box.visual.data.length) {
         // there are items in the box but an empty position is selected
-        addToolbarMemo("Select one or more itmes to see bulk actions.");
+        addToolbarMemo("Select one or more items to see bulk actions.");
         return;
       } else {
         // empty box
@@ -421,67 +376,64 @@ Box.ui = {
   },
 
   addItemToBox: function() {
-    var barcode = jQuery('#selectedBarcode').val();
-    if (!jQuery('#selectedPosition').text()) {
-      jQuery('#warningMessages').html("Please select a single position from the grid, then rescan the barcode.");
-      return null;
-    }
-    if (Utils.validation.isNullCheck(barcode)) {
-      Utils.showOkDialog('Enter a barcode', ['Please enter a barcode.']);
+    if (Box.visual.selectedItems.length !== 1) {
+      jQuery('#warningMessages').html("Please select a single position from the grid, then retry.");
       return;
-    } else {
-      var selectedBarcode = jQuery('#selectedBarcode').val().trim();
-      if (Box.visual.selectedItems.length !== 1) {
-        Utils.showOkDialog('Too many positions selected', ['Select a single position for the tube to go.']);
+    }
+    if (jQuery('#resultSelect').val() == -1) {
+      jQuery('#warningMessages').html('Please select an item to add.');
+      return;
+    }
+
+    var selectedPosition = Box.utils.getPositionString(Box.visual.selectedItems[0].row, Box.visual.selectedItems[0].col);
+    var selectedItem = Box.ui.getItemAtPosition(selectedPosition);
+
+    var addTheItem = function() {
+      jQuery('#emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
+      Box.ui.showBoxableSearchLoading();
+
+      jQuery.ajax({
+        url: '/miso/rest/box/' + Box.boxId + '/position/' + selectedPosition + '?' + jQuery.param({
+          entity: jQuery('#resultSelect').val()
+        }),
+        type: "PUT",
+        dataType: "json",
+        contentType: 'application/json; charset=utf8'
+      }).success(function(data) {
+        Box.boxJSON = data;
+        Box.update();
+        Box.ui.getBulkActions();
+        Box.ui.clearBoxableSearchResults();
+        jQuery('#searchField').val('');
+        jQuery('#emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
+      }).fail(function(response, textStatus, serverStatus) {
+        var error = JSON.parse(response.responseText);
+        var message = error.detail ? error.detail : error.message;
+        jQuery('#warningMessages').html('Error adding item: ' + message);
+        jQuery('#ajaxLoader').addClass('hidden');
+        jQuery('#searchField, #search, #resultSelect, #updateSelected').prop('disabled', false).removeClass('disabled');
+        Box.visual.setDisabled(false);
+        if (Box.visual.selectedItems.length === 1) {
+          jQuery('#emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
+        }
+      });
+    }
+
+    if (selectedItem) {
+      var selectedEntity = selectedItem.entityType + ":" + selectedItem.id;
+      if (selectedEntity === jQuery('#resultSelect').val()) {
+        // setting same item where it already is. No change necessary
+        Box.ui.clearBoxableSearchResults();
+        jQuery('#searchField').val('');
         return;
       }
-      var selectedPosition = Box.utils.getPositionString(Box.visual.selectedItems[0].row, Box.visual.selectedItems[0].col);
-      var selectedItem = Box.ui.getItemAtPosition(selectedPosition);
-
-      var addTheItem = function() {
-        jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', true).addClass('disabled');
-        jQuery('#warningMessages').html('<img id="ajaxLoader" src="/styles/images/ajax-loader.gif" alt="Loading" />');
-
-        Fluxion.doAjax('boxControllerHelperService', 'updateOneItem', {
-          'boxId': Box.boxId,
-          'barcode': selectedBarcode,
-          'position': selectedPosition,
-          'url': ajaxurl
-        }, {
-          'doOnSuccess': function(json) {
-            Box.boxJSON = JSON.parse(json.boxJSON);
-            Box.update();
-            Box.ui.getBulkActions();
-            console.log(json);
-            jQuery('#updateSelected, #emptySelected, #removeSelected').prop('disabled', false).removeClass('disabled');
-            jQuery('#ajaxLoader').remove();
-          },
-          'doOnError': function(json) {
-            Utils.showOkDialog('Error adding item', [json.error]);
-            jQuery('#selectedBarcode').val(selectedItem.identificationBarcode);
-            jQuery('#ajaxLoader').remove();
-          }
-        });
-      }
-
       // if selectedPosition is already filled, confirm before deleting that position
-      if (selectedItem && selectedItem.identificationBarcode != selectedBarcode) {
-        var sampleInfo = selectedItem.name + ' (' + selectedItem.alias + ')';
-        var existingInfo = jQuery('#selectedName a:first').html() + ' (' + jQuery('#selectedAlias a:first').html() + ')';
-
-        var replaceIt = function() {
-          Box.boxJSON.items = Box.boxJSON.items.filter(function(item) {
-            return item.coordinates != selectedPosition;
-          });
-          addTheItem();
-        }
-        Utils.showConfirmDialog('Replace Item', 'Replace', [
-            sampleInfo + " is already located at position " + selectedPosition
-                + ". Are you sure you wish to remove it from the box and replace it with " + existingInfo + "?",
-            "If so, you should re-home " + selectedItem.name + " as soon as possible."], replaceIt);
-      } else {
-        addTheItem();
-      }
+      var sampleInfo = selectedItem.name + ' (' + selectedItem.alias + ')';
+      Utils.showConfirmDialog('Replace Item', 'Replace', [
+          sampleInfo + " is already located at position " + selectedPosition + ". Are you sure you wish to replace it?",
+          "If so, you should re-home " + selectedItem.name + " as soon as possible."], addTheItem);
+    } else {
+      addTheItem();
     }
   },
 
@@ -557,5 +509,62 @@ Box.ui = {
       });
     };
     Utils.showConfirmDialog('Discard Entire Box', 'Discard', ["Are you sure you wish to discard all tubes in this box?"], discardBox);
-  }
+  },
+
+  searchBoxables: function() {
+    var searchString = jQuery('#searchField').val();
+    if (!searchString) {
+      Box.ui.clearBoxableSearchResults();
+      return;
+    }
+    Box.ui.showBoxableSearchLoading();
+    var url = "/miso/rest/boxables/search?q=" + searchString;
+    jQuery.ajax({
+      url: url,
+      contentType: "application/json; charset=utf8",
+      dataType: "json",
+      type: "GET"
+    }).success(function(data) {
+      Box.ui.showBoxableSearchResults(data);
+    }).fail(function(response, textStatus, serverStatus) {
+      Box.ui.clearBoxableSearchResults();
+      var error = JSON.parse(response.responseText);
+      var message = error.detail ? error.detail : error.message;
+      Utils.showOkDialog('Search error', [message]);
+    });
+  },
+
+  showBoxableSearchLoading: function() {
+    jQuery('#ajaxLoader').removeClass('hidden');
+    jQuery('#searchField, #search, #resultSelect, #updateSelected').prop('disabled', true).addClass('disabled');
+    Box.visual.setDisabled(true);
+  },
+
+  clearBoxableSearchResults: function() {
+    Box.ui.showBoxableSearchResults();
+  },
+
+  showBoxableSearchResults: function(results) {
+    jQuery('#resultSelect').empty();
+    jQuery('#warningMessages').html('');
+
+    if (!results || !results.length) {
+      jQuery('#resultSelect').append('<option value="-1" selected="selected">No results</option>');
+    } else {
+      if (results.length > 1) {
+        jQuery('#resultSelect').append('<option value="-1" selected="selected">SELECT</option>');
+      }
+      jQuery.each(results, function(index, result) {
+        var opt = jQuery('<option>');
+        opt.val(result.entityType + ':' + result.id);
+        opt.text(result.name + ': ' + result.alias);
+        jQuery('#resultSelect').append(opt);
+      });
+      jQuery('#updateSelected').prop('disabled', false).removeClass('disabled');
+    }
+
+    jQuery('#ajaxLoader').addClass('hidden');
+    jQuery('#searchField, #search, #resultSelect').prop('disabled', false).removeClass('disabled');
+    Box.visual.setDisabled(false);
+  },
 };

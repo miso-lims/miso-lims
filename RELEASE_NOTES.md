@@ -1,3 +1,10 @@
+# 0.2.101
+
+Changes:
+
+ * Allow adding non-barcoded boxables to boxes
+ * Fix Prometheus monitoring
+
 # 0.2.100
 
 Changes:

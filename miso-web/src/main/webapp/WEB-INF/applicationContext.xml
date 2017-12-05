@@ -50,6 +50,8 @@
   <bean id="applicationContextProvider" name="applicationContextProvider" class="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" />
   <bean id="iApplicationContextProvider" name="iApplicationContextProvider" class="uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider" />
 
+  <aop:config/>
+
   <bean name="prometheusInterceptor" class="uk.ac.bbsrc.tgac.miso.webapp.context.PrometheusInterceptor" />
   <bean id="prometheusAdvisor"
      class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">

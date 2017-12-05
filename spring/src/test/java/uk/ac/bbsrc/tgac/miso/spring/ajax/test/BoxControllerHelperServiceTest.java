@@ -210,29 +210,6 @@ public class BoxControllerHelperServiceTest {
   }
 
   @Test
-  public void testUpdateOneItem() throws Exception {
-    Box box = makeEmptyBox();
-    when(boxService.get(box.getId())).thenReturn(box);
-
-    BoxableView sample = makeSampleView();
-    when(boxService.getViewByBarcode(Mockito.any())).thenReturn(sample);
-
-    JSONObject json = new JSONObject();
-    json.put("boxId", box.getId());
-    json.put("position", "A01");
-    json.put("barcode", sample.getIdentificationBarcode());
-
-    JSONObject response = boxControllerHelperService.updateOneItem(null, json);
-    assertFalse(response.has("error"));
-    assertTrue(response.has("boxJSON"));
-    assertTrue(response.has("addedToBox"));
-
-    ArgumentCaptor<Box> saveBox = ArgumentCaptor.forClass(Box.class);
-    verify(boxService).save(saveBox.capture());
-    assertEquals(sample.getIdentificationBarcode(), saveBox.getValue().getBoxable("A01").getIdentificationBarcode());
-  }
-
-  @Test
   public void testRemoveTubeFromBox() throws Exception {
     Box box = makeEmptyBox();
     BoxableView sample = makeSampleView();
@@ -272,62 +249,6 @@ public class BoxControllerHelperServiceTest {
     assertFalse(response.has("error"));
     assertTrue(response.has("boxJSON"));
     verify(boxService).discardSingleTube(box, "A01");
-  }
-
-  @Test
-  public void testLookupBoxableByBarcode() throws Exception {
-    BoxableView sample = makeSampleView();
-    when(boxService.getViewByBarcode(Mockito.any())).thenReturn(sample);
-
-    JSONObject json = new JSONObject();
-    json.put("barcode", sample.getIdentificationBarcode());
-
-    JSONObject response = boxControllerHelperService.lookupBoxableByBarcode(null, json);
-    assertFalse(response.has("error"));
-    assertTrue(response.has("boxable"));
-    assertTrue(response.getJSONObject("boxable").has("alias"));
-    assertEquals(sample.getAlias(), response.getJSONObject("boxable").getString("alias"));
-  }
-
-  @Test
-  public void testLookupBoxableByBarcodeTrashed() throws Exception {
-    BoxableView sample = makeSampleView();
-    sample.setDiscarded(true);
-    when(boxService.getViewByBarcode(Mockito.any())).thenReturn(sample);
-
-    JSONObject json = new JSONObject();
-    json.put("barcode", sample.getIdentificationBarcode());
-
-    JSONObject response = boxControllerHelperService.lookupBoxableByBarcode(null, json);
-    assertFalse(response.has("error"));
-    assertTrue(response.has("boxable"));
-    assertTrue(response.has("trashed"));
-  }
-
-  @Test
-  public void testLookupBoxableByBarcodeDuplicate() throws Exception {
-    Sample sample = makeSample();
-    when(sampleService.getByBarcode(sample.getIdentificationBarcode())).thenReturn(sample);
-    Library library = makeLibrary();
-    library.setIdentificationBarcode(sample.getIdentificationBarcode());
-    when(libraryService.getByBarcode(library.getIdentificationBarcode())).thenReturn(library);
-
-    JSONObject json = new JSONObject();
-    json.put("barcode", sample.getIdentificationBarcode());
-
-    JSONObject response = boxControllerHelperService.lookupBoxableByBarcode(null, json);
-    assertTrue(response.has("error"));
-  }
-
-  @Test
-  public void testLookupBoxableByBarcodeNotFound() throws Exception {
-    Sample sample = makeSample();
-
-    JSONObject json = new JSONObject();
-    json.put("barcode", sample.getIdentificationBarcode());
-
-    JSONObject response = boxControllerHelperService.lookupBoxableByBarcode(null, json);
-    assertTrue(response.has("error"));
   }
 
   @Test

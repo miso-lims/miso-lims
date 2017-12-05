@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.MoreExpectedConditions.elementDoesNotExist;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,10 +30,10 @@ public class BoxVisualization extends AbstractElement {
 
   @FindBy(id = "boxContentsTableVisualization")
   private WebElement boxVisualization;
-  @FindBy(id = "selectedBarcode")
-  private WebElement barcodeInput;
-  @FindBy(id = "lookupBarcode")
-  private WebElement barcodeLookupButton;
+  @FindBy(id = "searchField")
+  private WebElement searchField;
+  @FindBy(id = "search")
+  private WebElement searchButton;
   @FindBy(id = "updateSelected")
   private WebElement updatePositionButton;
   @FindBy(id = "removeSelected")
@@ -90,18 +89,19 @@ public class BoxVisualization extends AbstractElement {
     return chosenRow.get(0).get(column);
   }
 
-  public void lookupBarcode(String barcode) {
-    barcodeInput.click();
-    barcodeInput.clear();
-    barcodeInput.sendKeys(barcode);
-    barcodeInput.sendKeys(Keys.ESCAPE);
-    barcodeLookupButton.click();
-    waitUntil(elementDoesNotExist(By.id("ajaxLoader")));
+  public void searchBoxables(String barcode) {
+    searchField.click();
+    searchField.clear();
+    searchField.sendKeys(barcode);
+    searchField.sendKeys(Keys.ESCAPE);
+    searchButton.click();
+
+    waitUntil(invisibilityOfElementLocated(By.id("ajaxLoader")));
     WebElement okButton = findElementIfExists(By.id("ok"));
     if (okButton != null) {
       okButton.click();
     } else {
-      waitUntil(elementToBeClickable(barcodeLookupButton));
+      waitUntil(elementToBeClickable(searchButton));
     }
   }
 
@@ -114,7 +114,7 @@ public class BoxVisualization extends AbstractElement {
         okButton.click();
         waitUntil(invisibilityOf(okButton));
       }
-      waitUntil(elementToBeClickable(updatePositionButton));
+      waitUntil(elementToBeClickable(searchButton));
     } else {
       throw new IllegalStateException("updatePositionButton is not clickable");
     }
