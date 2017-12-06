@@ -43,7 +43,7 @@
           <table class="in">
             <tr>
               <td class="h">User ID:</td>
-              <td>${user.userId}</td>
+              <td><span id="userId">${user.userId}</span></td>
             </tr>
             <tr>
               <td>Full name:</td>
@@ -135,7 +135,7 @@
         </form:form>
       </c:when>
       <c:otherwise>
-        <form:form action="/miso/user" method="POST" commandName="user" autocomplete="off">
+        <form:form id="user-form" data-parsley-validation="" action="/miso/user" method="POST" commandName="user" autocomplete="off">
           <sessionConversation:insertSessionConversationId attributeName="user"/>
           <h1>Edit Your Account
             <button onclick="return User.validateUser()" class="fg-button ui-state-default ui-corner-all">Save</button>
@@ -143,7 +143,7 @@
           <table class="in">
             <tr>
               <td class="h">User ID:</td>
-              <td>${user.userId}</td>
+              <td><span id="userId">${user.userId}</span></td>
             </tr>
             <tr>
               <td>Full name:</td>
@@ -174,7 +174,7 @@
               <c:when test="${mutablePassword}">
                 <tr>
                   <td>Current Password:</td>
-                  <td><form:password path="password"/></td>
+                  <td><input type="password" name="currentPassword" id="currentPassword"/></td>
                 </tr>
                 <tr>
                   <td>New Password:</td>

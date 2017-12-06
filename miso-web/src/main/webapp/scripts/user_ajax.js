@@ -42,28 +42,36 @@ var User = User || {
     jQuery('#email').attr('class', 'form-control');
     jQuery('#email').attr('data-parsley-required', 'true');
     jQuery('#email').attr('data-parsley-maxlength', '100');
-    // jQuery('#email').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
     jQuery('#email').attr('data-parsley-type', 'email');
 
     // Current Password input field validation
-    jQuery('#password').attr('class', 'form-control');
-    jQuery('#password').attr('data-parsley-required', 'true');
-    jQuery('#password').attr('data-parsley-maxlength', '100');
-    jQuery('#password').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    jQuery('#currentPassword').attr('class', 'form-control');
+    jQuery('#currentPassword').attr('data-parsley-maxlength', '100');
+    jQuery('#currentPassword').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
     // New Password input field validation
     jQuery('#newpassword').attr('class', 'form-control');
-    jQuery('#newpassword').attr('data-parsley-required', 'true');
     jQuery('#newpassword').attr('data-parsley-maxlength', '100');
     jQuery('#newpassword').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
     // Confirm password input field validation
     jQuery('#confirmpassword').attr('class', 'form-control');
-    jQuery('#confirmpassword').attr('data-parsley-required', 'true');
     jQuery('#confirmpassword').attr('data-parsley-maxlength', '100');
     jQuery('#confirmpassword').attr('data-parsley-equalto', '#newpassword');
     jQuery('#confirmpassword').attr('data-parsley-error-message', 'Password does not match!');
     jQuery('#confirmpassword').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    if (jQuery('#userId').text() === '0') {
+      // new user
+      jQuery('#newpassword').attr('data-parsley-required', 'true');
+      jQuery('#confirmpassword').attr('data-parsley-required', 'true');
+    } else {
+      // edit user
+      if (jQuery('#newpassword').val().length) {
+        jQuery('#currentPassword').attr('data-parsley-required', 'true');
+        jQuery('#confirmpassword').attr('data-parsley-required', 'true');
+      }
+    }
 
     jQuery('#user-form').parsley();
     jQuery('#user-form').parsley().validate();
