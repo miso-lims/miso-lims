@@ -34,4 +34,5 @@ CALL addTissueOrigin('Ge', 'Gastroesophageal Junction');
 CALL addTissueOrigin('Pi', 'Penis');
 CALL addTissueOrigin('Fb', 'Fibroid');
 CALL addTissueOrigin('Sn', 'Spine');
+CALL addTissueOrigin('An', 'Anus');
 -- EndNoTest
