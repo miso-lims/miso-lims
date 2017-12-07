@@ -15,7 +15,7 @@ MISO has been developed by the [Davey group](http://www.earlham.ac.uk/davey-grou
 
 In 2015, the [Genome Sequence Informatics](http://labs.oicr.on.ca/genome-sequence-informatics/) team at OICR chose MISO as their new LIMS system. OICR did not want to fork MISO entirely, so together the team at Earlham and OICR worked out a development plan to better support multiple institutes with the same code base. 
 
-Presently, MISO has five full-time developers between the two institutions. All active work is visible on Github and undergoes thorough code reviews and testing before being integrated into the mainline branches. Releases are pushed weekly to Github.
+Presently, MISO has three part-time developers between the two institutions. All active work is visible on Github and undergoes thorough code reviews and testing before being integrated into the mainline branches. Releases are pushed weekly to Github.
 
 
 ## Overview of Features
@@ -83,221 +83,15 @@ The My Account tab lets the user access areas of MISO via the sidebar navigation
 
 This tab lists all the projects available in MISO that are viewable by the logged-in user, with filtering functionality and provides two diagrams showing all projects and objects they contain in a round tree or dendogram style.
 
-### Reports
-
-Reporting is an important functionality of MISO, with different type of reports being able to be generated based on Projects, Runs, Samples, Libraries, and the resource calendar of sequencing machines.
-
-### Analysis
-
-The analysis area provides access to the MISO analysis pipeline system, which allows custom pipelines to be started on a computing cluster via a web interface. 
-
 ### Help
 
-Link to the user manual.
+Links to the [MISO tutorial](http://oicr-gsi.github.io/miso-docs-oicr/plain-index).
 
 # Working with MISO
 
 In MISO, Project elements are the heart of the system, and comprise many components. All elements are interconnected, based on models designed from the submission schemas specified by the SRA.
 
-## Project
-
-A MISO project is a collection of studies, samples, and libraries. Each project has a _prefix_ and an _ID_. The project ID becomes the suffix of the project's name_,_ e.g. **PRO1, PRO2**. The project name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any project is **[http://your.miso.host/miso/project/](http://your.miso.host/miso/project/)<project_ID>**.
-
-### Creating a project
-
-![Create Project page]({{ site.url }}/images/create-project.png)
-
-#### Enter project details
-
-* Click on the _Add Project_ link at the top-right of the My Projects tab
-* Enter project details:
-  * Alias: 3-5 character LIMS Sample Prefix
-  * Description: canonical project name
-  * Progress: project status
-  * Reference genome: genome against which reads will be aligned (a subproject can have a different reference genome than its parent project).
-  * An ID and name will be auto-generated for the project upon saving.
-* Add an Issue Tracker key, project can be created by relevant JIRA issue information.
-* Click **Save** in the top right corner
-
-#### Adding user permissions
-
-![Project Permissions]({{ site.url }}/images/project-permissions.png)
-
-* If necessary, click on the Permissions divider to expand it.
-* Select the users who need view (read) and edit (write) permissions. Groups of users can also be selected, in which case view and/or edit permissions will be granted to each user in that group
-* Click **Save** in the top right corner
-
-### Adding a study
-You will need to create a single study for your project in order to make MISO happy.
-* On the Project page, click on the Studies section divider to expand it.
-* Hover over the Options menu and click Add new Study.
-* Enter study details: alias, description, study type. Click **Save** in top right corner.
-* Click on project alias at top left of Edit Study page.
-
-### Adding a Project Overview
-
-A Project Overview represents the portion of work to be done on a particular number of samples for a particular collaborator. Once an overview has been added, this portion of the project work can now be tracked via the alerting system, and will be reflected in the progress indicator.
-
-## Study
-
-A MISO study represents more fine-grained information about the sequencing Project. Each study has a _prefix_ and an _ID_. The study ID becomes the suffix of the study name_,_ e.g. **STU1, STU2**. The study name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any study is **[http://your.miso.host/miso/study/](http://your.miso.host/miso/project/)\<study_ID\>**.
-
-#### Creating a study
-
-*   A study is related to a specific Project and is tracked by a unique **alias**.
-*   Add in a Study description, outlining perhaps the origin and purpose of this Study.
-*   Add a Study alias.
-    *   A Study alias cannot contains reserved characters or spaces.
-*   Specify the type of this Study.
-
-#### Edit Study
-
-Once a Study has been saved, the following operations are available when visiting the Edit Study page, via clicking on a Study's _Edit_ link in any relevant listing table, e.g. from the List Studies page, or the Studies table in a relevant Project.
-
-#### Adding Experiments
-
-*   Studies can contain any number of sequencing Experiments.
-*   Select _Add Experiment_ to start adding Experiments
-
-## Experiment
-
-A MISO Experiment represents design information about the sequencing experiment. Each Experiment has a _prefix_ and an _ID_. The Experiment ID becomes the suffix of the Experiment's name_,_ e.g. **EXP1, EXP2**.
-
-Experiments are associated with Pools that are placed on Run lanes, which contain the actual sequencing results.
-
-#### Automatic Experiment Creation
-
-*   Whilst MISO supports creating Experiments manually (see below), it is often easier to allow MISO to generate and link an Experiment to a Pool for you.
-*   From the _Edit Run_ page, you are able to select Pools to be placed on Run lanes (lanes/chambers).
-*   When assigning a Pool to a lane, the following rules apply for Experiment creation:
-    *   If the Pool has no Experiment already linked
-    *   If there is at least one Study available on each of the Projects represented by the Pool's dilutions
-*   If these rules are valid, drop boxes will appear for each represented Project, letting you choose the Study on which to base the automatic Experiment creation.
-*   Upon clicking _Select_ for each Study, one Experiment will be automatically created and linked to the Pool.
-
-#### Add Experiment Manually
-
-*   An Experiment is related to a specific Study and is tracked by a unique **alias**.
-    *   An Experiment alias cannot contains reserved characters or spaces.
-*   Add in an Experiment title, alias, and description.
-*   Specify the platform to which this Experiment is related.
-*   Selecting the Platform will populate a list of available Pools to link to this Experiment.
-*   Double click to add a chosen Pool to this Experiment.
-*   Double clicking again on the chosen Pool area will remove it.
-*   Permissions for each Experiment are inherited from the parent Study
-
-
-## Sample
-
-A MISO sample represents the physical material received upon which sample preparation, QC and library preparations are carried out to prepare that sample for eventual sequencing. Each sample has a _prefix_ and an _ID_. The sample ID becomes the suffix of the sample's name, e.g. SAM1, SAM2.
-
-There are two possible categories of samples: plain and detailed. Detailed samples extend the information recorded for plain samples and also permit deriving samples from other samples (for example, extracting DNA from a tissue to produce an analyte). MISO can be configured on startup to use the type of sample best for your institution.
-
-### Creating a single sample
-A sample is related to a specific Project and is tracked by a unique alias and identification barcode.
-
-![Create single sample in MISO]({{ site.url }}/images/create-sample.png)
-
-* Under _Tracking_, click _List Samples_.
-* Click _Add Sample_ in the top right hand corner.
-* Add in a sample description, outlining perhaps the origin and eventual preparation of this sample.
-* Add a sample alias. Sample aliases must conform to a naming convention determined by your institution, e.g. <collaborator_identifier>_S<sample_number_relative_to_parent_project>_<material_identifier>, ABC_S1_H.sapiens
-*   Specify a receipt date if this sample has already been received. Leave blank if this sample is to be received at a later date, i.e. when the sample delivery form has been returned to your centre.
-*   Specify a NCBI-valid species name for this sample. If enabled, MISO will check this species with the NCBI and ascribe the returned taxon ID to this sample.
-*   Specify the type of this sample.
-*   Lastly, specify whether this sample has passed QC. Please see the Sample QC section on how to add Sample QCs
-* Click *Save* at the upper right corner of the page.
-
-### Bulk sample creation
-Bulk sample addition is identical to single creation, but in tabular form for ease of adding multiple samples.
-
-*   To start the process, click on _Add Row_ at the top of the table. An empty row will be added.
-*   Add in the required fields as you would a normal single sample input.
-*   To copy this row, click the arrow icon in the _Copy_ field of the table. You will see that by default, the **sample_number_relative_to_parent_project** in the sample alias is incremented automatically. To turn this feature off, expand the _Table Options_ section above the table, and deselect the _Increment Sample Aliases Automatically_ option.
-*   Alternatively, you can specify a defined number of rows to add immediately by clicking the _Bulk Copy_ button. A dialog will appear asking you how many rows to add. Choose a value, e.g. "96", and click _OK_. This will copy the last row in the table _x_ times, incrementing the **sample_number_relative_to_parent_project**.
-*   To quickly fill down a value in a field to other Samples, fill in the value for the chosen field in an upper row, select that row, and then click the _Fill Down_ arrow button in a column header. All Samples below the chosen row will have the same value applied to that field.
-*   Click the _Save_ button. You will informed of any rows that did not save.
-
-### Sample operations
-
-Once a Sample has been saved, the following operations are available when visiting the Edit Sample page, via clicking on a sample's _Edit_ link in any relevant listing table, e.g. from the List Samples page, or the Samples table in a relevant Project.
-
-#### Printing Sample Barcodes
-
-*   Once a Sample has been saved, a barcode will be generated for it. This will be present in the top right of the screen when editing a Sample.
-*   Hovering over the barcode will show a menu with the _Print_ option.
-*   Clicking on this will show a dialog allowing the user to select which printer with which to print the barcode.
-
-#### Adding Notes
-
-*   Click on _Add Notes_ under the Notes header.
-*   Add any free-text notes related to the Sample.
-
-#### Adding Sample QCs
-
-*   In the Edit Sample Page, Click on _Add Sample QC_ under the Option menu.
-*   Add details
-    *   QCed By, QC Date, QC Method and Result
-
-#### Adding Libraries
-
-*   In the Edit Sample Page, Click on _Add Library_ under Option of Libraries Pane.
-*   Select _Add Library_ to start adding Libraries to start adding samples following the documentation below
-
-### Receiving samples
-
-*   Visit the _Receive Samples_ link in the Navigation Bar to access the form to receive samples.
-*   Either type, or beep in using a barcode reader, a sample barcode.
-*   If this sample has no previously set receipt date, it will be added to the list below the input box.
-*   You can repeat this process for as many samples as you need to receive.
-*   Once finished inputting, click _Save._
-
-## Library
-
-A MISO sample represents the first step in constructing sequenceable material from an initial Sample. A Library is then diluted down to a Dilution, and put in a Pool. Each library has a _prefix_ and an _ID_. The library ID becomes the suffix of the library's name_,_ e.g. **LIB1, LIB2**. 
-
-#### Adding single libraries
-A Library is related to a specific Sample and is tracked by a unique **alias** and **identification** **barcode**.
-
-![Add library button]({{ site.url }}/images/add-library.png)
-
-* Under _Tracking_, click _List Samples_. Locate the sample that you wish to derive the library from and click on the Sample name.
-* Scroll down to the Libraries section. Hover over the _Options_ menu at the top right hand corner and click _Add Library_ (see above image)
-*   Add in a library description, outlining perhaps the origin and eventual preparation of this library.
-*   The Library alias inherits from the parent Sample, but with some important changes:
-  * A Library alias must conform to the naming convention determined by your institution, e.g. <collaborator_identifier>_L<parent_sample_number>-<library_number_relative_to_parent_sample>_<material_identifier>. Thus the first Library added to ABC_S1_H.sapiens would have an alias of ABC_L1-1_H.sapiens. The second would be ABC_L1-2_H.sapiens, and so on
-*  The creation date is automatically set to the current date.
-*  Set the Platform that this Library is being prepared for, the Library type, Library section type, Library strategy type.
-* If this Library is to be multiplexed with an adaptor barcode, pick the barcode from the dropdown list available for the selected platform.
-* Check the QC Passed checkbox if the library has passed and QC stages.
-* Permissions will be inherited from the parent Sample.
-* Click **Save** in the upper right corner of the page.
-
-#### Bulk Library creation
-
-*   Bulk Library addition is identical to single creation, but in tabular form for ease of adding multiple Libraries.
-*   You will see the list of Samples associated with the parent Project. These form the basis for Library creation.
-*   Add in the required fields as you would a normal single Library input.
-*   Select the samples you wish to use for Library creation by clicking in the _Select_ column so that the row turns blue.
-*   **One** Library will be created for each Sample selected as such in the table.
-*   To quickly fill down a value in a field to other Libraries, fill in the value for the chosen field in an upper row, select that row, and then click the _Fill Down_ arrow button in a column header. All Libraries below the chosen row will have the same value applied to that field.
-*   Click the _Save_ button. You will informed of any rows that did not save.
-
-#### Library Operations
-
-Once a Library has been saved, the following operations are available when visiting the Edit Library page, via clicking on a Library's _Edit_ link in any relevant listing table, e.g. from the List Libraries page, or the Libraries table in a relevant Project.
-
-##### Adding Notes
-
-*   Click on _Add Notes_ under the Notes header.
-*   Add any free-text notes related to the Library.
-
-##### Adding Library QCs
-
-*   Click on _Add Library QC_ under Option menu.
-*   Add details
-    *   QC Date, QC Method and Result.
-    *   Insert Size in base pairs.
+A complete tutorial and walkthrough can be found [here](http://oicr-gsi.github.io/miso-docs-oicr/plain-index).
     *   Click on _Add_ to save.
 
 ##### Add Library Dilutions
