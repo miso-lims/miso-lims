@@ -6,7 +6,7 @@ services:
       - /storage/miso
   mysql-link:
     image: svendowideit/ambassador:latest
-    command: "lims-db.churrg6mfeyd.us-east-1.rds.amazonaws.com 3306"
+    command: "${REAL_DB_LOCATION} 3306"
     ports:
       - "3306:3306"
   web:
@@ -18,10 +18,12 @@ services:
       - mysql-link
   proxy:
 #    build: ./nginx
-    image: library/nginx:alpine
+    image: shepmaster/nginx-template-image
     ports:
       - "80:80"
     links:
       - web:miso-webservice
+    environment:
+      - URL_ROOT=${URL_ROOT}
 
   

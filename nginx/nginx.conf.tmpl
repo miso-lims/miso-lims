@@ -1,6 +1,6 @@
 server {
   listen          80;
-  server_name     yourdomain.com;
+  server_name     ${URL_ROOT};
   root            /etc/tomcat7/webapps/apple;
 
   proxy_cache one;
