@@ -39,7 +39,7 @@ script:
 after_script:
     - echo "ENV GIT_SHA ${TRAVIS_COMMIT}" >> Dockerfile
     - sudo docker version
-    - sudo docker build -t $DOCKER_TAG .
+    - sudo docker build --build-args SECURITY_METHOD ad -t $DOCKER_TAG .
 
 cache:
   directories:
