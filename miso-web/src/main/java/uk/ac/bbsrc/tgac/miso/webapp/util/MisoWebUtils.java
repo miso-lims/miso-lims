@@ -99,6 +99,8 @@ public class MisoWebUtils {
     Map<String, String> checks = new HashMap<>();
     if (baseStoragePath.endsWith("/")) {
       try {
+        checkFile(new File(baseStoragePath, "issuetracker.properties"));
+        checkFile(new File(baseStoragePath, "mail.properties"));
         checkFile(new File(baseStoragePath, "security.properties"));
         checkFile(new File(baseStoragePath, "submission.properties"));
         checks.put("ok", "All core properties files OK");

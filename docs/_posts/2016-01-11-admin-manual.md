@@ -11,7 +11,7 @@ MISO requires some configuration directly in the source code. While we plan to
 change this over time, running an instance of MISO will require building and
 deploying a fork of the code base with customisations.
 
-## Prerequisites
+# Prerequisites
 For each service, which may be put on the same machine, the following tools are
 required:
 
@@ -39,16 +39,14 @@ Development Machine(s):
 * Eclipse
 * A merge tool such as Meld
 
-<a id="latest-release">
-## Downloading the latest release
-Use the GitHub interface download the [latest release](https://github.com/TGAC/miso-lims/releases/latest).
-Extract the `.zip` or `.tar.gz` file.
+# Creating a Fork
+Use the GitHub interface or a private instance to create a forked repository.
 
 Proceed to set up a build environment.
 
 # Setting Up the Build Environment
 One or more machines should be set up to build MISO. A typical Linux system will
-work; a typical Mac system may work. MISO is not guaranteed to work on Windows.
+work.
 
 You will need:
 
@@ -60,7 +58,12 @@ For development purposes, Eclipse is recommended and it might be useful to set
 up the server environments for testing. There is an automatic code formatting
 configuration available for Eclipse.
 
-## Setting Up the Database Server
+Locally, create a checkout:
+
+    git clone you@server:your-miso.git
+    git remote add tgac git@github.com:TGAC/miso-lims.git
+
+# Setting Up the Database Server
 The database server needs to have [MySQL 5.7](https://www.mysql.com/). The tool
 [Flyway](https://flywaydb.org/) must also be present to migrate the database as
 the application is developed, but it can be installed on a different server so
@@ -127,21 +130,17 @@ manually deploy your webapp, or make the `ROOT.xml` file undeletable by using
 bug](https://issues.apache.org/bugzilla/show_bug.cgi?id=40050)
 
 Copy `$MISO_SRC/miso-web/src/main/resources/external/miso.properties` to
-`$CATALINA_HOME/conf/Catalina/localhost/miso.properties`. Review and edit
-this file as appropriate (see <a href="naming-schemes">Naming Schemes</a> below).
+`${CATALINA_HOME}/conf/Catalina/localhost/miso.properties`. Review and edit
+this file as appropriate.
 
 * The naming schemes will determine how MISO checks if object names (especially
 samples, libraries) are valid. If you do not want to use one of the supplied
 ones (TGAC's standard, OICR's standard, or no checks), you will have to write
-one or more specific to your organisation. See <a href="naming-schemes">Naming Schemes</a>
-below for more information.
+one or more specific to your organisation. See Naming Schemes below for more
+information.
 * If using a bulk barcode scanner (only VisionMate is supported at present), 
 set `miso.boxscanner.enabled` to `true` and change the host and port for your
 VisionMate server.
-* Optional: Update `miso.bugUrl` to the URL for your internal issue tracker or other
-method for users to report issues using the "Report a problem" link in the header.
-* Update `miso.instanceName` to update the instance name displayed in the header.
-
 
 Download some supporting JARs:
 
@@ -153,21 +152,21 @@ Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if using Tomcat 
 
     JAVA_OPTS="$JAVA_OPTS -Dsecurity.method=jdbc -Xmx768M"
 
-(Update the security method if you are using LDAP or Active Directory LDAP.)
-
-Create the directory `/storage/miso`:
+Create the directory `/storage/miso` and download the default MISO configuration files.
 
   	cd /storage/miso
+    curl https://repos.tgac.ac.uk/miso/latest/miso_userspace_properties.tar.gz | tar xvfz -
 
-Move the following configuration files from `miso-lims/miso-web/src/main/resources` into 
-the `/storage/miso/` directory:
+The configuration files are:
 
 | File                      | Purpose                                                    |
 |---------------------------|------------------------------------------------------------|
+| `issuetracker.properties` | settings for an issue tracking system, such as JIRA or RT. |
+| `mail.properties`         | email settings so that MISO can send emails to users.      |
 | `security.properties`     | properties to set the security environment (see below).    |
 | `submission.properties`   | properties to set the submission environment.              |
 
-## Security Environment (updating `/storage/miso/security.properties`)
+## Security Environment
 MISO can use either LDAP (`ldap`), Active Directory LDAP (`ad`), or JDBC
 (`jdbc`) as an authentication mechanism. This is set by the `-Dsecurity.method`
 noted in the previous section.
@@ -209,12 +208,10 @@ prefix.
 If using JDBC, once running, you should change the passwords of the `admin` and
 `notification` accounts.
 
-<a name="naming-schemes">
-## Naming Schemes (updating `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`)
+## Naming Schemes
 MISO Naming Schemes are used to validate and generate entity String fields. They are
 used for all `name` fields, and some `alias` fields. You may configure a base naming
-scheme, and customize it by switching validators and generators in `miso.properties` in 
-`$CATALINA_HOME/conf/Catalina/localhost/`.
+scheme, and customize it by switching validators and generators in `miso.properties`.
 
 The options for `miso.naming.scheme` are `default` and `oicr`, which have these
 default configurations:
@@ -301,7 +298,7 @@ Existing naming schemes:
 | AllowAnythingNamingScheme  | all       | Uses Java class name. Not intended for generation purposes  | None               |
 | DefaultSampleNamingScheme  | Samples   | None built in                                               | TGAC/EI's standard |
 | OicrSampleNamingScheme     | Samples   | None built in                                               | OICR's standard    |
-| DefaultLibraryNamingScheme | Libraries | None built in                                               | TGAC/EI's standard |
+| DefaultLibraryNamingScheme | Libraries | None built in                                               | TGAC's standard    |
 | OicrLibraryNamingScheme    | Libraries | None built in                                               | OICR's standard    |
 
 A Sample alias generator may also be configured via `miso.naming.generator.sample.alias`
@@ -365,16 +362,15 @@ If you intend to scan Illumina runs, you will have to build `runscanner-illumina
 
 Start Tomcat on this machine.
 
-Edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` and set `miso.runscanner.urls` to the URL of the Run Scanner instance and restart MISO.
+Edit `miso.properties` and set `miso.runscanner.urls` to the URL of the Run Scanner instance and restart MISO.
 
 It is possible to set up multiple run scanners managing different sequencers and add all the URLs to `miso.properties`.
 
-You can view the run scanner's state from the main page of the runscanner server (http://runscanner.url:8080).
+You can view the run scanner's state from the main page.
 
 # Building the Application
 
-`cd` into `$MISO_SRC`. 
-Build the application using:
+Building the application is done by:
 
     mvn clean package -P external
 
@@ -412,6 +408,28 @@ Updating the database (or setting it up initially) will apply patches to the dat
     unzip -xjo $CATALINA_HOME/webapps/ROOT.war 'WEB-INF/lib/sqlstore-*.jar' -d lib
     ./flyway -user=$MISO_DB_USER -password=$MISO_DB_PASS -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate
 
+
+
+# Building the Docker image (after building a release)
+
+Pull the tag or snapshot that you want to build and package it:
+
+    export version="0.2.35-SNAPSHOT"
+    git checkout "tags/${version}"
+    mvn -P external clean install package 
+    docker build -t "misolims/miso-lims:${version}" --build-arg version="${version}" --no-cache .
+
+Once the build completes, test it by launching it:
+
+    docker run -p 8090:8080 --name "miso${version}" -t "misolims/miso-lims:${version}"
+
+Navigate to http://localhost:8090 and login with the credentials admin:admin.
+
+Once satisfied, push the image to Docker Hub. Note that only members of the [misolims](https://hub.docker.com/u/misolims/) organisation can push:
+
+    docker login
+    docker push "misolims/miso-lims:${version}"
+    
 # Monitoring
 
 The main MISO application and Run Scanner can be monitored using [Prometheus](http://prometheus.io/).
