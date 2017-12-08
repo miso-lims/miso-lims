@@ -43,5 +43,3 @@ To grab the 0.1.9 release MISO core module artifact, include the repository decl
   <version>0.1.9</version>
 </dependency>
 ```
-
-Please note that releases later than 0.2.10 are not on the TGAC repository.

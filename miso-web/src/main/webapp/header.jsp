@@ -146,7 +146,7 @@
 
     <sec:authorize access="isAuthenticated()">
       <li>
-        <a href="<c:url value="http://oicr-gsi.github.io/miso-docs-oicr/plain-index"/>"><span>Help</span></a>
+        <a href="<c:url value="http://tgac.github.io/miso-lims/"/>"><span>Help</span></a>
       </li>
     </sec:authorize>
 
