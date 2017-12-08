@@ -1,0 +1,29 @@
+version: '3.2'
+services:
+  storage:
+    image: alpine:latest
+    volumes:
+      - /storage/miso
+  mysql-link:
+    image: svendowideit/ambassador:latest
+    command: "${REAL_DB_LOCATION} 3306"
+    ports:
+      - "3306:3306"
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    links:
+      - storage
+      - mysql-link
+  proxy:
+#    build: ./nginx
+    image: shepmaster/nginx-template-image
+    ports:
+      - "80:80"
+    links:
+      - web:miso-webservice
+    environment:
+      - URL_ROOT=${URL_ROOT}
+
+  

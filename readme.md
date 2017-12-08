@@ -87,6 +87,36 @@ migration.
 
 Installation and configuration details can be found in the [MISO maintainer guide](docs/_posts/2016-01-11-admin-manual.md).
 
+## Deploying MISO in production with Docker and docker-compose
+
+A ```Dockerfile``` and ```docker-compose.yml``` is provided to allow for a more 
+production-ready deployment using [Docker](https://www.docker.com/) and an 
+NGINX proxy server. Edit the propfiles in site-miso-properties to reflect your 
+local site configuration. You'll also need a ```.env``` file alongside 
+```docker-compose.yml``` (a ```.env.sample``` is given) to specify the hostname 
+of your MySQL database and the public-facing URL of your site for NGINX.
+
+To build the MISO container individually:
+
+```docker build -t miso-lims:latest .```
+
+To build the MISO container, but using authentication option ```ad```:
+
+```docker build -t miso-lims:latest --build-arg SECURITY_METHOD=ad .```
+
+To build the MISO container, but with site propfiles from another directory
+(this is useful for keeping your site config separate from the MISO repository):
+
+```docker build -t miso-lims:latest --build-arg SITE_PROPERTIES=/path/to/my/propfiles```
+
+To build MISO for use with Docker Compose, and using ```ad```:
+
+```docker-compose build --build-arg SECURITY_METHOD=ad web```
+
+To start the MISO Docker composition:
+
+```docker-compose up```
+
 ## Contact and Community
 
 - [MISO Twitter](https://twitter.com/misolims)

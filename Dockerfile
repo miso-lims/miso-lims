@@ -1,17 +1,21 @@
 FROM    tomcat
-LABEL   maintainer="Justin Payne <justin.payne@fda.hhs.gov"
+LABEL   maintainer="Justin Payne <justin.payne@fda.hhs.gov>"
 
-EXPOSE  80
+EXPOSE  8080
 
 VOLUME  /storage/miso
+VOLUME  /src
+VOLUME  $HOME/.m2
 
-ENV     SECURITY_METHOD ad
+ARG     SECURITY_METHOD="jdbc"
+ARG     SITE_PROPERTIES="site-miso-properties/"
 
-RUN     apt-get -y update && apt-get -y install --no-install-recommends     \
+RUN     apt-get -y update && apt-get -y install --no-install-recommends                                       \
             unzip xmlstarlet maven default-jdk                                                              &&\
-        apt-get purge --auto-remove -q -y                                   \
+        apt-get purge --auto-remove -q -y                                                                     \
             unzip xmlstarlet                                                                                &&\
-        echo "JAVA_OPTS=/"$JAVA_OPTS -Dsecurity.method=${SECURITY_METHOD} -Xmx768M/"" \
+        echo "Building with '${SECURITY_METHOD}' authentication"                                            &&\
+        echo "JAVA_OPTS=/"$JAVA_OPTS -Dsecurity.method=${SECURITY_METHOD} -Xmx768M/""                         \
             >> $CATALINA_HOME/bin/setenv.sh                                                                 &&\
         cd $CATALINA_HOME/lib                                                                               &&\
         curl -kO https://repos.tgac.ac.uk/miso/common/mysql-connector-java-5.1.10.jar                       &&\
@@ -26,5 +30,5 @@ RUN     cd /src && mvn clean package -P external
 
 COPY    miso/miso-web/target/ROOT.war $CATALINA_HOME/webapps/
 COPY    tomcat_conf/ $CATALINA_HOME/conf/Catalina/localhost/
-COPY    cfsan-miso-properties/ /storage/miso/
+COPY    ${SITE_PROPERTIES} /storage/miso/
 

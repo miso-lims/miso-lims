@@ -12,7 +12,7 @@
   testOnBorrow="true"
   testOnReturn="true"
   validationQuery="select 1"
-  url="jdbc:mysql://mysql:3306/lims?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8"
+  url="jdbc:mysql://mysql-link:3306/lims?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8"
   username="tgaclims"
   password="tgaclims"/>
   <Parameter name="miso.propertiesFile" value="file:${catalina.home}/conf/Catalina/localhost/miso.properties" override="false"/>
