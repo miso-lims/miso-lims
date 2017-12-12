@@ -6,9 +6,9 @@ date: 2016-01-12 13:42:52
 ---
 
 
-These pages represent the documentation that UEA intern Michal Zak produced during his developer work placement at TGAC.
+These pages represent the documentation that UEA intern Michal Zak produced during his developer work placement at TGAC. 
 
-Github branch:
+*Please note that this functionality is not yet part of MISO. It only exists on the following (outdated) GitHub branch:*
 
 [https://github.com/TGAC/miso-lims/tree/kitDevelopNewDB](https://github.com/TGAC/miso-lims/tree/kitDevelopNewDB)
 
