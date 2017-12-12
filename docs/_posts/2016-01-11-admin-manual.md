@@ -40,8 +40,9 @@ Development Machine(s):
 * A merge tool such as Meld
 
 <a id="latest-release">
+
 ## Downloading the latest release
-Use the GitHub interface download the [latest release](https://github.com/TGAC/miso-lims/releases/latest).
+Use the GitHub interface to download the [latest release](https://github.com/TGAC/miso-lims/releases/latest).
 Extract the `.zip` or `.tar.gz` file.
 
 Proceed to set up a build environment.
@@ -88,6 +89,7 @@ need to add a grant privilege to the MISO database from your remote machine:
 Download the Flyway command line tool and install it.
 
 <a id="root">
+
 # Setting Up the Application Server
 The application server needs [Tomcat 8](https://tomcat.apache.org/download-80.cgi).
 
@@ -210,6 +212,7 @@ If using JDBC, once running, you should change the passwords of the `admin` and
 `notification` accounts.
 
 <a name="naming-schemes">
+
 ## Naming Schemes (updating `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`)
 MISO Naming Schemes are used to validate and generate entity String fields. They are
 used for all `name` fields, and some `alias` fields. You may configure a base naming
@@ -369,7 +372,7 @@ Edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` and set `miso.runs
 
 It is possible to set up multiple run scanners managing different sequencers and add all the URLs to `miso.properties`.
 
-You can view the run scanner's state from the main page of the runscanner server (http://runscanner.url:8080).
+You can view the run scanner's state from the main page of the runscanner server.
 
 # Building the Application
 

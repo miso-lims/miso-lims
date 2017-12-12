@@ -12,7 +12,7 @@ There are some stored procedures which may help in adding these values to the da
 
 ## Indices (also known as Barcodes, Molecular IDs, Tag Barcodes)
 
-An `Index` has a name, a sequence, a position (1 or 2) and is a member of an `Index Family`. And `Index Family` has a name and is associated with a sequencing platform, and can be archived to hide its members when creating new libraries.
+An `Index` has a name, a sequence, a position (1 or 2) and is a member of an `Index Family`. An `Index Family` has a name and is associated with a sequencing platform, and can be archived to hide its members when creating new libraries.
 ```
 addIndexFamily(name, platformType, archived)
 addIndex(familyName, name, sequence, position)
@@ -86,7 +86,7 @@ For instance, to add an Illumina HiSeq 2000 which was later upgraded to a HiSeq2
 CALL addSequencerReference('h501', 'ILLUMINA', 'Illumina HiSeq 2000', '12345', 'localhost', '2015-01-07', '2016-05-19', 'SN501');
 ```
 Note that the sequencing platform must be in all caps, and the instrumentModel must be an exact match for a value in `Platform.instrumentModel`.
-Note also that if adding an instrument which references an upgraded instrument, the upgraded instrument must already exist in MISO.
+Note also that if adding an instrument which references an upgraded instrument, the upgraded instrument must already exist in MISO. If the instrument to be added has not been upgraded, set upgradedInstrumentName to `NULL`.
 
 
 ## Sequencing Parameters
@@ -94,7 +94,7 @@ Note also that if adding an instrument which references an upgraded instrument, 
 Runs have sequencing parameters, and pool Orders are requested with a given set of sequencing parameters. MISO determines whether a pool Order has been completed by looking at the run(s) associated with the pool and seeing if their sequencing parameters match the requested sequencing parameters. While it is possible to add all possible sequencing parameter combinations to this table, it may be easier to add the parameters used most often and describing all infrequently-used parameters with the 'Custom' label.
 
 ```
-addSequencingParamters(name, platform, instrumentModel, readLength, paired, chemistryVersion);
+addSequencingParameters(name, platform, instrumentModel, readLength, paired, chemistryVersion);
 ```
 
 For instance, to add sequencing parameters for a paired-end run with a read length of 151 bases on the MiSeq:
