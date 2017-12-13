@@ -74,7 +74,7 @@ public class LibraryRestController extends RestController {
   private final JQueryDataTableBackend<Library, LibraryDto> jQueryBackend = new JQueryDataTableBackend<Library, LibraryDto>() {
     @Override
     protected LibraryDto asDto(Library model) {
-      return Dtos.asDto(model);
+      return Dtos.asMinimalDto(model);
     }
 
     @Override
