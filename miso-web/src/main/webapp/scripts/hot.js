@@ -24,6 +24,13 @@ var HotUtils = {
     },
 
     /**
+     * Custom validator for a field that must be blank
+     */
+    requiredEmpty: function(value, callback) {
+      return callback(!value);
+    },
+
+    /**
      * Custom validator for required numeric fields
      */
     requiredNumber: function(value, callback) {
@@ -280,9 +287,11 @@ var HotUtils = {
       }
       // update function may return a promise. If so, we will wait for it to be resolved/rejected before revalidating and rerendering
       var updateJobs = [];
+      var triggeredChanges = [];
       for (var i = 0; i < changes.length; i++) {
         // trigger only if old value is different from new value
-        if (changes[i][2] == changes[i][3]) {
+        // also trigger on blank -> blank because chained afterChanges seem to miss the old value when clearing cells
+        if (changes[i][2] == changes[i][3] && (changes[i][2] || changes[i][3])) {
           continue;
         }
         columns.filter(function(column) {
@@ -297,14 +306,16 @@ var HotUtils = {
             needsRender = true;
           }, function(optionsObj) {
             for (prop in optionsObj) {
-              if (optionsObj.hasOwnProperty(prop)) {
-                table.setCellMeta(currentChange[0], column.hotIndex, prop, optionsObj[prop]);
-                needsRender = true;
-              }
+              table.setCellMeta(currentChange[0], column.hotIndex, prop, optionsObj[prop]);
+              needsRender = true;
             }
           }, function(value) {
-            flatObjects[currentChange[0]][column.data] = value;
-            needsRender = true;
+            var oldVal = flatObjects[currentChange[0]][column.data];
+            if (!value || oldVal !== value) {
+              flatObjects[currentChange[0]][column.data] = value;
+              needsRender = true;
+              triggeredChanges.push([currentChange[0], column.data, oldVal, value]);
+            }
           });
           if (update) {
             updateJobs.push(update);
@@ -322,6 +333,9 @@ var HotUtils = {
           table.validateCells(function() {
             table.render();
           });
+        }
+        if (triggeredChanges.length) {
+          table.runHooks('afterChange', triggeredChanges, 'autofill');
         }
       });
     });

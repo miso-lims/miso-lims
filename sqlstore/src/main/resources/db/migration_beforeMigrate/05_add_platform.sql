@@ -1,8 +1,10 @@
+-- If you change these method names or signatures, update the docs in `docs/_posts/2017-12-07-value-type-data.md`
 -- StartNoTest
 DELIMITER //
 
 DROP PROCEDURE IF EXISTS addPlatform//
-CREATE PROCEDURE addPlatform(
+DROP PROCEDURE IF EXISTS addInstrumentModel//
+CREATE PROCEDURE addInstrumentModel(
   iName varchar(50),
   iInstrumentModel varchar(100),
   iDescription varchar(255),

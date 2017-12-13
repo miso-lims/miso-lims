@@ -104,6 +104,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
 
   private String accession;
   private String name;
+  private String alias;
   private String description;
   private String scientificName;
   private String taxonIdentifier;
@@ -148,6 +149,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public String getBoxPosition() {
     return boxPosition == null ? null : boxPosition.getPosition();
+  }
+
+  @Override
+  public void setBoxPosition(SampleBoxPosition boxPosition) {
+    this.boxPosition = boxPosition;
   }
 
   @Override
@@ -228,6 +234,16 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public String getAlias() {
+    return alias;
+  }
+
+  @Override
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   @Override

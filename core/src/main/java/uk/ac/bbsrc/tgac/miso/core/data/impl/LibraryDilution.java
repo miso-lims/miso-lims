@@ -48,6 +48,7 @@ import javax.persistence.TemporalType;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
@@ -69,7 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @Entity
 @Table(name = "LibraryDilution")
-public class LibraryDilution
+public class LibraryDilution extends AbstractBoxable
     implements SecurableByProfile, Barcodable, Comparable<LibraryDilution>, Deletable, Nameable, Boxable, Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -115,16 +116,10 @@ public class LibraryDilution
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastUpdated;
 
-  @Column(nullable = true)
-  private Double volume;
-
   private String identificationBarcode;
 
   @Column(updatable = false)
   private Long preMigrationId;
-
-  @Column(name = "discarded")
-  private boolean discarded;
 
   @OneToOne(optional = true)
   @PrimaryKeyJoinColumn
@@ -179,22 +174,6 @@ public class LibraryDilution
   @Override
   public void setLastModifier(User lastUpdated) {
     this.lastModifier = lastUpdated;
-  }
-
-  /**
-   * @deprecated use {@link #getLastModified()} instead
-   */
-  @Deprecated
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  /**
-   * @deprecated use {@link #setLastModified(Date)} instead
-   */
-  @Deprecated
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
   }
 
   @Override
@@ -280,16 +259,6 @@ public class LibraryDilution
 
   public void setPreMigrationId(Long preMigrationId) {
     this.preMigrationId = preMigrationId;
-  }
-
-  @Override
-  public Double getVolume() {
-    return volume;
-  }
-
-  @Override
-  public void setVolume(Double volume) {
-    this.volume = volume;
   }
 
   @Override
@@ -429,6 +398,10 @@ public class LibraryDilution
     return boxPosition == null ? null : boxPosition.getPosition();
   }
 
+  public void setBoxPosition(DilutionBoxPosition boxPosition) {
+    this.boxPosition = boxPosition;
+  }
+
   @Override
   public Date getLastModified() {
     return lastUpdated;
@@ -445,18 +418,8 @@ public class LibraryDilution
   }
 
   @Override
-  public boolean isDiscarded() {
-    return discarded;
-  }
-
-  @Override
   public void setAlias(String alias) {
     name = alias;
-  }
-
-  @Override
-  public void setDiscarded(boolean emptied) {
-    discarded = emptied;
   }
 
   @Override

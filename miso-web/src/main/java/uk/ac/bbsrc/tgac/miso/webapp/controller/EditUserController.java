@@ -53,8 +53,9 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
+import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @SessionAttributes("user")
@@ -65,10 +66,17 @@ public class EditUserController {
   private SecurityManager securityManager;
 
   @Autowired
+  private AuthorizationManager authorizationManager;
+
+  @Autowired
   private PasswordCodecService passwordCodecService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
   }
 
   public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
@@ -149,74 +157,55 @@ public class EditUserController {
   @RequestMapping(value = "/admin/user", method = RequestMethod.POST)
   public String adminProcessSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
       throws IOException {
-    try {
-      if (!SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(MisoAuthority.ROLE_ADMIN)) {
-        throw new IOException("Only administrator can use admin edit page.");
-      }
-      String newPassword = request.getParameter("newpassword");
-      String confirmPassword = request.getParameter("confirmpassword");
-      if (!isStringEmptyOrNull(newPassword) || !isStringEmptyOrNull(confirmPassword)) {
+    if (!authorizationManager.isAdminUser()) {
+      throw new IOException("Only administrator can use admin edit page.");
+    }
 
-        if (isStringEmptyOrNull(newPassword) || isStringEmptyOrNull(confirmPassword)) {
-          throw new IOException("New password cannot be empty");
-        }
-        if (!request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
-          throw new IOException("New password and confirmation don't match.");
-        }
-        user.setPassword(passwordCodecService.encrypt(newPassword));
-      }
+    user.setPassword(null); // null password has the effect of keeping the current password in AbstractSecurityManager
+    processPasswordInput(request, user);
 
-      securityManager.saveUser(user);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/admin/users";
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to update user", ex);
+    securityManager.saveUser(user);
+    session.setComplete();
+    model.clear();
+    return "redirect:/miso/admin/users";
+  }
+
+  private void processPasswordInput(HttpServletRequest request, User user) throws IOException {
+    if (!securityManager.isPasswordMutable()) {
+      throw new IOException("Cannot change password in MISO directly. Please change your password as directed by your IT department.");
+    }
+    String newPassword = request.getParameter("newpassword");
+    String confirmPassword = request.getParameter("confirmpassword");
+    if (!isStringEmptyOrNull(newPassword) || !isStringEmptyOrNull(confirmPassword)) {
+      if (isStringEmptyOrNull(newPassword) || isStringEmptyOrNull(confirmPassword)) {
+        throw new IOException("New password cannot be empty");
       }
-      throw ex;
+      if (!request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
+        throw new IOException("New password and confirmation don't match.");
+      }
+      user.setPassword(passwordCodecService.encrypt(newPassword));
     }
   }
 
   @RequestMapping(value = "/user", method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
       throws IOException {
-    try {
-      if (!isStringEmptyOrNull(request.getParameter("password")) && !isStringEmptyOrNull(request.getParameter("newpassword"))) {
-        if (!securityManager.isPasswordMutable()) {
-          throw new IOException("Cannot change password in MISO directly. Please change your password as directed by your IT department.");
-        }
-
-        if (isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
-          throw new IOException("You must supply a confirmation of your new password.");
-        }
-        if (isStringEmptyOrNull(request.getParameter("newpassword"))
-            || isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
-          throw new IOException("New password cannot be empty");
-        }
-        if (!request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
-          throw new IOException("New password and confirmation don't match.");
-        }
-        if (!SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
-          throw new IOException("Cannot change password of another user.");
-        }
-        User original = securityManager.getUserById(user.getUserId());
-        if (!passwordCodecService.getEncoder().isPasswordValid(original.getPassword(), request.getParameter("password"), null)) {
-          throw new IOException("Existing password does not match.");
-        }
-        log.debug("User '" + user.getLoginName() + "' attempting own password change");
-        user.setPassword(passwordCodecService.encrypt(request.getParameter("newpassword")));
-      }
-
-      securityManager.saveUser(user);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/myAccount";
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to update user", ex);
-      }
-      throw ex;
+    User original = authorizationManager.getCurrentUser();
+    if (!original.getUserId().equals(user.getUserId())) {
+      throw new AuthorizationIOException("Permission denied.");
     }
+
+    user.setPassword(null); // null password has the effect of keeping the current password in AbstractSecurityManager
+    if (!isStringEmptyOrNull(request.getParameter("currentPassword"))) {
+      if (!passwordCodecService.getEncoder().isPasswordValid(original.getPassword(), request.getParameter("currentPassword"), null)) {
+        throw new IOException("Existing password does not match.");
+      }
+      processPasswordInput(request, user);
+    }
+
+    securityManager.saveUser(user);
+    session.setComplete();
+    model.clear();
+    return "redirect:/miso/myAccount";
   }
 }

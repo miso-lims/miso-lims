@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.TargetedSequencingService;
@@ -44,6 +45,8 @@ public class DefaultLibraryDilutionService
   private LibraryService libraryService;
   @Autowired
   private TargetedSequencingService targetedSequencingService;
+  @Autowired
+  private BoxService boxService;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
@@ -94,7 +97,9 @@ public class DefaultLibraryDilutionService
     
     // pre-save field generation
     dilution.setName(generateTemporaryName());
-    return save(dilution).getId();
+    long savedId = save(dilution).getId();
+    boxService.updateBoxableLocation(dilution);
+    return savedId;
   }
 
   @Override
@@ -104,6 +109,7 @@ public class DefaultLibraryDilutionService
     applyChanges(updatedDilution, dilution);
     loadChildEntities(updatedDilution);
     save(updatedDilution);
+    boxService.updateBoxableLocation(dilution);
   }
   
   @Override
@@ -186,6 +192,10 @@ public class DefaultLibraryDilutionService
 
   public void setTargetedSequencingService(TargetedSequencingService targetedSequencingService) {
     this.targetedSequencingService = targetedSequencingService;
+  }
+
+  public void setBoxService(BoxService boxService) {
+    this.boxService = boxService;
   }
 
   public void setAutoGenerateIdBarcodes(Boolean autoGenerateIdBarcodes) {

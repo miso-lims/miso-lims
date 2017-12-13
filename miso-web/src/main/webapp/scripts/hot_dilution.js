@@ -7,7 +7,7 @@ HotTarget.dilution = {
   fixUp: function(lib, errorHandler) {
   },
   createColumns: function(config, create, data) {
-    return [
+    var columns = [
         {
           header: 'Dilution Name',
           data: 'name',
@@ -95,6 +95,12 @@ HotTarget.dilution = {
             });
           }
         }];
+
+    var spliceIndex = columns.indexOf(columns.filter(function(column) {
+      return column.data === 'identificationBarcode';
+    })[0]) + 1;
+    columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+    return columns;
   },
 
   bulkActions: [{

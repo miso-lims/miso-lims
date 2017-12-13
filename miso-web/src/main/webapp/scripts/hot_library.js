@@ -87,7 +87,7 @@ HotTarget.library = (function() {
 
     createColumns: function(config, create, data) {
       var validationCache = {};
-      return [
+      var columns = [
           {
             header: 'Library Name',
             data: 'name',
@@ -382,6 +382,12 @@ HotTarget.library = (function() {
           HotUtils.makeColumnForFloat('Size (bp)', true, 'dnaSize', false),
           HotUtils.makeColumnForFloat('Vol. (&#181;l)', config.showVolume, 'volume', false),
           HotUtils.makeColumnForFloat('Conc.', true, 'concentration', false), ];
+
+      var spliceIndex = columns.indexOf(columns.filter(function(column) {
+        return column.data === 'identificationBarcode';
+      })[0]) + 1;
+      columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
+      return columns;
     },
 
     bulkActions: [{

@@ -1,3 +1,12 @@
+# 0.2.102
+
+Changes:
+
+ * Set box locations in bulk pages
+ * Documented stored procedures
+ * Fixed user password changes
+ * Fixed adding new users under JDBC security
+
 # 0.2.101
 
 Changes:

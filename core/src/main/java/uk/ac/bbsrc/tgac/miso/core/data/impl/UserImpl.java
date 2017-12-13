@@ -73,10 +73,10 @@ public class UserImpl implements User, Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long userId = UserImpl.UNSAVED_ID;
-  private String fullName = "";
-  private String loginName = "";
-  private String email = "";
-  private String password = "";
+  private String fullName;
+  private String loginName;
+  private String email;
+  private String password;
   private boolean internal = false;
   private boolean external = false;
   private boolean admin = false;

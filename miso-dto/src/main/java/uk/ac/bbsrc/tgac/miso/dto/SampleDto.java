@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
     @JsonSubTypes.Type(value = SampleLCMTubeDto.class, name = SampleLCMTube.SAMPLE_CLASS_NAME),
     @JsonSubTypes.Type(value = SampleDto.class, name = "Plain") })
 @JsonTypeName(value = "Plain")
-public class SampleDto implements WritableUrls {
+public class SampleDto extends AbstractBoxableDto implements WritableUrls {
 
   private Long id;
   private String url;
@@ -39,7 +39,6 @@ public class SampleDto implements WritableUrls {
   private String identificationBarcode;
   private String locationBarcode;
   private String locationLabel;
-  private Long boxId;
   private String sampleType;
   private String receivedDate;
   private Boolean qcPassed;
@@ -235,14 +234,6 @@ public class SampleDto implements WritableUrls {
 
   public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
-  }
-
-  public Long getBoxId() {
-    return boxId;
-  }
-
-  public void setBoxId(Long boxId) {
-    this.boxId = boxId;
   }
 
   public String getQcDv200() {

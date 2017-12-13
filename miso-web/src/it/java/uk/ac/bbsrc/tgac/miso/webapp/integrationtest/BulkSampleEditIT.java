@@ -20,29 +20,23 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTa
 
 public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
-  private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX,
-      SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
-
-  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS,
-      SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER,
-      SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.QC_STATUS,
+  private static final Set<String> commonColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
+      SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.SAMPLE_TYPE,
+      SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS,
       SamColumns.QC_NOTE);
 
-  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS,
-      SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.SLIDES, SamColumns.DISCARDS, SamColumns.THICKNESS, SamColumns.STAIN,
-      SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+  private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX);
 
-  private static final Set<String> curlsColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
-      SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+  private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.TISSUE_ORIGIN,
+      SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.LAB,
+      SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION);
 
-  private static final Set<String> lcmTubeColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.RECEIVE_DATE, SamColumns.ID_BARCODE, SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID,
-      SamColumns.GROUP_DESCRIPTION, SamColumns.SLIDES_CONSUMED, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.SLIDES, SamColumns.DISCARDS,
+      SamColumns.THICKNESS, SamColumns.STAIN);
+
+  private static final Set<String> curlsColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE);
+
+  private static final Set<String> lcmTubeColumns = Sets.newHashSet(SamColumns.RECEIVE_DATE, SamColumns.SLIDES_CONSUMED);
 
   @Before
   public void setup() {
@@ -56,11 +50,15 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   @Test
   public void testEditIdentitySetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(commonColumns);
+    expectedHeadings.addAll(identityColumns);
+
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Identity")));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(identityColumns.size(), headings.size());
-    for (String col : identityColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -156,11 +154,15 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   @Test
   public void testEditTissueSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(commonColumns);
+    expectedHeadings.addAll(tissueColumns);
+
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Tissue")));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(tissueColumns.size(), headings.size());
-    for (String col : tissueColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -273,11 +275,15 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   @Test
   public void testEditSlideSetup() throws Exception {
     // Goal: ensure all expected fields are present, and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(commonColumns);
+    expectedHeadings.addAll(slideColumns);
+
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Slide")));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(slideColumns.size(), headings.size());
-    for (String col : slideColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -375,11 +381,15 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   @Test
   public void testEditCurlsSetup() throws Exception {
     // Goal: ensure all expected fields are present, and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(commonColumns);
+    expectedHeadings.addAll(curlsColumns);
+
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Curls")));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals(curlsColumns.size(), headings.size());
-    for (String col : curlsColumns) {
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
       assertTrue("Check for column: '" + col + "'", headings.contains(col));
     }
     assertEquals(1, table.getRowCount());
@@ -464,7 +474,19 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   @Test
   public void testEditLcmTubeSetup() throws Exception {
+    // Goal: ensure all expected fields are present, and no extra
+    Set<String> expectedHeadings = Sets.newHashSet();
+    expectedHeadings.addAll(commonColumns);
+    expectedHeadings.addAll(lcmTubeColumns);
 
+    BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("LCM Tube")));
+    HandsOnTable table = page.getTable();
+    List<String> headings = table.getColumnHeadings();
+    assertEquals(expectedHeadings.size(), headings.size());
+    for (String col : expectedHeadings) {
+      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    }
+    assertEquals(1, table.getRowCount());
   }
 
   public Long getSampleId(String sampleClass) {
