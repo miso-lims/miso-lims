@@ -637,7 +637,7 @@ var HotUtils = {
     baseobj.unpack = function(obj, flat, setCellMeta) {
       flat[flatProperty] = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
         return item[id] == obj[modelProperty];
-      }, items), name) || (required ? '' : '(None)');
+      }, items), name) || (required ? null : '(None)');
     };
     baseobj.pack = function(obj, flat, errorHandler) {
       obj[modelProperty] = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
@@ -691,7 +691,7 @@ var HotUtils = {
       'type': 'text',
       'include': include,
       'unpack': function(obj, flat, setCellMeta) {
-        flat[property] = obj[property] || null;
+        flat[property] = Utils.valOrNull(obj[property]);
       },
       'validator': required ? HotUtils.validator.requiredNumber : HotUtils.validator.optionalNumber,
       'pack': function(obj, flat, errorHandler) {
@@ -723,7 +723,7 @@ var HotUtils = {
       'include': include,
       'validator': validator,
       'unpack': function(obj, flat, setCellMeta) {
-        flat[property] = obj[property] || null;
+        flat[property] = Utils.valOrNull(obj[property]);
       },
       'pack': function(obj, flat, errorHandler) {
         if (!Utils.validation.isEmpty(flat[property])) {
@@ -742,7 +742,7 @@ var HotUtils = {
     baseobj.include = include;
     if (!baseobj.hasOwnProperty('unpack')) {
       baseobj.unpack = function(obj, flat, setCellMeta) {
-        flat[property] = obj[property] || null;
+        flat[property] = Utils.valOrNull(obj[property]);
       };
     }
     baseobj.pack = function(obj, flat, errorHandler) {

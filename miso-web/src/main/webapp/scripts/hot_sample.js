@@ -103,7 +103,7 @@ HotTarget.sample = (function() {
             include: !config.isLibraryReceipt,
             unpackAfterSave: true,
             unpack: function(sam, flat, setCellMeta) {
-              flat.name = sam.name || null;
+              flat.name = Utils.valOrNull(sam.name);
             },
             pack: function(sam, flat, errorHandler) {
             }
@@ -143,7 +143,7 @@ HotTarget.sample = (function() {
             unpackAfterSave: true,
             unpack: function(sam, flat, setCellMeta) {
               validationCache[sam.alias] = true;
-              flat.alias = sam.alias || null;
+              flat.alias = Utils.valOrNull(sam.alias);
               if (sam.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
               }
@@ -168,7 +168,7 @@ HotTarget.sample = (function() {
             allowEmpty: true,
             include: (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity') && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
-              flat.receivedDate = sam.receivedDate || null;
+              flat.receivedDate = Utils.valOrNull(sam.receivedDate);
             },
             pack: function(sam, flat, errorHandler) {
               sam.receivedDate = flat.receivedDate;
@@ -181,7 +181,7 @@ HotTarget.sample = (function() {
           HotUtils.makeColumnForText('Sci. Name', true, 'scientificName', {
             validator: HotUtils.validator.requiredTextNoSpecialChars,
             unpack: function(obj, flat, setCellMeta) {
-              flat.scientificName = obj.scientificName || config.defaultSciName;
+              flat.scientificName = obj.scientificName || config.defaultSciName || null;
             }
           }),
           {
@@ -207,11 +207,11 @@ HotTarget.sample = (function() {
             unpack: function(sam, flat, setCellMeta) {
               var label = Constants.isDetailedSample ? 'shortName' : 'name';
               if (config.hasProject) {
-                flat.projectAlias = config.project[label] || null;
+                flat.projectAlias = Utils.valOrNull(config.project[label]);
               } else {
                 flat.projectAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
                   return item.id == sam.projectId;
-                }, config.projects), 'alias') || null;
+                }, config.projects), 'alias');
               }
             },
             pack: function(sam, flat, errorHandler) {
@@ -243,7 +243,7 @@ HotTarget.sample = (function() {
             unpack: function(sam, flat, setCellMeta) {
               flat.parentTissueSampleClassAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
                 return item.id == sam.parentTissueSampleClassId;
-              }, Constants.sampleClasses), 'alias') || null;
+              }, Constants.sampleClasses), 'alias');
             },
             pack: function(sam, flat, errorHandler) {
               sam.parentTissueSampleClassId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
@@ -260,7 +260,7 @@ HotTarget.sample = (function() {
             validator: HotUtils.validator.requiredTextNoSpecialChars,
             include: show['Identity'],
             unpack: function(sam, flat, setCellMeta) {
-              flat.externalName = sam.externalName || null;
+              flat.externalName = Utils.valOrNull(sam.externalName);
             },
             pack: function(sam, flat, errorHandler) {
               if (!getSelectedIdentity(flat)) {
@@ -374,7 +374,7 @@ HotTarget.sample = (function() {
             unpack: function(sam, flat, setCellMeta) {
               flat.sampleClassAlias = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
                 return item.id == sam.sampleClassId;
-              }, Constants.sampleClasses), 'alias') || null;
+              }, Constants.sampleClasses), 'alias');
             },
             pack: function(sam, flat, errorHandler) {
               sam.sampleClassId = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
@@ -432,8 +432,7 @@ HotTarget.sample = (function() {
             unpack: function(sam, flat, setCellMeta) {
               if (sam.stain) {
                 flat.stainName = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array.idPredicate(sam.stain.id),
-                    Constants.stains), 'name')
-                    || null;
+                    Constants.stains), 'name');
               } else {
                 flat.stainName = '(None)';
               }
@@ -526,8 +525,7 @@ HotTarget.sample = (function() {
                     || 'Not Ready';
               } else {
                 flat.detailedQcStatusDescription = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(Utils.array
-                    .idPredicate(sam.detailedQcStatusId), Constants.detailedQcStatuses), 'description')
-                    || null;
+                    .idPredicate(sam.detailedQcStatusId), Constants.detailedQcStatuses), 'description');
               }
             },
             pack: function(sam, flat, errorHandler) {

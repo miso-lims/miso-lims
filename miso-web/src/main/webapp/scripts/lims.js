@@ -460,6 +460,10 @@ var Utils = Utils
           row: rowVal,
           col: colVal
         };
+      },
+      
+      valOrNull: function(val) {
+        return val || null;
       }
     };
 
