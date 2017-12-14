@@ -1,0 +1,1 @@
+ALTER TABLE Pool DROP COLUMN ready;

@@ -144,7 +144,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   }
 
   @Override
-  public List<Pool> listAllByCriteria(PlatformType platformType, String query, Integer limit, boolean ready) throws IOException {
+  public List<Pool> listAllByCriteria(PlatformType platformType, String query, Integer limit) throws IOException {
     if (limit != null && limit == 0) {
       return Collections.emptyList();
     }
@@ -157,9 +157,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
     }
     if (limit != null) {
       criteria.setMaxResults(limit);
-    }
-    if (ready) {
-      criteria.add(Restrictions.eq("readyToRun", true));
     }
     @SuppressWarnings("unchecked")
     List<Pool> results = criteria.list();
@@ -308,11 +305,6 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   @Override
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platformType", platformType));
-  }
-
-  @Override
-  public void restrictPaginationByReadyToRun(Criteria criteria, boolean readyToRun, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("readyToRun", readyToRun));
   }
 
   @Override

@@ -44,7 +44,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     assertEquals(0, (expected.getCreationTime().getTime() - actual.getCreationTime().getTime()) / 84600000);
     assertEquals(expected.getSecurityProfile().getProfileId(), actual.getSecurityProfile().getProfileId());
     assertEquals(expected.getPlatformType(), actual.getPlatformType());
-    assertEquals(expected.getReadyToRun(), actual.getReadyToRun());
     assertEquals(expected.getAlias(), actual.getAlias());
     assertEquals(expected.getLastModifier().getUserId(), actual.getLastModifier().getUserId());
     assertEquals(expected.isDiscarded(), actual.isDiscarded());
@@ -75,7 +74,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     rtn.setLastModified(creationDate);
     rtn.setSecurityProfile(mockSecurityProfile);
     rtn.setPlatformType(PlatformType.ILLUMINA);
-    rtn.setReadyToRun(true);
     rtn.setAlias("Alias " + counter);
     rtn.setLastModifier(mockUser);
     rtn.setCreator(mockUser);
@@ -129,7 +127,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     testPool.setIdentificationBarcode("Foob");
     testPool.setCreationTime(new Date());
     testPool.setPlatformType(PlatformType.IONTORRENT);
-    testPool.setReadyToRun(false);
     testPool.setAlias("Alias changed");
     testPool.setDiscarded(true);
     testPool.setVolume(10D);
@@ -194,7 +191,7 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllByPlatform() throws IOException {
-    assertTrue(dao.listAllByCriteria(PlatformType.ILLUMINA, null, null, false).size() > 0);
+    assertTrue(dao.listAllByCriteria(PlatformType.ILLUMINA, null, null).size() > 0);
   }
 
   @Test
@@ -207,8 +204,8 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     dao.save(test1);
     dao.save(test2);
     dao.save(test3);
-    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "alias 8", null, false).size());
-    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "alias 81", null, false).size());
+    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "alias 8", null).size());
+    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "alias 81", null).size());
   }
 
   @Test
@@ -221,8 +218,8 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     dao.save(test1);
     dao.save(test2);
     dao.save(test3);
-    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "description 6", null, false).size());
-    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "description 61", null, false).size());
+    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "description 6", null).size());
+    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "description 61", null).size());
   }
 
   @Test
@@ -235,8 +232,8 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     dao.save(test1);
     dao.save(test2);
     dao.save(test3);
-    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "boop7", null, false).size());
-    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "boop71", null, false).size());
+    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "boop7", null).size());
+    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "boop71", null).size());
   }
 
   @Test
@@ -249,8 +246,8 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
     dao.save(test1);
     dao.save(test2);
     dao.save(test3);
-    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "test pool 9", null, false).size());
-    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "test pool 91", null, false).size());
+    assertEquals(3, dao.listAllByCriteria(PlatformType.ILLUMINA, "test pool 9", null).size());
+    assertEquals(1, dao.listAllByCriteria(PlatformType.ILLUMINA, "test pool 91", null).size());
   }
 
   @Test
@@ -271,16 +268,6 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
   @Test
   public void testListByProjectNone() throws IOException {
     assertEquals(0, dao.listByProjectId(100L).size());
-  }
-
-  @Test
-  public void testListReadyByPlatform() throws IOException {
-    assertTrue(dao.listAllByCriteria(PlatformType.ILLUMINA, null, null, true).size() > 0);
-  }
-
-  @Test
-  public void testListReadyByPlatformNone() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(PlatformType.SOLID, null, null, true).size());
   }
 
   @Test
@@ -383,27 +370,27 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllByPlatformAndSearchNoneForPlatformType() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(PlatformType.SOLID, "", null, false).size());
+    assertEquals(0, dao.listAllByCriteria(PlatformType.SOLID, "", null).size());
   }
 
   @Test
   public void testListAllByPlatformAndSearchNoneForQuery() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(PlatformType.ILLUMINA, "asdf", null, false).size());
+    assertEquals(0, dao.listAllByCriteria(PlatformType.ILLUMINA, "asdf", null).size());
   }
 
   @Test
   public void testListAllByPlatformAndSearchNullQuery() throws IOException {
-    assertTrue(dao.listAllByCriteria(PlatformType.ILLUMINA, null, null, false).size() > 0);
+    assertTrue(dao.listAllByCriteria(PlatformType.ILLUMINA, null, null).size() > 0);
   }
 
   @Test
   public void testListAllByPlatformAndSearchWithEmptyString() throws IOException {
-    assertTrue(dao.listAllByCriteria(PlatformType.ILLUMINA, "", null, false).size() > 0);
+    assertTrue(dao.listAllByCriteria(PlatformType.ILLUMINA, "", null).size() > 0);
   }
 
   @Test
   public void testListAllByPlatformNone() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(PlatformType.SOLID, null, null, false).size());
+    assertEquals(0, dao.listAllByCriteria(PlatformType.SOLID, null, null).size());
   }
 
   @Test
@@ -428,18 +415,18 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListBySearchWithBadQuery() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(null, ";DROP TABLE Users;", null, false).size());
+    assertEquals(0, dao.listAllByCriteria(null, ";DROP TABLE Users;", null).size());
   }
 
   @Test
   public void testListBySearchWithGoodAliasQuery() throws IOException {
     dao.listAll();
-    assertTrue(dao.listAllByCriteria(null, "IPO1", null, false).size() > 0);
+    assertTrue(dao.listAllByCriteria(null, "IPO1", null).size() > 0);
   }
 
   @Test
   public void testListBySearchWithGoodNameQuery() throws IOException {
-    assertTrue(dao.listAllByCriteria(null, "Pool 1", null, false).size() > 0);
+    assertTrue(dao.listAllByCriteria(null, "Pool 1", null).size() > 0);
   }
 
   @Test
@@ -462,12 +449,12 @@ public class HibernatePoolDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListPoolsWithLimit() throws IOException {
-    assertEquals(10, dao.listAllByCriteria(null, null, 10, false).size());
+    assertEquals(10, dao.listAllByCriteria(null, null, 10).size());
   }
 
   @Test
   public void testListPoolsWithLimitZero() throws IOException {
-    assertEquals(0, dao.listAllByCriteria(null, null, 0, false).size());
+    assertEquals(0, dao.listAllByCriteria(null, null, 0).size());
   }
 
   @Test

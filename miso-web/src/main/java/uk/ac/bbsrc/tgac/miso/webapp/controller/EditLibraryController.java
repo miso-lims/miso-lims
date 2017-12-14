@@ -906,7 +906,6 @@ public class EditLibraryController {
       dto.setAlias(item.getLibrary().getAlias() + "_POOL");
       dto.setPooledElements(Collections.singleton(Dtos.asDto(item)));
       dto.setPlatformType(item.getLibrary().getPlatformType().name());
-      dto.setReadyToRun(true);
       return dto;
     }
 
@@ -971,7 +970,6 @@ public class EditLibraryController {
       }
       PoolDto dto = new PoolDto();
       dto.setPlatformType(platformTypes.get(0).name());
-      dto.setReadyToRun(true);
 
       if (parents.size() == 1) {
         dto.setAlias(parents.get(0).getLibrary().getAlias() + "_POOL");

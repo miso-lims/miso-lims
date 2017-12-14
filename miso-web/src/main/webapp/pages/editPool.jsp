@@ -140,17 +140,6 @@
       <form:radiobutton path="qcPassed" value="false" label="False"/>
     </td>
   </tr>
-  <tr>
-    <td class="h"><label for="readyToRun">Ready To Run:</label></td>
-    <c:choose>
-    <c:when test="${pool.id != 0}">
-      <td><form:checkbox path="readyToRun" id="readyToRun"/></td>
-    </c:when>
-    <c:otherwise>
-      <td><form:checkbox path="readyToRun" checked="checked" id="readyToRun"/></td>
-    </c:otherwise>
-    </c:choose>
-  </tr>
   
   <tr>
     <td>Volume (&#181;l):</td>

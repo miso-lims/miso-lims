@@ -24,7 +24,6 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     CONCENTRATION(By.id("concentration"), FieldType.TEXT),
     CREATE_DATE(By.id("creationDate"), FieldType.TEXT),
     QC_PASSED(By.name("qcPassed"), FieldType.RADIO),
-    READY_TO_RUN(By.id("readyToRun"), FieldType.CHECKBOX),
     VOLUME(By.id("volume"), FieldType.TEXT),
     DISCARDED(By.id("discarded"), FieldType.CHECKBOX),
     LOCATION(By.id("location"), FieldType.LABEL);

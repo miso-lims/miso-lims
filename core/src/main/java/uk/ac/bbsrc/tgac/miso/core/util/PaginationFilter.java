@@ -313,16 +313,6 @@ public abstract interface PaginationFilter {
     };
   }
 
-  public static PaginationFilter readyToRun(boolean readyToRun) {
-    return new PaginationFilter() {
-
-      @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByReadyToRun(item, readyToRun, errorHandler);
-      }
-    };
-  }
-
   public static PaginationFilter sampleClass(String name) {
     return new PaginationFilter() {
 

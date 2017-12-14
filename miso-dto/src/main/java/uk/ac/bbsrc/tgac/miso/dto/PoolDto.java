@@ -15,7 +15,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   private String concentration;
   private String identificationBarcode;
   private String locationLabel;
-  private Boolean readyToRun;
   private Boolean qcPassed;
   private boolean duplicateIndices;
   private Set<String> duplicateIndicesSequences;
@@ -88,10 +87,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
     return qcPassed;
   }
 
-  public Boolean getReadyToRun() {
-    return readyToRun;
-  }
-
   public String getUrl() {
     return url;
   }
@@ -152,10 +147,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
-  }
-
-  public void setReadyToRun(Boolean readyToRun) {
-    this.readyToRun = readyToRun;
   }
 
   public void setUrl(String url) {

@@ -101,13 +101,13 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
 
   @Override
   public Collection<Pool> listBySearch(String query) throws IOException {
-    List<Pool> pools = poolStore.listAllByCriteria(null, query, null, false);
+    List<Pool> pools = poolStore.listAllByCriteria(null, query, null);
     return authorizationManager.filterUnreadable(pools);
   }
 
   @Override
   public Collection<Pool> listWithLimit(int limit) throws IOException {
-    List<Pool> pools = poolStore.listAllByCriteria(null, null, limit, false);
+    List<Pool> pools = poolStore.listAllByCriteria(null, null, limit);
     return authorizationManager.filterUnreadable(pools);
   }
 
@@ -119,25 +119,13 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
 
   @Override
   public Collection<Pool> listByPlatform(PlatformType platformType) throws IOException {
-    Collection<Pool> pools = poolStore.listAllByCriteria(platformType, null, null, false);
+    Collection<Pool> pools = poolStore.listAllByCriteria(platformType, null, null);
     return authorizationManager.filterUnreadable(pools);
   }
 
   @Override
   public Collection<Pool> listByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
-    List<Pool> pools = poolStore.listAllByCriteria(platformType, query, null, false);
-    return authorizationManager.filterUnreadable(pools);
-  }
-
-  @Override
-  public Collection<Pool> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
-    List<Pool> pools = poolStore.listAllByCriteria(platformType, null, null, true);
-    return authorizationManager.filterUnreadable(pools);
-  }
-
-  @Override
-  public Collection<Pool> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
-    List<Pool> pools = poolStore.listAllByCriteria(platformType, query, null, true);
+    List<Pool> pools = poolStore.listAllByCriteria(platformType, query, null);
     return authorizationManager.filterUnreadable(pools);
   }
 
@@ -214,7 +202,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
       managed.setIdentificationBarcode(LimsUtils.nullifyStringIfBlank(pool.getIdentificationBarcode()));
       managed.setPlatformType(pool.getPlatformType());
       managed.setQcPassed(pool.getQcPassed());
-      managed.setReadyToRun(pool.getReadyToRun());
       managed.setVolume(pool.getVolume());
       managed.setDiscarded(pool.isDiscarded());
       managed.setCreationDate(pool.getCreationDate());

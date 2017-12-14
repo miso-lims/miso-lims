@@ -1379,7 +1379,6 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
-    dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(formatDate(from.getCreationDate()));
     dto.setDiscarded(from.isDiscarded());
@@ -1756,7 +1755,6 @@ public class Dtos {
       return view;
     }).collect(Collectors.toSet()));
     to.setQcPassed(dto.getQcPassed());
-    to.setReadyToRun(dto.getReadyToRun());
     to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));
     return to;
   }

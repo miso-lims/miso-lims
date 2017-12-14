@@ -194,10 +194,7 @@ ListTarget.partition = {
         }), 'Outstanding Orders (Matched Chemistry)', assign, assignDialog) : null,
             assignFromRest('/miso/rest/poolorder/picker/active?' + jQuery.param({
               platform: platformType.name
-            }), 'Outstanding Orders (All)', assign, assignDialog), assignFromRest('/miso/rest/pool/picker/readytorun?' + jQuery.param({
-              platform: platformType.name,
-              readyToRun: true
-            }), 'Ready to Run', assign, assignDialog), assignFromRest('/miso/rest/pool/picker/recent?' + jQuery.param({
+            }), 'Outstanding Orders (All)', assign, assignDialog), assignFromRest('/miso/rest/pool/picker/recent?' + jQuery.param({
               platform: platformType.name
             }), 'Recently Modified', assign, assignDialog), ].filter(function(x) {
           return x;

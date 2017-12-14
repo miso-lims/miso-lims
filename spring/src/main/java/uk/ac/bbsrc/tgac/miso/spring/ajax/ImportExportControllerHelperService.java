@@ -494,7 +494,6 @@ public class ImportExportControllerHelperService {
                   if (!pools.containsKey(poolName)) {
                     pool.setAlias(poolName);
                     pool.setPlatformType(pt);
-                    pool.setReadyToRun(true);
                     pool.setCreationDate(new Date());
                     if (jsonArrayElement.get(13) != null && !isStringEmptyOrNull(jsonArrayElement.getString(13))) {
                       pool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
