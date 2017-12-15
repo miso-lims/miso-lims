@@ -253,6 +253,17 @@ public class EditSampleController {
     return defaultSciName != null ? defaultSciName : "";
   }
 
+  private static class Config {
+    private static final String CREATE = "create";
+    private static final String PROPAGATE = "propagate";
+    private static final String EDIT = "edit";
+    private static final String HAS_PROJECT = "hasProject";
+    private static final String DNASE_TREATABLE = "dnaseTreatable";
+    private static final String DEFAULT_SCI_NAME = "defaultSciName";
+    private static final String SOURCE_SAMPLE_CLASS = "sourceSampleClass";
+    private static final String TARGET_SAMPLE_CLASS = "targetSampleClass";
+  }
+
   @ModelAttribute("stains")
   public List<Stain> populateStains() {
     return stainService.list();
@@ -864,14 +875,14 @@ public class EditSampleController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
       if (sampleClass != null) {
-        config.putPOJO("targetSampleClass", Dtos.asDto(sampleClass));
-        config.putPOJO("sourceSampleClass", Dtos.asDto(sampleClass));
-        config.put("dnaseTreatable", sampleClass.getDNAseTreatable());
+        config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(sampleClass));
+        config.putPOJO(Config.SOURCE_SAMPLE_CLASS, Dtos.asDto(sampleClass));
+        config.put(Config.DNASE_TREATABLE, sampleClass.getDNAseTreatable());
       } else {
-        config.put("dnaseTreatable", false);
+        config.put(Config.DNASE_TREATABLE, false);
       }
-      config.put("propagate", false);
-      config.put("edit", true);
+      config.put(Config.PROPAGATE, false);
+      config.put(Config.EDIT, true);
     }
   };
 
@@ -940,11 +951,11 @@ public class EditSampleController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      config.put("propagate", true);
-      config.put("edit", false);
-      config.put("dnaseTreatable", targetSampleClass.getDNAseTreatable());
-      config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
-      config.putPOJO("sourceSampleClass", Dtos.asDto(sourceSampleClass));
+      config.put(Config.PROPAGATE, true);
+      config.put(Config.EDIT, false);
+      config.put(Config.DNASE_TREATABLE, targetSampleClass.getDNAseTreatable());
+      config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(targetSampleClass));
+      config.putPOJO(Config.SOURCE_SAMPLE_CLASS, Dtos.asDto(sourceSampleClass));
     }
   };
 
@@ -962,19 +973,19 @@ public class EditSampleController {
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       if (targetSampleClass != null) {
-        config.putPOJO("targetSampleClass", Dtos.asDto(targetSampleClass));
-        config.put("dnaseTreatable", targetSampleClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
+        config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(targetSampleClass));
+        config.put(Config.DNASE_TREATABLE, targetSampleClass.hasPathToDnaseTreatable(sampleValidRelationshipService.getAll()));
       } else {
-        config.put("dnaseTreatable", false);
+        config.put(Config.DNASE_TREATABLE, false);
       }
-      config.put("create", true);
-      config.put("hasProject", project != null);
+      config.put(Config.CREATE, true);
+      config.put(Config.HAS_PROJECT, project != null);
       if (project == null) {
         projectService.listAllProjects().stream().map(Dtos::asDto).forEach(config.putArray("projects")::addPOJO);
       } else {
         config.putPOJO("project", Dtos.asDto(project));
       }
-      config.put("defaultSciName", defaultSciName);
+      config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
     }
   };
 
