@@ -133,6 +133,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
+@SuppressWarnings("squid:S3776")
 public class Dtos {
 
   public static TissueOriginDto asDto(TissueOrigin from) {
