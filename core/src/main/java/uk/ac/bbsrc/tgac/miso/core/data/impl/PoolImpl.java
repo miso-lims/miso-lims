@@ -356,9 +356,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   private boolean hasDuplicateIndices(Set<String> indices, PoolableElementView item) {
     StringBuilder totalIndex = new StringBuilder();
-    int shortestIndex = getShortestIndex();
     for (Index index : item.getIndices()) {
-      totalIndex.append(index.getSequence().substring(0, shortestIndex));
+      totalIndex.append(index.getSequence());
     }
     return !indices.add(totalIndex.toString());
   }
@@ -566,11 +565,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   public int getLongestIndex() {
     return pooledElementViews.stream().flatMap(element -> element.getIndices().stream()).mapToInt(index -> index.getSequence().length())
         .max().orElse(0);
-  }
-
-  private int getShortestIndex() {
-    return pooledElementViews.stream().flatMap(element -> element.getIndices().stream()).mapToInt(index -> index.getSequence().length())
-        .min().orElse(0);
   }
 
   @Override
