@@ -766,35 +766,7 @@ public class EditSampleController {
       if (target == null || target.getSampleCategory() == null) {
         throw new RestException("Cannot find sample class with ID " + sampleClassId, Status.NOT_FOUND);
       }
-      // need to instantiate the correct DetailedSampleDto class to get the correct fields
-      final DetailedSampleDto detailedTemplate;
-      switch (target.getSampleCategory()) {
-      case SampleIdentity.CATEGORY_NAME:
-        detailedTemplate = new SampleIdentityDto();
-        break;
-      case SampleTissue.CATEGORY_NAME:
-        detailedTemplate = new SampleTissueDto();
-        break;
-      case SampleTissueProcessing.CATEGORY_NAME:
-        if (SampleSlide.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
-          detailedTemplate = new SampleSlideDto();
-        } else if (SampleLCMTube.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
-          detailedTemplate = new SampleLCMTubeDto();
-        } else {
-          detailedTemplate = new SampleTissueProcessingDto();
-        }
-        break;
-      case SampleStock.CATEGORY_NAME:
-        detailedTemplate = new SampleStockDto();
-        break;
-      case SampleAliquot.CATEGORY_NAME:
-        detailedTemplate = new SampleAliquotDto();
-        break;
-      default:
-        throw new RestException("Unknown category for sample class with ID " + sampleClassId, Status.BAD_REQUEST);
-      }
-      detailedTemplate.setSampleClassId(sampleClassId);
-      template = detailedTemplate;
+      template = getCorrectDetailedSampleDto(target, sampleClassId);
     } else {
       if (detailedSample) throw new RestException("Must specify sample class of samples to create", Status.BAD_REQUEST);
       template = new SampleDto();
@@ -809,6 +781,38 @@ public class EditSampleController {
     }
 
     return new BulkCreateSampleBackend(template.getClass(), template, quantity, project, target).create(model);
+  }
+
+  private DetailedSampleDto getCorrectDetailedSampleDto(SampleClass target, Long sampleClassId) {
+    // need to instantiate the correct DetailedSampleDto class to get the correct fields
+    final DetailedSampleDto detailedTemplate;
+    switch (target.getSampleCategory()) {
+    case SampleIdentity.CATEGORY_NAME:
+      detailedTemplate = new SampleIdentityDto();
+      break;
+    case SampleTissue.CATEGORY_NAME:
+      detailedTemplate = new SampleTissueDto();
+      break;
+    case SampleTissueProcessing.CATEGORY_NAME:
+      if (SampleSlide.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+        detailedTemplate = new SampleSlideDto();
+      } else if (SampleLCMTube.SAMPLE_CLASS_NAME.equals(target.getAlias())) {
+        detailedTemplate = new SampleLCMTubeDto();
+      } else {
+        detailedTemplate = new SampleTissueProcessingDto();
+      }
+      break;
+    case SampleStock.CATEGORY_NAME:
+      detailedTemplate = new SampleStockDto();
+      break;
+    case SampleAliquot.CATEGORY_NAME:
+      detailedTemplate = new SampleAliquotDto();
+      break;
+    default:
+      throw new RestException("Unknown category for sample class with ID " + sampleClassId, Status.BAD_REQUEST);
+    }
+    detailedTemplate.setSampleClassId(sampleClassId);
+    return detailedTemplate;
   }
 
   @RequestMapping(method = RequestMethod.POST)
