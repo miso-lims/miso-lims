@@ -139,6 +139,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
 
+@SuppressWarnings("squid:S3776")
 @Controller
 @RequestMapping("/sample")
 @SessionAttributes("sample")
