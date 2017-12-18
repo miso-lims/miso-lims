@@ -150,6 +150,16 @@ public class EditLibraryController {
     INDEX_FAMILY_NEEDS_PLATFORM.setName("Please select a platform...");
   }
 
+  private static class Config {
+    private static final String SORTABLE_LOCATION = "sortableLocation";
+    private static final String IS_LIBRARY_RECEIPT = "isLibraryReceipt";
+    private static final String DEFAULT_SCI_NAME = "defaultSciName";
+    private static final String PROPAGATE = "propagate";
+    private static final String SHOW_LIBRARY_ALIAS = "showLibraryAlias";
+    private static final String SHOW_DESCRIPTION = "showDescription";
+    private static final String SHOW_VOLUME = "showVolume";
+  }
+
   @Autowired
   private SecurityManager securityManager;
 
@@ -646,7 +656,7 @@ public class EditLibraryController {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
-      config.put("sortableLocation", true);
+      config.put(Config.SORTABLE_LOCATION, true);
       writeLibraryConfiguration(mapper, config);
     }
   };
@@ -705,11 +715,11 @@ public class EditLibraryController {
   };
 
   private void writeLibraryConfiguration(ObjectMapper mapper, ObjectNode config) {
-    config.put("showDescription", showDescription);
-    config.put("showVolume", showVolume);
-    config.put("showLibraryAlias", showLibraryAlias);
-    config.put("sortableLocation", true);
-    config.put("propagate", true);
+    config.put(Config.SHOW_DESCRIPTION, showDescription);
+    config.put(Config.SHOW_VOLUME, showVolume);
+    config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
+    config.put(Config.SORTABLE_LOCATION, true);
+    config.put(Config.PROPAGATE, true);
   }
 
   @RequestMapping(value = "/bulk/propagate", method = RequestMethod.GET)
@@ -791,13 +801,13 @@ public class EditLibraryController {
       } else {
         config.putPOJO("project", Dtos.asDto(project));
       }
-      config.put("defaultSciName", defaultSciName);
-      config.put("showDescription", showDescription);
-      config.put("showVolume", showVolume);
-      config.put("showLibraryAlias", showLibraryAlias);
-      config.put("sortableLocation", false);
-      config.put("propagate", false);
-      config.put("isLibraryReceipt", true);
+      config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
+      config.put(Config.SHOW_DESCRIPTION, showDescription);
+      config.put(Config.SHOW_VOLUME, showVolume);
+      config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
+      config.put(Config.SORTABLE_LOCATION, false);
+      config.put(Config.PROPAGATE, false);
+      config.put(Config.IS_LIBRARY_RECEIPT, true);
     }
 
   }
@@ -906,7 +916,6 @@ public class EditLibraryController {
       dto.setAlias(item.getLibrary().getAlias() + "_POOL");
       dto.setPooledElements(Collections.singleton(Dtos.asDto(item)));
       dto.setPlatformType(item.getLibrary().getPlatformType().name());
-      dto.setReadyToRun(true);
       return dto;
     }
 
@@ -971,7 +980,6 @@ public class EditLibraryController {
       }
       PoolDto dto = new PoolDto();
       dto.setPlatformType(platformTypes.get(0).name());
-      dto.setReadyToRun(true);
 
       if (parents.size() == 1) {
         dto.setAlias(parents.get(0).getLibrary().getAlias() + "_POOL");

@@ -423,22 +423,6 @@ public class RunPageIT extends AbstractIT {
     assertFalse(poolIds.contains(5104L));
   }
 
-  @Test
-  public void testPoolSearchReadyToRun() throws Exception {
-    // goal: pool search should return only pools with RTR = true, and no pools with RTR = false
-    RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5100L);
-
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.RTR, null);
-    List<Long> poolIds = page.getPoolIdsFromTiles();
-    assertTrue(poolIds.size() > 1);
-    poolIds.forEach(poolId -> {
-      Pool pool = (Pool) getSession().get(PoolImpl.class, poolId);
-      assertTrue(pool.getReadyToRun());
-    });
-    // assert that pools with readyToRun = false are not returned
-    assertFalse(poolIds.contains(5105L));
-  }
-
   @Ignore
   @Test
   public void testPoolSearchRecentlyModified() throws Exception {

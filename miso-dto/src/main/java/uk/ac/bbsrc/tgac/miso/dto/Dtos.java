@@ -133,6 +133,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
+@SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
 
   public static TissueOriginDto asDto(TissueOrigin from) {
@@ -1385,7 +1386,6 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
-    dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(formatDate(from.getCreationDate()));
     dto.setDiscarded(from.isDiscarded());
@@ -1762,7 +1762,6 @@ public class Dtos {
       return view;
     }).collect(Collectors.toSet()));
     to.setQcPassed(dto.getQcPassed());
-    to.setReadyToRun(dto.getReadyToRun());
     to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));
     return to;
   }

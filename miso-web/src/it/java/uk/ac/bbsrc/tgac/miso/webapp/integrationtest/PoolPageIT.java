@@ -41,7 +41,6 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.BARCODE, null);
     fields.put(Field.DESCRIPTION, null);
     fields.put(Field.QC_PASSED, null);
-    fields.put(Field.READY_TO_RUN, Boolean.TRUE.toString());
     fields.put(Field.VOLUME, null);
     fields.put(Field.DISCARDED, Boolean.FALSE.toString());
     fields.put(Field.LOCATION, null);
@@ -83,7 +82,6 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.CONCENTRATION, "6.5");
     fields.put(Field.CREATE_DATE, "2017-08-15");
     fields.put(Field.QC_PASSED, Boolean.FALSE.toString());
-    fields.put(Field.READY_TO_RUN, Boolean.FALSE.toString());
     fields.put(Field.VOLUME, "12.0");
     fields.put(Field.DISCARDED, Boolean.FALSE.toString());
     fields.put(Field.LOCATION, null);
@@ -94,7 +92,6 @@ public class PoolPageIT extends AbstractIT {
     changes.put(Field.DESCRIPTION, "changed desc");
     changes.put(Field.CONCENTRATION, "7.25");
     changes.put(Field.QC_PASSED, Boolean.TRUE.toString());
-    changes.put(Field.READY_TO_RUN, Boolean.TRUE.toString());
     changes.put(Field.VOLUME, "8.91");
     page1.setFields(changes);
 
@@ -122,7 +119,6 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.CONCENTRATION, "6.5");
     fields.put(Field.CREATE_DATE, "2017-08-15");
     fields.put(Field.QC_PASSED, null);
-    fields.put(Field.READY_TO_RUN, Boolean.FALSE.toString());
     fields.put(Field.VOLUME, null);
     fields.put(Field.DISCARDED, Boolean.FALSE.toString());
     fields.put(Field.LOCATION, null);
@@ -159,7 +155,6 @@ public class PoolPageIT extends AbstractIT {
     fields.put(Field.CONCENTRATION, "6.5");
     fields.put(Field.CREATE_DATE, "2017-08-15");
     fields.put(Field.QC_PASSED, Boolean.FALSE.toString());
-    fields.put(Field.READY_TO_RUN, Boolean.FALSE.toString());
     fields.put(Field.VOLUME, "12.0");
     fields.put(Field.DISCARDED, Boolean.FALSE.toString());
     fields.put(Field.LOCATION, null);
@@ -291,7 +286,6 @@ public class PoolPageIT extends AbstractIT {
     assertAttribute(Field.CONCENTRATION, expectedValues, nullOrToString(pool.getConcentration()));
     assertAttribute(Field.CREATE_DATE, expectedValues, LimsUtils.formatDate(pool.getCreationDate()));
     assertAttribute(Field.QC_PASSED, expectedValues, nullOrToString(pool.getQcPassed()));
-    assertAttribute(Field.READY_TO_RUN, expectedValues, Boolean.toString(pool.getReadyToRun()));
     assertAttribute(Field.VOLUME, expectedValues, nullOrToString(pool.getVolume()));
     assertAttribute(Field.DISCARDED, expectedValues, Boolean.toString(pool.isDiscarded()));
     assertAttribute(Field.LOCATION, expectedValues, pool.getLocationBarcode());

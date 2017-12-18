@@ -207,7 +207,6 @@ public class PoolRestController extends RestController {
         }))//
         .forEach(WhineyConsumer.rethrow(containerService::update));
     if (pool != null) {
-      pool.setReadyToRun(false);
       poolService.save(pool);
     }
   }
@@ -260,15 +259,6 @@ public class PoolRestController extends RestController {
     return getPoolPickerWithFilters(100,
         PaginationFilter.platformType(PlatformType.valueOf(platform)),
         PaginationFilter.query(query));
-  }
-
-  @RequestMapping(value = "/picker/readytorun")
-  @ResponseBody
-  public PoolPickerResponse getPickersByReadyToRun(@RequestParam("platform") String platform,
-      @RequestParam("readyToRun") boolean readyToRun) throws IOException {
-    return getPoolPickerWithFilters(100,
-        PaginationFilter.platformType(PlatformType.valueOf(platform)),
-        PaginationFilter.readyToRun(readyToRun));
   }
 
   @RequestMapping(value = "/picker/recent")

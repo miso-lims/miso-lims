@@ -28,8 +28,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 public class BulkPoolIT extends AbstractIT {
 
   private static final Set<String> commonColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.BARCODE, Columns.BOX_SEARCH,
-      Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.CREATE_DATE, Columns.CONCENTRATION, Columns.VOLUME, Columns.QC_PASSED,
-      Columns.READY_TO_RUN);
+      Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.CREATE_DATE, Columns.CONCENTRATION, Columns.VOLUME, Columns.QC_PASSED);
 
   @Before
   public void setup() {
@@ -123,11 +122,6 @@ public class BulkPoolIT extends AbstractIT {
     assertTrue(qcValues.contains("True"));
     assertTrue(qcValues.contains("False"));
     assertTrue(qcValues.contains("Unknown"));
-
-    List<String> readyToRunValues = table.getDropdownOptions(Columns.READY_TO_RUN, 0);
-    assertEquals(2, readyToRunValues.size());
-    assertTrue(readyToRunValues.contains("True"));
-    assertTrue(readyToRunValues.contains("False"));
   }
 
   @Test
@@ -144,7 +138,6 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CONCENTRATION, "6.5");
     attrs.put(Columns.VOLUME, "12.0");
     attrs.put(Columns.QC_PASSED, "False");
-    attrs.put(Columns.READY_TO_RUN, "False");
     assertColumnValues(table, 0, attrs, "loaded");
 
     // make changes
@@ -155,7 +148,6 @@ public class BulkPoolIT extends AbstractIT {
     changes.put(Columns.CONCENTRATION, "7.0");
     changes.put(Columns.VOLUME, "6.78");
     changes.put(Columns.QC_PASSED, "True");
-    changes.put(Columns.READY_TO_RUN, "True");
     fillRow(table, 0, changes);
     
     // unchanged
@@ -183,7 +175,6 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CONCENTRATION, "6.5");
     attrs.put(Columns.VOLUME, null);
     attrs.put(Columns.QC_PASSED, "Unknown");
-    attrs.put(Columns.READY_TO_RUN, "True");
     assertColumnValues(table, 0, attrs, "loaded");
 
     // make changes
@@ -198,7 +189,6 @@ public class BulkPoolIT extends AbstractIT {
     changes.put(Columns.ALIAS, attrs.get(Columns.ALIAS));
     changes.put(Columns.CREATE_DATE, attrs.get(Columns.CREATE_DATE));
     changes.put(Columns.CONCENTRATION, attrs.get(Columns.CONCENTRATION));
-    changes.put(Columns.READY_TO_RUN, attrs.get(Columns.READY_TO_RUN));
     assertColumnValues(table, 0, changes, "changes pre-save");
 
     saveAndAssertSuccess(table);
@@ -222,7 +212,6 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CONCENTRATION, "6.5");
     attrs.put(Columns.VOLUME, "7.92");
     attrs.put(Columns.QC_PASSED, "True");
-    attrs.put(Columns.READY_TO_RUN, "True");
     assertColumnValues(table, 0, attrs, "loaded");
 
     // make changes
@@ -237,7 +226,6 @@ public class BulkPoolIT extends AbstractIT {
     changes.put(Columns.ALIAS, attrs.get(Columns.ALIAS));
     changes.put(Columns.CREATE_DATE, attrs.get(Columns.CREATE_DATE));
     changes.put(Columns.CONCENTRATION, attrs.get(Columns.CONCENTRATION));
-    changes.put(Columns.READY_TO_RUN, attrs.get(Columns.READY_TO_RUN));
     assertColumnValues(table, 0, changes, "changes pre-save");
 
     saveAndAssertSuccess(table);
@@ -261,7 +249,6 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CONCENTRATION, null);
     attrs.put(Columns.VOLUME, null);
     attrs.put(Columns.QC_PASSED, "Unknown");
-    attrs.put(Columns.READY_TO_RUN, "True");
     assertColumnValues(table, 0, attrs, "default values");
 
     // enter pool data
@@ -272,7 +259,6 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CONCENTRATION, "1.23");
     attrs.put(Columns.VOLUME, "4.56");
     attrs.put(Columns.QC_PASSED, "True");
-    attrs.put(Columns.READY_TO_RUN, "True");
     fillRow(table, 0, attrs);
     assertColumnValues(table, 0, attrs, "changes pre-save");
 
@@ -301,7 +287,6 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.CONCENTRATION, null);
     row0.put(Columns.VOLUME, null);
     row0.put(Columns.QC_PASSED, "Unknown");
-    row0.put(Columns.READY_TO_RUN, "True");
     assertColumnValues(table, 0, row0, "row 0 default values");
 
     Map<String, String> row1 = Maps.newLinkedHashMap(row0);
@@ -316,7 +301,6 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.CONCENTRATION, "1.23");
     row0.put(Columns.VOLUME, "4.56");
     row0.put(Columns.QC_PASSED, "True");
-    row0.put(Columns.READY_TO_RUN, "True");
     fillRow(table, 0, row0);
     assertColumnValues(table, 0, row0, "row 0 changes pre-save");
 
@@ -327,7 +311,6 @@ public class BulkPoolIT extends AbstractIT {
     row1.put(Columns.CONCENTRATION, "1.25");
     row1.put(Columns.VOLUME, "4.53");
     row1.put(Columns.QC_PASSED, "True");
-    row1.put(Columns.READY_TO_RUN, "True");
     fillRow(table, 1, row1);
     assertColumnValues(table, 1, row1, "row 1 changes pre-save");
 
@@ -362,7 +345,6 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CONCENTRATION, "6.5");
     attrs.put(Columns.VOLUME, "7.92");
     attrs.put(Columns.QC_PASSED, "True");
-    attrs.put(Columns.READY_TO_RUN, "True");
     assertColumnValues(table, 0, attrs, "loaded for first edit");
 
     // change 1
@@ -407,7 +389,6 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CONCENTRATION, null);
     attrs.put(Columns.VOLUME, null);
     attrs.put(Columns.QC_PASSED, "Unknown");
-    attrs.put(Columns.READY_TO_RUN, "True");
     assertColumnValues(table, 0, attrs, "default values");
 
     // enter pool data
@@ -418,7 +399,6 @@ public class BulkPoolIT extends AbstractIT {
     attrs.put(Columns.CONCENTRATION, "1.23");
     attrs.put(Columns.VOLUME, "4.56");
     attrs.put(Columns.QC_PASSED, "True");
-    attrs.put(Columns.READY_TO_RUN, "True");
     fillRow(table, 0, attrs);
     assertColumnValues(table, 0, attrs, "creation pre-save");
 
@@ -456,7 +436,6 @@ public class BulkPoolIT extends AbstractIT {
     assertEntityAttribute(Columns.CONCENTRATION, attributes, pool, p -> p.getConcentration().toString());
     assertEntityAttribute(Columns.VOLUME, attributes, pool, p -> p.getVolume() == null ? null : p.getVolume().toString());
     assertEntityAttribute(Columns.QC_PASSED, attributes, pool, p -> getQcPassedString(p.getQcPassed()));
-    assertEntityAttribute(Columns.READY_TO_RUN, attributes, pool, p -> p.getReadyToRun() ? "True" : "False");
   }
 
   private static String assertAndGetSavedName(HandsOnTable table, int rowNum) {

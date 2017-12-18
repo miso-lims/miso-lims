@@ -125,21 +125,6 @@ public interface Pool
   public void setPlatformType(PlatformType name);
 
   /**
-   * Checks if this Pool is ready to be run
-   * 
-   * @return boolean ready.
-   */
-  public boolean getReadyToRun();
-
-  /**
-   * Sets the ready to run status of this Pool
-   * 
-   * @param ready Boolean.
-   */
-  public void setReadyToRun(boolean ready);
-
-
-  /**
    * Returns the poolQCs of this Pool object.
    * 
    * @return Collection<PoolQC> poolQCs.

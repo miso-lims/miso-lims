@@ -158,9 +158,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
 
   private Boolean qcPassed;
 
-  @Column(name = "ready")
-  private boolean readyToRun = false;
-
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile;
@@ -222,7 +219,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     return new EqualsBuilder().appendSuper(super.equals(obj)).append(description, other.getDescription())
         .append(pooledElementViews, other.getPoolableElementViews())
         .append(concentration, other.getConcentration())
-        .append(identificationBarcode, other.getIdentificationBarcode()).append(readyToRun, other.getReadyToRun())
+        .append(identificationBarcode, other.getIdentificationBarcode())
         .append(qcPassed, other.getQcPassed())
         .isEquals();
   }
@@ -323,11 +320,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public boolean getReadyToRun() {
-    return readyToRun;
-  }
-
-  @Override
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
   }
@@ -387,7 +379,7 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public int hashCode() {
     return new HashCodeBuilder(23, 47).appendSuper(super.hashCode()).append(description).append(pooledElementViews)
-        .append(concentration).append(identificationBarcode).append(readyToRun).append(qcPassed).toHashCode();
+        .append(concentration).append(identificationBarcode).append(qcPassed).toHashCode();
   }
 
   @Override
@@ -457,11 +449,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
-  }
-
-  @Override
-  public void setReadyToRun(boolean readyToRun) {
-    this.readyToRun = readyToRun;
   }
 
   @Override

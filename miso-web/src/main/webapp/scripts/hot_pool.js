@@ -61,8 +61,7 @@ HotTarget.pool = {
       }
     }, HotUtils.makeColumnForFloat('Concentration (' + Constants.poolConcentrationUnits + ')', true, 'concentration', true),
         HotUtils.makeColumnForFloat('Volume (&#181;l)', true, 'volume', false),
-        HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
-        HotUtils.makeColumnForBoolean('Ready to Run?', true, 'readyToRun', true)];
+        HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false)];
 
     var spliceIndex = columns.indexOf(columns.filter(function(column) {
       return column.data === 'identificationBarcode';
