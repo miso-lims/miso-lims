@@ -650,6 +650,97 @@ public class BulkLibraryIT extends AbstractIT {
     sortRows.forEach((k, v) -> assertTrue(table.getText(LibColumns.SAMPLE_LOCATION, k).endsWith(v)));
   }
 
+  @Test
+  public void testAddToBox() {
+    Long libId = 100005L;
+    DetailedLibrary before = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    assertNull(before.getBox());
+    assertNull(before.getBoxPosition());
+
+    BulkLibraryPage page = BulkLibraryPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(libId));
+    HandsOnTable table = page.getTable();
+    table.enterText(LibColumns.BOX_SEARCH, 0, "BOX100001");
+    table.waitForSearch(LibColumns.BOX_ALIAS, 0);
+    assertEquals("Bulk Boxables Test", table.getText(LibColumns.BOX_ALIAS, 0));
+    assertTrue(isStringEmptyOrNull(table.getText(LibColumns.BOX_POSITION, 0)));
+    assertTrue(table.getInvalidCells(0).contains(LibColumns.BOX_POSITION));
+    table.enterText(LibColumns.BOX_POSITION, 0, "A01");
+    assertFalse(table.getInvalidCells(0).contains(LibColumns.BOX_POSITION));
+    saveAndAssertSuccess(table);
+
+    DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    assertNotNull(after.getBox());
+    assertEquals("BOX100001", after.getBox().getName());
+    assertEquals("A01", after.getBoxPosition());
+  }
+
+  @Test
+  public void testRemoveFromBox() {
+    Long libId = 100006L;
+    DetailedLibrary before = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    assertNotNull(before.getBox());
+    assertEquals("BOX100001", before.getBox().getName());
+    assertEquals("A02", before.getBoxPosition());
+
+    BulkLibraryPage page = BulkLibraryPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(libId));
+    HandsOnTable table = page.getTable();
+    table.clearField(LibColumns.BOX_ALIAS, 0);
+    saveAndAssertSuccess(table);
+
+    DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    assertNull(after.getBox());
+    assertNull(after.getBoxPosition());
+  }
+
+  @Test
+  public void testDiscardFromBox() {
+    Long libId = 100007L;
+    DetailedLibrary before = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    assertNotNull(before.getBox());
+    assertEquals("BOX100001", before.getBox().getName());
+    assertEquals("A03", before.getBoxPosition());
+    assertFalse(before.isDiscarded());
+
+    BulkLibraryPage page = BulkLibraryPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(libId));
+    HandsOnTable table = page.getTable();
+    table.enterText(LibColumns.DISCARDED, 0, "True");
+    assertTrue(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
+    table.clearField(LibColumns.BOX_ALIAS, 0);
+    assertFalse(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
+    saveAndAssertSuccess(table);
+
+    DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    assertNull(after.getBox());
+    assertNull(after.getBoxPosition());
+    assertTrue(after.isDiscarded());
+  }
+
+  @Test
+  public void testUndiscardIntoBox() {
+    Long libId = 100008L;
+    DetailedLibrary before = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    assertNull(before.getBox());
+    assertNull(before.getBoxPosition());
+    assertTrue(before.isDiscarded());
+
+    BulkLibraryPage page = BulkLibraryPage.getForEdit(getDriver(), getBaseUrl(), Sets.newHashSet(libId));
+    HandsOnTable table = page.getTable();
+    table.enterText(LibColumns.BOX_SEARCH, 0, "BOX100001");
+    table.waitForSearch(LibColumns.BOX_ALIAS, 0);
+    assertEquals("Bulk Boxables Test", table.getText(LibColumns.BOX_ALIAS, 0));
+    table.enterText(LibColumns.BOX_POSITION, 0, "A04");
+    assertTrue(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
+    table.enterText(LibColumns.DISCARDED, 0, "False");
+    assertFalse(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
+    saveAndAssertSuccess(table);
+
+    DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    assertNotNull(after.getBox());
+    assertEquals("BOX100001", after.getBox().getName());
+    assertEquals("A04", after.getBoxPosition());
+    assertFalse(after.isDiscarded());
+  }
+
   private void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {
     attributes.forEach((key, val) -> table.enterText(key, rowNum, val));
   }

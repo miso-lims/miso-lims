@@ -33,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
 public class PlainSampleITs extends AbstractIT {
 
@@ -76,7 +75,7 @@ public class PlainSampleITs extends AbstractIT {
   public void testCreateOnePlainSampleNoProject() throws Exception {
     // Goal: ensure one sample can be saved
     BulkSamplePage page = BulkSamplePage.getForCreate(getDriver(), getBaseUrl(), 1, null, null);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.ALIAS, "PRO1_S02_1");
