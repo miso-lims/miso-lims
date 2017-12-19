@@ -48,13 +48,6 @@
           </div>
         </div>
       </sec:authorize>
-
-      <div class="portlet">
-        <div class="portlet-header">Reporting</div>
-        <div class="portlet-content">
-          <a href="<c:url value='/miso/flexreports'/>">Reports</a><br/>
-        </div>
-      </div>
     </div>
   </div>
 </div>
