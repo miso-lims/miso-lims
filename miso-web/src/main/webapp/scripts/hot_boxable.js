@@ -10,21 +10,44 @@ HotTarget.boxable = (function() {
     return callback(Utils.validation.isEmpty(value) || value in boxesByAlias);
   };
 
-  var cacheBox = function(box) {
-    var occupied = box.items.map(function(item) {
-      return item.coordinates;
-    });
-    var free = [];
-    for (var row = 0; row < box.rows; row++) {
-      for (var col = 0; col < box.cols; col++) {
-        var pos = String.fromCharCode(65 + row) + (col < 9 ? '0' : '') + (col + 1);
-        if (occupied.indexOf(pos) === -1) {
-          free.push(pos);
+  var mustBeFalseValidator = function(value, callback) {
+    return callback(value === 'False');
+  };
+
+  var cacheBox = function(box, itemPos) {
+    var cached = boxesByAlias[box.alias];
+    if (!cached) {
+      var occupied = box.items.map(function(item) {
+        return item.coordinates;
+      });
+      var free = [];
+      for (var row = 0; row < box.rows; row++) {
+        for (var col = 0; col < box.cols; col++) {
+          var pos = String.fromCharCode(65 + row) + (col < 9 ? '0' : '') + (col + 1);
+          if (occupied.indexOf(pos) === -1) {
+            free.push(pos);
+          }
         }
       }
+      box.emptyPositions = free;
+      boxesByAlias[box.alias] = box;
+      cached = box;
     }
-    box.emptyPositions = free;
-    boxesByAlias[box.alias] = box;
+    if (itemPos && cached.emptyPositions.indexOf(itemPos) === -1) {
+      cached.emptyPositions.push(itemPos);
+      cached.emptyPositions.sort();
+    }
+  };
+
+  var makeDiscardedColumn = function() {
+    var col = HotUtils.makeColumnForBoolean('Discarded', true, 'discarded', true);
+    col.depends = 'boxPosition';
+    col.update = function(obj, flat, value, setReadOnly, setOptions, setData) {
+      setOptions({
+        validator: !value ? HotUtils.validator.requiredAutocomplete : mustBeFalseValidator
+      });
+    };
+    return col;
   };
 
   return {
@@ -35,7 +58,7 @@ HotTarget.boxable = (function() {
         allowEmpty: true,
         include: true,
         unpack: function(obj, flat, setCellMeta) {
-          flat.boxSearch = '';
+          // search field only
         },
         pack: function(obj, flat, errorHandler) {
           // search field only
@@ -51,11 +74,11 @@ HotTarget.boxable = (function() {
         unpack: function(obj, flat, setCellMeta) {
           if (obj.box) {
             flat.boxAlias = obj.box.alias;
-            cacheBox(obj.box);
+            cacheBox(obj.box, obj.boxPosition);
           }
         },
         pack: function(obj, flat, errorHandler) {
-          obj.box = obj.box || {};
+          obj.box = {};
           if (flat.boxAlias) {
             obj.box.alias = flat.boxAlias;
             obj.box.id = boxesByAlias[flat.boxAlias].id;
@@ -151,7 +174,7 @@ HotTarget.boxable = (function() {
             });
           }
         }
-      }];
+      }, makeDiscardedColumn()];
     }
   }
 

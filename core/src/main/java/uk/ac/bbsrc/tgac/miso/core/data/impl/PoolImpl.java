@@ -240,6 +240,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
+  public void removeFromBox() {
+    this.boxPosition = null;
+  }
+
+  @Override
   public Collection<ChangeLog> getChangeLog() {
     return changeLog;
   }

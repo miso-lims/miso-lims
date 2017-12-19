@@ -300,7 +300,6 @@ var HotUtils = {
           var currentChange = changes[i];
           var flat = flatObjects[currentChange[0]];
           var obj = data[currentChange[0]];
-          flat[column.data] = '';
           var update = column.update(obj, flat, currentChange[3], function(readOnly) {
             table.setCellMeta(currentChange[0], column.hotIndex, 'readOnly', readOnly);
             needsRender = true;

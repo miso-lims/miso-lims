@@ -27,8 +27,8 @@ public class BulkDilutionIT extends AbstractIT {
   private static final Logger log = LoggerFactory.getLogger(BulkDilutionIT.class);
 
   private static final Set<String> columns = Sets.newHashSet(DilColumns.NAME, DilColumns.ID_BARCODE, DilColumns.BOX_SEARCH,
-      DilColumns.BOX_ALIAS, DilColumns.BOX_POSITION, DilColumns.LIBRARY_ALIAS, DilColumns.CONCENTRATION, DilColumns.CREATION_DATE,
-      DilColumns.VOLUME, DilColumns.TARGETED_SEQUENCING);
+      DilColumns.BOX_ALIAS, DilColumns.DISCARDED, DilColumns.BOX_POSITION, DilColumns.LIBRARY_ALIAS, DilColumns.CONCENTRATION,
+      DilColumns.CREATION_DATE, DilColumns.VOLUME, DilColumns.TARGETED_SEQUENCING);
 
   private static final String NO_TAR_SEQ = "(None)";
 

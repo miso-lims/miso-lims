@@ -157,6 +157,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
+  public void removeFromBox() {
+    this.boxPosition = null;
+  }
+
+  @Override
   public User getLastModifier() {
     return lastModifier;
   }

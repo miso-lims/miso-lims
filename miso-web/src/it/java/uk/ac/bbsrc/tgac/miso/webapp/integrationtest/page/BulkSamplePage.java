@@ -24,6 +24,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String BOX_SEARCH = "Box Search";
     public static final String BOX_ALIAS = "Box Alias";
     public static final String BOX_POSITION = "Position";
+    public static final String DISCARDED = "Discarded";
     public static final String SAMPLE_TYPE = "Sample Type";
     public static final String SCIENTIFIC_NAME = "Sci. Name";
     public static final String PROJECT = "Project";

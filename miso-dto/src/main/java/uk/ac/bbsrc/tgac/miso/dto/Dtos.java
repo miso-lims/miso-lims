@@ -641,7 +641,7 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setVolume(isStringEmptyOrNull(from.getVolume()) ? null : Double.valueOf(from.getVolume()));
-    if (from.getDiscarded() != null) to.setDiscarded(from.getDiscarded());
+    to.setDiscarded(from.isDiscarded());
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());
       to.getProject().setProjectId(from.getProjectId());
@@ -1124,6 +1124,7 @@ public class Dtos {
       dto.setBox(asDto(from.getBox(), includeBoxables));
       dto.setBoxPosition(from.getBoxPosition());
     }
+    dto.setDiscarded(from.isDiscarded());
     if (from.getSample().getBox() != null) {
       dto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
     }
@@ -1216,6 +1217,7 @@ public class Dtos {
       to.setReceivedDate(parseDate(from.getReceivedDate()));
     }
     to.setBoxPosition((LibraryBoxPosition) makeBoxablePosition(from, (LibraryImpl) to));
+    to.setDiscarded(from.isDiscarded());
     return to;
   }
 
@@ -1309,6 +1311,7 @@ public class Dtos {
       dto.setBox(asDto(from.getBox(), includeBoxables));
       dto.setBoxPosition(from.getBoxPosition());
     }
+    dto.setDiscarded(from.isDiscarded());
     return dto;
   }
 
@@ -1376,6 +1379,7 @@ public class Dtos {
       to.getTargetedSequencing().setId(from.getTargetedSequencingId());
     }
     to.setBoxPosition((DilutionBoxPosition) makeBoxablePosition(from, to));
+    to.setDiscarded(from.isDiscarded());
     return to;
   }
 
@@ -1388,7 +1392,6 @@ public class Dtos {
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(formatDate(from.getCreationDate()));
-    dto.setDiscarded(from.isDiscarded());
     if (from.getVolume() != null) {
       dto.setVolume(from.getVolume().toString());
     }
@@ -1421,6 +1424,7 @@ public class Dtos {
       dto.setBox(asDto(from.getBox(), true));
       dto.setBoxPosition(from.getBoxPosition());
     }
+    dto.setDiscarded(from.isDiscarded());
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
     return dto;
   }
