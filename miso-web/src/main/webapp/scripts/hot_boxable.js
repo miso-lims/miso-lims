@@ -50,6 +50,40 @@ HotTarget.boxable = (function() {
     return col;
   };
 
+  function fillBoxPositions(table, sortFunction) {
+    var rowCount = table.countRows();
+    var freeByAlias = [];
+
+    for (var row = 0; row < rowCount; row++) {
+      var boxAlias = table.getDataAtRowProp(row, 'boxAlias');
+      if (boxAlias) {
+        freeByAlias[boxAlias] = freeByAlias[boxAlias] || boxesByAlias[boxAlias].emptyPositions.slice();
+        var pos = table.getDataAtRowProp(row, 'boxPosition');
+        if (pos) {
+          freeByAlias[boxAlias] = freeByAlias[boxAlias].filter(function(freePos) {
+            return freePos !== pos;
+          });
+        }
+      }
+    }
+    for ( var key in freeByAlias) {
+      freeByAlias[key].sort(sortFunction);
+    }
+    for (var row = 0; row < rowCount; row++) {
+      var boxAlias = table.getDataAtRowProp(row, 'boxAlias');
+      if (boxAlias && !table.getDataAtRowProp(row, 'boxPosition')) {
+        var free = freeByAlias[boxAlias];
+        if (free && free.length > 0) {
+          var pos = free.shift();
+          table.setDataAtRowProp(row, 'boxPosition', pos);
+          freeByAlias[boxAlias] = free.filter(function(freePos) {
+            return freePos !== pos;
+          });
+        }
+      }
+    }
+  }
+
   return {
     makeBoxLocationColumns: function() {
       return [
@@ -179,6 +213,23 @@ HotTarget.boxable = (function() {
               }
             }
           }, makeDiscardedColumn()];
+    },
+    getCustomActions: function(table) {
+      return [{
+        buttonText: 'Fill Boxes by Row',
+        eventHandler: function() {
+          fillBoxPositions(table, function(a, b) {
+            return Utils.sorting.sortBoxPositions(a, b, true);
+          });
+        }
+      }, {
+        buttonText: 'Fill Boxes by Column',
+        eventHandler: function() {
+          fillBoxPositions(table, function(a, b) {
+            return Utils.sorting.sortBoxPositions(a, b, false);
+          });
+        }
+      }];
     }
   }
 

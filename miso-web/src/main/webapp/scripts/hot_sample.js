@@ -658,6 +658,10 @@ HotTarget.sample = (function() {
               (result.target || targets[0]).action(result.replicates);
             });
           }
-        }, HotUtils.printAction('sample'), ].concat(HotUtils.makeQcActions("Sample"))
+        }, HotUtils.printAction('sample'), ].concat(HotUtils.makeQcActions("Sample")),
+
+    getCustomActions: function(table) {
+      return HotTarget.boxable.getCustomActions(table);
+    }
   };
 })();

@@ -569,6 +569,16 @@ var HotUtils = {
     table.validateCells(function() {
       table.render();
     });
+
+    if (target.hasOwnProperty('getCustomActions')) {
+      target.getCustomActions(table).forEach(function(action) {
+        var button = document.createElement('input');
+        button.type = 'button';
+        button.value = action.buttonText;
+        button.addEventListener('click', action.eventHandler);
+        document.getElementById('bulkactions').appendChild(button);
+      });
+    }
   },
 
   sorting: {
