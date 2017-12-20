@@ -403,6 +403,11 @@ public class LibraryDilution extends AbstractBoxable
   }
 
   @Override
+  public void removeFromBox() {
+    this.boxPosition = null;
+  }
+
+  @Override
   public Date getLastModified() {
     return lastUpdated;
   }

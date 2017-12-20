@@ -16,14 +16,13 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
 public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   private static final Set<String> commonColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.SAMPLE_TYPE,
-      SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS,
-      SamColumns.QC_NOTE);
+      SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED,
+      SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION,
+      SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX);
 
@@ -102,7 +101,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   public void testEditSaveEmptySaveIdentity() throws Exception {
     // Goal: ensure all identity fields can be changed and that these changes will be persisted.
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Identity")));
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002");
@@ -127,7 +126,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
     // reload the page and edit again, setting optional fields to empty
     BulkSamplePage newPage = getEditPage(Arrays.asList(getSampleId("Identity")));
-    SampleHandsOnTable newTable = newPage.getTable();
+    HandsOnTable newTable = newPage.getTable();
 
     Map<String, String> empty = new HashMap<>();
     empty.put(SamColumns.ALIAS, "TEST_0002");
@@ -209,7 +208,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   public void testEditSaveEmptySaveTissue() throws Exception {
     // Goal: ensure all tissue fields can be changed and that these changes will be persisted.
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Tissue")));
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2");
@@ -241,7 +240,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
     // now, reload the page and empty all optional fields
     BulkSamplePage newPage = getEditPage(Arrays.asList(getSampleId("Tissue")));
-    SampleHandsOnTable newTable = newPage.getTable();
+    HandsOnTable newTable = newPage.getTable();
 
     Map<String, String> empty = new HashMap<>();
     empty.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2");
@@ -325,7 +324,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   public void testEditSaveEmptySaveSlide() throws Exception {
     // Goal: ensure all Slide fields can be changed and that these changes will be persisted.
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Slide")));
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL01");
@@ -352,7 +351,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
     // get the page again, and empty all optional fields
     BulkSamplePage newPage = getEditPage(Arrays.asList(getSampleId("Slide")));
-    SampleHandsOnTable newTable = newPage.getTable();
+    HandsOnTable newTable = newPage.getTable();
 
     Map<String, String> empty = new HashMap<>();
     empty.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_SL01");
@@ -427,7 +426,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
   public void testEditSaveEmptySaveCurls() throws Exception {
     // Goal: ensure all Curls fields can be changed and that these changes will be persisted.
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Curls")));
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_C01");
@@ -450,7 +449,7 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
     // get the page again, and empty all optional fields
     BulkSamplePage newPage = getEditPage(Arrays.asList(getSampleId("Curls")));
-    SampleHandsOnTable newTable = newPage.getTable();
+    HandsOnTable newTable = newPage.getTable();
 
     Map<String, String> empty = new HashMap<>();
     empty.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-2_C01");

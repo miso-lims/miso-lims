@@ -49,7 +49,6 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
   private Long rootSampleClassId;
   private String rootSampleClassUrl;
   private String volume;
-  private Boolean discarded;
   private Long updatedById;
   private String updatedByUrl;
   private String lastModified;
@@ -202,14 +201,6 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setVolume(String volume) {
     this.volume = volume;
-  }
-
-  public Boolean getDiscarded() {
-    return discarded;
-  }
-
-  public void setDiscarded(Boolean discarded) {
-    this.discarded = discarded;
   }
 
   public Long getUpdatedById() {

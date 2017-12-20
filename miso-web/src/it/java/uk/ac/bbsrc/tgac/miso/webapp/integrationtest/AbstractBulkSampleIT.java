@@ -26,7 +26,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
 public abstract class AbstractBulkSampleIT extends AbstractIT {
 
@@ -44,7 +43,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   protected static final long cAliquotClassId = 21L;
   protected static final long mRnaClassId = 19L;
 
-  protected void saveSingleAndAssertSuccess(SampleHandsOnTable table) {
+  protected void saveSingleAndAssertSuccess(HandsOnTable table) {
     HandsOnTableSaveResult result = table.save();
 
     assertTrue("Server errors: " + result.getServerErrors().toString(), result.getServerErrors().isEmpty());

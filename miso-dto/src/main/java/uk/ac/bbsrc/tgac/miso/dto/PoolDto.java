@@ -23,7 +23,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   private String creationDate;
   private String lastModified;
   private String description;
-  private boolean discarded;
   private String volume;
   private String platformType;
   private int longestIndex;
@@ -160,14 +159,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
       ldto.setLibraryUrl(
           WritableUrls.buildUriPath(baseUri, "/rest/library/{id}", ldto.getLibrary().getId()));
     }
-  }
-
-  public boolean isDiscarded() {
-    return discarded;
-  }
-
-  public void setDiscarded(boolean isDiscarded) {
-    this.discarded = isDiscarded;
   }
 
   public String getVolume() {

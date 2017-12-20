@@ -33,21 +33,20 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
 
 public class PlainSampleITs extends AbstractIT {
 
   private static final Set<String> sampleColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.RECEIVE_DATE, SamColumns.SAMPLE_TYPE,
-      SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.QC_PASSED);
+      SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.RECEIVE_DATE,
+      SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.PROJECT, SamColumns.QC_PASSED);
 
   private static final Set<String> libraryColumns = Sets.newHashSet(LibColumns.NAME, LibColumns.SAMPLE_ALIAS, LibColumns.SAMPLE_LOCATION,
-      LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.PLATFORM, LibColumns.LIBRARY_TYPE,
-      LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2,
+      LibColumns.BOX_SEARCH, LibColumns.BOX_ALIAS, LibColumns.BOX_POSITION, LibColumns.DISCARDED, LibColumns.PLATFORM,
+      LibColumns.LIBRARY_TYPE, LibColumns.SELECTION, LibColumns.STRATEGY, LibColumns.INDEX_FAMILY, LibColumns.INDEX_1, LibColumns.INDEX_2,
       LibColumns.KIT_DESCRIPTOR, LibColumns.QC_PASSED, LibColumns.SIZE, LibColumns.CONCENTRATION);
 
-  private static final Set<String> dilutionColumns = Sets.newHashSet(DilColumns.NAME, DilColumns.LIBRARY_ALIAS,
-      DilColumns.BOX_SEARCH, DilColumns.BOX_ALIAS, DilColumns.BOX_POSITION, DilColumns.CONCENTRATION, DilColumns.VOLUME,
+  private static final Set<String> dilutionColumns = Sets.newHashSet(DilColumns.NAME, DilColumns.LIBRARY_ALIAS, DilColumns.BOX_SEARCH,
+      DilColumns.BOX_ALIAS, DilColumns.BOX_POSITION, DilColumns.DISCARDED, DilColumns.CONCENTRATION, DilColumns.VOLUME,
       DilColumns.CREATION_DATE);
 
   @Before
@@ -76,7 +75,7 @@ public class PlainSampleITs extends AbstractIT {
   public void testCreateOnePlainSampleNoProject() throws Exception {
     // Goal: ensure one sample can be saved
     BulkSamplePage page = BulkSamplePage.getForCreate(getDriver(), getBaseUrl(), 1, null, null);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
     attrs.put(SamColumns.ALIAS, "PRO1_S02_1");

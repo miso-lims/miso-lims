@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
+import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.MoreExpectedConditions.textDoesNotContain;
 
 import java.util.Collections;
 import java.util.List;
@@ -81,7 +82,7 @@ public class HandsOnTable extends AbstractElement {
    */
   public void enterText(String columnHeading, int rowNum, String text) {
     if (LimsUtils.isStringEmptyOrNull(text)) {
-      clearField(columnHeading, rowNum, text);
+      clearField(columnHeading, rowNum);
       return;
     }
     if (!text.equals(cleanAscii(text))) {
@@ -107,7 +108,7 @@ public class HandsOnTable extends AbstractElement {
     waitUntil(invisibilityOf(cellEditor));
   }
 
-  public void clearField(String columnHeading, int rowNum, String text) {
+  public void clearField(String columnHeading, int rowNum) {
     WebElement cell = getCell(columnHeading, rowNum);
     new Actions(getDriver())
         .click(cell)
@@ -262,6 +263,11 @@ public class HandsOnTable extends AbstractElement {
       }
     }
     return invalid;
+  }
+
+  public void waitForSearch(String resultColumnHeading, int rowNum) {
+    WebElement resultField = getCell(resultColumnHeading, rowNum);
+    waitUntil(textDoesNotContain(resultField, "(...searching...)"));
   }
 
 }

@@ -974,4 +974,9 @@ public class DetailedSampleBuilder
   public void setBoxPosition(SampleBoxPosition boxPosition) {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
+
+  @Override
+  public void removeFromBox() {
+    throw new UnsupportedOperationException("Method not implemented on builder");
+  }
 }
