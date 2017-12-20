@@ -146,7 +146,8 @@ HotTarget.boxable = (function() {
         source: [''],
         unpack: function(obj, flat, setCellMeta) {
           flat.boxPosition = obj.boxPosition || null;
-          setCellMeta('validator', (obj.box && obj.box.alias) ? /^[A-Z][0-9]{2}$/ : HotUtils.validator.requiredEmpty);
+          setCellMeta('validator', (obj.box && obj.box.alias) ? HotUtils.validator.requiredAutocomplete
+              : HotUtils.validator.requiredEmpty);
         },
         pack: function(obj, flat, errorHandler) {
           obj.boxPosition = flat.boxPosition;
@@ -160,7 +161,7 @@ HotTarget.boxable = (function() {
         update: function(obj, flat, value, setReadOnly, setOptions, setData) {
           setReadOnly(!value);
           setOptions({
-            validator: value ? /^[A-Z][0-9]{2}$/ : HotUtils.validator.requiredEmpty
+            validator: value ? HotUtils.validator.requiredAutocomplete : HotUtils.validator.requiredEmpty
           });
           var box = !value ? null : boxesByAlias[value];
           if (!box) {

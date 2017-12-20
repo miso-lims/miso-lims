@@ -390,6 +390,14 @@ var HotUtils = {
     });
 
     var save = document.getElementById('save');
+    function setSaveDisabled(disabled) {
+      save.disabled = disabled;
+      if (disabled) {
+        jQuery(save).addClass('disabled');
+      } else {
+        jQuery(save).removeClass('disabled');
+      }
+    }
     save
         .addEventListener(
             'click',
@@ -437,7 +445,7 @@ var HotUtils = {
                 });
               }
 
-              save.disabled = true;
+              setSaveDisabled(true);
               var ajaxLoader = document.getElementById('ajaxLoader');
               ajaxLoader.classList.remove('hidden');
               // Check if the table is valid and all of the converters are happy
@@ -448,7 +456,7 @@ var HotUtils = {
                     if (anyInvalidCells) {
                       failed.push('Please fix highlighted cells.');
                       renderErrors();
-                      save.disabled = false;
+                      setSaveDisabled(false);
                       ajaxLoader.classList.add('hidden');
                       return;
                     }
@@ -471,7 +479,7 @@ var HotUtils = {
                       }
                       renderErrors();
                       table.render();
-                      save.disabled = false;
+                      setSaveDisabled(false);
                       ajaxLoader.classList.add('hidden');
                       return;
                     }
@@ -515,7 +523,7 @@ var HotUtils = {
                         }
                         renderErrors();
                         table.render();
-                        save.disabled = allSaved;
+                        setSaveDisabled(allSaved);
                         ajaxLoader.classList.add('hidden');
                         return;
                       }

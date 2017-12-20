@@ -20,9 +20,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   private static final Set<String> commonColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.SAMPLE_TYPE,
-      SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.QC_STATUS,
-      SamColumns.QC_NOTE);
+      SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS, SamColumns.BOX_POSITION, SamColumns.DISCARDED,
+      SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME, SamColumns.SAMPLE_CLASS, SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION,
+      SamColumns.QC_STATUS, SamColumns.QC_NOTE);
 
   private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX);
 
