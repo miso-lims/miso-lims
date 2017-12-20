@@ -729,6 +729,7 @@ public class BulkLibraryIT extends AbstractIT {
     table.waitForSearch(LibColumns.BOX_ALIAS, 0);
     assertEquals("Bulk Boxables Test", table.getText(LibColumns.BOX_ALIAS, 0));
     table.enterText(LibColumns.BOX_POSITION, 0, "A04");
+    assertEquals("A04", table.getText(LibColumns.BOX_POSITION, 0));
     assertTrue(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
     table.enterText(LibColumns.DISCARDED, 0, "False");
     assertFalse(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
