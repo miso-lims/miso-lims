@@ -208,7 +208,7 @@ public final class DefaultIllumina extends RunProcessor {
             .map(fileName -> new File(runDirectory, fileName))//
             .filter(File::exists)//
             .count();
-        if (netCopyFiles == 0) {
+        if (netCopyFiles == 0 && !new File(runDirectory, "CopyComplete.txt").exists()) {
           // This might mean incomplete or it might mean the sequencer never wrote the files
         } else {
           // If we see some net copy files, then it's still running; if they're all here, assume it's done.
