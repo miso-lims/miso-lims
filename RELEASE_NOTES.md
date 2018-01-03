@@ -1,3 +1,15 @@
+# 0.2.103
+
+Changes:
+
+ * Fixed Run Scanner check for completion of Illumina NextSeq machines
+ * Auto-fill box positions by row or column in bulk tables
+ * Add discarded column to bulk tables
+ * Set timeout on PacBio webservice calls for Run Scanner stability
+ * Removed 'Ready to Run' attribute from Pool
+ * Sorted Project dashboard widget with newest projects at the top
+ * Improved performance of list pages
+
 # 0.2.102
 
 Changes:
