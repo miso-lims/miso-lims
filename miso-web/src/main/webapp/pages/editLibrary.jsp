@@ -333,6 +333,10 @@
   <td><form:input id="volume" path="volume"/></td>
 </tr>
 <tr>
+  <td class="h"><label for="initialConcentration">Initial Concentration (<span id="concentrationUnits"></span>):</label></td>
+  <td><form:input id="initialConcentration" path="initialConcentration"/></td>
+</tr>
+<tr>
   <td><label for="discarded">Discarded:</label></td>
   <td><form:checkbox id="discarded" path="discarded"/></td>
 </tr>
@@ -388,10 +392,6 @@
     <td>
       <form:input id="groupDescription" path="groupDescription"/>
     </td>
-  </tr>
-  <tr>
-    <td class="h"><label for="initialConcentration">Initial Concentration (<span id="concentrationUnits"></span>):</label></td>
-    <td><form:input id="initialConcentration" path="initialConcentration"/></td>
   </tr>
   
   <tr>
