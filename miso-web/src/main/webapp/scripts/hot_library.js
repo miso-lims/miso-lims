@@ -390,6 +390,10 @@ HotTarget.library = (function() {
       return columns;
     },
 
+    getCustomActions: function(table) {
+      return HotTarget.boxable.getCustomActions(table);
+    },
+
     bulkActions: [{
       name: 'Edit',
       action: function(items) {
