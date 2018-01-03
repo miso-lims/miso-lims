@@ -3,13 +3,17 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.persistence.Table;
+
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -34,13 +38,21 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
   @Override
   public default long count(Consumer<String> errorHandler, PaginationFilter... filters) throws IOException {
+    if (filters.length == 0) {
+      // try a quicker approach
+      Table tableAnnotation = getRealClass().getAnnotation(Table.class);
+      if (tableAnnotation != null) {
+        Query query = currentSession().createSQLQuery("SELECT COUNT(*) FROM " + tableAnnotation.name());
+        return ((BigInteger) query.uniqueResult()).longValueExact();
+      }
+    }
+
     Criteria criteria = createPaginationCriteria();
     for (PaginationFilter filter : filters) {
       filter.apply(this, criteria, errorHandler);
     }
-    criteria.setProjection(Projections.countDistinct("id"));
-    return ((Long) criteria.uniqueResult()).intValue();
-
+    criteria.setProjection(Projections.rowCount());
+    return (Long) criteria.uniqueResult();
   }
 
   default Criteria createPaginationCriteria() throws IOException {
@@ -214,11 +226,6 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     if (!isStringBlankOrNull(query)) {
       criteria.add(DbUtils.searchRestrictions(query, getSearchProperties()));
     }
-  }
-
-  @Override
-  default void restrictPaginationByReadyToRun(Criteria criteria, boolean readyToRun, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be filtered by ready to run.");
   }
 
   @Override

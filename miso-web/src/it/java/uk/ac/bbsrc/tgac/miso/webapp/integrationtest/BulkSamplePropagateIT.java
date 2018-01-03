@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.SampleHandsOnTable;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
 
@@ -29,7 +29,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   public void testPropagateTissueFromIdentity() {
     // goal: ensure one tissue can be propagated from one identity
     BulkSamplePage page = getPropagatePage(Arrays.asList(4441L), 1, tissueClassId);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new HashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
@@ -71,7 +71,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   public void testPropagateCurlsFromTissue() {
     // goal: ensure one curls can be propagated from one tissue
     BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, curlsClassId);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new HashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
@@ -104,7 +104,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   public void testPropagateSlideFromTissue() {
     // goal: ensure one slide can be propagated from one tissue
     BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, slideClassId);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new HashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
@@ -141,7 +141,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   public void testPropagateCdnaStockFromTissue() {
     // goal: ensure one cDNA stock can be propagated from one tissue
     BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, cStockClassId);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new HashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
@@ -177,7 +177,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   public void testPropagateRnaStockFromTissue() {
     // goal: ensure one whole RNA stock can be propagated from one tissue
     BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, rStockClassId);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new HashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
@@ -214,7 +214,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   public void testPropagateLcmTubeFromSlide() {
     // goal: ensure one LCM Tube can be propagated from one slide
     BulkSamplePage page = getPropagatePage(Arrays.asList(4443L), 1, lcmTubeClassId);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new HashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
@@ -248,7 +248,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   public void testPropagateGdnaStockFromLcmTube() {
     // goal: ensure one gDNA stock can be propagated from one LCM Tube
     BulkSamplePage page = getPropagatePage(Arrays.asList(4444L), 1, gStockClassId);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new HashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
@@ -283,7 +283,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   public void testPropagateCdnaAliquotFromStock() {
     // goal: ensure one cDNA aliquot can be propagated from one cDNA stock
     BulkSamplePage page = getPropagatePage(Arrays.asList(4445L), 1, cAliquotClassId);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new HashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
@@ -316,7 +316,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   public void testPropagateWholeRnaAliquotFromStock() {
     // goal: ensure one whole RNA aliquot can be propagated from one whole RNA stock
     BulkSamplePage page = getPropagatePage(Arrays.asList(4446L), 1, rAliquotClassId);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new HashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");
@@ -349,7 +349,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   public void testPropagateMrnaFromAliquot() {
     // goal: ensure one mRNA can be propagated from one whole RNA aliquot
     BulkSamplePage page = getPropagatePage(Arrays.asList(4447L), 1, mRnaClassId);
-    SampleHandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new HashMap<>();
     attrs.put(SamColumns.DESCRIPTION, "Description");

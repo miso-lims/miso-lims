@@ -205,6 +205,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   }
 
   @Override
+  public void removeFromBox() {
+    this.boxPosition = null;
+  }
+
+  @Override
   public long getId() {
     return libraryId;
   }

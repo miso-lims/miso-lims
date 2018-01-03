@@ -452,7 +452,7 @@ var Utils = Utils
        * Helper method for extracting the components of a BoxPosition into integers e.g. "BOX3 A01" gets converted to [65, 1]
        */
       getBoxPositionAsIntArray: function(boxPosnString) {
-        var posnRegex = /.* ([A-Z])(\d{2})$/;
+        var posnRegex = /.*([A-Z])(\d{2})$/;
         var posn = posnRegex.exec(boxPosnString);
         var rowVal = posn[1].charCodeAt(0);
         var colVal = parseInt(posn[2]);
@@ -460,6 +460,10 @@ var Utils = Utils
           row: rowVal,
           col: colVal
         };
+      },
+
+      valOrNull: function(val) {
+        return val || null;
       }
     };
 

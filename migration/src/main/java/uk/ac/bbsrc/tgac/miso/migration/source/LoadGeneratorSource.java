@@ -429,7 +429,6 @@ public class LoadGeneratorSource implements MigrationSource {
     p.setPoolableElementViews(poolables);
     p.setConcentration(2D);
     p.setPlatformType(PlatformType.ILLUMINA);
-    p.setReadyToRun(true);
     return p;
   }
 

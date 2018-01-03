@@ -31,12 +31,6 @@
 
   <integration:annotation-config />
 
-  <!-- analysis server -->
-  <bean name="analysisQueryService" class="uk.ac.bbsrc.tgac.miso.integration.AnalysisQueryService">
-    <property name="analysisServerHost" value="${miso.analysis.server.host}" />
-    <property name="analysisServerPort" value="${miso.analysis.server.port}" />
-  </bean>
-
   <!-- box scanner -->
   <bean name="boxScanner" class="uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScanner">
     <constructor-arg index="0" value="${miso.visionmate.server.host}" />

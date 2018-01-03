@@ -61,14 +61,17 @@ HotTarget.pool = {
       }
     }, HotUtils.makeColumnForFloat('Concentration (' + Constants.poolConcentrationUnits + ')', true, 'concentration', true),
         HotUtils.makeColumnForFloat('Volume (&#181;l)', true, 'volume', false),
-        HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false),
-        HotUtils.makeColumnForBoolean('Ready to Run?', true, 'readyToRun', true)];
+        HotUtils.makeColumnForBoolean('QC Passed?', true, 'qcPassed', false)];
 
     var spliceIndex = columns.indexOf(columns.filter(function(column) {
       return column.data === 'identificationBarcode';
     })[0]) + 1;
     columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
     return columns;
+  },
+
+  getCustomActions: function(table) {
+    return HotTarget.boxable.getCustomActions(table);
   },
 
   bulkActions: [{

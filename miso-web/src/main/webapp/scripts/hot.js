@@ -300,7 +300,6 @@ var HotUtils = {
           var currentChange = changes[i];
           var flat = flatObjects[currentChange[0]];
           var obj = data[currentChange[0]];
-          flat[column.data] = '';
           var update = column.update(obj, flat, currentChange[3], function(readOnly) {
             table.setCellMeta(currentChange[0], column.hotIndex, 'readOnly', readOnly);
             needsRender = true;
@@ -391,6 +390,14 @@ var HotUtils = {
     });
 
     var save = document.getElementById('save');
+    function setSaveDisabled(disabled) {
+      save.disabled = disabled;
+      if (disabled) {
+        jQuery(save).addClass('disabled');
+      } else {
+        jQuery(save).removeClass('disabled');
+      }
+    }
     save
         .addEventListener(
             'click',
@@ -438,7 +445,7 @@ var HotUtils = {
                 });
               }
 
-              save.disabled = true;
+              setSaveDisabled(true);
               var ajaxLoader = document.getElementById('ajaxLoader');
               ajaxLoader.classList.remove('hidden');
               // Check if the table is valid and all of the converters are happy
@@ -449,7 +456,7 @@ var HotUtils = {
                     if (anyInvalidCells) {
                       failed.push('Please fix highlighted cells.');
                       renderErrors();
-                      save.disabled = false;
+                      setSaveDisabled(false);
                       ajaxLoader.classList.add('hidden');
                       return;
                     }
@@ -472,7 +479,7 @@ var HotUtils = {
                       }
                       renderErrors();
                       table.render();
-                      save.disabled = false;
+                      setSaveDisabled(false);
                       ajaxLoader.classList.add('hidden');
                       return;
                     }
@@ -516,7 +523,7 @@ var HotUtils = {
                         }
                         renderErrors();
                         table.render();
-                        save.disabled = allSaved;
+                        setSaveDisabled(allSaved);
                         ajaxLoader.classList.add('hidden');
                         return;
                       }
@@ -562,6 +569,16 @@ var HotUtils = {
     table.validateCells(function() {
       table.render();
     });
+
+    if (target.hasOwnProperty('getCustomActions')) {
+      target.getCustomActions(table).forEach(function(action) {
+        var button = document.createElement('input');
+        button.type = 'button';
+        button.value = action.buttonText;
+        button.addEventListener('click', action.eventHandler);
+        document.getElementById('bulkactions').appendChild(button);
+      });
+    }
   },
 
   sorting: {
@@ -651,7 +668,7 @@ var HotUtils = {
     baseobj.unpack = function(obj, flat, setCellMeta) {
       flat[flatProperty] = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
         return item[id] == obj[modelProperty];
-      }, items), name) || (required ? '' : '(None)');
+      }, items), name) || (required ? null : '(None)');
     };
     baseobj.pack = function(obj, flat, errorHandler) {
       obj[modelProperty] = Utils.array.maybeGetProperty(Utils.array.findFirstOrNull(function(item) {
@@ -705,7 +722,7 @@ var HotUtils = {
       'type': 'text',
       'include': include,
       'unpack': function(obj, flat, setCellMeta) {
-        flat[property] = obj[property] || null;
+        flat[property] = Utils.valOrNull(obj[property]);
       },
       'validator': required ? HotUtils.validator.requiredNumber : HotUtils.validator.optionalNumber,
       'pack': function(obj, flat, errorHandler) {
@@ -737,7 +754,7 @@ var HotUtils = {
       'include': include,
       'validator': validator,
       'unpack': function(obj, flat, setCellMeta) {
-        flat[property] = obj[property] || null;
+        flat[property] = Utils.valOrNull(obj[property]);
       },
       'pack': function(obj, flat, errorHandler) {
         if (!Utils.validation.isEmpty(flat[property])) {
@@ -756,7 +773,7 @@ var HotUtils = {
     baseobj.include = include;
     if (!baseobj.hasOwnProperty('unpack')) {
       baseobj.unpack = function(obj, flat, setCellMeta) {
-        flat[property] = obj[property] || null;
+        flat[property] = Utils.valOrNull(obj[property]);
       };
     }
     baseobj.pack = function(obj, flat, errorHandler) {

@@ -31,6 +31,7 @@ import java.util.Map;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -159,6 +160,7 @@ public class HibernateProjectDao implements ProjectStore {
   public List<Project> listAllWithLimit(long limit) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
     criteria.setMaxResults((int) limit);
+    criteria.addOrder(Order.desc("projectId"));
     @SuppressWarnings("unchecked")
     List<Project> results = criteria.list();
     return withWatcherGroup(results);

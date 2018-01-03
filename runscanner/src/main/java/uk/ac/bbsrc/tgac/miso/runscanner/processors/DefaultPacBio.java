@@ -25,6 +25,7 @@ import javax.xml.xpath.XPathExpression;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 
@@ -106,6 +107,8 @@ public class DefaultPacBio extends RunProcessor {
 
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
+  private static final HttpComponentsClientHttpRequestFactory HTTP_REQUEST_FACTORY = new HttpComponentsClientHttpRequestFactory();
+
   private static final Pattern LINES = Pattern.compile("\\r?\\n");
 
   private static final Logger log = LoggerFactory.getLogger(DefaultPacBio.class);
@@ -131,6 +134,12 @@ public class DefaultPacBio extends RunProcessor {
   private static final DateTimeFormatter URL_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
   private static final Pattern WELL_LINE = Pattern.compile("^([A-Z]\\d+),.*$");
+
+  static {
+    HTTP_REQUEST_FACTORY.setConnectionRequestTimeout(20_000);
+    HTTP_REQUEST_FACTORY.setConnectTimeout(20_000);
+    HTTP_REQUEST_FACTORY.setReadTimeout(20_000);
+  }
 
   public static DefaultPacBio create(Builder builder, ObjectNode parameters) {
     JsonNode address = parameters.get("address");
@@ -209,7 +218,6 @@ public class DefaultPacBio extends RunProcessor {
   }
 
   private final String address;
-
   public DefaultPacBio(Builder builder, String address) {
     super(builder);
     this.address = address;
@@ -221,11 +229,11 @@ public class DefaultPacBio extends RunProcessor {
   }
 
   protected String getSampleSheet(String url) {
-    return new RestTemplate().getForObject(url, String.class);
+    return new RestTemplate(HTTP_REQUEST_FACTORY).getForObject(url, String.class);
   }
 
   protected StatusResponse getStatus(String url) {
-    return new RestTemplate().getForObject(url, StatusResponse.class);
+    return new RestTemplate(HTTP_REQUEST_FACTORY).getForObject(url, StatusResponse.class);
   }
 
   @Override

@@ -59,4 +59,5 @@ public abstract class AbstractBoxable implements Boxable {
         .append(volume, other.volume)
         .isEquals();
   }
+
 }

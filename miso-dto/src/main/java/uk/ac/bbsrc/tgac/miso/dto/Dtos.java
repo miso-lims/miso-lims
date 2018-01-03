@@ -133,6 +133,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
+@SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
 
   public static TissueOriginDto asDto(TissueOrigin from) {
@@ -287,7 +288,7 @@ public class Dtos {
 
   public static SampleDto asMinimalDto(Sample from) {
     DetailedSampleDto dto = new DetailedSampleDto();
-    copySampleFields(from, dto);
+    copySampleFields(from, dto, false);
 
     if (isDetailedSample(from)) {
       dto.setSampleClassId(((DetailedSample) from).getSampleClass().getId());
@@ -295,7 +296,7 @@ public class Dtos {
     return dto;
   }
 
-  private static SampleDto copySampleFields(Sample from, SampleDto dto) {
+  private static SampleDto copySampleFields(Sample from, SampleDto dto, boolean includeBoxables) {
     dto.setId(from.getId());
     dto.setName(from.getName());
     dto.setDescription(from.getDescription());
@@ -304,7 +305,7 @@ public class Dtos {
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     if (from.getBox() != null) {
-      dto.setBox(asDto(from.getBox(), true));
+      dto.setBox(asDto(from.getBox(), includeBoxables));
       dto.setBoxPosition(from.getBoxPosition());
     }
     dto.setSampleType(from.getSampleType());
@@ -601,7 +602,7 @@ public class Dtos {
     } else {
       dto = new SampleDto();
     }
-    copySampleFields(from, dto);
+    copySampleFields(from, dto, true);
     dto.setAccession(from.getAccession());
 
     if (from.getQCs() != null && !from.getQCs().isEmpty()) {
@@ -640,7 +641,7 @@ public class Dtos {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setVolume(isStringEmptyOrNull(from.getVolume()) ? null : Double.valueOf(from.getVolume()));
-    if (from.getDiscarded() != null) to.setDiscarded(from.getDiscarded());
+    to.setDiscarded(from.isDiscarded());
     if (from.getProjectId() != null) {
       to.setProject(new ProjectImpl());
       to.getProject().setProjectId(from.getProjectId());
@@ -1052,7 +1053,7 @@ public class Dtos {
     return dtoList;
   }
 
-  public static LibraryDto asDto(Library from) {
+  private static LibraryDto asDto(Library from, boolean includeBoxables) {
     LibraryDto dto = null;
     if (isDetailedLibrary(from)) {
       dto = asDetailedLibraryDto((DetailedLibrary) from);
@@ -1120,9 +1121,10 @@ public class Dtos {
     dto.setLocationBarcode(from.getLocationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     if (from.getBox() != null) {
-      dto.setBox(asDto(from.getBox(), true));
+      dto.setBox(asDto(from.getBox(), includeBoxables));
       dto.setBoxPosition(from.getBoxPosition());
     }
+    dto.setDiscarded(from.isDiscarded());
     if (from.getSample().getBox() != null) {
       dto.setSampleBoxPositionLabel(BoxUtils.makeBoxPositionLabel(from.getSample().getBox().getAlias(), from.getSample().getBoxPosition()));
     }
@@ -1130,6 +1132,14 @@ public class Dtos {
       dto.setReceivedDate(formatDate(from.getReceivedDate()));
     }
     return dto;
+  }
+
+  public static LibraryDto asDto(Library from) {
+    return asDto(from, true);
+  }
+
+  public static LibraryDto asMinimalDto(Library from) {
+    return asDto(from, false);
   }
 
   public static List<LibraryDto> asLibraryDtos(Collection<Library> from) {
@@ -1207,6 +1217,7 @@ public class Dtos {
       to.setReceivedDate(parseDate(from.getReceivedDate()));
     }
     to.setBoxPosition((LibraryBoxPosition) makeBoxablePosition(from, (LibraryImpl) to));
+    to.setDiscarded(from.isDiscarded());
     return to;
   }
 
@@ -1280,7 +1291,7 @@ public class Dtos {
     return to;
   }
 
-  private static DilutionDto asDto(LibraryDilution from, LibraryDto libraryDto) {
+  private static DilutionDto asDto(LibraryDilution from, LibraryDto libraryDto, boolean includeBoxables) {
     DilutionDto dto = new DilutionDto();
     dto.setId(from.getId());
     dto.setName(from.getName());
@@ -1297,18 +1308,29 @@ public class Dtos {
     }
     dto.setLibrary(libraryDto);
     if (from.getBox() != null) {
-      dto.setBox(asDto(from.getBox(), true));
+      dto.setBox(asDto(from.getBox(), includeBoxables));
       dto.setBoxPosition(from.getBoxPosition());
     }
+    dto.setDiscarded(from.isDiscarded());
     return dto;
   }
 
   public static DilutionDto asMinimalDto(LibraryDilution from) {
-    return asDto(from, asMinimalDto(from.getLibrary()));
+    Library lib = from.getLibrary();
+    LibraryDto libDto = new LibraryDto();
+    libDto.setId(lib.getId());
+    libDto.setName(lib.getName());
+    libDto.setAlias(lib.getAlias());
+    libDto.setIdentificationBarcode(lib.getIdentificationBarcode());
+    if (lib.getPlatformType() != null) {
+      libDto.setPlatformType(lib.getPlatformType().getKey());
+    }
+
+    return asDto(from, libDto, false);
   }
 
   public static DilutionDto asDto(LibraryDilution from) {
-    return asDto(from, asDto(from.getLibrary()));
+    return asDto(from, asDto(from.getLibrary()), true);
 
   }
 
@@ -1340,18 +1362,6 @@ public class Dtos {
     return dto;
   }
 
-  public static LibraryDto asMinimalDto(Library from) {
-    LibraryDto dto = new LibraryDto();
-    dto.setId(from.getId());
-    dto.setName(from.getName());
-    dto.setAlias(from.getAlias());
-    dto.setIdentificationBarcode(from.getIdentificationBarcode());
-    if (from.getPlatformType() != null) {
-      dto.setPlatformType(from.getPlatformType().getKey());
-    }
-    return dto;
-  }
-
   public static LibraryDilution to(DilutionDto from) {
     LibraryDilution to = new LibraryDilution();
     if (from.getId() != null) to.setId(from.getId());
@@ -1369,6 +1379,7 @@ public class Dtos {
       to.getTargetedSequencing().setId(from.getTargetedSequencingId());
     }
     to.setBoxPosition((DilutionBoxPosition) makeBoxablePosition(from, to));
+    to.setDiscarded(from.isDiscarded());
     return to;
   }
 
@@ -1379,10 +1390,8 @@ public class Dtos {
     dto.setAlias(from.getAlias());
     dto.setDescription(from.getDescription());
     dto.setConcentration(from.getConcentration() == null ? null : from.getConcentration().toString());
-    dto.setReadyToRun(from.getReadyToRun());
     dto.setQcPassed(from.getQcPassed());
     dto.setCreationDate(formatDate(from.getCreationDate()));
-    dto.setDiscarded(from.isDiscarded());
     if (from.getVolume() != null) {
       dto.setVolume(from.getVolume().toString());
     }
@@ -1415,6 +1424,7 @@ public class Dtos {
       dto.setBox(asDto(from.getBox(), true));
       dto.setBoxPosition(from.getBoxPosition());
     }
+    dto.setDiscarded(from.isDiscarded());
     dto.setHasLowQualityLibraries(from.getHasLowQualityMembers());
     return dto;
   }
@@ -1756,7 +1766,6 @@ public class Dtos {
       return view;
     }).collect(Collectors.toSet()));
     to.setQcPassed(dto.getQcPassed());
-    to.setReadyToRun(dto.getReadyToRun());
     to.setBoxPosition((PoolBoxPosition) makeBoxablePosition(dto, to));
     return to;
   }

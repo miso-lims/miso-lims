@@ -24,6 +24,7 @@ public class BulkLibraryPage extends HeaderFooterPage {
     public static final String BOX_SEARCH = "Box Search";
     public static final String BOX_ALIAS = "Box Alias";
     public static final String BOX_POSITION = "Position";
+    public static final String DISCARDED = "Discarded";
     public static final String SAMPLE_LOCATION = "Sample Location";
     public static final String DESCRIPTION = "Description";
     public static final String RECEIVE_DATE = "Date of receipt";

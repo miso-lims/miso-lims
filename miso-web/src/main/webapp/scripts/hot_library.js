@@ -95,7 +95,7 @@ HotTarget.library = (function() {
             include: true,
             unpackAfterSave: true,
             unpack: function(lib, flat, setCellMeta) {
-              flat.name = lib.name;
+              flat.name = Utils.valOrNull(lib.name);
             },
             pack: function(lib, flat, errorHandler) {
             }
@@ -136,7 +136,7 @@ HotTarget.library = (function() {
             unpackAfterSave: true,
             unpack: function(lib, flat, setCellMeta) {
               validationCache[lib.alias] = true;
-              flat.alias = lib.alias;
+              flat.alias = Utils.valOrNull(lib.alias);
               if (lib.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
               }
@@ -169,7 +169,7 @@ HotTarget.library = (function() {
             readOnly: true,
             include: config.sortableLocation && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
-              flat.sampleBoxPositionLabel = sam.sampleBoxPositionLabel;
+              flat.sampleBoxPositionLabel = Utils.valOrNull(sam.sampleBoxPositionLabel);
             },
             pack: function(sam, flat, errorHandler) {
               sam.sampleBoxPositionLabel = flat.sampleBoxPositionLabel;
@@ -203,7 +203,7 @@ HotTarget.library = (function() {
             allowEmpty: !config.isLibraryReceipt,
             include: config.isLibraryReceipt || !create,
             unpack: function(lib, flat, setCellMeta) {
-              flat.receivedDate = lib.receivedDate || null;
+              flat.receivedDate = Utils.valOrNull(lib.receivedDate);
             },
             pack: function(lib, flat, errorHandler) {
               lib.receivedDate = flat.receivedDate;
@@ -270,7 +270,7 @@ HotTarget.library = (function() {
             validator: HotUtils.validator.requiredAutocomplete,
             include: true,
             unpack: function(lib, flat, setCellMeta) {
-              flat.platformType = lib.platformType;
+              flat.platformType = Utils.valOrNull(lib.platformType);
             },
             pack: function(lib, flat, errorHandler) {
               lib.platformType = flat.platformType;
@@ -326,7 +326,7 @@ HotTarget.library = (function() {
             source: [''],
             include: true,
             unpack: function(lib, flat, setCellMeta) {
-              flat.indexFamilyName = flat.platformType ? (lib.indexFamilyName || 'No indices') : '';
+              flat.indexFamilyName = flat.platformType ? (lib.indexFamilyName || 'No indices') : null;
             },
             pack: function(lib, flat, errorHandler) {
             },
@@ -388,6 +388,10 @@ HotTarget.library = (function() {
       })[0]) + 1;
       columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
       return columns;
+    },
+
+    getCustomActions: function(table) {
+      return HotTarget.boxable.getCustomActions(table);
     },
 
     bulkActions: [{

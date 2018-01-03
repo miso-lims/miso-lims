@@ -73,12 +73,11 @@ public interface PoolStore extends Store<Pool>, Remover<Pool>, PaginatedDataSour
    *          of type PlatformType (null for wildcard)
    * @param query the search term to use (null for wildcard)
    * @param limit the number of results to return (null for all)
-   * @param ready if true limit to only pools
    * @return List<Pool<? extends Poolable<?,?>>
    * @throws IOException
    *           when
    */
-  List<Pool> listAllByCriteria(PlatformType platformType, String query, Integer limit, boolean ready) throws IOException;
+  List<Pool> listAllByCriteria(PlatformType platformType, String query, Integer limit) throws IOException;
 
   /**
    * List all Samples associated with identificationBarcodes from the given identificationBarcode list

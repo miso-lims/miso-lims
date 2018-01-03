@@ -26,10 +26,6 @@ public interface PoolService extends PaginatedDataSource<Pool> {
 
   public Collection<Pool> listByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
 
-  public Collection<Pool> listReadyPoolsByPlatform(PlatformType platformType) throws IOException;
-
-  public Collection<Pool> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
-
   public Collection<Pool> listByProjectId(long projectId) throws IOException;
 
   public Collection<Pool> listByLibraryId(long libraryId) throws IOException;

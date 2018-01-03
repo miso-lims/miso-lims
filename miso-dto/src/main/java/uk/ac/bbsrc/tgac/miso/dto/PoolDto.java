@@ -15,7 +15,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   private String concentration;
   private String identificationBarcode;
   private String locationLabel;
-  private Boolean readyToRun;
   private Boolean qcPassed;
   private boolean duplicateIndices;
   private Set<String> duplicateIndicesSequences;
@@ -24,7 +23,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   private String creationDate;
   private String lastModified;
   private String description;
-  private boolean discarded;
   private String volume;
   private String platformType;
   private int longestIndex;
@@ -86,10 +84,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   public Boolean getQcPassed() {
     return qcPassed;
-  }
-
-  public Boolean getReadyToRun() {
-    return readyToRun;
   }
 
   public String getUrl() {
@@ -154,10 +148,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
     this.qcPassed = qcPassed;
   }
 
-  public void setReadyToRun(Boolean readyToRun) {
-    this.readyToRun = readyToRun;
-  }
-
   public void setUrl(String url) {
     this.url = url;
   }
@@ -169,14 +159,6 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
       ldto.setLibraryUrl(
           WritableUrls.buildUriPath(baseUri, "/rest/library/{id}", ldto.getLibrary().getId()));
     }
-  }
-
-  public boolean isDiscarded() {
-    return discarded;
-  }
-
-  public void setDiscarded(boolean isDiscarded) {
-    this.discarded = isDiscarded;
   }
 
   public String getVolume() {

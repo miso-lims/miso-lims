@@ -336,6 +336,9 @@ public class DefaultBoxService implements BoxService, AuthorizedPaginatedDataSou
 
   @Override
   public void updateBoxableLocation(Boxable boxable) throws IOException {
+    if (boxable.isDiscarded()) {
+      boxable.removeFromBox();
+    }
     if (boxable.getBox() != null && boxable.getBoxPosition() == null) {
       throw new IllegalArgumentException("Box position missing");
     } else if (boxable.getBoxPosition() != null && (boxable.getBox() == null || boxable.getBox().getId() == AbstractBox.UNSAVED_ID)) {

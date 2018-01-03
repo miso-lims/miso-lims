@@ -16,7 +16,7 @@ HotTarget.dilution = {
           validator: HotUtils.validator.optionalTextNoSpecialChars,
           unpackAfterSave: true,
           unpack: function(dil, flat, setCellMeta) {
-            flat.name = dil.name || null;
+            flat.name = Utils.valOrNull(dil.name);
           },
           pack: function(dil, flat, errorHandler) {
             dil.name = flat.name;
@@ -52,7 +52,7 @@ HotTarget.dilution = {
           validator: HotUtils.validator.requiredText,
           include: true,
           unpack: function(dil, flat, setCellMeta) {
-            flat.creationDate = dil.creationDate;
+            flat.creationDate = Utils.valOrNull(dil.creationDate);
           },
           pack: function(dil, flat, errorHandler) {
             dil.creationDate = flat.creationDate;
@@ -101,6 +101,10 @@ HotTarget.dilution = {
     })[0]) + 1;
     columns.splice.apply(columns, [spliceIndex, 0].concat(HotTarget.boxable.makeBoxLocationColumns()));
     return columns;
+  },
+
+  getCustomActions: function(table) {
+    return HotTarget.boxable.getCustomActions(table);
   },
 
   bulkActions: [{

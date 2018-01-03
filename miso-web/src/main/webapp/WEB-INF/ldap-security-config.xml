@@ -63,41 +63,17 @@
     <security:intercept-url pattern="/miso/fluxion.ajax" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
     <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
     <security:intercept-url pattern="/miso/tech/**" access="hasRole('ROLE_TECH')" />
-    <security:intercept-url pattern="/miso/reports/**" access="hasRole('ROLE_ADMIN') or hasRole('ROLE_TECH')" />
     <security:intercept-url pattern="/miso/activity/**" access="hasRole('ROLE_INTERNAL')" />
     <security:intercept-url pattern="/miso/protocols/**/results" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
     <security:intercept-url pattern="/miso/external/**" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
     <security:intercept-url pattern="/miso/mainMenu" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
 
-    <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
-    <!--<security:intercept-url pattern="/miso/consumer/**" access="isAuthenticated"/> -->
-    <!--
-      <security:intercept-url pattern="/miso/consumer/**" access="permitAll"/>
-      <security:intercept-url pattern="/miso/rest/**" access="permitAll"/>
-    -->
     <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL')" />
 
     <security:logout invalidate-session="true" logout-success-url="/loggedOut.jsp" />
 
     <security:session-management invalid-session-url="/login.jsp" session-fixation-protection="none" />
   </security:http>
-
-  <!--
-    <oauth:consumer resource-details-service-ref="resourceDetails" oauth-failure-page="/oauth_error.jsp">
-    <oauth:url pattern="/project/**" httpMethod="GET" resources="jiraIssues"/>
-    </oauth:consumer>
-
-    <oauth:resource-details-service id="resourceDetails">
-    <oauth:resource id="jiraIssues"
-    key="your.jira.server.key"
-    secret="your.jira.secret"
-    signature-method="RSA-SHA1"
-    request-token-url="http://your.jira.host/plugins/servlet/oauth/request-token"
-    user-authorization-url="http://your.jira.host/plugins/servlet/oauth/authorize"
-    access-token-url="http://your.jira.host/plugins/servlet/oauth/access-token"
-    accepts-authorization-header="true"/>
-    </oauth:resource-details-service>
-  -->
 
   <bean id="ajaxSessionFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.AjaxSessionFilter">
     <constructor-arg ref="httpSessionSecurityContextRepository" />

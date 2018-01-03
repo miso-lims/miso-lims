@@ -107,4 +107,9 @@ public interface Boxable extends Nameable, Barcodable, SecurableByProfile, Seria
 
   public void setLastModifier(User user);
 
+  /**
+   * Remove Box and position information from this Boxable
+   */
+  public void removeFromBox();
+
 }

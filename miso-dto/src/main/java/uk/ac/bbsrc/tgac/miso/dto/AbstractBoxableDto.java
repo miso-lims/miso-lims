@@ -4,6 +4,7 @@ public abstract class AbstractBoxableDto {
 
   private BoxDto box;
   private String boxPosition;
+  private boolean discarded = false;
 
   public BoxDto getBox() {
     return box;
@@ -19,6 +20,14 @@ public abstract class AbstractBoxableDto {
 
   public void setBoxPosition(String boxPosition) {
     this.boxPosition = boxPosition;
+  }
+
+  public boolean isDiscarded() {
+    return discarded;
+  }
+
+  public void setDiscarded(boolean discarded) {
+    this.discarded = discarded;
   }
 
 }
