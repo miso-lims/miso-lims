@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.util.Set;
+import java.util.List;
 
 public interface DetailedSample extends Sample {
 
@@ -8,9 +8,9 @@ public interface DetailedSample extends Sample {
 
   public void setParent(DetailedSample parent);
 
-  public Set<DetailedSample> getChildren();
+  public List<DetailedSample> getChildren();
 
-  public void setChildren(Set<DetailedSample> children);
+  public void setChildren(List<DetailedSample> children);
 
   SampleClass getSampleClass();
 
