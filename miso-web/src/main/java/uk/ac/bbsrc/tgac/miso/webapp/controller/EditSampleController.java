@@ -659,6 +659,13 @@ public class EditSampleController {
         if (projectId != null && projectId.longValue() != sample.getProject().getId()) {
           throw new IllegalArgumentException("Requested project does not match sample project");
         }
+
+        Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getProjectId());
+        if (!adjacentSamples.isEmpty()) {
+          model.put("previousSample", adjacentSamples.get("previousSample"));
+          model.put("nextSample", adjacentSamples.get("nextSample"));
+        }
+
         model.put("projectsDtos", "[]");
 
         model.put("sampleLibraries", sample.getLibraries().stream().map(Dtos::asDto).collect(Collectors.toList()));
