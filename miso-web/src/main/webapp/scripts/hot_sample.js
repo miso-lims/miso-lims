@@ -111,34 +111,6 @@ HotTarget.sample = (function() {
           {
             header: 'Sample Alias',
             data: 'alias',
-            validator: function(value, callback) {
-              (Constants.automaticSampleAlias ? HotUtils.validator.optionalTextNoSpecialChars
-                  : HotUtils.validator.requiredTextNoSpecialChars)(value, function(result) {
-                if (!result) {
-                  callback(false);
-                  return;
-                }
-                if (!value) {
-                  return callback(Constants.automaticSampleAlias);
-                }
-                if (validationCache.hasOwnProperty(value)) {
-                  return callback(validationCache[value]);
-                }
-                Fluxion.doAjax('sampleControllerHelperService', 'validateSampleAlias', {
-                  'alias': value,
-                  'url': ajaxurl
-                }, {
-                  'doOnSuccess': function() {
-                    validationCache[value] = true;
-                    return callback(true);
-                  },
-                  'doOnError': function(json) {
-                    validationCache[value] = false;
-                    return callback(false);
-                  }
-                });
-              });
-            },
             type: 'text',
             unpackAfterSave: true,
             unpack: function(sam, flat, setCellMeta) {
@@ -147,6 +119,37 @@ HotTarget.sample = (function() {
               if (sam.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
               }
+              setCellMeta('validator', function(value, callback) {
+                (Constants.automaticSampleAlias ? HotUtils.validator.optionalTextNoSpecialChars
+                    : HotUtils.validator.requiredTextNoSpecialChars)(value, function(result) {
+                  if (!result) {
+                    callback(false);
+                    return;
+                  }
+                  if (!value) {
+                    return callback(Constants.automaticSampleAlias);
+                  }
+                  if (validationCache.hasOwnProperty(value)) {
+                    return callback(validationCache[value]);
+                  }
+                  if (sam.nonStandardAlias) {
+                    return callback(true);
+                  }
+                  Fluxion.doAjax('sampleControllerHelperService', 'validateSampleAlias', {
+                    'alias': value,
+                    'url': ajaxurl
+                  }, {
+                    'doOnSuccess': function() {
+                      validationCache[value] = true;
+                      return callback(true);
+                    },
+                    'doOnError': function(json) {
+                      validationCache[value] = false;
+                      return callback(false);
+                    }
+                  });
+                });
+              })
             },
             pack: function(sam, flat, errorHandler) {
               sam.alias = flat.alias;
