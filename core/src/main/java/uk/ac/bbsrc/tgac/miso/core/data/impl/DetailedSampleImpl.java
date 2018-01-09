@@ -2,8 +2,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,7 +33,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   private DetailedSample parent;
 
   @OneToMany(targetEntity = DetailedSampleImpl.class, mappedBy = "parent")
-  private Set<DetailedSample> children = new HashSet<>();
+  private List<DetailedSample> children = new ArrayList<>();
 
   @ManyToOne(targetEntity = SampleClassImpl.class)
   @JoinColumn(name = "sampleClassId", nullable = false)
@@ -78,12 +78,12 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   }
 
   @Override
-  public Set<DetailedSample> getChildren() {
+  public List<DetailedSample> getChildren() {
     return children;
   }
 
   @Override
-  public void setChildren(Set<DetailedSample> children) {
+  public void setChildren(List<DetailedSample> children) {
     this.children = children;
   }
 

@@ -45,7 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -134,6 +133,7 @@ import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
@@ -169,6 +169,8 @@ public class EditSampleController {
   private RunService runService;
   @Autowired
   private StainService stainService;
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -224,6 +226,10 @@ public class EditSampleController {
 
   public void setTissueMaterialService(TissueMaterialService tissueMaterialService) {
     this.tissueMaterialService = tissueMaterialService;
+  }
+
+  public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+    this.authorizationManager = authorizationManager;
   }
 
   public RunService getRunService() {
@@ -612,7 +618,7 @@ public class EditSampleController {
   @RequestMapping(value = "/{sampleId}/project/{projectId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long sampleId, @PathVariable Long projectId, ModelMap model) throws IOException {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      User user = authorizationManager.getCurrentUser();
       Sample sample = null;
       if (sampleId == AbstractSample.UNSAVED_ID) {
         sample = detailedSample ? new DetailedSampleBuilder(user) : new SampleImpl(user);
@@ -650,21 +656,16 @@ public class EditSampleController {
         }
         model.put("title", "Sample " + sampleId);
 
-        if (projectId != null) {
-          Project project = projectService.getProjectById(projectId);
-          if (project == null) throw new SecurityException("No such project.");
-          model.addAttribute("project", project);
-          sample.setProject(project);
-          sample.inheritPermissions(project);
-
-          Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getProjectId());
-          if (!adjacentSamples.isEmpty()) {
-            model.put("previousSample", adjacentSamples.get("previousSample"));
-            model.put("nextSample", adjacentSamples.get("nextSample"));
-          }
-        } else {
-          model.put("accessibleProjects", populateProjects());
+        if (projectId != null && projectId.longValue() != sample.getProject().getId()) {
+          throw new IllegalArgumentException("Requested project does not match sample project");
         }
+
+        Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getProjectId());
+        if (!adjacentSamples.isEmpty()) {
+          model.put("previousSample", adjacentSamples.get("previousSample"));
+          model.put("nextSample", adjacentSamples.get("nextSample"));
+        }
+
         model.put("projectsDtos", "[]");
 
         model.put("sampleLibraries", sample.getLibraries().stream().map(Dtos::asDto).collect(Collectors.toList()));
@@ -676,27 +677,16 @@ public class EditSampleController {
             .collect(Collectors.toList());
         model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
         model.put("sampleRuns", runDtos);
-        List<SampleDto> relations = new ArrayList<>();
-        if (LimsUtils.isDetailedSample(sample)) {
-          DetailedSample detailed = (DetailedSample) sample;
-          for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
-            relations.add(0, Dtos.asDto(LimsUtils.deproxify(parent)));
-          }
-          addChildren(relations, detailed.getChildren());
-        }
-        model.put("sampleRelations", relations);
-      }
-
-      if (sample != null && !sample.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
+        model.put("sampleRelations", getRelations(sample));
       }
 
       model.put("formObj", sample);
       model.put("sample", sample);
       model.put("sampleTypes", sampleService.listSampleTypes());
 
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
+      Collection<User> allUsers = securityManager.listAllUsers();
+      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, allUsers));
+      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, allUsers));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
       populateSampleClasses(model);
 
@@ -709,7 +699,19 @@ public class EditSampleController {
     }
   }
 
-  private void addChildren(List<SampleDto> relations, Set<DetailedSample> children) {
+  private List<SampleDto> getRelations(Sample sample) {
+    List<SampleDto> relations = new ArrayList<>();
+    if (LimsUtils.isDetailedSample(sample)) {
+      DetailedSample detailed = (DetailedSample) sample;
+      for (DetailedSample parent = detailed.getParent(); parent != null; parent = parent.getParent()) {
+        relations.add(0, Dtos.asDto(LimsUtils.deproxify(parent)));
+      }
+      addChildren(relations, detailed.getChildren());
+    }
+    return relations;
+  }
+
+  private void addChildren(List<SampleDto> relations, Collection<DetailedSample> children) {
     for (DetailedSample child : children) {
       relations.add(Dtos.asDto(LimsUtils.deproxify(child)));
       addChildren(relations, child.getChildren());
