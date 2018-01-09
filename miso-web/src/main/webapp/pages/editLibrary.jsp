@@ -362,9 +362,10 @@
 <script type="text/javascript">
     Library = Library || {};
     Library.setOriginalIndices = function() {
+      Library.originalIndexFamilyId = ${library.getCurrentFamily().id};
       Library.lastIndexPosition = 0;
       jQuery('#indicesDiv').empty();
-      document.getElementById('indexFamily').value = '${library.getCurrentFamily().id}';
+      document.getElementById('indexFamily').value = Library.originalIndexFamilyId;
       <c:forEach items="${library.indices}" var="index">
         <c:if test="${index.id != 0}">
           Library.ui.createIndexBox(${index.id});

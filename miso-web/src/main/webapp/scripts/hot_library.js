@@ -345,7 +345,7 @@ HotTarget.library = (function() {
               } else {
                 setOptions({
                   'source': ['No indices'].concat(Constants.indexFamilies.filter(function(family) {
-                    return family.platformType == pt;
+                    return family.platformType == pt && (!family.archived || lib.indexFamilyName === family.name);
                   }).map(function(family) {
                     return family.name;
                   }).sort())
