@@ -463,6 +463,9 @@ var Utils = Utils
       },
 
       valOrNull: function(val) {
+        if (val === 0) {
+          return 0;
+        }
         return val || null;
       }
     };

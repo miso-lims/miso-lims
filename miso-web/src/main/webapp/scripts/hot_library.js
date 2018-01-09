@@ -103,34 +103,6 @@ HotTarget.library = (function() {
           {
             header: 'Library Alias',
             data: 'alias',
-            validator: function(value, callback) {
-              (Constants.automaticLibraryAlias ? HotUtils.validator.optionalTextNoSpecialChars
-                  : HotUtils.validator.requiredTextNoSpecialChars)(value, function(result) {
-                if (!result) {
-                  callback(false);
-                  return;
-                }
-                if (!value) {
-                  return callback(Constants.automaticLibraryAlias);
-                }
-                if (validationCache.hasOwnProperty(value)) {
-                  return callback(validationCache[value]);
-                }
-                Fluxion.doAjax('libraryControllerHelperService', 'validateLibraryAlias', {
-                  'alias': value,
-                  'url': ajaxurl
-                }, {
-                  'doOnSuccess': function() {
-                    validationCache[value] = true;
-                    return callback(true);
-                  },
-                  'doOnError': function(json) {
-                    validationCache[value] = false;
-                    return callback(false);
-                  }
-                });
-              });
-            },
             type: 'text',
             include: config.showLibraryAlias,
             unpackAfterSave: true,
@@ -140,6 +112,37 @@ HotTarget.library = (function() {
               if (lib.nonStandardAlias) {
                 HotUtils.makeCellNSAlias(setCellMeta);
               }
+              setCellMeta('validator', function(value, callback) {
+                (Constants.automaticLibraryAlias ? HotUtils.validator.optionalTextNoSpecialChars
+                    : HotUtils.validator.requiredTextNoSpecialChars)(value, function(result) {
+                  if (!result) {
+                    callback(false);
+                    return;
+                  }
+                  if (!value) {
+                    return callback(Constants.automaticLibraryAlias);
+                  }
+                  if (validationCache.hasOwnProperty(value)) {
+                    return callback(validationCache[value]);
+                  }
+                  if (lib.nonStandardAlias) {
+                    return callback(true);
+                  }
+                  Fluxion.doAjax('libraryControllerHelperService', 'validateLibraryAlias', {
+                    'alias': value,
+                    'url': ajaxurl
+                  }, {
+                    'doOnSuccess': function() {
+                      validationCache[value] = true;
+                      return callback(true);
+                    },
+                    'doOnError': function(json) {
+                      validationCache[value] = false;
+                      return callback(false);
+                    }
+                  });
+                });
+              });
             },
             pack: function(lib, flat, errorHandler) {
               lib.alias = flat.alias;
