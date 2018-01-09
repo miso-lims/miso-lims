@@ -131,9 +131,11 @@ Library.ui = {
     var platformType = Library.ui.getSelectedPlatformType();
 
     var indexFamilySelect = jQuery('#indexFamily').empty()[0];
-    Constants.indexFamilies.filter(function(family) {
-      return !family.platformType || family.platformType == platformType.name;
-    }).sort(function(a, b) {
+    Constants.indexFamilies.filter(
+        function(family) {
+          return (!family.platformType || family.platformType == platformType.name)
+              && (!family.archived || family.id == Library.originalIndexFamilyId);
+        }).sort(function(a, b) {
       if (a.id == b.id)
         return 0;
       if (a.id == 0)

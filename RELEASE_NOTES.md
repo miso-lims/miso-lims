@@ -1,3 +1,14 @@
+# 0.2.104
+
+Changes:
+
+ * Fixed hiding archived index families
+ * Fixed validation of non-standard aliases
+ * Fixed missing sample relatives on Edit Sample page
+ * Fix sibling numbers in DefaultLibraryAliasGenerator
+ * Require unique pool alias
+ * Show library concentration for plain sample
+
 # 0.2.103
 
 Changes:

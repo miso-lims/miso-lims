@@ -337,7 +337,10 @@ public class EditLibraryController {
     } else {
       List<IndexFamily> visibleFamilies = new ArrayList<>();
       visibleFamilies.add(IndexFamily.NULL);
-      visibleFamilies.addAll(indexService.getIndexFamiliesByPlatform(library.getPlatformType()));
+      visibleFamilies.addAll(indexService.getIndexFamiliesByPlatform(library.getPlatformType()).stream()
+          .filter(family -> !family.getArchived() || (library.getIndices() != null && !library.getIndices().isEmpty()
+              && library.getIndices().get(0).getFamily().getId().equals(family.getId())))
+          .collect(Collectors.toList()));
       model.put("indexFamilies", visibleFamilies);
     }
   }

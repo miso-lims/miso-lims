@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.w3c.dom.Document;
@@ -359,12 +358,12 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public Set<DetailedSample> getChildren() {
+  public List<DetailedSample> getChildren() {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
   @Override
-  public void setChildren(Set<DetailedSample> children) {
+  public void setChildren(List<DetailedSample> children) {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
 
