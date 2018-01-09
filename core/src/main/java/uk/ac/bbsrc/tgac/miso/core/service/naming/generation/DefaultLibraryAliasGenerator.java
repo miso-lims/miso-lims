@@ -34,7 +34,9 @@ public class DefaultLibraryAliasGenerator implements NameGenerator<Library> {
             .map(Library::getAlias)
             .collect(Collectors.toSet());
         String alias = null;
-        int siblingNumber = siblings.size();
+        long siblingNumber = siblings.stream()
+            .filter(sibling -> sibling.getId() != library.getId())
+            .count();
         do {
           siblingNumber++;
           alias = m.group(1) + "_" + "L" + m.group(2) + "-" + siblingNumber + "_" + m.group(3);
