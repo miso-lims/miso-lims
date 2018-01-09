@@ -268,7 +268,7 @@ SELECT parent.alias name
         ,NULL boxPosition 
         ,NULL paired 
         ,NULL readLength 
-        ,NULL targeted_sequencing 
+        ,ts.alias targeted_sequencing 
         ,'Dilution' miso_type 
         ,d.preMigrationId premigration_id 
         ,NULL organism 
@@ -283,3 +283,4 @@ JOIN Library parent ON parent.libraryId = d.library_libraryId
 JOIN LibraryType lt ON lt.libraryTypeId = parent.libraryType 
 LEFT JOIN DetailedLibrary lai ON lai.libraryId = parent.libraryId 
 LEFT JOIN LibraryDesignCode ldc ON lai.libraryDesignCodeId = ldc.libraryDesignCodeId
+LEFT JOIN TargetedSequencing ts ON d.targetedSequencingId = ts.targetedSequencingId

@@ -434,8 +434,8 @@ INSERT INTO DetailedLibrary(libraryId, archived, libraryDesign, libraryDesignCod
 INSERT INTO LibraryDilution (dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId, lastModifier, lastUpdated) VALUES
 (1, 'LDI1', 5.9, 1, '12321', '2017-07-20', 'admin', 1, 1, '2017-07-20 09:01:00');
 
-INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, ready, lastModifier, creator, created, lastModified, qcPassed) VALUES
-(1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 1, 'ILLUMINA', 1, 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL);
+INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, securityProfile_profileId, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
+(1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 1, 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL);
 
 INSERT INTO Pool_Dilution (pool_poolId, dilution_dilutionId) VALUES
 (1, 1);
