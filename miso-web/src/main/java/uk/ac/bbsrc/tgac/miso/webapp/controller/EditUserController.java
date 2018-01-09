@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -113,7 +112,7 @@ public class EditUserController {
     try {
       User user = securityManager.getUserById(userId);
       if (user != null) {
-        if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
+        if (authorizationManager.getCurrentUser().getLoginName().equals(user.getLoginName())) {
           model.put("user", user);
 
           return new ModelAndView("/pages/editUser.jsp", model);
