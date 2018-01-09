@@ -421,19 +421,24 @@ public class MisoClient implements Lims {
   }
 
   private List<MisoRunPosition> mapSamplesToPositions(List<MisoRunPosition> positions, List<MisoRunSample> samples) {
-    Map<Integer, MisoRunPosition> map = new HashMap<>();
+    Map<Integer, List<MisoRunPosition>> map = new HashMap<>();
     for (MisoRunPosition p : positions) {
-      map.put(p.getPartitionId(), p);
+      if (!map.containsKey(p.getPartitionId())) {
+        map.put(p.getPartitionId(), new ArrayList<>());
+      }
+      map.get(p.getPartitionId()).add(p);
     }
     for (MisoRunSample s : samples) {
-      MisoRunPosition p = map.get(s.getPartitionId());
-      if (p != null) {
-        Set<RunSample> rs = p.getRunSample();
-        if (rs == null) {
-          rs = new HashSet<RunSample>();
-          p.setRunSample(rs);
+      List<MisoRunPosition> ps = map.get(s.getPartitionId());
+      if (ps != null) {
+        for (MisoRunPosition p : ps) {
+          Set<RunSample> rs = p.getRunSample();
+          if (rs == null) {
+            rs = new HashSet<RunSample>();
+            p.setRunSample(rs);
+          }
+          rs.add(s);
         }
-        rs.add(s);
       }
     }
     return positions;
