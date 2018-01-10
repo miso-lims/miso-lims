@@ -105,21 +105,21 @@ public enum Driver {
       sb.append("J\n");
       sb.append("O R\n");
       sb.append("S l1;0.0,0.00,25.0,25.5,25.0\n");
-      sb.append("B 18,2,0,DATAMATRIX,0.3;").append(barcode).append("\n");
+      sb.append("B 1.5,2,0,DATAMATRIX,0.3;").append(barcode).append("\n");
       if (barcodable.getLabelText().length() > 14) {
-        sb.append("T 1.5,3,0,3,2;");
+        sb.append("T 7.5,3,0,3,2;");
         appendBradyEscapedUnicode(sb, barcodable.getLabelText().substring(0, 14));
         sb.append("\n");
-        sb.append("T 1.5,6,0,3,2;");
+        sb.append("T 7.5,6,0,3,2;");
         appendTruncated(14, barcodable.getLabelText().substring(14), s -> appendBradyEscapedUnicode(sb, s));
         sb.append("\n");
       } else {
-        sb.append("T 1.5,3,0,3,2;");
+        sb.append("T 7.5,3,0,3,2;");
         appendTruncated(14, barcodable.getLabelText(), s -> appendBradyEscapedUnicode(sb, s));
         sb.append("\n");
       }
       if (barcodable.getBarcodeDate() != null) {
-        sb.append("T 1.5,9,0,3,2;");
+        sb.append("T 7.5,9,0,3,2;");
         sb.append(LimsUtils.formatDate(barcodable.getBarcodeDate()));
         sb.append("\n");
       }
