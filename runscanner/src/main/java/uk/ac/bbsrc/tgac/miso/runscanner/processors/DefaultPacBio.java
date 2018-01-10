@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.runscanner.processors;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -252,7 +251,7 @@ public class DefaultPacBio extends RunProcessor {
         .forEach(metadata -> processMetadata(metadata.get(), dto));
 
     // The current job state is not available from the metadata files, so contact the PacBio instrument's web service.
-    String plateUrl = URLEncoder.encode(dto.getContainerSerialNumber(), "US-ASCII").replaceAll("\\+", "%20");
+    String plateUrl = dto.getContainerSerialNumber();
     dto.setHealthType(getStatus(String.format("%s/Jobs/Plate/%s/Status", address, plateUrl)).translateStatus());
     // If the metadata gave us a completion date, but the web service told us the run isn't complete, delete the completion date of lies.
     if (!dto.getHealthType().isDone()) {
