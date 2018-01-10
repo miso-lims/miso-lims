@@ -52,6 +52,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @Entity
 public class KitDescriptor implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
 
@@ -59,6 +62,7 @@ public class KitDescriptor implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long kitDescriptorId = KitDescriptor.UNSAVED_ID;
   private String name = "";
+  private String description;
   private Double version = 0.0D;
   private String manufacturer = "";
   private String partNumber = "";
@@ -102,6 +106,14 @@ public class KitDescriptor implements Serializable {
    */
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   /**
