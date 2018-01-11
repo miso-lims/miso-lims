@@ -216,41 +216,22 @@
         </thead>
         <tbody>
         <tr>
-          <c:choose>
-          <c:when test="${run.id == 0 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <td><form:input path="startDate" id="startDate" /></td>
-          
-              <script type="text/javascript">
-              Utils.ui.addDatePicker("startDate");
-              </script>
-            </c:when>
-            <c:otherwise>
-              <td id="startDate">
-                <fmt:formatDate pattern="yyyy-MM-dd" value="${run.startDate}"/>
-              </td>
-            </c:otherwise>
-          </c:choose>
-          <c:choose>
-          <c:when test="${(run.health.isDone() and empty run.completionDate) or run.id == 0 or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <td><form:input path="completionDate" id="completionDate" /></td>
-          
-              <script type="text/javascript">
-              Utils.ui.addDatePicker("completionDate");
-              Run.checkForCompletionDate(false);
-              </script>
-            </c:when>
-            <c:otherwise>
-              <td id="completionDate">
-                <fmt:formatDate pattern="yyyy-MM-dd" value="${run.completionDate}"/>
-              </td>
-            </c:otherwise>
-          </c:choose>
+          <td><form:input path="startDate" id="startDate" /></td>
+          <td><form:input path="completionDate" id="completionDate" /></td>
           <td>
             <fmt:formatDate value="${run.lastModified}" dateStyle="long" pattern="yyyy-MM-dd HH:mm:ss"/>
           </td>
         </tr>
         </tbody>
       </table>
+      <script type="text/javascript">
+      Utils.ui.addDatePicker("startDate");
+      Utils.ui.addDatePicker("completionDate");
+      Run.userIsAdmin = ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')};
+      var startDate = document.getElementById("startDate");
+      startDate.disabled = startDate.value && !Run.userIsAdmin;
+      Run.checkForCompletionDate(false);
+      </script>
     </td>
   </tr>
 

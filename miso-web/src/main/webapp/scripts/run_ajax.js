@@ -22,6 +22,8 @@
  */
 
 var Run = Run || {
+  userIsAdmin: false,
+
   deleteRun: function(runId, successfunc) {
     if (confirm("Are you sure you really want to delete RUN" + runId + "? This operation is permanent!")) {
       Fluxion.doAjax('runControllerHelperService', 'deleteRun', {
@@ -87,15 +89,11 @@ var Run = Run || {
     jQuery('#protocolVersion').attr('data-parsley-maxlength', '100');
     jQuery('#protocolVersion').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
-    if (!document.getElementById('startDate').disabled) {
-      jQuery('#startDate').attr('class', 'form-control');
-      jQuery('#startDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
-      jQuery('#startDate').attr('data-date-format', 'YYYY-MM-DD');
-      jQuery('#startDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
-      jQuery('#startDate').attr('required', 'true');
-    } else {
-      jQuery('#startDate').removeAttr('required');
-    }
+    jQuery('#startDate').attr('class', 'form-control');
+    jQuery('#startDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#startDate').attr('data-date-format', 'YYYY-MM-DD');
+    jQuery('#startDate').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
+    jQuery('#startDate').attr('required', 'true');
 
     if (!document.getElementById('completionDate').disabled) {
       jQuery('#completionDate').attr('class', 'form-control');
@@ -146,7 +144,7 @@ var Run = Run || {
     if (!completionDate) {
       return;
     }
-    var allowModification = (statusVal === "Failed" || statusVal === "Completed");
+    var allowModification = ((statusVal === "Failed" || statusVal === "Completed") && (!completionDate.value || Run.userIsAdmin));
     completionDate.disabled = !allowModification;
   },
 };
