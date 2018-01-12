@@ -238,6 +238,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   @Override
   public Long create(Run run) throws IOException {
     authorizationManager.throwIfNotWritable(run);
+    validateChanges(null, run);
     saveContainers(run);
     setChangeDetails(run);
     loadChildEntities(run);
@@ -332,7 +333,26 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     run.setSequencerReference(sequencerReferenceService.get(run.getSequencerReference().getId()));
   }
 
+  private void validateChanges(Run before, Run changed) throws IOException {
+    if (!changed.getHealth().isDone()) {
+      changed.setCompletionDate(null);
+    } else if (changed.getCompletionDate() == null) {
+      throw new IllegalArgumentException("Completion date missing for finished run");
+    }
+    if (before != null) {
+      if (before.getCompletionDate() != null && changed.getCompletionDate() != null
+          && !changed.getCompletionDate().equals(before.getCompletionDate()) && !authorizationManager.isAdminUser()) {
+        throw new IllegalArgumentException("Only admin may change completion date");
+      }
+      if (before.getStartDate() != null && changed.getStartDate() != null
+          && !changed.getStartDate().equals(before.getStartDate()) && !authorizationManager.isAdminUser()) {
+        throw new IllegalArgumentException("Only admin may change start date");
+      }
+    }
+  }
+
   private void applyChanges(Run target, Run source) throws IOException {
+    validateChanges(target, source);
     target.setAlias(source.getAlias());
     target.setAccession(source.getAccession());
     target.setDescription(source.getDescription());
