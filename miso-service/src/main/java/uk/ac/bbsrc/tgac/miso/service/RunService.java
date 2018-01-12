@@ -31,7 +31,7 @@ public interface RunService extends PaginatedDataSource<Run> {
 
   Collection<Run> listByContainerId(long containerId) throws IOException;
 
-  Collection<Run> listBySequencerId(long sequencerId) throws IOException;
+  Collection<Run> listByInstrumentId(long instrumentId) throws IOException;
 
   /**
    * Throws AuthorizationException if user is not authorized to read the retrieved run.
@@ -83,7 +83,7 @@ public interface RunService extends PaginatedDataSource<Run> {
    * @return true if the run is new, false if it already existed
    * @throws MisoNamingException
    */
-  boolean processNotification(Run run, int laneCount, String containerSerialNumber, String sequencerName,
+  boolean processNotification(Run run, int laneCount, String containerSerialNumber, String instrumentName,
       Predicate<SequencingParameters> filterParameters, GetLaneContents laneContents) throws IOException, MisoNamingException;
 
 }

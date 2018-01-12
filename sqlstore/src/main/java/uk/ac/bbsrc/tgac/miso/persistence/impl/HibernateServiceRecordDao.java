@@ -16,16 +16,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ServiceRecordStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSequencerServiceRecordDao implements SequencerServiceRecordStore {
+public class HibernateServiceRecordDao implements ServiceRecordStore {
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateSequencerServiceRecordDao.class);
+  protected static final Logger log = LoggerFactory.getLogger(HibernateServiceRecordDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -41,11 +41,11 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
   }
 
   @Override
-  public long save(SequencerServiceRecord ssr) throws IOException {
+  public long save(ServiceRecord ssr) throws IOException {
     long id;
-    if (ssr.getId() == SequencerServiceRecord.UNSAVED_ID) {
-      if (ssr.getSequencerReference().getDateDecommissioned() != null)
-        throw new IOException("Cannot add service records to a retired sequencer!");
+    if (ssr.getId() == ServiceRecord.UNSAVED_ID) {
+      if (ssr.getInstrument().getDateDecommissioned() != null)
+        throw new IOException("Cannot add service records to a retired instrument!");
 
       id = (long) currentSession().save(ssr);
     } else {
@@ -56,29 +56,29 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
   }
 
   @Override
-  public SequencerServiceRecord get(long id) throws IOException {
-    return (SequencerServiceRecord) currentSession().get(SequencerServiceRecord.class, id);
+  public ServiceRecord get(long id) throws IOException {
+    return (ServiceRecord) currentSession().get(ServiceRecord.class, id);
   }
 
   @Override
-  public List<SequencerServiceRecord> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(SequencerServiceRecord.class);
+  public List<ServiceRecord> listAll() throws IOException {
+    Criteria criteria = currentSession().createCriteria(ServiceRecord.class);
     @SuppressWarnings("unchecked")
-    List<SequencerServiceRecord> records = criteria.list();
+    List<ServiceRecord> records = criteria.list();
     return records;
   }
 
   @Override
   public int count() throws IOException {
-    Criteria criteria = currentSession().createCriteria(SequencerServiceRecord.class);
+    Criteria criteria = currentSession().createCriteria(ServiceRecord.class);
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();
   }
 
   @Override
-  public boolean remove(SequencerServiceRecord ssr) throws IOException {
+  public boolean remove(ServiceRecord ssr) throws IOException {
     if (ssr.isDeletable()) {
       currentSession().delete(ssr);
-      SequencerServiceRecord testIfExists = get(ssr.getId());
+      ServiceRecord testIfExists = get(ssr.getId());
       if (testIfExists != null) return false;
       removeAttachments(ssr.getId());
       return true;
@@ -95,9 +95,9 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
    */
   private void removeAttachments(long recordId) {
     try {
-      for (String filename : misoFilesManager.getFileNames(SequencerServiceRecord.class, String.valueOf(recordId))) {
+      for (String filename : misoFilesManager.getFileNames(ServiceRecord.class, String.valueOf(recordId))) {
         try {
-          misoFilesManager.deleteFile(SequencerServiceRecord.class, String.valueOf(recordId), filename);
+          misoFilesManager.deleteFile(ServiceRecord.class, String.valueOf(recordId), filename);
         } catch (IOException e) {
           log.error("Deleted service record " + recordId + ", but failed to delete attachment: " + filename, e);
         }
@@ -108,17 +108,17 @@ public class HibernateSequencerServiceRecordDao implements SequencerServiceRecor
   }
 
   @Override
-  public List<SequencerServiceRecord> listBySequencerId(long referenceId) {
-    Criteria criteria = currentSession().createCriteria(SequencerServiceRecord.class);
-    criteria.add(Restrictions.eq("sequencerReference.id", referenceId));
+  public List<ServiceRecord> listByInstrumentId(long instrumentId) {
+    Criteria criteria = currentSession().createCriteria(ServiceRecord.class);
+    criteria.add(Restrictions.eq("instrument.id", instrumentId));
     @SuppressWarnings("unchecked")
-    List<SequencerServiceRecord> records = criteria.list();
+    List<ServiceRecord> records = criteria.list();
     return records;
   }
 
   @Override
   public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(template, "SequencerServiceRecord");
+    return DbUtils.getColumnSizes(template, "ServiceRecord");
   }
 
   public SessionFactory getSessionFactory() {

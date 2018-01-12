@@ -43,75 +43,71 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 
-/**
- * Controller for View (read-only) Sequencer and Service Record pages. Redirects to /stats for
- * write access if user is admin
- */
 @Controller
-@RequestMapping("/sequencer")
-@SessionAttributes("sequencerReference")
-public class EditSequencerReferenceController {
+@RequestMapping("/instrument")
+@SessionAttributes("instrument")
+public class EditInstrumentController {
 
   @Autowired
   private SecurityManager securityManager;
 
   @Autowired
-  private SequencerReferenceService sequencerReferenceService;
+  private InstrumentService instrumentService;
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
 
-  public void setSequencerReferenceService(SequencerReferenceService sequencerReferenceService) {
-    this.sequencerReferenceService = sequencerReferenceService;
+  public void setInstrumentService(InstrumentService instrumentService) {
+    this.instrumentService = instrumentService;
   }
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return sequencerReferenceService.getSequencerReferenceColumnSizes();
+    return instrumentService.getInstrumentColumnSizes();
   }
 
-  @RequestMapping("/{referenceId}")
-  public ModelAndView viewSequencer(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
+  @RequestMapping("/{instrumentId}")
+  public ModelAndView viewInstrument(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    SequencerReference sr = sequencerReferenceService.get(referenceId);
-    Collection<SequencerServiceRecord> serviceRecords = sequencerReferenceService.listServiceRecordsByInstrument(referenceId);
+    Instrument sr = instrumentService.get(instrumentId);
+    Collection<ServiceRecord> serviceRecords = instrumentService.listServiceRecordsByInstrument(instrumentId);
 
     if (sr == null) {
-      throw new IOException("Cannot retrieve the requested sequencer reference");
+      throw new IOException("Cannot retrieve the requested instrument");
     }
     if (user.isAdmin()) {
-      model.put("otherSequencerReferences",
-          sequencerReferenceService.list().stream().filter(other -> other.getId() != referenceId).collect(Collectors.toList()));
+      model.put("otherInstruments",
+          instrumentService.list().stream().filter(other -> other.getId() != instrumentId).collect(Collectors.toList()));
     }
-    model.put("preUpgradeSeqRef", sequencerReferenceService.getByUpgradedReferenceId(sr.getId()));
+    model.put("preUpgradeInstrument", instrumentService.getByUpgradedInstrumentId(sr.getId()));
 
-    model.put("sequencerReference", sr);
-    model.put("sequencerServiceRecords", serviceRecords);
-    model.put("title", "Sequencer " + sr.getId());
+    model.put("instrument", sr);
+    model.put("serviceRecords", serviceRecords);
+    model.put("title", "Instrument " + sr.getId());
     String ip = sr.getIpAddress() == null ? "" : sr.getIpAddress();
     model.put("trimmedIpAddress", ip.startsWith("/") ? ip.substring(1) : ip);
-    return new ModelAndView("/pages/editSequencerReference.jsp", model);
+    return new ModelAndView("/pages/editInstrument.jsp", model);
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("sequencerReference") SequencerReference sr, ModelMap model, SessionStatus session)
+  public String processSubmit(@ModelAttribute("instrument") Instrument sr, ModelMap model, SessionStatus session)
       throws IOException {
     Long srId = null;
-    if (sr.getId() == SequencerReferenceImpl.UNSAVED_ID) {
-      srId = sequencerReferenceService.create(sr);
+    if (sr.getId() == InstrumentImpl.UNSAVED_ID) {
+      srId = instrumentService.create(sr);
     } else {
-      sequencerReferenceService.update(sr);
+      instrumentService.update(sr);
       srId = sr.getId();
     }
     session.setComplete();
     model.clear();
-    return "redirect:/miso/sequencer/" + srId;
+    return "redirect:/miso/instrument/" + srId;
   }
 
 }

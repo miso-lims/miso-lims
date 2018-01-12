@@ -12,10 +12,10 @@ import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.SequencerPage;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.InstrumentPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ServiceRecordPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ServiceRecordPage.Field;
 
@@ -29,15 +29,15 @@ public class ServiceRecordPageIT extends AbstractIT {
   @Test
   public void testCreate() throws Exception {
     // goal: add one service record
-    SequencerReference seq = (SequencerReference) getSession().get(SequencerReferenceImpl.class, 100L);
+    Instrument seq = (Instrument) getSession().get(InstrumentImpl.class, 100L);
     assertNotNull(seq);
     assertEquals(0, seq.getServiceRecords().size());
 
-    SequencerPage seqPage = SequencerPage.get(getDriver(), getBaseUrl(), 100L);
+    InstrumentPage seqPage = InstrumentPage.get(getDriver(), getBaseUrl(), 100L);
     ServiceRecordPage page = seqPage.addServiceRecord();
     assertNotNull(page);
 
-    assertEquals(page.getField(Field.SEQUENCER), seq.getName());
+    assertEquals(page.getField(Field.INSTRUMENT), seq.getName());
 
     Map<Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.TITLE, "Test Service Record");
@@ -57,7 +57,7 @@ public class ServiceRecordPageIT extends AbstractIT {
 
     String newId = page2.getField(Field.ID);
 
-    SequencerServiceRecord sr = (SequencerServiceRecord) getSession().get(SequencerServiceRecord.class, Long.valueOf(newId));
+    ServiceRecord sr = (ServiceRecord) getSession().get(ServiceRecord.class, Long.valueOf(newId));
     assertServiceRecordAttributes(fields, sr);
   }
 
@@ -69,7 +69,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     // initial values
     Map<ServiceRecordPage.Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "150");
-    fields.put(Field.SEQUENCER, "NewHiSeq_101");
+    fields.put(Field.INSTRUMENT, "NewHiSeq_101");
     fields.put(Field.TITLE, "Test 150");
     fields.put(Field.DETAILS, "details go here");
     fields.put(Field.SERVICED_BY, "technician1");
@@ -94,7 +94,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    SequencerServiceRecord savedRecord = (SequencerServiceRecord) getSession().get(SequencerServiceRecord.class, 150L);
+    ServiceRecord savedRecord = (ServiceRecord) getSession().get(ServiceRecord.class, 150L);
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
@@ -105,7 +105,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     // initial values;
     Map<ServiceRecordPage.Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "151");
-    fields.put(Field.SEQUENCER, "NewHiSeq_101");
+    fields.put(Field.INSTRUMENT, "NewHiSeq_101");
     fields.put(Field.TITLE, "Test 151");
     fields.put(Field.DETAILS, null);
     fields.put(Field.SERVICED_BY, "tech");
@@ -127,7 +127,7 @@ public class ServiceRecordPageIT extends AbstractIT {
 
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    SequencerServiceRecord savedRecord = (SequencerServiceRecord) getSession().get(SequencerServiceRecord.class, 151L);
+    ServiceRecord savedRecord = (ServiceRecord) getSession().get(ServiceRecord.class, 151L);
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
@@ -138,7 +138,7 @@ public class ServiceRecordPageIT extends AbstractIT {
     // initial values;
     Map<ServiceRecordPage.Field, String> fields = Maps.newLinkedHashMap();
     fields.put(Field.ID, "152");
-    fields.put(Field.SEQUENCER, "NewHiSeq_101");
+    fields.put(Field.INSTRUMENT, "NewHiSeq_101");
     fields.put(Field.TITLE, "Test 152");
     fields.put(Field.DETAILS, "details to remove");
     fields.put(Field.SERVICED_BY, "technitchin");
@@ -160,13 +160,13 @@ public class ServiceRecordPageIT extends AbstractIT {
 
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    SequencerServiceRecord savedRecord = (SequencerServiceRecord) getSession().get(SequencerServiceRecord.class, 152L);
+    ServiceRecord savedRecord = (ServiceRecord) getSession().get(ServiceRecord.class, 152L);
     assertServiceRecordAttributes(fields, savedRecord);
   }
 
-  private static void assertServiceRecordAttributes(Map<Field, String> expectedValues, SequencerServiceRecord sr) {
+  private static void assertServiceRecordAttributes(Map<Field, String> expectedValues, ServiceRecord sr) {
     assertAttribute(Field.ID, expectedValues, Long.toString(sr.getId()));
-    assertAttribute(Field.SEQUENCER, expectedValues, sr.getSequencerReference().getName());
+    assertAttribute(Field.INSTRUMENT, expectedValues, sr.getInstrument().getName());
     assertAttribute(Field.TITLE, expectedValues, sr.getTitle());
     assertAttribute(Field.DETAILS, expectedValues, sr.getDetails());
     assertAttribute(Field.SERVICE_DATE, expectedValues, formatDate(sr.getServiceDate()));

@@ -19,14 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePlatformDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 
-public class HibernateSequencerReferenceDaoTest extends AbstractDAOTest {
+public class HibernateInstrumentDaoTest extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();
@@ -41,7 +39,7 @@ public class HibernateSequencerReferenceDaoTest extends AbstractDAOTest {
   private SessionFactory sessionFactory;
 
   @InjectMocks
-  private HibernateSequencerReferenceDao dao;
+  private HibernateInstrumentDao dao;
 
   @Before
   public void setup() {
@@ -53,8 +51,8 @@ public class HibernateSequencerReferenceDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAll() throws IOException {
-    Collection<SequencerReference> sequencers = dao.listAll();
-    assertEquals(sequencers.iterator().next().getPlatform().getPlatformType(), PlatformType.ILLUMINA);
+    Collection<Instrument> instruments = dao.listAll();
+    assertEquals(PlatformType.ILLUMINA, instruments.iterator().next().getPlatform().getPlatformType());
   }
 
   @Test
@@ -62,17 +60,17 @@ public class HibernateSequencerReferenceDaoTest extends AbstractDAOTest {
     String serialNumber = "F00";
     Platform platform = dao.get(1L).getPlatform();
     InetAddress address = Inet4Address.getLoopbackAddress();
-    SequencerReference seqref = new SequencerReferenceImpl("foo", address.getHostAddress(), platform);
-    seqref.setSerialNumber(serialNumber);
+    Instrument instrument = new InstrumentImpl("foo", address.getHostAddress(), platform);
+    instrument.setSerialNumber(serialNumber);
 
     int sizeBefore = dao.listAll().size();
-    long id = dao.save(seqref);
-    SequencerReference retrieved = dao.get(id);
-    assertEquals("did not insert sequencer refence", sizeBefore + 1, dao.listAll().size());
-    assertEquals("sequencer reference name does not match", "foo", retrieved.getName());
-    assertEquals("sequencer reference address does not match", address.getHostAddress(), retrieved.getIpAddress());
-    assertEquals("sequencer reference date decommissioned does not match", null, retrieved.getDateDecommissioned());
-    assertEquals("sequencer reference platform does not match", platform.getId(), retrieved.getPlatform().getId());
+    long id = dao.save(instrument);
+    Instrument retrieved = dao.get(id);
+    assertEquals("did not insert instrument", sizeBefore + 1, dao.listAll().size());
+    assertEquals("instrument name does not match", "foo", retrieved.getName());
+    assertEquals("instrument address does not match", address.getHostAddress(), retrieved.getIpAddress());
+    assertEquals("instrument date decommissioned does not match", null, retrieved.getDateDecommissioned());
+    assertEquals("instrument platform does not match", platform.getId(), retrieved.getPlatform().getId());
 
     assertTrue(dao.remove(retrieved));
     assertNull(dao.get(id));
@@ -81,13 +79,13 @@ public class HibernateSequencerReferenceDaoTest extends AbstractDAOTest {
   @Test
   public void testSaveExisting() throws Exception {
 
-    SequencerReference seqref = dao.get(2);
-    seqref.setName("blargh");
+    Instrument instrument = dao.get(2);
+    instrument.setName("blargh");
 
     int sizeBefore = dao.listAll().size();
-    long id = dao.save(seqref);
-    SequencerReference retrieved = dao.get(id);
-    assertEquals("sequencer reference name does not match", "blargh", retrieved.getName());
+    long id = dao.save(instrument);
+    Instrument retrieved = dao.get(id);
+    assertEquals("instrument name does not match", "blargh", retrieved.getName());
     assertEquals("did not update sample", sizeBefore, dao.listAll().size());
   }
 
@@ -99,10 +97,10 @@ public class HibernateSequencerReferenceDaoTest extends AbstractDAOTest {
 
   @Test
   public void testGet() throws Exception {
-    SequencerReference seqref = dao.get(1);
-    assertNotNull(seqref);
-    assertEquals("seqref name does not match", "SN7001179", seqref.getName());
-    assertNull("seqref date commissioned is not null", seqref.getDateCommissioned());
-    assertNull("seqref date decommissioned is not null", seqref.getDateDecommissioned());
+    Instrument instrument = dao.get(1);
+    assertNotNull(instrument);
+    assertEquals("instrument name does not match", "SN7001179", instrument.getName());
+    assertNull("instrument date commissioned is not null", instrument.getDateCommissioned());
+    assertNull("instrument date decommissioned is not null", instrument.getDateDecommissioned());
   }
 }

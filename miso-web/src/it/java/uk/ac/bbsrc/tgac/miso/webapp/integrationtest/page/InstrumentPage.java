@@ -8,7 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-public class SequencerPage extends FormPage<SequencerPage.Field> {
+public class InstrumentPage extends FormPage<InstrumentPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
     ID(By.id("instrumentId"), FieldType.LABEL), //
@@ -19,7 +19,7 @@ public class SequencerPage extends FormPage<SequencerPage.Field> {
     COMMISSIONED(By.id("datecommissionedpicker"), FieldType.DATEPICKER), //
     DECOMMISSIONED(By.id("datedecommissionedpicker"), FieldType.DATEPICKER), //
     STATUS(By.name("status"), FieldType.RADIO), //
-    UPGRADED_REF(By.id("upgradedSequencerReference"), FieldType.DROPDOWN);
+    UPGRADED_INSTRUMENT(By.id("upgradedInstrument"), FieldType.DROPDOWN);
 
     private final By selector;
     private final FieldType type;
@@ -45,22 +45,22 @@ public class SequencerPage extends FormPage<SequencerPage.Field> {
   @FindBy(id = "addServiceRecord")
   private WebElement addServiceRecordButton;
 
-  public SequencerPage(WebDriver driver) {
+  public InstrumentPage(WebDriver driver) {
     super(driver);
     PageFactory.initElements(driver, this);
-    waitWithTimeout().until(titleContains("Sequencer "));
+    waitWithTimeout().until(titleContains("Instrument "));
   }
 
-  public static SequencerPage get(WebDriver driver, String baseUrl, long sequencerId) {
-    driver.get(baseUrl + "miso/sequencer/" + sequencerId);
-    return new SequencerPage(driver);
+  public static InstrumentPage get(WebDriver driver, String baseUrl, long instrumentId) {
+    driver.get(baseUrl + "miso/instrument/" + instrumentId);
+    return new InstrumentPage(driver);
   }
 
-  public SequencerPage save() {
+  public InstrumentPage save() {
     WebElement html = getHtmlElement();
     saveButton.click();
     waitForPageRefresh(html);
-    return new SequencerPage(getDriver());
+    return new InstrumentPage(getDriver());
   }
 
   public ServiceRecordPage addServiceRecord() {

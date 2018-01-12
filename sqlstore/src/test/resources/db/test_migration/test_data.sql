@@ -1,7 +1,3 @@
--- fixes LibraryDesign changes that were marked "NoTest" in V0130
-ALTER TABLE LibraryDesign DROP CONSTRAINT `uk_libraryDesign_name`;
-ALTER TABLE LibraryDesign ADD CONSTRAINT `uk_libraryDesign_name_sampleClass` UNIQUE (`name`, `sampleClassId`);
-
 DELETE FROM Indices;
 DELETE FROM IndexFamily;
 INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES
@@ -437,13 +433,13 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
 (10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
 
-DELETE FROM `SequencerReference`;
-INSERT INTO `SequencerReference`(`referenceId`, `name`, `ip`, `platformId`)
+DELETE FROM `Instrument`;
+INSERT INTO `Instrument`(`instrumentId`, `name`, `ip`, `platformId`)
 VALUES (1,'SN7001179','localhost',16),
 (2,'h1180','localhost',16);
 
-DELETE FROM `SequencerServiceRecord`;
-INSERT INTO `SequencerServiceRecord`(`recordId`, `sequencerReferenceId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `shutdownTime`, `restoredTime`)
+DELETE FROM `ServiceRecord`;
+INSERT INTO `ServiceRecord`(`recordId`, `instrumentId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `shutdownTime`, `restoredTime`)
 VALUES (1,1,'Seq1_Rec1','Test service','Service Person','12345','2016-01-01', '2016-01-01 07:30:00', '2016-01-01 09:00:00'),
 (2,1,'Seq1_Rec2',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL),
 (3,2,'Seq2_Rec1',NULL,'Service Person',NULL,'2016-01-21',NULL,NULL);
@@ -452,7 +448,7 @@ DELETE FROM `RunIllumina`;
 DELETE FROM `RunPacBio`;
 DELETE FROM `RunLS454`;
 DELETE FROM `Run`;
-INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `filePath`, `securityProfile_profileId`, `alias`, `sequencerReference_sequencerReferenceId`, `lastModifier`, `health`, `completionDate`, `lastModified`, `creator`, `created`) 
+INSERT INTO `Run`(`runId`, `name`, `description`, `accession`, `filePath`, `securityProfile_profileId`, `alias`, `instrumentId`, `lastModifier`, `health`, `completionDate`, `lastModified`, `creator`, `created`) 
 VALUES (1,'RUN1','BC0JHTACXX',NULL,'/.mounts/labs/prod/archive/h1179/120323_h1179_0070_BC0JHTACXX',12,'120323_h1179_0070_BC0JHTACXX',1,1,'Completed','2012-03-31','2016-07-07 13:30:49',1,'2016-07-07 13:30:49'),
 (2,'RUN2','AD0VJ9ACXX',NULL,'/.mounts/labs/prod/archive/h1179/120404_h1179_0072_AD0VJ9ACXX',13,'120404_h1179_0072_AD0VJ9ACXX',1,1,'Failed','2012-04-04','2016-07-07 13:30:51',1,'2016-07-07 13:30:51'),
 (3,'RUN3','BC075RACXX',NULL,'/.mounts/labs/prod/archive/h1179/120412_h1179_0073_BC075RACXX',14,'120412_h1179_0073_BC075RACXX',1,1,'Completed','2012-04-20','2016-07-07 13:30:53',1,'2016-07-07 13:30:53'),
@@ -467,7 +463,38 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 
 DELETE FROM `_Partition`;
 INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`)
-VALUES (1,1,1);
+VALUES (1,1,1),
+(2,2,NULL),
+(3,3,NULL),
+(4,4,NULL),
+(5,5,NULL),
+(6,6,NULL),
+(7,7,NULL),
+(8,8,NULL),
+(9,1,NULL),
+(10,2,NULL),
+(11,3,NULL),
+(12,4,NULL),
+(13,5,NULL),
+(14,6,NULL),
+(15,7,NULL),
+(16,8,NULL),
+(17,1,NULL),
+(18,2,NULL),
+(19,3,NULL),
+(20,4,NULL),
+(21,5,NULL),
+(22,6,NULL),
+(23,7,NULL),
+(24,8,NULL),
+(25,1,NULL),
+(26,2,NULL),
+(27,3,NULL),
+(28,4,NULL),
+(29,5,NULL),
+(30,6,NULL),
+(31,7,NULL),
+(32,8,NULL);
 
 DELETE FROM `SequencerPartitionContainer`;
 INSERT INTO `SequencerPartitionContainer`(`containerId`, `securityProfile_profileId`, `identificationBarcode`, `platform`, `lastModifier`, `lastModified`, `creator`, `created`) 
