@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.eaglegenomics.simlims.core.User;
 import com.google.common.base.Charsets;
 
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
@@ -67,8 +68,8 @@ public class Printer implements Deletable, Serializable {
     return enabled;
   }
 
-  public boolean printBarcode(Barcodable b) {
-    return backend.print(driver.encode(b).getBytes(Charsets.US_ASCII), configuration);
+  public boolean printBarcode(Barcodable b, User user) {
+    return backend.print(driver.encode(b).getBytes(Charsets.US_ASCII), configuration, user);
   }
 
   public void setBackend(Backend backend) {
