@@ -174,8 +174,8 @@ public enum Driver {
     public String encode(Barcodable b) {
       StringBuilder sb = new StringBuilder();
       sb.append("CT~~CD,~CC^~CT~\r\n");
+      sb.append("^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR2,2~SD30^JUS^LRN^CI0^XZ\r\n");
       sb.append("^XA\r\n");
-      sb.append("~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6^MD15^LRN^CI0\r\n");
       sb.append("^MMT\r\n");
       sb.append("^PW200\r\n");
       sb.append("^LL0185\r\n");
@@ -216,9 +216,9 @@ public enum Driver {
     @Override
     public String encode(Barcodable b) {
       StringBuilder sb = new StringBuilder();
-      sb.append("﻿CT~~CD,~CC^~CT~\r\n");
+      sb.append("CT~~CD,~CC^~CT~\r\n");
+      sb.append("^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR2,2~SD30^JUS^LRN^CI0^XZ\r\n");
       sb.append("^XA\r\n");
-      sb.append("~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR2,2^MD30^LRN^CI0\r\n");
       sb.append("^MMT\r\n");
       sb.append("^PW336\r\n");
       sb.append("^LL0112\r\n");
@@ -251,15 +251,24 @@ public enum Driver {
     public String encode(Barcodable b) {
       StringBuilder sb = new StringBuilder();
       sb.append("CT~~CD,~CC^~CT~\r\n");
+      sb.append("^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR2,2~SD30^JUS^LRN^CI0^XZ\r\n");
       sb.append("^XA\r\n");
-      sb.append("~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR6,6^MD15^LRN^CI0\r\n");
       sb.append("^MMT\r\n");
       sb.append("^PW200\r\n");
       sb.append("^LL0098\r\n");
       sb.append("^LS0\r\n");
       sb.append("^FT14,27^A0N,20,19^FH\\^FD");
-      appendTruncated(21, b.getAlias(), sb::append);
+      if (b.getAlias().length() > 21) {
+        sb.append(b.getAlias().substring(0, 21));
+      } else {
+        sb.append(b.getAlias());
+      }
       sb.append("^FS\r\n");
+      if (b.getAlias().length() > 21) {
+        sb.append("^FT14,45^A0N,20,19^FH\\^FD");
+        appendTruncated(21, b.getAlias().substring(21), sb::append);
+        sb.append("^FS\r\n");
+      }
       sb.append("^FT14,94^A0N,20,19^FH\\^FD").append(LimsUtils.formatDate(b.getBarcodeDate())).append("^FS\r\n");
       sb.append("^FT13,74^A0N,20,19^FH\\^FD");
       appendTruncated(12, b.getBarcodeExtraInfo(), sb::append);
@@ -284,6 +293,9 @@ public enum Driver {
   }
 
   protected static void appendTruncated(int length, String str, Consumer<String> writeEscaped) {
+    if (str == null) {
+      return;
+    }
     if (str.length() >= length) {
       writeEscaped.accept(str.substring(0, length - 2));
       writeEscaped.accept("...");
