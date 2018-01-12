@@ -382,18 +382,18 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListSequencersSetup() throws Exception {
-    testPageSetup(ListTarget.SEQUENCERS, sequencersColumns);
+    testPageSetup(ListTarget.INSTRUMENTS, sequencersColumns);
   }
 
   @Test
   public void testListSequencersColumnSort() throws Exception {
-    testColumnsSort(ListTarget.SEQUENCERS);
+    testColumnsSort(ListTarget.INSTRUMENTS);
   }
 
   @Test
   public void testListSequencersSearch() throws Exception {
     sequencersQueries.forEach(query -> {
-      testSearch(ListTarget.SEQUENCERS, query);
+      testSearch(ListTarget.INSTRUMENTS, query);
     });
   }
 

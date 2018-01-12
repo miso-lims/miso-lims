@@ -49,7 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
@@ -114,7 +114,7 @@ public class DownloadController {
   @RequestMapping(value = "/servicerecord/{id}/{hashcode}", method = RequestMethod.GET)
   protected void downloadServiceRecordFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
       throws Exception {
-    lookupAndRetrieveFile(SequencerServiceRecord.class, id.toString(), hashcode, response);
+    lookupAndRetrieveFile(ServiceRecord.class, id.toString(), hashcode, response);
   }
 
   @RequestMapping(value = "/sample/forms/{hashcode}", method = RequestMethod.GET)

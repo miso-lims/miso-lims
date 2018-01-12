@@ -19,11 +19,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 
 public class TabbedListItemsPage {
 
-  public static TabbedListItemsPage createForPlatformType(String targetType, SequencerReferenceService sequencerService)
+  public static TabbedListItemsPage createForPlatformType(String targetType, InstrumentService sequencerService)
       throws IOException {
     return TabbedListItemsPage.createWithJson(targetType, "platformType", getPlatformTypes(sequencerService), PlatformType::getKey,
         PlatformType::name);
@@ -42,7 +42,7 @@ public class TabbedListItemsPage {
 
   }
 
-  private static Stream<PlatformType> getPlatformTypes(SequencerReferenceService sequencerService) throws IOException {
+  private static Stream<PlatformType> getPlatformTypes(InstrumentService sequencerService) throws IOException {
     Set<PlatformType> platforms = sequencerService.list(0, 0, true, "id", PaginationFilter.archived(false)).stream()
         .map(sr -> sr.getPlatform().getPlatformType()).collect(Collectors.toSet());
 

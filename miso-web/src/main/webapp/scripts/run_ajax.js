@@ -113,11 +113,11 @@ var Run = Run || {
     jQuery('#platformType').attr('data-parsley-class-handler', '#platformButtons');
 
     // Sequencer select field validation
-    jQuery('#sequencerReference').attr('class', 'form-control');
-    jQuery('#sequencerReference').attr('required', 'true');
-    jQuery('#sequencerReference').attr('data-parsley-min', '1');
-    jQuery('#sequencerReference').attr('data-parsley-error-message', 'You must select a Sequencer.');
-    jQuery('#sequencerReference').attr('data-parsley-errors-container', '#sequencerReferenceError');
+    jQuery('#sequencer').attr('class', 'form-control');
+    jQuery('#sequencer').attr('required', 'true');
+    jQuery('#sequencer').attr('data-parsley-min', '1');
+    jQuery('#sequencer').attr('data-parsley-error-message', 'You must select a Sequencer.');
+    jQuery('#sequencer').attr('data-parsley-errors-container', '#sequencerError');
 
     jQuery('#sequencingParameters').attr('class', 'form-control');
     jQuery('#sequencingParameters').attr('required', 'true');

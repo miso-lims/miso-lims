@@ -23,66 +23,65 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.SequencerDto;
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 
 @Controller
-@RequestMapping("/rest/sequencer")
-public class SequencerRestController extends RestController {
-  private final JQueryDataTableBackend<SequencerReference, SequencerDto> jQueryBackend = new JQueryDataTableBackend<SequencerReference, SequencerDto>() {
+@RequestMapping("/rest/instrument")
+public class InstrumentRestController extends RestController {
+  private final JQueryDataTableBackend<Instrument, InstrumentDto> jQueryBackend = new JQueryDataTableBackend<Instrument, InstrumentDto>() {
     @Override
-    protected SequencerDto asDto(SequencerReference model) {
+    protected InstrumentDto asDto(Instrument model) {
       return Dtos.asDto(model);
     }
 
     @Override
-    protected PaginatedDataSource<SequencerReference> getSource() throws IOException {
-      return sequencerService;
+    protected PaginatedDataSource<Instrument> getSource() throws IOException {
+      return instrumentService;
     }
   };
 
   @Autowired
-  private SequencerReferenceService sequencerService;
+  private InstrumentService instrumentService;
 
-  public void setLibraryService(SequencerReferenceService sequencerService) {
-    this.sequencerService = sequencerService;
+  public void setLibraryService(InstrumentService instrumentService) {
+    this.instrumentService = instrumentService;
   }
 
-  @RequestMapping(value = "/{sequencerId}", method = RequestMethod.GET, produces = "application/json")
+  @RequestMapping(value = "/{instrumentId}", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
-  public SequencerDto getById(@PathVariable Long sequencerId) throws IOException {
-    SequencerReference r = sequencerService.get(sequencerId);
+  public InstrumentDto getById(@PathVariable Long instrumentId) throws IOException {
+    Instrument r = instrumentService.get(instrumentId);
     if (r == null) {
-      throw new RestException("No sequencer found with ID: " + sequencerId, Status.NOT_FOUND);
+      throw new RestException("No instrument found with ID: " + instrumentId, Status.NOT_FOUND);
     }
-    SequencerDto dto = Dtos.asDto(r);
-    return dto;
+    return Dtos.asDto(r);
   }
 
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
-  public List<SequencerDto> listAll() throws IOException {
-    return sequencerService.list().stream().map(Dtos::asDto).collect(Collectors.toList());
+  public List<InstrumentDto> listAll() throws IOException {
+    return instrumentService.list().stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  private static final Logger log = LoggerFactory.getLogger(SequencerRestController.class);
+  private static final Logger log = LoggerFactory.getLogger(InstrumentRestController.class);
 
   @RequestMapping(method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public SequencerDto create(@RequestBody SequencerDto sequencerDto, UriComponentsBuilder b, HttpServletResponse response)
+  public InstrumentDto create(@RequestBody InstrumentDto instrumentDto, UriComponentsBuilder b, HttpServletResponse response)
       throws IOException {
-    if (sequencerDto == null) {
-      throw new RestException("Cannot convert null to sequencer", Status.BAD_REQUEST);
+    if (instrumentDto == null) {
+      throw new RestException("Cannot convert null to instrument", Status.BAD_REQUEST);
     }
     Long id = null;
     try {
-      SequencerReference sequencer = Dtos.to(sequencerDto);
-      id = sequencerService.create(sequencer);
+      Instrument instrument = Dtos.to(instrumentDto);
+      id = instrumentService.create(instrument);
     } catch (ConstraintViolationException | IllegalArgumentException e) {
       log.error("Error while creating library. ", e);
       RestException restException = new RestException(e.getMessage(), Status.BAD_REQUEST);
@@ -91,15 +90,15 @@ public class SequencerRestController extends RestController {
       }
       throw restException;
     }
-    SequencerDto created = getById(id);
-    UriComponents uriComponents = b.path("/sequencer/{id}").buildAndExpand(id);
+    InstrumentDto created = getById(id);
+    UriComponents uriComponents = b.path("/instrument/{id}").buildAndExpand(id);
     response.setHeader("Location", uriComponents.toUri().toString());
     return created;
   }
 
   @RequestMapping(value = "/dt", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<SequencerDto> datatable(HttpServletRequest request, HttpServletResponse response,
+  public DataTablesResponseDto<InstrumentDto> datatable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
   }

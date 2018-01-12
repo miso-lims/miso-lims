@@ -41,21 +41,21 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractInstrument;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
+import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSequencerReferenceDao implements SequencerReferenceStore, HibernatePaginatedDataSource<SequencerReference> {
+public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginatedDataSource<Instrument> {
 
-  private static final String SEQUENCER_REFERENCE_TABLE_NAME = "SequencerReference";
+  private static final String INSTRUMENT_TABLE_NAME = "Instrument";
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateSequencerReferenceDao.class);
+  protected static final Logger log = LoggerFactory.getLogger(HibernateInstrumentDao.class);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -84,56 +84,56 @@ public class HibernateSequencerReferenceDao implements SequencerReferenceStore, 
   }
 
   @Override
-  public long save(SequencerReference sr) throws IOException {
+  public long save(Instrument instrument) throws IOException {
     long id;
-    if (sr.getId() == AbstractSequencerReference.UNSAVED_ID) {
-      id = (Long) currentSession().save(sr);
+    if (instrument.getId() == AbstractInstrument.UNSAVED_ID) {
+      id = (Long) currentSession().save(instrument);
     } else {
-      currentSession().update(sr);
-      id = sr.getId();
+      currentSession().update(instrument);
+      id = instrument.getId();
     }
     return id;
   }
 
   @Override
-  public SequencerReference get(long id) throws IOException {
-    return (SequencerReference) currentSession().get(SequencerReferenceImpl.class, id);
+  public Instrument get(long id) throws IOException {
+    return (Instrument) currentSession().get(InstrumentImpl.class, id);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public Collection<SequencerReference> listAll() throws IOException {
-    return currentSession().createCriteria(SequencerReferenceImpl.class).list();
+  public Collection<Instrument> listAll() throws IOException {
+    return currentSession().createCriteria(InstrumentImpl.class).list();
   }
 
   @Override
   public int count() throws IOException {
-    long c = (Long) currentSession().createCriteria(SequencerReferenceImpl.class)
+    long c = (Long) currentSession().createCriteria(InstrumentImpl.class)
         .setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
   }
 
   @Override
-  public SequencerReference getByName(String referenceName) throws IOException {
-    Criteria criteria = currentSession().createCriteria(SequencerReferenceImpl.class);
-    criteria.add(Restrictions.eq("name", referenceName));
-    return (SequencerReference) criteria.uniqueResult();
+  public Instrument getByName(String name) throws IOException {
+    Criteria criteria = currentSession().createCriteria(InstrumentImpl.class);
+    criteria.add(Restrictions.eq("name", name));
+    return (Instrument) criteria.uniqueResult();
   }
 
 
   @Override
-  public SequencerReference getByUpgradedReference(long id) {
-    Criteria criteria = currentSession().createCriteria(SequencerReferenceImpl.class);
-    criteria.add(Restrictions.eq("upgradedSequencerReference.id", id));
-    return (SequencerReference) criteria.uniqueResult();
+  public Instrument getByUpgradedInstrument(long id) {
+    Criteria criteria = currentSession().createCriteria(InstrumentImpl.class);
+    criteria.add(Restrictions.eq("upgradedInstrument.id", id));
+    return (Instrument) criteria.uniqueResult();
   }
 
   @Override
-  public boolean remove(SequencerReference sr) throws IOException {
+  public boolean remove(Instrument sr) throws IOException {
     if (sr.isDeletable()) {
       currentSession().delete(sr);
 
-      SequencerReference testIfExists = get(sr.getId());
+      Instrument testIfExists = get(sr.getId());
 
       return testIfExists == null;
     } else {
@@ -142,13 +142,13 @@ public class HibernateSequencerReferenceDao implements SequencerReferenceStore, 
   }
 
   @Override
-  public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException {
-    return DbUtils.getColumnSizes(jdbcTemplate, SEQUENCER_REFERENCE_TABLE_NAME);
+  public Map<String, Integer> getInstrumentColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(jdbcTemplate, INSTRUMENT_TABLE_NAME);
   }
 
   @Override
   public String getFriendlyName() {
-    return "Sequencer";
+    return "Instrument";
   }
 
   @Override
@@ -157,8 +157,8 @@ public class HibernateSequencerReferenceDao implements SequencerReferenceStore, 
   }
 
   @Override
-  public Class<? extends SequencerReference> getRealClass() {
-    return SequencerReferenceImpl.class;
+  public Class<? extends Instrument> getRealClass() {
+    return InstrumentImpl.class;
   }
 
   private static final String[] SEARCH_PROPERTIES = new String[] { "name", "platform.instrumentModel" };

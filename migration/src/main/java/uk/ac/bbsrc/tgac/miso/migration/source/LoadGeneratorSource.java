@@ -15,6 +15,7 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
@@ -29,10 +30,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -44,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
@@ -454,7 +454,6 @@ public class LoadGeneratorSource implements MigrationSource {
 
   private static final Date RUN_DATE = new Date();
   private static final String RUN_DATE_STRING = new DateFormatter("yyyyMMdd").print(RUN_DATE, Locale.ENGLISH);
-  private static final String RUN_INSTRUMENT_NAME = "Instrument";
 
   private Run createRun(List<Pool> pools, int runNum) {
     int runNumPadding = Math.max(Integer.toString(runNum).length(), 4);
@@ -467,9 +466,9 @@ public class LoadGeneratorSource implements MigrationSource {
     run.setAlias(RUN_DATE_STRING + "_LoadTest_" + runNumPadded + "_" + runBarcode);
     run.setDescription(runBarcode);
 
-    SequencerReference sequencer = new SequencerReferenceImpl(null, null, null);
+    Instrument sequencer = new InstrumentImpl(null, null, null);
     sequencer.setId(runSequencerId);
-    run.setSequencerReference(sequencer);
+    run.setSequencer(sequencer);
 
     SequencerPartitionContainer container = new SequencerPartitionContainerImpl();
     container.setIdentificationBarcode(runBarcode);

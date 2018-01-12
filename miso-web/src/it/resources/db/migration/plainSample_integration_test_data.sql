@@ -34,8 +34,8 @@ DELETE FROM Indices;
 DELETE FROM IndexFamily;
 DELETE FROM SequencingParameters;
 DELETE FROM PlatformSizes;
-DELETE FROM SequencerReference WHERE upgradedSequencerReferenceId IS NOT NULL;
-DELETE FROM SequencerReference;
+DELETE FROM Instrument WHERE instrumentId IS NOT NULL;
+DELETE FROM Instrument;
 DELETE FROM Platform;
 DELETE FROM ProjectOverview;
 DELETE FROM Project;
@@ -191,7 +191,7 @@ INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
   (3, 15),
   (3, 16);
 
-INSERT INTO SequencerReference (referenceId, name, platformId, ip) VALUES
+INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
   (1, 'T2500', 1, '127.0.0.1');
 
 INSERT INTO Project(projectId, name, alias, shortName, creationDate, description, securityProfile_profileId,

@@ -44,13 +44,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
+import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
 
-public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
+public class HibernateServiceRecordDaoTest extends AbstractDAOTest {
 
   @Rule
   public final ExpectedException exception = ExpectedException.none();
@@ -64,11 +64,11 @@ public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
   @Mock
   private MisoFilesManager misoFilesManager;
   @Mock
-  private SequencerReferenceStore sequencerReferenceDao;
-  private final SequencerReference emptySR = new SequencerReferenceImpl();
+  private InstrumentStore instrumentDao;
+  private final Instrument emptySR = new InstrumentImpl();
   
   @InjectMocks
-  private HibernateSequencerServiceRecordDao dao;
+  private HibernateServiceRecordDao dao;
   
   @Before
   public void setup() throws IOException {
@@ -77,7 +77,7 @@ public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
     dao.setSessionFactory(sessionFactory);
 
     emptySR.setId(2L);
-    Mockito.when(sequencerReferenceDao.get(Matchers.anyLong())).thenReturn(emptySR);
+    Mockito.when(instrumentDao.get(Matchers.anyLong())).thenReturn(emptySR);
   }
   
   @Test
@@ -85,14 +85,14 @@ public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
     String title = "New Record 1";
     Long newId = dao.save(makeServiceRecord(title));
     
-    SequencerServiceRecord savedRec = dao.get(newId);
+    ServiceRecord savedRec = dao.get(newId);
     assertEquals(title, savedRec.getTitle());
   }
   
-  private SequencerServiceRecord makeServiceRecord(String title) {
-    SequencerServiceRecord rec = new SequencerServiceRecord();
+  private ServiceRecord makeServiceRecord(String title) {
+    ServiceRecord rec = new ServiceRecord();
     rec.setTitle(title);
-    rec.setSequencerReference(emptySR);
+    rec.setInstrument(emptySR);
     rec.setServiceDate(new java.util.Date());
     rec.setServicedByName("Test Person");
     return rec;
@@ -100,23 +100,23 @@ public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
   
   @Test
   public void testSaveEdit() throws IOException {
-    SequencerServiceRecord rec = dao.get(1L);
+    ServiceRecord rec = dao.get(1L);
     String newTitle = "ChangedTitle";
     rec.setTitle(newTitle);
-    SequencerReference sr = Mockito.mock(SequencerReference.class);
+    Instrument sr = Mockito.mock(Instrument.class);
     Mockito.when(sr.getId()).thenReturn(1L);
-    rec.setSequencerReference(sr);
+    rec.setInstrument(sr);
     
     assertEquals(1L, dao.save(rec));
     
-    SequencerServiceRecord saved = dao.get(1L);
+    ServiceRecord saved = dao.get(1L);
     assertEquals(newTitle, saved.getTitle());
   }
   
   @Test
   public void testSaveDecommissioned() throws IOException {
-    SequencerServiceRecord newRec = makeServiceRecord("New Record 2");
-    newRec.getSequencerReference().setDateDecommissioned(new Date());
+    ServiceRecord newRec = makeServiceRecord("New Record 2");
+    newRec.getInstrument().setDateDecommissioned(new Date());
     
     exception.expect(IOException.class);
     dao.save(newRec);
@@ -124,20 +124,20 @@ public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
 
   @Test
   public void testGet() throws IOException {
-    SequencerServiceRecord rec = dao.get(1L);
+    ServiceRecord rec = dao.get(1L);
     assertNotNull(rec);
     assertEquals(1L, rec.getId());
   }
   
   @Test
   public void testGetNone() throws IOException {
-    SequencerServiceRecord rec = dao.get(100L);
+    ServiceRecord rec = dao.get(100L);
     assertNull(rec);
   }
 
   @Test
   public void testListAll() throws IOException {
-    List<SequencerServiceRecord> list = dao.listAll();
+    List<ServiceRecord> list = dao.listAll();
     assertEquals(3, list.size());
   }
 
@@ -148,20 +148,20 @@ public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testListBySequencerId() {
-    List<SequencerServiceRecord> list = dao.listBySequencerId(1L);
+  public void testListByInstrumentId() {
+    List<ServiceRecord> list = dao.listByInstrumentId(1L);
     assertEquals(2, list.size());
   }
   
   @Test
-  public void testListBySequencerIdNone() {
-    List<SequencerServiceRecord> list = dao.listBySequencerId(100L);
+  public void testListByInstrumentIdNone() {
+    List<ServiceRecord> list = dao.listByInstrumentId(100L);
     assertEquals(0, list.size());
   }
 
   @Test
   public void testRemove() throws IOException {
-    SequencerServiceRecord rec = dao.get(1L);
+    ServiceRecord rec = dao.get(1L);
     assertNotNull(rec);
     assertTrue(dao.remove(rec));
     assertNull(dao.get(1L));
@@ -169,19 +169,19 @@ public class HibernateSequencerServiceRecordDaoTest extends AbstractDAOTest {
   
   @Test
   public void testRemoveNotExisting() throws IOException {
-    assertFalse(dao.remove(new SequencerServiceRecord()));
+    assertFalse(dao.remove(new ServiceRecord()));
   }
   
   @Test
   public void testRemoveWithAttachments() throws IOException {
-    SequencerServiceRecord rec = dao.get(1L);
+    ServiceRecord rec = dao.get(1L);
     assertNotNull(rec);
     
-    Mockito.when(misoFilesManager.getFileNames(SequencerServiceRecord.class, "1")).thenReturn(Arrays.asList("file"));
+    Mockito.when(misoFilesManager.getFileNames(ServiceRecord.class, "1")).thenReturn(Arrays.asList("file"));
     
     assertTrue(dao.remove(rec));
     assertNull(dao.get(1L));
-    Mockito.verify(misoFilesManager, Mockito.times(1)).deleteFile(SequencerServiceRecord.class, "1", "file");
+    Mockito.verify(misoFilesManager, Mockito.times(1)).deleteFile(ServiceRecord.class, "1", "file");
   }
 
 }

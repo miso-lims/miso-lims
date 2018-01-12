@@ -70,7 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -107,7 +107,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
@@ -1448,8 +1448,8 @@ public class Dtos {
       dto.setStatus("");
     }
     dto.setLastModified(formatDateTime(from.getLastModified()));
-    if (from.getSequencerReference() != null) {
-      dto.setPlatformType(from.getSequencerReference().getPlatform().getPlatformType().getKey());
+    if (from.getSequencer() != null) {
+      dto.setPlatformType(from.getSequencer().getPlatform().getPlatformType().getKey());
     } else {
       dto.setPlatformType("");
     }
@@ -1489,8 +1489,8 @@ public class Dtos {
     if (lastRun != null) {
       dto.setLastRunAlias(lastRun.getAlias());
       dto.setLastRunId(lastRun.getId());
-      dto.setLastSequencerId(lastRun.getSequencerReference().getId());
-      dto.setLastSequencerName(lastRun.getSequencerReference().getName());
+      dto.setLastSequencerId(lastRun.getSequencer().getId());
+      dto.setLastSequencerName(lastRun.getSequencer().getName());
     }
     if (from.getLastModified() != null) {
       dto.setLastModified(formatDateTime(from.getLastModified()));
@@ -1856,8 +1856,8 @@ public class Dtos {
     return dto;
   }
 
-  public static SequencerDto asDto(SequencerReference from) {
-    SequencerDto dto = new SequencerDto();
+  public static InstrumentDto asDto(Instrument from) {
+    InstrumentDto dto = new InstrumentDto();
     dto.setId(from.getId());
     dto.setDateCommissioned(formatDate(from.getDateCommissioned()));
     dto.setDateDecommissioned(formatDate(from.getDateDecommissioned()));
@@ -1868,8 +1868,8 @@ public class Dtos {
     return dto;
   }
 
-  public static SequencerReference to(SequencerDto dto) {
-    SequencerReference to = new SequencerReferenceImpl();
+  public static Instrument to(InstrumentDto dto) {
+    Instrument to = new InstrumentImpl();
     to.setId(dto.getId());
     to.setDateCommissioned(parseDate(dto.getDateCommissioned()));
     to.setDateDecommissioned(parseDate(dto.getDateDecommissioned()));

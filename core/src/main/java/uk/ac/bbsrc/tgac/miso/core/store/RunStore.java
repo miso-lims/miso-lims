@@ -123,12 +123,12 @@ public interface RunStore extends Store<Run>, Remover<Run>, PaginatedDataSource<
   List<Run> listByStatus(String health) throws IOException;
 
   /**
-   * List all runs for a given sequencer reference id
+   * List all runs for a given instrument id
    * 
-   * @param sequencerReferenceId id of the sequencer reference to get runs for
-   * @return all runs with matching sequencer reference id
+   * @param instrumentId id of the sequencer to get runs for
+   * @return all runs with matching sequencer instrument id
    */
-  List<Run> listBySequencerId(long sequencerReferenceId) throws IOException;
+  List<Run> listBySequencerId(long instrumentId) throws IOException;
 
   /**
    * @return a map containing all column names and max lengths from the Run table

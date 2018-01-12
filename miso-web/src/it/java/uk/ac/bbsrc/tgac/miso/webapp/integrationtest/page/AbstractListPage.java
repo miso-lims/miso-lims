@@ -92,7 +92,7 @@ public interface AbstractListPage {
     public static final String STUDIES = "studies";
     public static final String PRINTERS = "printers";
     public static final String PROJECTS = "projects";
-    public static final String SEQUENCERS = "sequencers";
+    public static final String INSTRUMENTS = "instruments";
     public static final String POOLS = "pools";
     public static final String ORDERS = "poolorders";
     public static final String CONTAINERS = "containers";

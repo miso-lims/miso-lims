@@ -41,11 +41,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 
 @Controller
-@RequestMapping("/sequencers")
-public class ListSequencerReferencesController {
+@RequestMapping("/instruments")
+public class ListInstrumentsController {
   @Autowired
   private SecurityManager securityManager;
-  private final ListItemsPage listPage = new ListItemsPage("sequencer") {
+  private final ListItemsPage listPage = new ListItemsPage("instrument") {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
@@ -59,11 +59,11 @@ public class ListSequencerReferencesController {
 
   @ModelAttribute("title")
   public String title() {
-    return "Sequencers";
+    return "Instruments";
   }
 
   @RequestMapping(method = RequestMethod.GET)
-  public ModelAndView listSequencers(ModelMap model) throws IOException {
+  public ModelAndView listInstruments(ModelMap model) throws IOException {
     return listPage.list(model);
   }
 

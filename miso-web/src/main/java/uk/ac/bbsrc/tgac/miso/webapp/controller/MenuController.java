@@ -62,7 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -92,7 +92,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
@@ -165,7 +165,7 @@ public class MenuController implements ServletContextAware {
   @Autowired
   private ReferenceGenomeService referenceGenomeService;
   @Autowired
-  private SequencerReferenceService sequencerService;
+  private InstrumentService sequencerService;
   @Autowired
   private PartitionQCService partitionQCService;
 
@@ -297,7 +297,7 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "librarySelections", libraryService.listLibrarySelectionTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryStrategies", libraryService.listLibraryStrategyTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "libraryDesignCodes", libraryDesignCodeService.list(), Dtos::asDto);
-    Set<Long> activePlatforms = sequencerService.list().stream().filter(SequencerReference::isActive)
+    Set<Long> activePlatforms = sequencerService.list().stream().filter(Instrument::isActive)
         .map(sequencer -> sequencer.getPlatform().getId())
         .collect(Collectors.toSet());
     createArray(mapper, baseUri, node, "platforms", platformService.list(), platform -> {

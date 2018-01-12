@@ -36,7 +36,7 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form id="serviceRecordForm" data-parsley-validate="" action="/miso/sequencer/servicerecord" method="POST" commandName="serviceRecord" autocomplete="off">
+    <form:form id="serviceRecordForm" data-parsley-validate="" action="/miso/instrument/servicerecord" method="POST" commandName="serviceRecord" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="serviceRecord"/>
       <h1>
         <c:choose>
@@ -52,10 +52,10 @@
             <a href="<c:url value='/miso/'/>">Home</a>
           </li>
           <li>
-            <a href='<c:url value="/miso/sequencers"/>'>Sequencers</a>
+            <a href='<c:url value="/miso/instruments"/>'>Instruments</a>
           </li>
           <li>
-            <a href='<c:url value="/miso/sequencer/${serviceRecord.sequencerReference.id}"/>'>${serviceRecord.sequencerReference.name}</a>
+            <a href='<c:url value="/miso/instrument/${serviceRecord.instrument.id}"/>'>${serviceRecord.instrument.name}</a>
           </li>
         </ul>
       </div>
@@ -63,7 +63,7 @@
         <div id="noteArrowClick" class="toggleLeft"></div>
       </div>
       <div id="noteDiv" class="note" style="display:none;">A Service Record is a record of maintenance performed 
-      on a sequencer
+      on an instrument
       </div>
       
       <div class="bs-callout bs-callout-warning hidden">
@@ -85,8 +85,8 @@
           </span></td>
         </tr>
         <tr>
-          <td class="h">Sequencer:</td>
-          <td><a href='<c:url value="/miso/sequencer/${serviceRecord.sequencerReference.id}"/>' id="sequencerName">${serviceRecord.sequencerReference.name}</a></td>
+          <td class="h">Instrument:</td>
+          <td><a href='<c:url value="/miso/instrument/${serviceRecord.instrument.id}"/>' id="instrumentName">${serviceRecord.instrument.name}</a></td>
         </tr>
         <tr>
           <td class="h">Title:*</td>

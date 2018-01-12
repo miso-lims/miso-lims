@@ -37,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run> {
 
   private static final List<String> STANDARD_ALIASES = Arrays.asList("lastModifier", "creator",
-      "sequencerReference", "sequencerReference.platform");
+      "sequencer", "sequencer.platform");
 
   protected static final Logger log = LoggerFactory.getLogger(HibernateRunDao.class);
 
@@ -217,7 +217,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public List<Run> listByPlatformId(long platformId) throws IOException {
     Criteria criteria = currentSession().createCriteria(Run.class, "r");
-    criteria.createAlias("r.sequencerReference", "sr");
+    criteria.createAlias("r.sequencer", "sr");
     criteria.add(Restrictions.eq("sr.platform.id", platformId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
@@ -234,9 +234,9 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   }
 
   @Override
-  public List<Run> listBySequencerId(long sequencerReferenceId) throws IOException {
+  public List<Run> listBySequencerId(long sequencerId) throws IOException {
     Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.add(Restrictions.eq("sequencerReference.id", sequencerReferenceId));
+    criteria.add(Restrictions.eq("sequencer.id", sequencerId));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
@@ -372,8 +372,8 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
 
   @Override
   public void restrictPaginationBySequencerId(Criteria criteria, long id, Consumer<String> errorHandler) {
-    criteria.createAlias("sequencerReference", "sequencerReference");
-    criteria.add(Restrictions.eq("sequencerReference.id", id));
+    criteria.createAlias("sequencer", "sequencer");
+    criteria.add(Restrictions.eq("sequencer.id", id));
   }
 
   @Override
