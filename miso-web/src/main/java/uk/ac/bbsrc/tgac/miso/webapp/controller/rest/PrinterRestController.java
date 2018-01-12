@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -36,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/rest/printer")
@@ -43,6 +46,9 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
 public class PrinterRestController extends RestController {
   private static final Pattern COMMA = Pattern.compile(",");
   private static final Logger log = LoggerFactory.getLogger(PrinterRestController.class);
+
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @Autowired
   private BoxService boxService;
@@ -152,6 +158,7 @@ public class PrinterRestController extends RestController {
   @ResponseBody
   public long submit(@PathVariable("printerId") Long printerId, @RequestParam("type") String type, @RequestParam("ids") String ids)
       throws IOException {
+    User user = authorizationManager.getCurrentUser();
     Printer printer = printerService.get(printerId);
     if (printer == null) {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
@@ -181,7 +188,7 @@ public class PrinterRestController extends RestController {
     return COMMA.splitAsStream(ids)//
         .map(Long::parseLong)//
         .map(WhineyFunction.rethrow(fetcher))//
-        .filter(printer::printBarcode)//
+        .filter(b -> printer.printBarcode(b, user))//
         .count();
   }
 }
