@@ -294,8 +294,8 @@ public class ExternalSectionControllerHelperService {
               + "','"
               + (run.getCompletionDate() != null
                   ? LimsUtils.formatDate(run.getCompletionDate()) : "")
-              + "','" + (run.getSequencerReference().getPlatform().getPlatformType() != null
-                  ? run.getSequencerReference().getPlatform().getPlatformType().getKey() : "")
+              + "','" + (run.getSequencer().getPlatform().getPlatformType() != null
+                  ? run.getSequencer().getPlatform().getPlatformType().getKey() : "")
               + "','" + sb.toString() + "']");
 
         }

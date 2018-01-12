@@ -46,27 +46,21 @@ import javax.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 
-/**
- * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
 @MappedSuperclass
-public abstract class AbstractSequencerReference implements SequencerReference {
+public abstract class AbstractInstrument implements Instrument {
 
   private static final long serialVersionUID = 1L;
 
-  private static final Logger log = LoggerFactory.getLogger(AbstractSequencerReference.class);
+  private static final Logger log = LoggerFactory.getLogger(AbstractInstrument.class);
 
   public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "referenceId")
-  private long id = AbstractSequencerReference.UNSAVED_ID;
+  @Column(name = "instrumentId")
+  private long id = AbstractInstrument.UNSAVED_ID;
 
   @Column(nullable = false)
   private String name;
@@ -83,9 +77,9 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   @Temporal(TemporalType.DATE)
   private Date dateDecommissioned = null;
 
-  @OneToOne(targetEntity = SequencerReferenceImpl.class, optional = true)
-  @JoinColumn(name = "upgradedSequencerReferenceId")
-  private SequencerReference upgradedSequencerReference;
+  @OneToOne(targetEntity = InstrumentImpl.class, optional = true)
+  @JoinColumn(name = "upgradedInstrumentId")
+  private Instrument upgradedInstrument;
 
   @Transient
   private Date lastServicedDate;
@@ -171,13 +165,13 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   }
 
   @Override
-  public void setUpgradedSequencerReference(SequencerReference sequencer) {
-    this.upgradedSequencerReference = sequencer;
+  public void setUpgradedInstrument(Instrument instrument) {
+    this.upgradedInstrument = instrument;
   }
 
   @Override
-  public SequencerReference getUpgradedSequencerReference() {
-    return upgradedSequencerReference;
+  public Instrument getUpgradedInstrument() {
+    return upgradedInstrument;
   }
 
   @Override
@@ -187,19 +181,19 @@ public abstract class AbstractSequencerReference implements SequencerReference {
 
   @Override
   public boolean isDeletable() {
-    return getId() != AbstractSequencerReference.UNSAVED_ID;
+    return getId() != AbstractInstrument.UNSAVED_ID;
   }
 
   @Override
   public String toString() {
-    return "AbstractSequencerReference [id=" + id
+    return "AbstractInstrument [id=" + id
         + ", name=" + name
         + ", platform=" + platform.getId()
         + ", ip=" + ip
         + ", serialNumber=" + serialNumber
         + ", dateCommissioned=" + dateCommissioned
         + ", dateDecommissioned=" + dateDecommissioned
-        + ", upgradedSequencerReference=" + (upgradedSequencerReference == null ? null : upgradedSequencerReference.getId()) + "]";
+        + ", upgradedInstrument=" + (upgradedInstrument == null ? null : upgradedInstrument.getId()) + "]";
   }
   
   @Override
@@ -217,7 +211,7 @@ public abstract class AbstractSequencerReference implements SequencerReference {
     return lastServicedDate;
   }
   
-  @OneToMany(targetEntity = Run.class, mappedBy = "sequencerReference")
+  @OneToMany(targetEntity = Run.class, mappedBy = "sequencer")
   private Set<Run> runs = new HashSet<>();
 
   @Override
@@ -230,16 +224,16 @@ public abstract class AbstractSequencerReference implements SequencerReference {
     this.runs = runs;
   }
 
-  @OneToMany(targetEntity = SequencerServiceRecord.class, mappedBy = "sequencerReference")
-  private Set<SequencerServiceRecord> serviceRecords = new HashSet<>();
+  @OneToMany(targetEntity = ServiceRecord.class, mappedBy = "instrument")
+  private Set<ServiceRecord> serviceRecords = new HashSet<>();
 
   @Override
-  public Set<SequencerServiceRecord> getServiceRecords() {
+  public Set<ServiceRecord> getServiceRecords() {
     return serviceRecords;
   }
 
   @Override
-  public void setServiceRecords(Set<SequencerServiceRecord> serviceRecords) {
+  public void setServiceRecords(Set<ServiceRecord> serviceRecords) {
     this.serviceRecords = serviceRecords;
   }
 

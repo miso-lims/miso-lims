@@ -78,14 +78,14 @@ Each instrument has a platform, an instrument model, a serial number, an IP addr
 Instruments can also be added to MISO by admin users.
 
 ```
-addSequencerReference(name, platform, instrumentModel, serialNumber, ipAddress, commissionedDate, decommissionedDate, upgradedInstrumentName);
+addInstrument(name, platform, instrumentModel, serialNumber, ipAddress, commissionedDate, decommissionedDate, upgradedInstrumentName);
 ```
 
 For instance, to add an Illumina HiSeq 2000 which was later upgraded to a HiSeq2500:
 ```
-CALL addSequencerReference('h501', 'ILLUMINA', 'Illumina HiSeq 2000', '12345', 'localhost', '2015-01-07', '2016-05-19', 'SN501');
+CALL addInstrument('h501', 'ILLUMINA', 'Illumina HiSeq 2000', '12345', 'localhost', '2015-01-07', '2016-05-19', 'SN501');
 ```
-Note that the sequencing platform must be in all caps, and the instrumentModel must be an exact match for a value in `Platform.instrumentModel`.
+Note that the platform must be in all caps, and the instrumentModel must be an exact match for a value in `Platform.instrumentModel`.
 Note also that if adding an instrument which references an upgraded instrument, the upgraded instrument must already exist in MISO. If the instrument to be added has not been upgraded, set upgradedInstrumentName to `NULL`.
 
 

@@ -111,11 +111,19 @@
   </c:if>
   <tr>
     <td>Platform:</td>
-    <td><span id="platform">${run.sequencerReference.platform.platformType.key}</span></td>
+    <td><span id="platform">${run.sequencer.platform.platformType.key}</span></td>
   </tr>
   <tr>
     <td>Sequencer:</td>
-    <td><span id="sequencer">${run.sequencerReference.name} - ${run.sequencerReference.platform.instrumentModel}</span></td>
+    <td><span id="sequencer">${run.sequencer.name} - ${run.sequencer.platform.instrumentModel}</span></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <div class="parsley-errors-list filled" id="sequencerError">
+        <div class="parsley-required"></div>
+      </div>
+    </td>
   </tr>
   <tr>
     <td>Sequencing Parameters:*</td>
