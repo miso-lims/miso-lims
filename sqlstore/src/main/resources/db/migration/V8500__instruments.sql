@@ -19,3 +19,7 @@ ALTER TABLE Run CHANGE COLUMN sequencerReference_sequencerReferenceId instrument
 
 ALTER TABLE SequencerServiceRecord RENAME TO ServiceRecord;
 ALTER TABLE ServiceRecord CHANGE COLUMN sequencerReferenceId instrumentId bigint(20) NOT NULL;
+
+ALTER TABLE Platform ADD COLUMN instrumentType varchar(50);
+UPDATE Platform SET instrumentType = 'SEQUENCER';
+ALTER TABLE Platform CHANGE COLUMN instrumentType instrumentType varchar(50) NOT NULL;

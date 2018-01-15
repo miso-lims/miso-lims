@@ -24,7 +24,9 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
@@ -101,6 +103,17 @@ public class InstrumentRestController extends RestController {
   public DataTablesResponseDto<InstrumentDto> datatable(HttpServletRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, uriBuilder);
+  }
+
+  @RequestMapping(value = "/dt/instrument-type/{type}", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<InstrumentDto> datatableByInstrumentType(@PathVariable("type") String type, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+    InstrumentType instrumentType = InstrumentType.valueOf(type);
+    if (instrumentType == null) {
+      throw new RestException("Invalid instrument type.", Status.BAD_REQUEST);
+    }
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.instrumentType(instrumentType));
   }
 
 }

@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.function.Consumer;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -45,5 +46,7 @@ public interface PaginationFilterSink<T> {
   public void restrictPaginationBySequencingParametersId(T item, long id, Consumer<String> errorHandler);
 
   public void restrictPaginationByUser(T item, String userName, boolean creator, Consumer<String> errorHandler);
+
+  public void restrictPaginationByInstrumentType(T item, InstrumentType type, Consumer<String> errorHandler);
 
 }

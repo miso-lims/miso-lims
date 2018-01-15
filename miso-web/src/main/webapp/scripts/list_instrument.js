@@ -24,7 +24,11 @@
 ListTarget.instrument = {
   name: "Instruments",
   createUrl: function(config, projectId) {
-    return "/miso/rest/instrument/dt";
+    if (config.instrumentType) {
+      return "/miso/rest/instrument/dt/instrument-type/" + config.instrumentType;
+    } else {
+      return "/miso/rest/instrument/dt";
+    }
   },
   createBulkActions: function(config, projectId) {
     return [];
