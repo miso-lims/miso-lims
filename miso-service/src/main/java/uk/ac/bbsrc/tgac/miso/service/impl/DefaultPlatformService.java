@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -23,7 +23,7 @@ public class DefaultPlatformService implements PlatformService {
   @Autowired
   private PlatformStore platformDao;
   @Autowired
-  private SequencerReferenceService sequencerReferenceService;
+  private InstrumentService instrumentService;
 
   @Override
   public Platform get(long platformId) throws IOException {
@@ -48,7 +48,7 @@ public class DefaultPlatformService implements PlatformService {
   public Collection<PlatformType> listActivePlatformTypes() throws IOException {
     Collection<PlatformType> activePlatformTypes = new ArrayList<>();
     for (PlatformType platformType : PlatformType.values()) {
-      for (SequencerReference sequencer : sequencerReferenceService.listByPlatformType(platformType)) {
+      for (Instrument sequencer : instrumentService.listByPlatformType(platformType)) {
         if (sequencer.isActive()) {
           activePlatformTypes.add(platformType);
           break;
@@ -62,8 +62,8 @@ public class DefaultPlatformService implements PlatformService {
     this.platformDao = platformDao;
   }
 
-  public void setSequencerReferenceService(SequencerReferenceService sequencerReferenceService) {
-    this.sequencerReferenceService = sequencerReferenceService;
+  public void setInstrumentService(InstrumentService instrumentService) {
+    this.instrumentService = instrumentService;
   }
 
 }

@@ -12,7 +12,7 @@ public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
 
   public static enum Field implements FormPage.FieldElement {
     ID(By.id("serviceRecordId"), FieldType.LABEL), //
-    SEQUENCER(By.id("sequencerName"), FieldType.LABEL), //
+    INSTRUMENT(By.id("instrumentName"), FieldType.LABEL), //
     TITLE(By.id("title"), FieldType.TEXT), //
     DETAILS(By.id("details"), FieldType.TEXTAREA), //
     SERVICED_BY(By.id("servicedByName"), FieldType.TEXT), //
@@ -51,11 +51,11 @@ public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
 
   public static ServiceRecordPage get(WebDriver driver, String baseUrl, Long sequencerId, Long serviceRecordId) {
     if (sequencerId == null && serviceRecordId == null) {
-      throw new IllegalArgumentException("Must specify either sequencer ID or service record ID");
+      throw new IllegalArgumentException("Must specify either instrument ID or service record ID");
     } else if (serviceRecordId == null) {
-      driver.get(baseUrl + "miso/sequencer/servicerecord/new/" + sequencerId);
+      driver.get(baseUrl + "miso/instrument/servicerecord/new/" + sequencerId);
     } else {
-      driver.get(baseUrl + "miso/sequencer/servicerecord/" + serviceRecordId);
+      driver.get(baseUrl + "miso/instrument/servicerecord/" + serviceRecordId);
     }
     return new ServiceRecordPage(driver);
   }

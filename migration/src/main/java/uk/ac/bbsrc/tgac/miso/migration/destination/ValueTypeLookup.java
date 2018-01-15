@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
@@ -34,7 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -95,8 +95,8 @@ public class ValueTypeLookup {
   private Map<String, QcType> sampleQcTypeByName;
   private Map<Long, QcType> libraryQcTypeById;
   private Map<String, QcType> libraryQcTypeByName;
-  private Map<Long, SequencerReference> sequencerById;
-  private Map<String, SequencerReference> sequencerByName;
+  private Map<Long, Instrument> instrumentById;
+  private Map<String, Instrument> instrumentByName;
   private Map<Long, Subproject> subprojectById;
   private Map<String, Subproject> subprojectByAlias;
   private Map<Long, DetailedQcStatus> detailedQcStatusById;
@@ -128,7 +128,7 @@ public class ValueTypeLookup {
     setIndices(misoServiceManager.getIndexDao().list(0, 0, true, "id"));
     setSampleQcTypes(misoServiceManager.getQualityControlService().listQcTypes(QcTarget.Sample));
     setLibraryQcTypes(misoServiceManager.getQualityControlService().listQcTypes(QcTarget.Library));
-    setSequencers(misoServiceManager.getSequencerReferenceDao().listAll());
+    setSequencers(misoServiceManager.getInstrumentDao().listAll());
     setSubprojects(misoServiceManager.getSubprojectDao().getSubproject());
     setDetailedQcStatuses(misoServiceManager.getDetailedQcStatusDao().getDetailedQcStatus());
     setReferenceGenomes(misoServiceManager.getReferenceGenomeService().listAllReferenceGenomeTypes());
@@ -324,15 +324,15 @@ public class ValueTypeLookup {
     this.libraryQcTypeByName = mapByName;
   }
 
-  private void setSequencers(Collection<SequencerReference> sequencers) {
-    Map<Long, SequencerReference> mapById = new UniqueKeyHashMap<>();
-    Map<String, SequencerReference> mapByName = new UniqueKeyHashMap<>();
-    for (SequencerReference sequencer : sequencers) {
+  private void setSequencers(Collection<Instrument> sequencers) {
+    Map<Long, Instrument> mapById = new UniqueKeyHashMap<>();
+    Map<String, Instrument> mapByName = new UniqueKeyHashMap<>();
+    for (Instrument sequencer : sequencers) {
       mapByName.put(sequencer.getName(), sequencer);
       mapById.put(sequencer.getId(), sequencer);
     }
-    this.sequencerById = mapById;
-    this.sequencerByName = mapByName;
+    this.instrumentById = mapById;
+    this.instrumentByName = mapByName;
   }
 
   private void setSubprojects(Collection<Subproject> subprojects) {
@@ -704,22 +704,22 @@ public class ValueTypeLookup {
   }
 
   /**
-   * Attempts to find an existing SequencerReference
+   * Attempts to find an existing Instrument
    * 
-   * @param sequencer a partially-formed SequencerReference, which must have either its ID or its name set in order for this method to
-   *          resolve the SequencerReference
-   * @return the existing SequencerReference if a matching one is found; null otherwise
+   * @param instrument a partially-formed Instrument, which must have either its ID or its name set in order for this method to
+   *          resolve the Instrument
+   * @return the existing Instrument if a matching one is found; null otherwise
    */
   @VisibleForTesting
-  SequencerReference resolve(SequencerReference sequencer) {
-    if (sequencer == null) return null;
-    if (sequencer.getId() != Index.UNSAVED_ID) return sequencerById.get(sequencer.getId());
-    if (sequencer.getName() != null) return sequencerByName.get(sequencer.getName());
+  Instrument resolve(Instrument instrument) {
+    if (instrument == null) return null;
+    if (instrument.getId() != Index.UNSAVED_ID) return instrumentById.get(instrument.getId());
+    if (instrument.getName() != null) return instrumentByName.get(instrument.getName());
     return null;
   }
 
-  public boolean isValidSequencerReference(String name) {
-    return sequencerByName.containsKey(name);
+  public boolean isValidInstrument(String name) {
+    return instrumentByName.containsKey(name);
   }
 
   /**
@@ -993,16 +993,16 @@ public class ValueTypeLookup {
    * @throws IOException if no value is found matching the available data in run
    */
   public void resolveAll(Run run) throws IOException {
-    SequencerReference sequencer = resolve(run.getSequencerReference());
+    Instrument sequencer = resolve(run.getSequencer());
     if (sequencer == null) {
       throw new IOException(String.format(
-          "SequencerReference not found (id=%d or name=%s)",
-          run.getSequencerReference() == null ? null : run.getSequencerReference().getId(),
-          run.getSequencerReference() == null ? null : run.getSequencerReference().getName()));
+          "Instrument not found (id=%d or name=%s)",
+          run.getSequencer() == null ? null : run.getSequencer().getId(),
+          run.getSequencer() == null ? null : run.getSequencer().getName()));
     }
     Platform platform = sequencer.getPlatform();
     PlatformType platformType = platform.getPlatformType();
-    run.setSequencerReference(sequencer);
+    run.setSequencer(sequencer);
     if (run.getSequencerPartitionContainers() != null) {
       for (SequencerPartitionContainer flowcell : run.getSequencerPartitionContainers()) {
         if (flowcell.getPlatform() == null) flowcell.setPlatform(platform);

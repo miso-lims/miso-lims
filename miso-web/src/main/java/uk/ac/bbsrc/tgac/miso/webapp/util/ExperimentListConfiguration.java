@@ -113,7 +113,7 @@ public class ExperimentListConfiguration {
     addToExperiment = libraryGroups.entrySet().stream()
         .<AddRequest> flatMap(WhineyFunction.rethrow(group -> //
         experimentService.listAllByLibraryId(group.getKey().getId()).stream()//
-            .filter(experiment -> experiment.getPlatform().getId().equals(run.getSequencerReference().getPlatform().getId()))
+            .filter(experiment -> experiment.getPlatform().getId().equals(run.getSequencer().getPlatform().getId()))
             .flatMap(experiment -> group.getValue().stream()//
                 .filter(partition -> experiment.getRunPartitions().stream().noneMatch(rp -> rp.getPartition().equals(partition)))
                 .map(partition -> {

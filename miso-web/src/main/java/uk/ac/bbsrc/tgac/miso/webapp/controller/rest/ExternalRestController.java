@@ -237,8 +237,8 @@ public class ExternalRestController extends RestController {
               ? run.getCompletionDate().toString()
               : "") + "'");
           sb.append(",");
-          sb.append("'platformType':'" + (run.getSequencerReference().getPlatform().getPlatformType() != null
-              ? run.getSequencerReference().getPlatform().getPlatformType().getKey()
+          sb.append("'platformType':'" + (run.getSequencer().getPlatform().getPlatformType() != null
+              ? run.getSequencer().getPlatform().getPlatformType().getKey()
               : "") + "'");
           sb.append(",");
           sb.append("'samples':[");

@@ -20,8 +20,6 @@ public class ListCompletionsController {
 
   @RequestMapping("/poolorders")
   public ModelAndView listPools(ModelMap model) throws IOException {
-    return TabbedListItemsPage
-        .<Boolean> createWithJson("completion", "activeOnly", Stream.of(true, false), x -> x ? "Active" : "All", x -> x)
-        .list(model);
+    return new TabbedListItemsPage("completion", "activeOnly", Stream.of(true, false), x -> x ? "Active" : "All", x -> x).list(model);
   }
 }

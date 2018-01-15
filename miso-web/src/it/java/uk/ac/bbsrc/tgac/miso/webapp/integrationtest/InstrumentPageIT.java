@@ -12,12 +12,12 @@ import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.SequencerPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.SequencerPage.Field;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.InstrumentPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.InstrumentPage.Field;
 
-public class SequencerPageIT extends AbstractIT {
+public class InstrumentPageIT extends AbstractIT {
 
   @Before
   public void setup() {
@@ -27,7 +27,7 @@ public class SequencerPageIT extends AbstractIT {
   @Test
   public void testStatusEffects() throws Exception {
     // goal: ensure the Status radio buttons affect the visible fields as expected
-    SequencerPage page = SequencerPage.get(getDriver(), getBaseUrl(), 102L);
+    InstrumentPage page = InstrumentPage.get(getDriver(), getBaseUrl(), 102L);
 
     // check initial values
     Map<Field, String> fields = Maps.newLinkedHashMap();
@@ -38,7 +38,7 @@ public class SequencerPageIT extends AbstractIT {
     fields.put(Field.COMMISSIONED, "2017-01-01");
     fields.put(Field.STATUS, "upgraded");
     fields.put(Field.DECOMMISSIONED, "2017-02-01");
-    fields.put(Field.UPGRADED_REF, "NewHiSeq_101");
+    fields.put(Field.UPGRADED_INSTRUMENT, "NewHiSeq_101");
     assertFieldValues("loaded (upgraded)", fields, page);
 
     // set status to retired
@@ -46,13 +46,13 @@ public class SequencerPageIT extends AbstractIT {
     retired.put(Field.STATUS, "retired");
     page.setFields(retired);
 
-    // copy unchanged except for Upgraded Sequencer name, which should be hidden
+    // copy unchanged except for Upgraded Instrument name, which should be hidden
     fields.forEach((key, val) -> {
-      if (!retired.containsKey(key) && !Field.UPGRADED_REF.equals(key)) retired.put(key, val);
+      if (!retired.containsKey(key) && !Field.UPGRADED_INSTRUMENT.equals(key)) retired.put(key, val);
     });
     assertFieldValues("changes pre-save (retired)", retired, page);
 
-    SequencerPage retiredPage = page.save();
+    InstrumentPage retiredPage = page.save();
     assertNotNull(retiredPage);
     assertFieldValues("changes post-save (retired)", retired, retiredPage);
 
@@ -67,15 +67,15 @@ public class SequencerPageIT extends AbstractIT {
     });
     assertFieldValues("changes pre-save (production)", production, page);
 
-    SequencerPage productionPage = page.save();
+    InstrumentPage productionPage = page.save();
     assertNotNull(productionPage);
     assertFieldValues("changes post-save (production)", production, productionPage);
   }
 
   @Test
   public void testChangeValues() throws Exception {
-    // goal: test editing all editable fields on a sequencer
-    SequencerPage page = SequencerPage.get(getDriver(), getBaseUrl(), 100L);
+    // goal: test editing all editable fields on an instrument
+    InstrumentPage page = InstrumentPage.get(getDriver(), getBaseUrl(), 100L);
 
     // check initial values
     Map<Field, String> fields = Maps.newLinkedHashMap();
@@ -105,17 +105,17 @@ public class SequencerPageIT extends AbstractIT {
     });
     assertFieldValues("changes pre-save", changes, page);
 
-    SequencerPage page2 = page.save();
+    InstrumentPage page2 = page.save();
     assertNotNull(page2);
     assertFieldValues("changes post-save", changes, page2);
 
-    SequencerReference sr = (SequencerReference) getSession().get(SequencerReferenceImpl.class, 100L);
-    assertSequencerReferenceAttributes(changes, sr);
+    Instrument sr = (Instrument) getSession().get(InstrumentImpl.class, 100L);
+    assertInstrumentAttributes(changes, sr);
   }
 
   private static final DateTimeFormatter dateFormatter = ISODateTimeFormat.date();
 
-  private static void assertSequencerReferenceAttributes(Map<Field, String> expectedValues, SequencerReference sr) {
+  private static void assertInstrumentAttributes(Map<Field, String> expectedValues, Instrument sr) {
     assertAttribute(Field.ID, expectedValues, Long.toString(sr.getId()));
     assertAttribute(Field.NAME, expectedValues, sr.getName());
     assertAttribute(Field.PLATFORM, expectedValues, sr.getPlatform().getNameAndModel());
@@ -124,14 +124,14 @@ public class SequencerPageIT extends AbstractIT {
         (sr.getIpAddress() == null ? "" : sr.getIpAddress().toString()));
     assertAttribute(Field.COMMISSIONED, expectedValues, dateFormatter.print(sr.getDateCommissioned().getTime()));
     assertAttribute(Field.STATUS, expectedValues,
-        (sr.getUpgradedSequencerReference() != null ? "Upgraded" : (sr.getDateDecommissioned() != null ? "Retired" : "Production"))
+        (sr.getUpgradedInstrument() != null ? "Upgraded" : (sr.getDateDecommissioned() != null ? "Retired" : "Production"))
             .toLowerCase());
     if (expectedValues.containsKey(Field.DECOMMISSIONED)) {
       assertAttribute(Field.DECOMMISSIONED, expectedValues,
           (sr.getDateDecommissioned() == null ? null : dateFormatter.print(sr.getDateDecommissioned().getTime())));
     }
-    if (expectedValues.containsKey(Field.UPGRADED_REF)) {
-      assertAttribute(Field.UPGRADED_REF, expectedValues, sr.getUpgradedSequencerReference().getName());
+    if (expectedValues.containsKey(Field.UPGRADED_INSTRUMENT)) {
+      assertAttribute(Field.UPGRADED_INSTRUMENT, expectedValues, sr.getUpgradedInstrument().getName());
     }
   }
 

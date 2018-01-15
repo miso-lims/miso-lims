@@ -33,15 +33,15 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form id="sequencer_reference_form" data-parsley-validate="" action="/miso/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
-      <sessionConversation:insertSessionConversationId attributeName="sequencerReference"/>
+    <form:form id="instrument_form" data-parsley-validate="" action="/miso/instrument" method="POST" commandName="instrument" autocomplete="off">
+      <sessionConversation:insertSessionConversationId attributeName="instrument"/>
       <h1>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           Edit
         </sec:authorize>
-        Sequencer
+        Instrument
         <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <button id="save" onclick="return Sequencer.validateSequencerReference();" class="fg-button ui-state-default ui-corner-all">Save</button>
+          <button id="save" onclick="return Instrument.validateInstrument();" class="fg-button ui-state-default ui-corner-all">Save</button>
         </sec:authorize>
       </h1>
       <div class="breadcrumbs">
@@ -50,7 +50,7 @@
             <a href="<c:url value='/miso/'/>">Home</a>
           </li>
           <li>
-            <a href='<c:url value="/miso/sequencers"/>'>Sequencers</a>
+            <a href='<c:url value="/miso/instruments"/>'>Instruments</a>
           </li>
         </ul>
       </div>
@@ -67,21 +67,25 @@
         <p>This form seems to be invalid!</p>
       </div>
       
-      <h2>Sequencer Information</h2>
+      <h2>Instrument Information</h2>
 
       <table class="in">
         <tr>
-          <td class="h">Sequencer ID:</td>
+          <td class="h">Instrument ID:</td>
           <td><span id="instrumentId">
             <c:choose>
-              <c:when test="${sequencerReference.id != 0}">${sequencerReference.id}</c:when>
+              <c:when test="${instrument.id != 0}">${instrument.id}</c:when>
               <c:otherwise><i>Unsaved</i></c:otherwise>
             </c:choose>
           </span></td>
         </tr>
         <tr>
+          <td class="h">Instrument Type:</td>
+          <td><span id="instrumentType">${instrument.platform.instrumentType.label}</span></td>
+        </tr>
+        <tr>
           <td class="h">Platform:</td>
-          <td><span id="platform">${sequencerReference.platform.nameAndModel}</span></td>
+          <td><span id="platform">${instrument.platform.nameAndModel}</span></td>
         </tr>
         <tr>
           <td class="h">Serial Number:</td>
@@ -90,7 +94,7 @@
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <form:input path="serialNumber" id="serialNumber" name="serialNumber" class="validateable"/><span id="serialNumberCounter" class="counter"></span>
               </c:when>
-              <c:otherwise><span id="serialNumber">${sequencerReference.serialNumber}</span></c:otherwise>
+              <c:otherwise><span id="serialNumber">${instrument.serialNumber}</span></c:otherwise>
             </c:choose>
           </td>
         </tr>
@@ -101,7 +105,7 @@
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <form:input path="name" id="name" name="name" class="validateable"/><span id="nameCounter" class="counter"></span>
               </c:when>
-              <c:otherwise><span id="name">${sequencerReference.name}</span></c:otherwise>
+              <c:otherwise><span id="name">${instrument.name}</span></c:otherwise>
             </c:choose>
           </td>
         </tr>
@@ -117,11 +121,11 @@
             </c:choose>
           </td>
         </tr>
-        <c:if test="${preUpgradeSeqRef != null}">
+        <c:if test="${preUpgradeInstrument != null}">
           <tr>
             <td class="h">Upgraded From:</td>
             <td>
-              <a href="<c:url value='/miso/sequencer/${preUpgradeSeqRef.id}'/>">${preUpgradeSeqRef.name}</a>
+              <a href="<c:url value='/miso/instrument/${preUpgradeInstrument.id}'/>">${preUpgradeInsrument.name}</a>
             </td>
           </tr>
         </c:if>
@@ -136,7 +140,7 @@
                 </script>
               </c:when>
               <c:otherwise><span id="dateCommissioned">
-                <fmt:formatDate value="${sequencerReference.dateCommissioned}" pattern="yyyy-MM-dd"/>
+                <fmt:formatDate value="${instrument.dateCommissioned}" pattern="yyyy-MM-dd"/>
               </span></c:otherwise>
             </c:choose>
           </td>
@@ -146,15 +150,15 @@
           <td>
             <c:choose>
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <label><input type="radio" name="status" value="production" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned == null}">checked</c:if>/> Production</label>
-                <label><input type="radio" name="status" value="retired" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">checked</c:if>/> Retired</label>
-                <label><input type="radio" name="status" value="upgraded" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference != null}">checked</c:if>/> Upgraded</label>
+                <label><input type="radio" name="status" value="production" onchange="Instrument.ui.showStatusRows();" <c:if test="${instrument.dateDecommissioned == null}">checked</c:if>/> Production</label>
+                <label><input type="radio" name="status" value="retired" onchange="Instrument.ui.showStatusRows();" <c:if test="${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}">checked</c:if>/> Retired</label>
+                <label><input type="radio" name="status" value="upgraded" onchange="Instrument.ui.showStatusRows();" <c:if test="${instrument.dateDecommissioned != null && instrument.upgradedInstrument != null}">checked</c:if>/> Upgraded</label>
               </c:when>
               <c:otherwise>
                 <span name="status">
                 <c:choose>
-                  <c:when test="${sequencerReference.dateDecommissioned == null}">Production</c:when>
-                  <c:when test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">Retired</c:when>
+                  <c:when test="${instrument.dateDecommissioned == null}">Production</c:when>
+                  <c:when test="${instrument.dateDecommissioned != null && instrument.upgradedInstrument == null}">Retired</c:when>
                   <c:otherwise>Upgraded</c:otherwise>
                 </c:choose>
                 </span>
@@ -173,21 +177,21 @@
                 </script>
               </c:when>
               <c:otherwise>
-                <fmt:formatDate value="${sequencerReference.dateDecommissioned}" pattern="yyyy-MM-dd"/>
+                <fmt:formatDate value="${instrument.dateDecommissioned}" pattern="yyyy-MM-dd"/>
               </c:otherwise>
             </c:choose>
           </td>
         </tr>
-        <tr id="upgradedReferenceRow">
+        <tr id="upgradedInstrumentRow">
           <td class="h">Upgraded To:*</td>
           <td>
             <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <form:select id="upgradedSequencerReference" path="upgradedSequencerReference"  class="validateable" onchange="Sequencer.ui.updateUpgradedSequencerReferenceLink();">
+              <form:select id="upgradedInstrument" path="upgradedInstrument"  class="validateable" onchange="Instrument.ui.updateUpgradedInstrumentLink();">
                 <form:option value="0">(choose)</form:option>
-                <form:options items="${otherSequencerReferences}" itemLabel="name" itemValue="id"/>
+                <form:options items="${otherInstruments}" itemLabel="name" itemValue="id"/>
               </form:select>
             </c:if>
-            <span id="upgradedSequencerReferenceLink"></span>
+            <span id="upgradedInstrumentLink"></span>
           </td>
         </tr>
       </table>
@@ -195,18 +199,18 @@
         <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
           <script type="text/javascript">
             jQuery(document).ready(function() {
-	          Sequencer.ui.showStatusRows();
+	          Instrument.ui.showStatusRows();
 	        });
           </script>
         </c:when>
         <c:otherwise>
           <script type="text/javascript">
             jQuery(document).ready(function() {
-              Sequencer.ui.hideStatusRowsReadOnly(
-                  ${sequencerReference.dateDecommissioned != null}, 
-                  ${sequencerReference.upgradedSequencerReference != null}, 
-                  ${sequencerReference.upgradedSequencerReference != null ? sequencerReference.upgradedSequencerReference.id : 0}, 
-                  "<c:if test="${sequencerReference.upgradedSequencerReference != null}">${sequencerReference.upgradedSequencerReference.name}</c:if>"
+              Instrument.ui.hideStatusRowsReadOnly(
+                  ${instrument.dateDecommissioned != null}, 
+                  ${instrument.upgradedInstrument != null}, 
+                  ${instrument.upgradedInstrument != null ? instrument.upgradedInstrument.id : 0}, 
+                  "<c:if test="${instrument.upgradedInstrument != null}">${instrument.upgradedInstrument.name}</c:if>"
               );
             });
           </script>
@@ -218,19 +222,19 @@
     <script type="text/javascript">
       jQuery(document).ready(function () {
         // Attaches a Parsley form validator.
-        Validate.attachParsley('#sequencer_reference_form');
+        Validate.attachParsley('#instrument_form');
       });
     </script>
     
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#records_arrowclick'), 'recordsdiv');">
       <c:choose>
-        <c:when test="${fn:length(sequencerServiceRecords) == 1}">1 Service Record</c:when>
-        <c:otherwise>${fn:length(sequencerServiceRecords)} Service Records</c:otherwise>
+        <c:when test="${fn:length(serviceRecords) == 1}">1 Service Record</c:when>
+        <c:otherwise>${fn:length(serviceRecords)} Service Records</c:otherwise>
       </c:choose>
       <div id="records_arrowclick" class="toggleLeft"></div>
     </div>
     <h1>Service Records</h1>
-    <span onclick="Sequencer.ui.addServiceRecord(${sequencerReference.dateDecommissioned != null}, ${sequencerReference.id})" 
+    <span onclick="Instrument.ui.addServiceRecord(${instrument.dateDecommissioned != null}, ${instrument.id})" 
           class="sddm fg-button ui-state-default ui-corner-all" id="addServiceRecord">Add Service Record</span>
 
     <div id="recordsdiv" style="display:none;">
@@ -248,14 +252,14 @@
             </tr>
           </thead>
           <tbody>
-            <c:forEach items="${sequencerServiceRecords}" var="record">
+            <c:forEach items="${serviceRecords}" var="record">
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
                 <td>${record.serviceDate}</td>
-                <td><a href='<c:url value="/miso/sequencer/servicerecord/${record.id}"/>'>${record.title}</a></td>
+                <td><a href='<c:url value="/miso/instrument/servicerecord/${record.id}"/>'>${record.title}</a></td>
                 <td>${record.servicedByName}</td>
                 <td>${record.referenceNumber}</td>
                 <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <td class="misoicon" onclick="Sequencer.ui.deleteServiceRecord(${record.id}, Utils.page.pageReload);">
+                  <td class="misoicon" onclick="Instrument.ui.deleteServiceRecord(${record.id}, Utils.page.pageReload);">
                     <span class="ui-icon ui-icon-trash"></span>
                   </td>
                 </c:if>
@@ -289,17 +293,19 @@
     
     
     <br/>
-    <a id="runs"></a>
-    <div class="sectionDivider">Runs
-    </div>
-    <h1>Runs</h1>
-    <div style="clear:both">
-      <table id="run_table">
-      </table>
-    </div>
-    <script type="text/javascript">
-      ListUtils.createTable('run_table', ListTarget.run, null, { sequencer : ${sequencerReference.id} });
-    </script>
+    <c:if test="${instrument.platform.instrumentType eq 'SEQUENCER'}">
+      <a id="runs"></a>
+      <div class="sectionDivider">Runs
+      </div>
+      <h1>Runs</h1>
+      <div style="clear:both">
+        <table id="run_table">
+        </table>
+      </div>
+      <script type="text/javascript">
+        ListUtils.createTable('run_table', ListTarget.run, null, { sequencer : ${instrument.id} });
+      </script>
+    </c:if>
     
   </div>
 </div>

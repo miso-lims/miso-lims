@@ -43,7 +43,6 @@ public class ListKitDescriptorsController {
   }
   @RequestMapping("/kitdescriptors")
   public ModelAndView listKitDescriptors(ModelMap model) throws IOException {
-    return TabbedListItemsPage.createWithJson("kit", "kitType", Arrays.stream(KitType.values()), KitType::getKey, KitType::name)
-        .list(model);
+    return new TabbedListItemsPage("kit", "kitType", Arrays.stream(KitType.values()), KitType::getKey, KitType::name).list(model);
   }
 }

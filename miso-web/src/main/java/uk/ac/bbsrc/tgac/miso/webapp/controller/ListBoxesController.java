@@ -27,6 +27,6 @@ public class ListBoxesController {
   }
   @RequestMapping("/boxes")
   public ModelAndView listBoxes(ModelMap model) throws Exception {
-    return TabbedListItemsPage.createWithJson("box", "boxUse", boxService.listUses().stream(), BoxUse::getAlias, BoxUse::getId).list(model);
+    return new TabbedListItemsPage("box", "boxUse", boxService.listUses().stream(), BoxUse::getAlias, BoxUse::getId).list(model);
   }
 }

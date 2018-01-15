@@ -36,11 +36,11 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
@@ -58,8 +58,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -105,7 +105,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   @Autowired
   private ContainerService containerService;
   @Autowired
-  private SequencerReferenceService sequencerReferenceService;
+  private InstrumentService instrumentService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
   @Autowired
@@ -152,8 +152,8 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   @Override
-  public Collection<Run> listBySequencerId(long sequencerId) throws IOException {
-    Collection<Run> runs = runDao.listBySequencerId(sequencerId);
+  public Collection<Run> listByInstrumentId(long instrumentId) throws IOException {
+    Collection<Run> runs = runDao.listBySequencerId(instrumentId);
     return authorizationManager.filterUnreadable(runs);
   }
 
@@ -330,7 +330,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     if (run.getSequencingParameters() != null) {
       run.setSequencingParameters(sequencingParametersService.get(run.getSequencingParameters().getId()));
     }
-    run.setSequencerReference(sequencerReferenceService.get(run.getSequencerReference().getId()));
+    run.setSequencer(instrumentService.get(run.getSequencer().getId()));
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
@@ -366,7 +366,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setSequencerPartitionContainers(source.getSequencerPartitionContainers());
 
     target.setSequencingParameters(source.getSequencingParameters());
-    target.setSequencerReference(source.getSequencerReference());
+    target.setSequencer(source.getSequencer());
     if (isIlluminaRun(target)) {
       applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
     } else if (isLS454Run(target)) {
@@ -499,8 +499,8 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     this.sequencingParametersService = sequencingParametersService;
   }
 
-  public void setSequencerReferenceService(SequencerReferenceService sequencerReferenceService) {
-    this.sequencerReferenceService = sequencerReferenceService;
+  public void setInstrumentService(InstrumentService instrumentService) {
+    this.instrumentService = instrumentService;
   }
 
   public void setChangeLogService(ChangeLogService changeLogService) {
@@ -553,11 +553,11 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
     isMutated |= updateField(source.getStartDate(), target.getStartDate(), target::setStartDate);
 
-    final SequencerReference sequencer = sequencerReferenceService.getByName(sequencerName);
+    final Instrument sequencer = instrumentService.getByName(sequencerName);
     if (sequencer == null) {
       throw new IllegalArgumentException("No such sequencer: " + sequencerName);
     }
-    target.setSequencerReference(sequencer);
+    target.setSequencer(sequencer);
 
     if (!sequencer.getPlatform().getPartitionSizes().contains(laneCount)) {
       throw new IllegalArgumentException("Invalid number of partitions: " + laneCount);
@@ -666,7 +666,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private boolean updateSequencingParameters(final Run target, User user, Predicate<SequencingParameters> filterParameters,
-      final SequencerReference sequencer) throws IOException {
+      final Instrument sequencer) throws IOException {
     // If the sequencing parameters haven't been updated by a human, see if we can find exactly one that matches.
     if (!target.didSomeoneElseChangeColumn("parameters", user)) {
       List<SequencingParameters> possibleParameters = sequencingParametersService.getForPlatform(sequencer.getPlatform().getId()).stream()
@@ -683,7 +683,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private boolean updateContainerFromNotification(final Run target, User user, int laneCount, String containerSerialNumber,
-      final SequencerReference sequencer, final GetLaneContents getLaneContents) throws IOException {
+      final Instrument sequencer, final GetLaneContents getLaneContents) throws IOException {
     final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
     switch (containers.size()) {
     case 0:
@@ -692,9 +692,9 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       newContainer.setCreator(user);
       newContainer.setIdentificationBarcode(containerSerialNumber);
       newContainer.setPartitionLimit(laneCount);
-      newContainer
-          .setPartitions(
-              IntStream.range(0, laneCount).mapToObj((i) -> new PartitionImpl(newContainer, i + 1)).collect(Collectors.toList()));
+      newContainer.setPartitions(IntStream.range(0, laneCount)
+          .mapToObj(i -> new PartitionImpl(newContainer, i + 1))
+          .collect(Collectors.toList()));
       updatePartitionContents(getLaneContents, newContainer);
       target.setSequencerPartitionContainers(Collections.singletonList(containerService.create(newContainer)));
       return true;

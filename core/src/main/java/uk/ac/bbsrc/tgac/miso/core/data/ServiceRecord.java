@@ -14,11 +14,11 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 
 @Entity
-@Table(name = "SequencerServiceRecord")
-public class SequencerServiceRecord implements Serializable, Deletable {
+@Table(name = "ServiceRecord")
+public class ServiceRecord implements Serializable, Deletable {
 
   private static final long serialVersionUID = 1L;
 
@@ -26,11 +26,11 @@ public class SequencerServiceRecord implements Serializable, Deletable {
   
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long recordId = SequencerServiceRecord.UNSAVED_ID;
+  private long recordId = ServiceRecord.UNSAVED_ID;
 
-  @ManyToOne(targetEntity = SequencerReferenceImpl.class)
-  @JoinColumn(name = "sequencerReferenceId")
-  private SequencerReference sequencerReference;
+  @ManyToOne(targetEntity = InstrumentImpl.class)
+  @JoinColumn(name = "instrumentId")
+  private Instrument instrument;
 
   @Column(nullable = false)
   private String title;
@@ -58,12 +58,12 @@ public class SequencerServiceRecord implements Serializable, Deletable {
     return recordId;
   }
 
-  public void setSequencerReference(SequencerReference sequencer) {
-    this.sequencerReference = sequencer;
+  public void setInstrument(Instrument instrument) {
+    this.instrument = instrument;
   }
 
-  public SequencerReference getSequencerReference() {
-    return sequencerReference;
+  public Instrument getInstrument() {
+    return instrument;
   }
 
   public void setTitle(String title) {
@@ -124,6 +124,6 @@ public class SequencerServiceRecord implements Serializable, Deletable {
 
   @Override
   public boolean isDeletable() {
-    return getId() != AbstractSequencerReference.UNSAVED_ID;
+    return getId() != AbstractInstrument.UNSAVED_ID;
   }
 }

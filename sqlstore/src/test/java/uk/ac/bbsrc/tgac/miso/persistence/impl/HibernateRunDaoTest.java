@@ -50,16 +50,16 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
@@ -80,7 +80,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   @Mock
   private Store<SecurityProfile> securityProfileDAO;
   @Mock
-  private SequencerReferenceStore sequencerReferenceDAO;
+  private InstrumentStore instrumentDAO;
   @Mock
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
   @Mock
@@ -90,7 +90,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   private HibernateRunDao dao;
 
   private final User emptyUser = new UserImpl();
-  private final SequencerReference emptySR = new SequencerReferenceImpl();
+  private final Instrument emptySR = new InstrumentImpl();
 
   @Before
   public void setup() throws IOException {
@@ -101,7 +101,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     emptyUser.setUserId(1L);
     when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(emptyUser);
     emptySR.setId(1L);
-    when(sequencerReferenceDAO.get(Matchers.anyLong())).thenReturn(emptySR);
+    when(instrumentDAO.get(Matchers.anyLong())).thenReturn(emptySR);
   }
 
   @Test
@@ -276,11 +276,11 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
 
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     run.setSecurityProfile(profile);
-    SequencerReference sequencer = Mockito.mock(SequencerReferenceImpl.class);
-    Mockito.when(sequencer.getId()).thenReturn(1L);
+    Instrument instrument = Mockito.mock(InstrumentImpl.class);
+    Mockito.when(instrument.getId()).thenReturn(1L);
     User user = Mockito.mock(UserImpl.class);
     Mockito.when(user.getUserId()).thenReturn(1L);
-    run.setSequencerReference(sequencer);
+    run.setSequencer(instrument);
     run.setFilePath("/far/far/away");
     run.setName("AwesomeRun");
     run.setLastModifier(user);
@@ -311,7 +311,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
 
   private Run makeRun(String alias) {
     SecurityProfile profile = (SecurityProfile) sessionFactory.getCurrentSession().get(SecurityProfile.class, 3L);
-    SequencerReference sequencer = emptySR;
+    Instrument instrument = emptySR;
     Date now = new Date();
     User user = new UserImpl();
     user.setUserId(1L);
@@ -321,7 +321,7 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
     run.setAlias(alias);
     run.setDescription("description");
     run.setFilePath("/somewhere/someplace/");
-    run.setSequencerReference(sequencer);
+    run.setSequencer(instrument);
     run.setCreator(user);
     run.setCreationTime(now);
     run.setLastModifier(user);

@@ -57,8 +57,8 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -66,7 +66,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
- * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link SequencerReference}, comprising one or more
+ * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link Instrument}, comprising one or more
  * {@link SequencerPartitionContainer} objects in which {@link Pool}s are placed on {@link SequencerPoolPartition}s.
  * <p/>
  * Runs can be QCed via {@link RunQC} objects, and are always associated with a given {@link PlatformType}
@@ -144,9 +144,9 @@ public abstract class Run
   @JoinColumn(name = "securityProfile_profileId")
   private SecurityProfile securityProfile = new SecurityProfile();
 
-  @ManyToOne(targetEntity = SequencerReferenceImpl.class)
-  @JoinColumn(name = "sequencerReference_sequencerReferenceId", nullable = false)
-  private SequencerReference sequencerReference;
+  @ManyToOne(targetEntity = InstrumentImpl.class)
+  @JoinColumn(name = "instrumentId", nullable = false)
+  private Instrument sequencer;
 
   @ManyToOne
   @JoinColumn(name = "sequencingParameters_parametersId")
@@ -318,8 +318,8 @@ public abstract class Run
     return containers;
   }
 
-  public SequencerReference getSequencerReference() {
-    return sequencerReference;
+  public Instrument getSequencer() {
+    return sequencer;
   }
 
   public SequencingParameters getSequencingParameters() {
@@ -378,7 +378,7 @@ public abstract class Run
   }
 
   public boolean isFull() {
-    return containers.size() >= sequencerReference.getPlatform().getNumContainers();
+    return containers.size() >= sequencer.getPlatform().getNumContainers();
   }
 
   @Override
@@ -439,8 +439,8 @@ public abstract class Run
     this.containers = containers;
   }
 
-  public void setSequencerReference(SequencerReference sequencerReference) {
-    this.sequencerReference = sequencerReference;
+  public void setSequencer(Instrument sequencer) {
+    this.sequencer = sequencer;
   }
 
   public void setSequencingParameters(SequencingParameters parameters) {

@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-public class SequencerDto {
+public class InstrumentDto {
   private String dateCommissioned;
   
   private String dateDecommissioned;

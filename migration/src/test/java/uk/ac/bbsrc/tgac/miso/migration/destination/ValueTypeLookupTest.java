@@ -13,13 +13,14 @@ import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractInstrument;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -27,18 +28,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
@@ -53,13 +53,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstrumentDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSamplePurposeDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTargetedSequencingDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateTissueMaterialDao;
@@ -173,11 +173,11 @@ public class ValueTypeLookupTest {
 
     Mockito.when(mgr.getQualityControlService()).thenReturn(qcService);
 
-    HibernateSequencerReferenceDao seqRefDao = Mockito.mock(HibernateSequencerReferenceDao.class);
-    List<SequencerReference> seqRefs = new ArrayList<>();
+    HibernateInstrumentDao seqRefDao = Mockito.mock(HibernateInstrumentDao.class);
+    List<Instrument> seqRefs = new ArrayList<>();
     seqRefs.add(makeSequencer(VALID_LONG, VALID_STRING));
     Mockito.when(seqRefDao.listAll()).thenReturn(seqRefs);
-    Mockito.when(mgr.getSequencerReferenceDao()).thenReturn(seqRefDao);
+    Mockito.when(mgr.getInstrumentDao()).thenReturn(seqRefDao);
 
     HibernateDetailedQcStatusDao detQcStatusDao = Mockito.mock(HibernateDetailedQcStatusDao.class);
     List<DetailedQcStatus> qcStatuses = new ArrayList<>();
@@ -499,15 +499,15 @@ public class ValueTypeLookupTest {
   public void testResolveSequencer() {
     assertNotNull(sut.resolve(makeSequencer(VALID_LONG, null)));
     assertNotNull(sut.resolve(makeSequencer(null, VALID_STRING)));
-    assertNull(sut.resolve((SequencerReference) null));
+    assertNull(sut.resolve((Instrument) null));
     assertNull(sut.resolve(makeSequencer(null, null)));
     assertNull(sut.resolve(makeSequencer(INVALID_LONG, null)));
     assertNull(sut.resolve(makeSequencer(null, INVALID_STRING)));
   }
 
-  private SequencerReference makeSequencer(Long id, String name) {
-    SequencerReference seq = new SequencerReferenceImpl(name, null, null);
-    seq.setId(id == null ? AbstractSequencerReference.UNSAVED_ID : id);
+  private Instrument makeSequencer(Long id, String name) {
+    Instrument seq = new InstrumentImpl(name, null, null);
+    seq.setId(id == null ? AbstractInstrument.UNSAVED_ID : id);
     return seq;
   }
 
