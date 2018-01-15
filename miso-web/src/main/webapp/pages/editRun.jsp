@@ -115,7 +115,7 @@
   </tr>
   <tr>
     <td>Sequencer:</td>
-    <td><span id="sequencer">${run.sequencer.name} - ${run.sequencer.platform.instrumentModel}</span></td>
+    <td><a id="sequencer" href='<c:url value="/miso/instrument/${run.sequencer.id}"/>'>${run.sequencer.name} - ${run.sequencer.platform.instrumentModel}</a></td>
   </tr>
   <tr>
     <td></td>

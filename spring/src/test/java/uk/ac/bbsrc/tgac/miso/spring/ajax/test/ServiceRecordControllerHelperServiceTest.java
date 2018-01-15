@@ -33,7 +33,7 @@ public class ServiceRecordControllerHelperServiceTest {
   @Mock
   private ProjectService projectService;
   @Mock
-  private InstrumentService sequencerReferenceService;
+  private InstrumentService instrumentService;
   @Mock
   private MisoFilesManager misoFileManager;
   
@@ -83,7 +83,7 @@ public class ServiceRecordControllerHelperServiceTest {
     JSONObject request = new JSONObject();
     request.put("recordId", 1L);
     
-    Mockito.doThrow(new IOException()).when(sequencerReferenceService).deleteServiceRecord(Mockito.anyLong());
+    Mockito.doThrow(new IOException()).when(instrumentService).deleteServiceRecord(Mockito.anyLong());
     
     JSONObject result = chs.deleteServiceRecord(null, request);
     assertNotNull(result.get("error"));

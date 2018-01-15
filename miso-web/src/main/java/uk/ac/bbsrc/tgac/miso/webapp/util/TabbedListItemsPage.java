@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
@@ -25,25 +27,13 @@ public class TabbedListItemsPage {
 
   public static TabbedListItemsPage createForPlatformType(String targetType, InstrumentService sequencerService)
       throws IOException {
-    return TabbedListItemsPage.createWithJson(targetType, "platformType", getPlatformTypes(sequencerService), PlatformType::getKey,
+    return new TabbedListItemsPage(targetType, "platformType", getPlatformTypes(sequencerService), PlatformType::getKey,
         PlatformType::name);
   }
 
-  public static <T> TabbedListItemsPage createWithJson(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
-      Function<T, Object> getValue) {
-    ObjectMapper mapper = new ObjectMapper();
-    return new TabbedListItemsPage(targetType, property, tabItems.collect(Collectors.toMap(getName, v -> {
-      try {
-        return mapper.writeValueAsString(getValue.apply(v));
-      } catch (JsonProcessingException e) {
-        throw new IllegalStateException("Failed to serialised tab value as JSON", e);
-      }
-    }, (left, right) -> left, TreeMap::new)));
-
-  }
-
   private static Stream<PlatformType> getPlatformTypes(InstrumentService sequencerService) throws IOException {
-    Set<PlatformType> platforms = sequencerService.list(0, 0, true, "id", PaginationFilter.archived(false)).stream()
+    Set<PlatformType> platforms = sequencerService.list(0, 0, true, "id", PaginationFilter.archived(false),
+        PaginationFilter.instrumentType(InstrumentType.SEQUENCER)).stream()
         .map(sr -> sr.getPlatform().getPlatformType()).collect(Collectors.toSet());
 
     if (platforms.size() > 0) {
@@ -56,6 +46,22 @@ public class TabbedListItemsPage {
   private final String property;
   private final SortedMap<String, String> tabs;
   private final String targetType;
+
+  public <T> TabbedListItemsPage(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
+      Function<T, Object> getValue) {
+    this(targetType, property, tabItems, Comparator.naturalOrder(), getName, getValue);
+  }
+
+  public <T> TabbedListItemsPage(String targetType, String property, Stream<T> tabItems, Comparator<String> tabSorter,
+      Function<T, String> getName, Function<T, Object> getValue) {
+    this(targetType, property, tabItems.collect(Collectors.toMap(getName, v -> {
+      try {
+        return new ObjectMapper().writeValueAsString(getValue.apply(v));
+      } catch (JsonProcessingException e) {
+        throw new IllegalStateException("Failed to serialised tab value as JSON", e);
+      }
+    }, (left, right) -> left, () -> new TreeMap<String, String>(tabSorter))));
+  }
 
   /**
    * Create a page which lists items broken into tabs.

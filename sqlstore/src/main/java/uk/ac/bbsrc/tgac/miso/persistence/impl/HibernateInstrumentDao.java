@@ -44,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractInstrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -198,6 +199,11 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   @Override
   public void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
     criteria.add(isArchived ? Restrictions.isNotNull("dateDecommissioned") : Restrictions.isNull("dateDecommissioned"));
+  }
+
+  @Override
+  public void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.eq("platform.instrumentType", type));
   }
 
 }

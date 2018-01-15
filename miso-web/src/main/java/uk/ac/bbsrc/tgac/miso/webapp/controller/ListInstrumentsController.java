@@ -24,6 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,14 +40,25 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
 @RequestMapping("/instruments")
 public class ListInstrumentsController {
+
+  private static final Comparator<String> sortByOrdinal = (a, b) -> Integer
+      .compare(InstrumentType.get(a).ordinal(), InstrumentType.get(b).ordinal());
+
   @Autowired
   private SecurityManager securityManager;
-  private final ListItemsPage listPage = new ListItemsPage("instrument") {
+
+  @Autowired
+  private InstrumentService instrumentService;
+
+  private final TabbedListItemsPage listPage = new TabbedListItemsPage("instrument", "instrumentType",
+      Stream.of(InstrumentType.values()), sortByOrdinal, InstrumentType::getLabel, InstrumentType::name) {
 
     @Override
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {

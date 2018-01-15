@@ -80,6 +80,10 @@
           </span></td>
         </tr>
         <tr>
+          <td class="h">Instrument Type:</td>
+          <td><span id="instrumentType">${instrument.platform.instrumentType.label}</span></td>
+        </tr>
+        <tr>
           <td class="h">Platform:</td>
           <td><span id="platform">${instrument.platform.nameAndModel}</span></td>
         </tr>
@@ -289,17 +293,19 @@
     
     
     <br/>
-    <a id="runs"></a>
-    <div class="sectionDivider">Runs
-    </div>
-    <h1>Runs</h1>
-    <div style="clear:both">
-      <table id="run_table">
-      </table>
-    </div>
-    <script type="text/javascript">
-      ListUtils.createTable('run_table', ListTarget.run, null, { sequencer : ${instrument.id} });
-    </script>
+    <c:if test="${instrument.platform.instrumentType eq 'SEQUENCER'}">
+      <a id="runs"></a>
+      <div class="sectionDivider">Runs
+      </div>
+      <h1>Runs</h1>
+      <div style="clear:both">
+        <table id="run_table">
+        </table>
+      </div>
+      <script type="text/javascript">
+        ListUtils.createTable('run_table', ListTarget.run, null, { sequencer : ${instrument.id} });
+      </script>
+    </c:if>
     
   </div>
 </div>
