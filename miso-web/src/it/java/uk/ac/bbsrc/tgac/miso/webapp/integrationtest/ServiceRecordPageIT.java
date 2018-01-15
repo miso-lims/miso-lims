@@ -29,11 +29,11 @@ public class ServiceRecordPageIT extends AbstractIT {
   @Test
   public void testCreate() throws Exception {
     // goal: add one service record
-    Instrument seq = (Instrument) getSession().get(InstrumentImpl.class, 100L);
+    Instrument seq = (Instrument) getSession().get(InstrumentImpl.class, 200L);
     assertNotNull(seq);
     assertEquals(0, seq.getServiceRecords().size());
 
-    InstrumentPage seqPage = InstrumentPage.get(getDriver(), getBaseUrl(), 100L);
+    InstrumentPage seqPage = InstrumentPage.get(getDriver(), getBaseUrl(), 200L);
     ServiceRecordPage page = seqPage.addServiceRecord();
     assertNotNull(page);
 

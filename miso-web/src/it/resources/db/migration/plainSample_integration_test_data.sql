@@ -159,10 +159,10 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (11, 2, 'B03',      'GGGCCC', 2),
   (12, 2, 'B04',      'TTTAAA', 2);
 
-INSERT INTO Platform (platformId, name, instrumentModel, numContainers) VALUES
-  (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1),
-  (2, 'ILLUMINA', 'Illumina MiSeq', 1),
-  (3, 'PACBIO', 'PacBio RS II', 1);
+INSERT INTO Platform (platformId, name, instrumentModel, numContainers, instrumentType) VALUES
+  (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
+  (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
+  (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER');
   
 INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),

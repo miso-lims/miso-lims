@@ -316,10 +316,10 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (11, 2, 'B03',      'GGGCCC', 2),
   (12, 2, 'B04',      'TTTAAA', 2);
 
-INSERT INTO Platform (platformId, name, instrumentModel, numContainers) VALUES
-  (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1),
-  (2, 'ILLUMINA', 'Illumina MiSeq', 1),
-  (3, 'PACBIO', 'PacBio RS II', 1);
+INSERT INTO Platform (platformId, name, instrumentModel, numContainers, instrumentType) VALUES
+  (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
+  (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
+  (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER');
   
 INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
@@ -357,6 +357,7 @@ INSERT INTO Instrument (instrumentId, name, platformId, serialNumber, dateCommis
   (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, '127.0.0.1'),
   (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL, '127.0.0.1'),
   (102, 'OldHiSeq_102', 1, '102', '2017-01-01', '2017-02-01', 101, '127.0.0.1'),
+  (200, 'HiSeq_200', 1, '200', '2017-01-01', NULL, NULL, '127.0.0.1'),
   (5001, 'PacBio_SR_5001', 3, '5001', '2017-09-21', NULL, NULL, '127.0.0.1'),
   (5002, 'HiSeq_SR_5002', 1, '5002', '2017-02-01', NULL, NULL, '127.0.0.1');
 

@@ -44,11 +44,13 @@ ListTarget.run = {
       return [{
         name: "Add " + platformKey + " Run",
         handler: function() {
-          Utils.ajaxWithDialog('Getting Sequencer', 'Get', '/miso/rest/sequencer', null, function(sequencers) {
+          Utils.ajaxWithDialog('Getting Sequencer', 'Get', '/miso/rest/instrument', null, function(instruments) {
 
-            Utils.showWizardDialog("Add " + platformKey + " Run", sequencers.filter(function(sequencer) {
-              return sequencer.platform.platformType == config.platformType && !sequencer.dateDecommissioned;
-            }).sort(Utils.sorting.standardSort('name')).map(function(sequencer) {
+            Utils.showWizardDialog("Add " + platformKey + " Run", instruments.filter(
+                function(instrument) {
+                  return instrument.platform.platformType == config.platformType && !instrument.dateDecommissioned
+                      && instrument.platform.instrumentType === 'SEQUENCER';
+                }).sort(Utils.sorting.standardSort('name')).map(function(sequencer) {
               return {
                 name: sequencer.name + " (" + sequencer.platform.instrumentModel + ")",
                 handler: function() {
