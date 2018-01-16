@@ -51,6 +51,7 @@
         </tr>
         <tr>
           <td align="left">
+            <img src="<c:url value='/styles/images/blue-cud-button.png'/>" alt="CUD logo"/>
             <!--<small><a href="registerUser">New user</a></small>-->
           </td>
           <td align="right">
