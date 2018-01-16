@@ -40,7 +40,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 
 /**

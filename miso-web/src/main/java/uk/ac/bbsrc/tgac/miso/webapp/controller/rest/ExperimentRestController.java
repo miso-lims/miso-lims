@@ -50,7 +50,7 @@ import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.KitService;
-import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.service.RunService;
 
 @Controller
 public class ExperimentRestController extends RestController {

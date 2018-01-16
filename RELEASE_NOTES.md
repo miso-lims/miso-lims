@@ -1,3 +1,11 @@
+# 0.2.105
+
+Changes:
+
+ * Add support for UNIX line printer daemon
+ * Fix editing run start/end date (#1281)
+ * Fix PacBio access with URLs with spaces
+
 # 0.2.104
 
 Changes:
