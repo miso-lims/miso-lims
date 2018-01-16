@@ -1,6 +1,4 @@
 -- StartNoTest
-ALTER DATABASE CHARACTER SET utf8 COLLATE 'utf8_general_ci';
-
 SET foreign_key_checks = 0;
 ALTER TABLE BoxPosition CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
 ALTER TABLE ProjectOverview_Sample CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
