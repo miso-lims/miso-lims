@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.service;
+package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
+import uk.ac.bbsrc.tgac.miso.service.LibraryDesignCodeService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service

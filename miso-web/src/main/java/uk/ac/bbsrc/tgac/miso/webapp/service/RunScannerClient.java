@@ -28,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.NotificationDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProgressiveRequestDto;
 import uk.ac.bbsrc.tgac.miso.dto.ProgressiveResponseDto;
-import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.service.RunService;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
