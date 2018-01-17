@@ -538,12 +538,53 @@
 </div>
 <br/>
 
-  <miso:list-section-ajax id="project_studies" name="Studies" target="study" project="${project}" config="{ isAdmin : ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')} }"/>
-  <miso:list-section-ajax id="project_samples" name="Samples" target="sample" project="${project}" config="{}"/>
-  <miso:list-section-ajax id="project_libraries" name="Libraries" target="library" project="${project}" config="{}"/>
-  <miso:list-section-ajax id="project_dilutions" name="Dilutions" target="dilution" project="${project}" config="{}"/>
-  <miso:list-section-ajax id="project_pools" name="Pools" target="pool" project="${project}" config="{}"/>
-  <miso:list-section-ajax id="project_runs" name="Runs" target="run" project="${project}" config="{}"/>
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#studies_section_arrowclick'), 'studies_section');">
+    Studies
+	<div id="studies_section_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="studies_section">
+    <miso:list-section-ajax id="project_studies" name="Studies" target="study" project="${project}" config="{ isAdmin : ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')} }"/>
+  </div>
+
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_section_arrowclick'), 'samples_section');">
+    Samples
+	<div id="samples_section_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="samples_section">
+    <miso:list-section-ajax id="project_samples" name="Samples" target="sample" project="${project}" config="{}"/>
+  </div>
+
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#libraries_section_arrowclick'), 'libraries_section');">
+    Libraries
+	<div id="libraries_section_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="libraries_section">
+	  <miso:list-section-ajax id="project_libraries" name="Libraries" target="library" project="${project}" config="{}"/>
+  </div>
+
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#dilutions_section_arrowclick'), 'dilutions_section');">
+    Dilutions
+	<div id="dilutions_section_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="dilutions_section">
+	  <miso:list-section-ajax id="project_dilutions" name="Dilutions" target="dilution" project="${project}" config="{}"/>
+  </div>
+
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_section_arrowclick'), 'pools_section');">
+    Pools
+	<div id="pools_section_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="pools_section">
+	  <miso:list-section-ajax id="project_pools" name="Pools" target="pool" project="${project}" config="{}"/>
+  </div>
+
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_section_arrowclick'), 'runs_section');">
+    Runs
+	<div id="runs_section_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="runs_section">
+	  <miso:list-section-ajax id="project_runs" name="Runs" target="run" project="${project}" config="{}"/>
+  </div>
 </c:when>
 </c:choose>
 
