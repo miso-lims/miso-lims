@@ -46,7 +46,7 @@ public class OicrLibraryAliasValidator extends RegexValidator {
 
   private Pattern initializePattern() {
     boolean success = true;
-    final String identityRegex = "([A-Z\\d]{3,5})_(\\d{3,6}|\\d[CR]\\d{1,2})_"; // PROJ_0001_...
+    final String identityRegex = "([A-Z\\d]{3,5})_(\\d{3,}|\\d[CR]\\d{1,2})_"; // PROJ_0001_...
 
     String origins = makeOptionRegex(tissueOriginDao.getTissueOrigin(), TissueOrigin::getAlias);
     String tissueTypes = makeOptionRegex(tissueTypeDao.getTissueType(), TissueType::getAlias);
