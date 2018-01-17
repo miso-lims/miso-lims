@@ -38,6 +38,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter arrayed(boolean isArrayed) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByArrayed(item, isArrayed, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter box(String name) {
     return new PaginationFilter() {
 

@@ -16,6 +16,9 @@ import org.springframework.web.util.NestedServletException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError.DataFormat;
+
 /**
  * Class for handling exceptions ocurring in REST Controller classes
  */
@@ -37,8 +40,9 @@ public class RestExceptionHandler {
    * @return a representation of the error to return to the client
    */
   public static RestError handleException(HttpServletRequest request, HttpServletResponse response, Exception exception) {
-    Status status = null;
-    Map<String, String> data = null;
+    RestError error = new RestError();
+    error.setRequestUrl(request.getRequestURL().toString());
+    error.setDetail(exception.getLocalizedMessage());
     
     ResponseStatus rs = AnnotationUtils.findAnnotation(exception.getClass(), ResponseStatus.class);
     if (exception instanceof NestedServletException) {
@@ -49,35 +53,33 @@ public class RestExceptionHandler {
     }
     if (rs != null) {
       // Spring-annotated exception
-      status = Status.fromStatusCode(rs.value().value());
-    }
-    else if (exception instanceof RestException) {
+      error.setStatus(Status.fromStatusCode(rs.value().value()));
+    } else if (exception instanceof RestException) {
       // Customized REST exception with additional data fields
       RestException restException = (RestException) exception;
-      status = restException.getStatus();
-      data = restException.getData();
-    }
-    else {
+      error.setStatus(restException.getStatus());
+      error.setData(restException.getData());
+    } else if (exception instanceof ValidationException) {
+      ValidationException valException = (ValidationException) exception;
+      error.setStatus(Status.BAD_REQUEST);
+      error.setData(valException.getErrorsByField());
+      error.setDataFormat(DataFormat.VALIDATION);
+    } else {
       // Unknown/unexpected exception
-      status = Status.INTERNAL_SERVER_ERROR;
+      error.setStatus(Status.INTERNAL_SERVER_ERROR);
     }
     
-    if (status.getFamily() == Status.Family.SERVER_ERROR) {
-      if (data == null) data = new HashMap<>();
-      data.put("exceptionClass", exception.getClass().getName());
-      log.error(status.getStatusCode() + " error handling REST request", exception);
-    }
-    else {
-      log.debug(status.getStatusCode() + " error handling REST request", exception);
+    if (error.getStatus().getFamily() == Status.Family.SERVER_ERROR) {
+      if (error.getData() == null) {
+        error.setData(new HashMap<>());
+      }
+      error.getData().put("exceptionClass", exception.getClass().getName());
+      log.error(error.getStatus().getStatusCode() + " error handling REST request", exception);
+    } else {
+      log.debug(error.getStatus().getStatusCode() + " error handling REST request", exception);
     }
     
-    response.setStatus(status.getStatusCode());
-    
-    RestError error = new RestError();
-    error.setRequestUrl(request.getRequestURL().toString());
-    error.setStatus(status);
-    error.setDetail(exception.getLocalizedMessage());
-    error.setData(data);
+    response.setStatus(error.getStatus().getStatusCode());
     
     return error;
   }
@@ -88,9 +90,25 @@ public class RestExceptionHandler {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class RestError {
     
+    public enum DataFormat {
+      CUSTOM("custom"),
+      VALIDATION("validation");
+
+      private final String text;
+
+      private DataFormat(String text) {
+        this.text = text;
+      }
+
+      public String getText() {
+        return text;
+      }
+    }
+
     private Status status;
     private String detail;
     private String requestUrl;
+    private String dataFormat = DataFormat.CUSTOM.getText();
     private Map<String, String> data = new HashMap<>();
     
     public RestError() {
@@ -137,6 +155,17 @@ public class RestExceptionHandler {
 
     public void setRequestUrl(String requestUrl) {
       this.requestUrl = requestUrl;
+    }
+
+    /**
+     * @return the type of information that is included in the data map. May be "custom" or a more specific/useful format
+     */
+    public String getDataFormat() {
+      return dataFormat;
+    }
+
+    public void setDataFormat(DataFormat dataFormat) {
+      this.dataFormat = dataFormat.getText();
     }
 
     /**

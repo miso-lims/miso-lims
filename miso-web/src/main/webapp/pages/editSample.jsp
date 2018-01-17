@@ -666,6 +666,10 @@
 
   <miso:list-section id="list_pool" name="Pools" target="pool" items="${samplePools}"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${sampleRuns}"/>
+  
+  <miso:list-section id="list_array" name="Arrays" target="array" items="${sampleArrays}"/>
+  <miso:list-section id="list_arrayrun" name="Array Runs" target="arrayrun" items="${sampleArrayRuns}"/>
+  
   <miso:changelog item="${sample}"/>
 </c:if>
 <div id="dialog"></div>

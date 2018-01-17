@@ -14,10 +14,12 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
@@ -355,6 +358,18 @@ public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableS
     criteria.createAlias("sampleClass", "sampleClass");
     criteria.add(Restrictions.or(Restrictions.ilike("sampleClass.alias", name, MatchMode.ANYWHERE),
         Restrictions.ilike("sampleClass.sampleCategory", name, MatchMode.START)));
+  }
+
+  @Override
+  public void restrictPaginationByArrayed(Criteria criteria, boolean isArrayed, Consumer<String> errorHandler) {
+    DetachedCriteria subquery = DetachedCriteria.forClass(Array.class)
+        .createAlias("samples", "sample")
+        .setProjection(Projections.property("sample.id"));
+    if (isArrayed) {
+      criteria.add(Property.forName("id").in(subquery));
+    } else {
+      criteria.add(Property.forName("id").notIn(subquery));
+    }
   }
 
   @Override

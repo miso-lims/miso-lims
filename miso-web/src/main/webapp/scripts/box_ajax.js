@@ -268,15 +268,15 @@ Box.ui = {
 
     var items;
     if (positionStrings) {
-      items = Box.visual.data.filter(function(item) {
+      items = Box.boxJSON.items.filter(function(item) {
         return positionStrings.indexOf(item.coordinates) >= 0
       });
     } else {
       // if no items are selected, determine bulk actions based on the entity types of all box contents
-      items = Box.visual.data;
+      items = Box.boxJSON.items;
     }
     if (items.length < 1) {
-      if (Box.visual.data.length) {
+      if (Box.boxJSON.items.length) {
         // there are items in the box but an empty position is selected
         addToolbarMemo("Select one or more items to see bulk actions.");
         return;
