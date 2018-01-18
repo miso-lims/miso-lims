@@ -580,6 +580,12 @@ Utils.ui = {
     Utils.ui.toggleElement(id);
   },
 
+  collapseClass: function(class_) {
+    jQuery('.' + class_).slideUp({
+      'duration': 500
+    });
+  },
+
   goodDateFormat: 'yy-mm-dd',
 
   addDatePicker: function(id) {

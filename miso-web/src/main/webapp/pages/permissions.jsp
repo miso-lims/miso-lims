@@ -25,7 +25,7 @@
   Permissions
   <div id="permissions_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="permissions" class="note" style="display:none">
+<div id="permissions" class="note expandable_section" style="display:none">
   <h2>Permissions</h2>
   <table class="in">
     <tr>
