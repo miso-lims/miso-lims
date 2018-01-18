@@ -57,7 +57,8 @@
 <div class="sectionDivider"  onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="notediv" class="note" style="display:none;">A Box is subdivided into rows and columns whoch hold Samples, Libraries, Dilutions, or Pools.
+<div id="notediv" class="note" style="display:none;">
+  A Box is subdivided into rows and columns which hold Samples, Libraries, Dilutions, or Pools.
 </div>
 
 <div class="bs-callout bs-callout-warning hidden">
