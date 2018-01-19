@@ -93,10 +93,6 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
           @JoinColumn(name = "kitDescriptorId") })
   private Set<TargetedSequencing> targetedSequencing = new HashSet<>();
 
-  public void setTargetedSequencing(Set<TargetedSequencing> targetedSequencing) {
-    this.targetedSequencing = targetedSequencing;
-  }
-
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
@@ -106,6 +102,14 @@ public class KitDescriptor implements Serializable, ChangeLoggable {
 
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
+
+  public void setTargetedSequencing(Set<TargetedSequencing> targetedSequencing) {
+    this.targetedSequencing = targetedSequencing;
+  }
+
+  public boolean containsTargetedSequencing(TargetedSequencing ts) {
+    return targetedSequencing.contains(ts);
+  }
 
   /**
    * Returns the kitDescriptorId of this KitDescriptor object.
