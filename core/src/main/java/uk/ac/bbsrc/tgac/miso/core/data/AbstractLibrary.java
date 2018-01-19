@@ -59,6 +59,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
@@ -347,6 +348,11 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   public void addDilution(LibraryDilution libraryDilution) {
     this.libraryDilutions.add(libraryDilution);
     libraryDilution.setLibrary(this);
+  }
+
+  @Override
+  public boolean isDilutionTargetedSequencingValid(TargetedSequencing ts) {
+    return kitDescriptor.getTargetedSequencing().contains(ts);
   }
 
   @Override

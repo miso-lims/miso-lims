@@ -32,6 +32,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -137,6 +138,13 @@ public interface Library
    * @return Collection<Note> notes.
    */
   public Collection<Note> getNotes();
+
+  /**
+   * Determines if TargetedSequencing value is valid for a dilution from this library
+   * 
+   * @param ts TargetedSequencing value of dilution
+   */
+  public boolean isDilutionTargetedSequencingValid(TargetedSequencing ts);
 
   /**
    * Registers that a LibraryDilution has been carried out using this Library

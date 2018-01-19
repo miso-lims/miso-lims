@@ -167,6 +167,10 @@ public class LibraryDilution extends AbstractBoxable
     this.targetedSequencing = targetedSequencing;
   }
 
+  public boolean isTargetedSequencingValid() {
+    return library.isDilutionTargetedSequencingValid(targetedSequencing);
+  }
+
   public User getLastModifier() {
     return lastModifier;
   }
