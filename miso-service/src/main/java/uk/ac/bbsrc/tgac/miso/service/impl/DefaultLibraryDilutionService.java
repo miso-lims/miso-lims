@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
@@ -69,19 +70,27 @@ public class DefaultLibraryDilutionService
     return library.getKitDescriptor().getTargetedSequencing().contains(ts);
   }
 
+  private void throwTargetedSequencingIncompatible(TargetedSequencing ts, KitDescriptor kd) {
+    String tsName = ts.getAlias();
+    String kitName = kd.getName();
+
+    throw new IllegalArgumentException(String.format("Selected targeted sequencing is not available for kit on parent library.\n"
+        + "If you think this is an error, please contact your MISO administrator "
+        + "to make targeted sequencing \"%s\" available for kit \"%s\".", tsName, kitName));
+  }
+
   private void validateTargetedSequencing(LibraryDilution dilution) {
     TargetedSequencing ts = dilution.getTargetedSequencing();
     Library library = dilution.getLibrary();
 
-    if (ts == null && isTargetedSequencingRequired(library)) {
-      throw new IllegalArgumentException("Targeted sequencing value is required");
-    } else if (LimsUtils.isDetailedLibrary(library) && !isTargetedSequencingCompatible(ts, library)) {
-      String tsName = ts.getAlias();
-      String kitName = library.getKitDescriptor().getName();
-
-      throw new IllegalArgumentException(String.format("Selected targeted sequencing is not available for kit on parent library.\n"
-          + "If you think this is an error, please contact your MISO administrator "
-          + "to make targeted sequencing \"%s\" available for kit \"%s\".", tsName, kitName));
+    if (ts == null) {
+      if (isTargetedSequencingRequired(library)) {
+        throw new IllegalArgumentException("Targeted sequencing value is required");
+      }
+    } else {
+      if (!isTargetedSequencingCompatible(ts, library)) {
+        throwTargetedSequencingIncompatible(ts, library.getKitDescriptor());
+      }
     }
   }
 
