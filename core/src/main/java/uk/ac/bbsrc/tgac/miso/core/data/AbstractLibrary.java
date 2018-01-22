@@ -352,7 +352,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public boolean isDilutionTargetedSequencingValid(TargetedSequencing ts) {
-    return kitDescriptor.containsTargetedSequencing(ts);
+    return kitDescriptor.getTargetedSequencing().contains(ts);
   }
 
   @Override
