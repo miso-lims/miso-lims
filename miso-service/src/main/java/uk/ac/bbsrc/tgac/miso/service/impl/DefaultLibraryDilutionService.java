@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
@@ -57,13 +60,28 @@ public class DefaultLibraryDilutionService
     return dilution;
   }
 
-  private boolean isTargetedSequencingInLibrary(LibraryDilution dilution) {
-    return dilution.getLibrary().getKitDescriptor().getTargetedSequencing().contains(dilution.getTargetedSequencing());
+  private boolean isTargetedSequencingRequired(Library library) {
+    return LimsUtils.isDetailedLibrary(library)
+        && ((DetailedLibrary) library).getLibraryDesignCode().isTargetedSequencingRequired();
+  }
+
+  private boolean isTargetedSequencingCompatible(TargetedSequencing ts, Library library) {
+    return library.getKitDescriptor().getTargetedSequencing().contains(ts);
   }
 
   private void validateTargetedSequencing(LibraryDilution dilution) {
-    if (!isTargetedSequencingInLibrary(dilution)) {
-      throw new IllegalArgumentException("Dilution Targeted Sequencing not contained in parent library");
+    TargetedSequencing ts = dilution.getTargetedSequencing();
+    Library library = dilution.getLibrary();
+
+    if (ts == null && isTargetedSequencingRequired(library)) {
+      throw new IllegalArgumentException("Targeted sequencing value is required");
+    } else if (LimsUtils.isDetailedLibrary(library) && !isTargetedSequencingCompatible(ts, library)) {
+      String tsName = ts.getAlias();
+      String kitName = library.getKitDescriptor().getName();
+
+      throw new IllegalArgumentException(String.format("Selected targeted sequencing is not available for kit on parent library.\n"
+          + "If you think this is an error, please contact your MISO administrator "
+          + "to make targeted sequencing \"%s\" available for kit \"%s\".", tsName, kitName));
     }
   }
 
