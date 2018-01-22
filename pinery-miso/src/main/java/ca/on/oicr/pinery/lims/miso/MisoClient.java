@@ -67,8 +67,8 @@ public class MisoClient implements Lims {
   private static final String queryModelById = queryAllModels + " WHERE p.platformId = ?";
 
   // Instrument queries
-  private static final String queryAllInstruments = "SELECT sr.referenceId, sr.name, sr.platformId " + "FROM SequencerReference AS sr";
-  private static final String queryInstrumentById = queryAllInstruments + " WHERE sr.referenceId = ?";
+  private static final String queryAllInstruments = "SELECT i.instrumentId, i.name, i.platformId " + "FROM Instrument AS i";
+  private static final String queryInstrumentById = queryAllInstruments + " WHERE i.instrumentId = ?";
   private static final String queryInstrumentsByModelId = queryAllInstruments + " WHERE sr.platformId = ?";
 
   // Order queries
@@ -566,7 +566,7 @@ public class MisoClient implements Lims {
     public Instrument mapRow(ResultSet rs, int rowNum) throws SQLException {
       Instrument ins = new DefaultInstrument();
 
-      ins.setId(rs.getInt("referenceId"));
+      ins.setId(rs.getInt("instrumentId"));
       ins.setName(rs.getString("name"));
       ins.setModelId(rs.getInt("platformId"));
 

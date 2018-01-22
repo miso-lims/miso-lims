@@ -1,5 +1,5 @@
 SELECT DISTINCT r.alias
-  ,r.sequencerReference_sequencerReferenceId AS instrumentId
+  ,r.instrumentId AS instrumentId
   ,r.runId
   ,r.filePath
   ,r.health
