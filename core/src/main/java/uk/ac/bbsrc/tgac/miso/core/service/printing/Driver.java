@@ -235,7 +235,9 @@ public enum Driver {
       appendTruncated(12, b.getBarcodeExtraInfo(), sb::append);
       sb.append("^FS\r\n");
       sb.append("^BY40,40^FT25,82^BXN,2,200,0,0,1,~\r\n");
-      sb.append("^FH\\^FDPCSI_0735_Ly_R_nn_1-1^FS\r\n");
+      sb.append("^FH\\^FD");
+      sb.append(b.getAlias());
+      sb.append("^FS\r\n");
       sb.append("^FT246,90^A0N,14,14^FB86,1,0,C^FH\\^FD");
       appendTruncated(10, b.getBarcodeExtraInfo(), sb::append);
       sb.append("^FS\r\n");
@@ -274,7 +276,7 @@ public enum Driver {
       appendTruncated(12, b.getBarcodeExtraInfo(), sb::append);
       sb.append("^FS\r\n");
       sb.append("^BY32,32^FT158,96^BXN,2,200,0,0,1,~\r\n");
-      sb.append("^FH\\^FD1").append(getBarcode(b)).append("^FS\r\n");
+      sb.append("^FH\\^FD").append(getBarcode(b)).append("^FS\r\n");
       sb.append("^XZ\r\n");
       return sb.toString();
     }
@@ -307,7 +309,7 @@ public enum Driver {
   private static String getBarcode(Barcodable barcodable) {
     String str = barcodable.getIdentificationBarcode();
     if (LimsUtils.isStringBlankOrNull(str)) {
-      str = barcodable.getName();
+      str = barcodable.getAlias();
     }
     return str;
   }
