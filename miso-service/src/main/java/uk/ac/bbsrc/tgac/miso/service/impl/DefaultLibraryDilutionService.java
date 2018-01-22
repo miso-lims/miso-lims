@@ -57,7 +57,19 @@ public class DefaultLibraryDilutionService
     return dilution;
   }
 
+  private boolean isTargetedSequencingInLibrary(LibraryDilution dilution) {
+    return dilution.getLibrary().getKitDescriptor().getTargetedSequencing().contains(dilution.getTargetedSequencing());
+  }
+
+  private void validateTargetedSequencing(LibraryDilution dilution) {
+    if (!isTargetedSequencingInLibrary(dilution)) {
+      throw new IllegalArgumentException("Dilution Targeted Sequencing not contained in parent library");
+    }
+  }
+
   private LibraryDilution save(LibraryDilution dilution) throws IOException {
+    validateTargetedSequencing(dilution);
+
     dilution.setLastModifier(authorizationManager.getCurrentUser());
     try {
       Long newId = dilutionDao.save(dilution);
@@ -94,7 +106,7 @@ public class DefaultLibraryDilutionService
       dilution.inheritPermissions(libraryService.get(dilution.getLibrary().getId()));
     }
     authorizationManager.throwIfNotWritable(dilution);
-    
+
     // pre-save field generation
     dilution.setName(generateTemporaryName());
     long savedId = save(dilution).getId();
@@ -111,7 +123,7 @@ public class DefaultLibraryDilutionService
     save(updatedDilution);
     boxService.updateBoxableLocation(dilution);
   }
-  
+
   @Override
   public boolean delete(LibraryDilution dilution) throws IOException {
     authorizationManager.throwIfNonAdmin();
