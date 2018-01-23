@@ -71,7 +71,7 @@ public class MisoClient implements Lims {
   // Instrument queries
   private static final String queryAllInstruments = "SELECT i.instrumentId, i.name, i.platformId " + "FROM Instrument AS i";
   private static final String queryInstrumentById = queryAllInstruments + " WHERE i.instrumentId = ?";
-  private static final String queryInstrumentsByModelId = queryAllInstruments + " WHERE sr.platformId = ?";
+  private static final String queryInstrumentsByModelId = queryAllInstruments + " WHERE i.platformId = ?";
 
   // Order queries
   private static final String queryAllOrders = getResourceAsString("queryAllOrders.sql");
