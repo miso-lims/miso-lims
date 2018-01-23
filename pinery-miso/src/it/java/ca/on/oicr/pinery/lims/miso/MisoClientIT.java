@@ -2,9 +2,10 @@ package ca.on.oicr.pinery.lims.miso;
 
 import static org.junit.Assert.*;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
-import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import ca.on.oicr.pinery.api.Sample;
 import ca.on.oicr.pinery.api.SampleProject;
 import ca.on.oicr.pinery.api.Type;
 import ca.on.oicr.pinery.api.User;
+import ca.on.oicr.pinery.lims.miso.MisoClient;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/test-context.xml")
@@ -87,13 +89,13 @@ public class MisoClientIT {
 
   @Test
   public void testGetSamplesFilteredByDateRange() throws Exception {
-    DateTime after = DateTime.parse("2016-01-01T00:00:00Z");
-    DateTime before = DateTime.parse("2017-01-01T00:00:00Z");
+    ZonedDateTime after = ZonedDateTime.parse("2016-01-01T00:00:00Z");
+    ZonedDateTime before = ZonedDateTime.parse("2017-01-01T00:00:00Z");
     List<Sample> samples = sut.getSamples(null, null, null, before, after);
     assertFalse(samples.isEmpty());
     samples.forEach(sam -> {
-      DateTime created = new DateTime(sam.getCreated().getTime());
-      DateTime modified = new DateTime(sam.getModified().getTime());
+      ZonedDateTime created = ZonedDateTime.ofInstant(sam.getCreated().toInstant(), ZoneId.systemDefault());
+      ZonedDateTime modified = ZonedDateTime.ofInstant(sam.getModified().toInstant(), ZoneId.systemDefault());
       assertTrue(before.isAfter(created));
       assertTrue(after.isBefore(modified));
     });

@@ -3,7 +3,10 @@ package ca.on.oicr.pinery.lims.miso;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,7 +17,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.text.WordUtils;
-import org.joda.time.DateTime;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -180,7 +182,7 @@ public class MisoClient implements Lims {
   }
 
   @Override
-  public List<Sample> getSamples(Boolean archived, Set<String> projects, Set<String> types, DateTime before, DateTime after) {
+  public List<Sample> getSamples(Boolean archived, Set<String> projects, Set<String> types, ZonedDateTime before, ZonedDateTime after) {
     List<Sample> samples = template.query(queryAllSamples, sampleMapper);
     mapChildren(samples);
     if (archived == null && (projects == null || projects.isEmpty()) && (types == null || types.isEmpty()) && before == null
@@ -191,8 +193,9 @@ public class MisoClient implements Lims {
     }
   }
 
-  private List<Sample> filterSamples(List<Sample> unfiltered, Boolean archived, Set<String> projects, Set<String> types, DateTime before,
-      DateTime after) {
+  private List<Sample> filterSamples(List<Sample> unfiltered, Boolean archived, Set<String> projects, Set<String> types,
+      ZonedDateTime before,
+      ZonedDateTime after) {
     Set<Filter<Sample>> filters = makeSampleFilters(archived, projects, types, before, after);
     List<Sample> filteredSamples = new ArrayList<>();
     for (Sample sample : unfiltered) {
@@ -209,69 +212,38 @@ public class MisoClient implements Lims {
   }
 
   private Set<Filter<Sample>> makeSampleFilters(final Boolean archived, final Set<String> projects, final Set<String> types,
-      final DateTime before, final DateTime after) {
+      final ZonedDateTime before, final ZonedDateTime after) {
     Set<Filter<Sample>> filters = new HashSet<>();
 
     // archived filter
     if (archived != null) {
-      filters.add(new Filter<Sample>() {
-        @Override
-        public boolean matches(Sample object) {
-          return archived.equals(object.getArchived());
-        }
-      });
+      filters.add(sam -> archived.equals(sam.getArchived()));
     }
 
     // projects filter
     if (projects != null && !projects.isEmpty()) {
-      filters.add(new Filter<Sample>() {
-        @Override
-        public boolean matches(Sample object) {
-          for (String project : projects) {
-            if (project.equals(object.getProject())) {
-              return true;
-            }
-          }
-          return false;
-        }
-      });
+      filters.add(sam -> projects.contains(sam.getProject()));
     }
 
     // types filter
     if (types != null && !types.isEmpty()) {
-      filters.add(new Filter<Sample>() {
-        @Override
-        public boolean matches(Sample object) {
-          for (String type : types) {
-            if (type.equals(object.getSampleType())) {
-              return true;
-            }
-          }
-          return false;
-        }
-      });
+      filters.add(sam -> types.contains(sam.getSampleType()));
     }
 
     // before filter
     if (before != null) {
-      filters.add(new Filter<Sample>() {
-        @Override
-        public boolean matches(Sample object) {
-          return before.isAfter(object.getCreated().getTime());
-        }
-      });
+      filters.add(sam -> before.isAfter(toZonedDateTime(sam.getCreated())));
     }
 
     // after filter
     if (after != null) {
-      filters.add(new Filter<Sample>() {
-        @Override
-        public boolean matches(Sample object) {
-          return after.isBefore(object.getModified().getTime());
-        }
-      });
+      filters.add(sam -> after.isBefore(toZonedDateTime(sam.getModified())));
     }
     return filters;
+  }
+
+  private static ZonedDateTime toZonedDateTime(Date from) {
+    return ZonedDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault());
   }
 
   private interface Filter<T> {
