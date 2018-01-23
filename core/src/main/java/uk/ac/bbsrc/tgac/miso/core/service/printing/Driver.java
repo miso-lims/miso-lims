@@ -228,7 +228,7 @@ public enum Driver {
       sb.append("^FS\r\n");
       sb.append("^FT247,66^A0N,11,12^FB85,1,0,C^FH\\^FD").append(LimsUtils.formatDate(b.getBarcodeDate())).append("^FS\r\n");
       sb.append("^FT76,38^A0N,21,21^FH\\^FD");
-      appendTruncated(8, b.getAlias(), sb::append);
+      appendTruncated(18, b.getAlias(), sb::append);
       sb.append("^FS\r\n");
       sb.append("^FT76,65^A0N,20,19^FH\\^FD").append(LimsUtils.formatDate(b.getBarcodeDate())).append("^FS\r\n");
       sb.append("^FT76,91^A0N,18,16^FH\\^FD");
@@ -260,15 +260,15 @@ public enum Driver {
       sb.append("^LL0098\r\n");
       sb.append("^LS0\r\n");
       sb.append("^FT14,27^A0N,20,19^FH\\^FD");
-      if (b.getAlias().length() > 21) {
-        sb.append(b.getAlias().substring(0, 21));
+      if (b.getAlias().length() > 18) {
+        sb.append(b.getAlias().substring(0, 18));
       } else {
         sb.append(b.getAlias());
       }
       sb.append("^FS\r\n");
-      if (b.getAlias().length() > 21) {
+      if (b.getAlias().length() > 18) {
         sb.append("^FT14,45^A0N,20,19^FH\\^FD");
-        appendTruncated(21, b.getAlias().substring(21), sb::append);
+        appendTruncated(21, b.getAlias().substring(18), sb::append);
         sb.append("^FS\r\n");
       }
       sb.append("^FT14,94^A0N,20,19^FH\\^FD").append(LimsUtils.formatDate(b.getBarcodeDate())).append("^FS\r\n");
