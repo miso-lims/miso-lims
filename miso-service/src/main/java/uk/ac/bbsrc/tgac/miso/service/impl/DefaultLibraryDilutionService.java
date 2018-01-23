@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -66,7 +68,8 @@ public class DefaultLibraryDilutionService
         && ((DetailedLibrary) library).getLibraryDesignCode().isTargetedSequencingRequired();
   }
 
-  private boolean isTargetedSequencingCompatible(TargetedSequencing ts, Library library) {
+  @VisibleForTesting
+  protected boolean isTargetedSequencingCompatible(TargetedSequencing ts, Library library) {
     return library.getKitDescriptor().getTargetedSequencing().contains(ts);
   }
 
