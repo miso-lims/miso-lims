@@ -15,7 +15,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.annotations.VisibleForTesting;
+
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
@@ -57,7 +63,43 @@ public class DefaultLibraryDilutionService
     return dilution;
   }
 
+  private boolean isTargetedSequencingRequired(Library library) {
+    return LimsUtils.isDetailedLibrary(library)
+        && ((DetailedLibrary) library).getLibraryDesignCode().isTargetedSequencingRequired();
+  }
+
+  @VisibleForTesting
+  protected boolean isTargetedSequencingCompatible(TargetedSequencing ts, Library library) {
+    return library.getKitDescriptor().getTargetedSequencing().contains(ts);
+  }
+
+  private void throwTargetedSequencingIncompatible(TargetedSequencing ts, KitDescriptor kd) {
+    String tsName = ts.getAlias();
+    String kitName = kd.getName();
+
+    throw new IllegalArgumentException(String.format("Selected targeted sequencing is not available for kit on parent library.\n"
+        + "If you think this is an error, please contact your MISO administrator "
+        + "to make targeted sequencing \"%s\" available for kit \"%s\".", tsName, kitName));
+  }
+
+  private void validateTargetedSequencing(LibraryDilution dilution) {
+    TargetedSequencing ts = dilution.getTargetedSequencing();
+    Library library = dilution.getLibrary();
+
+    if (ts == null) {
+      if (isTargetedSequencingRequired(library)) {
+        throw new IllegalArgumentException("Targeted sequencing value is required");
+      }
+    } else {
+      if (!isTargetedSequencingCompatible(ts, library)) {
+        throwTargetedSequencingIncompatible(ts, library.getKitDescriptor());
+      }
+    }
+  }
+
   private LibraryDilution save(LibraryDilution dilution) throws IOException {
+    validateTargetedSequencing(dilution);
+
     dilution.setLastModifier(authorizationManager.getCurrentUser());
     try {
       Long newId = dilutionDao.save(dilution);
@@ -94,7 +136,7 @@ public class DefaultLibraryDilutionService
       dilution.inheritPermissions(libraryService.get(dilution.getLibrary().getId()));
     }
     authorizationManager.throwIfNotWritable(dilution);
-    
+
     // pre-save field generation
     dilution.setName(generateTemporaryName());
     long savedId = save(dilution).getId();
@@ -111,7 +153,7 @@ public class DefaultLibraryDilutionService
     save(updatedDilution);
     boxService.updateBoxableLocation(dilution);
   }
-  
+
   @Override
   public boolean delete(LibraryDilution dilution) throws IOException {
     authorizationManager.throwIfNonAdmin();

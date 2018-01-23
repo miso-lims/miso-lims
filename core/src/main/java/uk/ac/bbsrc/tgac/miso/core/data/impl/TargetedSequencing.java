@@ -168,4 +168,34 @@ public class TargetedSequencing implements Serializable {
     this.kitDescriptors.addAll(kitDescriptors);
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((alias == null) ? 0 : alias.hashCode());
+    result = prime * result + (archived ? 1231 : 1237);
+    result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((targetedSequencingId == null) ? 0 : targetedSequencingId.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    TargetedSequencing other = (TargetedSequencing) obj;
+    if (alias == null) {
+      if (other.alias != null) return false;
+    } else if (!alias.equals(other.alias)) return false;
+    if (archived != other.archived) return false;
+    if (description == null) {
+      if (other.description != null) return false;
+    } else if (!description.equals(other.description)) return false;
+    if (targetedSequencingId == null) {
+      if (other.targetedSequencingId != null) return false;
+    } else if (!targetedSequencingId.equals(other.targetedSequencingId)) return false;
+    return true;
+  }
+
 }
