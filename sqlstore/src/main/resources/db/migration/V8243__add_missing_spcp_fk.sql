@@ -1,2 +1,0 @@
-DELETE FROM SequencerPartitionContainer_Partition WHERE partitions_partitionId NOT IN (SELECT partitionId FROM _Partition);
-ALTER TABLE SequencerPartitionContainer_Partition ADD CONSTRAINT spcp_partition_partitionid_fk FOREIGN KEY(partitions_partitionId) REFERENCES _Partition(partitionId);

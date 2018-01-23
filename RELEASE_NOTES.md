@@ -1,3 +1,13 @@
+# 0.2.106
+
+Changes:
+
+ * Improved layout of some barcode labels
+ * Improved performance of box position autofill
+ * Added collapse button to Edit Project page
+ * Separated sequencers from other instruments
+ * Allowed more digits in Identity number
+
 # 0.2.105
 
 Changes:

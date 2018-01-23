@@ -1,3 +1,11 @@
+-- add_missing_spcp_fk
+
+DELETE FROM SequencerPartitionContainer_Partition WHERE partitions_partitionId NOT IN (SELECT partitionId FROM _Partition);
+ALTER TABLE SequencerPartitionContainer_Partition ADD CONSTRAINT spcp_partition_partitionid_fk FOREIGN KEY(partitions_partitionId) REFERENCES _Partition(partitionId);
+
+
+-- instruments
+
 -- StartNoTest
 ALTER TABLE SequencerReference DROP FOREIGN KEY sequencerReference_upgradedReference_fkey;
 ALTER TABLE Run DROP FOREIGN KEY fk_run_sequencerReference;
@@ -23,3 +31,25 @@ ALTER TABLE ServiceRecord CHANGE COLUMN sequencerReferenceId instrumentId bigint
 ALTER TABLE Platform ADD COLUMN instrumentType varchar(50);
 UPDATE Platform SET instrumentType = 'SEQUENCER';
 ALTER TABLE Platform CHANGE COLUMN instrumentType instrumentType varchar(50) NOT NULL;
+
+
+-- fix_collation
+
+-- StartNoTest
+SET foreign_key_checks = 0;
+ALTER TABLE BoxPosition CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE ProjectOverview_Sample CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+SET foreign_key_checks = 1;
+-- EndNoTest
+
+DROP TABLE IF EXISTS Workflow;
+DROP TABLE IF EXISTS WorkflowDefinition;
+DROP TABLE IF EXISTS WorkflowDefinition_State;
+DROP TABLE IF EXISTS WorkflowDefinition_WorkflowProcessDefinition;
+DROP TABLE IF EXISTS WorkflowProcess;
+DROP TABLE IF EXISTS WorkflowProcessDefinition;
+DROP TABLE IF EXISTS WorkflowProcessDefinition_State;
+DROP TABLE IF EXISTS WorkflowProcess_State;
+DROP TABLE IF EXISTS Workflow_WorkflowProcess;
+
+
