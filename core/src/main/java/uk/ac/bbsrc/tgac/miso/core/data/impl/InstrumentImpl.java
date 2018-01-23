@@ -29,32 +29,16 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractInstrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 
-/**
- * Concrete implementation to encapsulate a reference to a physical machine attached to a sequencer
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
 @Entity
-@Table(name = "SequencerReference")
-public class SequencerReferenceImpl extends AbstractSequencerReference implements Serializable {
+@Table(name = "Instrument")
+public class InstrumentImpl extends AbstractInstrument implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * Constructor SequencerReferenceImpl creates a new SequencerReference instance
-   * 
-   * @param name
-   *          of type String
-   * @param ip
-   *          of type InetAddress
-   * @param platform
-   *          of type Platform
-   */
-  public SequencerReferenceImpl(String name, String ip, Platform platform) {
+  public InstrumentImpl(String name, String ip, Platform platform) {
     setName(name);
     setIpAddress(ip);
     setPlatform(platform);
@@ -65,7 +49,7 @@ public class SequencerReferenceImpl extends AbstractSequencerReference implement
    * 
    * @throws IOException
    */
-  public SequencerReferenceImpl() {
+  public InstrumentImpl() {
     setPlatform(null);
     setName(null);
     setIpAddress(null);

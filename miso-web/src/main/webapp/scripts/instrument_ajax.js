@@ -21,12 +21,12 @@
  * *********************************************************************
  */
 
-var Sequencer = Sequencer || {
+var Instrument = Instrument || {
 
-  validateSequencerReference: function() {
-    Validate.cleanFields('#sequencer_reference_form');
+  validateInstrument: function() {
+    Validate.cleanFields('#instrument_form');
 
-    jQuery('#sequencer_reference_form').parsley().destroy();
+    jQuery('#instrument_form').parsley().destroy();
 
     jQuery('#serialNumber').attr('data-parsley-maxlength', '30');
 
@@ -43,8 +43,8 @@ var Sequencer = Sequencer || {
     jQuery('#datedecommissionedpicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
     jQuery('#datedecommissionedpicker').attr('data-parsley-error-message', 'Date must be of form YYYY-MM-DD');
 
-    jQuery('#upgradedSequencerReference').attr('type', 'number');
-    jQuery('#upgradedSequencerReference').attr('data-parsley-error-message', 'Upgrade must refer to an existing sequencer.');
+    jQuery('#upgradedInstrument').attr('type', 'number');
+    jQuery('#upgradedInstrument').attr('data-parsley-error-message', 'Upgrade must refer to an existing instrument.');
 
     if (jQuery('input[name="status"]:checked').val() != "production") {
       jQuery('#datedecommissionedpicker').attr('required', 'true');
@@ -53,49 +53,49 @@ var Sequencer = Sequencer || {
     }
 
     if (jQuery('input[name="status"]:checked').val() === "upgraded") {
-      jQuery('#upgradedSequencerReference').attr('required', 'true');
-      jQuery('#upgradedSequencerReference').attr('min', '1');
+      jQuery('#upgradedInstrument').attr('required', 'true');
+      jQuery('#upgradedInstrument').attr('min', '1');
     } else {
-      jQuery('#upgradedSequencerReference').removeAttr('required');
-      jQuery('#upgradedSequencerReference').removeAttr('min');
+      jQuery('#upgradedInstrument').removeAttr('required');
+      jQuery('#upgradedInstrument').removeAttr('min');
     }
 
-    jQuery('#sequencer_reference_form').parsley();
-    jQuery('#sequencer_reference_form').parsley().validate();
+    jQuery('#instrument_form').parsley();
+    jQuery('#instrument_form').parsley().validate();
 
-    Validate.updateWarningOrSubmit('#sequencer_reference_form');
+    Validate.updateWarningOrSubmit('#instrument_form');
     return false;
   }
 
 };
 
-Sequencer.ui = {
+Instrument.ui = {
 
   hideStatusRowsReadOnly: function(decommissioned, upgraded, upgradedId, upgradedName) {
     if (!decommissioned) {
       jQuery("#decommissionedRow").hide();
     }
     if (!upgraded) {
-      jQuery("#upgradedReferenceRow").hide();
+      jQuery("#upgradedInstrumentRow").hide();
     } else {
-      jQuery("#upgradedSequencerReferenceLink").empty();
-      jQuery("#upgradedSequencerReferenceLink").append("<a href='/miso/sequencer/" + upgradedId + "'>" + upgradedName + "</a>");
+      jQuery("#upgradedInstrumentLink").empty();
+      jQuery("#upgradedInstrumentLink").append("<a href='/miso/instrument/" + upgradedId + "'>" + upgradedName + "</a>");
     }
   },
 
   showStatusRows: function() {
     switch (jQuery('input[name="status"]:checked').val()) {
     case "production":
-      Sequencer.ui.hideDecommissioned();
-      Sequencer.ui.hideUpgradedSequencerReference();
+      Instrument.ui.hideDecommissioned();
+      Instrument.ui.hideUpgradedInstrument();
       break;
     case "retired":
-      Sequencer.ui.showDecommissioned();
-      Sequencer.ui.hideUpgradedSequencerReference();
+      Instrument.ui.showDecommissioned();
+      Instrument.ui.hideUpgradedInstrument();
       break;
     case "upgraded":
-      Sequencer.ui.showDecommissioned();
-      Sequencer.ui.showUpgradedSequencerReference();
+      Instrument.ui.showDecommissioned();
+      Instrument.ui.showUpgradedInstrument();
       break;
     }
   },
@@ -112,29 +112,28 @@ Sequencer.ui = {
     jQuery("#decommissionedRow").show();
   },
 
-  hideUpgradedSequencerReference: function() {
-    jQuery("#upgradedReferenceRow").hide();
-    jQuery("#upgradedSequencerReference").val("");
+  hideUpgradedInstrument: function() {
+    jQuery("#upgradedInstrumentRow").hide();
+    jQuery("#upgradedInstrument").val("");
   },
 
-  showUpgradedSequencerReference: function() {
-    jQuery("#upgradedReferenceRow").show();
-    Sequencer.ui.updateUpgradedSequencerReferenceLink();
+  showUpgradedInstrument: function() {
+    jQuery("#upgradedInstrumentRow").show();
+    Instrument.ui.updateUpgradedInstrumentLink();
   },
 
-  updateUpgradedSequencerReferenceLink: function() {
-    jQuery("#upgradedSequencerReferenceLink").empty();
-    if (jQuery("#upgradedSequencerReference").val() != "" && jQuery("#upgradedSequencerReference").val() != 0) {
-      jQuery("#upgradedSequencerReferenceLink").append(
-          "<a href='/miso/sequencer/" + jQuery("#upgradedSequencerReference").val() + "'>View</a>");
+  updateUpgradedInstrumentLink: function() {
+    jQuery("#upgradedInstrumentLink").empty();
+    if (jQuery("#upgradedInstrument").val() != "" && jQuery("#upgradedInstrument").val() != 0) {
+      jQuery("#upgradedInstrumentLink").append("<a href='/miso/instrument/" + jQuery("#upgradedInstrument").val() + "'>View</a>");
     }
   },
 
-  addServiceRecord: function(isDecommissioned, sequencerId) {
+  addServiceRecord: function(isDecommissioned, instrumentId) {
     if (!isDecommissioned) {
-      window.location = '/miso/sequencer/servicerecord/new/' + sequencerId;
+      window.location = '/miso/instrument/servicerecord/new/' + instrumentId;
     } else {
-      Utils.showOkDialog('Error adding Service Record', ['Cannot add Service Records to a retired sequencer.']);
+      Utils.showOkDialog('Error adding Service Record', ['Cannot add Service Records to a retired instrument.']);
     }
   },
 

@@ -38,6 +38,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
+import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
@@ -61,6 +62,9 @@ public class Platform implements Comparable<Platform>, Serializable {
 
   @Column(nullable = true)
   private String description;
+
+  @Enumerated(EnumType.STRING)
+  private InstrumentType instrumentType;
 
   @Column(nullable = false)
   private String instrumentModel;
@@ -126,6 +130,14 @@ public class Platform implements Comparable<Platform>, Serializable {
 
   public void setPartitionSizes(Set<Integer> partitionSizes) {
     this.partitionSizes = partitionSizes;
+  }
+
+  public InstrumentType getInstrumentType() {
+    return instrumentType;
+  }
+
+  public void setInstrumentType(InstrumentType instrumentType) {
+    this.instrumentType = instrumentType;
   }
 
   /**

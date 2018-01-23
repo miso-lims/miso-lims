@@ -441,12 +441,20 @@
 </c:when>
 </c:choose>
 </div>
+<br/>
+
+<button id="collapse_all" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Utils.ui.collapseClass('expandable_section')">
+    Collapse all
+</button>
+<br/>
+<br/>
+
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#issues_arrowclick'), 'issuesdiv');">
   Tracked Issues
   <div id="issues_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="issuesdiv" class="note" style="display:none;">
+<div id="issuesdiv" class="note expandable_section" style="display:none;">
   <c:choose>
     <c:when test="${project.id != 0}">
       To link issues to this project please enter your issue keys here, separated by a single comma, e.g. FOO-1,FOO-2,FOO-3:<br/>
@@ -491,7 +499,7 @@
     Project Files
     <div id="upload_arrowclick" class="toggleLeft"></div>
   </div>
-  <div id="uploaddiv" class="simplebox" style="display:none;">
+  <div id="uploaddiv" class="simplebox expandable_section" style="display:none;">
     <table class="in">
       <tr>
         <td>
@@ -538,14 +546,61 @@
 </div>
 <br/>
 
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#studies_section_arrowclick'), 'studies_section');">
+  Studies
+<div id="studies_section_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="studies_section" class="expandable_section">
   <miso:list-section-ajax id="project_studies" name="Studies" target="study" project="${project}" config="{ isAdmin : ${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')} }"/>
+</div>
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_section_arrowclick'), 'samples_section');">
+  Samples
+<div id="samples_section_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="samples_section" class="expandable_section">
   <miso:list-section-ajax id="project_samples" name="Samples" target="sample" project="${project}" config="{}"/>
+</div>
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#libraries_section_arrowclick'), 'libraries_section');">
+  Libraries
+<div id="libraries_section_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="libraries_section" class="expandable_section">
   <miso:list-section-ajax id="project_libraries" name="Libraries" target="library" project="${project}" config="{}"/>
+</div>
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#dilutions_section_arrowclick'), 'dilutions_section');">
+  Dilutions
+<div id="dilutions_section_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="dilutions_section" class="expandable_section">
   <miso:list-section-ajax id="project_dilutions" name="Dilutions" target="dilution" project="${project}" config="{}"/>
+</div>
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_section_arrowclick'), 'pools_section');">
+  Pools
+<div id="pools_section_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="pools_section" class="expandable_section">
   <miso:list-section-ajax id="project_pools" name="Pools" target="pool" project="${project}" config="{}"/>
+</div>
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_section_arrowclick'), 'runs_section');">
+  Runs
+<div id="runs_section_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="runs_section" class="expandable_section">
   <miso:list-section-ajax id="project_runs" name="Runs" target="run" project="${project}" config="{}"/>
+</div>
+
 </c:when>
 </c:choose>
+<br/>
+
+<button id="collapse_all" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Utils.ui.collapseClass('expandable_section')">
+    Collapse all
+</button>
 
 <div id="addProjectOverviewNoteDialog" title="Create new Note"></div>
 

@@ -34,8 +34,8 @@ DELETE FROM Indices;
 DELETE FROM IndexFamily;
 DELETE FROM SequencingParameters;
 DELETE FROM PlatformSizes;
-DELETE FROM SequencerReference WHERE upgradedSequencerReferenceId IS NOT NULL;
-DELETE FROM SequencerReference;
+DELETE FROM Instrument WHERE upgradedInstrumentId IS NOT NULL;
+DELETE FROM Instrument;
 DELETE FROM Platform;
 DELETE FROM ProjectOverview;
 DELETE FROM Project;
@@ -316,10 +316,10 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
   (11, 2, 'B03',      'GGGCCC', 2),
   (12, 2, 'B04',      'TTTAAA', 2);
 
-INSERT INTO Platform (platformId, name, instrumentModel, numContainers) VALUES
-  (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1),
-  (2, 'ILLUMINA', 'Illumina MiSeq', 1),
-  (3, 'PACBIO', 'PacBio RS II', 1);
+INSERT INTO Platform (platformId, name, instrumentModel, numContainers, instrumentType) VALUES
+  (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
+  (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
+  (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER');
   
 INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
@@ -348,19 +348,20 @@ INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
   (3, 15),
   (3, 16);
 
-INSERT INTO SequencerReference (referenceId, name, platformId, ip) VALUES
+INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
   (1, 'T2000', 1, '127.0.0.1'),
   (2, 'TMS1', 2, '127.0.0.1'),
   (3, 'TPB2', 3, '127.0.0.1');
   
-INSERT INTO SequencerReference (referenceId, name, platformId, serialNumber, dateCommissioned, dateDecommissioned, upgradedSequencerReferenceId, ip) VALUES
+INSERT INTO Instrument (instrumentId, name, platformId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId, ip) VALUES
   (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, '127.0.0.1'),
   (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL, '127.0.0.1'),
   (102, 'OldHiSeq_102', 1, '102', '2017-01-01', '2017-02-01', 101, '127.0.0.1'),
+  (200, 'HiSeq_200', 1, '200', '2017-01-01', NULL, NULL, '127.0.0.1'),
   (5001, 'PacBio_SR_5001', 3, '5001', '2017-09-21', NULL, NULL, '127.0.0.1'),
   (5002, 'HiSeq_SR_5002', 1, '5002', '2017-02-01', NULL, NULL, '127.0.0.1');
 
-INSERT INTO SequencerServiceRecord(recordId, sequencerReferenceId, title, details, servicedBy, referenceNumber, serviceDate, shutdownTime, restoredTime) VALUES
+INSERT INTO ServiceRecord(recordId, instrumentId, title, details, servicedBy, referenceNumber, serviceDate, shutdownTime, restoredTime) VALUES
   (150, 101, 'Test 150', 'details go here', 'technician1', '12345', '2017-09-05', '2017-09-01 10:00:00', '2017-09-05 10:00:00'),
   (151, 101, 'Test 151', NULL, 'tech', NULL, '2017-09-12', NULL, NULL),
   (152, 101, 'Test 152', 'details to remove', 'technitchin', 'Riffraff', '2017-09-12', '2017-09-11 11:00:00', '2017-09-12 12:00:00');
@@ -787,11 +788,11 @@ INSERT INTO SequencerPartitionContainer_Partition (container_containerId, partit
 (5101, 5104), (5101, 5105),
 (6001, 6001);
 
-INSERT INTO Run (runId, name, securityProfile_profileId, alias, sequencerReference_sequencerReferenceId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
+INSERT INTO Run (runId, name, securityProfile_profileId, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
 (1, 'RUN1', 5, 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
 (2, 'RUN2', 5, 'PacBio_Run_1', 3, '2017-08-01', NULL, 'Running', 1, '2017-08-01 10:03:02', 1, '2017-08-01 10:03:02');
 
-INSERT INTO Run (runId, name, securityProfile_profileId, alias, sequencerReference_sequencerReferenceId, sequencingParameters_parametersId, description, filePath, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
+INSERT INTO Run (runId, name, securityProfile_profileId, alias, instrumentId, sequencingParameters_parametersId, description, filePath, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
 (5001, 'RUN5001', 5, 'Change_Values_Run', 5002, 2, 'description', '/filePath', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
 (5002, 'RUN5002', 5, 'Add_Existing_Container_Run', 5002, 2, 'add existing container to run', '/existing', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
 (5003, 'RUN5003', 5, 'Remove_Existing_Container_Run', 5002, 2, 'remove container from run', '/removable', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),

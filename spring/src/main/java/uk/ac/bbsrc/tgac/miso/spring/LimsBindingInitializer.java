@@ -67,7 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -96,7 +96,7 @@ import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.StainService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
@@ -152,7 +152,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
   @Autowired
   private TissueOriginService tissueOriginService;
   @Autowired
-  private SequencerReferenceService sequencerReferenceService;
+  private InstrumentService instrumentService;
   @Autowired
   private SequencingParametersDao sequencingParametersDao;
 
@@ -516,10 +516,10 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     }.register(binder);
 
-    new BindingConverterById<SequencerReference>(SequencerReference.class) {
+    new BindingConverterById<Instrument>(Instrument.class) {
       @Override
-      public SequencerReference resolveById(long id) throws Exception {
-        return sequencerReferenceService.get(id);
+      public Instrument resolveById(long id) throws Exception {
+        return instrumentService.get(id);
       }
     }.register(binder);
 
@@ -633,7 +633,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     this.platformService = platformService;
   }
 
-  public void setSequencerReferenceService(SequencerReferenceService sequencerReferenceService) {
-    this.sequencerReferenceService = sequencerReferenceService;
+  public void setInstrumentService(InstrumentService instrumentService) {
+    this.instrumentService = instrumentService;
   }
 }

@@ -69,19 +69,21 @@ HotTarget.boxable = (function() {
     for ( var key in freeByAlias) {
       freeByAlias[key].sort(sortFunction);
     }
+    var changes = [];
     for (var row = 0; row < rowCount; row++) {
       var boxAlias = table.getDataAtRowProp(row, 'boxAlias');
       if (boxAlias && !table.getDataAtRowProp(row, 'boxPosition')) {
         var free = freeByAlias[boxAlias];
         if (free && free.length > 0) {
           var pos = free.shift();
-          table.setDataAtRowProp(row, 'boxPosition', pos);
+          changes.push([row, 'boxPosition', pos]);
           freeByAlias[boxAlias] = free.filter(function(freePos) {
             return freePos !== pos;
           });
         }
       }
     }
+    table.setDataAtRowProp(changes);
   }
 
   return {

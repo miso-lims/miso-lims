@@ -1,1 +1,0 @@
-ALTER TABLE SequencerPartitionContainer_Partition ADD CONSTRAINT spcp_partition_partitionid_fk FOREIGN KEY(partitions_partitionId) REFERENCES _Partition(partitionId);

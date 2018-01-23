@@ -17,9 +17,9 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 
 @Ajaxified
 public class ServiceRecordControllerHelperService {
@@ -28,7 +28,7 @@ public class ServiceRecordControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private SequencerReferenceService sequencerReferenceService;
+  private InstrumentService instrumentService;
   @Autowired
   private MisoFilesManager misoFileManager;
   
@@ -53,7 +53,7 @@ public class ServiceRecordControllerHelperService {
       if (json.has("recordId")) {
         Long recordId = json.getLong("recordId");
         try {
-          sequencerReferenceService.deleteServiceRecord(recordId);
+          instrumentService.deleteServiceRecord(recordId);
           return JSONUtils.SimpleJSONResponse("Service Record deleted");
         } catch (IOException e) {
           log.error("cannot delete service record", e);
@@ -80,7 +80,7 @@ public class ServiceRecordControllerHelperService {
     try {
       if (user.isAdmin()) {
         String filename = null;
-        for (final String s : misoFileManager.getFileNames(SequencerServiceRecord.class, id.toString())) {
+        for (final String s : misoFileManager.getFileNames(ServiceRecord.class, id.toString())) {
           if (s.hashCode() == hashcode) {
             filename = s;
             break;
@@ -90,7 +90,7 @@ public class ServiceRecordControllerHelperService {
           return JSONUtils.SimpleJSONError("File not found");
         }
         log.info(MessageFormat.format("Attempting to delete file {0}", filename));
-        misoFileManager.deleteFile(SequencerServiceRecord.class, id.toString(), filename);
+        misoFileManager.deleteFile(ServiceRecord.class, id.toString(), filename);
         log.info(MessageFormat.format("{0} deleted", filename));
         return JSONUtils.SimpleJSONResponse("OK");
       } else {

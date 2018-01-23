@@ -45,14 +45,14 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 
 @Controller
-@RequestMapping("/sequencer/servicerecord")
+@RequestMapping("/instrument/servicerecord")
 @SessionAttributes("serviceRecord")
 public class EditServiceRecordController {
   
@@ -74,7 +74,7 @@ public class EditServiceRecordController {
   }
 
   @Autowired
-  private SequencerReferenceService sequencerReferenceService;
+  private InstrumentService instrumentService;
   @Autowired
   private FilesManager filesManager;
 
@@ -82,10 +82,10 @@ public class EditServiceRecordController {
     this.filesManager = filesManager;
   }
   
-  public Map<Integer, String> populateServiceRecordFiles(SequencerServiceRecord record) throws IOException {
-    if (record.getId() != SequencerServiceRecord.UNSAVED_ID) {
+  public Map<Integer, String> populateServiceRecordFiles(ServiceRecord record) throws IOException {
+    if (record.getId() != ServiceRecord.UNSAVED_ID) {
       Map<Integer, String> fileMap = new HashMap<>();
-      for (String s : filesManager.getFileNames(SequencerServiceRecord.class, String.valueOf(record.getId()))) {
+      for (String s : filesManager.getFileNames(ServiceRecord.class, String.valueOf(record.getId()))) {
         fileMap.put(s.hashCode(), s);
       }
       return fileMap;
@@ -95,12 +95,12 @@ public class EditServiceRecordController {
   
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return sequencerReferenceService.getServiceRecordColumnSizes();
+    return instrumentService.getServiceRecordColumnSizes();
   }
 
   @RequestMapping(value = "/{recordId}", method = RequestMethod.GET)
   public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId, ModelMap model) throws IOException {
-    SequencerServiceRecord sr = sequencerReferenceService.getServiceRecord(recordId);
+    ServiceRecord sr = instrumentService.getServiceRecord(recordId);
     if (sr != null) {
       model.put(ModelKeys.RECORD.getKey(), sr);
       model.put(ModelKeys.FILES.getKey(), populateServiceRecordFiles(sr));
@@ -111,32 +111,32 @@ public class EditServiceRecordController {
     return new ModelAndView("/pages/editServiceRecord.jsp", model);
   }
   
-  @RequestMapping(value = "/new/{sequencerReferenceId}", method = RequestMethod.GET)
-  public ModelAndView newServiceRecord(@PathVariable(value = "sequencerReferenceId") Long sequencerReferenceId, ModelMap model) throws IOException {
-    SequencerReference sequencer = sequencerReferenceService.get(sequencerReferenceId);
-    if (sequencer == null) {
-      throw new IOException("No such Sequencer.");
+  @RequestMapping(value = "/new/{instrumentId}", method = RequestMethod.GET)
+  public ModelAndView newServiceRecord(@PathVariable(value = "instrumentId") Long instrumentId, ModelMap model) throws IOException {
+    Instrument instrument = instrumentService.get(instrumentId);
+    if (instrument == null) {
+      throw new IOException("No such Instrument.");
     }
-    SequencerServiceRecord record = new SequencerServiceRecord();
-    record.setSequencerReference(sequencer);
+    ServiceRecord record = new ServiceRecord();
+    record.setInstrument(instrument);
     model.put(ModelKeys.RECORD.getKey(), record);
     model.put("title", "New Service Record");
     return new ModelAndView("/pages/editServiceRecord.jsp", model);
   }
   
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("serviceRecord") SequencerServiceRecord record, ModelMap model, SessionStatus session)
+  public String processSubmit(@ModelAttribute("serviceRecord") ServiceRecord record, ModelMap model, SessionStatus session)
       throws IOException {
     Long recordId = null;
-    if (record.getId() == SequencerServiceRecord.UNSAVED_ID) {
-      recordId = sequencerReferenceService.createServiceRecord(record);
+    if (record.getId() == ServiceRecord.UNSAVED_ID) {
+      recordId = instrumentService.createServiceRecord(record);
     } else {
-      sequencerReferenceService.updateServiceRecord(record);
+      instrumentService.updateServiceRecord(record);
       recordId = record.getId();
     }
     session.setComplete();
     model.clear();
-    return "redirect:/miso/sequencer/servicerecord/" + recordId;
+    return "redirect:/miso/instrument/servicerecord/" + recordId;
   }
   
   @InitBinder

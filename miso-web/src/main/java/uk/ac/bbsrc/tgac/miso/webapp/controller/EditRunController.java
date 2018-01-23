@@ -51,12 +51,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
@@ -66,11 +66,11 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
+import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.PlatformService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
-import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ExperimentListConfiguration;
 import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
@@ -103,7 +103,7 @@ public class EditRunController {
   private PartitionQCService partitionQCService;
 
   @Autowired
-  private SequencerReferenceService sequencerReferenceService;
+  private InstrumentService instrumentService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
   @Autowired
@@ -157,9 +157,9 @@ public class EditRunController {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     // clear any existing run in the model
     model.addAttribute("run", null);
-    SequencerReference sequencerReference = sequencerReferenceService.get(srId);
-    Run run = sequencerReference.getPlatform().getPlatformType().createRun(user);
-    run.setSequencerReference(sequencerReference);
+    Instrument instrument = instrumentService.get(srId);
+    Run run = instrument.getPlatform().getPlatformType().createRun(user);
+    run.setSequencer(instrument);
     return setupForm(run, model);
 
   }
@@ -222,7 +222,7 @@ public class EditRunController {
       }
 
       model.put("sequencingParameters",
-          sequencingParametersService.getForPlatform((long) run.getSequencerReference().getPlatform().getId()));
+          sequencingParametersService.getForPlatform((long) run.getSequencer().getPlatform().getId()));
 
       model.put("runContainers", run.getSequencerPartitionContainers().stream().map(Dtos::asDto).collect(Collectors.toList()));
       model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
@@ -248,7 +248,7 @@ public class EditRunController {
       ObjectMapper mapper = new ObjectMapper();
       ObjectNode partitionConfig = mapper.createObjectNode();
       partitionConfig.put("platformType", run.getPlatformType().name());
-      partitionConfig.put("platformId", run.getSequencerReference().getPlatform().getId());
+      partitionConfig.put("platformId", run.getSequencer().getPlatform().getId());
       partitionConfig.put("runId", run.getId());
       partitionConfig.put("isFull", run.isFull());
       partitionConfig.put("showContainer", true);
@@ -259,7 +259,7 @@ public class EditRunController {
               .collect(Collectors.toList()));
       model.put("experimentConfiguration",
           mapper.writeValueAsString(
-              new ExperimentListConfiguration(experimentService, libraryService, run.getSequencerReference().getPlatform(),
+              new ExperimentListConfiguration(experimentService, libraryService, run.getSequencer().getPlatform(),
                   run)));
 
       return new ModelAndView("/pages/editRun.jsp", model);

@@ -21,10 +21,14 @@
  * *********************************************************************
  */
 
-ListTarget.sequencer = {
-  name: "Sequencers",
+ListTarget.instrument = {
+  name: "Instruments",
   createUrl: function(config, projectId) {
-    return "/miso/rest/sequencer/dt";
+    if (config.instrumentType) {
+      return "/miso/rest/instrument/dt/instrument-type/" + config.instrumentType;
+    } else {
+      return "/miso/rest/instrument/dt";
+    }
   },
   createBulkActions: function(config, projectId) {
     return [];
@@ -35,7 +39,7 @@ ListTarget.sequencer = {
         "name": "Add",
         "handler": function() {
 
-          Utils.showDialog("Add Sequencer", "Add", [{
+          Utils.showDialog("Add Instrument", "Add", [{
             property: "name",
             type: "text",
             label: "Instrument Name",
@@ -66,9 +70,9 @@ ListTarget.sequencer = {
             type: "date",
             label: "Date Commissioned",
             required: false
-          }], function(seq) {
-            seq.id = 0;
-            Utils.ajaxWithDialog('Saving Sequencer', 'POST', '/miso/rest/sequencer', seq, Utils.page.pageReload);
+          }], function(instrument) {
+            instrument.id = 0;
+            Utils.ajaxWithDialog('Saving Instrument', 'POST', '/miso/rest/instrument', instrument, Utils.page.pageReload);
 
           });
 
@@ -79,7 +83,7 @@ ListTarget.sequencer = {
     }
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.labelHyperlinkColumn("Instrument Name", "sequencer", Utils.array.getId, "name", 1, true), {
+    return [ListUtils.labelHyperlinkColumn("Instrument Name", "instrument", Utils.array.getId, "name", 1, true), {
       "sTitle": "Platform",
       "mData": "platform.platformType",
       "include": true,

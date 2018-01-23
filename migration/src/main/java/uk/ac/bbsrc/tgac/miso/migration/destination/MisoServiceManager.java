@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstituteDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateInstrumentDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateKitDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLabDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryDao;
@@ -46,7 +47,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleValidRelationshipDa
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityProfileDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerPartitionContainerDao;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencerReferenceDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSequencingParametersDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateStudyDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSubprojectDao;
@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultContainerService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultIndexService;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultInstrumentService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultKitService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLabService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryDesignCodeService;
@@ -79,7 +80,6 @@ import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSampleValidRelationshipService;
-import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultSequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultStudyService;
 import uk.ac.bbsrc.tgac.miso.service.impl.DefaultTargetedSequencingService;
@@ -115,7 +115,7 @@ public class MisoServiceManager {
   private HibernateStudyDao studyDao;
   private HibernateRunDao runDao;
   private HibernateSequencerPartitionContainerDao sequencerPartitionContainerDao;
-  private HibernateSequencerReferenceDao sequencerReferenceDao;
+  private HibernateInstrumentDao instrumentDao;
   private HibernateBoxDao boxDao;
   private HibernatePoolableElementViewDao poolableElementViewDao;
   private HibernatePoolOrderDao poolOrderDao;
@@ -137,7 +137,7 @@ public class MisoServiceManager {
   private DefaultSampleValidRelationshipService sampleValidRelationshipService;
   private DefaultReferenceGenomeService referenceGenomeService;
   private DefaultRunService runService;
-  private DefaultSequencerReferenceService sequencerReferenceService;
+  private DefaultInstrumentService instrumentService;
   private DefaultSequencingParametersService sequencingParametersService;
   private DefaultStudyService studyService;
   private DefaultPoolableElementViewService poolableElementViewService;
@@ -236,8 +236,8 @@ public class MisoServiceManager {
     m.setDefaultSecurityProfileDao();
     m.setDefaultSecurityStore();
     m.setDefaultSequencerPartitionContainerDao();
-    m.setDefaultSequencerReferenceDao();
-    m.setDefaultSequencerReferenceService();
+    m.setDefaultInstrumentDao();
+    m.setDefaultInstrumentService();
     m.setDefaultSequencingParametersService();
     m.setDefaultStudyDao();
     m.setDefaultStudyService();
@@ -332,7 +332,7 @@ public class MisoServiceManager {
     if (poolService != null) poolService.setAuthorizationManager(authorizationManager);
     if (runService != null) runService.setAuthorizationManager(authorizationManager);
     if (containerService != null) containerService.setAuthorizationManager(authorizationManager);
-    if (sequencerReferenceService != null) sequencerReferenceService.setAuthorizationManager(authorizationManager);
+    if (instrumentService != null) instrumentService.setAuthorizationManager(authorizationManager);
     if (kitService != null) kitService.setAuthorizationManager(authorizationManager);
     if (changeLogService != null) changeLogService.setAuthorizationManager(authorizationManager);
     if (experimentService != null) experimentService.setAuthorizationManager(authorizationManager);
@@ -878,24 +878,24 @@ public class MisoServiceManager {
     if (containerService != null) containerService.setContainerDao(sequencerPartitionContainerDao);
   }
 
-  public HibernateSequencerReferenceDao getSequencerReferenceDao() {
-    return sequencerReferenceDao;
+  public HibernateInstrumentDao getInstrumentDao() {
+    return instrumentDao;
   }
 
-  public void setSequencerReferenceDao(HibernateSequencerReferenceDao sequencerReferenceDao) {
-    this.sequencerReferenceDao = sequencerReferenceDao;
-    updateSequencerReferenceDaoDependencies();
+  public void setInstrumentDao(HibernateInstrumentDao instrumentDao) {
+    this.instrumentDao = instrumentDao;
+    updateInstrumentDaoDependencies();
   }
 
-  public void setDefaultSequencerReferenceDao() {
-    HibernateSequencerReferenceDao dao = new HibernateSequencerReferenceDao();
+  public void setDefaultInstrumentDao() {
+    HibernateInstrumentDao dao = new HibernateInstrumentDao();
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setSessionFactory(sessionFactory);
-    setSequencerReferenceDao(dao);
+    setInstrumentDao(dao);
   }
 
-  private void updateSequencerReferenceDaoDependencies() {
-    if (sequencerReferenceService != null) sequencerReferenceService.setSequencerReferenceDao(sequencerReferenceDao);
+  private void updateInstrumentDaoDependencies() {
+    if (instrumentService != null) instrumentService.setInstrumentDao(instrumentDao);
   }
 
   public HibernateBoxDao getBoxDao() {
@@ -1368,13 +1368,13 @@ public class MisoServiceManager {
     service.setNamingScheme(getNamingScheme());
     service.setSecurityProfileStore(securityProfileDao);
     service.setContainerService(containerService);
-    service.setSequencerReferenceService(sequencerReferenceService);
+    service.setInstrumentService(instrumentService);
     service.setSequencingParametersService(sequencingParametersService);
     setRunService(service);
   }
 
   private void updateRunServiceDependencies() {
-    if (sequencerReferenceService != null) sequencerReferenceService.setRunService(runService);
+    if (instrumentService != null) instrumentService.setRunService(runService);
   }
 
   public DefaultContainerService getContainerService() {
@@ -1412,7 +1412,7 @@ public class MisoServiceManager {
   public void setDefaultPlatformService() {
     DefaultPlatformService service = new DefaultPlatformService();
     service.setPlatformDao(platformDao);
-    service.setSequencerReferenceService(sequencerReferenceService);
+    service.setInstrumentService(instrumentService);
     setPlatformService(service);
   }
 
@@ -1421,25 +1421,25 @@ public class MisoServiceManager {
     if (experimentService != null) experimentService.setPlatformService(platformService);
   }
 
-  public DefaultSequencerReferenceService getSequencerReferenceService() {
-    return sequencerReferenceService;
+  public DefaultInstrumentService getInstrumentService() {
+    return instrumentService;
   }
 
-  public void setSequencerReferenceService(DefaultSequencerReferenceService service) {
-    this.sequencerReferenceService = service;
-    updateSequencerReferenceServiceDependencies();
+  public void setInstrumentService(DefaultInstrumentService service) {
+    this.instrumentService = service;
+    updateInstrumentServiceDependencies();
   }
 
-  public void setDefaultSequencerReferenceService() {
-    DefaultSequencerReferenceService service = new DefaultSequencerReferenceService();
+  public void setDefaultInstrumentService() {
+    DefaultInstrumentService service = new DefaultInstrumentService();
     service.setAuthorizationManager(authorizationManager);
-    service.setSequencerReferenceDao(sequencerReferenceDao);
+    service.setInstrumentDao(instrumentDao);
     service.setRunService(runService);
-    setSequencerReferenceService(service);
+    setInstrumentService(service);
   }
 
-  private void updateSequencerReferenceServiceDependencies() {
-    if (runService != null) runService.setSequencerReferenceService(sequencerReferenceService);
+  private void updateInstrumentServiceDependencies() {
+    if (runService != null) runService.setInstrumentService(instrumentService);
   }
 
   public DefaultLibraryDesignService getLibraryDesignService() {

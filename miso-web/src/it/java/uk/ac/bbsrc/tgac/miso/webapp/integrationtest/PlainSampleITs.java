@@ -236,7 +236,7 @@ public class PlainSampleITs extends AbstractIT {
     slugs.add("containers");
     slugs.add("runs");
     slugs.add("boxes");
-    slugs.add("sequencers");
+    slugs.add("instruments");
     slugs.add("kitdescriptors");
     slugs.add("indices");
     slugs.add("studies");

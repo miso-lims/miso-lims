@@ -16,6 +16,8 @@ public class PlatformDto {
 
   private String platformType;
 
+  private String instrumentType;
+
   public String getDescription() {
     return description;
   }
@@ -71,6 +73,14 @@ public class PlatformDto {
 
   public void setPlatformType(String platformType) {
     this.platformType = platformType;
+  }
+
+  public String getInstrumentType() {
+    return instrumentType;
+  }
+
+  public void setInstrumentType(String instrumentType) {
+    this.instrumentType = instrumentType;
   }
 
 }

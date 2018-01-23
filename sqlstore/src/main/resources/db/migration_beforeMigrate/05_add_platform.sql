@@ -9,11 +9,12 @@ CREATE PROCEDURE addInstrumentModel(
   iInstrumentModel varchar(100),
   iDescription varchar(255),
   iNumContainers tinyint(4),
-  iPartitionSize int(11)
+  iPartitionSize int(11),
+  iInstrumentType varchar(50)
 ) BEGIN
   IF NOT EXISTS (SELECT 1 FROM Platform WHERE name = iName and instrumentModel = iInstrumentModel) THEN
-    INSERT INTO Platform(name, instrumentModel, description, numContainers)
-    VALUES (iName, iInstrumentModel, iDescription, iNumContainers);
+    INSERT INTO Platform(name, instrumentModel, description, numContainers, instrumentType)
+    VALUES (iName, iInstrumentModel, iDescription, iNumContainers, iInstrumentType);
     
     INSERT INTO PlatformSizes(platform_platformId, partitionSize)
     VALUES (LAST_INSERT_ID(), iPartitionSize);

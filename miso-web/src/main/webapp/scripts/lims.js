@@ -556,13 +556,19 @@ Utils.ui = {
     return Element.extend(element);
   },
 
+  toggleElement: function(id) {
+    jQuery("#" + id).slideToggle({
+      'duration': 500
+    });
+  },
+
   toggleRightInfo: function(div, id) {
     if (jQuery(div).hasClass("toggleRight")) {
       jQuery(div).removeClass("toggleRight").addClass("toggleRightDown");
     } else {
       jQuery(div).removeClass("toggleRightDown").addClass("toggleRight");
     }
-    jQuery("#" + id).toggle("blind", {}, 500);
+    Utils.ui.toggleElement(id);
   },
 
   toggleLeftInfo: function(div, id) {
@@ -571,7 +577,13 @@ Utils.ui = {
     } else {
       jQuery(div).removeClass("toggleLeftDown").addClass("toggleLeft");
     }
-    jQuery("#" + id).toggle("blind", {}, 500);
+    Utils.ui.toggleElement(id);
+  },
+
+  collapseClass: function(class_) {
+    jQuery('.' + class_).slideUp({
+      'duration': 500
+    });
   },
 
   goodDateFormat: 'yy-mm-dd',
