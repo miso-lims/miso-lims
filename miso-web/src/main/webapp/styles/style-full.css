@@ -1942,3 +1942,107 @@ button.disabled {
 
 .boxVisCell {
 }
+
+#searchHelpQuestionMark {
+    height: 20px;
+    width: 20px;
+    vertical-align: middle;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    padding: 5px;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: auto;
+    background-color: black;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    position: absolute;
+    z-index: 1;
+    left: -300%;
+    top: 25px;
+
+    /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Outer */
+.popup {
+    width: 100%;
+    height: 100%;
+    display: none;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    background: rgba(0, 0, 0, 0.75);
+}
+
+/* Inner */
+.popup-inner {
+    max-width: 700px;
+    width: 90%;
+    padding: 40px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 1);
+    border-radius: 3px;
+    background: #fff;
+    text-align: left;
+    /*font-size: 10px;*/
+}
+
+.popup-close {
+    width: 30px;
+    height: 30px;
+    padding-top: 4px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    transition: ease 0.25s all;
+    transform: translate(50%, -50%);
+    border-radius: 1000px;
+    /*background:black;*/
+    background: #F1EDFF;
+    font-size: 20px;
+    text-align: center;
+    /*color:white !important;*/
+    color: black;
+    text-decoration: none;
+}
+
+.searchHelpTable {
+    border-collapse: collapse;
+    border: 1px solid black;
+    width: 100%;
+}
+
+.searchHelpTable td {
+    border: 1px solid black;
+    font-size: 12px;
+}
+.searchHelpTable th {
+    border: 1px solid black;
+    font-size: 12px;
+}
+
+.searchHelpTable caption {
+    border: 1px solid black;
+    font-size: 12px;
+}
