@@ -33,6 +33,51 @@ ListUtils = (function() {
     state.element.innerText = (state.selected.length ? (' ' + state.selected.length + ' selected') : '')
         + (hidden ? ' (' + hidden + ' on other pages)' : '');
   };
+
+  var searchHelpTerms = {
+    "fulfilled": "is:fulfilled",
+    "active": "is:active",
+    "order": "is:order",
+    "unknown": "is:unknown",
+    "started": "is:started",
+    "running": "is:running",
+    "stopped": "is:stopped",
+    "incomplete": "is:incomplete",
+    "failed": "is:failed",
+    "completed": "is:completed",
+    "created": "created:DATE",
+    "received": "received:DATE",
+    "changed": "changed:DATE",
+    "creator": "creator:USER",
+    "changedby": "changedby:USER",
+    "platform": "platform:PLATFORM",
+    "index_name": "index:NAME",
+    "index_seq": "index:SEQ",
+    "class": "class:NAME",
+    "institute": "institute:NAME",
+    "external": "external:NAME",
+    "box": "box:NAME"
+  };
+
+  var getSearchHelp = function(target) {
+      return "Search syntax:<br/><br/>" + target.searchHelpTermSelector(searchHelpTerms).join('<br/>');
+  };
+
+  var getSearchHelpTooltipText = function(target) {
+      return '<div class="tooltip">' +
+          '  <span>' +
+          '    <img id="magnify" src="/styles/images/question_mark.png" style="height: 20px; width: 20px; vertical-align: middle">' +
+          '  </span>' +
+          '  <span class="tooltiptext">' +
+               getSearchHelp(target) +
+          '  </span>' +
+          '</div>'
+  };
+
+  var makeSearchHelpTooltip = function(searchDivId, target) {
+      jQuery('#' + searchDivId).children('label').prepend(getSearchHelpTooltipText(target));
+  };
+
   var initTable = function(elementId, target, projectId, config, optionModifier) {
     var staticActions = target.createStaticActions(config, projectId);
     var bulkActions = target.createBulkActions(config, projectId);
@@ -116,6 +161,9 @@ ListUtils = (function() {
     });
     optionModifier(options, jqTable, errorMessage, columns);
     jqTable.dataTable(options);
+    if (target.hasOwnProperty("searchHelpTermSelector")) {
+        makeSearchHelpTooltip(elementId + '_filter', target);
+    }
     var filterbox = jQuery('#' + elementId + '_filter :input');
     filterbox.unbind();
     filterbox.bind('keyup', function(e) {
