@@ -131,7 +131,7 @@ ListTarget.completion = {
       "include": true
     }];
   },
-  searchHelpTermSelector: function(searchTerms) {
+  searchTermSelector: function(searchTerms) {
     return [searchTerms['fulfilled'],
       searchTerms['active'],
       searchTerms['unknown'],

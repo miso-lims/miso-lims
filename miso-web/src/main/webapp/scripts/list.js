@@ -34,7 +34,7 @@ ListUtils = (function() {
         + (hidden ? ' (' + hidden + ' on other pages)' : '');
   };
 
-  var searchHelpTerms = {
+  var searchTerms = {
     "fulfilled": "is:fulfilled",
     "active": "is:active",
     "unknown": "is:unknown",
@@ -58,21 +58,27 @@ ListUtils = (function() {
     "box": "box:NAME"
   };
 
-  var getSearchHelp = function(target) {
-    return "Search syntax:<br/><br/>" + target.searchHelpTermSelector(searchHelpTerms).join('<br/>');
+  var questionMarkImg = '<img id="magnify" src="/styles/images/question_mark.png"' +
+    'style="height: 20px; width: 20px; vertical-align: middle">';
+
+  var searchHelpText = function(target) {
+    return "Search syntax: <br/><br/>"
+      + target.searchTermSelector(searchTerms).join('<br/>');
   };
 
-  var getSearchHelpTooltipText = function(target) {
-    return '<div class="tooltip">' + '  <span>'
-      + '    <img id="magnify" src="/styles/images/question_mark.png" style="height: 20px; width: 20px; vertical-align: middle">'
-      + '  </span>' + '  <span class="tooltiptext">' + getSearchHelp(target) + '  </span>' + '</div>'
+  var searchHelpTooltip = function(target) {
+    return '<div id="searchHelpTooltip" class="tooltip">' +
+      '<span>' +
+      questionMarkImg +
+      '</span>' +
+      '<span class="tooltiptext">' +
+      searchHelpText(target) +
+      '</span>' +
+      '</div>';
   };
 
   var makeSearchHelpTooltip = function(searchDivId, target) {
-    // jQuery('#' + searchDivId).children('label').prepend(getSearchHelpTooltipText(target));
-    jQuery('#' + searchDivId).append(getSearchHelpTooltipText(target));
-    // jQuery('#' + searchDivId).children('label').prop('title', getSearchHelpTooltipText(target));
-    // jQuery('#' + searchDivId + " :input").prop('title', getSearchHelpTooltipText(target));
+    jQuery("#" + searchDivId).append(searchHelpTooltip(target));
   };
 
   var initTable = function(elementId, target, projectId, config, optionModifier) {
@@ -158,7 +164,7 @@ ListUtils = (function() {
     });
     optionModifier(options, jqTable, errorMessage, columns);
     jqTable.dataTable(options);
-    if (target.hasOwnProperty("searchHelpTermSelector")) {
+    if (target.hasOwnProperty("searchTermSelector")) {
       makeSearchHelpTooltip(elementId + '_filter', target);
     }
     var filterbox = jQuery('#' + elementId + '_filter :input');

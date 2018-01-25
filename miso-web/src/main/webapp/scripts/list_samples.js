@@ -191,7 +191,7 @@ ListTarget.sample = {
           "iSortPriority": 2
         }];
   },
-  searchHelpTermSelector: function(searchTerms) {
+  searchTermSelector: function(searchTerms) {
     return [searchTerms['created'],
       searchTerms['changed'],
       searchTerms['received'],

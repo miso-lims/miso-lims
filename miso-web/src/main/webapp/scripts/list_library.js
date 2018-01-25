@@ -112,7 +112,7 @@ ListTarget.library = {
           "bVisible": false
         }];
   },
-  searchHelpTermSelector: function(searchTerms) {
+  searchTermSelector: function(searchTerms) {
     return [searchTerms['created'],
       searchTerms['changed'],
       searchTerms['creator'],

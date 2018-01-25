@@ -95,7 +95,7 @@ ListTarget.pool = {
           "iSortPriority": 2
         }];
   },
-  searchHelpTermSelector: function(searchTerms) {
+  searchTermSelector: function(searchTerms) {
     return [searchTerms['fulfilled'],
       searchTerms['active'],
       searchTerms['created'],

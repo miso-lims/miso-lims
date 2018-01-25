@@ -1962,6 +1962,7 @@ button.disabled {
     position: absolute;
     z-index: 1;
     left: -300%;
+    top: 25px;
 
     /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */
     opacity: 0;

@@ -104,7 +104,7 @@ ListTarget.run = {
           "iSortPriority": 0
         }];
   },
-  searchHelpTermSelector: function(searchTerms) {
+  searchTermSelector: function(searchTerms) {
     return [searchTerms['unknown'],
       searchTerms['started'],
       searchTerms['running'],

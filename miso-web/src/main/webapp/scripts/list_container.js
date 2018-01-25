@@ -129,7 +129,7 @@ ListTarget.container = {
       "iSortPriority": 0
     }];
   },
-  searchHelpTermSelector: function(searchTerms) {
+  searchTermSelector: function(searchTerms) {
     return [searchTerms['created'],
       searchTerms['changed'],
       searchTerms['creator'],
