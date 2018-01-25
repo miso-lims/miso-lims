@@ -103,5 +103,22 @@ ListTarget.run = {
           "include": Constants.isDetailedSample,
           "iSortPriority": 0
         }];
+  },
+  searchHelpTermSelector: function(searchTerms) {
+    return [searchTerms['unknown'],
+      searchTerms['started'],
+      searchTerms['running'],
+      searchTerms['stopped'],
+      searchTerms['incomplete'],
+      searchTerms['failed'],
+      searchTerms['completed'],
+      searchTerms['created'],
+      searchTerms['changed'],
+      searchTerms['creator'],
+      searchTerms['changedby'],
+      searchTerms['platform'],
+      searchTerms['index_name'],
+      searchTerms['index_seq']
+    ]
   }
 };

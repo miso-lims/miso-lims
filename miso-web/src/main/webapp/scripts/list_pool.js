@@ -94,5 +94,18 @@ ListTarget.pool = {
           "include": Constants.isDetailedSample,
           "iSortPriority": 2
         }];
+  },
+  searchHelpTermSelector: function(searchTerms) {
+    return [searchTerms['fulfilled'],
+      searchTerms['active'],
+      searchTerms['created'],
+      searchTerms['changed'],
+      searchTerms['creator'],
+      searchTerms['changedby'],
+      searchTerms['platform'],
+      searchTerms['index_name'],
+      searchTerms['index_seq'],
+      searchTerms['box']
+    ]
   }
 };

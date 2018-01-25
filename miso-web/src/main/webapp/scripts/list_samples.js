@@ -193,14 +193,14 @@ ListTarget.sample = {
   },
   searchHelpTermSelector: function(searchTerms) {
     return [searchTerms['created'],
-            searchTerms['changed'],
-            searchTerms['received'],
-            searchTerms['creator'],
-            searchTerms['changedby'],
-            searchTerms['class'],
-            searchTerms['institute'],
-            searchTerms['external'],
-            searchTerms['box']
+      searchTerms['changed'],
+      searchTerms['received'],
+      searchTerms['creator'],
+      searchTerms['changedby'],
+      searchTerms['class'],
+      searchTerms['institute'],
+      searchTerms['external'],
+      searchTerms['box']
     ]
   }
 };

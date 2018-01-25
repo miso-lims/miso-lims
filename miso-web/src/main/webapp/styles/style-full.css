@@ -1946,6 +1946,7 @@ button.disabled {
 .tooltip {
     position: relative;
     display: inline-block;
+    padding: 5px;
 }
 
 .tooltip .tooltiptext {
@@ -1960,8 +1961,7 @@ button.disabled {
     padding-right: 5px;
     position: absolute;
     z-index: 1;
-    left: 50%;
-    margin-left: -60px;
+    left: -300%;
 
     /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */
     opacity: 0;

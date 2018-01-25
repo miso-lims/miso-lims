@@ -130,5 +130,21 @@ ListTarget.completion = {
       "iSortPriority": 2,
       "include": true
     }];
+  },
+  searchHelpTermSelector: function(searchTerms) {
+    return [searchTerms['fulfilled'],
+      searchTerms['active'],
+      searchTerms['unknown'],
+      searchTerms['started'],
+      searchTerms['running'],
+      searchTerms['stopped'],
+      searchTerms['incomplete'],
+      searchTerms['failed'],
+      searchTerms['completed'],
+      searchTerms['changed'],
+      searchTerms['platform'],
+      searchTerms['index_name'],
+      searchTerms['index_seq']
+    ]
   }
 };

@@ -128,5 +128,15 @@ ListTarget.container = {
       "include": true,
       "iSortPriority": 0
     }];
+  },
+  searchHelpTermSelector: function(searchTerms) {
+    return [searchTerms['created'],
+      searchTerms['changed'],
+      searchTerms['creator'],
+      searchTerms['changedby'],
+      searchTerms['platform'],
+      searchTerms['index_name'],
+      searchTerms['index_seq']
+    ]
   }
 };
