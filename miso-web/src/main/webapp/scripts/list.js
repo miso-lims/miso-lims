@@ -112,7 +112,7 @@ ListUtils = (function() {
   };
 
   var makeSearchTooltip = function(searchDivId, target) {
-    var searchTooltipId = "searchHelpTooltip";
+    var searchTooltipId = "searchHelpTooltip_" + target.name.replace(/\s/g, '');
 
     jQuery("#" + searchDivId).append(' \
       <div id="' + searchTooltipId + '" class="tooltip"> \
@@ -227,8 +227,8 @@ ListUtils = (function() {
   };
 
   var makeSearchPopup = function(parentId, triggerId, target) {
-    var popupId = "searchHelpPopup";
-    var popupCloseId = "searchHelpPopupClose";
+    var popupId = "searchHelpPopup_" + target.name.replace(/\s/g, '');
+    var popupCloseId = "searchHelpPopupClose_" + target.name.replace(/\s/g, '');
 
     makePopupElement(parentId, popupId, target);
     registerPopupOpen(triggerId, popupId);
