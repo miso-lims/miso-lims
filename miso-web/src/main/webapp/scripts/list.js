@@ -210,8 +210,9 @@ ListUtils = (function() {
   };
 
   var registerPopupClose = function(popupCloseId, popupId) {
-    jQuery("#" + popupCloseId).click(function() {
+    jQuery("#" + popupCloseId).click(function(e) {
       jQuery("#" + popupId).fadeOut(350);
+      e.preventDefault()
     });
   };
 
