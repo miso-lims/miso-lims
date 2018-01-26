@@ -193,8 +193,8 @@ ListUtils = (function() {
       + userGrammar;
   };
 
-  var makePopupElement = function(searchDivId, popupId, target) {
-    jQuery("#" + searchDivId).append(' \
+  var makePopupElement = function(parentId, popupId, target) {
+    jQuery("#" + parentId).append(' \
       <div id="' + popupId + '" class="popup"> \
         <div class="popup-inner"> \
           ' + makePopupHelp(target) + '\
@@ -203,25 +203,35 @@ ListUtils = (function() {
       </div>');
   };
 
-  var registerPopupOpen = function(tooltipId, popupId) {
-    jQuery("#" + tooltipId).click(function() {
+  var registerPopupOpen = function(triggerId, popupId) {
+    jQuery("#" + triggerId).click(function() {
       jQuery("#" + popupId).fadeIn(350);
     });
   };
 
   var registerPopupClose = function(popupCloseId, popupId) {
-    jQuery("#" + popupCloseId).click(function(e) {
+    var closePopup = function(e) {
       jQuery("#" + popupId).fadeOut(350);
-      e.preventDefault()
+      e.preventDefault();
+    };
+
+    // Close popup when popupCloseId is clicked
+    jQuery("#" + popupCloseId).click(function(e) {
+      closePopup(e);
+    });
+
+    // Close popup when esc is pressed
+    jQuery(document).keyup(function(e) {
+      closePopup(e);
     });
   };
 
-  var makeSearchPopup = function(searchDivId, tooltipId, target) {
+  var makeSearchPopup = function(parentId, triggerId, target) {
     var popupId = "searchHelpPopup";
     var popupCloseId = "searchHelpPopupClose";
 
-    makePopupElement(searchDivId, popupId, target);
-    registerPopupOpen(tooltipId, popupId);
+    makePopupElement(parentId, popupId, target);
+    registerPopupOpen(triggerId, popupId);
     registerPopupClose(popupCloseId, popupId);
   };
 
