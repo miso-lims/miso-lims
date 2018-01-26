@@ -35,50 +35,193 @@ ListUtils = (function() {
   };
 
   var searchTerms = {
-    "fulfilled": "is:fulfilled",
-    "active": "is:active",
-    "unknown": "is:unknown",
-    "started": "is:started",
-    "running": "is:running",
-    "stopped": "is:stopped",
-    "incomplete": "is:incomplete",
-    "failed": "is:failed",
-    "completed": "is:completed",
-    "created": "created:DATE",
-    "received": "received:DATE",
-    "changed": "changed:DATE",
-    "creator": "creator:USER",
-    "changedby": "changedby:USER",
-    "platform": "platform:PLATFORM",
-    "index_name": "index:NAME",
-    "index_seq": "index:SEQ",
-    "class": "class:NAME",
-    "institute": "institute:NAME",
-    "external": "external:NAME",
-    "box": "box:NAME"
+    "fulfilled": {
+      term: "is:fulfilled",
+      help: "Check if there are no outstanding orders (remaining = 0)."
+    },
+    "active": {
+      term: "is:active",
+      help: "Check if there are outstanding orders (remaining > 0)."
+    },
+    "runstatus": {
+      term: "is:RUNSTATUS",
+      help: 'Match based on a run\'s "health".  ' +
+      'RUNSTATUS may be one of: ' +
+      'fulfilled, active, unknown, started, running, stopped, incomplete, failed, or completed.  ' +
+      'For order completions, this means that the order includes at least one run with this status.  ' +
+      '"incomplete" matches when a run\'s health ' +
+      '(or an order completion with a run of this health) is any of running, started, or stopped'
+    },
+    "created": {
+      term: "created:DATE",
+      help: "Checks when this item was entered into MISO.  For rules about dates, see below."
+    },
+    "received": {
+      term: "received:DATE",
+      help: "Checks whether this item has a received date that matches the provided date.  For rules about dates, see below."
+    },
+    "changed": {
+      term: "changed:DATE",
+      help: "Checks when any person last edited this item.  For rules about dates, see below."
+    },
+    "creator": {
+      term: "creator:USER",
+      help: "Check for items entered into MISO by a particular user.  For the rules about users, see below."
+    },
+    "changedby": {
+      term: "changedby:USER",
+      help: "Checks for the last person to edit this item in MISO.  For the rules about users, see below."
+    },
+    "platform": {
+      term: "platform:PLATFORM",
+      help: "Check if this item is meant for a particular platform type: ILLUMINA, LS454, SOLID, IONTORRENT, PACBIO, OXFORDNANOPORE."
+    },
+    "index_name": {
+      term: "index:NAME",
+      help: "Checks if this item has the index provided.  The name can be a partial match."
+    },
+    "index_seq": {
+      term: "index:SEQ",
+      help: "Checks if this item has the index provided.  The sequence must be an exact match."
+    },
+    "class": {
+      term: "class:NAME",
+      help: "Check if the item belong to the sample class provided.  This is taken as a partial match."
+    },
+    "institute": {
+      term: "institute:NAME",
+      help: "Check if the item came from the institute mentioned.  This is a partial match."
+    },
+    "external": {
+      term: "external:NAME",
+      help: "Checks if an item came from the external identifier or external name."
+    },
+    "box": {
+      term: "box:NAME",
+      help: "Checks if an item is located in a particular box.  The name can either be the partial name or partial alias of the box."
+    }
   };
 
-  var questionMarkImg = '<img id="magnify" src="/styles/images/question_mark.png"' +
-    'style="height: 20px; width: 20px; vertical-align: middle">';
-
-  var searchHelpText = function(target) {
-    return "Search syntax: <br/><br/>"
-      + target.searchTermSelector(searchTerms).join('<br/>');
+  var makeTooltipHelp = function(target) {
+    return "Search syntax: \
+      <br/> \
+      <br/>"
+      + target.searchTermSelector(searchTerms).map(function(term) {
+        return term["term"];
+      }).join('<br/>');
   };
 
-  var searchHelpTooltip = function(target) {
-    return '<div id="searchHelpTooltip" class="tooltip">' +
-      '<span>' +
-      questionMarkImg +
-      '</span>' +
-      '<span class="tooltiptext">' +
-      searchHelpText(target) +
-      '</span>' +
-      '</div>';
+  var makeSearchTooltip = function(searchDivId, target) {
+    var searchTooltipId = "searchHelpTooltip";
+
+    jQuery("#" + searchDivId).append(' \
+      <div id="' + searchTooltipId + '" class="tooltip"> \
+        <span> \
+          <img id="searchHelpQuestionMark" src="/styles/images/question_mark.png" \
+        </span> \
+        <span class="tooltiptext"> \
+          ' + makeTooltipHelp(target) + ' \
+        </span> \
+      </div>');
+
+    return searchTooltipId;
   };
 
-  var makeSearchHelpTooltip = function(searchDivId, target) {
-    jQuery("#" + searchDivId).append(searchHelpTooltip(target));
+  var makePopupTableBody = function(target) {
+    var result = "";
+    var targetTerms = target.searchTermSelector(searchTerms);
+
+    for (var i = 0; i < targetTerms.length; ++i) {
+      result += "<tr><td>" + targetTerms[i]["term"] + "</td><td>" + targetTerms[i]["help"] + "</td></tr>";
+    }
+
+    return result;
+  };
+
+  var makePopupTable = function(target) {
+    return ' \
+      <table class="searchHelpTable">\
+        <caption><h2>Search Terms</h2></caption>\
+        <thead> \
+          <tr><th>Syntax</th><th>Meaning</th></tr> \
+        </thead> \
+      ' + makePopupTableBody(target) + ' \
+      </table>';
+  };
+
+  var dateGrammar = '\
+    <table class="searchHelpTable"> \
+      <caption><h2>DATE Format</h2></caption> \
+      <thead> \
+        <tr><th>Format</th><th>Behaviour</th></tr> \
+      </thead> \
+      <tr><td>lasthour</td><td>Filter from 1 hour ago to the current time.</td></tr> \
+      <tr><td>today</td><td>Anything that happened on the current calendar day.</td></tr> \
+      <tr><td>yesterday</td><td>Filter for anything on the last calendar day.</td></tr> \
+      <tr><td>thisweek</td><td>Filter from Monday 00:00:00 of the current week to the present time.</td></tr> \
+      <tr><td>lastweek</td><td>Filter from Monday 00:00:00 of the previous week to Sunday 23:59:59 of the previous week.</td></tr> \
+      <tr><td><i>N</i>hours</td><td>Filter for anything from the current time to <i>N</i> hours ago.</td></tr> \
+      <tr><td><i>N</i>days</td><td>Filter for anything from the current time to <i>N</i>*24 hours ago.</td></tr> \
+      <tr><td>YYYY-MM-DD</td><td>Search from YYYY-MM-DD 00:00:00 to YYYY-MM-DD 23:59:59</td></tr> \
+    </table>';
+
+  var userGrammar = '\
+    <table class="searchHelpTable"> \
+      <caption><h2>USER Format</h2></caption> \
+      <thead> \
+        <tr><th>Format</th><th>Behaviour</th></tr> \
+      </thead> \
+      <tr><td>me</td><td>Searches for the current user.</td></tr> \
+      <tr><td>Anything else</td><td>Assumed to be the user\'s login name (not their human name). \
+        This starts searching from the beginning, so “jrh” will match “jrhacker”, but “hacker” will not match “jrhacker”.</td></tr> \
+    </table>';
+
+  var makePopupHelp = function(target) {
+    return "\
+      <h1>Search Syntax</h1> \
+      <p> \
+        This search box supports case-sensitive search syntax. \
+        Multiple searches can be separated by spaces (not AND). \
+        If a filter does not apply, it is ignored.  \
+        Any other search term is taken as a regular query and matched against the current fields for each item. \
+      </p> \
+      <br/>"
+      + makePopupTable(target)
+      + "<br/>"
+      + dateGrammar
+      + "<br/>"
+      + userGrammar;
+  };
+
+  var makePopupElement = function(searchDivId, popupId, target) {
+    jQuery("#" + searchDivId).append(' \
+      <div id="' + popupId + '" class="popup"> \
+        <div class="popup-inner"> \
+          ' + makePopupHelp(target) + '\
+          <a id="searchHelpPopupClose" class="popup-close" href="#">x</a>\
+        </div> \
+      </div>');
+  };
+
+  var registerPopupOpen = function(tooltipId, popupId) {
+    jQuery("#" + tooltipId).click(function() {
+      jQuery("#" + popupId).fadeIn(350);
+    });
+  };
+
+  var registerPopupClose = function(popupCloseId, popupId) {
+    jQuery("#" + popupCloseId).click(function() {
+      jQuery("#" + popupId).fadeOut(350);
+    });
+  };
+
+  var makeSearchPopup = function(searchDivId, tooltipId, target) {
+    var popupId = "searchHelpPopup";
+    var popupCloseId = "searchHelpPopupClose";
+
+    makePopupElement(searchDivId, popupId, target);
+    registerPopupOpen(tooltipId, popupId);
+    registerPopupClose(popupCloseId, popupId);
   };
 
   var initTable = function(elementId, target, projectId, config, optionModifier) {
@@ -165,7 +308,10 @@ ListUtils = (function() {
     optionModifier(options, jqTable, errorMessage, columns);
     jqTable.dataTable(options);
     if (target.hasOwnProperty("searchTermSelector")) {
-      makeSearchHelpTooltip(elementId + '_filter', target);
+      var searchDivId = elementId + '_filter';
+
+      tooltipId = makeSearchTooltip(searchDivId, target);
+      makeSearchPopup(searchDivId, tooltipId, target);
     }
     var filterbox = jQuery('#' + elementId + '_filter :input');
     filterbox.unbind();

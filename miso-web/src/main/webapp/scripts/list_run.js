@@ -105,13 +105,7 @@ ListTarget.run = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['unknown'],
-      searchTerms['started'],
-      searchTerms['running'],
-      searchTerms['stopped'],
-      searchTerms['incomplete'],
-      searchTerms['failed'],
-      searchTerms['completed'],
+    return [searchTerms['runstatus'],
       searchTerms['created'],
       searchTerms['changed'],
       searchTerms['creator'],

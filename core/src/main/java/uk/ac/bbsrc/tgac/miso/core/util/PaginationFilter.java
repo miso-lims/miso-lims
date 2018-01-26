@@ -138,6 +138,9 @@ public abstract interface PaginationFilter {
     };
   }
 
+  /**
+   * Search terms are documented in miso-web/src/main/webapp/scripts/list.js
+   */
   public static PaginationFilter[] parse(String request, String currentUser, Consumer<String> errorHandler) {
     return WHITESPACE.splitAsStream(request).map(x -> {
       if (x.isEmpty()) return null;
