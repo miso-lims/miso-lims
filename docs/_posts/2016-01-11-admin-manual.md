@@ -75,7 +75,13 @@ Once installed, start the MySQL console and create the database:
     CREATE DATABASE lims;
     USE lims;
 
-Then add a user that has all grant access on the 'lims' db:
+Then add a user that has all grant access on the 'lims' db. For MySQL 5.7.7 or
+higher:
+
+    CREATE USER 'tgaclims'@'localhost' IDENTIFIED BY 'tgaclims';
+    GRANT ALL ON `lims`.* TO 'tgaclims'@'localhost';
+
+For earlier versions of MySQL:
 
     GRANT ALL ON `lims`.* TO 'tgaclims'@'localhost';
     GRANT ALL ON `lims`.* TO 'tgaclims'@'localhost' IDENTIFIED BY 'tgaclims';
