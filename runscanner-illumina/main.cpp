@@ -265,8 +265,10 @@ std::string format(const illumina::interop::model::summary::metric_stat &stat,
     return "N/A";
   }
   std::stringstream output;
-  output << std::setprecision(precision) << stat.mean() / scale << " ± "
-         << stat.stddev() / scale;
+  output << std::setprecision(precision) << stat.mean() / scale;
+  if (!std::isnan(stat.stddev())) {
+    output << " ± " << stat.stddev() / scale;
+  }
   return output.str();
 }
 
