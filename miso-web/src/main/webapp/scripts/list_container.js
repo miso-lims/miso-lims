@@ -111,23 +111,30 @@ ListTarget.container = {
     }, ];
   },
   createColumns: function(config, projectId) {
-    return [ListUtils.labelHyperlinkColumn("Serial Number", "container", Utils.array.getId, "identificationBarcode", 1, true), {
-      "sTitle": "Platform",
-      "mData": "platform",
-      "include": !config.platformType,
-      "iSortPriority": 0
-    }, ListUtils.idHyperlinkColumn("Last Run Name", "run", "lastRunId", function(container) {
-      return "RUN" + container.lastRunId;
-    }, -1, true), ListUtils.labelHyperlinkColumn("Last Run Alias", "run", function(container) {
-      return container.lastRunId;
-    }, "lastRunAlias", -1, true), ListUtils.labelHyperlinkColumn("Last Sequencer Used", "sequencer", function(container) {
-      return container.lastSequencerId;
-    }, "lastSequencerName", -1, true), {
-      "sTitle": "Last Modified",
-      "mData": "lastModified",
-      "include": true,
-      "iSortPriority": 0
-    }];
+    return [
+      ListUtils.labelHyperlinkColumn("ID", "container", Utils.array.getId, "id", 1, true),
+      ListUtils.labelHyperlinkColumn("Serial Number", "container", Utils.array.getId, "identificationBarcode", 1, true),
+      {
+        "sTitle": "Platform",
+        "mData": "platform",
+        "include": !config.platformType,
+        "iSortPriority": 0
+      },
+      ListUtils.idHyperlinkColumn("Last Run Name", "run", "lastRunId", function(container) {
+        return "RUN" + container.lastRunId;
+      }, -1, true),
+      ListUtils.labelHyperlinkColumn("Last Run Alias", "run", function(container) {
+        return container.lastRunId;
+      }, "lastRunAlias", -1, true),
+      ListUtils.labelHyperlinkColumn("Last Sequencer Used", "sequencer", function(container) {
+        return container.lastSequencerId;
+      }, "lastSequencerName", -1, true),
+      {
+        "sTitle": "Last Modified",
+        "mData": "lastModified",
+        "include": true,
+        "iSortPriority": 2
+      }];
   },
   searchTermSelector: function(searchTerms) {
     return [searchTerms['created'],

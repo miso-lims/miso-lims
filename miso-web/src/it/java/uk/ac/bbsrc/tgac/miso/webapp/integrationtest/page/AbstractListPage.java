@@ -30,6 +30,7 @@ public interface AbstractListPage {
     public static final String POOL_CONCENTRATION = "Conc. (nM)";
     public static final String LONGEST_INDEX = "Longest Index";
     public static final String SEQUENCING_PARAMETERS = "Sequencing Parameters";
+    public static final String ID = "ID";
     public static final String SERIAL_NUMBER = "Serial Number";
     public static final String LAST_RUN_NAME = "Last Run Name";
     public static final String LAST_RUN_ALIAS = "Last Run Alias";
