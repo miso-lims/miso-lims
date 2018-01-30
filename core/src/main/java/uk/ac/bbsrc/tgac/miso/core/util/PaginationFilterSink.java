@@ -13,6 +13,8 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByArchived(T item, boolean isArchived, Consumer<String> errorHandler);
 
+  public void restrictPaginationByArrayed(T item, boolean isArrayed, Consumer<String> errorHandler);
+
   public void restrictPaginationByBox(T item, String name, Consumer<String> errorHandler);
 
   public void restrictPaginationByBoxUse(T item, long id, Consumer<String> errorHandler);
@@ -31,7 +33,11 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByInstitute(T item, String name, Consumer<String> errorHandler);
 
+  public void restrictPaginationByInstrumentType(T item, InstrumentType type, Consumer<String> errorHandler);
+
   public void restrictPaginationByKitType(T item, KitType type, Consumer<String> errorHandler);
+
+  public void restrictPaginationByPending(T item, Consumer<String> errorHandler);
 
   public void restrictPaginationByPlatformType(T item, PlatformType platformType, Consumer<String> errorHandler);
 
@@ -46,9 +52,5 @@ public interface PaginationFilterSink<T> {
   public void restrictPaginationBySequencingParametersId(T item, long id, Consumer<String> errorHandler);
 
   public void restrictPaginationByUser(T item, String userName, boolean creator, Consumer<String> errorHandler);
-
-  public void restrictPaginationByInstrumentType(T item, InstrumentType type, Consumer<String> errorHandler);
-
-  public void restrictPaginationByArrayed(T item, boolean isArrayed, Consumer<String> errorHandler);
 
 }

@@ -95,7 +95,9 @@ public interface AbstractListPage {
     public static final String PROJECTS = "projects";
     public static final String INSTRUMENTS = "instruments";
     public static final String POOLS = "pools";
-    public static final String ORDERS = "poolorders";
+    public static final String ORDERS_ACTIVE = "poolorders/active";
+    public static final String ORDERS_ALL = "poolorders/all";
+    public static final String ORDERS_PENDING = "poolorders/pending";
     public static final String CONTAINERS = "containers";
     public static final String RUNS = "runs";
     public static final String BOXES = "boxes";

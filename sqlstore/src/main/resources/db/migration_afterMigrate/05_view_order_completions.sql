@@ -34,7 +34,17 @@ CREATE OR REPLACE VIEW OrderCompletion AS SELECT
       WHEN 'Requested' THEN 1
       WHEN 'Unknown' THEN 0
       WHEN 'Failed' THEN 0
-      ELSE -1 END))) AS remaining
+      ELSE -1 END))) AS remaining,
+    COALESCE((SELECT SUM(partitions) FROM PoolOrder WHERE
+      PoolOrder.poolId = OrderCompletion_Backing.poolId
+      AND EXISTS(
+        SELECT *
+          FROM SequencerPartitionContainer_Partition
+           JOIN _Partition ON SequencerPartitionContainer_Partition.partitions_partitionId = _Partition.partitionId
+        WHERE _Partition.pool_poolId = PoolOrder.poolId
+          AND NOT EXISTS(SELECT *
+            FROM Run_SequencerPartitionContainer
+            WHERE Run_SequencerPartitionContainer.containers_containerId = SequencerPartitionContainer_Partition.container_containerId))), 0) AS loaded
   FROM OrderCompletion_Backing
   GROUP BY poolId, parametersId;
 

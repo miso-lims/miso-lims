@@ -50,31 +50,6 @@ public class PoolOrderCompletion implements Serializable {
     public PoolOrderCompletionId() {
     }
 
-    public SequencingParameters getParameters() {
-      return parameters;
-    }
-
-    public Pool getPool() {
-      return pool;
-    }
-
-    public void setParameters(SequencingParameters parameters) {
-      this.parameters = parameters;
-    }
-
-    public void setPool(Pool pool) {
-      this.pool = pool;
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
-      result = prime * result + ((pool == null) ? 0 : pool.hashCode());
-      return result;
-    }
-
     @Override
     public boolean equals(Object obj) {
       if (this == obj) return true;
@@ -88,6 +63,31 @@ public class PoolOrderCompletion implements Serializable {
         if (other.pool != null) return false;
       } else if (!pool.equals(other.pool)) return false;
       return true;
+    }
+
+    public SequencingParameters getParameters() {
+      return parameters;
+    }
+
+    public Pool getPool() {
+      return pool;
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+      result = prime * result + ((pool == null) ? 0 : pool.hashCode());
+      return result;
+    }
+
+    public void setParameters(SequencingParameters parameters) {
+      this.parameters = parameters;
+    }
+
+    public void setPool(Pool pool) {
+      this.pool = pool;
     }
 
   }
@@ -114,6 +114,8 @@ public class PoolOrderCompletion implements Serializable {
 
   private int remaining;
 
+  private int loaded;
+
   public int get(HealthType health) {
     if (items.containsKey(health)) {
       return items.get(health);
@@ -127,6 +129,13 @@ public class PoolOrderCompletion implements Serializable {
 
   public Date getLastUpdated() {
     return lastUpdated;
+  }
+
+  /**
+   * The number of partitions holding this pool which are in containers that have not been run
+   */
+  public int getLoaded() {
+    return loaded;
   }
 
   public Pool getPool() {
@@ -147,6 +156,10 @@ public class PoolOrderCompletion implements Serializable {
 
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  public void setLoaded(int loaded) {
+    this.loaded = loaded;
   }
 
   public void setPool(Pool pool) {
