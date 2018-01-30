@@ -12,6 +12,7 @@ public class PoolOrderCompletionDto {
   private int started;
   private int stopped;
   private int unknown;
+  private int loaded;
 
   public int getCompleted() {
     return completed;
@@ -23,6 +24,10 @@ public class PoolOrderCompletionDto {
 
   public String getLastUpdated() {
     return lastUpdated;
+  }
+
+  public int getLoaded() {
+    return loaded;
   }
 
   public SequencingParametersDto getParameters() {
@@ -69,6 +74,10 @@ public class PoolOrderCompletionDto {
     this.lastUpdated = lastUpdated;
   }
 
+  public void setLoaded(int loaded) {
+    this.loaded = loaded;
+  }
+
   public void setParameters(SequencingParametersDto parameters) {
     this.parameters = parameters;
   }
@@ -88,7 +97,6 @@ public class PoolOrderCompletionDto {
   public void setRunning(int running) {
     this.running = running;
   }
-
   public void setStarted(int started) {
     this.started = started;
   }
@@ -96,6 +104,7 @@ public class PoolOrderCompletionDto {
   public void setStopped(int stopped) {
     this.stopped = stopped;
   }
+
   public void setUnknown(int unknown) {
     this.unknown = unknown;
   }

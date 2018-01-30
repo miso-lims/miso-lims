@@ -323,6 +323,16 @@ public abstract interface PaginationFilter {
     return user(username, creator);
   }
 
+  public static PaginationFilter pending() {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByPending(item, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter platformType(final PlatformType platformType) {
     return new PaginationFilter() {
 

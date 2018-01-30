@@ -31,7 +31,7 @@ public class TabbedListItemsPage {
         PlatformType::name);
   }
 
-  private static Stream<PlatformType> getPlatformTypes(InstrumentService sequencerService) throws IOException {
+  public static Stream<PlatformType> getPlatformTypes(InstrumentService sequencerService) throws IOException {
     Set<PlatformType> platforms = sequencerService.list(0, 0, true, "id", PaginationFilter.archived(false),
         PaginationFilter.instrumentType(InstrumentType.SEQUENCER)).stream()
         .map(sr -> sr.getPlatform().getPlatformType()).collect(Collectors.toSet());
@@ -60,7 +60,7 @@ public class TabbedListItemsPage {
       } catch (JsonProcessingException e) {
         throw new IllegalStateException("Failed to serialised tab value as JSON", e);
       }
-    }, (left, right) -> left, () -> new TreeMap<String, String>(tabSorter))));
+    }, (left, right) -> left, () -> new TreeMap<>(tabSorter))));
   }
 
   /**

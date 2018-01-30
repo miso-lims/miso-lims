@@ -36,7 +36,9 @@
         <li><a href="<c:url value="/miso/libraries"/>">Libraries</a></li>
         <li><a href="<c:url value="/miso/dilutions"/>">Dilutions</a></li>
         <li><a href="<c:url value="/miso/pools"/>">Pools</a></li>
-        <li><a href="<c:url value="/miso/poolorders"/>">Orders</a></li>
+        <li><a href="<c:url value="/miso/poolorders/active"/>">Active Orders</a></li>
+        <li><a href="<c:url value="/miso/poolorders/all"/>">All Orders</a></li>
+        <li><a href="<c:url value="/miso/poolorders/pending"/>">Pending Orders</a></li>
         <li><a href="<c:url value="/miso/containers"/>">Sequencing Containers</a></li>
         <li><a href="<c:url value="/miso/runs"/>">Sequencer Runs</a></li>
         <li><a href="<c:url value="/miso/arrays"/>">Arrays</a></li>
