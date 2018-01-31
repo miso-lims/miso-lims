@@ -5,8 +5,6 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.Before;
@@ -139,37 +137,6 @@ public class BoxControllerHelperServiceTest {
     JSONObject json = new JSONObject();
     json.put("boxId", id);
     assertTrue(boxControllerHelperService.getBoxScan(null, json).getJSONArray("errors").size() > 0);
-  }
-
-  @Test
-  public final void testExportBoxContentsFormNoBoxId() throws Exception {
-    when(boxService.get(anyLong())).thenReturn(mockBox);
-
-    final JSONObject json = new JSONObject();
-    json.put("boxId", null);
-
-    final JSONObject response = boxControllerHelperService.exportBoxContentsForm(null, json);
-
-    verify(misoFileManager, never()).getNewFile(any(Class.class), any(String.class), any(String.class));
-
-    assertEquals("Missing+boxId", response.get("error"));
-  }
-
-  @Test
-  public final void testExportBoxContentsFormError() throws Exception {
-    final long id = 1L;
-    final Exception error = new IOException("thrown by mock");
-    ArrayList<String> array = new ArrayList<>();
-    array.add("a:a:a");
-    array.add("b:b:b");
-    array.add("c:c:c");
-    when(boxService.get(anyLong())).thenThrow(error);
-
-    final JSONObject json = new JSONObject();
-    json.put("boxId", id);
-
-    JSONObject response = boxControllerHelperService.exportBoxContentsForm(null, json);
-    assertTrue(response.has("error"));
   }
 
   @Test
