@@ -358,14 +358,16 @@ Box.ui = {
   },
 
   exportBox: function(boxId) {
-    Fluxion.doAjax('boxControllerHelperService', 'exportBoxContentsForm', {
-      'boxId': boxId,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function(json) {
-        Utils.page.pageRedirect('/miso/download/box/forms/' + json.response);
-      }
-    });
+    jQuery.ajax({
+      url: "/miso/rest/box/" + boxId + "/spreadsheet",
+      type: "GET",
+      contentType: "application/json; charset=utf8",
+      dataType: "json",
+    }).success(function(json) {
+      // REST endpoint will return a JSON object with the spreadsheet filename's hashCode inside
+      // Send the hashCode to the DownloadController to download the spreadsheet
+      Utils.page.pageRedirect('/miso/download/box/forms/' + json.hashCode);
+    })
   },
 
   getItemAtPosition: function(coordinates) {
