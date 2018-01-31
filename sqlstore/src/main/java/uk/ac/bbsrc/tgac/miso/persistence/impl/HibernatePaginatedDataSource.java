@@ -223,9 +223,9 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  default void restrictPaginationByQuery(Criteria criteria, String query, Consumer<String> errorHandler) {
+  default void restrictPaginationByQuery(Criteria criteria, String query, boolean exact, Consumer<String> errorHandler) {
     if (!isStringBlankOrNull(query)) {
-      criteria.add(DbUtils.searchRestrictions(query, getSearchProperties()));
+      criteria.add(DbUtils.searchRestrictions(query, exact, getSearchProperties()));
     }
   }
 

@@ -26,6 +26,7 @@ ListTarget.container = {
   createUrl: function(config, projectId) {
     return "/miso/rest/container/dt" + (config.platformType ? "/platform/" + config.platformType : "");
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     var actions = HotUtils.makeQcActions('Container');
     if (config.runId) {

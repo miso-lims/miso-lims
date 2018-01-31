@@ -26,6 +26,7 @@ ListTarget.sample = {
   createUrl: function(config, projectId) {
     return "/miso/rest/tree/samples/dt" + (projectId ? '/project/' + projectId : '');
   },
+  queryUrl: "/miso/rest/tree/sample/query",
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.sample.bulkActions;
 

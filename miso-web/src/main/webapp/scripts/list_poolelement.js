@@ -26,6 +26,7 @@ ListTarget.poolelement = {
   createUrl: function(config, projectId) {
     return '/miso/rest/librarydilution/dt/pool/' + config.poolId + '/' + (config.add ? 'available' : 'included');
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return [{
       'name': config.add ? 'Add' : 'Remove',

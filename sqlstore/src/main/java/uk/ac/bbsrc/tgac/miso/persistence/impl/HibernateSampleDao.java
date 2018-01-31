@@ -187,7 +187,7 @@ public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableS
   @Override
   public void restrictPaginationByExternalName(Criteria criteria, String name, Consumer<String> errorHandler) {
     // TODO: this should extends to the children of the entity with this external name (including libraries and dilutions)
-    String query = DbUtils.convertStringToSearchQuery(name);
+    String query = DbUtils.convertStringToSearchQuery(name, false);
     Disjunction or = Restrictions.disjunction();
     or.add(externalNameCheck(SampleIdentityImpl.class, "externalName", query));
     or.add(externalNameCheck(SampleTissueImpl.class, "secondaryIdentifier", query));
@@ -204,7 +204,7 @@ public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableS
     // TODO: this should extends to the children of the entity with this lab (including libraries and dilutions)
     criteria.createAlias("lab", "lab");
     criteria.createAlias("lab.institute", "institute");
-    criteria.add(DbUtils.searchRestrictions(name, "lab.alias", "institute.alias"));
+    criteria.add(DbUtils.searchRestrictions(name, false, "lab.alias", "institute.alias"));
   }
 
   @Override
@@ -251,7 +251,7 @@ public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableS
   @Override
   public Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
     if (isStringEmptyOrNull(externalName)) return Collections.emptySet();
-    String str = DbUtils.convertStringToSearchQuery(externalName);
+    String str = DbUtils.convertStringToSearchQuery(externalName, false);
     Criteria criteria = currentSession().createCriteria(SampleIdentityImpl.class);
     criteria.add(Restrictions.or(Restrictions.ilike("externalName", str), Restrictions.ilike("alias", str)));
     @SuppressWarnings("unchecked")

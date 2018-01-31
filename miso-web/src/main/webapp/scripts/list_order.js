@@ -26,6 +26,7 @@ ListTarget.order = {
   createUrl: function(config, projectId) {
     throw "Orders can only be shown statically.";
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     var platformType = Utils.array.findFirstOrNull(function(pt) {
       return pt.name == config.platformType;

@@ -127,7 +127,7 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   @Override
   public List<Study> listBySearch(String query) {
     Criteria criteria = currentSession().createCriteria(StudyImpl.class);
-    criteria.add(DbUtils.searchRestrictions(query, "alias", "name", "description"));
+    criteria.add(DbUtils.searchRestrictions(query, false, "alias", "name", "description"));
     @SuppressWarnings("unchecked")
     List<Study> results = criteria.list();
     return results;

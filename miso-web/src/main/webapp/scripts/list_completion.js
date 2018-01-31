@@ -29,6 +29,7 @@ ListTarget.completion = {
     }
     return '/miso/rest/poolorder/dt/completions' + (config.activeOnly ? '/active' : '');
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },
