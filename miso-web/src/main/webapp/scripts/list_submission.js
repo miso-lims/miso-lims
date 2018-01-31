@@ -26,6 +26,7 @@ ListTarget.submission = {
   createUrl: function(config, projectId) {
     throw "Submissions must be provided statically";
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },

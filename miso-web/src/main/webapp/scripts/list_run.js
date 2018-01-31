@@ -34,6 +34,7 @@ ListTarget.run = {
       return "/miso/rest/run/dt";
     }
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },

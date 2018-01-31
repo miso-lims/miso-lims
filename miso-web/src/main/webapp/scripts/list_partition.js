@@ -26,6 +26,7 @@ ListTarget.partition = {
   createUrl: function(config, projectId) {
     throw "Can only be created statically";
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     var maxDilutions = 5;
     var platformType = Utils.array.findFirstOrNull(function(pt) {

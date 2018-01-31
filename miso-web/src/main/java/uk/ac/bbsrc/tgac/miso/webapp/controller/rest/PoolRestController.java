@@ -277,7 +277,16 @@ public class PoolRestController extends RestController {
 
   private PoolPickerEntry poolTransform(Pool pool) throws IOException {
     List<PoolOrderCompletionDto> completions = poolOrderCompletionService.getByPoolId(pool.getId()).stream()
-        .map(completion -> Dtos.asDto(completion)).collect(Collectors.toList());
+        .map(Dtos::asDto).collect(Collectors.toList());
     return new PoolPickerEntry(Dtos.asDto(pool, true), completions);
   }
+
+  @RequestMapping(value = "query", method = RequestMethod.POST, produces = { "application/json" })
+  @ResponseBody
+  public List<PoolDto> getPoolsInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) {
+    return PaginationFilter.bulkSearch(names, poolService, p -> Dtos.asDto(p, false),
+        message -> new RestException(message, Status.BAD_REQUEST));
+  }
+
 }

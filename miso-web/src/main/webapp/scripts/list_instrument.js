@@ -30,6 +30,7 @@ ListTarget.instrument = {
       return "/miso/rest/instrument/dt";
     }
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },

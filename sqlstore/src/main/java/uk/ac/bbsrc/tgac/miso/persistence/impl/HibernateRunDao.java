@@ -151,7 +151,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public List<Run> listBySearch(String query) throws IOException {
     Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.add(DbUtils.searchRestrictions(query, SEARCH_PROPERTIES));
+    criteria.add(DbUtils.searchRestrictions(query, false, SEARCH_PROPERTIES));
     @SuppressWarnings("unchecked")
     List<Run> records = criteria.list();
     return withWatcherGroup(records);
@@ -256,7 +256,7 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   @Override
   public long countBySearch(String querystr) throws IOException {
     Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.add(DbUtils.searchRestrictions(querystr, "name", "alias", "description"));
+    criteria.add(DbUtils.searchRestrictions(querystr, false, "name", "alias", "description"));
     long c = (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
     return (int) c;
   }

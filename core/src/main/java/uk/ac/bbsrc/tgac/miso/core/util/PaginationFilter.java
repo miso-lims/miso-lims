@@ -1,15 +1,19 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -54,12 +58,41 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static <M extends Identifiable, D, X extends RuntimeException> List<D> bulkSearch(Collection<String> names,
+      PaginatedDataSource<M> service,
+      Function<M, D> dto, Function<String, X> makeException) {
+    return names.stream()//
+        .filter(name -> !LimsUtils.isStringBlankOrNull(name))//
+        .flatMap(WhineyFunction.flatRethrow(name -> {
+          Collection<M> matches = service.list(0, 0, true, "id", exactQuery(name));
+          if (matches.isEmpty()) {
+            throw makeException.apply(String.format("Cannot find \"%s\".", name));
+          }
+          return matches;
+        }))//
+        .collect(Collectors.groupingBy(Identifiable::getId))//
+        .values()//
+        .stream()//
+        .map(list -> list.get(0))//
+        .map(dto).collect(Collectors.toList());
+  }
+
   public static PaginationFilter date(Date start, Date end, DateType type) {
     return new PaginationFilter() {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationByDate(item, start, end, type, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter exactQuery(final String query) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByQuery(item, query, true, errorHandler);
       }
     };
   }
@@ -118,22 +151,22 @@ public abstract interface PaginationFilter {
     };
   }
 
-  public static PaginationFilter kitType(KitType type) {
-    return new PaginationFilter() {
-
-      @Override
-      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByKitType(item, type, errorHandler);
-      }
-    };
-  }
-
   public static PaginationFilter instrumentType(InstrumentType type) {
     return new PaginationFilter() {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
         sink.restrictPaginationByInstrumentType(item, type, errorHandler);
+      }
+    };
+  }
+
+  public static PaginationFilter kitType(KitType type) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByKitType(item, type, errorHandler);
       }
     };
   }
@@ -322,7 +355,7 @@ public abstract interface PaginationFilter {
 
       @Override
       public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
-        sink.restrictPaginationByQuery(item, query, errorHandler);
+        sink.restrictPaginationByQuery(item, query, false, errorHandler);
       }
     };
   }

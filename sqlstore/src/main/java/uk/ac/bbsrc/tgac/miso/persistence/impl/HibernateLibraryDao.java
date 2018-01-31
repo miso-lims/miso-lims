@@ -156,7 +156,7 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   @Override
   public List<Library> listBySearch(String query) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-    criteria.add(DbUtils.searchRestrictions(query, SEARCH_FIELDS));
+    criteria.add(DbUtils.searchRestrictions(query, false, SEARCH_FIELDS));
     @SuppressWarnings("unchecked")
     List<Library> records = criteria.list();
     return records;
@@ -309,7 +309,7 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
       return count();
     } else {
       Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
-      criteria.add(DbUtils.searchRestrictions(querystr, SEARCH_FIELDS));
+      criteria.add(DbUtils.searchRestrictions(querystr, false, SEARCH_FIELDS));
       return (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
     }
   }

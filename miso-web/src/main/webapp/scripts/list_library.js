@@ -26,6 +26,7 @@ ListTarget.library = {
   createUrl: function(config, projectId) {
     return "/miso/rest/library/dt" + (projectId ? '/project/' + projectId : '');
   },
+  queryUrl: "/miso/rest/library/query",
   createBulkActions: function(config, projectId) {
     return HotTarget.library.bulkActions;
   },

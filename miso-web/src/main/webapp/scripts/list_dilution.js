@@ -26,6 +26,7 @@ ListTarget.dilution = {
   createUrl: function(config, projectId) {
     return "/miso/rest/librarydilution/dt" + (projectId ? "/project/" + projectId : "");
   },
+  queryUrl: "/miso/rest/librarydilution/query",
   createBulkActions: function(config, projectId) {
     return config.library ? HotTarget.dilution.bulkActions.filter(function(action) {
       return action.allowOnLibraryPage;

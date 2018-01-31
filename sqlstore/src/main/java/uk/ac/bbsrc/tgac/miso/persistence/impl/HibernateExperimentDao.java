@@ -109,7 +109,7 @@ public class HibernateExperimentDao implements ExperimentStore {
   @CoverageIgnore
   public List<Experiment> listBySearch(String query) {
     Criteria criteria = currentSession().createCriteria(Experiment.class);
-    criteria.add(DbUtils.searchRestrictions(query, "name", "alias", "description"));
+    criteria.add(DbUtils.searchRestrictions(query, false, "name", "alias", "description"));
     @SuppressWarnings("unchecked")
     List<Experiment> results = criteria.list();
     return results;

@@ -169,7 +169,7 @@ public class HibernateProjectDao implements ProjectStore {
   @Override
   public List<Project> listBySearch(String query) throws IOException {
     Criteria criteria = currentSession().createCriteria(ProjectImpl.class);
-    criteria.add(DbUtils.searchRestrictions(query, SEARCH_PROPERTIES));
+    criteria.add(DbUtils.searchRestrictions(query, false, SEARCH_PROPERTIES));
     @SuppressWarnings("unchecked")
     List<Project> results = criteria.list();
     return withWatcherGroup(results);

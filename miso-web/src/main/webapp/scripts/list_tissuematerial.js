@@ -26,6 +26,7 @@ ListTarget.tissuematerial = {
   createUrl: function(config, projectId) {
     throw "Must be provided statically";
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return config.isAdmin ? HotTarget.tissuematerial.bulkActions : [];
   },

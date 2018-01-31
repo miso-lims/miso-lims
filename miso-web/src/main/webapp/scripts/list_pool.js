@@ -30,6 +30,7 @@ ListTarget.pool = {
       return "/miso/rest/pool/dt/platform/" + config.platformType;
     }
   },
+  queryUrl: "/miso/rest/pool/query",
   createBulkActions: function(config, projectId) {
     return HotTarget.pool.bulkActions;
   },

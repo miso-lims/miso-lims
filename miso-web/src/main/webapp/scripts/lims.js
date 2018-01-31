@@ -266,6 +266,16 @@ var Utils = Utils
               output[field.property] = input.value;
             };
             break;
+          case 'textarea':
+            input = document.createElement('TEXTAREA');
+            input.setAttribute('rows', field.rows || 10);
+            input.setAttribute('cols', field.cols || 40);
+            input.value = field.value || "";
+            output[field.property] = field.value || "";
+            input.onchange = function() {
+              output[field.property] = input.value;
+            };
+            break;
           case 'int':
             input = document.createElement('INPUT');
             input.setAttribute('type', 'text');
@@ -339,7 +349,9 @@ var Utils = Utils
         };
         var dialog = jQuery('#dialog').dialog({
           autoOpen: true,
-          height: fields.length * 40 + 200,
+          height: fields.reduce(function(length, field) {
+            return length + (field.type == 'textarea' ? field.rows * 20 : 40);
+          }, 200),
           width: 500,
           title: title,
           modal: true,

@@ -26,6 +26,7 @@ ListTarget.user = {
   createUrl: function(config, projectId) {
     throw "Static data only";
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },

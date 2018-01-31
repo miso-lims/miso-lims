@@ -26,6 +26,7 @@ ListTarget.box = {
   createUrl: function(config, projectId) {
     return "/miso/rest/box/dt" + (config.boxUse ? "/use/" + config.boxUse : "");
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return [HotUtils.printAction('box'), ];
   },

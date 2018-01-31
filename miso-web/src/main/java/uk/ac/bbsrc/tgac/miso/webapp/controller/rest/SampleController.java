@@ -280,4 +280,11 @@ public class SampleController extends RestController {
     }
     return uniqueIdentities.stream().map(Dtos::asDto).collect(Collectors.toSet());
   }
+
+  @RequestMapping(value = "/sample/query", method = RequestMethod.POST, produces = { "application/json" })
+  @ResponseBody
+  public List<SampleDto> getSamplesInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) {
+    return PaginationFilter.bulkSearch(names, sampleService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
+  }
 }
