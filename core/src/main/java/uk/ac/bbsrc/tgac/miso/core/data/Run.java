@@ -485,4 +485,8 @@ public abstract class Run
   
   public abstract PlatformType getPlatformType();
 
+  public String getProgress() {
+    return getHealth() == HealthType.Running ? "Running" : "";
+  }
+
 }
