@@ -11,6 +11,7 @@ public class RunDto implements WritableUrls {
   private String platformType;
   private String startDate;
   private String endDate;
+  private String progress;
   private String url;
   private SequencingParametersDto parameters;
 
@@ -97,6 +98,14 @@ public class RunDto implements WritableUrls {
 
   public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
+  }
+
+  public String getProgress() {
+    return progress;
+  }
+
+  public void setProgress(String progress) {
+    this.progress = progress;
   }
 
 }

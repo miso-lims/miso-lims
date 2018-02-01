@@ -29,6 +29,7 @@ import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -96,6 +97,19 @@ public class IlluminaRun extends Run {
   @Override
   public PlatformType getPlatformType() {
     return PlatformType.ILLUMINA;
+  }
+
+  @Override
+  public String getProgress() {
+    if (getHealth() == HealthType.Running) {
+      if (numCycles != null && callCycle != null) {
+        if (numCycles != 0) {
+          return String.format("Cycle %d of %d", callCycle, numCycles);
+        }
+      }
+      return "Running";
+    }
+    return "";
   }
 
 }

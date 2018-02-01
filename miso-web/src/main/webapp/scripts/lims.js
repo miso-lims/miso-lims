@@ -380,8 +380,8 @@ var Utils = Utils
 
         var dialog = jQuery('#dialog').dialog({
           autoOpen: true,
-          height: 400,
-          width: 350,
+          height: actions.length * 40 + 200,
+          width: 450,
           title: title,
           modal: true,
           buttons: {
@@ -520,14 +520,6 @@ Utils.timer = {
 };
 
 Utils.ui = {
-  checkUser: function(username) {
-    Fluxion.doAjax('dashboard', 'checkUser', {
-      'username': username,
-      'url': ajaxurl
-    }, {
-      '': ''
-    });
-  },
 
   checkAll: function(field) {
     var self = this;

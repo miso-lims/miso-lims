@@ -556,26 +556,38 @@ a.dashboardresult {
     color: #555;
 }
 
-.dashboard, .pool-tile {
+.dashboard, .tile {
     font: 10px Verdana, arial, sans-serif;
     border: 1px solid lightgray;
     margin: 5px;
     padding: 5px; /* width: 94%; */
     cursor: pointer;
     background: #FFFFFF;
-    overflow: hidden;
+}
+
+.tile p {
+    line-height: inherit;
+    font-size: inherit;
+    margin-bottom: inherit;
+}
+
+.dashboardhighlight, .tile:hover {
+    background-color: #F0F0F6;
+    color: #111;
+    cursor: pointer;
+}
+
+.dashboard {
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.dashboardhighlight, .pool-tile:hover {
+.dashboardhighlight {
     font: 10px Verdana, arial, sans-serif;
     border: 1px solid lightgray;
     margin: 5px;
     padding: 5px; /* width: 94%; */
-    background-color: #F0F0F6;
-    color: #111;
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -586,6 +598,11 @@ a.dashboardresult {
 .dashboard_widget{
     margin:20px 0 0 20px;
     float:left;
+}
+
+.tile .name span {
+    float: right;
+    font-size: 200%;
 }
 
 .autocompletebox {

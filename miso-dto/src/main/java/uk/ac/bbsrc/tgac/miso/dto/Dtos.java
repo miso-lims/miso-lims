@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
@@ -1474,6 +1475,7 @@ public class Dtos {
       parametersDto.setName("(None)");
       dto.setParameters(parametersDto);
     }
+    dto.setProgress(from.getProgress());
     return dto;
   }
 
@@ -2180,4 +2182,20 @@ public class Dtos {
     return run;
   }
 
+  public static InstrumentStatusDto asDto(InstrumentStatus from) {
+    InstrumentStatusDto to = new InstrumentStatusDto();
+    to.setInstrument(asDto(from.getInstrument()));
+    to.setRun(from.getRun() == null ? null : asDto(from.getRun()));
+    to.setPools(from.getRun() == null ? Collections.emptyList()
+        : from.getRun().getSequencerPartitionContainers().stream()//
+            .flatMap(c -> c.getPartitions().stream())//
+            .map(Partition::getPool)
+            .filter(Objects::nonNull)//
+            .collect(Collectors.groupingBy(Pool::getId)).values().stream()//
+            .map(l -> l.get(0))//
+            .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
+            .map(p -> asDto(p, false))//
+            .collect(Collectors.toList()));
+    return to;
+  }
 }

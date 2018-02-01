@@ -21,17 +21,11 @@
   ~
   ~ **********************************************************************
   --%>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 <div id="maincontent">
     <div id="contentcolumn">
         <h1>Dashboard</h1>
-        <%--
-          <div id="alertbox">
-            <fieldset class="alertwidget">
-              <legend>Alerts</legend>
-             <div id="alertList" class="elementList"><i style="color: gray">No unread alerts</i></div>
-            </fieldset>
-          </div>
-        --%>
         <div id="rightpanel" style="float:right;margin-top:10px;">
             <div align="right" style="margin-right:5px;">
                 <h2>Projects with recently<br/> received samples:</h2>
@@ -41,6 +35,7 @@
                  align="right"></div>
         </div>
 
+        <miso:tiles-ajax id="tiles_instrument_status" target="instrument_status" url="/miso/rest/instrumentstatus"/>
         <div class="dashboard_widget">
             <div class="widget_title ui-corner-top">
                 Project <input type="text" size="20" id="searchProject" name="searchProject"/>
