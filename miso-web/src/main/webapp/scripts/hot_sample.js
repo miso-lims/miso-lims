@@ -171,7 +171,12 @@ HotTarget.sample = (function() {
             allowEmpty: true,
             include: (!Constants.isDetailedSample || config.targetSampleClass.alias != 'Identity') && !config.isLibraryReceipt,
             unpack: function(sam, flat, setCellMeta) {
-              flat.receivedDate = Utils.valOrNull(sam.receivedDate);
+              // If creating, default to today's date in format YYYY-MM-DD
+              if (config.create) {
+                flat.receivedDate = Utils.getCurrentDate();
+              } else {
+                flat.receivedDate = Utils.valOrNull(sam.receivedDate);
+              }
             },
             pack: function(sam, flat, errorHandler) {
               sam.receivedDate = flat.receivedDate;

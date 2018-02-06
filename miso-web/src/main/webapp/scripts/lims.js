@@ -467,7 +467,18 @@ var Utils = Utils
           return 0;
         }
         return val || null;
-      }
+      },
+
+      // Return current date in format YYYY-MM-DD
+      getCurrentDate: function() {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; // Month is zero-indexed
+        var yyyy = today.getFullYear();
+
+        // Zero-pad month and day if necessary
+        return yyyy + "-" + (mm < 10 ? "0" + mm : mm) + "-" + (dd < 10 ? "0" + dd : dd);
+      },
     };
 
 Utils.timer = {
