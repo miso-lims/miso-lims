@@ -59,6 +59,9 @@ public class ListTablesIT extends AbstractIT {
       Columns.AVAILABLE);
   private static final Set<String> projectsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.SHORT_NAME,
       Columns.DESCRIPTION, Columns.PROGRESS);
+  private static final Set<String> arraysColumns = Sets.newHashSet(Columns.ID, Columns.ALIAS, Columns.SERIAL_NUMBER);
+  private static final Set<String> arrayRunsColumns = Sets.newHashSet(Columns.ID, Columns.ALIAS, Columns.STATUS, Columns.START_DATE,
+      Columns.END_DATE, Columns.LAST_MODIFIED);
 
   private static final Set<String> poolsTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
   private static final Set<String> ordersTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
@@ -167,6 +170,10 @@ public class ListTablesIT extends AbstractIT {
 
   private static final Set<String> submissionsQueries = concatSets(
       Sets.newHashSet("Sub"), createdDates, createdOnDates, creator, modifier);
+
+  private static final Set<String> arrayQueries = Sets.newHashSet("Array");
+
+  private static final Set<String> arrayRunQueries = Sets.newHashSet("ArrayRun");
 
   private static final Comparator<String> standardComparator = (s1, s2) -> s1.compareToIgnoreCase(s2);
 
@@ -483,6 +490,40 @@ public class ListTablesIT extends AbstractIT {
   public void testListProjectsSearch() throws Exception {
     projectsQueries.forEach(query -> {
       testSearch(ListTarget.PROJECTS, query);
+    });
+  }
+
+  @Test
+  public void testListArraysSetup() throws Exception {
+    testPageSetup(ListTarget.ARRAYS, arraysColumns);
+  }
+
+  @Test
+  public void testListArraysColumnSort() throws Exception {
+    testColumnsSort(ListTarget.ARRAYS);
+  }
+
+  @Test
+  public void testListArraysSearch() throws Exception {
+    arrayQueries.forEach(query -> {
+      testSearch(ListTarget.ARRAYS, query);
+    });
+  }
+
+  @Test
+  public void testListArrayRunsSetup() throws Exception {
+    testPageSetup(ListTarget.ARRAYRUNS, arrayRunsColumns);
+  }
+
+  @Test
+  public void testListArrayRunsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.ARRAYRUNS);
+  }
+
+  @Test
+  public void testListArrayRunsSearch() throws Exception {
+    arrayRunQueries.forEach(query -> {
+      testSearch(ListTarget.ARRAYRUNS, query);
     });
   }
 
