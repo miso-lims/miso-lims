@@ -299,59 +299,74 @@ ListUtils = (function() {
           "title": "Select by names",
           "handler": function() {
 
-            Utils.showDialog("Select by Names", "Select", [{
-              "label": "Names, Aliases, or Barcodes",
-              "type": "textarea",
-              "property": "names",
-              "rows": 15,
-              "cols": 40,
-              "required": true
-            }], function(result) {
-              var names = result.names.split(/[ \t\r\n]+/).filter(function(name) {
-                return name.length > 0;
-              });
-              if (names.length == 0) {
-                return;
-              }
-              Utils.ajaxWithDialog('Searching', 'POST', target.queryUrl, names, function(items) {
-                var selectedActions = bulkActions.filter(function(bulkAction) {
-                  return !!bulkAction;
-                }).map(function(bulkAction) {
-                  return {
-                    "name": bulkAction.name,
-                    "handler": function() {
-                      bulkAction.action(items);
-                    }
-                  };
+            var showSelect = function(defaultText) {
+
+              Utils.showDialog("Select by Names", "Select", [{
+                "label": "Names, Aliases, or Barcodes",
+                "type": "textarea",
+                "property": "names",
+                "rows": 15,
+                "cols": 40,
+                "value": defaultText,
+                "required": true
+              }], function(result) {
+                var names = result.names.split(/[ \t\r\n]+/).filter(function(name) {
+                  return name.length > 0;
                 });
-
-                selectedActions.push({
-                  "name": "Select in list",
-                  "handler": function() {
-
-                    var state = ListState[elementId];
-                    state.lastId = -1;
-                    state.selected = items;
-                    var ids = items.map(function(item) {
-                      return item.id;
-                    });
-                    state.data.forEach(function(item) {
-                      var element = document.getElementById(elementId + "_toggle" + item.id);
-                      if (element) {
-                        element.checked = ids.indexOf(item.id) != -1;
+                if (names.length == 0) {
+                  return;
+                }
+                Utils.ajaxWithDialog('Searching', 'POST', target.queryUrl, names, function(items) {
+                  var title = items.length + ' ' + target.name;
+                  var selectedActions = bulkActions.filter(function(bulkAction) {
+                    return !!bulkAction;
+                  }).map(function(bulkAction) {
+                    return {
+                      "name": bulkAction.name,
+                      "handler": function() {
+                        bulkAction.action(items);
                       }
-                    });
-                    updateSelectedLabel(state);
-                    if (names.length != items.length) {
-                      Utils.showOkDialog('Search by Names', ['Found unexpected number of matches.', names.length + ' requested',
-                          items.length + ' found']);
-                    }
-                  }
-                });
+                    };
+                  });
+                  var showActionDialog = function() {
+                    Utils.showWizardDialog(title, selectedActions);
+                  };
 
-                Utils.showWizardDialog('Selected Items', selectedActions);
-              });
-            }, null);
+                  selectedActions.unshift({
+                    "name": "View Selected",
+                    "handler": function() {
+                      Utils.showOkDialog(title, items.map(function(item) {
+                        return item.name + ' (' + item.alias + ')';
+                      }), showActionDialog);
+                    }
+                  });
+
+                  selectedActions.push({
+                    "name": "Select in list",
+                    "handler": function() {
+
+                      var state = ListState[elementId];
+                      state.lastId = -1;
+                      state.selected = items;
+                      var ids = items.map(function(item) {
+                        return item.id;
+                      });
+                      state.data.forEach(function(item) {
+                        var element = document.getElementById(elementId + "_toggle" + item.id);
+                        if (element) {
+                          element.checked = ids.indexOf(item.id) != -1;
+                        }
+                      });
+                      updateSelectedLabel(state);
+                    }
+                  });
+                  showActionDialog();
+                }, function() {
+                  showSelect(names.join('\n'));
+                });
+              }, null);
+            };
+            showSelect('');
           }
         });
       }
