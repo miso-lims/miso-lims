@@ -164,7 +164,7 @@ var Utils = Utils
         }
       },
 
-      showOkDialog: function(title, fields) {
+      showOkDialog: function(title, fields, callback) {
         var dialogArea = document.getElementById('dialog');
         while (dialogArea.hasChildNodes()) {
           dialogArea.removeChild(dialogArea.lastChild);
@@ -187,6 +187,9 @@ var Utils = Utils
               text: 'OK',
               click: function() {
                 dialog.dialog("close");
+                if (typeof callback == 'function') {
+                  callback();
+                }
               }
             }
           }
@@ -395,7 +398,7 @@ var Utils = Utils
           }
         });
       },
-      ajaxWithDialog: function(title, method, url, data, callback) {
+      ajaxWithDialog: function(title, method, url, data, callback, errorCallback) {
         var dialogArea = document.getElementById('dialog');
         while (dialogArea.hasChildNodes()) {
           dialogArea.removeChild(dialogArea.lastChild);
@@ -433,7 +436,7 @@ var Utils = Utils
             } catch (e) {
               // If we got detail, great; if we didn't meh.
             }
-            Utils.showOkDialog(title, lines);
+            Utils.showOkDialog(title, lines, errorCallback);
           }
         });
       },
