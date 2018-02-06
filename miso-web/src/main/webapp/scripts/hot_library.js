@@ -206,7 +206,12 @@ HotTarget.library = (function() {
             allowEmpty: !config.isLibraryReceipt,
             include: config.isLibraryReceipt || !create,
             unpack: function(lib, flat, setCellMeta) {
-              flat.receivedDate = Utils.valOrNull(lib.receivedDate);
+              // If creating, default to today's date in format YYYY-MM-DD
+              if (create) {
+                flat.receivedDate = Utils.getCurrentDate();
+              } else {
+                flat.receivedDate = Utils.valOrNull(lib.receivedDate);
+              }
             },
             pack: function(lib, flat, errorHandler) {
               lib.receivedDate = flat.receivedDate;
