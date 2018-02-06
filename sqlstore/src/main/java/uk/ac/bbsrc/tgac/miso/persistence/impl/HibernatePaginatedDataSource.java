@@ -71,9 +71,7 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public String getFriendlyName();
 
   /**
-   * Get the property name of the project to which the item is connected.
-   * 
-   * @return
+   * @return the property name of the project to which the item is connected, or null if not applicable
    */
   String getProjectColumn();
 
@@ -148,6 +146,16 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public abstract String propertyForUserName(Criteria criteria, boolean creator);
 
   @Override
+  default void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " is not archivable.");
+  }
+
+  @Override
+  default void restrictPaginationByArrayed(Criteria criteria, boolean isArrayed, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be arrayed.");
+  }
+
+  @Override
   default void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " cannot be boxed.");
   }
@@ -198,8 +206,18 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be filtered by instrument type.");
+  }
+
+  @Override
   default void restrictPaginationByKitType(Criteria criteria, KitType type, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " cannot be filtered by pool.");
+  }
+
+  @Override
+  default void restrictPaginationByPending(Criteria criteria, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " is not dependable.");
   }
 
   @Override
@@ -223,9 +241,9 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
-  default void restrictPaginationByQuery(Criteria criteria, String query, Consumer<String> errorHandler) {
+  default void restrictPaginationByQuery(Criteria criteria, String query, boolean exact, Consumer<String> errorHandler) {
     if (!isStringBlankOrNull(query)) {
-      criteria.add(DbUtils.searchRestrictions(query, getSearchProperties()));
+      criteria.add(DbUtils.searchRestrictions(query, exact, getSearchProperties()));
     }
   }
 
@@ -248,15 +266,4 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
       errorHandler.accept(getFriendlyName() + " has no " + (creator ? "creator" : "modifier") + ".");
     }
   }
-
-  @Override
-  default void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " is not archivable.");
-  }
-
-  @Override
-  default void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " cannot be filtered by instrument type.");
-  }
-
 }

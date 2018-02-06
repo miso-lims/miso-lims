@@ -22,8 +22,6 @@ public class ListTabbedPage extends HeaderFooterPage implements AbstractListPage
     public static final String PACBIO = "PacBio";
     public static final String SOLID = "Solid";
     public static final String OXFORD_NANOPORE = "OxfordNanopore";
-    public static final String ACTIVE = "Active";
-    public static final String ALL = "All";
     public static final String DNA = "DNA";
     public static final String RNA = "RNA";
     public static final String LIBRARIES = "Libraries";

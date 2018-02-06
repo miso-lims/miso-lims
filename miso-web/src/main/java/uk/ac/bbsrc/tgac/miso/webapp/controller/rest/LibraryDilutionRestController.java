@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -137,6 +138,13 @@ public class LibraryDilutionRestController extends RestController {
       HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return jQueryBackend.get(request, response, null, PaginationFilter.pool(poolId));
+  }
+
+  @RequestMapping(value = "query", method = RequestMethod.POST, produces = { "application/json" })
+  @ResponseBody
+  public List<DilutionDto> getLibraryDilutionsInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) {
+    return PaginationFilter.bulkSearch(names, dilutionService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
   }
 
 }

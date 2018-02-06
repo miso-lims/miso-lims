@@ -153,7 +153,7 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
       criteria.add(Restrictions.eq("platformType", platformType));
     }
     if (query != null) {
-      criteria.add(DbUtils.searchRestrictions(query, SEARCH_PROPERTIES));
+      criteria.add(DbUtils.searchRestrictions(query, false, SEARCH_PROPERTIES));
     }
     if (limit != null) {
       criteria.setMaxResults(limit);

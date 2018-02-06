@@ -24,8 +24,16 @@
 ListTarget.sample = {
   name: "Samples",
   createUrl: function(config, projectId) {
-    return "/miso/rest/tree/samples/dt" + (projectId ? '/project/' + projectId : '');
+    var url = "/miso/rest/tree/samples/dt";
+    if (projectId) {
+      url += '/project/' + projectId;
+      if (config.arrayed) {
+        url += '/arrayed';
+      }
+    }
+    return url;
   },
+  queryUrl: "/miso/rest/tree/sample/query",
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.sample.bulkActions;
 
@@ -190,5 +198,17 @@ ListTarget.sample = {
           "include": Constants.isDetailedSample,
           "iSortPriority": 2
         }];
+  },
+  searchTermSelector: function(searchTerms) {
+    return [searchTerms['created'],
+      searchTerms['changed'],
+      searchTerms['received'],
+      searchTerms['creator'],
+      searchTerms['changedby'],
+      searchTerms['class'],
+      searchTerms['institute'],
+      searchTerms['external'],
+      searchTerms['box']
+    ]
   }
 };

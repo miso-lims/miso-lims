@@ -34,6 +34,7 @@ ListTarget.run = {
       return "/miso/rest/run/dt";
     }
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },
@@ -103,5 +104,16 @@ ListTarget.run = {
           "include": Constants.isDetailedSample,
           "iSortPriority": 0
         }];
+  },
+  searchTermSelector: function(searchTerms) {
+    return [searchTerms['runstatus'],
+      searchTerms['created'],
+      searchTerms['changed'],
+      searchTerms['creator'],
+      searchTerms['changedby'],
+      searchTerms['platform'],
+      searchTerms['index_name'],
+      searchTerms['index_seq']
+    ]
   }
 };

@@ -266,6 +266,16 @@ var Utils = Utils
               output[field.property] = input.value;
             };
             break;
+          case 'textarea':
+            input = document.createElement('TEXTAREA');
+            input.setAttribute('rows', field.rows || 10);
+            input.setAttribute('cols', field.cols || 40);
+            input.value = field.value || "";
+            output[field.property] = field.value || "";
+            input.onchange = function() {
+              output[field.property] = input.value;
+            };
+            break;
           case 'int':
             input = document.createElement('INPUT');
             input.setAttribute('type', 'text');
@@ -339,7 +349,9 @@ var Utils = Utils
         };
         var dialog = jQuery('#dialog').dialog({
           autoOpen: true,
-          height: fields.length * 40 + 200,
+          height: fields.reduce(function(length, field) {
+            return length + (field.type == 'textarea' ? field.rows * 20 : 40);
+          }, 200),
           width: 500,
           title: title,
           modal: true,
@@ -368,8 +380,8 @@ var Utils = Utils
 
         var dialog = jQuery('#dialog').dialog({
           autoOpen: true,
-          height: 400,
-          width: 350,
+          height: actions.length * 40 + 200,
+          width: 450,
           title: title,
           modal: true,
           buttons: {
@@ -467,7 +479,18 @@ var Utils = Utils
           return 0;
         }
         return val || null;
-      }
+      },
+
+      // Return current date in format YYYY-MM-DD
+      getCurrentDate: function() {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; // Month is zero-indexed
+        var yyyy = today.getFullYear();
+
+        // Zero-pad month and day if necessary
+        return yyyy + "-" + (mm < 10 ? "0" + mm : mm) + "-" + (dd < 10 ? "0" + dd : dd);
+      },
     };
 
 Utils.timer = {
@@ -508,14 +531,6 @@ Utils.timer = {
 };
 
 Utils.ui = {
-  checkUser: function(username) {
-    Fluxion.doAjax('dashboard', 'checkUser', {
-      'username': username,
-      'url': ajaxurl
-    }, {
-      '': ''
-    });
-  },
 
   checkAll: function(field) {
     var self = this;

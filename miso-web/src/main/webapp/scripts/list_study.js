@@ -26,6 +26,7 @@ ListTarget.study = {
   createUrl: function(config, projectId) {
     return "/miso/rest/study/dt" + (projectId ? "/project/" + projectId : "");
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     if (config.isAdmin) {
       return [{

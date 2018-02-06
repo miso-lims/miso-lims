@@ -26,6 +26,7 @@ ListTarget.partition = {
   createUrl: function(config, projectId) {
     throw "Can only be created statically";
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     var maxDilutions = 5;
     var platformType = Utils.array.findFirstOrNull(function(pt) {
@@ -49,55 +50,34 @@ ListTarget.partition = {
         var problems = [item.pool.hasLowQualityLibraries ? "LOW QUALITY LIBRARIES" : null,
             item.pool.duplicateIndices ? "DUPLICATE INDICES" : null].filter(function(x) {
           return x;
-        });
-        var div = document.createElement('DIV');
-        div.setAttribute('class', 'pool-tile');
+        }).map(Tile.error);
 
-        var title = document.createElement('DIV');
-        title.setAttribute('class', 'pool-name');
-        title.setAttribute('style', 'font-weight:bold');
-        title.innerText = item.pool.name + " (" + item.pool.alias + ")";
-        div.appendChild(title);
-
-        problems.forEach(function(message) {
-          var errorP = document.createElement('P');
-          errorP.setAttribute('class', 'parsley-error');
-          errorP.innerText = "⚠ " + message;
-          div.appendChild(errorP);
-        });
-
-        var dilutionP = document.createElement('P');
-        item.pool.pooledElements.filter(function(element, index, array) {
+        var dilutionInfo = item.pool.pooledElements.filter(function(element, index, array) {
           return array.length < maxDilutions || index < maxDilutions - 1;
-        }).forEach(
-            function(dilution) {
-              dilutionP.appendChild(document.createTextNode(dilution.name + " - " + dilution.library.name + " (" + dilution.library.alias
-                  + ")"));
-              dilutionP.appendChild(document.createElement('BR'));
-            });
+        }).map(function(dilution) {
+          return dilution.name + " - " + dilution.library.name + " (" + dilution.library.alias + ")";
+        });
         if (item.pool.pooledElements.length >= maxDilutions) {
-          dilutionP.appendChild(document.createTextNode("...and " + (item.pool.pooledElements.length - maxDilutions + 1)
-              + " more dilutions"));
-
+          dilutionInfo.push("...and " + (item.pool.pooledElements.length - maxDilutions + 1) + " more dilutions");
         }
-        div.appendChild(dilutionP);
-        var orderP = document.createElement('P');
-        orderP.setAttribute('style', 'font-style:italic');
-        item.orders.filter(function(order) {
+
+        var orderInfo = item.orders.filter(function(order) {
           return order.remaining > 0;
-        }).forEach(
+        }).map(
             function(order) {
-              orderP.appendChild(document.createTextNode(order.parameters.name + ": " + order.remaining + " "
-                  + (order.remaining == 1 ? platformType.partitionName : platformType.pluralPartitionName) + " remaining"));
-              orderP.appendChild(document.createElement('BR'));
+              return order.parameters.name + ": " + order.remaining + " "
+                  + (order.remaining == 1 ? platformType.partitionName : platformType.pluralPartitionName) + " remaining";
             });
-        div.appendChild(orderP);
-        div.onclick = function() {
+
+        var tileParts = [Tile.title(item.pool.name + " (" + item.pool.alias + ")", problems.length == 0 ? Tile.statusOk() : Tile.statusBad())].concat(problems);
+        tileParts.push(Tile.lines(dilutionInfo, false));
+        tileParts.push(Tile.lines(orderInfo, true));
+
+        dialogArea.appendChild(Tile.make(tileParts, function() {
           dialog.dialog("close");
           assignCallback(item.pool.id);
           return false;
-        };
-        dialogArea.appendChild(div);
+        }));
       });
       if (response.numMatches > response.items.length) {
         var moreMatches = document.createElement('P');

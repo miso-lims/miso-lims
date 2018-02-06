@@ -14,6 +14,6 @@ public interface HibernatePaginatedBoxableSource<T extends Boxable> extends Hibe
   default void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
     criteria.createAlias("boxPosition", "boxPosition");
     criteria.createAlias("boxPosition.box", "box");
-    criteria.add(DbUtils.searchRestrictions(name, BOX_SEARCH_PROPERTIES));
+    criteria.add(DbUtils.searchRestrictions(name, false, BOX_SEARCH_PROPERTIES));
   }
 }

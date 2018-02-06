@@ -66,7 +66,13 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao, 
 
   @Override
   public void restrictPaginationByFulfilled(Criteria criteria, boolean isFulfilled, Consumer<String> errorHandler) {
-    criteria.add(isFulfilled ? Restrictions.le("remaining", 0) : Restrictions.gt("remaining", 0));
+    criteria.add(isFulfilled ? Restrictions.geProperty("loaded", "remaining")
+        : Restrictions.ltProperty("loaded", "remaining"));
+  }
+
+  @Override
+  public void restrictPaginationByPending(Criteria criteria, Consumer<String> errorHandler) {
+    criteria.add(Restrictions.gt("loaded", 0));
   }
 
   @Override

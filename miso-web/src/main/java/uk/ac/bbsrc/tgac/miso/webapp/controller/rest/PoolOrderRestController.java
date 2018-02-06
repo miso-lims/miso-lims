@@ -111,19 +111,32 @@ public class PoolOrderRestController extends RestController {
     return new ResponseEntity<>(headers, HttpStatus.CREATED);
   }
   
-  @RequestMapping(value = "/poolorder/dt/completions", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/poolorder/dt/completions/all/{platform}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<PoolOrderCompletionDto> getDtCompletions(UriComponentsBuilder uriBuilder, HttpServletRequest request, HttpServletResponse response)
+  public DataTablesResponseDto<PoolOrderCompletionDto> getDtCompletions(@PathVariable String platform, UriComponentsBuilder uriBuilder,
+      HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder);
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
-  @RequestMapping(value = "/poolorder/dt/completions/active", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/poolorder/dt/completions/active/{platform}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public DataTablesResponseDto<PoolOrderCompletionDto> getDtCompletionsUnfulfilled(UriComponentsBuilder uriBuilder, HttpServletRequest request,
+  public DataTablesResponseDto<PoolOrderCompletionDto> getDtCompletionsUnfulfilled(@PathVariable String platform,
+      UriComponentsBuilder uriBuilder, HttpServletRequest request,
       HttpServletResponse response)
       throws IOException {
-    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.fulfilled(false));
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.fulfilled(false),
+        PaginationFilter.platformType(PlatformType.valueOf(platform)));
+  }
+
+  @RequestMapping(value = "/poolorder/dt/completions/pending/{platform}", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public DataTablesResponseDto<PoolOrderCompletionDto> getDtCompletionsPending(@PathVariable String platform,
+      UriComponentsBuilder uriBuilder, HttpServletRequest request,
+      HttpServletResponse response)
+      throws IOException {
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.pending(),
+        PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
   @RequestMapping(value = "/poolorder/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })

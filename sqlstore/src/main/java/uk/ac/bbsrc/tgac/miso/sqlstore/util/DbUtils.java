@@ -12,11 +12,11 @@
  *
  * MISO is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MISO. If not, see <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -54,12 +54,13 @@ import org.springframework.jdbc.support.MetaDataAccessException;
 public class DbUtils {
   protected static final Logger log = LoggerFactory.getLogger(DbUtils.class);
 
-  public static String convertStringToSearchQuery(String input) {
+  public static String convertStringToSearchQuery(String input, boolean exact) {
     if (input == null) {
       return "%";
     }
-    return "%" + input.trim().toUpperCase().replaceAll("(\\s|,)+", " ").replaceAll("_", Matcher.quoteReplacement("\\_")).replaceAll("%",
-        Matcher.quoteReplacement("\\%")) + "%";
+    String query = input.trim().toUpperCase().replaceAll("(\\s|,)+", " ").replaceAll("_", Matcher.quoteReplacement("\\_")).replaceAll("%",
+        Matcher.quoteReplacement("\\%"));
+    return exact ? query : ("%" + query + "%");
   }
 
   public static ArrayList<String> getTables(JdbcTemplate template) throws MetaDataAccessException, SQLException {
@@ -191,12 +192,12 @@ public class DbUtils {
    * @param querystr
    * @return
    */
-  public static Criterion searchRestrictions(String querystr, String... searchProperties) {
-    String str = DbUtils.convertStringToSearchQuery(querystr);
+  public static Criterion searchRestrictions(String querystr, boolean exact, String... searchProperties) {
+    String str = DbUtils.convertStringToSearchQuery(querystr, exact);
 
     Criterion[] criteria = new Criterion[searchProperties.length];
     for (int i = 0; i < searchProperties.length; i++) {
-      criteria[i] = Restrictions.ilike(searchProperties[i], str, MatchMode.ANYWHERE);
+      criteria[i] = Restrictions.ilike(searchProperties[i], str, exact ? MatchMode.EXACT : MatchMode.ANYWHERE);
     }
     return Restrictions.or(criteria);
   }

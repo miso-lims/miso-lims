@@ -108,7 +108,7 @@ public class HibernatePlatformDaoTest extends AbstractDAOTest {
 
   @Test
   public void testGetByModel() throws IOException {
-    Platform platform = dao.getByModel("PacBio RS");
+    Platform platform = dao.getByModel("Illumina HiSeq 2000");
     assertNotNull(platform);
   }
 

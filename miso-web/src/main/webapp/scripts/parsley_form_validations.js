@@ -39,19 +39,65 @@ var Validate = Validate || {
     });
   },
 
-  updateWarningOrSubmit: function(formSelector, extraValidationsFunction) {
+  updateWarningOrSubmit: function(formSelector, extraValidationsFunction, submitMethod) {
     jQuery(formSelector).parsley().whenValidate().done(function() {
       jQuery('.bs-callout-warning').addClass('hidden');
       // submit if form is valid
       if (extraValidationsFunction) {
         extraValidationsFunction(jQuery(formSelector));
       } else {
-        jQuery(formSelector).submit();
+        if (submitMethod) {
+          submitMethod();
+        } else {
+          jQuery(formSelector).submit();
+        }
       }
     }).fail(function() {
       jQuery('.bs-callout-warning').removeClass('hidden');
       return false;
     });
+  },
+
+  /**
+   * Display all errors from a RestError. Errors may apply to a specific field, or be "general" errors which belong to no specific field.
+   * The page should include error containers with ID '[fieldName]Error' e.g. 'aliasError' for alias, and one container with ID
+   * 'generalErrors'
+   */
+  displayErrors: function(restError, formSelector) {
+    Validate.clearErrors(formSelector);
+    jQuery('.bs-callout-warning').removeClass('hidden');
+    
+    if (!restError || !restError.data || restError.dataFormat !== 'validation') {
+      Validate.displayError('GENERAL', 'Something has gone terribly wrong. Please report this to your MISO administrator.');
+    } else {
+      jQuery.each(restError.data, function(key, value) {
+        Validate.displayError(key, value);
+      });
+    }
+  },
+
+  /**
+   * Displays an error in the appropriate container. See Validate.displayErrors above
+   */
+  displayError: function(property, message) {
+    var messages = message.split('\n');
+    var containerId = property === 'GENERAL' ? 'generalErrors' : property + 'Error';
+    var container = jQuery('#' + containerId);
+    var list = container.find('.errorList');
+    if (!list.length) {
+      list = jQuery('<ul class="parsley-errors-list filled">')
+      container.append(list);
+    }
+    jQuery.each(messages, function(i, msg) {
+      list.append(jQuery('<li>' + msg + '</li>'));
+    });
+  },
+
+  clearErrors: function(formSelector) {
+    jQuery('.bs-callout-warning').addClass('hidden');
+    jQuery(formSelector).parsley().destroy();
+    jQuery('#generalErrors').empty();
+    jQuery('.errorContainer').empty();
   }
 
 };

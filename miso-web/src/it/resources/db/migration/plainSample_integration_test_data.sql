@@ -34,7 +34,7 @@ DELETE FROM Indices;
 DELETE FROM IndexFamily;
 DELETE FROM SequencingParameters;
 DELETE FROM PlatformSizes;
-DELETE FROM Instrument WHERE instrumentId IS NOT NULL;
+DELETE FROM Instrument WHERE upgradedInstrumentId IS NOT NULL;
 DELETE FROM Instrument;
 DELETE FROM Platform;
 DELETE FROM ProjectOverview;

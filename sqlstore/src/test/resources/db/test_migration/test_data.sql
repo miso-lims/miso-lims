@@ -180,7 +180,9 @@ VALUES (1,NULL,'SAM1','Inherited from TEST_0001',1,'SAM1::TEST_0001_Bn_P_nn_1-1_
 (14,NULL,'SAM14','Inherited from TEST_0007',1,'SAM14::TEST_0007_Bn_R_nn_1-1_D_1','Freezer1_14','GENOMIC','2015-01-27','true','TEST_0007_Bn_R_nn_1-1_D_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:11',1,'2016-07-07 13:31:11'),
 (15,NULL,'SAM15','identity1',1,'SAM15::TEST_0001_IDENTITY_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_IDENTITY_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:13',1,'2016-07-07 13:31:13'),
 (16,NULL,'SAM16','tissue1',1,'SAM16::TEST_0001_TISSUE_1','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:15',1,'2016-07-07 13:31:15'),
-(17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17');
+(17,NULL,'SAM17','tissue2',1,'SAM17::TEST_0001_TISSUE_2','Freezer1_1','GENOMIC','2016-04-05','true','TEST_0001_TISSUE_2',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:17',1,'2016-07-07 13:31:17'),
+(18,NULL,'SAM18','stock1',1,'SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',NULL,'true','TEST_0001_STOCK_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19'),
+(19,NULL,'SAM19','aliquot1',1,'SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',NULL,'true','TEST_0001_ALIQUOT_1',1,'Homo sapiens',NULL,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21');
 
 DELETE FROM `SampleQC`;
 INSERT INTO `SampleQC`(`sample_sampleId`, `creator`, `date`, `type`, `results`) 
@@ -433,10 +435,22 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (9, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:05'),
 (10, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:07');
 
+DELETE FROM SequencingParameters;
+DELETE FROM PlatformSizes;
+DELETE FROM Platform;
+INSERT INTO Platform(platformId, name, instrumentModel, description, numContainers, instrumentType) VALUES
+(16, 'ILLUMINA', 'Illumina HiSeq 2000', '4-channel flowgram', 1, 'SEQUENCER'),
+(30, 'ILLUMINA', 'Illumina iScan', NULL, 1, 'ARRAY_SCANNER');
+
+INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
+(16, 2),
+(16, 8);
+
 DELETE FROM `Instrument`;
 INSERT INTO `Instrument`(`instrumentId`, `name`, `ip`, `platformId`)
 VALUES (1,'SN7001179','localhost',16),
-(2,'h1180','localhost',16);
+(2,'h1180','localhost',16),
+(3, 'iScan_1', 'localhost', 30);
 
 DELETE FROM `ServiceRecord`;
 INSERT INTO `ServiceRecord`(`recordId`, `instrumentId`, `title`, `details`, `servicedBy`, `referenceNumber`, `serviceDate`, `shutdownTime`, `restoredTime`)
@@ -593,11 +607,12 @@ DELETE FROM `SampleClass`;
 INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
 VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
 (2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
-(3,'Stock','Stock',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00');
+(3,'Stock','Stock',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00'),
+(4,'Aliquot','Aliquot',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00');
 
-DELETE FROM `LibraryDesignCode`;
-INSERT INTO `LibraryDesignCode`(`code`,`description`) 
-VALUES ('TT', 'TEST');
+DELETE FROM LibraryDesignCode;
+INSERT INTO LibraryDesignCode(libraryDesignCodeId, code, description) 
+VALUES (1, 'TT', 'TEST');
 
 DELETE FROM `LibraryDesign`;
 INSERT INTO `LibraryDesign`(`libraryDesignId`, `name`, `sampleClassId`, `librarySelectionType`, `libraryStrategyType`, `libraryDesignCodeId`)
@@ -607,7 +622,9 @@ VALUES (1, 'DESIGN1', 1, 1, 1, 1),
 INSERT INTO `DetailedSample`(`sampleId`, `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic)
 VALUES (15,1,0,NULL,NULL,NULL,0),
 (16,2,0,15,1,NULL,1),
-(17,2,0,15,2,1,0);
+(17,2,0,15,2,1,0),
+(18,3,0,17,1,NULL,0),
+(19,4,0,18,1,NULL,0);
 
 DELETE FROM `Identity`;
 INSERT INTO `Identity` (`sampleId`, `externalName`,`donorSex`)
@@ -624,6 +641,12 @@ VALUES (1,'Test Type','for testing',1,'2016-02-19 11:28:00',1,'2016-02-19 11:28:
 INSERT INTO SampleTissue(sampleId, tissueOriginId, tissueTypeId, timesReceived, tubeNumber)
 VALUES (16, 1, 1, 1, 1),
 (17, 1, 1, 1, 2);
+
+INSERT INTO SampleStock (sampleId) VALUES
+(18);
+
+INSERT INTO SampleAliquot (sampleId) VALUES
+(19);
 
 DELETE FROM `Institute`;
 INSERT INTO `Institute`(`instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
@@ -644,3 +667,18 @@ VALUES ('2', '3', '9999', '4', '1', '1', '2016-01-28 14:32:00', '2016-01-28 14:3
 DELETE FROM `DetailedLibrary`;
 INSERT INTO `DetailedLibrary`(`libraryId`, `libraryDesignCodeId`)
 VALUES (1,1);
+
+DELETE FROM ArrayPosition;
+DELETE FROM Array;
+DELETE FROM ArrayModel;
+INSERT INTO ArrayModel(arrayModelId, alias, rows, columns) VALUES
+(1, 'Test BeadChip', 8, 1);
+
+INSERT INTO Array(arrayId, alias, arrayModelId, serialNumber, description, creator, created, lastModifier, lastModified) VALUES
+(1, 'Array_1', 1, '1234', 'test array', 1, '2018-01-26 17:11:00', 1, '2018-01-26 17:11:00');
+
+INSERT INTO ArrayPosition(arrayId, position, sampleId) VALUES
+(1, 'R01C01', 19);
+
+INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate, creator, created, lastModifier, lastModified) VALUES
+(1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 1, '2018-02-02 15:40:00', 1, '2018-02-02 15:40:00');

@@ -27,8 +27,9 @@ ListTarget.completion = {
     if (config.poolId) {
       return '/miso/rest/pool/' + config.poolId + '/dt/completions';
     }
-    return '/miso/rest/poolorder/dt/completions' + (config.activeOnly ? '/active' : '');
+    return '/miso/rest/poolorder/dt/completions/' + config.slug + '/' + config.platform;
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },
@@ -76,7 +77,6 @@ ListTarget.completion = {
       "iSortPriority": 0,
       "include": true,
       "visibilityFilter": nonZero
-
     }, {
       "sTitle": "Failed",
       "mData": "failed",
@@ -120,15 +120,39 @@ ListTarget.completion = {
       "include": true,
       "visibilityFilter": nonZero
     }, {
+      "sTitle": "Pending",
+      "mData": "loaded",
+      "bSortable": false,
+      "iSortPriority": 0,
+      "include": true,
+      "visibilityFilter": nonZero
+    }, {
       "sTitle": "Remaining",
       "mData": "remaining",
       "iSortPriority": 0,
-      "include": true
+      "include": true,
+      "mRender": function(data, type, full) {
+        if (type === 'display') {
+          return (data - full.loaded) + (full.loaded ? '*' : '');
+        }
+        return data;
+      }
     }, {
       "sTitle": "Last Modified",
       "mData": "lastUpdated",
       "iSortPriority": 2,
       "include": true
     }];
+  },
+  searchTermSelector: function(searchTerms) {
+    return [
+      searchTerms['fulfilled'],
+      searchTerms['active'],
+      searchTerms['runstatus'],
+      searchTerms['changed'],
+      searchTerms['platform'],
+      searchTerms['index_name'],
+      searchTerms['index_seq']
+    ]
   }
 };

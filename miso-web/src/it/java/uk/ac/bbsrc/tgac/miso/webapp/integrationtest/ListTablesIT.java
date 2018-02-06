@@ -42,8 +42,8 @@ public class ListTablesIT extends AbstractIT {
       Columns.AVG_INSERT_SIZE, Columns.LAST_MODIFIED);
   private static final Set<String> ordersColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.DESCRIPTION,
       Columns.PLATFORM, Columns.LONGEST_INDEX, Columns.SEQUENCING_PARAMETERS, Columns.REMAINING, Columns.LAST_MODIFIED);
-  private static final Set<String> containersColumns = Sets.newHashSet(Columns.SORT, Columns.SERIAL_NUMBER, Columns.LAST_RUN_NAME,
-      Columns.LAST_RUN_ALIAS, Columns.LAST_SEQUENCER, Columns.LAST_MODIFIED);
+  private static final Set<String> containersColumns = Sets.newHashSet(Columns.SORT, Columns.ID, Columns.SERIAL_NUMBER,
+      Columns.LAST_RUN_NAME, Columns.LAST_RUN_ALIAS, Columns.LAST_SEQUENCER, Columns.LAST_MODIFIED);
   private static final Set<String> runsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.STATUS,
       Columns.START_DATE, Columns.END_DATE, Columns.LAST_MODIFIED);
   private static final Set<String> boxesColumns = Sets.newHashSet(Columns.SORT, Columns.NAME, Columns.ALIAS, Columns.LOCATION,
@@ -59,9 +59,12 @@ public class ListTablesIT extends AbstractIT {
       Columns.AVAILABLE);
   private static final Set<String> projectsColumns = Sets.newHashSet(Columns.NAME, Columns.ALIAS, Columns.SHORT_NAME,
       Columns.DESCRIPTION, Columns.PROGRESS);
+  private static final Set<String> arraysColumns = Sets.newHashSet(Columns.ID, Columns.ALIAS, Columns.SERIAL_NUMBER);
+  private static final Set<String> arrayRunsColumns = Sets.newHashSet(Columns.ID, Columns.ALIAS, Columns.STATUS, Columns.START_DATE,
+      Columns.END_DATE, Columns.LAST_MODIFIED);
 
   private static final Set<String> poolsTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
-  private static final Set<String> ordersTabs = Sets.newHashSet(Tabs.ACTIVE, Tabs.ALL);
+  private static final Set<String> ordersTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
   private static final Set<String> containersTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
   private static final Set<String> runsTabs = Sets.newHashSet(Tabs.ILLUMINA, Tabs.PACBIO);
   private static final Set<String> boxesTabs = Sets.newHashSet(Tabs.DNA, Tabs.LIBRARIES, Tabs.RNA, Tabs.SEQUENCING, Tabs.STORAGE,
@@ -74,7 +77,9 @@ public class ListTablesIT extends AbstractIT {
   static {
     Map<String, Set<String>> tabs = new HashMap<>();
     tabs.put(ListTarget.POOLS, poolsTabs);
-    tabs.put(ListTarget.ORDERS, ordersTabs);
+    tabs.put(ListTarget.ORDERS_ACTIVE, ordersTabs);
+    tabs.put(ListTarget.ORDERS_ALL, ordersTabs);
+    tabs.put(ListTarget.ORDERS_PENDING, ordersTabs);
     tabs.put(ListTarget.CONTAINERS, containersTabs);
     tabs.put(ListTarget.RUNS, runsTabs);
     tabs.put(ListTarget.BOXES, boxesTabs);
@@ -91,7 +96,9 @@ public class ListTablesIT extends AbstractIT {
   static {
     Map<String, String> preferredTab = new HashMap<>();
     preferredTab.put(ListTarget.POOLS, Tabs.ILLUMINA);
-    preferredTab.put(ListTarget.ORDERS, Tabs.ALL);
+    preferredTab.put(ListTarget.ORDERS_ACTIVE, Tabs.ILLUMINA);
+    preferredTab.put(ListTarget.ORDERS_ALL, Tabs.ILLUMINA);
+    preferredTab.put(ListTarget.ORDERS_PENDING, Tabs.ILLUMINA);
     preferredTab.put(ListTarget.CONTAINERS, Tabs.ILLUMINA);
     preferredTab.put(ListTarget.RUNS, Tabs.ILLUMINA);
     preferredTab.put(ListTarget.BOXES, Tabs.STORAGE);
@@ -163,6 +170,10 @@ public class ListTablesIT extends AbstractIT {
 
   private static final Set<String> submissionsQueries = concatSets(
       Sets.newHashSet("Sub"), createdDates, createdOnDates, creator, modifier);
+
+  private static final Set<String> arrayQueries = Sets.newHashSet("Array");
+
+  private static final Set<String> arrayRunQueries = Sets.newHashSet("ArrayRun");
 
   private static final Comparator<String> standardComparator = (s1, s2) -> s1.compareToIgnoreCase(s2);
 
@@ -296,35 +307,41 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListOrdersSetup() throws Exception {
-    // this one is special because the number of order completion states is variable
-    ListTabbedPage page = getTabbedList(ListTarget.ORDERS);
-    DataTable table = page.getTable();
-    List<String> headings = table.getColumnHeadings();
-    // size = order columns + some number of completion state columns
-    assertTrue(ordersColumns.size() <= headings.size());
-    for (String col : ordersColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
-    }
-    headings.removeAll(ordersColumns);
+    for (String pageName : new String[] { ListTarget.ORDERS_ALL,  ListTarget.ORDERS_ACTIVE,  ListTarget.ORDERS_PENDING }) {
+      // this one is special because the number of order completion states is variable
+      ListTabbedPage page = getTabbedList(pageName);
+      DataTable table = page.getTable();
+      List<String> headings = table.getColumnHeadings();
+      // size = order columns + some number of completion state columns
+      assertTrue(ordersColumns.size() <= headings.size());
+      for (String col : ordersColumns) {
+        assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      }
+      headings.removeAll(ordersColumns);
 
-    // confirm that order completion columns are part of the expected set and are not duplicated
-    Set<String> foundCompletionHeaders = new HashSet<>();
-    for (String remaining : headings) {
-      if (!completionHeaders.contains(remaining)) throw new IllegalArgumentException("Found unexpected column '" + remaining + "'");
-      if (!foundCompletionHeaders.add(remaining))
-        throw new IllegalArgumentException("Found duplicate completion column '" + foundCompletionHeaders + "'");
+      // confirm that order completion columns are part of the expected set and are not duplicated
+      Set<String> foundCompletionHeaders = new HashSet<>();
+      for (String remaining : headings) {
+        if (!completionHeaders.contains(remaining)) throw new IllegalArgumentException("Found unexpected column '" + remaining + "' on " + pageName);
+        if (!foundCompletionHeaders.add(remaining))
+          throw new IllegalArgumentException("Found duplicate completion column '" + foundCompletionHeaders + "' on " + pageName);
+      }
     }
   }
 
   @Test
   public void testListOrdersColumnSort() throws Exception {
-    testTabbedColumnsSort(ListTarget.ORDERS);
+    testTabbedColumnsSort(ListTarget.ORDERS_ALL);
+    testTabbedColumnsSort(ListTarget.ORDERS_ACTIVE);
+    testTabbedColumnsSort(ListTarget.ORDERS_PENDING);
   }
 
   @Test
   public void testListOrdersSearch() throws Exception {
     ordersQueries.forEach(query -> {
-      testTabbedSearch(ListTarget.ORDERS, query);
+      testTabbedSearch(ListTarget.ORDERS_ACTIVE, query);
+      testTabbedSearch(ListTarget.ORDERS_ALL, query);
+      testTabbedSearch(ListTarget.ORDERS_PENDING, query);
     });
   }
 
@@ -473,6 +490,40 @@ public class ListTablesIT extends AbstractIT {
   public void testListProjectsSearch() throws Exception {
     projectsQueries.forEach(query -> {
       testSearch(ListTarget.PROJECTS, query);
+    });
+  }
+
+  @Test
+  public void testListArraysSetup() throws Exception {
+    testPageSetup(ListTarget.ARRAYS, arraysColumns);
+  }
+
+  @Test
+  public void testListArraysColumnSort() throws Exception {
+    testColumnsSort(ListTarget.ARRAYS);
+  }
+
+  @Test
+  public void testListArraysSearch() throws Exception {
+    arrayQueries.forEach(query -> {
+      testSearch(ListTarget.ARRAYS, query);
+    });
+  }
+
+  @Test
+  public void testListArrayRunsSetup() throws Exception {
+    testPageSetup(ListTarget.ARRAYRUNS, arrayRunsColumns);
+  }
+
+  @Test
+  public void testListArrayRunsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.ARRAYRUNS);
+  }
+
+  @Test
+  public void testListArrayRunsSearch() throws Exception {
+    arrayRunQueries.forEach(query -> {
+      testSearch(ListTarget.ARRAYRUNS, query);
     });
   }
 

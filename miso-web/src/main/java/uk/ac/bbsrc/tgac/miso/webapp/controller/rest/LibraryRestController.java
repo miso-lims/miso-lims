@@ -179,4 +179,11 @@ public class LibraryRestController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
+  @RequestMapping(value = "/query", method = RequestMethod.POST, produces = { "application/json" })
+  @ResponseBody
+  public List<LibraryDto> getLibariesInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) {
+    return PaginationFilter.bulkSearch(names, libraryService, Dtos::asDto, message -> new RestException(message, Status.BAD_REQUEST));
+  }
+
 }

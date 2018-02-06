@@ -268,15 +268,15 @@ Box.ui = {
 
     var items;
     if (positionStrings) {
-      items = Box.visual.data.filter(function(item) {
+      items = Box.boxJSON.items.filter(function(item) {
         return positionStrings.indexOf(item.coordinates) >= 0
       });
     } else {
       // if no items are selected, determine bulk actions based on the entity types of all box contents
-      items = Box.visual.data;
+      items = Box.boxJSON.items;
     }
     if (items.length < 1) {
-      if (Box.visual.data.length) {
+      if (Box.boxJSON.items.length) {
         // there are items in the box but an empty position is selected
         addToolbarMemo("Select one or more items to see bulk actions.");
         return;
@@ -358,14 +358,16 @@ Box.ui = {
   },
 
   exportBox: function(boxId) {
-    Fluxion.doAjax('boxControllerHelperService', 'exportBoxContentsForm', {
-      'boxId': boxId,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function(json) {
-        Utils.page.pageRedirect('/miso/download/box/forms/' + json.response);
-      }
-    });
+    jQuery.ajax({
+      url: "/miso/rest/box/" + boxId + "/spreadsheet",
+      type: "GET",
+      contentType: "application/json; charset=utf8",
+      dataType: "json",
+    }).success(function(json) {
+      // REST endpoint will return a JSON object with the spreadsheet filename's hashCode inside
+      // Send the hashCode to the DownloadController to download the spreadsheet
+      Utils.page.pageRedirect('/miso/download/box/forms/' + json.hashCode);
+    })
   },
 
   getItemAtPosition: function(coordinates) {

@@ -26,6 +26,7 @@ ListTarget.experiment_run_partition = {
   createUrl: function(config, projectId) {
     throw "Must be created statically.";
   },
+  queryUrl: null,
   createBulkActions: function(config, projectId) {
     return [];
   },

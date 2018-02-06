@@ -23,23 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.util;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -57,31 +44,13 @@ import org.odftoolkit.odfdom.incubator.doc.text.OdfTextParagraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
-
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.User;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.QcTarget;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.*;
 import uk.ac.bbsrc.tgac.miso.core.exception.DeliveryFormException;
 import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -91,11 +60,17 @@ import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 
+import java.io.*;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 /**
  * @author Rob Davey
  */
 public class FormUtils {
-
   protected static final Logger log = LoggerFactory.getLogger(FormUtils.class);
 
   private static final Pattern digitPattern = Pattern.compile("(^[0-9]+)[\\.0-9]*");
@@ -1232,43 +1207,52 @@ public class FormUtils {
     return samples;
   }
 
-  public static void createBoxContentsSpreadsheet(File outpath, ArrayList<String> array) throws IOException {
-    InputStream in = null;
-    in = FormUtils.class.getResourceAsStream("/forms/ods/box_input.xlsx");
-    if (in != null) {
+  public static void createPlainBoxSpreadsheet(File outpath, String name, String alias, List<List<String>> boxContents)
+      throws IOException {
+    createBoxSpreadsheet("/forms/ods/box_input_plain.xlsx", outpath, name, alias, boxContents);
+  }
+
+  public static void createDetailedBoxSpreadsheet(File outpath, String name, String alias, List<List<String>> boxContents)
+      throws IOException {
+    createBoxSpreadsheet("/forms/ods/box_input_detailed.xlsx", outpath, name, alias, boxContents);
+  }
+
+  private static void createBoxSpreadsheet(String templateName, File outpath, String name, String alias, List<List<String>> boxContents)
+      throws IOException {
+    try (FileOutputStream fileOut = new FileOutputStream(outpath); InputStream in = FormUtils.class.getResourceAsStream(templateName)) {
       XSSFWorkbook oDoc = new XSSFWorkbook(in);
 
-      XSSFSheet sheet = oDoc.getSheet("Input");
-      FileOutputStream fileOut = new FileOutputStream(outpath);
+      writeBoxSpreadsheet(oDoc, name, alias, boxContents, fileOut);
+    }
+  }
 
-      String boxInfo = array.remove(0);
-      String boxName = boxInfo.split(":")[0];
-      String boxAlias = boxInfo.split(":")[1];
-      XSSFRow row1 = sheet.createRow(1);
-      XSSFCell cellA = row1.createCell(0);
-      cellA.setCellValue(boxName);
-      XSSFCell cellB = row1.createCell(1);
-      cellB.setCellValue(boxAlias);
+  private static void writeBoxSpreadsheet(XSSFWorkbook oDoc, String name, String alias, List<List<String>> boxContents,
+      FileOutputStream fileOut) throws IOException {
+    XSSFSheet sheet = oDoc.getSheet("Input");
 
-      int i = 4; // start on row 4 of the sheet
-      for (String item : array) {
-        String position = item.split(":")[0];
-        String name = item.split(":")[1];
-        String alias = item.split(":")[2];
+    writeBoxContentsHeader(name, alias, sheet);
+    writeBoxContentsBody(boxContents, sheet);
 
-        XSSFRow row = sheet.createRow(i);
-        cellA = row.createCell(0);
-        cellA.setCellValue(position);
-        cellB = row.createCell(1);
-        cellB.setCellValue(name);
-        XSSFCell cellC = row.createCell(2);
-        cellC.setCellValue(alias);
-        i++;
+    oDoc.write(fileOut);
+  }
+
+  private static void writeBoxContentsHeader(String name, String alias, XSSFSheet sheet) {
+    XSSFRow row = sheet.createRow(1);
+    row.createCell(0).setCellValue(name);
+    row.createCell(1).setCellValue(alias);
+  }
+
+  private static void writeBoxContentsBody(List<List<String>> boxContents, XSSFSheet sheet) {
+    int rowIndex = 4; // start on row 5 of the sheet
+
+    for (List<String> row : boxContents) {
+      XSSFRow sheetRow = sheet.createRow(rowIndex);
+
+      for (int colIndex = 0; colIndex < row.size(); ++colIndex) {
+        sheetRow.createCell(colIndex).setCellValue(row.get(colIndex));
       }
-      oDoc.write(fileOut);
-      fileOut.close();
-    } else {
-      throw new IOException("Could not read from resource.");
+
+      rowIndex++;
     }
   }
 

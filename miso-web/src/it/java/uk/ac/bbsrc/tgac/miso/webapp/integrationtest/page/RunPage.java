@@ -220,17 +220,17 @@ public class RunPage extends FormPage<RunPage.Field> {
     } else {
       waitUntil(textToBe(By.className("ui-dialog-title"), "Select Pool"));
     }
-    if (dialog.findElements(By.className("pool-tile")).isEmpty()) {
+    if (dialog.findElements(By.className("tile")).isEmpty()) {
       throw new IllegalArgumentException("Cannot find pool for search term '" + searchText + "'.");
     }
-    dialog.findElements(By.className("pool-tile")).get(0).click();
+    dialog.findElements(By.className("tile")).get(0).click();
   }
 
   public List<Long> getPoolIdsFromTiles() {
     if (!dialog.isDisplayed()) {
       throw new IllegalStateException("Dialog is not visible");
     }
-    List<WebElement> poolTitles = dialog.findElements(By.className("pool-name"));
+    List<WebElement> poolTitles = dialog.findElements(By.className("name"));
     return poolTitles.stream()
         .map(title -> Long.valueOf(title.getText().substring(3, title.getText().indexOf(" "))))
         .collect(Collectors.toList());

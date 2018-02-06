@@ -162,7 +162,7 @@ public class HibernatePoolableElementViewDao implements PoolableElementViewDao, 
 
   @Override
   public void restrictPaginationByBox(Criteria criteria, String name, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.searchRestrictions(name, "boxAlias", "boxName", "boxIdentificationBarcode", "boxLocationBarcode"));
+    criteria.add(DbUtils.searchRestrictions(name, false, "boxAlias", "boxName", "boxIdentificationBarcode", "boxLocationBarcode"));
   }
 
   @Override

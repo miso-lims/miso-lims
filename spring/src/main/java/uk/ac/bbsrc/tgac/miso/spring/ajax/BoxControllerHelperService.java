@@ -1,14 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,7 +27,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.BoxableDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
@@ -42,7 +34,6 @@ import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 
 @Ajaxified
 public class BoxControllerHelperService {
@@ -586,42 +577,6 @@ public class BoxControllerHelperService {
     } catch (IntegrationException | IOException e) {
       log.error(e.getMessage());
       return JSONUtils.SimpleJSONError("Error scanning box: " + e.getMessage());
-    }
-  }
-
-  /**
-   * Creates an Excel spreadsheet that contains the list of all Boxable items located in a particular position. Empty positions are not
-   * listed.
-   * 
-   * Note: json must contain the following key-value pairs: "boxId": boxId
-   * 
-   * @param session
-   * @param json
-   * @return JSON message indicating success (and hash code of newly-created file name on disk) or error
-   */
-  public JSONObject exportBoxContentsForm(HttpSession session, JSONObject json) {
-    if (json.has("boxId")) {
-      Long boxId = json.getLong("boxId");
-      try {
-        ArrayList<String> array = new ArrayList<>();
-
-        Box box = boxService.get(boxId);
-        array.add(box.getName() + ":" + box.getAlias());
-        Map<String, BoxableView> boxableItems = new TreeMap<>(box.getBoxables()); // sorted by position
-        for (Map.Entry<String, BoxableView> entry : boxableItems.entrySet()) {
-          String arrayEntry = entry.getKey() + ":" + entry.getValue().getName() + ":" + entry.getValue().getAlias();
-          array.add(arrayEntry);
-        }
-
-        File f = misoFileManager.getNewFile(Box.class, "forms", "BoxContentsForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
-        FormUtils.createBoxContentsSpreadsheet(f, array);
-        return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-      } catch (Exception e) {
-        log.debug("failed to create box contents form");
-        return JSONUtils.SimpleJSONError("Failed to get box contents form: " + e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("Missing boxId");
     }
   }
 

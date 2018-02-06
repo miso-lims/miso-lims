@@ -30,6 +30,7 @@ public interface AbstractListPage {
     public static final String POOL_CONCENTRATION = "Conc. (nM)";
     public static final String LONGEST_INDEX = "Longest Index";
     public static final String SEQUENCING_PARAMETERS = "Sequencing Parameters";
+    public static final String ID = "ID";
     public static final String SERIAL_NUMBER = "Serial Number";
     public static final String LAST_RUN_NAME = "Last Run Name";
     public static final String LAST_RUN_ALIAS = "Last Run Alias";
@@ -94,12 +95,16 @@ public interface AbstractListPage {
     public static final String PROJECTS = "projects";
     public static final String INSTRUMENTS = "instruments";
     public static final String POOLS = "pools";
-    public static final String ORDERS = "poolorders";
+    public static final String ORDERS_ACTIVE = "poolorders/active";
+    public static final String ORDERS_ALL = "poolorders/all";
+    public static final String ORDERS_PENDING = "poolorders/pending";
     public static final String CONTAINERS = "containers";
     public static final String RUNS = "runs";
     public static final String BOXES = "boxes";
     public static final String KITS = "kitdescriptors";
     public static final String INDICES = "indices";
+    public static final String ARRAYS = "arrays";
+    public static final String ARRAYRUNS = "arrayruns";
   }
 
   public static class ButtonText {

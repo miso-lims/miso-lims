@@ -206,6 +206,7 @@
   jQuery(document).ready(function() {
     Box.boxJSON = ${boxJSON};
     Box.boxId = ${box.id};
+    Box.ui.createListingBoxablesTable(Box.boxJSON);
     Box.visual.create({
       div: '#boxContentsTable',
       size: {
@@ -217,7 +218,6 @@
     jQuery('#updateSelected, #removeSelected, #emptySelected, #resultSelect, #search, #searchField')
         .prop('disabled', true)
         .addClass('disabled');
-    Box.ui.createListingBoxablesTable(Box.boxJSON);
   });
 
   jQuery('#searchField').keyup(function(event) {

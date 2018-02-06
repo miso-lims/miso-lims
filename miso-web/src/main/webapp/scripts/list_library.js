@@ -26,6 +26,7 @@ ListTarget.library = {
   createUrl: function(config, projectId) {
     return "/miso/rest/library/dt" + (projectId ? '/project/' + projectId : '');
   },
+  queryUrl: "/miso/rest/library/query",
   createBulkActions: function(config, projectId) {
     return HotTarget.library.bulkActions;
   },
@@ -111,5 +112,18 @@ ListTarget.library = {
           "iSortPriority": 0,
           "bVisible": false
         }];
+  },
+  searchTermSelector: function(searchTerms) {
+    return [searchTerms['created'],
+      searchTerms['changed'],
+      searchTerms['creator'],
+      searchTerms['changedby'],
+      searchTerms['platform'],
+      searchTerms['index_name'],
+      searchTerms['index_seq'],
+      searchTerms['institute'],
+      searchTerms['external'],
+      searchTerms['box']
+    ]
   }
 };

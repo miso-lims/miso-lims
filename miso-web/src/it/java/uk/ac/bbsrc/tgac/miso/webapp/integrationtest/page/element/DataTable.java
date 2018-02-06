@@ -18,10 +18,10 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Column
 
 public class DataTable extends AbstractElement {
 
-  private static final By tableSelector = By.tagName("table");
+  private static final By tableSelector = By.cssSelector("table.dataTable");
   private static final By searchBarSelector = By.xpath(".//div[@class='dataTables_filter']/descendant::label/descendant::input");
   private static final By searchBarDivSelector = By.xpath(".//div[@class='dataTables_filter']");
-  private static final By columnHeadingsSelector = By.tagName("th");
+  private static final By columnHeadingsSelector = By.cssSelector("th");
   private static final By rowSelector = By.cssSelector("tbody > tr");
   private static final By cellSelector = By.tagName("td");
   private static final By emptyTableSelector = By.className("dataTables_empty");
@@ -41,8 +41,7 @@ public class DataTable extends AbstractElement {
     PageFactory.initElements(driver, this);
     WebElement tableWrapper = getDriver().findElement(By.id(tableWrapperId));
     this.table = tableWrapper.findElement(tableSelector);
-    this.columnHeaders = tableWrapper.findElements(columnHeadingsSelector).stream()
-        .collect(Collectors.toList());
+    this.columnHeaders = table.findElements(columnHeadingsSelector).stream().collect(Collectors.toList());
     this.columnHeadings = columnHeaders.stream()
         .map(element -> element.getText().trim())
         .collect(Collectors.toList());

@@ -92,7 +92,7 @@ public class HibernateInstrumentDaoTest extends AbstractDAOTest {
   @Test
   public void testCount() throws Exception {
     int total = dao.count();
-    assertEquals(2, total);
+    assertEquals(3, total);
   }
 
   @Test

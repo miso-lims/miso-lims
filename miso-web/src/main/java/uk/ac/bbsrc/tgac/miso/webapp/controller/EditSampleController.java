@@ -119,6 +119,8 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleSlideDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
+import uk.ac.bbsrc.tgac.miso.service.ArrayRunService;
+import uk.ac.bbsrc.tgac.miso.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
@@ -169,6 +171,10 @@ public class EditSampleController {
   private RunService runService;
   @Autowired
   private StainService stainService;
+  @Autowired
+  private ArrayService arrayService;
+  @Autowired
+  private ArrayRunService arrayRunService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -678,6 +684,7 @@ public class EditSampleController {
         model.put("samplePools", pools.stream().map(p -> Dtos.asDto(p, false)).collect(Collectors.toList()));
         model.put("sampleRuns", runDtos);
         model.put("sampleRelations", getRelations(sample));
+        addArrayData(sampleId, model);
       }
 
       model.put("formObj", sample);
@@ -697,6 +704,15 @@ public class EditSampleController {
       }
       throw ex;
     }
+  }
+
+  private void addArrayData(long sampleId, ModelMap model) throws IOException {
+    model.put("sampleArrays", arrayService.listBySampleId(sampleId).stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList()));
+    model.put("sampleArrayRuns", arrayRunService.listBySampleId(sampleId).stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList()));
   }
 
   private List<SampleDto> getRelations(Sample sample) {

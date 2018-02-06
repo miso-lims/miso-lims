@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,9 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Array;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
@@ -36,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
@@ -1470,6 +1475,7 @@ public class Dtos {
       parametersDto.setName("(None)");
       dto.setParameters(parametersDto);
     }
+    dto.setProgress(from.getProgress());
     return dto;
   }
 
@@ -1578,6 +1584,7 @@ public class Dtos {
     dto.setStarted(from.get(HealthType.Started));
     dto.setStopped(from.get(HealthType.Stopped));
     dto.setUnknown(from.get(HealthType.Unknown));
+    dto.setLoaded(from.getLoaded());
     return dto;
   }
 
@@ -2036,5 +2043,160 @@ public class Dtos {
     dto.setTitle(from.getTitle());
     dto.setVerified(from.isVerified());
     return dto;
+  }
+
+  public static ArrayDto asDto(Array from) {
+    ArrayDto dto = new ArrayDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    if (from.getArrayModel() != null) {
+      dto.setArrayModelId(from.getArrayModel().getId());
+      dto.setArrayModelAlias(from.getArrayModel().getAlias());
+      dto.setRows(from.getArrayModel().getRows());
+      dto.setColumns(from.getArrayModel().getColumns());
+    }
+    dto.setSerialNumber(from.getSerialNumber());
+    dto.setDescription(from.getDescription());
+    if (from.getSamples() != null) {
+      dto.setSamples(asArraySampleDtos(from.getSamples()));
+    }
+    if (from.getLastModified() != null) {
+      dto.setLastModified(formatDate(from.getLastModified()));
+    }
+    return dto;
+  }
+
+  private static List<ArraySampleDto> asArraySampleDtos(Map<String, Sample> arraySamples) {
+    List<ArraySampleDto> list = new ArrayList<>();
+    if (arraySamples != null) {
+      for (Entry<String, Sample> entry : arraySamples.entrySet()) {
+        list.add(asArraySampleDto(entry.getKey(), entry.getValue()));
+      }
+    }
+    return list;
+  }
+
+  private static ArraySampleDto asArraySampleDto(String position, Sample sample) {
+    ArraySampleDto dto = new ArraySampleDto();
+    dto.setCoordinates(position);
+    dto.setId(sample.getId());
+    dto.setAlias(sample.getAlias());
+    dto.setName(sample.getName());
+    dto.setIdentificationBarcode(sample.getIdentificationBarcode());
+    return dto;
+  }
+
+  public static Array to(ArrayDto from) {
+    Array array = new Array();
+    if (from.getId() != null) {
+      array.setId(from.getId());
+    }
+    array.setAlias(from.getAlias());
+    array.setArrayModel(new ArrayModel());
+    if (from.getArrayModelId() != null) {
+      array.getArrayModel().setId(from.getArrayModelId());
+    }
+    if (from.getArrayModelAlias() != null) {
+      array.getArrayModel().setAlias(from.getArrayModelAlias());
+    }
+    array.setSerialNumber(from.getSerialNumber());
+    array.setDescription(nullifyStringIfBlank(from.getDescription()));
+    array.setSamples(toArraySamples(from.getSamples()));
+    return array;
+  }
+
+  private static Map<String, Sample> toArraySamples(List<ArraySampleDto> dtos) {
+    Map<String, Sample> samples = new HashMap<>();
+    if (dtos != null) {
+      for (ArraySampleDto dto : dtos) {
+        Sample sample = new SampleImpl();
+        sample.setId(dto.getId());
+        sample.setAlias(dto.getAlias());
+        sample.setName(dto.getName());
+        sample.setIdentificationBarcode(dto.getIdentificationBarcode());
+        samples.put(dto.getCoordinates(), sample);
+      }
+    }
+    return samples;
+  }
+
+  public static ArrayRunDto asDto(ArrayRun from) {
+    ArrayRunDto dto = new ArrayRunDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    dto.setFilePath(from.getFilePath());
+    if (from.getInstrument() != null) {
+      dto.setInstrumentId(from.getInstrument().getId());
+      dto.setInstrumentName(from.getInstrument().getName());
+    }
+    if (from.getArray() != null) {
+      dto.setArray(asDto(from.getArray()));
+    }
+    dto.setStatus(from.getHealth().getKey());
+    if (from.getStartDate() != null) {
+      dto.setStartDate(formatDate(from.getStartDate()));
+    }
+    if (from.getCompletionDate() != null) {
+      dto.setCompletionDate(formatDate(from.getCompletionDate()));
+    }
+    if (from.getLastModified() != null) {
+      dto.setLastModified(formatDate(from.getLastModified()));
+    }
+    return dto;
+  }
+
+  public static List<ArrayDto> asArrayDtos(Collection<Array> arrays) {
+    return arrays.stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
+  }
+
+  public static final ArrayRun to(ArrayRunDto from) {
+    ArrayRun run = new ArrayRun();
+    if (from.getId() != null) {
+      run.setId(from.getId());
+    }
+    run.setAlias(from.getAlias());
+    run.setDescription(nullifyStringIfBlank(from.getDescription()));
+    run.setFilePath(nullifyStringIfBlank(from.getFilePath()));
+    run.setInstrument(new InstrumentImpl());
+    if (from.getInstrumentId() != null) {
+      run.getInstrument().setId(from.getInstrumentId());
+    }
+    if (from.getInstrumentName() != null) {
+      run.getInstrument().setName(from.getInstrumentName());
+    }
+    if (from.getArray() != null) {
+      run.setArray(to(from.getArray()));
+    }
+    run.setHealth(HealthType.get(from.getStatus()));
+    if (from.getStartDate() != null) {
+      run.setStartDate(parseDate(from.getStartDate()));
+    }
+    if (from.getCompletionDate() != null) {
+      run.setCompletionDate(parseDate(from.getCompletionDate()));
+    }
+    if (from.getLastModified() != null) {
+      run.setLastModified(parseDate(from.getLastModified()));
+    }
+    return run;
+  }
+
+  public static InstrumentStatusDto asDto(InstrumentStatus from) {
+    InstrumentStatusDto to = new InstrumentStatusDto();
+    to.setInstrument(asDto(from.getInstrument()));
+    to.setRun(from.getRun() == null ? null : asDto(from.getRun()));
+    to.setPools(from.getRun() == null ? Collections.emptyList()
+        : from.getRun().getSequencerPartitionContainers().stream()//
+            .flatMap(c -> c.getPartitions().stream())//
+            .map(Partition::getPool)
+            .filter(Objects::nonNull)//
+            .collect(Collectors.groupingBy(Pool::getId)).values().stream()//
+            .map(l -> l.get(0))//
+            .sorted((a, b) -> a.getAlias().compareTo(b.getAlias()))//
+            .map(p -> asDto(p, false))//
+            .collect(Collectors.toList()));
+    return to;
   }
 }

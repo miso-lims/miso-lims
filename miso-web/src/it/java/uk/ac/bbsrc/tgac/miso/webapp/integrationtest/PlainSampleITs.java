@@ -232,7 +232,9 @@ public class PlainSampleITs extends AbstractIT {
     slugs.add("libraries");
     slugs.add("dilutions");
     slugs.add("pools");
-    slugs.add("poolorders");
+    slugs.add("poolorders/active");
+    slugs.add("poolorders/all");
+    slugs.add("poolorders/pending");
     slugs.add("containers");
     slugs.add("runs");
     slugs.add("boxes");
