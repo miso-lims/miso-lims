@@ -146,6 +146,7 @@ public class HibernateArrayRunDao implements ArrayRunStore, HibernatePaginatedDa
   @Override
   public String propertyForSortColumn(String original) {
     if ("platformType".equals(original)) return "platform.platformType";
+    if ("status".equals(original)) return "health";
     return original;
   }
 

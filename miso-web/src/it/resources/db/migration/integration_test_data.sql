@@ -42,6 +42,9 @@ DELETE FROM Project;
 DELETE FROM Note;
 DELETE FROM Library_Note;
 DELETE FROM Pool_Note;
+DELETE FROM ArrayPosition;
+DELETE FROM Array;
+DELETE FROM ArrayModel;
 
 INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `password`, `email`)
 VALUES (3,1,0,0,'user',1,'user','user','user@user.user');
@@ -319,7 +322,8 @@ INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
 INSERT INTO Platform (platformId, name, instrumentModel, numContainers, instrumentType) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
-  (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER');
+  (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER'),
+  (4, 'ILLUMINA', 'Illumina iScan', 1, 'ARRAY_SCANNER');
   
 INSERT INTO SequencingParameters (parametersId, name, platformId, readLength, paired, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
@@ -351,7 +355,8 @@ INSERT INTO PlatformSizes(platform_platformId, partitionSize) VALUES
 INSERT INTO Instrument (instrumentId, name, platformId, ip) VALUES
   (1, 'T2000', 1, '127.0.0.1'),
   (2, 'TMS1', 2, '127.0.0.1'),
-  (3, 'TPB2', 3, '127.0.0.1');
+  (3, 'TPB2', 3, '127.0.0.1'),
+  (4, 'iScan1', 4, NULL);
   
 INSERT INTO Instrument (instrumentId, name, platformId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId, ip) VALUES
   (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, '127.0.0.1'),
@@ -842,3 +847,15 @@ INSERT INTO Library_Note(library_libraryId, notes_noteId) VALUES
 
 INSERT INTO Pool_Note(pool_poolId, notes_noteId) VALUES
   (120001, 2);
+
+INSERT INTO ArrayModel(arrayModelId, alias, rows, columns) VALUES
+(1, 'Test BeadChip', 8, 1);
+
+INSERT INTO Array(arrayId, alias, arrayModelId, serialNumber, description, creator, created, lastModifier, lastModified) VALUES
+(1, 'Array_1', 1, '1234', 'test array', 1, '2018-01-26 17:11:00', 1, '2018-01-26 17:11:00');
+
+INSERT INTO ArrayPosition(arrayId, position, sampleId) VALUES
+(1, 'R01C01', 8);
+
+INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate, creator, created, lastModifier, lastModified) VALUES
+(1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 1, '2018-02-02 15:40:00', 1, '2018-02-02 15:40:00');
