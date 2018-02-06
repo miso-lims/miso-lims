@@ -1,3 +1,5 @@
+-- arrays
+
 DROP TABLE IF EXISTS ArrayRunChangeLog;
 DROP TABLE IF EXISTS ArrayRun;
 DROP TABLE IF EXISTS ArrayChangeLog;
@@ -90,4 +92,6 @@ CREATE TABLE ArrayRunChangeLog (
 INSERT INTO Platform (name, instrumentModel, description, numContainers, instrumentType)
 SELECT 'ILLUMINA', 'Illumina iScan', 'Array scanner for extensive applications', 1, 'ARRAY_SCANNER' FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM Platform WHERE instrumentModel = 'Illumina iScan');
+
+
 

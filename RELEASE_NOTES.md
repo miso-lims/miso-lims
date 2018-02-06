@@ -1,3 +1,14 @@
+# 0.2.107
+
+Changes:
+
+ * Added Sample Arrays and Array Runs (#1308)
+ * Display "pending" partition count
+ * Make Date of receipt to default to today's date when creating samples and receiving libraries
+ * Add an instrument status table to the main page
+ * Allow bulk select using names, aliases, or barcodes
+ * Document search syntax using tooltip and popup
+
 # 0.2.106
 
 Changes:
