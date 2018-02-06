@@ -71,9 +71,7 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public String getFriendlyName();
 
   /**
-   * Get the property name of the project to which the item is connected.
-   * 
-   * @return
+   * @return the property name of the project to which the item is connected, or null if not applicable
    */
   String getProjectColumn();
 
@@ -159,7 +157,7 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
 
   @Override
   public default void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
-    errorHandler.accept(getFriendlyName() + " is exempt from class strugle.");
+    errorHandler.accept(getFriendlyName() + " is exempt from class struggle.");
   }
 
   @Override
@@ -257,6 +255,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   @Override
   default void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type, Consumer<String> errorHandler) {
     errorHandler.accept(getFriendlyName() + " cannot be filtered by instrument type.");
+  }
+
+  @Override
+  default void restrictPaginationByArrayed(Criteria criteria, boolean isArrayed, Consumer<String> errorHandler) {
+    errorHandler.accept(getFriendlyName() + " cannot be arrayed.");
   }
 
 }

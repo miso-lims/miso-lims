@@ -1790,13 +1790,20 @@ textarea.parsley-error {
   -webkit-transition: all .3s ease-in;
 }
 
-
 .parsley-errors-list.filled {
   opacity: 1;
 }
 
+.parsley-errors-list li {
+  color: #ff0000;
+}
+
+.parsley-custom-error-message {
+  color: #ff0000;
+}
+
 .hidden {
-    display: none;
+  display: none;
 }
 
 .bs-callout {
@@ -1850,10 +1857,6 @@ img.center {
 
 button.disabled {
   opacity: .4;
-}
-
-.parsley-required, .parsley-custom-error-message {
-  color: #ff0000;
 }
 
 .floatleft {

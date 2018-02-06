@@ -121,9 +121,7 @@
   <tr>
       <td></td>
       <td>
-        <div class="parsley-errors-list filled" id="progressSelectError">
-          <div class="parsley-required"></div>
-        </div>
+        <div class="parsley-errors-list filled" id="progressSelectError"></div>
       </td>
   </tr>
   <tr>
@@ -592,6 +590,22 @@
 </div>
 <div id="runs_section" class="expandable_section">
   <miso:list-section-ajax id="project_runs" name="Runs" target="run" project="${project}" config="{}"/>
+</div>
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#arrayruns_section_arrowclick'), 'arrayruns_section');">
+  Array Runs
+<div id="arrayruns_section_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="arrayruns_section" class="expandable_section">
+  <miso:list-section-ajax id="project_arrayruns" name="Array Runs" target="arrayrun" project="${project}" config="{}"/>
+</div>
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#arraysamples_section_arrowclick'), 'arraysamples_section');">
+  Arrayed Samples
+<div id="arraysamples_section_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="arraysamples_section" class="expandable_section">
+  <miso:list-section-ajax id="project_arraysamples" name="Arrayed Samples" target="sample" project="${project}" config="{arrayed: true}"/>
 </div>
 
 </c:when>

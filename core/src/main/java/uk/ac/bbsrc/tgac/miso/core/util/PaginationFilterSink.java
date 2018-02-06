@@ -49,4 +49,6 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByInstrumentType(T item, InstrumentType type, Consumer<String> errorHandler);
 
+  public void restrictPaginationByArrayed(T item, boolean isArrayed, Consumer<String> errorHandler);
+
 }

@@ -147,6 +147,14 @@ public class SampleController extends RestController {
     return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id));
   }
 
+  @RequestMapping(value = "/samples/dt/project/{id}/arrayed", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public DataTablesResponseDto<SampleDto> getDTArrayedSamplesByProject(@PathVariable("id") Long id, HttpServletRequest request,
+      HttpServletResponse response,
+      UriComponentsBuilder uriBuilder) throws IOException {
+    return jQueryBackend.get(request, response, uriBuilder, PaginationFilter.project(id), PaginationFilter.arrayed(true));
+  }
+
   @RequestMapping(value = "/sample", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody

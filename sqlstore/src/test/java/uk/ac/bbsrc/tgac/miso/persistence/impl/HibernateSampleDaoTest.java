@@ -63,7 +63,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void testListAll() throws IOException {
     Collection<Sample> samples = dao.listAll();
     samples.iterator().next().getScientificName().equals("Homo sapiens");
-    assertEquals(17, samples.size());
+    assertEquals(19, samples.size());
   }
 
   @Test
@@ -140,7 +140,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void testCount() throws Exception {
     int total = dao.count();
-    assertEquals(17, total);
+    assertEquals(19, total);
   }
 
   @Test
@@ -234,21 +234,21 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   public void getSamplesOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(0, 2, false, "id");
     assertEquals(2, samples.size());
-    assertEquals(17L, samples.get(0).getId());
+    assertEquals(19L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetThreeWithThreeSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(3, 3, false, "id");
     assertEquals(3, samples.size());
-    assertEquals(14L, samples.get(0).getId());
+    assertEquals(16L, samples.get(0).getId());
   }
 
   @Test
-  public void getSamplesOffsetThreeWithThreeSamplesPerPageOrderLastModTest() throws Exception {
+  public void getSamplesOffsetTwoWithTwoSamplesPerPageOrderLastModTest() throws Exception {
     List<Sample> samples = dao.list(2, 2, false, "lastModified");
     assertEquals(2, samples.size());
-    assertEquals(15L, samples.get(0).getId());
+    assertEquals(17L, samples.get(0).getId());
   }
 
   @Test
@@ -261,14 +261,14 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void getSamplesBySearchOffsetZeroWithTenSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(0, 10, false, "id", PaginationFilter.query("SaM1"));
-    assertEquals(9, samples.size());
-    assertEquals(17L, samples.get(0).getId());
+    assertEquals(10, samples.size());
+    assertEquals(19L, samples.get(0).getId());
   }
 
   @Test
   public void countSamplesBySearch() throws IOException {
     Long numSamples = dao.count(PaginationFilter.query("SAM1"));
-    assertEquals(Long.valueOf(9L), numSamples);
+    assertEquals(Long.valueOf(11L), numSamples);
   }
 
   @Test
@@ -280,7 +280,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   @Test
   public void countSamplesByEmptySearch() throws IOException {
     Long numSamples = dao.count(PaginationFilter.query(""));
-    assertEquals(Long.valueOf(17L), numSamples);
+    assertEquals(Long.valueOf(19L), numSamples);
   }
 
   @Test
