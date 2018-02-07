@@ -28,7 +28,11 @@ ListTarget.index = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return [];
+    var actions = [];
+    if (config.additionalBulkActions) {
+      actions = actions.concat(config.additionalBulkActions);
+    }
+    return actions;
   },
   createStaticActions: function(config, projectId) {
     return [];
