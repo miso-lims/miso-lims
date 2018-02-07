@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 
 import java.io.ByteArrayOutputStream;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
@@ -15,9 +16,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Collect a stream of string rows into a spreadsheet.
  */
-public abstract class SpreadSheetCollector<Workbook, Sheet, Row>
-    implements Collector<String[], SpreadSheetCollector<Workbook, Sheet, Row>.State, byte[]> {
-  public class State {
+public abstract class SpreadSheetCollector<T, Workbook, Sheet, Row>
+    implements Collector<T, SpreadSheetCollector.State<Sheet, Workbook>, byte[]> {
+  public static class State<Sheet, Workbook> {
     int currentRow = 1;
     Sheet sheet;
     Workbook workbook;
@@ -25,24 +26,24 @@ public abstract class SpreadSheetCollector<Workbook, Sheet, Row>
 
   private final static Logger log = LoggerFactory.getLogger(SpreadSheetCollector.class);
 
-  private final Iterable<String> columns;
+  private final List<Column<T>> columns;
 
   /**
    * Create a new collector.
    * 
    * @param columns The names of the column headers.
    */
-  public SpreadSheetCollector(Iterable<String> columns) {
+  public SpreadSheetCollector(List<Column<T>> columns) {
     this.columns = columns;
   }
 
   @Override
-  public BiConsumer<State, String[]> accumulator() {
-    return (state, contents) -> {
+  public BiConsumer<State<Sheet, Workbook>, T> accumulator() {
+    return (state, item) -> {
       if (state == null) return;
       Row row = createRow(state.workbook, state.sheet, state.currentRow++);
-      for (int i = 0; i < contents.length; i++) {
-        setCell(state.workbook, state.sheet, row, i, contents[i]);
+      for (int i = 0; i < columns.size(); i++) {
+        setCell(state.workbook, state.sheet, row, i, columns.get(i), item);
       }
     };
   }
@@ -53,7 +54,7 @@ public abstract class SpreadSheetCollector<Workbook, Sheet, Row>
   }
 
   @Override
-  public BinaryOperator<State> combiner() {
+  public BinaryOperator<State<Sheet, Workbook>> combiner() {
     return (left, right) -> {
       throw new UnsupportedOperationException();
     };
@@ -72,7 +73,7 @@ public abstract class SpreadSheetCollector<Workbook, Sheet, Row>
   protected abstract Workbook createWorkbook() throws Exception;
 
   @Override
-  public Function<State, byte[]> finisher() {
+  public Function<State<Sheet, Workbook>, byte[]> finisher() {
     return state -> {
       if (state == null) return null;
       try {
@@ -92,19 +93,21 @@ public abstract class SpreadSheetCollector<Workbook, Sheet, Row>
    */
   protected abstract Sheet getSheet(Workbook workbook);
 
+  protected abstract void setCell(Workbook workbook, Sheet sheet, Row row, int i, Column<T> column, T item);
+
   protected abstract void setCell(Workbook workbook, Sheet sheet, Row row, int i, String string);
 
   @Override
-  public Supplier<State> supplier() {
+  public Supplier<State<Sheet, Workbook>> supplier() {
     return () -> {
       try {
-        State state = new State();
+        State<Sheet, Workbook> state = new State<>();
         state.workbook = createWorkbook();
         state.sheet = getSheet(state.workbook);
         Row row = createRow(state.workbook, state.sheet, 0);
         int col = 0;
-        for (String column : columns) {
-          setCell(state.workbook, state.sheet, row, col++, column);
+        for (Column<T> column : columns) {
+          setCell(state.workbook, state.sheet, row, col++, column.name());
         }
         return state;
       } catch (Exception e) {

@@ -2,14 +2,15 @@ package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class ExcelCollector extends SpreadSheetCollector<XSSFWorkbook, XSSFSheet, XSSFRow> {
+public class ExcelCollector<T> extends SpreadSheetCollector<T, XSSFWorkbook, XSSFSheet, XSSFRow> {
 
-  public ExcelCollector(Iterable<String> columns) {
+  public ExcelCollector(List<Column<T>> columns) {
     super(columns);
   }
 
@@ -26,6 +27,11 @@ public class ExcelCollector extends SpreadSheetCollector<XSSFWorkbook, XSSFSheet
   @Override
   protected XSSFSheet getSheet(XSSFWorkbook workbook) {
     return workbook.createSheet();
+  }
+
+  @Override
+  protected void setCell(XSSFWorkbook workbook, XSSFSheet sheet, XSSFRow row, int i, Column<T> column, T item) {
+    column.setExcel(row.createCell(i), item);
   }
 
   @Override

@@ -1,20 +1,21 @@
 package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableRow;
 
-public class OpenDocumentCollector extends SpreadSheetCollector<OdfSpreadsheetDocument, OdfTable, OdfTableRow> {
+public class OpenDocumentCollector<T> extends SpreadSheetCollector<T, OdfSpreadsheetDocument, OdfTable, OdfTableRow> {
 
-  public OpenDocumentCollector(Iterable<String> columns) {
+  public OpenDocumentCollector(List<Column<T>> columns) {
     super(columns);
   }
 
   @Override
   protected OdfTableRow createRow(OdfSpreadsheetDocument workbook, OdfTable sheet, int index) {
-    return sheet.appendRow();
+    return sheet.getRowByIndex(index);
   }
 
   @Override
@@ -24,7 +25,7 @@ public class OpenDocumentCollector extends SpreadSheetCollector<OdfSpreadsheetDo
 
   @Override
   protected OdfTable getSheet(OdfSpreadsheetDocument workbook) {
-    return OdfTable.newTable(workbook);
+    return workbook.getTableList().get(0);
   }
 
   @Override
@@ -35,6 +36,11 @@ public class OpenDocumentCollector extends SpreadSheetCollector<OdfSpreadsheetDo
   @Override
   protected void write(OdfSpreadsheetDocument workbook, ByteArrayOutputStream output) throws Exception {
     workbook.save(output);
+  }
+
+  @Override
+  protected void setCell(OdfSpreadsheetDocument workbook, OdfTable sheet, OdfTableRow row, int i, Column<T> column, T item) {
+    column.setODF(sheet.getCellByPosition(i, row.getRowIndex()), item);
   }
 
 }

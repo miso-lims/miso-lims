@@ -65,6 +65,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -333,6 +335,8 @@ public class MenuController implements ServletContextAware {
     createArray(mapper, baseUri, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "partitionQcTypes", partitionQCService.listTypes(), Dtos::asDto);
     createArray(mapper, baseUri, node, "referenceGenomes", referenceGenomeService.listAllReferenceGenomeTypes(), Dtos::asDto);
+    createArray(mapper, baseUri, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
+    createArray(mapper, baseUri, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
 
     ArrayNode platformTypes = node.putArray("platformTypes");
     Collection<PlatformType> activePlatformTypes = platformService.listActivePlatformTypes();
