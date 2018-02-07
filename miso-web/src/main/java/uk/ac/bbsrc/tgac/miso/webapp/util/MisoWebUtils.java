@@ -25,13 +25,25 @@ package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.util
@@ -109,4 +121,23 @@ public class MisoWebUtils {
     }
     return checks;
   }
+
+  private static final Pattern COMMA = Pattern.compile(",");
+
+  public static <T> HttpEntity<byte[]> generateSpreadsheet(WhineyFunction<Long, T> fetcher, Function<String, Spreadsheet<T>> formatLibrary,
+      HttpServletRequest request,
+      HttpServletResponse response) {
+    Spreadsheet<T> spreadsheet = formatLibrary.apply(request.getParameter("sheet"));
+    SpreadSheetFormat formatter = SpreadSheetFormat.valueOf(request.getParameter("format"));
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(formatter.mediaType());
+    response.setHeader("Content-Disposition",
+        "attachment; filename=" + String.format("%s-%s.%s", spreadsheet.name(), DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(
+            ZonedDateTime.now()), formatter.extension()));
+
+    return new HttpEntity<>(formatter.generate(
+        COMMA.splitAsStream(request.getParameter("ids")).map(Long::parseLong).map(WhineyFunction.rethrow(fetcher)), spreadsheet), headers);
+
+  }
+
 }
