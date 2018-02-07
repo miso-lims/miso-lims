@@ -57,6 +57,26 @@ public class Index implements Nameable, Serializable {
     Collections.sort(indices, (o1, o2) -> o1.getPosition() - o2.getPosition());
   }
 
+  /**
+   * Compares two sequences to check for duplicates or near matches. For sequences of different lengths, the additional characters
+   * on the longer sequence are ignored - "AAAA" and "AAAACC" are considered duplicates. For every non-matching character, edit
+   * distance increases by 1
+   * 
+   * @param sequence1
+   * @param sequence2
+   * @return edit distance between the two sequences with 0 meaning they are duplicates, 1 meaning they differ by one character, etc.
+   */
+  public static int checkEditDistance(String sequence1, String sequence2) {
+    int minLength = Math.min(sequence1.length(), sequence2.length());
+    int editDistance = minLength;
+    for (int i = 0; i < minLength; i++) {
+      if (sequence1.charAt(i) == sequence2.charAt(i)) {
+        editDistance--;
+      }
+    }
+    return editDistance;
+  }
+
   @ManyToOne
   @JoinColumn(name = "indexFamilyId", nullable = false)
   private IndexFamily family;
