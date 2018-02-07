@@ -39,8 +39,8 @@ HotTarget.sample = (function() {
 
   return {
 
-    createUrl: '/miso/rest/tree/sample/',
-    updateUrl: '/miso/rest/tree/sample/',
+    createUrl: '/miso/rest/sample',
+    updateUrl: '/miso/rest/sample/',
     requestConfiguration: function(config, callback) {
       if (Constants.isDetailedSample) {
         config.rnaSamples = config.targetSampleClass.alias.indexOf("RNA") != -1;
@@ -306,7 +306,7 @@ HotTarget.sample = (function() {
 
               function getIdentities() {
                 jQuery.ajax({
-                  url: "/miso/rest/tree/identities",
+                  url: "/miso/rest/sample/identities",
                   data: JSON.stringify({
                     "identitiesSearches": flat.externalName
                   }),
