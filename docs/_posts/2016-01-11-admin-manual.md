@@ -389,14 +389,14 @@ To install or upgrade, perform the following steps:
 
 1. Backup your existing database.
 1. Stop Tomcat.
-1. Migrate the database to the newest version. (Described below.)
 1. Remove `$CATALINA_HOME/webapps/ROOT`.
 1. Copy the `ROOT.war` from the build to `$CATALINA_HOME/webapps`.
 1. Make any necessary configuration changes to `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`.
+1. Migrate the database to the newest version. (Described below.)
 1. Deploy Run Scanner:
-        1. Stop Run Scanner's Tomcat.
-        1. Deploy the Run Scanner WAR.
-        1. Restart Run Scanner's Tomcat.
+    1. Stop Run Scanner's Tomcat.
+    1. Deploy the Run Scanner WAR.
+    1. Restart Run Scanner's Tomcat.
 
 ## Migrating the database
 
