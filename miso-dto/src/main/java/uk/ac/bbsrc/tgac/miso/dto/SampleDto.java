@@ -253,7 +253,7 @@ public class SampleDto extends AbstractBoxableDto implements WritableUrls {
 
   @Override
   public void writeUrls(URI baseUri) {
-    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/tree/sample/{id}", getId()));
+    setUrl(WritableUrls.buildUriPath(baseUri, "/rest/sample/{id}", getId()));
     setUpdatedByUrl(WritableUrls.buildUriPath(baseUri, "/rest/user/{id}", getUpdatedById()));
     if (getRootSampleClassId() != null) {
       setRootSampleClassUrl(WritableUrls.buildUriPath(baseUri, "/rest/sampleclass/{id}", getRootSampleClassId()));

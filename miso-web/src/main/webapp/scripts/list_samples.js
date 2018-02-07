@@ -24,7 +24,7 @@
 ListTarget.sample = {
   name: "Samples",
   createUrl: function(config, projectId) {
-    var url = "/miso/rest/tree/samples/dt";
+    var url = "/miso/rest/sample/dt";
     if (projectId) {
       url += '/project/' + projectId;
       if (config.arrayed) {
@@ -33,7 +33,7 @@ ListTarget.sample = {
     }
     return url;
   },
-  queryUrl: "/miso/rest/tree/sample/query",
+  queryUrl: "/miso/rest/sample/query",
   createBulkActions: function(config, projectId) {
     var actions = HotTarget.sample.bulkActions;
 
