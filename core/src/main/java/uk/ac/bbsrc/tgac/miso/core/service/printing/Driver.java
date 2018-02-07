@@ -310,7 +310,7 @@ public enum Driver {
   private static String getBarcode(Barcodable barcodable) {
     String str = barcodable.getIdentificationBarcode();
     if (LimsUtils.isStringBlankOrNull(str)) {
-      str = barcodable.getAlias();
+      str = barcodable.getName();
     }
     return str;
   }
