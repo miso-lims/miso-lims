@@ -1420,10 +1420,14 @@ public class Dtos {
       }
       dto.setPooledElements(pooledElements);
       dto.setDuplicateIndicesSequences(from.getDuplicateIndicesSequences());
+      dto.setDuplicateIndices(!dto.getDuplicateIndicesSequences().isEmpty());
+      dto.setNearDuplicateIndicesSequences(from.getNearDuplicateIndicesSequences());
+      dto.setNearDuplicateIndices(!dto.getNearDuplicateIndicesSequences().isEmpty());
     } else {
       dto.setPooledElements(Collections.emptySet());
+      dto.setDuplicateIndices(!from.getDuplicateIndicesSequences().isEmpty());
+      dto.setNearDuplicateIndices(!from.getNearDuplicateIndicesSequences().isEmpty());
     }
-    dto.setDuplicateIndices(from.hasDuplicateIndices());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     if (from.getBox() != null) {

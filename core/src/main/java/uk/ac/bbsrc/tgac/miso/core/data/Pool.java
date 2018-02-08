@@ -187,9 +187,9 @@ public interface Pool
    */
   void setDescription(String description);
 
-  boolean hasDuplicateIndices();
-
   Set<String> getDuplicateIndicesSequences();
+
+  Set<String> getNearDuplicateIndicesSequences();
 
   @Override
   void setWatchGroup(Group group);
