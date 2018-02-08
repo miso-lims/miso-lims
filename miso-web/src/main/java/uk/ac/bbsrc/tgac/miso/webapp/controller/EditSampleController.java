@@ -300,14 +300,13 @@ public class EditSampleController {
       if (!p.getSamples().isEmpty()) {
         Map<String, Sample> ret = new HashMap<>();
         List<Sample> ss = new ArrayList<>(p.getSamples());
-        Collections.sort(ss);
+        Collections.sort(ss, (a, b) -> Long.compare(a.getId(), b.getId()));
         for (int i = 0; i < ss.size(); i++) {
-          if (ss.get(i).equals(s)) {
-            if (i != 0 && ss.get(i - 1) != null) {
+          if (ss.get(i).getId() == s.getId()) {
+            if (i > 0) {
               prevS = ss.get(i - 1);
             }
-
-            if (i != ss.size() - 1 && ss.get(i + 1) != null) {
+            if (i < ss.size() - 2) {
               nextS = ss.get(i + 1);
             }
             break;
