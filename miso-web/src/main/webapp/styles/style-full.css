@@ -600,9 +600,8 @@ a.dashboardresult {
     float:left;
 }
 
-.tile .name span {
+.tile .name img {
     float: right;
-    font-size: 200%;
 }
 
 .autocompletebox {

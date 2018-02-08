@@ -73,21 +73,18 @@ Tile = (function() {
       return p;
     },
     statusOk: function() {
-      var status = document.createElement("SPAN");
-      status.setAttribute("style", "color:#66ce16");
-      status.innerText = "⬤";
+      var status = document.createElement("IMG");
+      status.setAttribute("src", "/styles/images/tile-ok.svg");
       return status;
     },
     statusBad: function() {
-      var status = document.createElement("SPAN");
-      status.setAttribute("style", "color:#db0f34");
-      status.innerText = "⬛";
+      var status = document.createElement("IMG");
+      status.setAttribute("src", "/styles/images/tile-bad.svg");
       return status;
     },
     statusBusy: function() {
-      var status = document.createElement("SPAN");
-      status.setAttribute("style", "color:#4286f4");
-      status.innerText = "🞜";
+      var status = document.createElement("IMG");
+      status.setAttribute("src", "/styles/images/tile-busy.svg");
       return status;
     },
     make: function(tileparts, clickHandler) {

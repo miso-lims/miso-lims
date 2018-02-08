@@ -370,7 +370,10 @@ var Utils = Utils
         actions.forEach(function(action) {
           var p = document.createElement('P');
           var link = document.createElement('A');
-          link.appendChild(document.createTextNode("→ " + action.name));
+          var img = document.createElement('IMG');
+          img.src = '/styles/images/arrow.svg';
+          link.appendChild(img);
+          link.appendChild(document.createTextNode(action.name));
           link.href = '#';
           link.onclick = function() {
             dialog.dialog("close");
