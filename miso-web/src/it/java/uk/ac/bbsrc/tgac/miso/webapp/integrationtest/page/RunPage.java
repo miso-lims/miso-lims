@@ -54,23 +54,23 @@ public class RunPage extends FormPage<RunPage.Field> {
   } // end Field enum
 
   public static class PoolSearch {
-    public static final String NO_POOL = "→ No Pool";
-    public static final String SEARCH = "→ Search";
-    public static final String OUTSTANDING_MATCH = "→ Outstanding Orders (Matched Chemistry)";
-    public static final String OUTSTANDING_ALL = "→ Outstanding Orders (All)";
-    public static final String RTR = "→ Ready to Run";
-    public static final String RECENT = "→ Recently Modified";
+    public static final String NO_POOL = "No Pool";
+    public static final String SEARCH = "Search";
+    public static final String OUTSTANDING_MATCH = "Outstanding Orders (Matched Chemistry)";
+    public static final String OUTSTANDING_ALL = "Outstanding Orders (All)";
+    public static final String RTR = "Ready to Run";
+    public static final String RECENT = "Recently Modified";
   } // end PoolSearch class
 
   public static class LaneQC {
-    public static final String OK = "→ OK";
-    public static final String OK_COLLAB = "→ OK'd by collaborator";
-    public static final String FAIL_INSTRUMENT = "→ Failed: Instrument problem";
-    public static final String FAIL_LIB_PREP = "→ Failed: Library preparation problem";
-    public static final String FAIL_ANALYSIS = "→ Failed: Analysis problem";
-    public static final String FAIL_OTHER = "→ Failed: Other problem";
-    public static final String FAIL_SEQINFO = "→ Failed: SeqInfo QC";
-    public static final String FAIL_SEQOPS = "→ Failed: SeqOps QC";
+    public static final String OK = "OK";
+    public static final String OK_COLLAB = "OK'd by collaborator";
+    public static final String FAIL_INSTRUMENT = "Failed: Instrument problem";
+    public static final String FAIL_LIB_PREP = "Failed: Library preparation problem";
+    public static final String FAIL_ANALYSIS = "Failed: Analysis problem";
+    public static final String FAIL_OTHER = "Failed: Other problem";
+    public static final String FAIL_SEQINFO = "Failed: SeqInfo QC";
+    public static final String FAIL_SEQOPS = "Failed: SeqOps QC";
   } // end LaneQC class
 
   public static class RunTableWrapperId {
