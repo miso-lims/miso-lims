@@ -419,7 +419,7 @@
     return self;
   };
 
-  Box.ScanDialog = function() {
+  Box.ScanDialog = function(scannerName) {
     var self = new BoxVisual();
 
     self.show = function(opts) {
@@ -486,7 +486,7 @@
       jQuery('#dialogDialog').dialog('open');
 
       // Initiate Scan
-      Box.scan.scanBox();
+      Box.scan.scanBox(scannerName);
     };
 
     self.getBoxPositionOpts = function(row, col) {
@@ -627,7 +627,7 @@
     return self;
   };
 
-  Box.PrepareScannerDialog = function() {
+  Box.PrepareScannerDialog = function(scannerName) {
     var self = {};
 
     self.show = function() {
@@ -646,7 +646,7 @@
         buttons: {}
       });
       jQuery('#dialogDialog').dialog('open');
-      Box.scan.prepareScanner(Box.boxJSON.rows, Box.boxJSON.cols);
+      Box.scan.prepareScanner(scannerName, Box.boxJSON.rows, Box.boxJSON.cols);
     };
 
     self.error = function() {

@@ -63,11 +63,11 @@ var Box = Box
         });
       },
       // Start the scanning process
-      initScan: function() {
+      initScan: function(scannerName) {
         Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
         Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
-        Box.scanDialog = Box.ScanDialog();
-        Box.prepareScannerDialog = Box.PrepareScannerDialog();
+        Box.scanDialog = Box.ScanDialog(scannerName);
+        Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName);
         Box.scanDiff = Box.ScanDiff();
         Box.prepareScannerDialog.show();
       },
@@ -164,48 +164,53 @@ var Box = Box
     };
 
 Box.scan = {
-  prepareScanner: function(boxRows, boxColumns) {
+  prepareScanner: function(scannerName, boxRows, boxColumns) {
     var prepareScannerTimeout = setTimeout(Box.prepareScannerDialog.error, 10000); // otherwise box scanner may poll indefinitely
-    Fluxion.doAjax('boxControllerHelperService', 'prepareBoxScanner', {
-      'rows': boxRows,
-      'columns': boxColumns,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function(json) {
-        clearTimeout(prepareScannerTimeout);
-        jQuery('#dialogDialog').dialog('close');
-        Box.scanDialog.show({
-          size: {
-            rows: Box.boxJSON.rows,
-            cols: Box.boxJSON.cols
-          },
-          data: Box.boxJSON.items
-        });
-      },
-      'doOnError': function() {
-        clearTimeout(prepareScannerTimeout);
-        Box.prepareScannerDialog.error();
-      }
+
+    jQuery.ajax({
+      url: '/miso/rest/box/prepare-scan',
+      type: 'POST',
+      contentType: 'application/json; charset=utf8',
+      data: JSON.stringify({
+        scannerName: scannerName,
+        rows: boxRows,
+        columns: boxColumns
+      })
+    }).success(function(data) {
+      clearTimeout(prepareScannerTimeout);
+      jQuery('#dialogDialog').dialog('close');
+      Box.scanDialog.show({
+        size: {
+          rows: Box.boxJSON.rows,
+          cols: Box.boxJSON.cols
+        },
+        data: Box.boxJSON.items
+      });
+    }).fail(function(response, textStatus, serverStatus) {
+      clearTimeout(prepareScannerTimeout);
+      Box.prepareScannerDialog.error();
     });
   },
 
-  scanBox: function() {
-    Fluxion.doAjax('boxControllerHelperService', 'getBoxScan', {
-      'boxId': Box.boxJSON.id,
-      'url': ajaxurl
-    }, {
-      'doOnSuccess': function(json) {
-        jQuery('#magnify').stop();
-        Box.scanDiff.show(json);
-      },
-      'doOnError': function(json) {
-        jQuery('#magnify').stop();
-        jQuery('#dialogDialog').dialog('close');
-        Box.scanDialog.error(json.error);
-      }
+  scanBox: function(scannerName) {
+    jQuery.ajax({
+      url: '/miso/rest/box/' + Box.boxJSON.id + '/scan',
+      type: 'POST',
+      contentType: 'application/json; charset=utf8',
+      data: JSON.stringify({
+        scannerName: scannerName
+      })
+    }).success(function(data) {
+      jQuery('#magnify').stop();
+      Box.scanDiff.show(data);
+    }).fail(function(response, textStatus, serverStatus) {
+      jQuery('#magnify').stop();
+      jQuery('#dialogDialog').dialog('close');
+      var error = (response && response.responseText && response.responseText.detail) ? response.responseText.detail : 'Scan failed';
+      Box.scanDialog.error(error);
     });
   }
-};
+}
 
 Box.ui = {
   changeBoxListing: function(alias) {

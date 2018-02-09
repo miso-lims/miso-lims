@@ -30,12 +30,5 @@
        default-autowire="byName">
 
   <integration:annotation-config />
-
-  <!-- box scanner -->
-  <bean name="boxScanner" class="uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScanner">
-    <constructor-arg index="0" value="${miso.visionmate.server.host}" />
-    <constructor-arg index="1" value="${miso.visionmate.server.port}" />
-  </bean>
-
   <integration:channel id="outboundChannel" />
 </beans>
