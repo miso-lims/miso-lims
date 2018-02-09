@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.management.MalformedObjectNameException;
@@ -48,9 +50,6 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DelegatingNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -70,6 +69,11 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
  */
 public class MisoAppListener implements ServletContextListener {
   protected static final Logger log = LoggerFactory.getLogger(MisoAppListener.class);
+
+  private static String getStringPropertyOrNull(String key, Map<String, String> misoProperties) {
+    String value = misoProperties.get(key);
+    return LimsUtils.isStringBlankOrNull(value) ? null : value;
+  }
 
   /**
    * Called on webapp context init
@@ -159,69 +163,55 @@ public class MisoAppListener implements ServletContextListener {
     log.info("Replacing default namingScheme with " + scheme.getClass().getSimpleName());
     schemeHolder.setActualNamingScheme(scheme);
 
-    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.generator.nameable.name", misoProperties)) != null) {
-      NameGenerator<Nameable> generator = resolver.getNameGenerator(currentPropertyValue);
-      if (generator == null) throw new IllegalArgumentException("Failed to load name generator '" + currentPropertyValue + "'");
-      SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(generator);
-      scheme.setNameGenerator(generator);
-    }
+    applyGenerator("miso.naming.generator.nameable.name", misoProperties, resolver::getNameGenerator, scheme::setNameGenerator);
+    applyGenerator("miso.naming.generator.sample.alias", misoProperties, resolver::getSampleAliasGenerator, scheme::setSampleAliasGenerator);
+    applyGenerator("miso.naming.generator.library.alias", misoProperties, resolver::getLibraryAliasGenerator,
+        scheme::setLibraryAliasGenerator);
 
-    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.generator.sample.alias", misoProperties)) != null) {
-      NameGenerator<Sample> generator = resolver.getSampleAliasGenerator(currentPropertyValue);
-      if (generator == null) throw new IllegalArgumentException("Failed to load sample alias generator '" + currentPropertyValue + "'");
-      SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(generator);
-      scheme.setSampleAliasGenerator(generator);
-    }
+    applyValidator("miso.naming.validator.nameable.name", misoProperties, resolver::getNameValidator, scheme::setNameValidator);
+    applyValidator("miso.naming.validator.sample.alias", misoProperties, resolver::getSampleAliasValidator, scheme::setSampleAliasValidator);
+    applyValidator("miso.naming.validator.library.alias", misoProperties, resolver::getLibraryAliasValidator,
+        scheme::setLibraryAliasValidator);
+    applyValidator("miso.naming.validator.project.shortName", misoProperties, resolver::getProjectShortNameValidator,
+        scheme::setProjectShortNameValidator);
+  }
 
-    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.generator.library.alias", misoProperties)) != null) {
-      NameGenerator<Library> generator = resolver.getLibraryAliasGenerator(currentPropertyValue);
-      if (generator == null) throw new IllegalArgumentException("Failed to load library alias generator '" + currentPropertyValue + "'");
-      SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(generator);
-      scheme.setLibraryAliasGenerator(generator);
-    }
-
-    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.validator.nameable.name", misoProperties)) != null) {
-      NameValidator validator = resolver.getNameValidator(currentPropertyValue);
-      setUpValidator(validator, misoProperties, "miso.naming.validator.nameable.name");
-      scheme.setNameValidator(validator);
-    }
-
-    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.validator.sample.alias", misoProperties)) != null) {
-      NameValidator validator = resolver.getSampleAliasValidator(currentPropertyValue);
-      setUpValidator(validator, misoProperties, "miso.naming.validator.sample.alias");
-      scheme.setSampleAliasValidator(validator);
-    }
-
-    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.validator.library.alias", misoProperties)) != null) {
-      NameValidator validator = resolver.getLibraryAliasValidator(currentPropertyValue);
-      setUpValidator(validator, misoProperties, "miso.naming.validator.library.alias");
-      scheme.setLibraryAliasValidator(validator);
-    }
-
-    if ((currentPropertyValue = getStringPropertyOrNull("miso.naming.validator.project.shortName", misoProperties)) != null) {
-      NameValidator validator = resolver.getLibraryAliasValidator(currentPropertyValue);
-      setUpValidator(validator, misoProperties, "miso.naming.validator.library.alias");
-      scheme.setLibraryAliasValidator(validator);
+  private <T> void applyGenerator(String property, Map<String, String> misoProperties, Function<String, NameGenerator<T>> resolver,
+      Consumer<NameGenerator<T>> setter) {
+    NameGenerator<T> generator = loadComponent(property, misoProperties, resolver);
+    if (generator != null) {
+      setter.accept(generator);
     }
   }
 
-  private String getStringPropertyOrNull(String key, Map<String, String> misoProperties) {
-    String value = misoProperties.get(key);
-    return LimsUtils.isStringBlankOrNull(value) ? null : value;
+  private void applyValidator(String property, Map<String, String> misoProperties, Function<String, NameValidator> resolver,
+      Consumer<NameValidator> setter) {
+    NameValidator validator = loadComponent(property, misoProperties, resolver);
+    if (validator != null) {
+      String regex = misoProperties.get(property + ".regex");
+      if (!LimsUtils.isStringBlankOrNull(regex)) {
+        validator.setValidationRegex(regex);
+      }
+      String duplicatesProp = property + ".duplicates";
+      if (misoProperties.containsKey(duplicatesProp)) {
+        boolean allowDuplicates = Boolean.valueOf(misoProperties.get(duplicatesProp));
+        validator.setDuplicateAllowed(allowDuplicates);
+      }
+      setter.accept(validator);
+    }
   }
-
-  private void setUpValidator(NameValidator validator, Map<String, String> misoProperties, String baseProperty) {
-    if (validator == null) throw new IllegalArgumentException("Failed to load name validator specified for '" + baseProperty + "'");
-    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(validator);
-
-    String regexProp = misoProperties.get(baseProperty + ".regex");
-    if (!LimsUtils.isStringBlankOrNull(regexProp)) {
-      validator.setValidationRegex(regexProp);
+  
+  private <T> T loadComponent(String property, Map<String, String> misoProperties, Function<String, T> resolver) {
+    String value = getStringPropertyOrNull(property, misoProperties);
+    if (value == null) {
+      return null;
     }
-    if (misoProperties.containsKey(baseProperty + ".duplicates")) {
-      boolean duplicatesProp = Boolean.valueOf(misoProperties.get("miso.naming.validator.nameable.name.regex"));
-      validator.setDuplicateAllowed(duplicatesProp);
+    T component = resolver.apply(value);
+    if (component == null) {
+      throw new IllegalArgumentException("Failed to load name naming scheme component specified for '" + property + "'");
     }
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(component);
+    return component;
   }
 
   /**
