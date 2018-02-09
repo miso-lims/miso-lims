@@ -209,7 +209,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   @Override
-  public Sample get(Long sampleId) throws IOException {
+  public Sample get(long sampleId) throws IOException {
     Sample sample = sampleDao.getSample(sampleId);
     authorizationManager.throwIfNotReadable(sample);
     return sample;
