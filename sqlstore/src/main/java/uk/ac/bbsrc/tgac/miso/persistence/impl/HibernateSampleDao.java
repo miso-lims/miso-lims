@@ -134,7 +134,7 @@ public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableS
   }
 
   @Override
-  public Sample getSample(Long id) throws IOException {
+  public Sample getSample(long id) throws IOException {
     return (Sample) currentSession().get(SampleImpl.class, id);
   }
 

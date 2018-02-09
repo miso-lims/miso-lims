@@ -15,7 +15,7 @@ public interface SampleDao extends SampleStore {
 
   List<Sample> list() throws IOException;
 
-  Sample getSample(Long id) throws IOException;
+  Sample getSample(long id) throws IOException;
   
   Sample getByPreMigrationId(Long id) throws IOException;
 

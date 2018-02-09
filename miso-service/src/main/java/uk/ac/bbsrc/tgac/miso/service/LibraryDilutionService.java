@@ -3,11 +3,17 @@ package uk.ac.bbsrc.tgac.miso.service;
 import java.io.IOException;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface LibraryDilutionService extends PaginatedDataSource<LibraryDilution> {
+public interface LibraryDilutionService extends PaginatedDataSource<LibraryDilution>, BarcodableService {
+  @Override
+  default EntityType getEntityType() {
+    return EntityType.DILUTION;
+  }
 
+  @Override
   LibraryDilution get(long dilutionId) throws IOException;
 
   Long create(LibraryDilution dilution) throws IOException;

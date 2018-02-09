@@ -8,11 +8,16 @@ import java.util.Map;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface PoolService extends PaginatedDataSource<Pool> {
+public interface PoolService extends PaginatedDataSource<Pool>, BarcodableService {
+  @Override
+  default EntityType getEntityType() {
+    return EntityType.POOL;
+  }
 
   public Collection<Pool> listBySearch(String query) throws IOException;
 
@@ -38,6 +43,7 @@ public interface PoolService extends PaginatedDataSource<Pool> {
 
   public void saveNote(Pool pool, Note note) throws IOException;
 
+  @Override
   public Pool get(long poolId) throws IOException;
 
   public Pool getByBarcode(String barcode) throws IOException;

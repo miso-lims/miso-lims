@@ -143,8 +143,8 @@ public class LibraryDilution extends AbstractBoxable
   }
 
   @Override
-  public EntityType getEntityType() {
-    return EntityType.DILUTION;
+  public Boxable.EntityType getEntityType() {
+    return Boxable.EntityType.DILUTION;
   }
 
   public Library getLibrary() {
