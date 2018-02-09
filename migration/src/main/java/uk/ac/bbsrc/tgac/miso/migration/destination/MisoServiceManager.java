@@ -16,7 +16,7 @@ import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.OicrNamingScheme;
-import uk.ac.bbsrc.tgac.miso.persistence.HibernateSampleClassDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateBoxDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateChangeLogDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedQcStatusDao;

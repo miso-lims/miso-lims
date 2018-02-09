@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.persistence;
+package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.Date;
 import java.util.List;
@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 
 @Repository
 @Transactional
