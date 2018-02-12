@@ -30,8 +30,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -355,30 +357,36 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public boolean hasDuplicateIndices() {
-    return !getDuplicateIndicesSequences().isEmpty();
-  }
-
-  private boolean hasDuplicateIndices(Set<String> indices, PoolableElementView item) {
-    StringBuilder totalIndex = new StringBuilder();
-    for (Index index : item.getIndices()) {
-      totalIndex.append(index.getSequence());
-    }
-    return !indices.add(totalIndex.toString());
+  public Set<String> getDuplicateIndicesSequences() {
+    return getIndexSequencesWithMinimumEditDistance(1);
   }
 
   @Override
-  public Set<String> getDuplicateIndicesSequences() {
-    Set<String> indices = new HashSet<>();
-    Set<String> duplicateSequences = new HashSet<>();
-    for (PoolableElementView item : getPoolableElementViews()) {
-      if (hasDuplicateIndices(indices, item)) {
-        for (Index index : item.getIndices()) {
-          duplicateSequences.add(index.getSequence());
+  public Set<String> getNearDuplicateIndicesSequences() {
+    return getIndexSequencesWithMinimumEditDistance(2);
+  }
+
+  private Set<String> getIndexSequencesWithMinimumEditDistance(int minimumDistance) {
+    Set<String> sequences = new HashSet<>();
+    List<PoolableElementView> views = new ArrayList<>(getPoolableElementViews());
+    for (int i = 0; i < views.size(); i++) {
+      String sequence1 = getCombinedIndexSequences(views.get(i));
+      for (int j = i + 1; j < views.size(); j++) {
+        String sequence2 = getCombinedIndexSequences(views.get(j));
+        if (Index.checkEditDistance(sequence1, sequence2) < minimumDistance) {
+          sequences.add(sequence1);
+          sequences.add(sequence2);
         }
       }
     }
-    return duplicateSequences.isEmpty() ? Collections.emptySet() : duplicateSequences;
+    return sequences;
+  }
+
+  private static String getCombinedIndexSequences(PoolableElementView view) {
+    return view.getIndices().stream()
+        .sorted((i1, i2) -> Integer.compare(i1.getPosition(), i2.getPosition()))
+        .map(Index::getSequence)
+        .collect(Collectors.joining());
   }
 
   @Override

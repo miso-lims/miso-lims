@@ -70,9 +70,14 @@
   </tr>
   <tr>
     <td colspan="2">
-    <c:if test="${pool.hasDuplicateIndices()}">
-      <p style="font-size:200%; font-weight:bold; color:#a93232; margin-top:0px;">This pool contains duplicate indices!<span style="float:right;"><img src="/styles/images/fail.png"/></span></p>
-    </c:if>
+    <c:choose>
+      <c:when test="${!empty pool.getDuplicateIndicesSequences()}">
+        <p style="font-size:200%; font-weight:bold; color:#a93232; margin-top:0px;">This pool contains duplicate indices!<span style="float:right;"><img src="/styles/images/fail.png"/></span></p>
+      </c:when>
+      <c:when test="${!empty pool.getNearDuplicateIndicesSequences()}">
+        <p style="font-size:200%; font-weight:bold; color:#a93232; margin-top:0px;">This pool contains near-duplicate indices!<span style="float:right;"><img src="/styles/images/fail.png"/></span></p>
+      </c:when>
+    </c:choose>
     </td>
   </tr>
   <tr>
@@ -219,7 +224,7 @@
   <miso:list-section id="list_order" name="Requested Orders" target="order" alwaysShow="true" items="${orders}" config="{ poolId: ${pool.id}, platformType: '${pool.platformType.name()}' }"/>
   <miso:list-section-ajax id="list_completion" name="Order Status" target="completion" config="{ poolId: ${pool.id} }"/>
   <miso:list-section id="list_run" name="Runs" target="run" items="${runs}"/>
-  <miso:list-section-ajax id="list_included" name="Included Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences} }"/>
+  <miso:list-section-ajax id="list_included" name="Included Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: false, duplicateIndicesSequences: ${duplicateIndicesSequences}, nearDuplicateIndicesSequences: ${nearDuplicateIndicesSequences} }"/>
   <miso:list-section-ajax id="list_available" name="Available Dilutions" target="poolelement" config="{ poolId: ${pool.id}, add: true }"/>
 </c:if>
 <miso:changelog item="${pool}"/>

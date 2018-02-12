@@ -47,10 +47,16 @@ ListTarget.partition = {
       });
 
       response.items.forEach(function(item) {
-        var problems = [item.pool.hasLowQualityLibraries ? "LOW QUALITY LIBRARIES" : null,
-            item.pool.duplicateIndices ? "DUPLICATE INDICES" : null].filter(function(x) {
-          return x;
-        }).map(Tile.error);
+        var problems = [];
+        if (item.pool.hasLowQualityLibraries) {
+          problems.push("LOW QUALITY LIBRARIES");
+        }
+        if (item.pool.duplicateIndices) {
+          problems.push("DUPLICATE INDICES");
+        } else if (item.pool.nearDuplicateIndices) {
+          problems.push("NEAR-DUPLICATE INDICES");
+        }
+        problems = problems.map(Tile.error);
 
         var dilutionInfo = item.pool.pooledElements.filter(function(element, index, array) {
           return array.length < maxDilutions || index < maxDilutions - 1;
@@ -69,7 +75,8 @@ ListTarget.partition = {
                   + (order.remaining == 1 ? platformType.partitionName : platformType.pluralPartitionName) + " remaining";
             });
 
-        var tileParts = [Tile.title(item.pool.name + " (" + item.pool.alias + ")", problems.length == 0 ? Tile.statusOk() : Tile.statusBad())].concat(problems);
+        var tileParts = [Tile.title(item.pool.name + " (" + item.pool.alias + ")", problems.length == 0 ? Tile.statusOk() : Tile
+            .statusBad())].concat(problems);
         tileParts.push(Tile.lines(dilutionInfo, false));
         tileParts.push(Tile.lines(orderInfo, true));
 
@@ -221,74 +228,75 @@ ListTarget.partition = {
     return [];
   },
   createColumns: function(config, projectId) {
-    return [
-        ListUtils.labelHyperlinkColumn("Container", "container", function(partition) {
-          return partition.containerId;
-        }, "containerName", 2, config.showContainer),
-        {
-          "sTitle": "Number",
-          "mData": "partitionNumber",
-          "include": true,
-          "iSortPriority": 1,
-          "bSortDirection": true
-        },
-        {
-          "sTitle": "Pool",
-          "mData": "pool",
-          "include": true,
-          "iSortPriority": 0,
-          "mRender": function(data, type, full) {
-            if (!data) {
-              if (type === 'display') {
-                return "(None)";
-              } else {
-                return "";
-              }
-            }
-            var prettyName = data.name + " (" + data.alias + ")";
-            if (type === 'display') {
-              var problems = [data.hasLowQualityLibraries ? "LOW QUALITY LIBRARIES" : null,
-                  data.duplicateIndices ? "DUPLICATE INDICES" : null].filter(function(x) {
-                return x;
-              });
-
-              return "<a href=\"/miso/pool/" + data.id + "\">" + prettyName + "</a>"
-                  + (problems.length > 0 ? problems.map(function(message) {
-                    return ' <span class="lowquality">' + message + '</span>';
-                  }).join('') + '<img style="float:right; height:25px;" src="/styles/images/fail.png" />' : "");
-            } else {
-              return prettyName;
-            }
-
+    return [ListUtils.labelHyperlinkColumn("Container", "container", function(partition) {
+      return partition.containerId;
+    }, "containerName", 2, config.showContainer), {
+      "sTitle": "Number",
+      "mData": "partitionNumber",
+      "include": true,
+      "iSortPriority": 1,
+      "bSortDirection": true
+    }, {
+      "sTitle": "Pool",
+      "mData": "pool",
+      "include": true,
+      "iSortPriority": 0,
+      "mRender": function(data, type, full) {
+        if (!data) {
+          if (type === 'display') {
+            return "(None)";
+          } else {
+            return "";
           }
-        }, {
-          "sTitle": "Dilutions",
-          "mData": "pool",
-          "include": true,
-          "iSortPriority": 0,
-          "bSortable": false,
-          "mRender": function(data, type, full) {
-            if (data) {
-              return data.dilutionCount;
-            } else {
-              if (type === 'display') {
-                return "(None)";
-              } else {
-                return "";
-              }
-            }
+        }
+        var prettyName = data.name + " (" + data.alias + ")";
+        if (type === 'display') {
+          var problems = [];
+          if (data.hasLowQualityLibraries) {
+            problems.push("LOW QUALITY LIBRARIES");
           }
-        }, {
-          "sTitle": "QC Status",
-          "mData": "qcType",
-          "include": config.runId,
-          "iSortPriority": 0,
-          "mRender": ListUtils.render.textFromId(Constants.partitionQcTypes, 'description', '(Unset)')
-        }, {
-          "sTitle": "QC Note",
-          "mData": "qcNotes",
-          "iSortPriority": 0,
-          "include": config.runId
-        }];
+          if (data.duplicateIndices) {
+            problems.push("DUPLICATE INDICES");
+          } else if (data.nearDuplicateIndices) {
+            problems.push("NEAR-DUPLICATE INDICES");
+          }
+
+          return "<a href=\"/miso/pool/" + data.id + "\">" + prettyName + "</a>" + (problems.length > 0 ? problems.map(function(message) {
+            return ' <span class="lowquality">' + message + '</span>';
+          }).join('') + '<img style="float:right; height:25px;" src="/styles/images/fail.png" />' : "");
+        } else {
+          return prettyName;
+        }
+
+      }
+    }, {
+      "sTitle": "Dilutions",
+      "mData": "pool",
+      "include": true,
+      "iSortPriority": 0,
+      "bSortable": false,
+      "mRender": function(data, type, full) {
+        if (data) {
+          return data.dilutionCount;
+        } else {
+          if (type === 'display') {
+            return "(None)";
+          } else {
+            return "";
+          }
+        }
+      }
+    }, {
+      "sTitle": "QC Status",
+      "mData": "qcType",
+      "include": config.runId,
+      "iSortPriority": 0,
+      "mRender": ListUtils.render.textFromId(Constants.partitionQcTypes, 'description', '(Unset)')
+    }, {
+      "sTitle": "QC Note",
+      "mData": "qcNotes",
+      "iSortPriority": 0,
+      "include": config.runId
+    }];
   }
 };
