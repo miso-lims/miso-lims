@@ -84,6 +84,7 @@ public interface AbstractListPage {
     public static final String LOGGED_IN = "Logged In";
     public static final String GROUP_NAME = "Group Name";
     public static final String AVG_INSERT_SIZE = "Average Insert Size";
+    public static final String SEQ_PARAMS = "Seq. Params.";
   }
 
   public static class ListTarget {
