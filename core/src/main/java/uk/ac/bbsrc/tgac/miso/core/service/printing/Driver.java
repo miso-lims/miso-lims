@@ -79,7 +79,7 @@ public enum Driver {
       sb.append("J\n");
       sb.append("O R\n");
       sb.append("S 0.0,0.00,12.78,12.78,41.50\n");
-      sb.append("T 7,12,90,5,2;");
+      sb.append("T 7,12,90,3,2;");
       appendTruncated(10, barcodable.getName(), s -> appendBradyEscapedUnicode(sb, s));
       sb.append("\n");
       multiline(9, 4, barcodable.getLabelText(), (line, text) -> {
@@ -90,7 +90,7 @@ public enum Driver {
         sb.append("\n");
       });
       if (barcodable.getBarcodeExtraInfo() != null) {
-        sb.append("T 22,12,90,3,2;");
+        sb.append("T 22,12,90,5,2;");
         appendTruncated(9, barcodable.getBarcodeExtraInfo(), s -> appendBradyEscapedUnicode(sb, s));
         sb.append("\n");
       }
