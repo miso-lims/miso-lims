@@ -70,6 +70,7 @@ public class IlluminaNotificationDtoTest {
     notificationDto.setCompletionDate(LocalDateTime.of(2017, 2, 27, 0, 0));
     notificationDto.setPairedEndRun(true);
     notificationDto.setSoftware("Fido Opus SEAdog Standard Interface Layer");
+    notificationDto.setRunBasesMask("y151,I8,y151");
     notificationDto.setNumCycles(20);
     notificationDto.setImgCycle(19);
     notificationDto.setScoreCycle(18);
