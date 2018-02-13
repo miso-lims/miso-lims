@@ -1,3 +1,17 @@
+# 0.2.108
+
+Changes:
+
+ * Modified label formatting
+ * Allow downloading sample data as a spreadsheet
+ * Added sequencing parameters column to Runs list
+ * Added warnings for near-duplicate indices in a pool
+ * Fixed ordering for previous/next sample links
+ * Allow editing bulk select after failure
+ * Added Lane QC changes to RunChangeLog
+ * Added tool to check index edit distance
+ * Add metrics endpoint to Run Scanner
+
 # 0.2.107
 
 Changes:
