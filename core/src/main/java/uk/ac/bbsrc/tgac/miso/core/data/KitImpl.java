@@ -202,4 +202,9 @@ public class KitImpl implements Kit {
   public String getAlias() {
     return getLotNumber();
   }
+
+  @Override
+  public String getBarcodeSizeInfo() {
+    return null;
+  }
 }

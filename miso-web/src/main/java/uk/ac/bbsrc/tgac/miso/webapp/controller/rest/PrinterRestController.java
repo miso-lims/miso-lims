@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
@@ -75,6 +76,9 @@ public class PrinterRestController extends RestController {
 
   @Autowired
   private LibraryService libraryService;
+
+  @Autowired
+  private PoolService poolService;
 
   @Autowired
   private PrinterService printerService;
@@ -180,6 +184,9 @@ public class PrinterRestController extends RestController {
       break;
     case "sample":
       fetcher = sampleService::get;
+      break;
+    case "pool":
+      fetcher = poolService::get;
       break;
     default:
       throw new IllegalArgumentException("Unknown barcodeable type: " + type);

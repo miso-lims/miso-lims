@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Skeleton implementation of a Sample
@@ -497,6 +498,11 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public String getBarcodeExtraInfo() {
     return getDescription();
+  }
+
+  @Override
+  public String getBarcodeSizeInfo() {
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), null, null);
   }
 
 }

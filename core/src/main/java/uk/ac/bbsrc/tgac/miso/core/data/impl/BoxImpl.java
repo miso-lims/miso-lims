@@ -184,4 +184,9 @@ public class BoxImpl extends AbstractBox {
     return getDescription();
   }
 
+  @Override
+  public String getBarcodeSizeInfo() {
+    return getSize().getRowsByColumns();
+  }
+
 }

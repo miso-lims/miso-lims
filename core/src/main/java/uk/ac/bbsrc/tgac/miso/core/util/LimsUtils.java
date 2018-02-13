@@ -45,7 +45,26 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
+import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleLCMTube;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -386,5 +405,18 @@ public class LimsUtils {
   @SafeVarargs
   public static Set<String> concatSets(Set<String>... sets) {
     return Arrays.stream(sets).flatMap(Collection::stream).collect(Collectors.toSet());
+  }
+
+  public static String makeVolumeAndConcentrationLabel(Double volume, Double concentration, String concentrationUnits) {
+    if (volume != null && volume != 0 && concentration != null && concentration != 0) {
+      return String.format("%.0fµL@%.0f%s", volume, concentration, concentrationUnits);
+    }
+    if (volume != null && volume != 0) {
+      return String.format("%.0fµL", volume);
+    }
+    if (concentration != null && concentration != 0) {
+      return String.format("%.0f%s", concentration, concentrationUnits);
+    }
+    return null;
   }
 }

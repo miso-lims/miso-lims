@@ -77,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Info
@@ -593,6 +594,11 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   @Override
   public String getBarcodeExtraInfo() {
     return getDescription();
+  }
+
+  @Override
+  public String getBarcodeSizeInfo() {
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getUnits());
   }
 
 }
