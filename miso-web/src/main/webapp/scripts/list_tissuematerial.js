@@ -28,7 +28,7 @@ ListTarget.tissuematerial = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return config.isAdmin ? HotTarget.tissuematerial.bulkActions : [];
+    return HotTarget.tissuematerial.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
     return config.isInternal ? [{

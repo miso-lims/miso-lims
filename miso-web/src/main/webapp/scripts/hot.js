@@ -499,7 +499,7 @@ var HotUtils = {
                           successMessageDiv.innerHTML = 'Saved ' + numSaved + ' items.';
                           if (allSaved) {
                             var bulkActionsDiv = document.getElementById('bulkactions');
-                            target.bulkActions.forEach(function(bulkAction) {
+                            target.getBulkActions(config).forEach(function(bulkAction) {
                               var button;
                               if (bulkAction) {
                                 button = document.createElement('A');
@@ -543,11 +543,21 @@ var HotUtils = {
                           } else {
                             try {
                               var response = JSON.parse(xhr.responseText);
-                              failed
-                                  .push('<b>Row '
-                                      + (index + 1)
-                                      + ': '
-                                      + (response.detail || 'Something went terribly wrong. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.</b>'));
+                              var messageHtml = '<b>Row ' + (index + 1) + ': ';
+                              if (response.detail) {
+                                messageHtml += response.detail;
+                                if (response.dataFormat === 'validation' && response.data) {
+                                  messageHtml += '<ul>';
+                                  jQuery.each(response.data, function(key, value) {
+                                    messageHtml += '<li>' + key + ': ' + value + '</li>';
+                                  });
+                                  messageHtml += '</ul>';
+                                }
+                              } else {
+                                messageHtml += 'Something went terribly wrong. Please file a ticket with a screenshot or copy-paste of the data that you were trying to save.';
+                              }
+                              messageHtml += '</b>';
+                              failed.push(messageHtml);
                             } catch (e) {
                               failed
                                   .push('<b>Row '

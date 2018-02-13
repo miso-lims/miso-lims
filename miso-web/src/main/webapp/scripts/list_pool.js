@@ -32,7 +32,7 @@ ListTarget.pool = {
   },
   queryUrl: "/miso/rest/pool/query",
   createBulkActions: function(config, projectId) {
-    return HotTarget.pool.bulkActions;
+    return HotTarget.pool.getBulkActions(config);
   },
   createStaticActions: function(config, prodjectId) {
     return [{

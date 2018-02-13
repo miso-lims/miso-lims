@@ -46,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -534,7 +533,7 @@ public class ValueTypeLookup {
    */
   public TissueOrigin resolve(TissueOrigin tissueOrigin) {
     if (tissueOrigin == null) return null;
-    if (tissueOrigin.getId() != TissueOriginImpl.UNSAVED_ID) return tissueOriginsById.get(tissueOrigin.getId());
+    if (tissueOrigin.getId() != TissueOrigin.UNSAVED_ID) return tissueOriginsById.get(tissueOrigin.getId());
     if (tissueOrigin.getAlias() != null) {
       TissueOrigin byAlias = tissueOriginsByAlias.get(tissueOrigin.getAlias());
       if (byAlias != null) return byAlias;

@@ -10,10 +10,14 @@ public interface TissueOriginDao {
 
   public TissueOrigin getTissueOrigin(Long id);
 
+  public TissueOrigin getByAlias(String alias);
+
   public Long addTissueOrigin(TissueOrigin tissueOrigin);
 
   public void deleteTissueOrigin(TissueOrigin tissueOrigin);
 
   public void update(TissueOrigin tissueOrigin);
+
+  public int getUsageCount(Long id);
 
 }

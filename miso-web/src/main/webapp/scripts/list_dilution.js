@@ -28,9 +28,9 @@ ListTarget.dilution = {
   },
   queryUrl: "/miso/rest/librarydilution/query",
   createBulkActions: function(config, projectId) {
-    return config.library ? HotTarget.dilution.bulkActions.filter(function(action) {
+    return config.library ? HotTarget.dilution.getBulkActions(config).filter(function(action) {
       return action.allowOnLibraryPage;
-    }) : HotTarget.dilution.bulkActions;
+    }) : HotTarget.dilution.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
     return config.library ? [{
@@ -140,16 +140,7 @@ ListTarget.dilution = {
     }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['created'],
-      searchTerms['changed'],
-      searchTerms['creator'],
-      searchTerms['changedby'],
-      searchTerms['platform'],
-      searchTerms['index_name'],
-      searchTerms['index_seq'],
-      searchTerms['institute'],
-      searchTerms['external'],
-      searchTerms['box']
-    ]
+    return [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],
+        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['institute'], searchTerms['external'], searchTerms['box']]
   }
 };
