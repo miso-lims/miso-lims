@@ -24,10 +24,15 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import io.prometheus.client.hibernate.HibernateStatisticsCollector;
+import io.prometheus.client.hotspot.DefaultExports;
+import io.prometheus.jmx.JmxCollector;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.management.MalformedObjectNameException;
 import javax.servlet.ServletContext;
@@ -46,7 +51,6 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.factory.issuetracker.IssueTrackerFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DelegatingNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -56,10 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.NameValidator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
-
-import io.prometheus.client.hibernate.HibernateStatisticsCollector;
-import io.prometheus.client.hotspot.DefaultExports;
-import io.prometheus.jmx.JmxCollector;
 
 /**
  * The custom MISO context listener class. On webapp context init, we can do some startup checks, e.g. checking the existence of required
@@ -119,15 +119,25 @@ public class MisoAppListener implements ServletContextListener {
       log.error("Failed to load Prometheus configuration.", e);
     }
 
+    loadIssueTrackerManager(misoProperties, context);
+  }
+
+  private void loadIssueTrackerManager(Map<String, String> misoProperties, XmlWebApplicationContext context) {
     if ("true".equals(misoProperties.get("miso.issuetracker.enabled"))) {
       String trackerType = misoProperties.get("miso.issuetracker.tracker");
       if (!isStringEmptyOrNull(trackerType)) {
-        IssueTrackerManager manager = IssueTrackerFactory.newInstance().getTrackerManager(trackerType);
-        if (manager != null) {
+        List<IssueTrackerManager> managers = context.getBeanFactory().getBeansOfType(IssueTrackerManager.class).values().stream()
+            .filter(mgr -> mgr.getType().equals(trackerType))
+            .collect(Collectors.toList());
+        switch (managers.size()) {
+        case 0:
+          throw new IllegalStateException("No issue tracker available with given type " + trackerType);
+        case 1:
           ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
-          context.getBeanFactory().registerSingleton("issueTrackerManager", manager);
-        } else {
-          log.error("No such issue tracker available with given type: " + trackerType);
+          context.getBeanFactory().registerSingleton("issueTrackerManager", managers.get(0));
+          break;
+        default:
+          throw new IllegalStateException("Found multiple IssueTrackerManagers of type " + trackerType);
         }
       }
     }
