@@ -18,6 +18,8 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
   private Boolean qcPassed;
   private boolean duplicateIndices;
   private Set<String> duplicateIndicesSequences;
+  private boolean nearDuplicateIndices;
+  private Set<String> nearDuplicateIndicesSequences;
   private Integer avgInsertSize;
   private Set<DilutionDto> pooledElements;
   private String creationDate;
@@ -56,6 +58,14 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   public Set<String> getDuplicateIndicesSequences() {
     return duplicateIndicesSequences;
+  }
+
+  public boolean getNearDuplicateIndices() {
+    return nearDuplicateIndices;
+  }
+
+  public Set<String> getNearDuplicateIndicesSequences() {
+    return nearDuplicateIndicesSequences;
   }
 
   public Long getId() {
@@ -116,6 +126,14 @@ public class PoolDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setDuplicateIndicesSequences(Set<String> duplicateIndicesSequences) {
     this.duplicateIndicesSequences = duplicateIndicesSequences;
+  }
+
+  public void setNearDuplicateIndices(Boolean nearDuplicateIndices) {
+    this.nearDuplicateIndices = nearDuplicateIndices;
+  }
+
+  public void setNearDuplicateIndicesSequences(Set<String> nearDuplicateIndicesSequences) {
+    this.nearDuplicateIndicesSequences = nearDuplicateIndicesSequences;
   }
 
   public void setId(Long id) {

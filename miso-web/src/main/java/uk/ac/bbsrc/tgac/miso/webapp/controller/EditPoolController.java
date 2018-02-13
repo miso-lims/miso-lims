@@ -199,6 +199,7 @@ public class EditPoolController {
 
       ObjectMapper mapper = new ObjectMapper();
       model.put("duplicateIndicesSequences", mapper.writeValueAsString(pool.getDuplicateIndicesSequences()));
+      model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(pool.getNearDuplicateIndicesSequences()));
 
       return new ModelAndView("/pages/editPool.jsp", model);
     } catch (IOException ex) {

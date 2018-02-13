@@ -597,7 +597,7 @@ Sample.ui = {
                   jQuery
                       .ajax(
                           {
-                            url: "/miso/rest/tree/identities",
+                            url: "/miso/rest/sample/identities",
                             data: "{\"identitiesSearches\":" + JSON.stringify([jQuery('#externalNameInput').val()])
                                 + ", \"requestCounter\":1}",
                             contentType: 'application/json; charset=utf8',

@@ -39,8 +39,8 @@ HotTarget.sample = (function() {
 
   return {
 
-    createUrl: '/miso/rest/tree/sample/',
-    updateUrl: '/miso/rest/tree/sample/',
+    createUrl: '/miso/rest/sample',
+    updateUrl: '/miso/rest/sample/',
     requestConfiguration: function(config, callback) {
       if (Constants.isDetailedSample) {
         config.rnaSamples = config.targetSampleClass.alias.indexOf("RNA") != -1;
@@ -306,7 +306,7 @@ HotTarget.sample = (function() {
 
               function getIdentities() {
                 jQuery.ajax({
-                  url: "/miso/rest/tree/identities",
+                  url: "/miso/rest/sample/identities",
                   data: JSON.stringify({
                     "identitiesSearches": flat.externalName
                   }),
@@ -666,7 +666,8 @@ HotTarget.sample = (function() {
               (result.target || targets[0]).action(result.replicates);
             });
           }
-        }, HotUtils.printAction('sample'), ].concat(HotUtils.makeQcActions("Sample")),
+        }, HotUtils.printAction('sample'), HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets), ]
+        .concat(HotUtils.makeQcActions("Sample")),
 
     getCustomActions: function(table) {
       return HotTarget.boxable.getCustomActions(table);

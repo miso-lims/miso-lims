@@ -671,7 +671,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public String getBarcodeExtraInfo() {
-    return getDescription();
+    return dnaSize == null ? getDescription() : (dnaSize.toString() + "bp");
   }
 
 }

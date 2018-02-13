@@ -43,15 +43,18 @@ ListTarget.pool = {
     }];
   },
   createColumns: function(config, projectId) {
-    return [
-        ListUtils.idHyperlinkColumn("Name", "pool", "id", Utils.array.getName, 1, true),
-        ListUtils.labelHyperlinkColumn("Alias", "pool", Utils.array.getId, "alias", 0, true),
-        {
+    return [ListUtils.idHyperlinkColumn("Name", "pool", "id", Utils.array.getName, 1, true),
+        ListUtils.labelHyperlinkColumn("Alias", "pool", Utils.array.getId, "alias", 0, true), {
           "sTitle": "Description",
           "mData": "description",
           "mRender": function(data, type, full) {
-            return (data ? data : "")
-                + (full.duplicateIndices ? " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDICES)</strong></span>" : "");
+            var html = data ? data : ""
+            if (full.duplicateIndices) {
+              html += " <span class='parsley-custom-error-message'><strong>(DUPLICATE INDICES)</strong></span>"
+            } else if (full.nearDuplicateIndices) {
+              html += " <span class='parsley-custom-error-message'><strong>(NEAR-DUPLICATE INDICES)</strong></span>"
+            }
+            return html;
           },
           "include": true,
           "iSortPriority": 0
@@ -97,16 +100,7 @@ ListTarget.pool = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['fulfilled'],
-      searchTerms['active'],
-      searchTerms['created'],
-      searchTerms['changed'],
-      searchTerms['creator'],
-      searchTerms['changedby'],
-      searchTerms['platform'],
-      searchTerms['index_name'],
-      searchTerms['index_seq'],
-      searchTerms['box']
-    ]
+    return [searchTerms['fulfilled'], searchTerms['active'], searchTerms['created'], searchTerms['changed'], searchTerms['creator'],
+        searchTerms['changedby'], searchTerms['platform'], searchTerms['index_name'], searchTerms['index_seq'], searchTerms['box']]
   }
 };

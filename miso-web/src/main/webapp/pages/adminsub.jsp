@@ -53,6 +53,11 @@
         <li><a href="<c:url value="/miso/printers"/>">Printers</a></li>
     </ul>
 
+    <h2>Tools</h2>
+    <ul class="bullets">
+        <li><a href="<c:url value="/miso/tools/indexdistance"/>">Index Distance</a></li>
+    </ul>
+
     <c:if test="${detailedSample}">
       <h2>Institute Defaults</h2>
       <ul class="bullets">

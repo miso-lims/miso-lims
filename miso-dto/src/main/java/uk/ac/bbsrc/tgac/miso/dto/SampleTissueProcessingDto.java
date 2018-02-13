@@ -16,7 +16,7 @@ public class SampleTissueProcessingDto extends SampleTissueDto {
   @Override
   public void writeUrls(URI baseUri) {
     super.writeUrls(baseUri);
-    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tree/sample/{id}").buildAndExpand(getId()).toUriString());
+    setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sample/{id}").buildAndExpand(getId()).toUriString());
   }
 
 }

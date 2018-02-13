@@ -86,7 +86,7 @@ public class LibraryRestController extends RestController {
   @Autowired
   private LibraryService libraryService;
   @Autowired
-  private SampleController sampleController;
+  private SampleRestController sampleController;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;

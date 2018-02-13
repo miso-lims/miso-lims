@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
 import java.io.UnsupportedEncodingException;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.apache.commons.codec.binary.Base64;
@@ -74,20 +75,27 @@ public enum Driver {
     public String encode(Barcodable barcodable) {
       StringBuilder sb = new StringBuilder();
 
-      String barcode = getBarcode(barcodable);
       sb.append("mm\n");
       sb.append("J\n");
       sb.append("O R\n");
-      sb.append("S l1;0.0,0.00,17.95,17.95,46.41\n");
-      sb.append("B 4,5,0,DATAMATRIX,0.5;").append(barcode).append("\n");
-      sb.append("T 15,7,0,5,4;");
-      appendTruncated(12, barcodable.getName(), s -> appendBradyEscapedUnicode(sb, s));
+      sb.append("S 0.0,0.00,12.78,12.78,41.50\n");
+      sb.append("T 7,12,90,3,2;");
+      appendTruncated(10, barcodable.getName(), s -> appendBradyEscapedUnicode(sb, s));
       sb.append("\n");
-      sb.append("T 15,12,0,3,4;");
-      appendTruncated(12, barcodable.getLabelText(), s -> appendBradyEscapedUnicode(sb, s));
-      sb.append("\n");
+      multiline(9, 4, barcodable.getLabelText(), (line, text) -> {
+        sb.append("T ");
+        sb.append(10 + line * 3);
+        sb.append(",12,90,3,2;");
+        appendBradyEscapedUnicode(sb, text);
+        sb.append("\n");
+      });
+      if (barcodable.getBarcodeExtraInfo() != null) {
+        sb.append("T 22,12,90,5,2;");
+        appendTruncated(9, barcodable.getBarcodeExtraInfo(), s -> appendBradyEscapedUnicode(sb, s));
+        sb.append("\n");
+      }
       if (barcodable.getBarcodeDate() != null) {
-        sb.append("T 15,17,0,3,4;");
+        sb.append("T 26,12,90,3,2;");
         sb.append(LimsUtils.formatDate(barcodable.getBarcodeDate()));
         sb.append("\n");
       }
@@ -310,13 +318,22 @@ public enum Driver {
   private static String getBarcode(Barcodable barcodable) {
     String str = barcodable.getIdentificationBarcode();
     if (LimsUtils.isStringBlankOrNull(str)) {
-      str = barcodable.getAlias();
+      str = barcodable.getName();
     }
     return str;
   }
 
   private static String getBarcode64(Barcodable barcodable) throws UnsupportedEncodingException {
     return new String(Base64.encodeBase64(getBarcode(barcodable).getBytes("UTF-8")));
+  }
+
+  private static void multiline(int lineLength, int maxLines, String input, BiConsumer<Integer, String> writer) {
+    for (int line = 0; line < maxLines - 1 && input.length() > line * lineLength; line++) {
+      writer.accept(line, input.substring(line * lineLength, Math.min(input.length(), (line + 1) * lineLength)));
+    }
+    if (input.length() > (maxLines - 1) * lineLength) {
+      writer.accept(maxLines - 1, input.substring((maxLines - 1) * lineLength, maxLines * lineLength - 2) + "...");
+    }
   }
 
   /**

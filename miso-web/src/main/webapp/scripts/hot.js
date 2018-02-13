@@ -814,6 +814,39 @@ var HotUtils = {
     };
   },
 
+  spreadsheetAction: function(url, sheets) {
+    return {
+      name: 'Download',
+      action: function(items) {
+        Utils.showDialog('Download Spreadsheet', 'Download', [{
+          property: 'sheet',
+          type: 'select',
+          label: 'Type',
+          values: sheets,
+          getLabel: function(x) {
+            return x.description;
+          }
+        }, {
+          property: 'format',
+          type: 'select',
+          label: 'Format',
+          values: Constants.spreadsheetFormats,
+          getLabel: function(x) {
+            return x.description;
+          }
+        }], function(result) {
+          window.location = window.location.origin + url + '?' + jQuery.param({
+            ids: items.map(Utils.array.getId).join(','),
+            format: result.format.name,
+            sheet: result.sheet.name
+          });
+        });
+
+      },
+      allowOnLibraryPage: true
+    };
+  },
+
   makeQcActions: function(qcTarget) {
     return [null, {
       name: 'Add QCs',

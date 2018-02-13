@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +45,17 @@ public class RestController {
   @ResponseBody
   public NotificationDto getByName(@PathVariable("name") String id) {
     return scheduler.finished().filter(dto -> dto.getRunAlias().equals(id)).findAny().orElse(null);
+  }
+
+  /**
+   * Given a known run name. get its metrics.
+   * If no run is found, null is returned. If there are multiple runs with the same name that are from different sequencers, one is randomly
+   * selected.
+   */
+  @RequestMapping(value = "/run/{name}/metrics", method = RequestMethod.GET, produces = { "application/json" })
+  public HttpEntity<String> getMetricsByName(@PathVariable("name") String id) {
+    return new HttpEntity<>(
+        scheduler.finished().filter(dto -> dto.getRunAlias().equals(id)).findAny().map(NotificationDto::getMetrics).orElse("[]"));
   }
 
   /**

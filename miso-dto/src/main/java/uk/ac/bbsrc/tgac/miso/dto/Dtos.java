@@ -126,6 +126,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -1420,10 +1422,14 @@ public class Dtos {
       }
       dto.setPooledElements(pooledElements);
       dto.setDuplicateIndicesSequences(from.getDuplicateIndicesSequences());
+      dto.setDuplicateIndices(!dto.getDuplicateIndicesSequences().isEmpty());
+      dto.setNearDuplicateIndicesSequences(from.getNearDuplicateIndicesSequences());
+      dto.setNearDuplicateIndices(!dto.getNearDuplicateIndicesSequences().isEmpty());
     } else {
       dto.setPooledElements(Collections.emptySet());
+      dto.setDuplicateIndices(!from.getDuplicateIndicesSequences().isEmpty());
+      dto.setNearDuplicateIndices(!from.getNearDuplicateIndicesSequences().isEmpty());
     }
-    dto.setDuplicateIndices(from.hasDuplicateIndices());
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     if (from.getBox() != null) {
@@ -2198,5 +2204,19 @@ public class Dtos {
             .map(p -> asDto(p, false))//
             .collect(Collectors.toList()));
     return to;
+  }
+
+  public static SpreadsheetFormatDto asDto(SpreadSheetFormat from) {
+    SpreadsheetFormatDto dto = new SpreadsheetFormatDto();
+    dto.setName(from.name());
+    dto.setDescription(from.description());
+    return dto;
+  }
+
+  public static SpreadsheetDto asDto(Spreadsheet<?> from) {
+    SpreadsheetDto dto = new SpreadsheetDto();
+    dto.setDescription(from.description());
+    dto.setName(from.name());
+    return dto;
   }
 }
