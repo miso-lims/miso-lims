@@ -85,10 +85,6 @@
       <classifier>jdk15</classifier>
     </dependency>
     <dependency>
-      <groupId>net.sourceforge.fluxion</groupId>
-      <artifactId>fluxion-spi</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
     </dependency>

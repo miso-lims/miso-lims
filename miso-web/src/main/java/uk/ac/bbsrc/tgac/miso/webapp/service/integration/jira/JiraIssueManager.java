@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.springframework.stereotype.Component;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
@@ -41,7 +42,6 @@ import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 
 import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.spi.ServiceProvider;
 
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.jira.IssueJsonConverter;
@@ -56,7 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.jira.IssueJsonConverter;
  * @date 20-Jan-2011
  * @since 0.0.3
  */
-@ServiceProvider
+@Component
 public class JiraIssueManager implements IssueTrackerManager {
   private String oAuthConsumerKey;
   private String oAuthConsumerSecret;
