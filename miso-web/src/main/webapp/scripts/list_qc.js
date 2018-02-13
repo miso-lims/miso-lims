@@ -29,7 +29,7 @@ ListTarget.qc = function(qcTarget) {
     },
     queryUrl: null,
     createBulkActions: function(config, projectId) {
-      return HotTarget.qc(qcTarget).bulkActions;
+      return HotTarget.qc(qcTarget).getBulkActions(config);
     },
     createStaticActions: function(config, projectId) {
       return config.entityId ? [{

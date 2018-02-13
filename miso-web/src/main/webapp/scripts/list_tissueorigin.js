@@ -21,31 +21,31 @@
  * *********************************************************************
  */
 
-ListTarget.lab = {
-  name: "Labs",
+ListTarget.tissueorigin = {
+  name: "Tissue Origins",
   createUrl: function(config, projectId) {
     throw "Must be provided statically";
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return HotTarget.lab.getBulkActions(config);
+    return HotTarget.tissueorigin.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
     return config.isInternal ? [{
       "name": "Add",
       "handler": function() {
 
-        Utils.showDialog('Create Labs', 'Create', [{
+        Utils.showDialog('Create Tissue Origins', 'Create', [{
           property: 'quantity',
           type: 'int',
           label: 'Quantity',
           value: 1
         }], function(result) {
           if (result.quantity < 1) {
-            Utils.showOkDialog('Create Labs', ["That's a peculiar number of labs to create."]);
+            Utils.showOkDialog('Create Tissue Origins', ["That's a peculiar number of tissueorigins to create."]);
             return;
           }
-          window.location = '/miso/lab/bulk/new?' + jQuery.param({
+          window.location = '/miso/tissueorigin/bulk/new?' + jQuery.param({
             quantity: result.quantity,
           });
         });
@@ -59,11 +59,10 @@ ListTarget.lab = {
       "include": true,
       "iSortPriority": 0
     }, {
-      "sTitle": "Institute",
-      "mData": "instituteId",
+      "sTitle": "Description",
+      "mData": "description",
       "include": true,
-      "iSortPriority": 0,
-      "mRender": ListUtils.render.textFromId(config.institutes, 'alias')
-    }, ];
+      "iSortPriority": 0
+    }];
   }
 };

@@ -28,7 +28,7 @@ ListTarget.institute = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return config.isAdmin ? HotTarget.institute.bulkActions : [];
+    return HotTarget.institute.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
     return config.isInternal ? [{

@@ -33,11 +33,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.BoxStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -296,7 +296,7 @@ public class HibernateSampleDao implements SampleDao, HibernatePaginatedBoxableS
     if (tissue.getParent() == null
         || tissue.getParent().getId() == SampleImpl.UNSAVED_ID
         || tissue.getTissueOrigin() == null
-        || tissue.getTissueOrigin().getId() == TissueOriginImpl.UNSAVED_ID
+        || tissue.getTissueOrigin().getId() == TissueOrigin.UNSAVED_ID
         || tissue.getTissueType() == null
         || tissue.getTissueType().getId() == TissueTypeImpl.UNSAVED_ID
         || tissue.getTimesReceived() == null

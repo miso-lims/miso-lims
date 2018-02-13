@@ -28,7 +28,7 @@ ListTarget.samplepurpose = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return config.isAdmin ? HotTarget.samplepurpose.bulkActions : [];
+    return HotTarget.samplepurpose.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
     return config.isInternal ? [{

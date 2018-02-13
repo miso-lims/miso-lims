@@ -28,7 +28,7 @@ ListTarget.library = {
   },
   queryUrl: "/miso/rest/library/query",
   createBulkActions: function(config, projectId) {
-    return HotTarget.library.bulkActions;
+    return HotTarget.library.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
     return [{
@@ -114,16 +114,7 @@ ListTarget.library = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['created'],
-      searchTerms['changed'],
-      searchTerms['creator'],
-      searchTerms['changedby'],
-      searchTerms['platform'],
-      searchTerms['index_name'],
-      searchTerms['index_seq'],
-      searchTerms['institute'],
-      searchTerms['external'],
-      searchTerms['box']
-    ]
+    return [searchTerms['created'], searchTerms['changed'], searchTerms['creator'], searchTerms['changedby'], searchTerms['platform'],
+        searchTerms['index_name'], searchTerms['index_seq'], searchTerms['institute'], searchTerms['external'], searchTerms['box']]
   }
 };

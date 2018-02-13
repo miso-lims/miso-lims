@@ -306,16 +306,16 @@ Box.ui = {
     var actions = [];
     switch (entityTypes[0]) {
     case 'SAMPLE':
-      actions = HotTarget.sample.bulkActions;
+      actions = HotTarget.sample.getBulkActions({});
       break;
     case 'LIBRARY':
-      actions = HotTarget.library.bulkActions;
+      actions = HotTarget.library.getBulkActions({});
       break;
     case 'DILUTION':
-      actions = HotTarget.dilution.bulkActions;
+      actions = HotTarget.dilution.getBulkActions({});
       break;
     case 'POOL':
-      actions = HotTarget.pool.bulkActions;
+      actions = HotTarget.pool.getBulkActions({});
       break;
     }
 

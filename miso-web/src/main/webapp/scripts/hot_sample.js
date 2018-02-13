@@ -577,97 +577,100 @@ HotTarget.sample = (function() {
       return columns;
     },
 
-    bulkActions: [
-        {
-          name: "Edit",
-          action: function(samples) {
+    getBulkActions: function(config) {
+      return [
+          {
+            name: "Edit",
+            action: function(samples) {
 
-            if (samples.some(function(sample) {
-              return sample.sampleClassId;
-            }) && !Constants.isDetailedSample) {
-              alert("There's detailed samples, but MISO is not configured for this.");
-              return;
-            }
+              if (samples.some(function(sample) {
+                return sample.sampleClassId;
+              }) && !Constants.isDetailedSample) {
+                alert("There's detailed samples, but MISO is not configured for this.");
+                return;
+              }
 
-            var classes = getSampleClasses(samples);
-            var categories = Utils.array.deduplicateString(classes.map(function(sampleClass) {
-              return sampleClass.sampleCategory;
-            }));
-            if (categories.length > 1) {
-              alert("You have selected samples of categories " + categories.join(" & ") + ". Please select samples from only one category.");
-              return;
-            }
+              var classes = getSampleClasses(samples);
+              var categories = Utils.array.deduplicateString(classes.map(function(sampleClass) {
+                return sampleClass.sampleCategory;
+              }));
+              if (categories.length > 1) {
+                alert("You have selected samples of categories " + categories.join(" & ")
+                    + ". Please select samples from only one category.");
+                return;
+              }
 
-            if (categories[0] == 'Tissue Processing' && classes.length > 1) {
-              alert("You have selected samples of classes " + classes.map(Utils.array.getAlias).join(" & ")
-                  + ". Please select samples from only one tissue processing class.");
-              return;
-            }
+              if (categories[0] == 'Tissue Processing' && classes.length > 1) {
+                alert("You have selected samples of classes " + classes.map(Utils.array.getAlias).join(" & ")
+                    + ". Please select samples from only one tissue processing class.");
+                return;
+              }
 
-            window.location = "/miso/sample/bulk/edit?" + jQuery.param({
-              ids: samples.map(Utils.array.getId).join(',')
-            });
-          }
-
-        }, {
-          name: "Propagate",
-          action: function(samples) {
-            var idsString = samples.map(Utils.array.getId).join(",");
-            var classes = getSampleClasses(samples);
-
-            // In the case of plain samples, this will be empty, which is fine.
-            var targets = getChildSampleClasses(classes).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
-
-              return {
-                name: sampleClass.alias,
-                action: function(replicates) {
-                  window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
-                    parentIds: idsString,
-                    replicates: replicates,
-                    sampleClassId: sampleClass.id
-                  });
-                }
-              };
-
-            });
-            if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
-              return sampleClass.sampleCategory == "Aliquot";
-            })) {
-              targets.push({
-                name: "Library",
-                action: function(replicates) {
-                  window.location = "/miso/library/bulk/propagate?" + jQuery.param({
-                    ids: idsString,
-                    replicates: replicates
-                  });
-                }
+              window.location = "/miso/sample/bulk/edit?" + jQuery.param({
+                ids: samples.map(Utils.array.getId).join(',')
               });
             }
 
-            if (targets.length == 0) {
-              alert("No propagation is possible from the samples.");
-              return;
-            }
+          }, {
+            name: "Propagate",
+            action: function(samples) {
+              var idsString = samples.map(Utils.array.getId).join(",");
+              var classes = getSampleClasses(samples);
 
-            Utils.showDialog(targets.length > 1 ? 'Propagate Samples' : ('Propagate to ' + targets[0].name), 'Propagate', [{
-              property: 'replicates',
-              type: 'int',
-              label: 'Replicates',
-              value: 1
-            }, targets.length > 1 ? {
-              property: 'target',
-              type: 'select',
-              label: 'To',
-              values: targets,
-              getLabel: Utils.array.getName
-            } : null].filter(function(x) {
-              return !!x;
-            }), function(result) {
-              (result.target || targets[0]).action(result.replicates);
-            });
-          }
-        }, HotUtils.printAction('sample'), HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets), ]
-        .concat(HotUtils.makeQcActions("Sample")),
+              // In the case of plain samples, this will be empty, which is fine.
+              var targets = getChildSampleClasses(classes).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
+
+                return {
+                  name: sampleClass.alias,
+                  action: function(replicates) {
+                    window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
+                      parentIds: idsString,
+                      replicates: replicates,
+                      sampleClassId: sampleClass.id
+                    });
+                  }
+                };
+
+              });
+              if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
+                return sampleClass.sampleCategory == "Aliquot";
+              })) {
+                targets.push({
+                  name: "Library",
+                  action: function(replicates) {
+                    window.location = "/miso/library/bulk/propagate?" + jQuery.param({
+                      ids: idsString,
+                      replicates: replicates
+                    });
+                  }
+                });
+              }
+
+              if (targets.length == 0) {
+                alert("No propagation is possible from the samples.");
+                return;
+              }
+
+              Utils.showDialog(targets.length > 1 ? 'Propagate Samples' : ('Propagate to ' + targets[0].name), 'Propagate', [{
+                property: 'replicates',
+                type: 'int',
+                label: 'Replicates',
+                value: 1
+              }, targets.length > 1 ? {
+                property: 'target',
+                type: 'select',
+                label: 'To',
+                values: targets,
+                getLabel: Utils.array.getName
+              } : null].filter(function(x) {
+                return !!x;
+              }), function(result) {
+                (result.target || targets[0]).action(result.replicates);
+              });
+            }
+          }, HotUtils.printAction('sample'), HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets), ]
+          .concat(HotUtils.makeQcActions("Sample"));
+    },
 
     getCustomActions: function(table) {
       return HotTarget.boxable.getCustomActions(table);

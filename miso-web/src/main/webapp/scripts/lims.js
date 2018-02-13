@@ -435,6 +435,11 @@ var Utils = Utils
               var responseObj = JSON.parse(xhr.responseText);
               if (responseObj.detail) {
                 lines.push(responseObj.detail);
+                if (responseObj.dataFormat === 'validation') {
+                  jQuery.each(responseObj.data, function(key, val) {
+                    lines.push(key === 'GENERAL' ? val : (key + ": " + val));
+                  });
+                }
               }
             } catch (e) {
               // If we got detail, great; if we didn't meh.
