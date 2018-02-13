@@ -53,6 +53,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -62,8 +63,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -304,4 +307,48 @@ public class SampleRestController extends RestController {
   public HttpEntity<byte[]> getSpreadsheet(HttpServletRequest request, HttpServletResponse response, UriComponentsBuilder uriBuilder) {
     return MisoWebUtils.generateSpreadsheet(sampleService::get, SampleSpreadSheets::valueOf, request, response);
   }
+
+  @RequestMapping(value = "/parents/{category}", method = RequestMethod.POST)
+  @ResponseBody
+  public List<SampleDto> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) {
+    Class<? extends DetailedSample> targetClass;
+    switch (category) {
+    case SampleIdentity.CATEGORY_NAME:
+      targetClass = SampleIdentity.class;
+      break;
+    case SampleTissue.CATEGORY_NAME:
+      targetClass = SampleTissue.class;
+      break;
+    case SampleTissueProcessing.CATEGORY_NAME:
+      targetClass = SampleTissueProcessing.class;
+      break;
+    case SampleStock.CATEGORY_NAME:
+      targetClass = SampleStock.class;
+      break;
+    case SampleAliquot.CATEGORY_NAME:
+      targetClass = SampleAliquot.class;
+      break;
+    default:
+      throw new RestException(String.format("No such category %s.", category), Status.NOT_FOUND);
+    }
+    return ids.stream()//
+        .map(WhineyFunction.rethrow(sampleService::get)).map(sample -> {
+          if (sample instanceof DetailedSample) {
+            DetailedSample parent = LimsUtils.getParent(targetClass, (DetailedSample) sample);
+            if (parent == null) {
+              throw new RestException(String.format("%s (%s) has no %s.", sample.getName(), sample.getAlias(), category),
+                  Status.BAD_REQUEST);
+            }
+            return parent;
+          } else {
+            return null;
+          }
+        })//
+        .collect(Collectors.groupingBy(Sample::getId)).values().stream()//
+        .map(l -> l.get(0))//
+        .map(Dtos::asDto)//
+        .collect(Collectors.toList());
+  }
+
 }
