@@ -429,4 +429,9 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   public QcTarget getQcTarget() {
     return QcTarget.Container;
   }
+
+  @Override
+  public String getBarcodeSizeInfo() {
+    return String.format("%s: %d", platform.getPlatformType().getPluralPartitionName(), getPartitions().size());
+  }
 }

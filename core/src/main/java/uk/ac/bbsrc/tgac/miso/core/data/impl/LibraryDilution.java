@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.DilutionBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -435,6 +436,11 @@ public class LibraryDilution extends AbstractBoxable
   @Override
   public String getBarcodeExtraInfo() {
     return library.getName();
+  }
+
+  @Override
+  public String getBarcodeSizeInfo() {
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), getUnits());
   }
 
 }

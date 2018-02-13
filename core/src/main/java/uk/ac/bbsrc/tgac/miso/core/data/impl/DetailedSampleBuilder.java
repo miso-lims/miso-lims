@@ -978,4 +978,9 @@ public class DetailedSampleBuilder
   public void removeFromBox() {
     throw new UnsupportedOperationException("Method not implemented on builder");
   }
+
+  @Override
+  public String getBarcodeSizeInfo() {
+    return "HOW DID YOU EVER PRINT THIS?!?";
+  }
 }

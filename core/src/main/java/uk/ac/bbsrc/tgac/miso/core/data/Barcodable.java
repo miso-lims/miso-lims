@@ -75,4 +75,6 @@ public interface Barcodable extends Nameable, Aliasable {
     }
     return labels;
   }
+
+  public String getBarcodeSizeInfo();
 }

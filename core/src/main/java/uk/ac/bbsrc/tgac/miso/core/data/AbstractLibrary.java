@@ -69,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * Skeleton implementation of a Library
@@ -671,7 +672,13 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
 
   @Override
   public String getBarcodeExtraInfo() {
-    return dnaSize == null ? getDescription() : (dnaSize.toString() + "bp");
+    return getDescription();
+  }
+
+  @Override
+  public String getBarcodeSizeInfo() {
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getInitialConcentration(),
+        getPlatformType().getLibraryConcentrationUnits());
   }
 
 }
