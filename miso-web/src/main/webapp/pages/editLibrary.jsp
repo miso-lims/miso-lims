@@ -114,6 +114,14 @@
   </td>
 </tr>
 <tr>
+  <td colspan="2">
+    <c:if test="${!empty warning}">
+      <span style="float:right;"><img src="/styles/images/fail.png"/></span>
+      <p class="big-warning">${warning}</p>
+    </c:if>
+  </td>
+</tr>
+<tr>
   <td class="h">Name:</td>
   <td id="name">
     <c:choose>

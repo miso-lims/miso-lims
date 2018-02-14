@@ -56,6 +56,12 @@ ListTarget.partition = {
         } else if (item.pool.nearDuplicateIndices) {
           problems.push("NEAR-DUPLICATE INDICES");
         }
+        var consentRevoked = item.pool.pooledElements.filter(function(element) {
+          return element.identityConsentLevel === 'Revoked';
+        });
+        if (consentRevoked.length) {
+          problems.push("CONSENT REVOKED");
+        }
         problems = problems.map(Tile.error);
 
         var dilutionInfo = item.pool.pooledElements.filter(function(element, index, array) {
@@ -82,7 +88,7 @@ ListTarget.partition = {
 
         dialogArea.appendChild(Tile.make(tileParts, function() {
           dialog.dialog("close");
-          assignCallback(item.pool.id);
+          assignCallback(item.pool);
           return false;
         }));
       });
@@ -138,9 +144,18 @@ ListTarget.partition = {
     var actions = [{
       name: "Assign Pool",
       action: function(partitions) {
-        var assign = function(poolId) {
-          Utils.ajaxWithDialog('Assigning Pool', 'POST', '/miso/rest/pool/' + poolId + '/assign', partitions.map(Utils.array.getId),
-              Utils.page.pageReload);
+        var assign = function(pool) {
+          var doAssign = function() {
+            Utils.ajaxWithDialog('Assigning Pool', 'POST', '/miso/rest/pool/' + (pool ? pool.id : 0) + '/assign', partitions
+                .map(Utils.array.getId), Utils.page.pageReload);
+          };
+          if (pool) {
+            HotUtils.warnIfConsentRevoked(pool.pooledElements, function() {
+              doAssign();
+            }, HotTarget.dilution.getLabel);
+          } else {
+            doAssign();
+          }
         };
         var makeSearch = function(defaultQuery, backHandler) {
           return function() {

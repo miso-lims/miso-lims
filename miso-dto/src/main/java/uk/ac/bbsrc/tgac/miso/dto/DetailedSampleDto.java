@@ -25,6 +25,7 @@ public class DetailedSampleDto extends SampleDto {
   private String concentration;
   private boolean nonStandardAlias;
   private Long identityId;
+  private String identityConsentLevel;
 
   public Long getParentId() {
     return parentId;
@@ -187,6 +188,14 @@ public class DetailedSampleDto extends SampleDto {
     if (getParentId() != null) {
       setParentUrl(WritableUrls.buildUriPath(baseUri, "/rest/sample/{id}", getParentId()));
     }
+  }
+
+  public String getIdentityConsentLevel() {
+    return identityConsentLevel;
+  }
+
+  public void setIdentityConsentLevel(String identityConsentLevel) {
+    this.identityConsentLevel = identityConsentLevel;
   }
 
 }

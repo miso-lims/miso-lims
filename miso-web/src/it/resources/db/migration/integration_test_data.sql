@@ -510,16 +510,16 @@ INSERT INTO DetailedSample(sampleId, sampleClassId, parentId, detailedQcStatusId
   (503, 11, NULL, 1, 0),
   (504, 15, NULL, 1, 0);
 
-INSERT INTO Identity (sampleId, externalName, donorSex) VALUES
-  (1, 'TEST_external_1', 'MALE'),
-  (100001, 'LIBT_identity1', 'UNKNOWN'),
-  (110001, '1LIB_identity1', 'UNKNOWN'),
-  (120001, '1IPO_identity1', 'UNKNOWN'),
-  (200001, 'IPOT_identity1', 'UNKNOWN'),
-  (201, 'SORT_identity_1', 'UNKNOWN'),
-  (301, 'DILT_identity_1', 'FEMALE'),
-  (501, 'TIB_identity_1', 'UNKNOWN'),
-  (4441, 'PROP_identity_1', 'UNKNOWN');
+INSERT INTO Identity (sampleId, externalName, donorSex, consentLevel) VALUES
+  (1, 'TEST_external_1', 'MALE', 'THIS_PROJECT'),
+  (100001, 'LIBT_identity1', 'UNKNOWN', 'THIS_PROJECT'),
+  (110001, '1LIB_identity1', 'UNKNOWN', 'THIS_PROJECT'),
+  (120001, '1IPO_identity1', 'UNKNOWN', 'THIS_PROJECT'),
+  (200001, 'IPOT_identity1', 'UNKNOWN', 'THIS_PROJECT'),
+  (201, 'SORT_identity_1', 'UNKNOWN', 'THIS_PROJECT'),
+  (301, 'DILT_identity_1', 'FEMALE', 'THIS_PROJECT'),
+  (501, 'TIB_identity_1', 'UNKNOWN', 'THIS_PROJECT'),
+  (4441, 'PROP_identity_1', 'UNKNOWN', 'THIS_PROJECT');
 
 INSERT INTO `SampleTissue` (sampleId, tissueOriginId, tissueTypeId, secondaryIdentifier, labId, region, passageNumber, tubeNumber, timesReceived, tissueMaterialId) VALUES
   (2, 1, 1, 'tube 1', 2, 'cortex', NULL, 1, 1, 2),

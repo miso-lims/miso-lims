@@ -70,14 +70,12 @@
   </tr>
   <tr>
     <td colspan="2">
-    <c:choose>
-      <c:when test="${!empty pool.getDuplicateIndicesSequences()}">
-        <p style="font-size:200%; font-weight:bold; color:#a93232; margin-top:0px;">This pool contains duplicate indices!<span style="float:right;"><img src="/styles/images/fail.png"/></span></p>
-      </c:when>
-      <c:when test="${!empty pool.getNearDuplicateIndicesSequences()}">
-        <p style="font-size:200%; font-weight:bold; color:#a93232; margin-top:0px;">This pool contains near-duplicate indices!<span style="float:right;"><img src="/styles/images/fail.png"/></span></p>
-      </c:when>
-    </c:choose>
+      <c:if test="${!empty warnings}">
+        <span style="float:right;"><img src="/styles/images/fail.png"/></span>
+        <c:forEach items="${warnings}" var="warning">
+          <p class="big-warning">${warning}</p>
+        </c:forEach>
+      </c:if>
     </td>
   </tr>
   <tr>

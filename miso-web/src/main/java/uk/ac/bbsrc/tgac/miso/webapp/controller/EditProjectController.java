@@ -315,7 +315,7 @@ public class EditProjectController {
       }
       session.setComplete();
       model.clear();
-      return "redirect:/miso/project/" + project.getProjectId();
+      return "redirect:/miso/project/" + project.getId();
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save project", ex);

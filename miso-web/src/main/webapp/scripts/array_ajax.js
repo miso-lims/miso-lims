@@ -2,6 +2,7 @@
   var arrayJson = null;
   var visual = null;
   var changelogInitialised = false;
+  var consentRevokedSampleIds = [];
 
   var positionStringifier = {
     getRowLabel: function(row) {
@@ -211,6 +212,20 @@
       });
     };
 
+    var checkConsentAndAdd = function() {
+      var sampleId = $('#resultSelect').val();
+      var revoked = Utils.array.findFirstOrNull(function(id) {
+        return id == sampleId;
+      }, consentRevokedSampleIds);
+      if (sampleId && sampleId > 0 && revoked) {
+        var lines = ['Donor has revoked consent for the following item.'];
+        lines.push('* ' + jQuery('#resultSelect').text());
+        Utils.showConfirmDialog('Warning', 'Proceed anyway', lines, addTheItem);
+      } else {
+        addTheItem();
+      }
+    }
+
     if (selectedItem) {
       if (selectedItem.id == $('#resultSelect').val()) {
         // setting same item where it already is. No change necessary
@@ -219,10 +234,10 @@
       } else {
         // if selectedPosition is already filled, confirm before deleting that position
         Utils.showConfirmDialog('Replace Sample', 'Replace', [selectedItem.alias + " is already located at position " + selectedPosition
-            + ". Replace it?"], addTheItem);
+            + ". Replace it?"], checkConsentAndAdd);
       }
     } else {
-      addTheItem();
+      checkConsentAndAdd();
     }
   };
 
@@ -235,8 +250,14 @@
     $('#warningMessages').html('');
 
     if (!results || !results.length) {
+      consentRevokedSampleIds = [];
       $('#resultSelect').append('<option value="-1" selected="selected">No results</option>');
     } else {
+      consentRevokedSampleIds = results.filter(function(sample) {
+        return sample.identityConsentLevel === 'Revoked';
+      }).map(function(sample) {
+        return sample.id;
+      });
       if (results.length > 1) {
         $('#resultSelect').append('<option value="-1" selected="selected">SELECT</option>');
       }

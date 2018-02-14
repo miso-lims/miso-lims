@@ -107,6 +107,10 @@ HotTarget.dilution = {
     return HotTarget.boxable.getCustomActions(table);
   },
 
+  getLabel: function(item) {
+    return item.name + ' (' + item.library.alias + ')';
+  },
+
   getBulkActions: function(config) {
     return [{
       name: 'Edit',
@@ -120,18 +124,22 @@ HotTarget.dilution = {
       name: 'Pool together',
       title: 'Create one pool from many dilutions',
       action: function(items) {
-        window.location = window.location.origin + '/miso/library/dilution/bulk/merge?' + jQuery.param({
-          ids: items.map(Utils.array.getId).join(',')
-        });
+        HotUtils.warnIfConsentRevoked(items, function() {
+          window.location = window.location.origin + '/miso/library/dilution/bulk/merge?' + jQuery.param({
+            ids: items.map(Utils.array.getId).join(',')
+          });
+        }, HotTarget.dilution.getLabel);
       },
       allowOnLibraryPage: false
     }, {
       name: 'Pool separately',
       title: 'Create a pool for each dilution',
       action: function(items) {
-        window.location = window.location.origin + '/miso/library/dilution/bulk/propagate?' + jQuery.param({
-          ids: items.map(Utils.array.getId).join(',')
-        });
+        HotUtils.warnIfConsentRevoked(items, function() {
+          window.location = window.location.origin + '/miso/library/dilution/bulk/propagate?' + jQuery.param({
+            ids: items.map(Utils.array.getId).join(',')
+          });
+        }, HotTarget.dilution.getLabel);
       },
       allowOnLibraryPage: true
     }, HotUtils.printAction('dilution'), ];

@@ -508,7 +508,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     Sample identitySample = new IdentityBuilder().project(sample.getProject())
         .sampleType(sample.getSampleType()).scientificName(sample.getScientificName()).name(generateTemporaryName())
         .rootSampleClass(rootSampleClass).volume(0D).externalName(identity.getExternalName())
-        .donorSex(identity.getDonorSex()).build();
+        .donorSex(identity.getDonorSex()).consentLevel(identity.getConsentLevel()).build();
     identitySample.setAlias(namingScheme.generateSampleAlias(identitySample));
 
     setChangeDetails(identitySample);
@@ -660,7 +660,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
       dTarget.setConcentration(dSource.getConcentration());
 
       dTarget.setDetailedQcStatus(dSource.getDetailedQcStatus());
-      dTarget.setDetailedQcStatusNote(dSource.getDetailedQcStatusNote());
+      dTarget.setDetailedQcStatusNote(nullifyStringIfBlank(dSource.getDetailedQcStatusNote()));
       dTarget.setQcPassed(dSource.getQcPassed());
       dTarget.setSubproject(dSource.getSubproject());
       if (isIdentitySample(target)) {
@@ -671,6 +671,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
         }
         iTarget.setExternalName(iSource.getExternalName());
         iTarget.setDonorSex(iSource.getDonorSex());
+        iTarget.setConsentLevel(iSource.getConsentLevel());
       }
       if (isTissueSample(target)) {
         applyTissueChanges((SampleTissue) target, (SampleTissue) source);

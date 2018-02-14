@@ -168,7 +168,7 @@ public class PoolRestController extends RestController {
   }
 
   @RequestMapping(value = "/{poolId}/assign", method = RequestMethod.POST, produces = "application/json")
-  @ResponseStatus(code = HttpStatus.OK)
+  @ResponseStatus(code = HttpStatus.NO_CONTENT)
   public void assignPool(@PathVariable Long poolId, @RequestBody List<Long> partitionIds) throws IOException {
     Pool pool = poolId == 0 ? null : poolService.get(poolId);
 

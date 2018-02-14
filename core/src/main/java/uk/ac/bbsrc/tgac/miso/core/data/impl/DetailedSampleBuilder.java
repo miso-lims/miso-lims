@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -93,6 +94,7 @@ public class DetailedSampleBuilder
   // Identity attributes
   private String externalName;
   private DonorSex donorSex = DonorSex.UNKNOWN;
+  private ConsentLevel consentLevel;
 
   // TissueSample attributes
   private SampleClass tissueClass; // identifies a parent tissue class if this sample itself is not a tissue
@@ -548,6 +550,16 @@ public class DetailedSampleBuilder
   }
 
   @Override
+  public ConsentLevel getConsentLevel() {
+    return consentLevel;
+  }
+
+  @Override
+  public void setConsentLevel(ConsentLevel consentLevel) {
+    this.consentLevel = consentLevel;
+  }
+
+  @Override
   public Integer getSlides() {
     return slides;
   }
@@ -983,4 +995,5 @@ public class DetailedSampleBuilder
   public String getBarcodeSizeInfo() {
     return "HOW DID YOU EVER PRINT THIS?!?";
   }
+
 }

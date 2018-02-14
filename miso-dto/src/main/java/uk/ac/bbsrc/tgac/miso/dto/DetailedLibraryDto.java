@@ -14,6 +14,7 @@ public class DetailedLibraryDto extends LibraryDto {
   private Long preMigrationId;
   private String groupId;
   private String groupDescription;
+  private String identityConsentLevel;
 
   public Boolean getArchived() {
     return archived;
@@ -69,6 +70,14 @@ public class DetailedLibraryDto extends LibraryDto {
 
   public void setGroupDescription(String groupDescription) {
     this.groupDescription = groupDescription;
+  }
+
+  public String getIdentityConsentLevel() {
+    return identityConsentLevel;
+  }
+
+  public void setIdentityConsentLevel(String identityConsentLevel) {
+    this.identityConsentLevel = identityConsentLevel;
   }
 
 }
