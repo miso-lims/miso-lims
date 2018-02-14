@@ -259,7 +259,9 @@ var RunGraph = (function() {
           title: {
             text: title
           },
-          xAxis: {},
+          xAxis: {
+            tickInterval: 1,
+          },
           yAxis: {
             min: 1,
             title: {
