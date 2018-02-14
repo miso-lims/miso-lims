@@ -370,6 +370,7 @@ HotTarget.sample = (function() {
           },
           HotUtils.makeColumnForEnum('&nbsp;&nbsp;Donor Sex&nbsp;&nbsp;', show['Identity'], true, 'donorSex', Constants.donorSexes,
               'Unknown'),
+          HotUtils.makeColumnForEnum('Consent', show['Identity'], true, 'consentLevel', Constants.consentLevels, 'This Project'),
 
           // Detailed sample columns
           {
@@ -614,58 +615,60 @@ HotTarget.sample = (function() {
           }, {
             name: "Propagate",
             action: function(samples) {
-              var idsString = samples.map(Utils.array.getId).join(",");
-              var classes = getSampleClasses(samples);
+              HotUtils.warnIfConsentRevoked(samples, function() {
+                var idsString = samples.map(Utils.array.getId).join(",");
+                var classes = getSampleClasses(samples);
 
-              // In the case of plain samples, this will be empty, which is fine.
-              var targets = getChildSampleClasses(classes).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
+                // In the case of plain samples, this will be empty, which is fine.
+                var targets = getChildSampleClasses(classes).sort(Utils.sorting.sampleClassComparator).map(function(sampleClass) {
 
-                return {
-                  name: sampleClass.alias,
-                  action: function(replicates) {
-                    window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
-                      parentIds: idsString,
-                      replicates: replicates,
-                      sampleClassId: sampleClass.id
-                    });
-                  }
-                };
+                  return {
+                    name: sampleClass.alias,
+                    action: function(replicates) {
+                      window.location = "/miso/sample/bulk/propagate?" + jQuery.param({
+                        parentIds: idsString,
+                        replicates: replicates,
+                        sampleClassId: sampleClass.id
+                      });
+                    }
+                  };
 
-              });
-              if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
-                return sampleClass.sampleCategory == "Aliquot";
-              })) {
-                targets.push({
-                  name: "Library",
-                  action: function(replicates) {
-                    window.location = "/miso/library/bulk/propagate?" + jQuery.param({
-                      ids: idsString,
-                      replicates: replicates
-                    });
-                  }
                 });
-              }
+                if (!Constants.isDetailedSample || classes.every(function(sampleClass) {
+                  return sampleClass.sampleCategory == "Aliquot";
+                })) {
+                  targets.push({
+                    name: "Library",
+                    action: function(replicates) {
+                      window.location = "/miso/library/bulk/propagate?" + jQuery.param({
+                        ids: idsString,
+                        replicates: replicates
+                      });
+                    }
+                  });
+                }
 
-              if (targets.length == 0) {
-                alert("No propagation is possible from the samples.");
-                return;
-              }
+                if (targets.length == 0) {
+                  alert("No propagation is possible from the samples.");
+                  return;
+                }
 
-              Utils.showDialog(targets.length > 1 ? 'Propagate Samples' : ('Propagate to ' + targets[0].name), 'Propagate', [{
-                property: 'replicates',
-                type: 'int',
-                label: 'Replicates',
-                value: 1
-              }, targets.length > 1 ? {
-                property: 'target',
-                type: 'select',
-                label: 'To',
-                values: targets,
-                getLabel: Utils.array.getName
-              } : null].filter(function(x) {
-                return !!x;
-              }), function(result) {
-                (result.target || targets[0]).action(result.replicates);
+                Utils.showDialog(targets.length > 1 ? 'Propagate Samples' : ('Propagate to ' + targets[0].name), 'Propagate', [{
+                  property: 'replicates',
+                  type: 'int',
+                  label: 'Replicates',
+                  value: 1
+                }, targets.length > 1 ? {
+                  property: 'target',
+                  type: 'select',
+                  label: 'To',
+                  values: targets,
+                  getLabel: Utils.array.getName
+                } : null].filter(function(x) {
+                  return !!x;
+                }), function(result) {
+                  (result.target || targets[0]).action(result.replicates);
+                });
               });
             }
           }, HotUtils.printAction('sample'), HotUtils.spreadsheetAction('/miso/rest/sample/spreadsheet', Constants.sampleSpreadsheets),

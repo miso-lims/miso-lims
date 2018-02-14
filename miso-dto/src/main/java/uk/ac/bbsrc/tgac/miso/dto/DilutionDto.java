@@ -20,6 +20,7 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
   private String libraryUrl;
   private String lastModified;
   private List<Long> indexIds;
+  private String identityConsentLevel;
 
   public Long getId() {
     return id;
@@ -132,6 +133,14 @@ public class DilutionDto extends AbstractBoxableDto implements WritableUrls {
 
   public void setVolume(String volume) {
     this.volume = volume;
+  }
+
+  public String getIdentityConsentLevel() {
+    return identityConsentLevel;
+  }
+
+  public void setIdentityConsentLevel(String identityConsentLevel) {
+    this.identityConsentLevel = identityConsentLevel;
   }
 
 }

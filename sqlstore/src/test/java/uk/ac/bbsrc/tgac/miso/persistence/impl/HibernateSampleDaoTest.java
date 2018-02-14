@@ -103,7 +103,7 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
     sample.setSecurityProfile(profile);
 
     Project project = new ProjectImpl();
-    project.setProjectId(2L);
+    project.setId(2L);
     sample.setProject(project);
 
     String sampleName = "updatedSample";

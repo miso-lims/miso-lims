@@ -12,18 +12,22 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -72,6 +76,12 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
   private String librarySelectionType;
 
   private String libraryStrategyType;
+
+  // Note: @LazyToOne used because setting FetchType.LAZY prevents extensions from loading (DetailedSample)
+  @ManyToOne(targetEntity = SampleImpl.class)
+  @LazyToOne(LazyToOneOption.PROXY)
+  @JoinColumn(name = "sampleId", insertable = false, updatable = false)
+  private Sample sample;
 
   private Long sampleId;
 
@@ -480,6 +490,19 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setBoxLocationBarcode(String boxLocationBarcode) {
     this.boxLocationBarcode = boxLocationBarcode;
+  }
+
+  /**
+   * Note: this field is lazy-loaded and retrieval can impact performance
+   * 
+   * @return the dilution's Sample parent
+   */
+  public Sample getSample() {
+    return sample;
+  }
+
+  public void setSample(Sample sample) {
+    this.sample = sample;
   }
 
 }

@@ -31,6 +31,7 @@ public class BulkSamplePage extends HeaderFooterPage {
     public static final String EXTERNAL_NAME = "External Name";
     public static final String IDENTITY_ALIAS = "Identity Alias";
     public static final String DONOR_SEX = "Donor Sex";
+    public static final String CONSENT = "Consent";
     public static final String SAMPLE_CLASS = "Sample Class";
     public static final String GROUP_ID = "Group ID";
     public static final String GROUP_DESCRIPTION = "Group Desc.";

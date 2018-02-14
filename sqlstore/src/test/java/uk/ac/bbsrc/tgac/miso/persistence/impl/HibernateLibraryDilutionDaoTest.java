@@ -62,7 +62,7 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testCount() throws IOException {
-    assertEquals(14, dao.count());
+    assertEquals(15, dao.count());
   }
 
   @Test
@@ -85,15 +85,15 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAll() throws IOException {
-    assertEquals(14, dao.listAll().size());
+    assertEquals(15, dao.listAll().size());
   }
 
   @Test
   public void testListAllWithLimit() throws IOException {
-    assertEquals(14, dao.list(0, 9999, false, "id").size());
+    assertEquals(15, dao.list(0, 9999, false, "id").size());
     assertEquals(10, dao.list(0, 10, false, "id").size());
     assertEquals(5, dao.list(0, 5, false, "id").size());
-    assertEquals(14, dao.list(0, 0, false, "id").size());
+    assertEquals(15, dao.list(0, 0, false, "id").size());
   }
 
   @Test
@@ -114,13 +114,13 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllLibraryDilutionsBySearchWithEmptyQueryString() throws IOException {
-    assertEquals(14, dao.list(0, 0, false, "id", PaginationFilter.query(""),
+    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.query(""),
         PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchWithNullQueryString() throws IOException {
-    assertEquals(14, dao.list(0, 0, false, "id",
+    assertEquals(15, dao.list(0, 0, false, "id",
         PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
@@ -142,12 +142,12 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllLibraryDilutionsBySearchOnlyWithEmptyQueryString() throws IOException {
-    assertEquals(14, dao.list(0, 0, false, "id", PaginationFilter.query("")).size());
+    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.query("")).size());
   }
 
   @Test
   public void testListAllLibraryDilutionsBySearchOnlyWithNullQueryString() throws IOException {
-    assertEquals(14, dao.list(0, 0, false, "id", PaginationFilter.query(null)).size());
+    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.query(null)).size());
   }
 
   @Test
@@ -162,7 +162,7 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllLibraryDilutionsByPlatform() throws IOException {
-    assertEquals(14, dao.list(0, 0, false, "id",
+    assertEquals(15, dao.list(0, 0, false, "id",
         PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
@@ -174,7 +174,7 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllLibraryDilutionsByProjectId() throws IOException {
-    assertEquals(14, dao.list(0, 0, false, "id", PaginationFilter.project(1L)).size());
+    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.project(1L)).size());
   }
 
   @Test
@@ -184,7 +184,7 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
 
   @Test
   public void testListAllLibraryDilutionsByProjectAndPlatform() throws IOException {
-    assertEquals(14, dao.list(0, 0, false, "id", PaginationFilter.project(1L),
+    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.project(1L),
         PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
@@ -244,7 +244,7 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
     final List<LibraryDilution> results = dao.list(0, 100, false, "name",
         PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertNotNull(results);
-    assertEquals(14, results.size());
+    assertEquals(15, results.size());
   }
 
   @Test
@@ -260,7 +260,7 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
     final List<LibraryDilution> results = dao.list(0, 100, true, "name", PaginationFilter.query("LDI"),
         PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertNotNull(results);
-    assertEquals(14, results.size());
+    assertEquals(15, results.size());
   }
 
   @Test

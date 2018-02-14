@@ -22,7 +22,6 @@
  */
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -77,7 +76,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
  */
 @Entity
 @Table(name = "Project")
-public class ProjectImpl implements Serializable, Project {
+public class ProjectImpl implements Project {
 
   private static final long serialVersionUID = 1L;
 
@@ -195,12 +194,6 @@ public class ProjectImpl implements Serializable, Project {
   }
 
   @Override
-  @Deprecated
-  public Long getProjectId() {
-    return projectId;
-  }
-
-  @Override
   public Collection<Sample> getSamples() {
     return samples;
   }
@@ -243,12 +236,6 @@ public class ProjectImpl implements Serializable, Project {
   @Override
   public void setAlias(String alias) {
     this.alias = alias;
-  }
-
-  @Override
-  @Deprecated
-  public void setProjectId(Long projectId) {
-    this.projectId = projectId;
   }
 
   @Override

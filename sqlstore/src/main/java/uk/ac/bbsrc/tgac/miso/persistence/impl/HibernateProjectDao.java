@@ -209,7 +209,7 @@ public class HibernateProjectDao implements ProjectStore {
       return (Long) currentSession().save(project);
     } else {
       currentSession().update(project);
-      return project.getProjectId();
+      return project.getId();
     }
   }
 

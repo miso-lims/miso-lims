@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import io.prometheus.client.Gauge;
+
 import java.io.IOException;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
@@ -67,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
@@ -104,8 +107,6 @@ import uk.ac.bbsrc.tgac.miso.service.TissueMaterialService;
 import uk.ac.bbsrc.tgac.miso.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
-
-import io.prometheus.client.Gauge;
 
 @Controller
 public class MenuController implements ServletContextAware {
@@ -357,6 +358,10 @@ public class MenuController implements ServletContextAware {
     ArrayNode donorSexes = node.putArray("donorSexes");
     for (String label : DonorSex.getLabels()) {
       donorSexes.add(label);
+    }
+    ArrayNode consentLevels = node.putArray("consentLevels");
+    for (ConsentLevel level : ConsentLevel.values()) {
+      consentLevels.add(level.getLabel());
     }
     ArrayNode strStatuses = node.putArray("strStatuses");
     for (String label : StrStatus.getLabels()) {

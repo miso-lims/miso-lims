@@ -218,7 +218,7 @@ public class FormUtilsTests {
     s.setSecurityProfile(new SecurityProfile());
 
     Project p = new ProjectImpl();
-    p.setProjectId(1L);
+    p.setId(1L);
     p.setAlias("MockInputProject");
     s.setProject(p);
 

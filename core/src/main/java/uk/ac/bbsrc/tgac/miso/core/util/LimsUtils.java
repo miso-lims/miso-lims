@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
@@ -230,6 +231,19 @@ public class LimsUtils {
 
   public static boolean isDetailedLibrary(Library library) {
     return library instanceof DetailedLibrary;
+  }
+
+  public static ConsentLevel getIdentityConsentLevel(DetailedSample sample) {
+    SampleIdentity identity = null;
+    if (isIdentitySample(sample)) {
+      identity = (SampleIdentity) sample;
+    } else {
+      identity = LimsUtils.getParent(SampleIdentity.class, sample);
+    }
+    if (identity != null && identity.getConsentLevel() != null) {
+      return identity.getConsentLevel();
+    }
+    return null;
   }
 
   public static boolean isIlluminaRun(Run run) {
