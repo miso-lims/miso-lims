@@ -44,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -205,7 +204,7 @@ public class HibernateProjectDao implements ProjectStore {
   public long save(Project project) throws IOException {
     Date timestamp = new Date();
     project.setLastUpdated(timestamp);
-    if (project.getId() == AbstractProject.UNSAVED_ID) {
+    if (project.getId() == ProjectImpl.UNSAVED_ID) {
       project.setCreationDate(timestamp);
       return (Long) currentSession().save(project);
     } else {

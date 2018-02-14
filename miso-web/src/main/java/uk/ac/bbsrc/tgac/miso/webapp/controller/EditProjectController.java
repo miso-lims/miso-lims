@@ -56,7 +56,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -74,9 +73,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.service.RunService;
-import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
 
@@ -149,7 +148,7 @@ public class EditProjectController {
   }
 
   public Map<Integer, String> populateProjectFiles(Long projectId) throws IOException {
-    if (projectId != AbstractProject.UNSAVED_ID) {
+    if (projectId != ProjectImpl.UNSAVED_ID) {
       Project p = projectService.getProjectById(projectId);
       if (p != null) {
         Map<Integer, String> fileMap = new HashMap<>();
@@ -253,7 +252,7 @@ public class EditProjectController {
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws IOException {
-    return setupForm(AbstractProject.UNSAVED_ID, model);
+    return setupForm(ProjectImpl.UNSAVED_ID, model);
   }
 
   @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
@@ -261,7 +260,7 @@ public class EditProjectController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Project project = null;
-      if (projectId == AbstractProject.UNSAVED_ID) {
+      if (projectId == ProjectImpl.UNSAVED_ID) {
         project = new ProjectImpl(user);
         model.put("title", "New Project");
       } else {
