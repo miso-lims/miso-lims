@@ -25,6 +25,7 @@
   },
   "readLength": 121,
   "runAlias": "130417_M00146_0021_000000000-A2WDF",
+  "runBasesMask": "y121,y121",
   "scoreCycle": 242,
   "sequencerName": "M00146",
   "startDate": [

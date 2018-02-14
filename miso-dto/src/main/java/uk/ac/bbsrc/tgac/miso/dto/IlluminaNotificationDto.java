@@ -10,6 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class IlluminaNotificationDto extends NotificationDto {
 
+  private String runBasesMask;
   private int bclCount;
   private int callCycle;
   private IlluminaChemistry chemistry;
@@ -27,6 +28,9 @@ public class IlluminaNotificationDto extends NotificationDto {
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
     IlluminaNotificationDto other = (IlluminaNotificationDto) obj;
+    if (runBasesMask == null) {
+      if (other.runBasesMask != null) return false;
+    } else if (!runBasesMask.equals(other.runBasesMask)) return false;
     if (bclCount != other.bclCount) return false;
     if (callCycle != other.callCycle) return false;
     if (chemistry != other.chemistry) return false;
@@ -42,6 +46,10 @@ public class IlluminaNotificationDto extends NotificationDto {
     if (readLength != other.readLength) return false;
     if (scoreCycle != other.scoreCycle) return false;
     return true;
+  }
+
+  public String getRunBasesMask() {
+    return runBasesMask;
   }
 
   public int getBclCount() {
@@ -104,6 +112,7 @@ public class IlluminaNotificationDto extends NotificationDto {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
+    result = prime * result + ((runBasesMask == null) ? 0 : runBasesMask.hashCode());
     result = prime * result + bclCount;
     result = prime * result + callCycle;
     result = prime * result + ((chemistry == null) ? 0 : chemistry.hashCode());
@@ -115,6 +124,10 @@ public class IlluminaNotificationDto extends NotificationDto {
     result = prime * result + readLength;
     result = prime * result + scoreCycle;
     return result;
+  }
+
+  public void setRunBasesMask(String runBasesMask) {
+    this.runBasesMask = runBasesMask;
   }
 
   public void setBclCount(int bclCount) {
@@ -167,10 +180,11 @@ public class IlluminaNotificationDto extends NotificationDto {
   public String toString() {
     return "IlluminaNotificationDto [callCycle=" + callCycle + ", chemistry=" + chemistry + ", imgCycle=" + imgCycle + ", indexLengths="
         + indexLengths + ", numCycles=" + numCycles + ", poolNames=" + poolNames + ", readLength=" + readLength + ", scoreCycle="
-        + scoreCycle + ", bclCount=" + bclCount + ", getRunAlias()=" + getRunAlias() + ", getSequencerName()=" + getSequencerName()
-        + ", getContainerSerialNumber()=" + getContainerSerialNumber() + ", getLaneCount()=" + getLaneCount() + ", getHealthType()="
-        + getHealthType() + ", getSequencerFolderPath()=" + getSequencerFolderPath() + ", isPairedEndRun()=" + isPairedEndRun()
-        + ", getSoftware()=" + getSoftware() + ", getStartDate()=" + getStartDate() + ", getCompletionDate()=" + getCompletionDate() + "]";
+        + scoreCycle + ", bclCount=" + bclCount + ", runBasesMask=" + runBasesMask + ", getRunAlias()=" + getRunAlias()
+        + ", getSequencerName()=" + getSequencerName() + ", getContainerSerialNumber()=" + getContainerSerialNumber() + ", getLaneCount()="
+        + getLaneCount() + ", getHealthType()=" + getHealthType() + ", getSequencerFolderPath()=" + getSequencerFolderPath()
+        + ", isPairedEndRun()=" + isPairedEndRun() + ", getSoftware()=" + getSoftware() + ", getStartDate()=" + getStartDate()
+        + ", getCompletionDate()=" + getCompletionDate() + "]";
   }
 
 }

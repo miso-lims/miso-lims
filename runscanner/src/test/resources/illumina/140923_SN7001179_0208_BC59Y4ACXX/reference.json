@@ -23,6 +23,7 @@
   "poolNames": {},
   "readLength": 101,
   "runAlias": "140923_SN7001179_0208_BC59Y4ACXX",
+  "runBasesMask": "y101,y101",
   "scoreCycle": 202,
   "sequencerName": "SN7001179",
   "startDate": [

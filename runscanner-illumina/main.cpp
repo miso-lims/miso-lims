@@ -28,6 +28,21 @@ std::string formatDate(std::tm *timeValue) {
   return date_buffer.str();
 }
 
+std::string getRunBasesMask(const illumina::interop::model::metrics::run_metrics &run){
+  std::stringstream basemask;
+  auto first = true;
+
+  for (const auto &read : run.run_info().reads()) {
+    if (first) {
+      first = false;
+    } else {
+      basemask << ",";
+    }
+    basemask << (read.is_index() ? "I" : "y") << length(read);
+  }
+  return basemask.str();
+}
+
 /**
  * Convert a "candlestick" or "line" point into a JSON object.
  *
@@ -227,18 +242,7 @@ void add_global_chart(
          << " / " << run.run_info().total_cycles();
   add_chart_row(values, "Cycles", cycles.str());
 
-  std::stringstream basemask;
-  auto first = true;
-
-  for (const auto &read : run.run_info().reads()) {
-    if (first) {
-      first = false;
-    } else {
-      basemask << ",";
-    }
-    basemask << (read.is_index() ? "I" : "y") << length(read);
-  }
-  add_chart_row(values, "Base Mask", basemask.str());
+  add_chart_row(values, "Base Mask", getRunBasesMask(run));
   std::stringstream q_30;
   q_30 << std::fixed << std::setprecision(2)
        << run_summary.total_summary().percent_gt_q30() << " %";
@@ -503,6 +507,7 @@ int main(int argc, const char **argv) {
   }
 
   result["readLength"] = readLength;
+  result["runBasesMask"] = getRunBasesMask(run);
   result["indexLengths"] = std::move(indexLengths);
 
   /* We can't tell the difference between the stopped or running states, so we
