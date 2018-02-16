@@ -1,12 +1,12 @@
 ---
 layout: page
 title: "Kit Tracking"
-category: dev
 date: 2016-01-12 13:42:52
+order: 2
 ---
 
 
-These pages represent the documentation that UEA intern Michal Zak produced during his developer work placement at TGAC. 
+These pages represent the documentation that UEA intern Michal Zak produced during his developer work placement at TGAC.
 
 *Please note that this functionality is not yet part of MISO. It only exists on the following (outdated) GitHub branch:*
 
@@ -21,9 +21,9 @@ Here's a link to a folder containing documentation and the sql files:
 Kit Stock Management system records and keeps track of each Component of a Kit as an independent entity that can be counted and filtered based on its characteristics. For example:
 
 > _MiSeq Reagent Kit v3 Box 2 of 2_
-> 
+>
 > **Kit: **MiSeq Reagent Kit v3
-> 
+>
 > **Component: **Box 2 of 2
 
 Any change to Component's location is logged and stored in a KitChangeLog table.

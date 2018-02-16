@@ -1,8 +1,8 @@
 ---
 layout: page
 title: "Kit Tracking"
-category: user
 date: 2016-01-12 13:45:57
+order: 2
 ---
 A Kit Component in MISO represents the unique physical box (component) that is part of the kit package.
 

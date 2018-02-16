@@ -1,9 +1,13 @@
 ---
 layout: page
-title: "Adding Value-Type Data"
+title: "Administrator's Guide"
 category: adm
 date: 2016-01-11 13:51:46
+order: 2
 ---
+
+This guide container instructions to facilitate day-to-day running MISO at your institution. See the [installation guides](installation-guide) if you need to set up your instance.
+
 
 # Adding Value-Type Data
 
@@ -121,7 +125,7 @@ Note that special characters should be HTML-encoded. If your lab does Qubit for 
 
 ## Kits
 
-A `KitDescriptor` has a name, version, manufacturer, part number, kit type (Library, Multiplexing, Sequencing), sequencing platform, and description. Note that while the MISO database does have a `Kit` table, it is not accessible from the user interface at this time. There are plans to add a kit tracking feature to MISO in the future. 
+A `KitDescriptor` has a name, version, manufacturer, part number, kit type (Library, Multiplexing, Sequencing), sequencing platform, and description. Note that while the MISO database does have a `Kit` table, it is not accessible from the user interface at this time. There are plans to add a kit tracking feature to MISO in the future.
 ```
 addKitDescriptor(name, version, partNumber, kitType, platform, description);
 ```

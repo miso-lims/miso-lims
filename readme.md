@@ -80,7 +80,7 @@ Cancer Research, but this can be changed by forking and configuring the
 To run your own MISO instance in the long term, download the 
 [latest release](https://github.com/TGAC/miso-lims/releases/latest).
 
-Installation and configuration details can be found in the [MISO maintainer guide](docs/_posts/2016-01-11-admin-manual.md).
+Installation and configuration details can be found in the [MISO installation guide](docs/_posts/2016-01-11-installation-guide.md).
 
 ## Contact and Community
 

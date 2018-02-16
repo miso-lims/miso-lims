@@ -1,12 +1,13 @@
 ---
 layout: page
-title: "Administrator's Manual"
+title: "Installation Guide"
 category: adm
 date: 2016-01-11 13:51:46
+order: 1
 ---
 
 
-# Running a MISO Instance
+# Installing MISO
 MISO requires some configuration directly in the source code. While we plan to
 change this over time, running an instance of MISO will require building and
 deploying a fork of the code base with customisations.
@@ -137,7 +138,7 @@ samples, libraries) are valid. If you do not want to use one of the supplied
 ones (TGAC's standard, OICR's standard, or no checks), you will have to write
 one or more specific to your organisation. See <a href="naming-schemes">Naming Schemes</a>
 below for more information.
-* If using a bulk barcode scanner (only VisionMate is supported at present), 
+* If using a bulk barcode scanner (only VisionMate is supported at present),
 set `miso.boxscanner.enabled` to `true` and change the host and port for your
 VisionMate server.
 * Optional: Update `miso.bugUrl` to the URL for your internal issue tracker or other
@@ -161,7 +162,7 @@ Create the directory `/storage/miso`:
 
   	cd /storage/miso
 
-Move the following configuration files from `miso-lims/miso-web/src/main/resources` into 
+Move the following configuration files from `miso-lims/miso-web/src/main/resources` into
 the `/storage/miso/` directory:
 
 | File                      | Purpose                                                    |
@@ -174,7 +175,7 @@ MISO can use either LDAP (`ldap`), Active Directory LDAP (`ad`), or JDBC
 (`jdbc`) as an authentication mechanism. This is set by the `-Dsecurity.method`
 noted in the previous section.
 
-If you are using JDBC (aka storing usernames and passwords in the database), set the 
+If you are using JDBC (aka storing usernames and passwords in the database), set the
 security method to `jdbc`.
 The default configuration should work properly.
 
@@ -182,7 +183,7 @@ For using LDAP, set the security method to `ldap`. Additional settings are
 needed for LDAP in the `security.properties`. Talk to your LDAP administrator.
 
 To use Active Directory, a specific kind of LDAP, set the security method to
-`ad`. Three additional settings are needed for Active Directory in the 
+`ad`. Three additional settings are needed for Active Directory in the
 `security.properties` file.
 
 | Property                    | Purpose                                                    |
@@ -203,7 +204,7 @@ Some valid examples are: `ad.oicr.on.ca`, `ldap://ad.oicr.on.ca:389` and
 The groups used by MISO are `ROLE_INTERNAL` for regular users, `ROLE_EXTERNAL` for
 external collaborators and `ROLE_ADMIN` for administrators. If you find these names
 too general you may wish to add a prefix before adding these groups to your Active
-Directory. For example `MISO_ROLE_INTERNAL` gives a clearer indication as to what 
+Directory. For example `MISO_ROLE_INTERNAL` gives a clearer indication as to what
 the group is used for. In this case you will need to set the property
 `security.ad.stripRolePrefix` to the value `MISO_` to allow MISO to ignore the
 prefix.
@@ -216,7 +217,7 @@ If using JDBC, once running, you should change the passwords of the `admin` and
 ## Naming Schemes (updating `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`)
 MISO Naming Schemes are used to validate and generate entity String fields. They are
 used for all `name` fields, and some `alias` fields. You may configure a base naming
-scheme, and customize it by switching validators and generators in `miso.properties` in 
+scheme, and customize it by switching validators and generators in `miso.properties` in
 `$CATALINA_HOME/conf/Catalina/localhost/`.
 
 The options for `miso.naming.scheme` are `default` and `oicr`, which have these
@@ -310,7 +311,7 @@ Existing naming schemes:
 A Sample alias generator may also be configured via `miso.naming.generator.sample.alias`
 
 The values used in these options refer to classes in the `uk.ac.bbsrc.tgac.miso.core.service.naming`
-Java package. To create a new naming scheme option, create a new class in this package that extends 
+Java package. To create a new naming scheme option, create a new class in this package that extends
 `MisoNamingScheme<T>`. To create a new Sample alias generator, extend `NameGenerator<Sample>`.
 Extending the functionality to validate and/or generate additional fields is possible, but will
 require modifications at the Service layer as well.
@@ -321,7 +322,7 @@ sequencer output. It is not required for a functioning MISO install, but
 without it, sequencer runs must be added manually.
 
 Run Scanner must be hosted on a separate server from MISO. Create a file called `ROOT.xml`
-in the following directory `$CATALINA_HOME/conf/Catalina/localhost` on that server (create 
+in the following directory `$CATALINA_HOME/conf/Catalina/localhost` on that server (create
 the directory if necessary), and populate it with the following information:
 
     <Context>
@@ -373,7 +374,7 @@ You can view the run scanner's state from the main page of the Run Scanner serve
 
 # Building the Application
 
-`cd` into `$MISO_SRC`. 
+`cd` into `$MISO_SRC`.
 Build the application using:
 
     mvn clean package -P external
