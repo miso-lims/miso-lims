@@ -300,7 +300,7 @@
 	<tag>
 		<description>Renders a tile collection with a section header.</description>
 		<name>tiles</name>
-		<tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TileTag</tag-class>
+		<tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.PaneTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
 			<description>Id for the table</description>
@@ -332,7 +332,7 @@
 	<tag>
 		<description>Renders a tile collection with a section header fetched on the client.</description>
 		<name>tiles-ajax</name>
-		<tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.TileAjaxTag</tag-class>
+		<tag-class>uk.ac.bbsrc.tgac.miso.webapp.util.form.PaneAjaxTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
 			<description>Id for the table</description>
@@ -345,12 +345,6 @@
 			<name>target</name>
 			<required>true</required>
 			<rtexprvalue>false</rtexprvalue>
-		</attribute>
-		<attribute>
-			<description>The URL to fetch the data from</description>
-			<name>url</name>
-			<required>true</required>
-			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<dynamic-attributes>false</dynamic-attributes>
 	</tag>

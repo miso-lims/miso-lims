@@ -125,6 +125,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
@@ -430,7 +431,7 @@ public class Dtos {
 
   /**
    * Extracts parent details from the DTO, according to these possible cases:
-   * 
+   *
    * <ol>
    * <li>parent ID is provided. This implies that the parent exists, so no other parent information will be required</li>
    * <li>identity information and parentTissueSampleClassId are provided. This implies that a tissue parent should be created, and that the
@@ -438,7 +439,7 @@ public class Dtos {
    * provided to indicate a second aliquot level in the hierarchy</li>
    * <li>identity information is provided, but no parentTissueSampleClassId. You must be creating a tissue in this case.</li>
    * </ol>
-   * 
+   *
    * @param childDto
    *          the DTO to take parent details from
    * @return the parent details from the DTO, or null if there are none. A returned sample will also include its own parent if applicable.
@@ -2255,6 +2256,16 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setUserName(from.getUser().getFullName());
     dto.setChangeTime(formatDateTime(from.getChangeTime()));
+    return dto;
+  }
+
+  public static BarcodableDto asDto(BarcodableView from) {
+    BarcodableDto dto = new BarcodableDto();
+    dto.setId(from.getId().getTargetId());
+    dto.setEntityType(from.getId().getTargetType().toString());
+    dto.setAlias(from.getAlias());
+    dto.setName(from.getName());
+    dto.setIdentificationBarcode(from.getIdentificationBarcode());
     return dto;
   }
 }

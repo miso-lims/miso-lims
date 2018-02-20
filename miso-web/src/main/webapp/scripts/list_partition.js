@@ -81,7 +81,7 @@ ListTarget.partition = {
                   + (order.remaining == 1 ? platformType.partitionName : platformType.pluralPartitionName) + " remaining";
             });
 
-        var tileParts = [Tile.title(item.pool.name + " (" + item.pool.alias + ")", problems.length == 0 ? Tile.statusOk() : Tile
+        var tileParts = [Tile.titleAndStatus(item.pool.name + " (" + item.pool.alias + ")", problems.length == 0 ? Tile.statusOk() : Tile
             .statusBad())].concat(problems);
         tileParts.push(Tile.lines(dilutionInfo, false));
         tileParts.push(Tile.lines(orderInfo, true));

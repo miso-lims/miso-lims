@@ -38,6 +38,11 @@ public class DefaultBarcodableViewService implements BarcodableViewService {
   }
 
   @Override
+  public List<BarcodableView> search(String query) {
+    return barcodableViewDao.search(query);
+  }
+
+  @Override
   public <T extends Barcodable> T getEntity(BarcodableView view) throws IOException {
     EntityType entityType = view.getId().getTargetType();
     long id = view.getId().getTargetId();

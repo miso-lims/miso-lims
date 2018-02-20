@@ -22,8 +22,8 @@ import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SuppressWarnings("serial")
-public class TileTag extends RequestContextAwareTag {
+@SuppressWarnings({"serial", "squid:S1948"})
+public class PaneTag extends RequestContextAwareTag {
   private boolean alwaysShow;
 
   private Object items;
@@ -43,7 +43,7 @@ public class TileTag extends RequestContextAwareTag {
     ObjectMapper mapper = new ObjectMapper();
 
     pageContext.getOut().append(String.format(
-        "<div id='%1$s'></div><script type='text/javascript'>jQuery(document).ready(function () { Tile.createPane('%1$s', TileTarget.%2$s, %3$s);});</script>",
+        "<div id='%1$s'></div><script type='text/javascript'>jQuery(document).ready(function () { Pane.createPane('%1$s', PaneTarget.%2$s, %3$s);});</script>",
         getId(), target, mapper.writeValueAsString(items)));
     return SKIP_BODY;
   }
