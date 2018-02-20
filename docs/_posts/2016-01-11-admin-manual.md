@@ -137,9 +137,8 @@ samples, libraries) are valid. If you do not want to use one of the supplied
 ones (TGAC's standard, OICR's standard, or no checks), you will have to write
 one or more specific to your organisation. See <a href="naming-schemes">Naming Schemes</a>
 below for more information.
-* If using a bulk barcode scanner (only VisionMate is supported at present), 
-set `miso.boxscanner.enabled` to `true` and change the host and port for your
-VisionMate server.
+* Optional: If using any bulk barcode scanners (only VisionMate is supported at present), 
+define `miso.visionmate.servers` as specified in the properties file
 * Optional: Update `miso.bugUrl` to the URL for your internal issue tracker or other
 method for users to report issues using the "Report a problem" link in the header.
 * Update `miso.instanceName` to update the instance name displayed in the header.

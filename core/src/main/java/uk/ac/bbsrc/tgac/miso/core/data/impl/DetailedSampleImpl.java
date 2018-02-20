@@ -18,8 +18,10 @@ import javax.persistence.Transient;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "DetailedSample")
@@ -217,6 +219,11 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
   @Override
   public void setIdentityId(Long identityId) {
     this.identityId = identityId;
+  }
+
+  @Override
+  public String getBarcodeSizeInfo() {
+    return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), getConcentration(), Sample.CONCENTRATION_UNITS);
   }
 
 }

@@ -33,17 +33,15 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -98,32 +96,27 @@ public class TissueOriginController extends RestController {
   }
 
   @RequestMapping(value = "/tissueorigin", method = RequestMethod.POST, headers = { "Content-type=application/json" })
-  @ResponseBody
-  public ResponseEntity<?> createTissueOrigin(@RequestBody TissueOriginDto tissueOriginDto, UriComponentsBuilder b,
+  @ResponseStatus(HttpStatus.CREATED)
+  public @ResponseBody TissueOriginDto createTissueOrigin(@RequestBody TissueOriginDto tissueOriginDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
     Long id = tissueOriginService.create(tissueOrigin);
-    UriComponents uriComponents = b.path("/tissueorigin/{id}").buildAndExpand(id);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setLocation(uriComponents.toUri());
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    return Dtos.asDto(tissueOriginService.get(id));
   }
 
   @RequestMapping(value = "/tissueorigin/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
-  @ResponseBody
-  public ResponseEntity<?> updateTissueOrigin(@PathVariable("id") Long id, @RequestBody TissueOriginDto tissueOriginDto,
+  public @ResponseBody TissueOriginDto updateTissueOrigin(@PathVariable("id") Long id, @RequestBody TissueOriginDto tissueOriginDto,
       HttpServletResponse response) throws IOException {
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
     tissueOrigin.setId(id);
     tissueOriginService.update(tissueOrigin);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return Dtos.asDto(tissueOriginService.get(id));
   }
 
   @RequestMapping(value = "/tissueorigin/{id}", method = RequestMethod.DELETE)
-  @ResponseBody
-  public ResponseEntity<?> deleteTissueOrigin(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteTissueOrigin(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     tissueOriginService.delete(id);
-    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 }

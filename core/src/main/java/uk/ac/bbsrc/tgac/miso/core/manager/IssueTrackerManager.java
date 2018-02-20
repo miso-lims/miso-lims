@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.spi.Spi;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager
@@ -38,7 +37,6 @@ import net.sourceforge.fluxion.spi.Spi;
  * @date 25-Jan-2011
  * @since 0.0.3
  */
-@Spi
 public interface IssueTrackerManager {
   String OAUTH = "oauth";
   String BASIC = "basic";

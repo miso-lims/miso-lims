@@ -49,21 +49,23 @@ HotTarget.libraryReceipt = (function() {
 
     fixedColumns: 0,
 
-    bulkActions: [{
-      name: 'Edit',
-      action: function(items) {
-        window.location = window.location.origin + '/miso/library/bulk/edit?' + jQuery.param({
-          ids: items.map(Utils.array.getId).join(',')
-        });
-      }
-    }, {
-      name: 'Make dilutions',
-      action: function(items) {
-        window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery.param({
-          ids: items.map(Utils.array.getId).join(',')
-        });
-      }
-    }, HotUtils.printAction('library'), ].concat(HotUtils.makeQcActions("Library")),
+    getBulkActions: function(config) {
+      return [{
+        name: 'Edit',
+        action: function(items) {
+          window.location = window.location.origin + '/miso/library/bulk/edit?' + jQuery.param({
+            ids: items.map(Utils.array.getId).join(',')
+          });
+        }
+      }, {
+        name: 'Make dilutions',
+        action: function(items) {
+          window.location = window.location.origin + '/miso/library/dilutions/bulk/propagate?' + jQuery.param({
+            ids: items.map(Utils.array.getId).join(',')
+          });
+        }
+      }, HotUtils.printAction('library'), ].concat(HotUtils.makeQcActions("Library"));
+    }
 
   };
 })();

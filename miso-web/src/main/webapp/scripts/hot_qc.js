@@ -137,13 +137,15 @@ HotTarget.qc = function(qcTarget) {
       }];
     },
 
-    bulkActions: [{
-      name: 'Edit',
-      action: function(items) {
-        window.location = window.location.origin + '/miso/qc/bulk/edit/' + qcTarget + '?' + jQuery.param({
-          ids: items.map(Utils.array.getId).join(',')
-        });
-      }
-    }, ]
+    getBulkActions: function(config) {
+      return [{
+        name: 'Edit',
+        action: function(items) {
+          window.location = window.location.origin + '/miso/qc/bulk/edit/' + qcTarget + '?' + jQuery.param({
+            ids: items.map(Utils.array.getId).join(',')
+          });
+        }
+      }];
+    }
   };
 };

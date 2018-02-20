@@ -150,7 +150,11 @@
       <div id="actionsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <a onclick="Box.ui.exportBox(${box.id});" href="javascript:void(0);" class="add">Export Box to Excel</a>
         <a onclick="Box.ui.discardEntireBox(${box.id});" href="javascript:void(0);" class="add">Discard All Tubes</a>
-        <c:if test="${(scannerEnabled) && (box.size.scannable)}"><a onclick="Box.initScan();" href="javascript:void(0);">Scan Box</a></c:if>
+        <c:if test="${(scannerEnabled) && (box.size.scannable)}">
+          <c:forEach items="${scannerNames}" var="scannerName">
+            <a onclick="Box.initScan('${scannerName}');" href="javascript:void(0);">Scan with ${scannerName}</a>
+          </c:forEach>
+        </c:if>
         <a onclick="Box.fakeScan();" href="javascript:void(0);">Fill by Barcode Pattern</a>
       </div>
     </li>

@@ -5,12 +5,16 @@ import java.util.Date;
 
 import com.eaglegenomics.simlims.core.User;
 
-public interface TissueOrigin extends Serializable {
+public interface TissueOrigin extends Aliasable, Serializable {
 
+  public static final long UNSAVED_ID = 0L;
+
+  @Override
   public long getId();
 
   public void setId(long tissueOriginId);
 
+  @Override
   public String getAlias();
 
   public void setAlias(String alias);

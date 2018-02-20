@@ -45,12 +45,21 @@ public class IlluminaRun extends Run {
     super(user);
   }
 
+  private String runBasesMask;
   private Integer callCycle;
   private Integer imgCycle;
   private Integer numCycles;
   private Integer scoreCycle;
   @Column(nullable = false)
   private boolean pairedEnd = true;
+
+  public String getRunBasesMask() {
+    return runBasesMask;
+  }
+
+  public void setRunBasesMask(String runBasesMask) {
+    this.runBasesMask = runBasesMask;
+  }
 
   public Integer getCallCycle() {
     return callCycle;

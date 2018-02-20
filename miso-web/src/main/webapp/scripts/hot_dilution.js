@@ -107,32 +107,34 @@ HotTarget.dilution = {
     return HotTarget.boxable.getCustomActions(table);
   },
 
-  bulkActions: [{
-    name: 'Edit',
-    action: function(items) {
-      window.location = window.location.origin + '/miso/library/dilution/bulk/edit?' + jQuery.param({
-        ids: items.map(Utils.array.getId).join(',')
-      });
-    },
-    allowOnLibraryPage: true
-  }, {
-    name: 'Pool together',
-    title: 'Create one pool from many dilutions',
-    action: function(items) {
-      window.location = window.location.origin + '/miso/library/dilution/bulk/merge?' + jQuery.param({
-        ids: items.map(Utils.array.getId).join(',')
-      });
-    },
-    allowOnLibraryPage: false
-  }, {
-    name: 'Pool separately',
-    title: 'Create a pool for each dilution',
-    action: function(items) {
-      window.location = window.location.origin + '/miso/library/dilution/bulk/propagate?' + jQuery.param({
-        ids: items.map(Utils.array.getId).join(',')
-      });
-    },
-    allowOnLibraryPage: true
-  }, HotUtils.printAction('dilution'), ],
+  getBulkActions: function(config) {
+    return [{
+      name: 'Edit',
+      action: function(items) {
+        window.location = window.location.origin + '/miso/library/dilution/bulk/edit?' + jQuery.param({
+          ids: items.map(Utils.array.getId).join(',')
+        });
+      },
+      allowOnLibraryPage: true
+    }, {
+      name: 'Pool together',
+      title: 'Create one pool from many dilutions',
+      action: function(items) {
+        window.location = window.location.origin + '/miso/library/dilution/bulk/merge?' + jQuery.param({
+          ids: items.map(Utils.array.getId).join(',')
+        });
+      },
+      allowOnLibraryPage: false
+    }, {
+      name: 'Pool separately',
+      title: 'Create a pool for each dilution',
+      action: function(items) {
+        window.location = window.location.origin + '/miso/library/dilution/bulk/propagate?' + jQuery.param({
+          ids: items.map(Utils.array.getId).join(',')
+        });
+      },
+      allowOnLibraryPage: true
+    }, HotUtils.printAction('dilution'), ];
+  }
 
 };

@@ -35,7 +35,7 @@ ListTarget.sample = {
   },
   queryUrl: "/miso/rest/sample/query",
   createBulkActions: function(config, projectId) {
-    var actions = HotTarget.sample.bulkActions;
+    var actions = HotTarget.sample.getBulkActions(config);
 
     if (projectId) {
       actions = actions.concat([{
@@ -200,15 +200,7 @@ ListTarget.sample = {
         }];
   },
   searchTermSelector: function(searchTerms) {
-    return [searchTerms['created'],
-      searchTerms['changed'],
-      searchTerms['received'],
-      searchTerms['creator'],
-      searchTerms['changedby'],
-      searchTerms['class'],
-      searchTerms['institute'],
-      searchTerms['external'],
-      searchTerms['box']
-    ]
+    return [searchTerms['created'], searchTerms['changed'], searchTerms['received'], searchTerms['creator'], searchTerms['changedby'],
+        searchTerms['class'], searchTerms['institute'], searchTerms['external'], searchTerms['box']]
   }
 };

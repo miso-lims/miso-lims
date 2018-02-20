@@ -24,6 +24,7 @@
   "poolNames": {},
   "readLength": 75,
   "runAlias": "170609_NB551051_0017_AHLFFJBGX2",
+  "runBasesMask": "y75,I8,y75",
   "scoreCycle": 158,
   "sequencerName": "NB551051",
   "startDate": [

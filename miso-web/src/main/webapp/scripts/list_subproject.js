@@ -28,7 +28,7 @@ ListTarget.subproject = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return config.isAdmin ? HotTarget.subproject.bulkActions : [];
+    return HotTarget.subproject.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
     return config.isInternal ? [{

@@ -28,7 +28,7 @@ ListTarget.lab = {
   },
   queryUrl: null,
   createBulkActions: function(config, projectId) {
-    return config.isAdmin ? HotTarget.lab.bulkActions : [];
+    return HotTarget.lab.getBulkActions(config);
   },
   createStaticActions: function(config, projectId) {
     return config.isInternal ? [{

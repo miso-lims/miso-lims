@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax.test;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -121,22 +121,6 @@ public class BoxControllerHelperServiceTest {
     json.put("boxId", "box");
     exception.expect(JSONException.class);
     boxControllerHelperService.deleteBox(null, json);
-  }
-
-  @Test
-  public final void testGetBoxScanWithReadErrorsReturnsError() throws Exception {
-    final long id = 1L;
-
-    Box box = makeEmptyBox();
-    when(scan.getRowCount()).thenReturn(box.getSize().getRows());
-    when(scan.getColumnCount()).thenReturn(box.getSize().getColumns());
-    when(boxScanner.getScan()).thenReturn(scan);
-    when(scan.getReadErrorPositions()).thenReturn(Arrays.asList("A01"));
-    when(boxService.get(1L)).thenReturn(box);
-
-    JSONObject json = new JSONObject();
-    json.put("boxId", id);
-    assertTrue(boxControllerHelperService.getBoxScan(null, json).getJSONArray("errors").size() > 0);
   }
 
   @Test
