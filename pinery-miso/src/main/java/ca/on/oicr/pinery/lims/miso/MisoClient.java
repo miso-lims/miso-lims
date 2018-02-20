@@ -329,7 +329,7 @@ public class MisoClient implements Lims {
       if (o != null) {
         Set<OrderSample> os = o.getSamples();
         if (os == null) {
-          os = new HashSet<OrderSample>();
+          os = new HashSet<>();
           o.setSample(os);
         }
         os.add(s);
@@ -351,7 +351,7 @@ public class MisoClient implements Lims {
       if (r != null) {
         Set<RunPosition> rp = r.getSamples();
         if (rp == null) {
-          rp = new HashSet<RunPosition>();
+          rp = new HashSet<>();
           r.setSample(rp);
         }
         rp.add(p);
@@ -406,7 +406,7 @@ public class MisoClient implements Lims {
         for (MisoRunPosition p : ps) {
           Set<RunSample> rs = p.getRunSample();
           if (rs == null) {
-            rs = new HashSet<RunSample>();
+            rs = new HashSet<>();
             p.setRunSample(rs);
           }
           rs.add(s);
@@ -456,7 +456,7 @@ public class MisoClient implements Lims {
         }
       }
     }
-    return new ArrayList<AttributeName>(map.values());
+    return new ArrayList<>(map.values());
   }
 
   @Override
@@ -487,7 +487,7 @@ public class MisoClient implements Lims {
       }
       ch.add(c);
     }
-    return new ArrayList<ChangeLog>(map.values());
+    return new ArrayList<>(map.values());
   }
 
   @Override
@@ -623,6 +623,7 @@ public class MisoClient implements Lims {
       r.setCompletionDate(rs.getDate("completionDate"));
       r.setReadLength(AttributeKey.READ_LENGTH.extractStringValueFrom(rs));
       r.setRunDirectory(rs.getString("filePath"));
+      r.setRunBasesMask(rs.getString("runBasesMask"));
 
       return r;
     }

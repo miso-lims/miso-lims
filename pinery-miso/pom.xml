@@ -14,7 +14,7 @@
     <mysql.db>lims</mysql.db>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
-    <pinery.version>2.1.1</pinery.version>
+    <pinery.version>2.2.0</pinery.version>
   </properties>
 
   <dependencies>
