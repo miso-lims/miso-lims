@@ -21,16 +21,18 @@
  * *********************************************************************
  */
 
-TileTarget.instrument_status = {
-  name: "Instrument Status",
-  transform: function(data) {
+PaneTarget.instrument_status = (function() {
+  var title = "Instrument Status";
+  var url = "/miso/rest/instrumentstatus";
+
+  var transform = function(data) {
     var isRunning = data.run && data.run.status === 'Running';
     return Tile.make([
-        Tile.title(data.instrument.name, isRunning ? Tile.statusBusy() : Tile.statusOk()),
-        Tile.lines(data.run ? [
-            data.run.name + ' (' + data.run.alias + ')',
-            (isRunning ? ("Busy since " + data.run.startDate) : ("Idle since " + data.run.endDate))
-                + (data.run.progress ? (" " + data.run.progress) : "")] : ["Idle"], false)], function() {
+      Tile.titleAndStatus(data.instrument.name, isRunning ? Tile.statusBusy() : Tile.statusOk()),
+      Tile.lines(data.run ? [
+        data.run.name + ' (' + data.run.alias + ')',
+        (isRunning ? ("Busy since " + data.run.startDate) : ("Idle since " + data.run.endDate))
+        + (data.run.progress ? (" " + data.run.progress) : "")] : ["Idle"], false)], function() {
       Utils.showWizardDialog(data.instrument.name, [{
         "name": "View Instrument (" + data.instrument.name + ")",
         "handler": function() {
@@ -51,7 +53,14 @@ TileTarget.instrument_status = {
           }
         };
       })));
-
     });
-  }
-};
+  };
+
+  return {
+    createPane: function(paneId) {
+      var divs = Pane.createPane(paneId, title);
+
+      Pane.updateTiles(divs.content, transform, url);
+    }
+  };
+})();

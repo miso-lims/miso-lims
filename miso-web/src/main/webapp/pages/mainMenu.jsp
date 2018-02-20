@@ -35,7 +35,9 @@
                  align="right"></div>
         </div>
 
-        <miso:tiles-ajax id="tiles_instrument_status" target="instrument_status" url="/miso/rest/instrumentstatus"/>
+        <miso:tiles-ajax id="tiles_barcode" target="barcode"/>
+        <miso:tiles-ajax id="tiles_instrument_status" target="instrument_status"/>
+
         <div class="dashboard_widget">
             <div class="widget_title ui-corner-top">
                 Project <input type="text" size="20" id="searchProject" name="searchProject"/>

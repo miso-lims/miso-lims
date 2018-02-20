@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static java.util.stream.Collectors.toList;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -51,5 +52,21 @@ public class HibernateBarcodableViewDao implements BarcodableViewDao {
     Predicate<BarcodableView> matchesTypeFilter = barcodableView -> typeFilter.contains(barcodableView.getId().getTargetType());
 
     return searchByBarcode(barcode).stream().filter(matchesTypeFilter).collect(toList());
+  }
+
+  @Override
+  public List<BarcodableView> search(String query) {
+    if (isStringEmptyOrNull(query))
+      throw new IllegalArgumentException("Search is empty");
+
+    @SuppressWarnings("unchecked")
+    List<BarcodableView> results = currentSession().createCriteria(BarcodableView.class)
+        .add(Restrictions.or(
+                Restrictions.eq("identificationBarcode", query),
+                Restrictions.eq("alias", query),
+                Restrictions.eq("name", query)))
+        .list();
+
+    return results;
   }
 }

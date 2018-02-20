@@ -19,18 +19,15 @@ package uk.ac.bbsrc.tgac.miso.webapp.util.form;
 import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
 @SuppressWarnings("serial")
-public class TileAjaxTag extends RequestContextAwareTag {
+public class PaneAjaxTag extends RequestContextAwareTag {
 
   private String target;
 
-  private String url;
-
   @Override
   protected int doStartTagInternal() throws Exception {
-
     pageContext.getOut().append(String.format(
-        "<div id='%1$s'></div><script type='text/javascript'>jQuery(document).ready(function () { Tile.createPaneAjax('%1$s', TileTarget.%2$s, '%3$s');});</script>",
-        getId(), target, url));
+        "<div id='%1$s'></div><script type='text/javascript'>jQuery(document).ready(function () { PaneTarget.%2$s.createPane('%1$s');});</script>",
+        getId(), target));
     return SKIP_BODY;
   }
 
@@ -38,15 +35,7 @@ public class TileAjaxTag extends RequestContextAwareTag {
     return target;
   }
 
-  public String getUrl() {
-    return url;
-  }
-
   public void setTarget(String target) {
     this.target = target;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
   }
 }
