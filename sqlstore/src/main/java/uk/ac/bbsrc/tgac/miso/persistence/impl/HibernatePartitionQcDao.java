@@ -26,6 +26,7 @@ public class HibernatePartitionQcDao implements PartitionQcStore {
 
   @Override
   public void create(PartitionQC qc) throws IOException {
+    currentSession().flush(); // required to update related entity lastModifiers for changelogs
     currentSession().save(qc);
   }
 
@@ -64,6 +65,7 @@ public class HibernatePartitionQcDao implements PartitionQcStore {
 
   @Override
   public void update(PartitionQC managedQc) throws IOException {
+    currentSession().flush(); // required to update related entity lastModifiers for changelogs
     currentSession().update(managedQc);
   }
 
