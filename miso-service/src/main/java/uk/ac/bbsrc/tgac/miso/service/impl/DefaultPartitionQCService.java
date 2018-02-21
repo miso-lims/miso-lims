@@ -52,9 +52,15 @@ public class DefaultPartitionQCService implements PartitionQCService {
     PartitionQC managedQc = get(qc.getRun(), qc.getPartition());
     Run managedRun = runService.get(qc.getRun().getId());
     authorizationManager.throwIfNotWritable(managedRun);
+    Partition managedPartition = containerService.getPartition(qc.getPartition().getId());
+
+    // update run and container for accurate lastModified and lastModifier (used in changelogs)
+    runService.update(managedRun);
+    containerService.update(managedPartition.getSequencerPartitionContainer());
+
     if (managedQc == null) {
       qc.setRun(managedRun);
-      qc.setPartition(containerService.getPartition(qc.getPartition().getId()));
+      qc.setPartition(managedPartition);
       qc.setType(getType(qc.getType().getId()));
       partitionQcDao.create(qc);
     } else {
