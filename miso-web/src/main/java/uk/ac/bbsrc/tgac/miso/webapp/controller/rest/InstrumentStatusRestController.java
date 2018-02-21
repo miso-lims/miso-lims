@@ -64,8 +64,8 @@ public class InstrumentStatusRestController extends RestController {
             aDate = a.getRun().getStartDate();
             bDate = b.getRun().getStartDate();
           } else {
-            aDate = a.getRun() == null ? new Date(0L) : a.getRun().getCompletionDate();
-            bDate = b.getRun() == null ? new Date(0L) : b.getRun().getCompletionDate();
+            aDate = a.getRun() == null || a.getRun().getCompletionDate() == null ? new Date(0L) : a.getRun().getCompletionDate();
+            bDate = b.getRun() == null || b.getRun().getCompletionDate() == null ? new Date(0L) : b.getRun().getCompletionDate();
           }
           return bDate.compareTo(aDate);
         })//
