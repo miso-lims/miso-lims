@@ -34,7 +34,7 @@ import java.io.Serializable;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Partition extends Identifiable, Comparable<Partition>, Deletable, Serializable {
+public interface Partition extends Identifiable, Comparable<Partition>, Serializable {
   /**
    * Returns the sequencerPartitionContainer of this Partition object.
    * 

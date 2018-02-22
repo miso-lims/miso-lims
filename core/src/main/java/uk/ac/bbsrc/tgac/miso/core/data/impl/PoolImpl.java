@@ -67,6 +67,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -186,8 +187,8 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public EntityType getEntityType() {
-    return EntityType.POOL;
+  public Boxable.EntityType getEntityType() {
+    return Boxable.EntityType.POOL;
   }
 
   @Override
@@ -403,11 +404,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
     } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }
-
-  @Override
-  public boolean isDeletable() {
-    return getId() != PoolImpl.UNSAVED_ID && getPoolableElementViews().isEmpty();
   }
 
   @Override

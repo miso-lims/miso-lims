@@ -61,7 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  */
 @Entity
 @Table(name = "Experiment")
-public class Experiment implements SecurableByProfile, Comparable<Experiment>, Deletable, Nameable, ChangeLoggable, Serializable {
+public class Experiment implements SecurableByProfile, Comparable<Experiment>, Nameable, ChangeLoggable, Serializable {
   @Entity
   @Embeddable
   @Table(name = "Experiment_Run_Partition")
@@ -304,12 +304,6 @@ public class Experiment implements SecurableByProfile, Comparable<Experiment>, D
     } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }
-
-  @Override
-  @CoverageIgnore
-  public boolean isDeletable() {
-    return getId() != UNSAVED_ID;
   }
 
   public void setAccession(String accession) {

@@ -28,7 +28,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Set;
 
-public interface Instrument extends Nameable, Deletable, Serializable {
+public interface Instrument extends Nameable, Serializable {
 
   public void setId(Long id);
 

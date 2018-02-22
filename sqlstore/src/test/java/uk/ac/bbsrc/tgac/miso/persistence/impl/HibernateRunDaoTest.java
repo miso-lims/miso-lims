@@ -256,21 +256,6 @@ public class HibernateRunDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testRemove() throws IOException, MisoNamingException {
-    Run run = makeRun("RunAlias");
-
-    long runId = dao.save(run);
-    Run insertedRun = dao.get(runId);
-    assertNotNull(insertedRun);
-
-    runId = dao.save(insertedRun);
-
-    Run changedRun = dao.get(runId);
-    assertTrue(dao.remove(changedRun));
-    assertNull(dao.get(changedRun.getId()));
-  }
-
-  @Test
   public void testSaveEdit() throws IOException, MisoNamingException {
     Run run = dao.get(1L);
 

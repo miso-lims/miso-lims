@@ -35,7 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface ExperimentStore extends Store<Experiment>, Remover<Experiment> {
+public interface ExperimentStore extends Store<Experiment> {
   /**
    * List all Experiments that match a search criteria
    * 

@@ -383,11 +383,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public boolean isDeletable() {
-    return getId() != AbstractSample.UNSAVED_ID && getLibraries().isEmpty() && getNotes().isEmpty() && getQCs().isEmpty();
-  }
-
-  @Override
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
   }

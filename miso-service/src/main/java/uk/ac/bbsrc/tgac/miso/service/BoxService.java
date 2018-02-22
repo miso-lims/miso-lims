@@ -20,8 +20,6 @@ public interface BoxService extends PaginatedDataSource<Box>, BarcodableService 
     return EntityType.BOX;
   }
 
-  public void deleteBox(Box box) throws IOException;
-
   public void discardAllTubes(Box box) throws IOException;
 
   public void discardSingleTube(Box box, String position) throws IOException;

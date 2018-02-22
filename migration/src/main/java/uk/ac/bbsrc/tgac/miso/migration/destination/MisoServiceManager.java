@@ -514,7 +514,7 @@ public class MisoServiceManager {
     svc.setTissueMaterialDao(tissueMaterialDao);
     svc.setTissueOriginDao(tissueOriginDao);
     svc.setTissueTypeDao(tissueTypeDao);
-    svc.setSampleDao(sampleDao);
+    svc.setSampleStore(sampleDao);
     svc.setLabService(labService);
     setSampleService(svc);
   }
@@ -541,7 +541,7 @@ public class MisoServiceManager {
   }
 
   private void updateSampleDaoDependencies() {
-    if (sampleService != null) sampleService.setSampleDao(sampleDao);
+    if (sampleService != null) sampleService.setSampleStore(sampleDao);
   }
 
   public HibernateChangeLogDao getChangeLogDao() {

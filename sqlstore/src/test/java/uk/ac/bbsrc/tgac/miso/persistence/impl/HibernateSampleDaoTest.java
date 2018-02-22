@@ -144,16 +144,6 @@ public class HibernateSampleDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testRemove() throws Exception {
-
-    Sample sample = dao.get(7);
-
-    assertTrue(dao.remove(sample));
-    assertNull(dao.get(7));
-
-  }
-
-  @Test
   public void testGet() throws Exception {
     Sample sample = dao.get(3);
     assertNotNull(sample);

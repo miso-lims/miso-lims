@@ -64,14 +64,6 @@ public class DefaultExperimentService implements ExperimentService, NamingScheme
   private RunService runService;
 
   @Override
-  public void delete(Experiment experiment) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    if (!experimentStore.remove(experiment)) {
-      throw new IOException("Unable to delete Experiment. Make sure the experiment has no child entitites.");
-    }
-  }
-
-  @Override
   public Experiment get(long experimentId) throws IOException {
     Experiment o = experimentStore.get(experimentId);
     authorizationManager.throwIfNotReadable(o);

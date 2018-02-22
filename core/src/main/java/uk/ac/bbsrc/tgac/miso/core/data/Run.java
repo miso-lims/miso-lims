@@ -78,7 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @Table(name = "Run")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Run
-    implements SecurableByProfile, Comparable<Run>, Watchable, Deletable, Nameable, ChangeLoggable, Aliasable,
+    implements SecurableByProfile, Comparable<Run>, Watchable, Nameable, ChangeLoggable, Aliasable,
     Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -370,11 +370,6 @@ public abstract class Run
     } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }
-
-  @Override
-  public boolean isDeletable() {
-    return getId() != Run.UNSAVED_ID;
   }
 
   public boolean isFull() {

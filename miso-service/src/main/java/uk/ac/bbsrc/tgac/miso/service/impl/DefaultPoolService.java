@@ -142,14 +142,6 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
   }
 
   @Override
-  public void delete(Pool pool) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    if (!poolStore.remove(pool)) {
-      throw new IOException("Unable to delete Pool.");
-    }
-  }
-
-  @Override
   public void deleteNote(Pool pool, Long noteId) throws IOException {
     if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
       throw new IllegalArgumentException("Cannot delete an unsaved Note");

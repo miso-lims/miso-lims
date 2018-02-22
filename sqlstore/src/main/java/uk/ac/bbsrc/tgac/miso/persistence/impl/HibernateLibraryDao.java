@@ -135,18 +135,6 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public boolean remove(Library library) throws IOException {
-    if (library.isDeletable()) {
-      currentSession().delete(library);
-      Library testIfExists = get(library.getId());
-
-      return testIfExists == null;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public Library getByBarcode(String barcode) throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryImpl.class);
     criteria.add(Restrictions.eq("identificationBarcode", barcode));

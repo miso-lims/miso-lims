@@ -311,13 +311,6 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     }
   }
 
-  @Override
-  public void delete(Long runId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Run run = get(runId);
-    runDao.remove(run);
-  }
-
   /**
    * Loads persisted objects into run fields. Should be called before saving or updating. Loads all fields except for:
    * <ul>

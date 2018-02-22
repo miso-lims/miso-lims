@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.InstrumentStore;
@@ -146,18 +144,6 @@ public class DefaultInstrumentService implements InstrumentService {
   public void deleteServiceRecord(long recordId) throws IOException {
     authorizationManager.throwIfNonAdmin();
     serviceRecordDao.remove(getServiceRecord(recordId));
-  }
-
-  @Override
-  public void delete(long instrumentId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Collection<Run> attachedRuns = runService.listByInstrumentId(instrumentId);
-    if (attachedRuns.isEmpty()) {
-      instrumentDao.remove(get(instrumentId));
-    } else {
-      throw new ConstraintViolationException("Cannot delete sequencer since runs are still associated.", null,
-          "sequencer");
-    }
   }
 
   public void setInstrumentDao(InstrumentStore instrumentDao) {

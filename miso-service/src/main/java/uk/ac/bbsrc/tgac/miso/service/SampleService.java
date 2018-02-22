@@ -31,8 +31,6 @@ public interface SampleService extends PaginatedDataSource<Sample>, BarcodableSe
 
   List<Sample> getByAlias(String alias) throws IOException;
 
-  void delete(Long sampleId) throws IOException;
-
   Long countAll() throws IOException;
 
   Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException;

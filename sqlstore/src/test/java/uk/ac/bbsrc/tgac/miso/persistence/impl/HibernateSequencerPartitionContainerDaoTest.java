@@ -178,19 +178,6 @@ public class HibernateSequencerPartitionContainerDaoTest extends AbstractDAOTest
     assertEquals(newSPC.getIdentificationBarcode(), savedSPC.getIdentificationBarcode());
   }
 
-  @Test
-  public void testRemove() throws IOException {
-    SequencerPartitionContainer spc = makeSPC("ABCDEFXX");
-    assertEquals(SequencerPartitionContainerImpl.UNSAVED_ID, spc.getId());
-    dao.save(spc);
-    assertNotEquals(SequencerPartitionContainerImpl.UNSAVED_ID, spc.getId());
-    SequencerPartitionContainer insertedSpc = dao.get(spc.getId());
-    assertNotNull(insertedSpc);
-
-    assertTrue(dao.remove(spc));
-    assertNull(dao.get(insertedSpc.getId()));
-  }
-
   private SequencerPartitionContainer makeSPC(String identificationBarcode) throws IOException {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     SequencerPartitionContainer pc = new SequencerPartitionContainerImpl();

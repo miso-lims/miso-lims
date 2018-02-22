@@ -41,7 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PoolStore extends Store<Pool>, Remover<Pool>, PaginatedDataSource<Pool> {
+public interface PoolStore extends Store<Pool>, PaginatedDataSource<Pool> {
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Library} by means of that Library's

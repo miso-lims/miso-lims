@@ -186,8 +186,8 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   private Date receivedDate;
 
   @Override
-  public EntityType getEntityType() {
-    return EntityType.LIBRARY;
+  public Boxable.EntityType getEntityType() {
+    return Boxable.EntityType.LIBRARY;
   }
 
   @Override
@@ -458,12 +458,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @Override
   public Long getPreMigrationId() {
     return null;
-  }
-
-  @CoverageIgnore
-  @Override
-  public boolean isDeletable() {
-    return getId() != AbstractLibrary.UNSAVED_ID && getLibraryDilutions().isEmpty();
   }
 
   @CoverageIgnore
