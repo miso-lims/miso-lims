@@ -18,7 +18,7 @@ The more search terms, the longer the search will take.
 
 “has:” can be substituted for “is:”
 
-Legend: 🔵 fully implemented ; ⚪ partially implemented; see 'Meaning' for details
+Legend: 🔷 fully implemented in all versions; 🔹 only available in Detailed Samples; ⚪ some exceptions: see 'Meaning' for details
 
 <table>
 <tr>
@@ -38,10 +38,10 @@ Legend: 🔵 fully implemented ; ⚪ partially implemented; see 'Meaning' for de
   <td name='samples'></td>
   <td name='libraries'></td>
   <td name='dilutions'></td>
-  <td name='pool'>🔵</td>
+  <td name='pool'>🔷</td>
   <td name='run'></td>
   <td name='container'></td>
-  <td name='ordercomp'>🔵</td>
+  <td name='ordercomp'>🔷</td>
 </tr>
 <tr>
   <td name='syntax'>is:active<br/>is:order</td>
@@ -49,10 +49,10 @@ Legend: 🔵 fully implemented ; ⚪ partially implemented; see 'Meaning' for de
   <td name='samples'></td>
   <td name='libraries'></td>
   <td name='dilutions'></td>
-  <td name='pool'>🔵</td>
+  <td name='pool'>🔷</td>
   <td name='run'></td>
   <td name='container'></td>
-  <td name='ordercomp'>🔵</td>
+  <td name='ordercomp'>🔷</td>
 </tr>
   <tr>
     <td name='syntax'>is:unknown<br/>is:complete<br/>is:completed<br/>is:failed<br/>is:started<br/>is:stopped<br/>is:running</td>
@@ -61,9 +61,9 @@ Legend: 🔵 fully implemented ; ⚪ partially implemented; see 'Meaning' for de
     <td name='libraries'></td>
     <td name='dilutions'></td>
     <td name='pool'></td>
-    <td name='run'>🔵</td>
+    <td name='run'>🔷</td>
     <td name='container'></td>
-    <td name='ordercomp'>🔵</td>
+    <td name='ordercomp'>🔷</td>
   </tr>
 <tr>
   <td name='syntax'>is:incomplete</td>
@@ -72,39 +72,39 @@ Legend: 🔵 fully implemented ; ⚪ partially implemented; see 'Meaning' for de
   <td name='libraries'></td>
   <td name='dilutions'></td>
   <td name='pool'></td>
-  <td name='run'>🔵</td>
+  <td name='run'>🔷</td>
   <td name='container'></td>
-  <td name='ordercomp'>🔵</td>
+  <td name='ordercomp'>🔷</td>
 </tr>
 
 <tr>
-  <td name='syntax'>created:<a href="#dates">DATE</a><br/>createdon:<a href="#dates">DATE</a></td>
+  <td name='syntax'>created:<a href="#date">DATE</a><br/>createdon:<a href="#date">DATE</a></td>
 <td name='meaning'>Checks when this item was entered into MISO.</td>
-<td name='samples'>🔵</td>
-<td name='libraries'>🔵</td>
-<td name='dilutions'>🔵</td>
-<td name='pool'>🔵</td>
-<td name='run'>🔵</td>
-<td name='container'>🔵</td>
+<td name='samples'>🔷</td>
+<td name='libraries'>🔷</td>
+<td name='dilutions'>🔷</td>
+<td name='pool'>🔷</td>
+<td name='run'>🔷</td>
+<td name='container'>🔷</td>
 <td name='ordercomp'></td>
 </tr>
 
 <tr>
-  <td name='syntax'>changed:<a href="#dates">DATE</a><br/>modified:<a href="#dates">DATE</a><br/>updated:<a href="#dates">DATE</a><br/>changedon:<a href="#dates">DATE</a><br/>modifiedon:<a href="#dates">DATE</a><br/>updatedon:<a href="#dates">DATE</a></td>
+  <td name='syntax'>changed:<a href="#date">DATE</a><br/>modified:<a href="#date">DATE</a><br/>updated:<a href="#date">DATE</a><br/>changedon:<a href="#date">DATE</a><br/>modifiedon:<a href="#date">DATE</a><br/>updatedon:<a href="#date">DATE</a></td>
 <td name='meaning'>Checks when any person last edited this item.</td>
-<td name='samples'>🔵</td>
-<td name='libraries'>🔵</td>
-<td name='dilutions'>🔵</td>
-<td name='pool'>🔵</td>
-<td name='run'>🔵</td>
-<td name='container'>🔵</td>
-<td name='ordercomp'>🔵</td>
+<td name='samples'>🔷</td>
+<td name='libraries'>🔷</td>
+<td name='dilutions'>🔷</td>
+<td name='pool'>🔷</td>
+<td name='run'>🔷</td>
+<td name='container'>🔷</td>
+<td name='ordercomp'>🔷</td>
 </tr>
 
 <tr>
-  <td name='syntax'>received:<a href="#dates">DATE</a><br/>recieved:<a href="#dates">DATE</a><br/>receivedon:<a href="#dates">DATE</a><br/>recievedon:<a href="#dates">DATE</a></td>
+  <td name='syntax'>received:<a href="#date">DATE</a><br/>recieved:<a href="#date">DATE</a><br/>receivedon:<a href="#date">DATE</a><br/>recievedon:<a href="#date">DATE</a></td>
   <td name='meaning'>Checks whether this item has a received date that matches the provided date.</td>
-  <td name='samples'>🔵</td>
+  <td name='samples'>🔷</td>
   <td name='libraries'></td>
   <td name='dilutions'></td>
   <td name='pool'></td>
@@ -116,51 +116,51 @@ Legend: 🔵 fully implemented ; ⚪ partially implemented; see 'Meaning' for de
 <tr>
   <td name='syntax'>createdby:<a href="#user">USER</a><br/>creator:<a href="#user">USER</a><br/>creater:<a href="#user">USER</a></td>
   <td name='meaning'>Check for items entered into MISO by a particular user.</td>
-  <td name='samples'>🔵</td>
-  <td name='libraries'>🔵</td>
-  <td name='dilutions'>🔵</td>
-  <td name='pool'>🔵</td>
-  <td name='run'>🔵</td>
-  <td name='container'>🔵</td>
+  <td name='samples'>🔷</td>
+  <td name='libraries'>🔷</td>
+  <td name='dilutions'>🔷</td>
+  <td name='pool'>🔷</td>
+  <td name='run'>🔷</td>
+  <td name='container'>🔷</td>
   <td name='ordercomp'></td>
 </tr>
 <tr>
   <td name='syntax'>changedby:<a href="#user">USER</a><br/>modifier:<a href="#user">USER</a><br/>updater:<a href="#user">USER</a></td>
   <td name='meaning'>Checks for the last person to edit this item in MISO.</td>
-  <td name='samples'>🔵</td>
-  <td name='libraries'>🔵</td>
-  <td name='dilutions'>🔵</td>
-  <td name='pool'>🔵</td>
-  <td name='run'>🔵</td>
-  <td name='container'>🔵</td>
+  <td name='samples'>🔷</td>
+  <td name='libraries'>🔷</td>
+  <td name='dilutions'>🔷</td>
+  <td name='pool'>🔷</td>
+  <td name='run'>🔷</td>
+  <td name='container'>🔷</td>
   <td name='ordercomp'></td>
 </tr>
 <tr>
   <td name='syntax'>platform:PLATFORM</td>
   <td name='meaning'>Check if this item is meant for a particular platform type: ILLUMINA, LS454, SOLID, IONTORRENT, PACBIO, OXFORDNANOPORE.</td>
   <td name='samples'></td>
-  <td name='libraries'>🔵</td>
-  <td name='dilutions'>🔵</td>
-  <td name='pool'>🔵</td>
-  <td name='run'>🔵</td>
-  <td name='container'>🔵</td>
-  <td name='ordercomp'>🔵</td>
+  <td name='libraries'>🔷</td>
+  <td name='dilutions'>🔷</td>
+  <td name='pool'>🔷</td>
+  <td name='run'>🔷</td>
+  <td name='container'>🔷</td>
+  <td name='ordercomp'>🔷</td>
 </tr>
 <tr>
   <td name='syntax'>index:<a href="#name">NAME</a><br/>index:SEQ</td>
   <td name='meaning'>Checks if this item has the index provided. The index can be a name or a DNA sequence. The sequence must be an exact match.</td>
   <td name='samples'></td>
-  <td name='libraries'>🔵</td>
-  <td name='dilutions'>🔵</td>
-  <td name='pool'>🔵</td>
-  <td name='run'>🔵</td>
-  <td name='container'>🔵</td>
-  <td name='ordercomp'>🔵</td>
+  <td name='libraries'>🔷</td>
+  <td name='dilutions'>🔷</td>
+  <td name='pool'>🔷</td>
+  <td name='run'>🔷</td>
+  <td name='container'>🔷</td>
+  <td name='ordercomp'>🔷</td>
 </tr>
 <tr>
   <td name='syntax'>class:<a href="#name">NAME</a></td>
-  <td name='meaning'>Check if the item belong to the sample class provided.</td>
-  <td name='samples'>🔵</td>
+  <td name='meaning'>Check if the item belongs to the sample class provided.</td>
+  <td name='samples'>🔹</td>
   <td name='libraries'></td>
   <td name='dilutions'></td>
   <td name='pool'></td>
@@ -171,9 +171,9 @@ Legend: 🔵 fully implemented ; ⚪ partially implemented; see 'Meaning' for de
 <tr>
   <td name='syntax'>institute:<a href="#name">NAME</a><br/>inst:<a href="#name">NAME</a></td>
   <td name='meaning'>Check if the item came from the institute mentioned. Currently, this only matches identities. It will be expanded in future.</td>
-  <td name='samples'>⚪</td>
-  <td name='libraries'>⚪</td>
-  <td name='dilutions'>⚪</td>
+  <td name='samples'>🔹⚪</td>
+  <td name='libraries'>🔹⚪</td>
+  <td name='dilutions'>🔹⚪</td>
   <td name='pool'></td>
   <td name='run'></td>
   <td name='container'></td>
@@ -182,9 +182,9 @@ Legend: 🔵 fully implemented ; ⚪ partially implemented; see 'Meaning' for de
 <tr>
   <td name='syntax'>external:<a href="#name">NAME</a><br/>ext:<a href="#name">NAME</a><br/>extern:<a href="#name">NAME</a></td>
   <td name='meaning'>Checks if an item came from the external identifier or external name. Currently, this only matches identities and tissues. It will be expanded in future.</td>
-  <td name='samples'>⚪</td>
-  <td name='libraries'>⚪</td>
-  <td name='dilutions'>⚪</td>
+  <td name='samples'>🔹⚪</td>
+  <td name='libraries'>🔹⚪</td>
+  <td name='dilutions'>🔹⚪</td>
   <td name='pool'></td>
   <td name='run'></td>
   <td name='container'></td>
@@ -193,10 +193,10 @@ Legend: 🔵 fully implemented ; ⚪ partially implemented; see 'Meaning' for de
 <tr>
   <td name='syntax'>box:<a href="#name">NAME</a></td>
   <td name='meaning'>	Checks if an item is located in a particular box. The name can either be the partial name or partial alias of the box.</td>
-  <td name='samples'>🔵</td>
-  <td name='libraries'>🔵</td>
-  <td name='dilutions'>🔵</td>
-  <td name='pool'>🔵</td>
+  <td name='samples'>🔷</td>
+  <td name='libraries'>🔷</td>
+  <td name='dilutions'>🔷</td>
+  <td name='pool'>🔷</td>
   <td name='run'></td>
   <td name='container'></td>
   <td name='ordercomp'></td>
@@ -205,7 +205,7 @@ Legend: 🔵 fully implemented ; ⚪ partially implemented; see 'Meaning' for de
 
 # Formats
 
-Many of the expressions above use <a href="#dates">DATE</a>, <a href="#name">NAME</a>, or <a href="#user">USER</a>. The formats are defined below.
+Many of the expressions above use <a href="#date">DATE</a>, <a href="#name">NAME</a>, or <a href="#user">USER</a>. The formats are defined below.
 
 <a name="date">
 ## DATE

@@ -1,12 +1,12 @@
 ---
 layout: page
-title: "Administrator's Guide"
+title: "Administrator's Manual"
 category: adm
 date: 2016-01-11 13:51:46
 order: 2
 ---
 
-This guide container instructions to facilitate day-to-day running MISO at your institution. See the [installation guides](installation-guide) if you need to set up your instance.
+This guide container instructions to facilitate day-to-day running MISO at your institution. See [Building and Deploying](installation-guide) if you need to set up your instance.
 
 
 # Adding Value-Type Data
@@ -150,3 +150,9 @@ For example, to add a targeted sequencing panel for a library kit of the same na
 CALL addTargetedSequencing('Agilent SureSelectXT MethylSeq', 'Agilent SureSelectXT panel for methyl seq', 'Agilent SureSelectXT MethylSeq', 0);
 ```
 Note: the library kit must already exist in MISO.
+
+
+
+# Upgrading to the latest version.
+
+To upgrade MISO to the latest version, follow the upgrading instructions in [Building and Deploying](installation-guide#upgrading).

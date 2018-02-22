@@ -35,7 +35,7 @@ When `UNAUTHENTICATED_MODE` is set to `true` the following message will be displ
 
 Postman is a browser extension to test and exercise REST web service APIs. Postman can be downloaded here: [https://www.getpostman.com/](https://www.getpostman.com/)
 
-Here is a collection of MISO REST urls in the file [miso-rest.json.postman_collection](/download/attachments/10420483/miso-rest.json.postman_collection?version=1&modificationDate=1449691946000&api=v2) that you can download and import into Postman. The url (host and port) is specified as a Postman environment variable so you will need to set one up as will in order to use these urls.
+<!--Here is a collection of MISO REST urls in the file [miso-rest.json.postman_collection](/download/attachments/10420483/miso-rest.json.postman_collection?version=1&modificationDate=1449691946000&api=v2) that you can download and import into Postman. The url (host and port) is specified as a Postman environment variable so you will need to set one up as will in order to use these urls.
 
 Here an environment called "localhost" has been created. It contains one environment variable "url" which in this case has the value "http://localhost:8080". When setting this up make sure the value points to the particular instance of MISO being tested.
- ![Postman]({{ site.baseurl }}/images/postman.png)
+ ![Postman]({{ site.baseurl }}/images/postman.png)-->

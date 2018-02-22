@@ -35,4 +35,4 @@ Use IDE automatic formatting features to configure code according to the MISO co
 
 ### Eclipse
 
-A set of Eclipse code formatting rules is available to automatically format code when using Eclipse. Follow the guide named [Eclipse Code Formatting](/display/MISO/Eclipse+Code+Formatting) to setup the MISO coding standards.
+A set of Eclipse code formatting rules is available to automatically format code when using Eclipse. Follow the guide named [Eclipse Code Formatting](eclipse-code-formatting) to setup the MISO coding standards.
