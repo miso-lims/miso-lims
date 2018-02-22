@@ -1768,6 +1768,7 @@ public class Dtos {
     to.setImgCycle(from.getImgCycle());
     to.setCallCycle(from.getCallCycle());
     to.setScoreCycle(from.getScoreCycle());
+    to.setRunBasesMask(from.getRunBasesMask());
   }
 
   private static void setCommonRunValues(NotificationDto from, Run to) {
