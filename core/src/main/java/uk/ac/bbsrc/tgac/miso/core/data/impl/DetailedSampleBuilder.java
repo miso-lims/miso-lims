@@ -682,11 +682,6 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public boolean isDeletable() {
-    return false;
-  }
-
-  @Override
   public Box getBox() {
     return null;
   }

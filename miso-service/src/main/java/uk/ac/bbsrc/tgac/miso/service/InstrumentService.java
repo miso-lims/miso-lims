@@ -39,5 +39,4 @@ public interface InstrumentService extends PaginatedDataSource<Instrument> {
 
   void deleteServiceRecord(long recordId) throws IOException;
 
-  void delete(long instrumentId) throws IOException;
 }

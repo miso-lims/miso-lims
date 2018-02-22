@@ -236,36 +236,6 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testRemove() throws Exception {
-    Library library = new LibraryImpl();
-    String libraryName = "LIB111";
-    library.setName(libraryName);
-    library.setAlias("libraryAlias");
-    library.setDescription("test");
-    library.setSample(new SampleImpl());
-    library.getSample().setId(1L);
-    library.setPaired(true);
-    library.setPlatformType(PlatformType.ILLUMINA);
-    library.setLibraryType(dao.getLibraryTypeById(1L));
-    library.setLibrarySelectionType(dao.getLibrarySelectionTypeById(1L));
-    library.setLibraryStrategyType(dao.getLibraryStrategyTypeById(1L));
-    User emptyUser = new UserImpl();
-    emptyUser.setUserId(1L);
-    library.setCreator(emptyUser);
-    library.setLastModifier(emptyUser);
-    Date now = new Date();
-    library.setCreationTime(now);
-    library.setLastModified(now);
-
-    long libraryId = dao.save(library);
-    Library insertedLibrary = dao.get(libraryId);
-
-    assertNotNull(insertedLibrary);
-    assertTrue(dao.remove(insertedLibrary));
-    assertNull(dao.get(libraryId));
-  }
-
-  @Test
   public void testGetLibraryTypeById() throws Exception {
     LibraryType libraryTypeById = dao.getLibraryTypeById(5);
 

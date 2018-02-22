@@ -29,8 +29,6 @@ public interface LibraryService extends PaginatedDataSource<Library>, Barcodable
 
   void update(Library library) throws IOException;
 
-  boolean delete(Library library) throws IOException;
-
   int count() throws IOException;
 
   long countBySearch(String querystr) throws IOException;

@@ -181,14 +181,6 @@ public class DefaultLibraryService implements LibraryService, AuthorizedPaginate
   }
 
   @Override
-  public boolean delete(Library library) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Library managed = get(library.getId());
-    managed.getSample().getLibraries().remove(managed);
-    return libraryDao.remove(managed);
-  }
-
-  @Override
   public int count() throws IOException {
     return libraryDao.count();
   }

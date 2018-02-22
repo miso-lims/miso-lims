@@ -3,8 +3,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.util.Collection;
 
 import org.hibernate.SessionFactory;
@@ -20,8 +18,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class HibernateInstrumentDaoTest extends AbstractDAOTest {
@@ -53,27 +49,6 @@ public class HibernateInstrumentDaoTest extends AbstractDAOTest {
   public void testListAll() throws IOException {
     Collection<Instrument> instruments = dao.listAll();
     assertEquals(PlatformType.ILLUMINA, instruments.iterator().next().getPlatform().getPlatformType());
-  }
-
-  @Test
-  public void testSaveNew() throws Exception {
-    String serialNumber = "F00";
-    Platform platform = dao.get(1L).getPlatform();
-    InetAddress address = Inet4Address.getLoopbackAddress();
-    Instrument instrument = new InstrumentImpl("foo", address.getHostAddress(), platform);
-    instrument.setSerialNumber(serialNumber);
-
-    int sizeBefore = dao.listAll().size();
-    long id = dao.save(instrument);
-    Instrument retrieved = dao.get(id);
-    assertEquals("did not insert instrument", sizeBefore + 1, dao.listAll().size());
-    assertEquals("instrument name does not match", "foo", retrieved.getName());
-    assertEquals("instrument address does not match", address.getHostAddress(), retrieved.getIpAddress());
-    assertEquals("instrument date decommissioned does not match", null, retrieved.getDateDecommissioned());
-    assertEquals("instrument platform does not match", platform.getId(), retrieved.getPlatform().getId());
-
-    assertTrue(dao.remove(retrieved));
-    assertNull(dao.get(id));
   }
 
   @Test

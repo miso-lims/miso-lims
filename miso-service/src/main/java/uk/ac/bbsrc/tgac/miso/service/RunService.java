@@ -60,8 +60,6 @@ public interface RunService extends PaginatedDataSource<Run> {
    */
   Run getLatestRunBySequencerPartitionContainerId(long containerId) throws IOException, AuthorizationException;
 
-  void delete(Long runId) throws IOException;
-
   void addRunWatcher(Run run, User watcher) throws IOException;
 
   void removeRunWatcher(Run run, User watcher) throws IOException;

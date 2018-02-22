@@ -19,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FlowCellVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
@@ -71,19 +71,6 @@ public class HibernateSequencerPartitionContainerDao
     long c = (Long) currentSession().createCriteria(SequencerPartitionContainerImpl.class).setProjection(Projections.rowCount())
         .uniqueResult();
     return (int) c;
-  }
-
-  @Override
-  public boolean remove(SequencerPartitionContainer spc) throws IOException {
-    if (spc.isDeletable()) {
-      Long spcId = spc.getId();
-      currentSession().delete(spc);
-
-      SequencerPartitionContainer testIfExists = get(spcId);
-      return testIfExists == null;
-    } else {
-      return false;
-    }
   }
 
   @Override

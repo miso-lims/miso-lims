@@ -207,16 +207,6 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public boolean remove(Box box) throws IOException {
-    if (box.getId() != AbstractBox.UNSAVED_ID) {
-      Box persisted = (Box) currentSession().merge(box);
-      currentSession().delete(persisted);
-      return true;
-    }
-    return false;
-  }
-
-  @Override
   public void removeBoxableFromBox(Boxable boxable) throws IOException {
     Long boxId = boxable.getBox() == null ? null : boxable.getBox().getId();
     removeBoxableFromBox(boxId, boxable.getBoxPosition());

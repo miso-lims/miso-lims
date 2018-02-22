@@ -154,11 +154,6 @@ public class BoxImpl extends AbstractBox {
   public void removeAllBoxables() {
     boxableViews.clear();
   }
-
-  @Override
-  public boolean isDeletable() {
-    return true;
-  }
   
   @Override
   public String toString() {

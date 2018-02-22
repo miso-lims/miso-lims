@@ -76,18 +76,6 @@ public class HibernateLibraryDilutionDao
   }
 
   @Override
-  public boolean remove(LibraryDilution dilution) throws IOException {
-    if (dilution.isDeletable()) {
-      currentSession().delete(dilution);
-      LibraryDilution testIfExists = get(dilution.getId());
-
-      return testIfExists == null;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public int count() throws IOException {
     Criteria criteria = currentSession().createCriteria(LibraryDilution.class);
     return ((Long) criteria.setProjection(Projections.rowCount()).uniqueResult()).intValue();

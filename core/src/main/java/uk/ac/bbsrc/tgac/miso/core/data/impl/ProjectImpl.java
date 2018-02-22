@@ -288,11 +288,6 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public boolean isDeletable() {
-    return getId() != UNSAVED_ID && getSamples().isEmpty() && getStudies().isEmpty();
-  }
-
-  @Override
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
   }

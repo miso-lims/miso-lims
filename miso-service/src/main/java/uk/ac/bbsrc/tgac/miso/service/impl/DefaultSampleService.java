@@ -49,13 +49,13 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.TissueOriginDao;
 import uk.ac.bbsrc.tgac.miso.core.store.TissueTypeDao;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
@@ -96,7 +96,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     return false;
   }
   @Autowired
-  private SampleDao sampleDao;
+  private SampleStore sampleStore;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -132,8 +132,8 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   private Boolean uniqueExternalNameWithinProjectRequired = true;
 
-  public void setSampleDao(SampleDao sampleDao) {
-    this.sampleDao = sampleDao;
+  public void setSampleStore(SampleStore sampleStore) {
+    this.sampleStore = sampleStore;
   }
 
   public void setAuthorizationManager(AuthorizationManager authorizationManager) {
@@ -210,7 +210,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public Sample get(long sampleId) throws IOException {
-    Sample sample = sampleDao.getSample(sampleId);
+    Sample sample = sampleStore.getSample(sampleId);
     authorizationManager.throwIfNotReadable(sample);
     return sample;
   }
@@ -281,11 +281,11 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
         validateAlias(sample);
       }
       if (newId == Sample.UNSAVED_ID) {
-        newId = sampleDao.addSample(sample);
+        newId = sampleStore.addSample(sample);
       } else {
-        sampleDao.update(sample);
+        sampleStore.update(sample);
       }
-      Sample created = sampleDao.getSample(newId);
+      Sample created = sampleStore.getSample(newId);
 
       // post-save field generation
       boolean needsUpdate = false;
@@ -311,7 +311,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
         needsUpdate = true;
       }
       if (needsUpdate) {
-        sampleDao.update(created);
+        sampleStore.update(created);
       }
 
       if (validateAliasUniqueness) {
@@ -358,7 +358,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     if (isDetailedSample(sample) && ((DetailedSample) sample).hasNonStandardAlias()) {
       return;
     }
-    if (!namingScheme.duplicateSampleAliasAllowed() && sampleDao.listByAlias(sample.getAlias()).size() > 1) {
+    if (!namingScheme.duplicateSampleAliasAllowed() && sampleStore.listByAlias(sample.getAlias()).size() > 1) {
       throw new ConstraintViolationException(String.format("A sample with this alias '%s' already exists in the database",
           sample.getAlias()), null, "alias");
     }
@@ -411,14 +411,14 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
     DetailedSample tempParent = sample.getParent();
     if (tempParent.getId() != Sample.UNSAVED_ID) {
-      Sample parent = sampleDao.getSample(tempParent.getId());
+      Sample parent = sampleStore.getSample(tempParent.getId());
       if (parent == null)
         throw new IllegalArgumentException("Parent sample does not exist");
       else
         return (DetailedSample) parent;
     } else {
       if (isTissueSample(tempParent) && isIdentitySample(tempParent.getParent())) {
-        DetailedSample tissueParent = sampleDao.getMatchingGhostTissue((SampleTissue) tempParent);
+        DetailedSample tissueParent = sampleStore.getMatchingGhostTissue((SampleTissue) tempParent);
         if (tissueParent != null) {
           return tissueParent;
         }
@@ -469,7 +469,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   private SampleIdentity findOrCreateIdentity(DetailedSample descendant, SampleIdentity identity) throws IOException, MisoNamingException {
     if (identity.getId() != SampleImpl.UNSAVED_ID) {
-      return (SampleIdentity) sampleDao.getSample(identity.getId());
+      return (SampleIdentity) sampleStore.getSample(identity.getId());
     } else {
       // If samples are being bulk received for the same new donor, they will all have a null parentId.
       // After the new donor's Identity is created, the following samples need to be parented to that now-existing Identity.
@@ -733,30 +733,30 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
 
   @Override
   public List<Sample> list() throws IOException {
-    Collection<Sample> allSamples = sampleDao.list();
+    Collection<Sample> allSamples = sampleStore.list();
     return authorizationManager.filterUnreadable(allSamples);
   }
 
   @Override
   public Long countAll() throws IOException {
-    return sampleDao.countAll();
+    return sampleStore.countAll();
   }
 
   @Override
   public Collection<Sample> listByReceivedDate(long limit) throws IOException {
-    Collection<Sample> samples = sampleDao.listAllByReceivedDate(limit);
+    Collection<Sample> samples = sampleStore.listAllByReceivedDate(limit);
     return authorizationManager.filterUnreadable(samples);
   }
 
   @Override
   public Collection<Sample> listByProjectId(long projectId) throws IOException {
-    Collection<Sample> samples = sampleDao.listByProjectId(projectId);
+    Collection<Sample> samples = sampleStore.listByProjectId(projectId);
     return authorizationManager.filterUnreadable(samples);
   }
 
   @Override
   public Collection<Sample> listByIdList(List<Long> idList) throws IOException {
-    Collection<Sample> samples = sampleDao.getByIdList(idList);
+    Collection<Sample> samples = sampleStore.getByIdList(idList);
     for (Sample sample : samples) {
       authorizationManager.throwIfNotReadable(sample);
     }
@@ -764,43 +764,36 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
   }
 
   @Override
-  public void delete(Long sampleId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Sample sample = get(sampleId);
-    sampleDao.deleteSample(sample);
-  }
-
-  @Override
   @Transactional(propagation = Propagation.REQUIRED)
   public Collection<SampleIdentity> getIdentitiesByExternalNameOrAlias(String externalName) throws IOException {
-    return sampleDao.getIdentitiesByExternalNameOrAlias(externalName);
+    return sampleStore.getIdentitiesByExternalNameOrAlias(externalName);
   }
 
   @Override
   @Transactional(propagation = Propagation.REQUIRED)
   public Collection<SampleIdentity> getIdentitiesByExternalNameAndProject(String externalName, Long projectId) throws IOException {
-    return sampleDao.getIdentitiesByExternalNameAndProject(externalName, projectId);
+    return sampleStore.getIdentitiesByExternalNameAndProject(externalName, projectId);
   }
 
   @Override
   public List<Sample> getByAlias(String alias) throws IOException {
-    return new ArrayList<>(sampleDao.listByAlias(alias));
+    return new ArrayList<>(sampleStore.listByAlias(alias));
   }
 
   @Override
   public Sample getByBarcode(String barcode) throws IOException {
-    Sample sample = sampleDao.getByBarcode(barcode);
+    Sample sample = sampleStore.getByBarcode(barcode);
     return (authorizationManager.readCheck(sample) ? sample : null);
   }
 
   @Override
   public void addNote(Sample sample, Note note) throws IOException {
-    Sample managed = sampleDao.get(sample.getId());
+    Sample managed = sampleStore.get(sample.getId());
     authorizationManager.throwIfNotWritable(managed);
     note.setCreationDate(new Date());
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
-    sampleDao.save(managed);
+    sampleStore.save(managed);
   }
 
   @Override
@@ -808,7 +801,7 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     if (noteId == null || noteId.equals(Note.UNSAVED_ID)) {
       throw new IllegalArgumentException("Cannot delete an unsaved Note");
     }
-    Sample managed = sampleDao.get(sample.getId());
+    Sample managed = sampleStore.get(sample.getId());
     authorizationManager.throwIfNotWritable(managed);
     Note deleteNote = null;
     for (Note note : managed.getNotes()) {
@@ -822,22 +815,22 @@ public class DefaultSampleService implements SampleService, AuthorizedPaginatedD
     }
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
-    sampleDao.save(managed);
+    sampleStore.save(managed);
   }
 
   @Override
   public Collection<String> listSampleTypes() throws IOException {
-    return sampleDao.listAllSampleTypes();
+    return sampleStore.listAllSampleTypes();
   }
 
   @Override
   public Map<String, Integer> getSampleColumnSizes() throws IOException {
-    return sampleDao.getSampleColumnSizes();
+    return sampleStore.getSampleColumnSizes();
   }
 
   @Override
   public PaginatedDataSource<Sample> getBackingPaginationSource() {
-    return sampleDao;
+    return sampleStore;
   }
 
   @Override

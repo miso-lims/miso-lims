@@ -30,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface InstrumentStore
-    extends Store<Instrument>, Remover<Instrument>, PaginatedDataSource<Instrument> {
+    extends Store<Instrument>, PaginatedDataSource<Instrument> {
 
   /**
    * Get an Instrument by a given name

@@ -33,8 +33,6 @@ public interface ContainerService extends PaginatedDataSource<SequencerPartition
 
   SequencerPartitionContainer update(SequencerPartitionContainer container) throws IOException;
 
-  void delete(Long containerId) throws IOException;
-
   Collection<SequencerPartitionContainer> listByRunId(long runId) throws IOException;
 
   Partition getPartition(long partitionId) throws IOException;

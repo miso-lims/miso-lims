@@ -35,8 +35,6 @@ public interface PoolService extends PaginatedDataSource<Pool>, BarcodableServic
 
   public Collection<Pool> listByLibraryId(long libraryId) throws IOException;
 
-  public void delete(Pool pool) throws IOException;
-
   public void deleteNote(Pool pool, Long noteId) throws IOException;
 
   public long save(Pool pool) throws IOException;

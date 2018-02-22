@@ -228,11 +228,6 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
     return getIdentificationBarcode() + " (" + getPlatform().getNameAndModel() + ")";
   }
 
-  @Override
-  public boolean isDeletable() {
-    return getId() != SequencerPartitionContainerImpl.UNSAVED_ID;
-  }
-
   /**
    * Containers don't have names, but they implement an interface which requires this method.
    */

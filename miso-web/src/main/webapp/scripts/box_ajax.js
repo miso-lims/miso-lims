@@ -115,21 +115,6 @@ var Box = Box
         });
       },
 
-      deleteBox: function() {
-        function deleteIt() {
-          Fluxion.doAjax('boxControllerHelperService', 'deleteBox', {
-            'boxId': Box.boxId,
-            'url': ajaxurl
-          }, {
-            'doOnSuccess': function() {
-              window.location.href = '/miso/boxes';
-            }
-          })
-        }
-        Utils.showConfirmDialog('Delete Box', 'Delete', ["Are you sure you really want to delete BOX" + Box.boxId
-            + "? This operation is permanent!"], deleteIt);
-      },
-
       // Validate methods are in parsley_form_validations.js
       validateBox: function() {
         Validate.cleanFields('#box-form');

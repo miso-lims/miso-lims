@@ -185,33 +185,6 @@ public class SampleControllerHelperService {
     }
   }
 
-  public JSONObject deleteSample(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    } catch (IOException e) {
-      log.error("delete sample", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null && user.isAdmin()) {
-      if (json.has("sampleId")) {
-        Long sampleId = json.getLong("sampleId");
-        try {
-          sampleService.delete(sampleId);
-          return JSONUtils.SimpleJSONResponse("Sample deleted");
-        } catch (IOException e) {
-          log.error("delete sample", e);
-          return JSONUtils.SimpleJSONError("Cannot delete sample: " + e.getMessage());
-        }
-      } else {
-        return JSONUtils.SimpleJSONError("No sample specified to delete.");
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
-    }
-  }
-
   public JSONObject removeSampleFromOverview(HttpSession session, JSONObject json) {
     User user;
     try {

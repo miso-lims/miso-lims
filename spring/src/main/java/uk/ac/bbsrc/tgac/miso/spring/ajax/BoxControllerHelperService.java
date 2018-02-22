@@ -45,43 +45,6 @@ public class BoxControllerHelperService {
   private MisoFilesManager misoFileManager;
 
   /**
-   * Deletes a box from the database. Requires admin permissions.
-   * 
-   * @param session
-   * @param json
-   *          must contain the entry "boxId"
-   * @return message indicating success or error
-   */
-  public JSONObject deleteBox(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = authorizationManager.getCurrentUser();
-    } catch (IOException e) {
-      log.debug("Error getting currently logged in user", e);
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
-    }
-
-    if (user != null) { // && user.isAdmin()) {
-      if (json.has("boxId")) {
-        Long boxId = json.getLong("boxId");
-        try {
-          boxService.deleteBox(boxService.get(boxId));
-          return JSONUtils.SimpleJSONResponse("Box deleted");
-        } catch (IOException e) {
-          log.debug("Cannot delete box", e);
-          return JSONUtils.SimpleJSONError("Cannot delete box: " + e.getMessage());
-        }
-      } else {
-        log.debug("No box specified to delete");
-        return JSONUtils.SimpleJSONError("No box specified to delete.");
-      }
-    } else {
-      log.debug("Only logged-in admins can delete objects.");
-      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
-    }
-  }
-
-  /**
    * Saves the relationships between box positions and the boxables within them. Note: this method will delete everything that was
    * previously in the box, and then replace them with the boxables as per the input json (all modifications happen in BoxPosition table).
    * The boxables themselves are not modified in the database.

@@ -9,7 +9,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationException;
 
 public interface ExperimentService {
-  public void delete(Experiment experiment) throws IOException;
 
   public Experiment get(long experimentId) throws IOException;
 

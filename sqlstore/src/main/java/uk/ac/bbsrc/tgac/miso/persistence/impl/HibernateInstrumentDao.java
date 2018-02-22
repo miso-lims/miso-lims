@@ -130,19 +130,6 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   }
 
   @Override
-  public boolean remove(Instrument sr) throws IOException {
-    if (sr.isDeletable()) {
-      currentSession().delete(sr);
-
-      Instrument testIfExists = get(sr.getId());
-
-      return testIfExists == null;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public Map<String, Integer> getInstrumentColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(jdbcTemplate, INSTRUMENT_TABLE_NAME);
   }

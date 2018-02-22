@@ -30,6 +30,4 @@ public interface LibraryDilutionService extends PaginatedDataSource<LibraryDilut
 
   LibraryDilution getByBarcode(String barcode) throws IOException;
 
-  boolean delete(LibraryDilution dilution) throws IOException;
-
 }

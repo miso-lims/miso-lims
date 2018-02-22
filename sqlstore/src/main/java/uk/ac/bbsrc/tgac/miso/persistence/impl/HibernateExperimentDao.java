@@ -125,16 +125,6 @@ public class HibernateExperimentDao implements ExperimentStore {
     return results;
   }
 
-  @Override
-  public boolean remove(Experiment experiment) throws IOException {
-    if (experiment.isDeletable()) {
-      currentSession().delete(experiment);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   /**
    * Writes the given experiment to the database, using the default transaction strategy configured for the datasource.
    *

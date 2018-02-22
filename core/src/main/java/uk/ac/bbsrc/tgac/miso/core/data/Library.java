@@ -52,7 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.0.2
  */
 public interface Library
-    extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Deletable, Boxable, ChangeLoggable, Aliasable, Serializable,
+    extends SecurableByProfile, Comparable<Library>, Barcodable, Locatable, Boxable, ChangeLoggable, Aliasable, Serializable,
     QualityControllable<LibraryQC> {
 
   /** Field UNSAVED_ID */

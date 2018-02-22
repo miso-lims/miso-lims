@@ -201,14 +201,6 @@ public class HibernateLibraryDilutionDaoTest extends AbstractDAOTest {
   }
 
   @Test
-  public void testRemove() throws IOException {
-    final LibraryDilution ld = dao.get(1L);
-    assertNotNull(ld);
-    assertTrue(dao.remove(ld));
-    assertNull(dao.get(1L));
-  }
-
-  @Test
   public void testSaveNew() throws IOException {
 
     final LibraryDilution ld = new LibraryDilution();

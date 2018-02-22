@@ -155,14 +155,6 @@ public class DefaultLibraryDilutionService
   }
 
   @Override
-  public boolean delete(LibraryDilution dilution) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    LibraryDilution managed = get(dilution.getId());
-    managed.getLibrary().getLibraryDilutions().remove(managed);
-    return dilutionDao.remove(managed);
-  }
-
-  @Override
   public int count() throws IOException {
     return dilutionDao.count();
   }

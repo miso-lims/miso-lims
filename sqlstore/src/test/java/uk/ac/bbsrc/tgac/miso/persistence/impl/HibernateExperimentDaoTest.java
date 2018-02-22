@@ -145,18 +145,6 @@ public class HibernateExperimentDaoTest extends AbstractDAOTest {
     assertEquals("PRO1 Illumina Other experiment (Auto-gen)", experiment.getTitle());
   }
 
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#remove(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testRemove() throws IOException {
-    Experiment experiment = dao.get(1L);
-    dao.remove(experiment);
-    assertEquals(31, dao.listAll().size());
-  }
-
   @Test
   public void testlistByLibraryExists() throws IOException {
     assertEquals(4, dao.listByLibrary(10).size());

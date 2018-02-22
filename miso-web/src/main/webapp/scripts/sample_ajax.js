@@ -44,19 +44,6 @@ window.Parsley.addValidator('sampleAlias', {
 });
 
 var Sample = Sample || {
-  deleteSample: function(sampleId, successfunc) {
-    if (confirm("Are you sure you really want to delete SAM" + sampleId + "? This operation is permanent!")) {
-      Fluxion.doAjax('sampleControllerHelperService', 'deleteSample', {
-        'sampleId': sampleId,
-        'url': ajaxurl
-      }, {
-        'doOnSuccess': function(json) {
-          successfunc();
-        }
-      });
-    }
-  },
-
   removeSampleFromOverview: function(sampleId, overviewId, successfunc) {
     if (confirm("Are you sure you really want to remove SAM" + sampleId + " from overview?")) {
       Fluxion.doAjax('sampleControllerHelperService', 'removeSampleFromOverview', {
