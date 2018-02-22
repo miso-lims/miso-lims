@@ -1871,6 +1871,13 @@ img.center {
   color: #b23115;
 }
 
+.big-warning {
+  font-size:200%;
+  font-weight:bold;
+  color:#a93232;
+  margin-top:0px
+}
+
 button.disabled {
   opacity: .4;
 }

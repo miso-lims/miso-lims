@@ -153,8 +153,8 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   @Test
   public void testListByProjectId() throws Exception {
     List<Library> libraries = dao.listByProjectId(1);
-    List<Long> libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
-    assertEquals(14, libraries.size());
+    List<Long> libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l, 15l);
+    assertEquals(15, libraries.size());
     for (Library library : libraries) {
       assertTrue("bad library found", libraryIds.contains(library.getId()));
     }
@@ -163,8 +163,8 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   @Test
   public void testListAll() throws Exception {
     List<Library> libraries = dao.listAll();
-    List<Long> libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l);
-    assertEquals(14, libraries.size());
+    List<Long> libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l, 15l);
+    assertEquals(15, libraries.size());
     for (Library library : libraries) {
       assertTrue("bad library found", libraryIds.contains(library.getId()));
     }
@@ -173,14 +173,14 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
 
   @Test
   public void testCount() throws Exception {
-    assertEquals("count incorrect", 14, dao.count());
+    assertEquals("count incorrect", 15, dao.count());
   }
 
   @Test
   public void testListBySearch() throws Exception {
     String searchStr = "LIB";
     List<Library> libraries = dao.listBySearch(searchStr);
-    assertEquals("did not find all libraries", 14, libraries.size());
+    assertEquals("did not find all libraries", 15, libraries.size());
   }
 
   @Test
@@ -197,12 +197,12 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
 
   @Test
   public void testCountBySearch() throws IOException {
-    assertEquals(6L, dao.countLibrariesBySearch("LIB1"));
+    assertEquals(7L, dao.countLibrariesBySearch("LIB1"));
   }
 
   @Test
   public void testCountByEmptySearch() throws IOException {
-    assertEquals(14L, dao.countLibrariesBySearch(""));
+    assertEquals(15L, dao.countLibrariesBySearch(""));
   }
 
   @Test
@@ -232,7 +232,7 @@ public class HibernateLibraryDaoTest extends AbstractDAOTest {
   public void testListOffsetThreeWithThreeLibsPerPageOrderLastMod() throws IOException {
     List<Library> libraries = dao.list(3, 3, false, "lastModified");
     assertEquals(3, libraries.size());
-    assertEquals(11, libraries.get(0).getId());
+    assertEquals(12, libraries.get(0).getId());
   }
 
   @Test

@@ -31,10 +31,17 @@ ListTarget.poolelement = {
     return [{
       'name': config.add ? 'Add' : 'Remove',
       'action': function(elements) {
-        var data = {};
-        data[(config.add ? 'add' : 'remove')] = elements.map(Utils.array.getId);
-        data[(config.add ? 'remove' : 'add')] = [];
-        Utils.ajaxWithDialog('Changing pool', 'PUT', '/miso/rest/pool/' + config.poolId + '/contents', data, Utils.page.pageReload);
+        var doAction = function() {
+          var data = {};
+          data[(config.add ? 'add' : 'remove')] = elements.map(Utils.array.getId);
+          data[(config.add ? 'remove' : 'add')] = [];
+          Utils.ajaxWithDialog('Changing pool', 'PUT', '/miso/rest/pool/' + config.poolId + '/contents', data, Utils.page.pageReload);
+        };
+        if (config.add) {
+          HotUtils.warnIfConsentRevoked(elements, doAction, HotTarget.dilution.getLabel);
+        } else {
+          doAction();
+        }
       }
     }];
   },

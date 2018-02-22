@@ -11,6 +11,7 @@ public class SampleIdentityDto extends DetailedSampleDto {
 
   private String externalName;
   private String donorSex;
+  private String consentLevel;
 
   public String getExternalName() {
     return externalName;
@@ -26,6 +27,14 @@ public class SampleIdentityDto extends DetailedSampleDto {
 
   public void setDonorSex(String donorSex) {
     this.donorSex = donorSex;
+  }
+
+  public String getConsentLevel() {
+    return consentLevel;
+  }
+
+  public void setConsentLevel(String consentLevel) {
+    this.consentLevel = consentLevel;
   }
 
   @Override

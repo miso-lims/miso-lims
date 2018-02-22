@@ -101,6 +101,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -475,6 +476,11 @@ public class EditSampleController {
     return StrStatus.values();
   }
 
+  @ModelAttribute("consentLevelOptions")
+  public ConsentLevel[] getConsentLevelOptions() {
+    return ConsentLevel.values();
+  }
+
   @ModelAttribute("donorSexOptions")
   public DonorSex[] getDonorSexOptions() {
     return DonorSex.values();
@@ -665,7 +671,7 @@ public class EditSampleController {
           throw new IllegalArgumentException("Requested project does not match sample project");
         }
 
-        Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getProjectId());
+        Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getId());
         if (!adjacentSamples.isEmpty()) {
           model.put("previousSample", adjacentSamples.get("previousSample"));
           model.put("nextSample", adjacentSamples.get("nextSample"));
@@ -689,6 +695,9 @@ public class EditSampleController {
       model.put("formObj", sample);
       model.put("sample", sample);
       model.put("sampleTypes", sampleService.listSampleTypes());
+      if (LimsUtils.isDetailedSample(sample) && LimsUtils.getIdentityConsentLevel((DetailedSample) sample) == ConsentLevel.REVOKED) {
+        model.put("warning", "Donor has revoked consent");
+      }
 
       Collection<User> allUsers = securityManager.listAllUsers();
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, allUsers));

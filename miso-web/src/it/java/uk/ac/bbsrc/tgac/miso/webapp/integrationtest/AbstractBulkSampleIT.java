@@ -88,6 +88,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   protected void assertIdentityAttributes(Map<String, String> attributes, SampleIdentity sample) {
     assertEntityAttribute(SamColumns.EXTERNAL_NAME, attributes, sample, SampleIdentity::getExternalName);
     assertEntityAttribute(SamColumns.DONOR_SEX, attributes, sample, s -> s.getDonorSex() == null ? "Unknown" : s.getDonorSex().getLabel());
+    assertEntityAttribute(SamColumns.CONSENT, attributes, sample, s -> s.getConsentLevel().getLabel());
   }
 
   protected void assertTissueAttributes(Map<String, String> attributes, SampleTissue sample) {

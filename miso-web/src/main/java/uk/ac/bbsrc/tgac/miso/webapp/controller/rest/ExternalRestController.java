@@ -99,7 +99,7 @@ public class ExternalRestController extends RestController {
     int pi = 0;
     for (Project p : lp) {
       pi++;
-      sb.append(jsonRestProjectList(p.getProjectId()));
+      sb.append(jsonRestProjectList(p.getId()));
       if (pi < lp.size()) {
         sb.append(",");
       }
