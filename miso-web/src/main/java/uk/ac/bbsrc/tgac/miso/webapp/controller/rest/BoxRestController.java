@@ -1,13 +1,47 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import net.sf.json.JSONObject;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import net.sf.json.JSONObject;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BoxableView.BoxableId;
@@ -15,22 +49,17 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
+import uk.ac.bbsrc.tgac.miso.dto.BoxableDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
+import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
+import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryDilutionService;
 import uk.ac.bbsrc.tgac.miso.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 @Controller
 @RequestMapping("/rest")
@@ -53,6 +82,9 @@ public class BoxRestController extends RestController {
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSampleEnabled;
 
+  @Resource
+  private Map<String, BoxScanner> boxScanners;
+
   private final JQueryDataTableBackend<Box, BoxDto> jQueryBackend = new JQueryDataTableBackend<Box, BoxDto>() {
     @Override
     protected BoxDto asDto(Box model) {
@@ -64,6 +96,14 @@ public class BoxRestController extends RestController {
       return boxService;
     }
   };
+
+  public void setBoxService(BoxService boxService) {
+    this.boxService = boxService;
+  }
+
+  public void setBoxScanners(Map<String, BoxScanner> boxScanners) {
+    this.boxScanners = boxScanners;
+  }
 
   @RequestMapping(value = "/box/dt", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
@@ -252,8 +292,294 @@ public class BoxRestController extends RestController {
     }
   }
 
-  public void setBoxService(BoxService boxService) {
-    this.boxService = boxService;
+  public static class ScannerPreparationRequest {
+    private String scannerName;
+    private Integer rows;
+    private Integer columns;
+
+    public String getScannerName() {
+      return scannerName;
+    }
+
+    public void setScannerName(String scannerName) {
+      this.scannerName = scannerName;
+    }
+
+    public Integer getRows() {
+      return rows;
+    }
+
+    public void setRows(Integer rows) {
+      this.rows = rows;
+    }
+
+    public Integer getColumns() {
+      return columns;
+    }
+
+    public void setColumns(Integer columns) {
+      this.columns = columns;
+    }
+  }
+
+  /**
+   * Prepares the associated Box Scanner for scanning.
+   * 
+   * @param requestData
+   */
+  @RequestMapping(value = "/box/prepare-scan", method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void prepareBoxScanner(@RequestBody(required = true) ScannerPreparationRequest requestData) {
+    if (requestData.getRows() == null || requestData.getColumns() == null) {
+      throw new RestException("Box size not specified", Status.BAD_REQUEST);
+    } else if (isStringEmptyOrNull(requestData.getScannerName())) {
+      throw new RestException("No scanner specified", Status.BAD_REQUEST);
+    }
+    BoxScanner boxScanner = boxScanners.get(requestData.getScannerName());
+    if (boxScanner == null) {
+      throw new RestException("Invalid scanner specified", Status.BAD_REQUEST);
+    }
+    try {
+      boxScanner.prepareScan(requestData.getRows(), requestData.getColumns());
+    } catch (IntegrationException e) {
+      throw new RestException("Could not find the scanner", Status.INTERNAL_SERVER_ERROR);
+    } catch (Exception e) {
+      throw new RestException("Could not find the scanner", Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  public static class ScanRequest {
+    private String scannerName;
+
+    public String getScannerName() {
+      return scannerName;
+    }
+
+    public void setScannerName(String scannerName) {
+      this.scannerName = scannerName;
+    }
+  }
+
+  public static class DiffMessage {
+    private BoxableDto original;
+    private BoxableDto modified;
+    private String action;
+
+    public BoxableDto getOriginal() {
+      return original;
+    }
+
+    public void setOriginal(BoxableDto original) {
+      this.original = original;
+    }
+
+    public BoxableDto getModified() {
+      return modified;
+    }
+
+    public void setModified(BoxableDto modified) {
+      this.modified = modified;
+    }
+
+    public String getAction() {
+      return action;
+    }
+
+    public void setAction(String action) {
+      this.action = action;
+    }
+  }
+
+  public static class ErrorMessage {
+    private String coordinates;
+    private String message;
+
+    public String getCoordinates() {
+      return coordinates;
+    }
+
+    public void setCoordinates(String coordinates) {
+      this.coordinates = coordinates;
+    }
+
+    public String getMessage() {
+      return message;
+    }
+
+    public void setMessage(String message) {
+      this.message = message;
+    }
+  }
+
+  public static class ScanResultsDto {
+    private List<BoxableDto> items;
+    private List<ErrorMessage> errors;
+    private List<DiffMessage> diffs;
+    private int rows;
+    private int columns;
+
+    public List<BoxableDto> getItems() {
+      return items;
+    }
+
+    public void setItems(List<BoxableDto> items) {
+      this.items = items;
+    }
+
+    public List<ErrorMessage> getErrors() {
+      return errors;
+    }
+
+    public void setErrors(List<ErrorMessage> errors) {
+      this.errors = errors;
+    }
+
+    public List<DiffMessage> getDiffs() {
+      return diffs;
+    }
+
+    public void setDiffs(List<DiffMessage> diffs) {
+      this.diffs = diffs;
+    }
+
+    public int getRows() {
+      return rows;
+    }
+
+    public void setRows(int rows) {
+      this.rows = rows;
+    }
+
+    public int getColumns() {
+      return columns;
+    }
+
+    public void setColumns(int columns) {
+      this.columns = columns;
+    }
+  }
+
+  /**
+   * Gets the Box Scanner scan results (map of box positions and barcodes)
+   * 
+   * @param boxId
+   * @param requestData
+   * @return a serialized box object containing the Boxable items
+   *         linked with each barcode at each position indicated by the scan results. Any errors are returned with a message containing the
+   *         type of
+   *         error (unable to read at certain positions; multiple items associated with a single barcode; unable to find box scanner), a
+   *         message
+   *         about the error, the positions that were successfully read (if applicable) and the positions at which the error was triggered
+   *         (if
+   *         applicable)
+   */
+  @RequestMapping(value = "/box/{boxId}/scan", method = RequestMethod.POST)
+  public @ResponseBody ScanResultsDto getBoxScan(@PathVariable(required = true) int boxId,
+      @RequestBody(required = true) ScanRequest requestData) {
+    try {
+      BoxScanner boxScanner = boxScanners.get(requestData.getScannerName());
+      if (boxScanner == null) {
+        throw new RestException("Invalid scanner specified", Status.BAD_REQUEST);
+      }
+      BoxScan scan = boxScanner.getScan();
+      if (scan == null) {
+        throw new RestException("The scanner did not detect a box!", Status.CONFLICT);
+      }
+
+      Map<String, String> barcodesByPosition = scan.getBarcodesMap();
+      // Extract the valid barcodes and build a barcode to item map
+      Set<String> validBarcodes = barcodesByPosition.values().stream()
+          .filter(barcode -> isRealBarcode(scan, barcode)).collect(Collectors.toSet());
+      Map<String, BoxableView> boxablesByBarcode = boxService.getViewsFromBarcodeList(validBarcodes).stream()
+          .collect(Collectors.toMap(BoxableView::getIdentificationBarcode, Function.identity()));
+
+      // For all the valid barcodes, build a list of DTOs with the updated positions
+      List<BoxableDto> items = barcodesByPosition.entrySet().stream()
+          .filter(entry -> isRealBarcode(scan, entry.getValue()) && boxablesByBarcode.containsKey(entry.getValue()))
+          .map(entry -> {
+            BoxableDto dto = Dtos.asDto(boxablesByBarcode.get(entry.getValue()));
+            dto.setCoordinates(entry.getKey());
+            return dto;
+          }).collect(Collectors.toList());
+
+      // Collect all the errors
+      List<ErrorMessage> errors = new ArrayList<>();
+
+      // If there's a barcode that wasn't found in the DB, create an error.
+      barcodesByPosition.entrySet().stream()
+          .filter(entry -> isRealBarcode(scan, entry.getValue()) && !boxablesByBarcode.containsKey(entry.getValue())).map(entry -> {
+            ErrorMessage dto = new ErrorMessage();
+            dto.setCoordinates(entry.getKey());
+            dto.setMessage("Barcode " + entry.getValue() + " not found.");
+            return dto;
+          }).forEachOrdered(errors::add);
+      // If there was a read error, produce an error.
+      scan.getReadErrorPositions().stream().map(position -> {
+        ErrorMessage dto = new ErrorMessage();
+        dto.setCoordinates(position);
+        dto.setMessage("Cannot read tube.");
+        return dto;
+      }).forEachOrdered(errors::add);
+
+      long totalBarcodes = barcodesByPosition.values().stream().filter(barcode -> isRealBarcode(scan, barcode)).count();
+      if (validBarcodes.size() != totalBarcodes) {
+        ErrorMessage dto = new ErrorMessage();
+        dto.message = "Duplicate barcodes detected!";
+        errors.add(dto);
+      }
+
+      // Build the diffs for this box
+      List<DiffMessage> diffs = new ArrayList<>();
+      Box box;
+      try {
+        box = boxService.get(boxId);
+      } catch (IOException e) {
+        throw new RestException("Cannot get the Box: " + e.getMessage(), Status.INTERNAL_SERVER_ERROR);
+      }
+      if (box.getSize().getRows() != scan.getRowCount() || box.getSize().getColumns() != scan.getColumnCount())
+        throw new RestException(String.format("Box is %d×%d, but scanner detected %d×%d.", box.getSize().getRows(),
+            box.getSize().getColumns(), scan.getRowCount(), scan.getColumnCount()), Status.BAD_REQUEST);
+
+      box.getSize().positionStream().map(position -> {
+        BoxableView originalItem = box.getBoxables().containsKey(position) ? box.getBoxables().get(position) : null;
+        BoxableView newItem = barcodesByPosition.containsKey(position) && boxablesByBarcode.containsKey(barcodesByPosition.get(position))
+            ? boxablesByBarcode.get(barcodesByPosition.get(position)) : null;
+        if (originalItem != null && newItem != null &&
+            !newItem.getIdentificationBarcode().equals(originalItem.getIdentificationBarcode())) {
+          DiffMessage dto = new DiffMessage();
+          dto.action = "changed";
+          dto.modified = Dtos.asDto(newItem);
+          dto.original = Dtos.asDto(originalItem);
+          return dto;
+        } else if (originalItem != null && newItem == null) {
+          DiffMessage dto = new DiffMessage();
+          dto.action = "removed";
+          dto.original = Dtos.asDto(originalItem);
+          return dto;
+        } else if (originalItem == null && newItem != null) {
+          DiffMessage dto = new DiffMessage();
+          dto.action = "added";
+          dto.modified = Dtos.asDto(newItem);
+          return dto;
+        } else {
+          return null;
+        }
+      }).filter(Objects::nonNull);
+
+      ScanResultsDto scanResults = new ScanResultsDto();
+      scanResults.setItems(items);
+      scanResults.setErrors(errors);
+      scanResults.setDiffs(diffs);
+      scanResults.setRows(scan.getRowCount());
+      scanResults.setColumns(scan.getColumnCount());
+      return scanResults;
+    } catch (IntegrationException | IOException e) {
+      throw new RestException("Error scanning box: " + e.getMessage(), Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private static boolean isRealBarcode(BoxScan scan, String barcode) {
+    return !barcode.equals(scan.getNoTubeLabel()) && !barcode.equals(scan.getNoReadLabel());
   }
 
 }

@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -32,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
 
@@ -58,12 +61,20 @@ public class EditBoxController {
     this.securityManager = securityManager;
   }
 
-  @Value("${miso.boxscanner.enabled}")
-  private Boolean scannerEnabled;
+  @Resource
+  private Boolean boxScannerEnabled;
+
+  @Resource
+  private Map<String, BoxScanner> boxScanners;
 
   @ModelAttribute("scannerEnabled")
   public Boolean isScannerEnabled() {
-    return scannerEnabled;
+    return boxScannerEnabled;
+  }
+
+  @ModelAttribute("scannerNames")
+  public Set<String> getScannerNames() {
+    return boxScanners.keySet();
   }
 
   @ModelAttribute("maxLengths")

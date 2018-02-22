@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Installation Guide"
+title: "Building and Deploying"
 category: adm
 date: 2016-01-11 13:51:46
 order: 1
@@ -131,16 +131,15 @@ bug](https://issues.apache.org/bugzilla/show_bug.cgi?id=40050)
 
 Copy `$MISO_SRC/miso-web/src/main/resources/external/miso.properties` to
 `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`. Review and edit
-this file as appropriate (see <a href="naming-schemes">Naming Schemes</a> below).
+this file as appropriate (see [Naming Schemes](#naming-schemes) below).
 
 * The naming schemes will determine how MISO checks if object names (especially
 samples, libraries) are valid. If you do not want to use one of the supplied
 ones (TGAC's standard, OICR's standard, or no checks), you will have to write
-one or more specific to your organisation. See <a href="naming-schemes">Naming Schemes</a>
+one or more specific to your organisation. See [Naming Schemes](#naming-schemes)
 below for more information.
-* If using a bulk barcode scanner (only VisionMate is supported at present),
-set `miso.boxscanner.enabled` to `true` and change the host and port for your
-VisionMate server.
+* Optional: If using any bulk barcode scanners (only VisionMate is supported at present),
+define `miso.visionmate.servers` as specified in the properties file
 * Optional: Update `miso.bugUrl` to the URL for your internal issue tracker or other
 method for users to report issues using the "Report a problem" link in the header.
 * Update `miso.instanceName` to update the instance name displayed in the header.
@@ -384,7 +383,12 @@ There will be two important build artefacts:
 * `miso-web/target/ROOT.war`
 * `runscanner/runscanner-*.war`
 
+
+<a name="upgrading"/>
 # Releasing and Upgrading
+
+Prior to release, ensure that you have followed the instructions in the
+above and have WAR files for both MISO (`ROOT.war`) and Run Scanner(`runscanner-*.war`).
 
 To install or upgrade, perform the following steps:
 
@@ -411,3 +415,7 @@ Updating the database (or setting it up initially) will apply patches to the dat
 # Monitoring
 
 The main MISO application and Run Scanner can be monitored using [Prometheus](http://prometheus.io/).
+
+# Next steps
+
+After MISO is installed, refer to the [Admin Manual](admin-guide) for tips on maintaining and running MISO.
