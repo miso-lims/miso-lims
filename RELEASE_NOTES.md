@@ -3,9 +3,9 @@
 Changes:
 
  * Support multiple bulk barcode scanners
- * Allow selecting sample parents by category (Detailed Sample only)
+ * Allow acting on the sample parents (of a single sample class) for selected samples (Detailed Sample only)
  * Enforce integer increments on cycles graph
- * Allow admins to manage Tissue Origins (Detailed Sample only)
+ * Allow users to add and admins to add, edit, and delete new Tissue Origins (Detailed Sample only)
  * Export run bases mask
 
 # 0.2.108

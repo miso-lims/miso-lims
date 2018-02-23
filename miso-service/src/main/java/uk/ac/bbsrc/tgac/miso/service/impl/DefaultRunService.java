@@ -385,6 +385,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     target.setNumCycles(source.getNumCycles());
     target.setScoreCycle(source.getScoreCycle());
     target.setPairedEnd(source.getPairedEnd());
+    target.setRunBasesMask(source.getRunBasesMask());
   }
 
   private void applyLS454Changes(LS454Run target, LS454Run source) {
