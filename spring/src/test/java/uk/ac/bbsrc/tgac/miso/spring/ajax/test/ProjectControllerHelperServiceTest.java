@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -42,6 +43,8 @@ public class ProjectControllerHelperServiceTest {
   @Mock
   private Project project;
   @Mock
+  private SecurityProfile securityProfile;
+  @Mock
   private Authentication authentication;
   @Mock
   private MisoFilesManager misoFileManager;
@@ -55,7 +58,8 @@ public class ProjectControllerHelperServiceTest {
   public final void testDeleteProjectFile() throws Exception {
     final String fileName = "file_name";
     final long id = 1L;
-    when(project.userCanWrite(any(User.class))).thenReturn(true);
+    when(securityProfile.userCanWrite(any(User.class))).thenReturn(true);
+    when(project.getSecurityProfile()).thenReturn(securityProfile);
     when(projectService.getProjectById(anyLong())).thenReturn(project);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");
@@ -79,7 +83,8 @@ public class ProjectControllerHelperServiceTest {
   public final void testDeleteProjectFileNoPermission() throws IOException {
     final String fileName = "file_name";
     final long id = 1L;
-    when(project.userCanWrite(any(User.class))).thenReturn(false);
+    when(securityProfile.userCanWrite(any(User.class))).thenReturn(false);
+    when(project.getSecurityProfile()).thenReturn(securityProfile);
     when(projectService.getProjectById(anyLong())).thenReturn(project);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Johnny Badhat");
@@ -117,7 +122,8 @@ public class ProjectControllerHelperServiceTest {
   public final void testDeleteProjectFileIOException() throws Exception {
     final String fileName = "file_name";
     final long id = 1L;
-    when(project.userCanWrite(any(User.class))).thenReturn(true);
+    when(securityProfile.userCanWrite(any(User.class))).thenReturn(true);
+    when(project.getSecurityProfile()).thenReturn(securityProfile);
     when(projectService.getProjectById(anyLong())).thenReturn(project);
     when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
     when(authentication.getName()).thenReturn("Dr Admin");

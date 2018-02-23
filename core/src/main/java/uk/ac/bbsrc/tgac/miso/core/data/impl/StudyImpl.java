@@ -109,24 +109,6 @@ public class StudyImpl implements Study {
   }
 
   /**
-   * If the given User can read the parent Project, construct a new Study with a SecurityProfile inherited from the parent Project. If not,
-   * construct a new Study with a SecurityProfile owned by the given User
-   * 
-   * @param project
-   *          of type Project
-   * @param user
-   *          of type User
-   */
-  public StudyImpl(Project project, User user) {
-    if (project.userCanRead(user)) {
-      setProject(project);
-      setSecurityProfile(project.getSecurityProfile());
-    } else {
-      setSecurityProfile(new SecurityProfile(user));
-    }
-  }
-
-  /**
    * Construct a new Study with a SecurityProfile owned by the given User
    * 
    * @param user
@@ -252,11 +234,6 @@ public class StudyImpl implements Study {
   }
 
   @Override
-  public boolean isDeletable() {
-    return getId() != StudyImpl.UNSAVED_ID && getExperiments().isEmpty();
-  }
-
-  @Override
   public void setAccession(String accession) {
     this.accession = accession;
   }
@@ -326,16 +303,6 @@ public class StudyImpl implements Study {
   }
 
   @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
-  @Override
   public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
     StudyChangeLog changeLog = new StudyChangeLog();
     changeLog.setStudy(this);
@@ -343,5 +310,22 @@ public class StudyImpl implements Study {
     changeLog.setColumnsChanged(columnsChanged);
     changeLog.setUser(user);
     return changeLog;
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Study";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    Project p = getProject();
+    return (p.getShortName() == null ? p.getAlias() : p.getShortName())
+        + " " + getName() + " (" + getAlias() + ")";
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return getSecurityProfile();
   }
 }

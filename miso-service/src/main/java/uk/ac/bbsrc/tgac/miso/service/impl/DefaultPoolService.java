@@ -26,7 +26,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -312,9 +311,7 @@ public class DefaultPoolService implements PoolService, AuthorizedPaginatedDataS
     User managedWatcher = securityManager.getUserById(watcher.getUserId());
     Pool managedPool = poolStore.get(pool.getId());
     authorizationManager.throwIfNotReadable(managedPool);
-    if (!managedPool.userCanRead(managedWatcher)) {
-      throw new AuthorizationIOException("User " + watcher.getLoginName() + " cannot see this pool.");
-    }
+    authorizationManager.throwIfNotReadable(managedPool, managedWatcher);
     poolStore.addWatcher(pool, watcher);
   }
 

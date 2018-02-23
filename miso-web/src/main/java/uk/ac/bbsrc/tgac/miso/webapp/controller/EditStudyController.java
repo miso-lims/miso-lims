@@ -56,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.service.StudyService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/study")
@@ -65,6 +66,9 @@ public class EditStudyController {
 
   @Autowired
   private SecurityManager securityManager;
+
+  @Autowired
+  private AuthorizationManager authorizationManager;
 
   @Autowired
   private ProjectService projectService;
@@ -117,9 +121,7 @@ public class EditStudyController {
       study.inheritPermissions(project);
     }
 
-    if (!study.userCanWrite(user)) {
-      throw new SecurityException("Permission denied.");
-    }
+    authorizationManager.throwIfNotWritable(study);
     return setupForm(study, user, "New Study", model);
   }
 
@@ -129,9 +131,6 @@ public class EditStudyController {
     Study study = studyService.get(studyId);
     if (study == null) {
       throw new SecurityException("No such Study");
-    }
-    if (!study.userCanRead(user)) {
-      throw new SecurityException("Permission denied.");
     }
 
     return setupForm(study, user, "Study " + studyId, model);
@@ -150,21 +149,9 @@ public class EditStudyController {
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("study") Study study, ModelMap model, SessionStatus session) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!study.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-      study.setLastModifier(user);
-      studyService.save(study);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/study/" + study.getId();
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save Study", ex);
-      }
-      throw ex;
-    }
+    studyService.save(study);
+    session.setComplete();
+    model.clear();
+    return "redirect:/miso/study/" + study.getId();
   }
 }

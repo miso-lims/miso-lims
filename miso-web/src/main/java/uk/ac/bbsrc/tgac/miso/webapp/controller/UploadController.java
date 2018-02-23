@@ -62,11 +62,12 @@ import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
-import uk.ac.bbsrc.tgac.miso.service.ProjectService;
-import uk.ac.bbsrc.tgac.miso.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.service.ProjectService;
+import uk.ac.bbsrc.tgac.miso.service.QualityControlService;
+import uk.ac.bbsrc.tgac.miso.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.spring.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService;
 
@@ -90,6 +91,8 @@ public class UploadController {
   private LibraryService libraryService;
   @Autowired
   private InstrumentService instrumentService;
+  @Autowired
+  private ServiceRecordService serviceRecordService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -310,7 +313,7 @@ public class UploadController {
     String recordId = request.getParameter("serviceRecordId");
     if (recordId == null) {
       throw new IOException("Cannot upload file - serviceRecordId parameter missing or null");
-    } else if (instrumentService.getServiceRecord(Long.valueOf(recordId)) == null) {
+    } else if (serviceRecordService.get(Long.valueOf(recordId)) == null) {
       throw new IOException("Cannot upload file - service record does not exist");
     }
 

@@ -460,18 +460,6 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
     return null;
   }
 
-  @CoverageIgnore
-  @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @CoverageIgnore
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
   @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;

@@ -23,18 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-/**
- * Defines a contract whereby an implementing class is able to be deleted
- * 
- * @author Rob Davey
- * @date 10-May-2011
- * @since 0.0.3
- */
-public interface Deletable {
+import com.eaglegenomics.simlims.core.SecurityProfile;
+
+public interface Deletable extends Identifiable {
+
+  public String getDeleteType();
+
+  public String getDeleteDescription();
+
   /**
-   * Ascertain whether this object is deletable given a set of underlying criteria
-   * 
-   * @return boolean true if able to be deleted successfully
+   * @return the SecurityProfile to attach to the Deletion record. May return null to make the Deletion visible to all users
    */
-  public boolean isDeletable();
+  public SecurityProfile getDeletionSecurityProfile();
+
 }

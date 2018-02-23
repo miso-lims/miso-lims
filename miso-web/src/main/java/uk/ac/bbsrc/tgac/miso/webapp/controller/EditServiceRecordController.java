@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 
 @Controller
 @RequestMapping("/instrument/servicerecord")
@@ -76,6 +77,8 @@ public class EditServiceRecordController {
   @Autowired
   private InstrumentService instrumentService;
   @Autowired
+  private ServiceRecordService serviceRecordService;
+  @Autowired
   private FilesManager filesManager;
 
   public void setFilesManager(FilesManager filesManager) {
@@ -95,12 +98,12 @@ public class EditServiceRecordController {
   
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return instrumentService.getServiceRecordColumnSizes();
+    return serviceRecordService.getColumnSizes();
   }
 
   @RequestMapping(value = "/{recordId}", method = RequestMethod.GET)
   public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId, ModelMap model) throws IOException {
-    ServiceRecord sr = instrumentService.getServiceRecord(recordId);
+    ServiceRecord sr = serviceRecordService.get(recordId);
     if (sr != null) {
       model.put(ModelKeys.RECORD.getKey(), sr);
       model.put(ModelKeys.FILES.getKey(), populateServiceRecordFiles(sr));
@@ -129,9 +132,9 @@ public class EditServiceRecordController {
       throws IOException {
     Long recordId = null;
     if (record.getId() == ServiceRecord.UNSAVED_ID) {
-      recordId = instrumentService.createServiceRecord(record);
+      recordId = serviceRecordService.create(record);
     } else {
-      instrumentService.updateServiceRecord(record);
+      serviceRecordService.update(record);
       recordId = record.getId();
     }
     session.setComplete();

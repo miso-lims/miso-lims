@@ -38,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @author Rob Davey
  * @since version
  */
-public interface StudyStore extends Store<Study>, Remover<Study>, PaginatedDataSource<Study> {
+public interface StudyStore extends Store<Study>, PaginatedDataSource<Study> {
   /**
    * List all Studies that match a search criteria
    * 

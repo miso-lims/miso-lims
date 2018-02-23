@@ -87,6 +87,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContainerQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
@@ -2243,6 +2244,17 @@ public class Dtos {
     SpreadsheetDto dto = new SpreadsheetDto();
     dto.setDescription(from.description());
     dto.setName(from.name());
+    return dto;
+  }
+
+  public static DeletionDto asDto(Deletion from) {
+    DeletionDto dto = new DeletionDto();
+    dto.setId(from.getId());
+    dto.setTargetType(from.getTargetType());
+    dto.setTargetId(from.getTargetId());
+    dto.setDescription(from.getDescription());
+    dto.setUserName(from.getUser().getFullName());
+    dto.setChangeTime(formatDateTime(from.getChangeTime()));
     return dto;
   }
 }

@@ -197,7 +197,7 @@ public class ProjectControllerHelperService {
       final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       final Project project = projectService.getProjectById(id);
 
-      if (project.userCanWrite(user)) {
+      if (project.getSecurityProfile().userCanWrite(user)) {
         String filename = null;
         for (final String s : misoFileManager.getFileNames(Project.class, id.toString())) {
           if (s.hashCode() == hashcode) {

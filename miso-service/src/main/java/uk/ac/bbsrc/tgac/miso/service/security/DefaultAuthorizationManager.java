@@ -92,10 +92,15 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
 
   @Override
   public boolean readCheck(SecurableByProfile resource) throws IOException {
-    if (resource == null) {
+    return readCheck(resource, getCurrentUser());
+  }
+
+  @Override
+  public boolean readCheck(SecurableByProfile resource, User user) {
+    if (resource == null || resource.getSecurityProfile() == null) {
       return true;
     } else {
-      return resource.userCanRead(getCurrentUser());
+      return resource.getSecurityProfile().userCanRead(user);
     }
   }
 
@@ -107,8 +112,24 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
   }
 
   @Override
+  public void throwIfNotReadable(SecurableByProfile resource, User user) throws AuthorizationException {
+    if (!readCheck(resource, user)) {
+      throw new AuthorizationException("User " + user.getLoginName() + " does not have permission to view this resource");
+    }
+  }
+
+  @Override
   public boolean writeCheck(SecurableByProfile resource) throws IOException {
-    return resource.userCanWrite(getCurrentUser());
+    return writeCheck(resource, getCurrentUser());
+  }
+
+  @Override
+  public boolean writeCheck(SecurableByProfile resource, User user) {
+    if (resource.getSecurityProfile() == null) {
+      return true;
+    } else {
+      return resource.getSecurityProfile().userCanWrite(user);
+    }
   }
 
   @Override
@@ -119,12 +140,19 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
   }
 
   @Override
-  public <T, R extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered, Function<T, R> getOwner) throws IOException {
+  public void throwIfNotWritable(SecurableByProfile resource, User user) throws AuthorizationException {
+    if (!writeCheck(resource, user)) {
+      throw new AuthorizationException("User " + user.getLoginName() + " does not have permission to modify this resource");
+    }
+  }
+
+  @Override
+  public <T, R extends SecurableByProfile> List<T> filterUnreadable(Collection<T> unfiltered, Function<T, R> getProfileHolder) throws IOException {
     User currentUser = getCurrentUser();
     List<T> filtered = new ArrayList<>();
     if (unfiltered != null) {
       for (T item : unfiltered) {
-        if (getOwner.apply(item).userCanRead(currentUser)) {
+        if (readCheck(getProfileHolder.apply(item), currentUser)) {
           filtered.add(item);
         }
       }

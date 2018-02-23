@@ -49,6 +49,7 @@
         <li><a href="<c:url value="/miso/indices"/>">Indices</a></li>
         <li><a href="<c:url value="/miso/studies"/>">Studies</a></li>
         <li><a href="<c:url value="/miso/printers"/>">Printers</a></li>
+        <li><a href="<c:url value="/miso/deletions"/>">Deletions</a></li>
     </ul>
 
     <h2>Tools</h2>

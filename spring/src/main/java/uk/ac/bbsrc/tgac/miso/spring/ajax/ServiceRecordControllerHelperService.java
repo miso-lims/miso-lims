@@ -19,7 +19,7 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.service.ServiceRecordService;
 
 @Ajaxified
 public class ServiceRecordControllerHelperService {
@@ -28,7 +28,7 @@ public class ServiceRecordControllerHelperService {
   @Autowired
   private SecurityManager securityManager;
   @Autowired
-  private InstrumentService instrumentService;
+  private ServiceRecordService serviceRecordService;
   @Autowired
   private MisoFilesManager misoFileManager;
   
@@ -53,7 +53,8 @@ public class ServiceRecordControllerHelperService {
       if (json.has("recordId")) {
         Long recordId = json.getLong("recordId");
         try {
-          instrumentService.deleteServiceRecord(recordId);
+          ServiceRecord record = serviceRecordService.get(recordId);
+          serviceRecordService.delete(record);
           return JSONUtils.SimpleJSONResponse("Service Record deleted");
         } catch (IOException e) {
           log.error("cannot delete service record", e);

@@ -402,16 +402,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   }
 
   @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
-  @Override
   public int compareTo(Sample s) {
     if (getId() != 0L && s.getId() != 0L) {
       if (getId() < s.getId()) return -1;
@@ -498,6 +488,22 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public String getBarcodeSizeInfo() {
     return LimsUtils.makeVolumeAndConcentrationLabel(getVolume(), null, null);
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Sample";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getName()
+        + (getAlias() == null ? "" : " (" + getAlias() + ")");
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return getSecurityProfile();
   }
 
 }

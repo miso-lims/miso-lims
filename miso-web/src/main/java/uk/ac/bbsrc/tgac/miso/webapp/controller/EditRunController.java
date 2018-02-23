@@ -217,10 +217,6 @@ public class EditRunController {
         }
       }
 
-      if (!run.userCanRead(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-
       model.put("sequencingParameters",
           sequencingParametersService.getForPlatform((long) run.getSequencer().getPlatform().getId()));
 

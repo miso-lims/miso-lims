@@ -12,7 +12,6 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
@@ -37,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Controller
 @RequestMapping("/box")
@@ -45,7 +44,7 @@ public class EditBoxController {
   protected static final Logger log = LoggerFactory.getLogger(EditBoxController.class);
 
   @Autowired
-  private SecurityManager securityManager;
+  private AuthorizationManager authorizationManager;
 
   @Autowired
   private BoxService boxService;
@@ -55,10 +54,6 @@ public class EditBoxController {
 
   public void setBoxService(BoxService boxService) {
     this.boxService = boxService;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
   }
 
   @Resource
@@ -108,7 +103,7 @@ public class EditBoxController {
   @RequestMapping(value = "/{boxId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long boxId, ModelMap model) throws IOException {
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      User user = authorizationManager.getCurrentUser();
       Box box = null;
 
       if (boxId == AbstractBox.UNSAVED_ID) {
@@ -120,9 +115,6 @@ public class EditBoxController {
           throw new SecurityException("No such Box");
         }
         model.put("title", "Box " + box.getId());
-      }
-      if (!box.userCanRead(user)) {
-        throw new SecurityException("Permission denied.");
       }
 
       model.put("formObj", box);
@@ -149,27 +141,14 @@ public class EditBoxController {
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("box") Box box, ModelMap model, SessionStatus session) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!box.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-
-      // The user may have modified the box contents while editing the form. Update the contents.
-      if (box.getId() != AbstractBox.UNSAVED_ID) {
-        Box original = boxService.get(box.getId());
-        box.setBoxables(original.getBoxables());
-      }
-      box.setLastModifier(user);
-      boxService.save(box);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/box/" + box.getId();
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.error("Failed to save box ", ex);
-      }
-      throw ex;
+    // The user may have modified the box contents while editing the form. Update the contents.
+    if (box.getId() != AbstractBox.UNSAVED_ID) {
+      Box original = boxService.get(box.getId());
+      box.setBoxables(original.getBoxables());
     }
+    boxService.save(box);
+    session.setComplete();
+    model.clear();
+    return "redirect:/miso/box/" + box.getId();
   }
 }

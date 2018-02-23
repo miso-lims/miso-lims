@@ -498,16 +498,6 @@ public class PoolImpl extends AbstractBoxable implements Pool {
   }
 
   @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
-  @Override
   public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
     PoolChangeLog changeLog = new PoolChangeLog();
     changeLog.setPool(this);

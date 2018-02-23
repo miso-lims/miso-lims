@@ -31,20 +31,21 @@ ListTarget.study = {
     if (config.isAdmin) {
       return [{
         "name": "Delete",
-        "action": function(ids) {
-          if (confirm("Are you sure you really want to delete? This operation is permanent!")) {
-            var deleter = function(index) {
-              if (index >= ids.length) {
-                Utils.page.pageReload();
-                return;
-              }
-              Utils.ajaxWithDialog('Deleting study', 'DELETE', '/miso/rest/study/' + ids[index], function() {
-                deleter(index + 1);
-              });
-            };
+        "action": function(studies) {
+          Utils.showConfirmDialog("Confirm Delete", "OK", ["Are you sure you really want to delete? This operation is permanent!"],
+              function() {
+                var deleter = function(index) {
+                  if (index >= studies.length) {
+                    Utils.page.pageReload();
+                    return;
+                  }
+                  Utils.ajaxWithDialog('Deleting study', 'DELETE', '/miso/rest/study/' + studies[index].id, null, function() {
+                    deleter(index + 1);
+                  });
+                };
 
-            deleter(0);
-          }
+                deleter(0);
+              });
         }
       }];
     } else {

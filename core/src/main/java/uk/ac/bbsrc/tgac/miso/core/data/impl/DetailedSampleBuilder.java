@@ -667,16 +667,6 @@ public class DetailedSampleBuilder
   }
 
   @Override
-  public boolean userCanRead(User arg0) {
-    return true;
-  }
-
-  @Override
-  public boolean userCanWrite(User arg0) {
-    return true;
-  }
-
-  @Override
   public int compareTo(Sample s) {
     return 0;
   }
@@ -989,6 +979,21 @@ public class DetailedSampleBuilder
   @Override
   public String getBarcodeSizeInfo() {
     return "HOW DID YOU EVER PRINT THIS?!?";
+  }
+
+  @Override
+  public String getDeleteType() {
+    throw new UnsupportedOperationException("Cannot delete non-persisted builder object");
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    throw new UnsupportedOperationException("Cannot delete non-persisted builder object");
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    throw new UnsupportedOperationException("Cannot delete non-persisted builder object");
   }
 
 }

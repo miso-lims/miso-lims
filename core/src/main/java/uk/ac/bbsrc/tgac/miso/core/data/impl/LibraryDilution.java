@@ -270,18 +270,6 @@ public class LibraryDilution extends AbstractBoxable
     }
   }
 
-  @CoverageIgnore
-  @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @CoverageIgnore
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
