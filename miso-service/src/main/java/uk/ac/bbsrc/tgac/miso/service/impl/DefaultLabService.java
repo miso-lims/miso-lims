@@ -11,9 +11,12 @@ import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
+import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.persistence.InstituteDao;
 import uk.ac.bbsrc.tgac.miso.persistence.LabDao;
 import uk.ac.bbsrc.tgac.miso.service.LabService;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.service.security.AuthorizationManager;
 
 @Transactional(rollbackFor = Exception.class)
@@ -22,6 +25,9 @@ public class DefaultLabService implements LabService {
 
   @Autowired
   private LabDao labDao;
+
+  @Autowired
+  private DeletionStore deletionStore;
 
   @Autowired
   private InstituteDao instituteDao;
@@ -42,7 +48,7 @@ public class DefaultLabService implements LabService {
   }
 
   @Override
-  public Lab get(Long id) throws IOException {
+  public Lab get(long id) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return labDao.getLab(id);
   }
@@ -75,10 +81,26 @@ public class DefaultLabService implements LabService {
   }
 
   @Override
-  public void delete(Long labId) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Lab lab = get(labId);
-    labDao.deleteLab(lab);
+  public DeletionStore getDeletionStore() {
+    return deletionStore;
+  }
+
+  @Override
+  public AuthorizationManager getAuthorizationManager() {
+    return authorizationManager;
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Lab object) {
+    ValidationResult result = new ValidationResult();
+
+    long usage = labDao.getUsage(object);
+    if (usage > 0L) {
+      result.addError(new ValidationError(usage + " sample" + (usage > 1L ? "s are" : " is") + " associated with lab '" + object.getAlias()
+          + "'"));
+    }
+
+    return result;
   }
 
 }

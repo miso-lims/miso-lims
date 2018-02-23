@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
@@ -129,6 +130,21 @@ public class LabImpl implements Lab {
   public String getItemLabel() {
     String label = getAlias() + " (" + getInstitute().getAlias() + ")";
     return (label.length() < 51 ? label : label.substring(0, 49) + "\u2026");
+  }
+
+  @Override
+  public String getDeleteType() {
+    return "Lab";
+  }
+
+  @Override
+  public String getDeleteDescription() {
+    return getAlias() + " (" + getInstitute().getAlias() + ")";
+  }
+
+  @Override
+  public SecurityProfile getDeletionSecurityProfile() {
+    return null;
   }
 
 }

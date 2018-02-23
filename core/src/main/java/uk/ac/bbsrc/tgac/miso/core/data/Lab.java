@@ -8,7 +8,7 @@ import com.eaglegenomics.simlims.core.User;
 /**
  * A lab within an Institute
  */
-public interface Lab extends Serializable, Aliasable {
+public interface Lab extends Serializable, Aliasable, Deletable {
 
   void setId(long id);
 
