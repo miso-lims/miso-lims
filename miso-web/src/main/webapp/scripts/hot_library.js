@@ -419,8 +419,9 @@ HotTarget.library = (function() {
             });
           });
         }
-      }, HotUtils.printAction('library'), ].concat(HotUtils.makeQcActions("Library"));
-    }
+      }, HotUtils.printAction('library'),
 
+      HotUtils.makeParents('library', HotUtils.parentCategoriesForDetailed()), ].concat(HotUtils.makeQcActions("Library"));
+    }
   };
 })();

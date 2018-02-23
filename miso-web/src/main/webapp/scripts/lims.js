@@ -434,7 +434,7 @@ var Utils = Utils
             try {
               var responseObj = JSON.parse(xhr.responseText);
               if (responseObj.detail) {
-                lines.push(responseObj.detail);
+                lines = lines.concat(responseObj.detail.split('\n'));
                 if (responseObj.dataFormat === 'validation') {
                   jQuery.each(responseObj.data, function(key, val) {
                     var errors = val.split('\n');

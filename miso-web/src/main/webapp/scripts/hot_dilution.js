@@ -142,7 +142,13 @@ HotTarget.dilution = {
         }, HotTarget.dilution.getLabel);
       },
       allowOnLibraryPage: true
-    }, HotUtils.printAction('dilution'), ];
+    }, HotUtils.printAction('dilution'),
+
+    HotUtils.makeParents('librarydilution', HotUtils.parentCategoriesForDetailed().concat([{
+      "name": "Library",
+      "target": HotTarget.library,
+      "config": {}
+    }])), ];
   }
 
 };
