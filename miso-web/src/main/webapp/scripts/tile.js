@@ -52,7 +52,7 @@ Tile = (function() {
     },
     error: function(message) {
       var errorP = document.createElement("P");
-      errorP.setAttribute("class", "parsley-error");
+      errorP.setAttribute("class", "parsley-custom-error-message");
       errorP.innerText = "⚠ " + message;
       return errorP;
     },
